@@ -316,6 +316,115 @@ theorem psiK_sub_theta (ha : a ≠ 0) (hk : k ≠ 0) {x : ℕ} (hx : 1 ≤ x) :
         exact card_bad_le hm x
     _ = _ := by push_cast; ring
 
+/-- The constant of `theta_bound`. -/
+noncomputable def thetaConst (C : ℝ) (a : ℤ) : ℝ :=
+  max C 0 * (5 + 8 * Real.log |(a : ℝ)|) + 4 + 4 * Real.log |(a : ℝ)|
+
+lemma one_le_abs_cast (ha : a ≠ 0) : (1 : ℝ) ≤ |(a : ℝ)| := by
+  have : ((1 : ℤ) : ℝ) ≤ ((|a| : ℤ) : ℝ) := by exact_mod_cast Int.one_le_abs ha
+  simpa using this
+
+lemma thetaConst_nonneg (C : ℝ) (ha : a ≠ 0) : 0 ≤ thetaConst C a := by
+  have := Real.log_nonneg (one_le_abs_cast ha)
+  unfold thetaConst
+  have := le_max_right C 0
+  positivity
+
+/-- **θ from ψ.** `PsiKBound` for `K_k` gives `|θ_k(x) - x / n| ≤ C₁ √x log x log(k x)`. -/
+theorem theta_bound (ha : a ≠ 0) (hk : k ≠ 0) {C : ℝ} (hψ : PsiKBound 𝓚 C) {x : ℕ}
+    (hx : 2 ≤ x) :
+    |kummerTheta a k x - x / kummerDegree a k| ≤
+      thetaConst C a * Real.sqrt x * Real.log x * Real.log (k * x) := by
+  set n : ℝ := ((kummerDegree a k : ℕ) : ℝ) with hn_def
+  set X : ℝ := (x : ℝ)
+  set C' : ℝ := max C 0
+  set La := Real.log |(a : ℝ)|
+  set L := Real.log (k * a.natAbs : ℝ)
+  set ℓ := Real.log X
+  set lam := Real.log (k * X)
+  have hn : 1 ≤ n := by
+    rw [hn_def]; exact_mod_cast Module.finrank_pos (R := ℚ) (M := 𝓚)
+  have hX : (2 : ℝ) ≤ X := by simp only [X]; exact_mod_cast hx
+  have hk1 : (1 : ℝ) ≤ k := by exact_mod_cast Nat.one_le_iff_ne_zero.2 hk
+  have hlog2 := Real.log_two_gt_d9
+  have hnat : ((a.natAbs : ℕ) : ℝ) = |(a : ℝ)| := by simp
+  have hℓ : Real.log 2 ≤ ℓ := Real.log_le_log (by norm_num) hX
+  have hℓlam : ℓ ≤ lam := Real.log_le_log (by linarith) (by nlinarith)
+  have hLa : 0 ≤ La := Real.log_nonneg (one_le_abs_cast ha)
+  have hlogk : 0 ≤ Real.log k := Real.log_nonneg hk1
+  have hlogk' : Real.log k ≤ lam := Real.log_le_log (by linarith) (by nlinarith)
+  have hL : L = Real.log k + La := by
+    simp only [L, La, hnat]
+    rw [Real.log_mul (by positivity) (by simpa using ha)]
+  have hsqrt : 1 ≤ Real.sqrt X := by
+    rw [show (1 : ℝ) = Real.sqrt 1 by simp]; exact Real.sqrt_le_sqrt (by linarith)
+  -- the analytic input
+  have hψx := hψ X hX
+  have hd := log_abs_discr_le ha hk
+  rw [← hnat] at hd
+  change Real.log |(discr 𝓚 : ℝ)| ≤ 4 * n * L at hd
+  have hd0 : 0 ≤ Real.log |(discr 𝓚 : ℝ)| := by
+    apply Real.log_nonneg
+    have := discr_ne_zero 𝓚
+    have : (1 : ℤ) ≤ |discr 𝓚| := Int.one_le_abs this
+    exact_mod_cast this
+  rw [finrank_eq_kummerDegree] at hψx
+  have hT : |psiK 𝓚 X - X| ≤ C' * (n * (Real.sqrt X * (4 * L + ℓ) * ℓ)) := by
+    refine hψx.trans ?_
+    have h0 : 0 ≤ Real.sqrt X * (Real.log |(discr 𝓚 : ℝ)| + n * ℓ) * ℓ := by
+      have : 0 ≤ ℓ := by linarith
+      positivity
+    calc C * Real.sqrt X * (Real.log |(discr 𝓚 : ℝ)| + n * ℓ) * ℓ
+        = C * (Real.sqrt X * (Real.log |(discr 𝓚 : ℝ)| + n * ℓ) * ℓ) := by ring
+      _ ≤ C' * (Real.sqrt X * (Real.log |(discr 𝓚 : ℝ)| + n * ℓ) * ℓ) :=
+          mul_le_mul_of_nonneg_right (le_max_left _ _) h0
+      _ ≤ C' * (Real.sqrt X * (4 * n * L + n * ℓ) * ℓ) := by
+          gcongr
+      _ = _ := by ring
+  obtain ⟨h1, h2⟩ := psiK_sub_theta ha hk (x := x) (by omega)
+  -- combine
+  have hℓ0 : 0 ≤ ℓ := by linarith
+  have hmain : |n * kummerTheta a k x - X| ≤
+      n * (Real.sqrt X * ℓ * (C' * (4 * L + ℓ)) + ℓ * (2 * L + Real.sqrt X)) := by
+    have : |n * kummerTheta a k x - X| ≤ |psiK 𝓚 X - X| + (psiK 𝓚 X - n * kummerTheta a k x) := by
+      rw [abs_le]; constructor
+      · have := neg_abs_le (psiK 𝓚 X - X); linarith
+      · have := le_abs_self (psiK 𝓚 X - X); linarith
+    refine this.trans ?_
+    have h2' : psiK 𝓚 X - n * kummerTheta a k x ≤ n * (ℓ * (2 * L + Real.sqrt X)) := by
+      refine h2.trans (le_of_eq ?_)
+      ring
+    have hT' : C' * (n * (Real.sqrt X * (4 * L + ℓ) * ℓ)) =
+        n * (Real.sqrt X * ℓ * (C' * (4 * L + ℓ))) := by ring
+    linarith
+  have hdiv : |kummerTheta a k x - X / n| = |n * kummerTheta a k x - X| / n := by
+    rw [← abs_of_pos (by linarith : (0 : ℝ) < n), ← abs_div,
+      abs_of_pos (by linarith : (0 : ℝ) < n)]
+    congr 1
+    field_simp
+  rw [hdiv, div_le_iff₀ (by linarith)]
+  refine hmain.trans ?_
+  rw [mul_comm _ n]
+  apply mul_le_mul_of_nonneg_left _ (by linarith)
+  -- now the bracket
+  have hlam0 : 0 ≤ lam := by linarith
+  have hLlam : L ≤ (1 + 2 * La) * lam := by
+    rw [hL]; nlinarith
+  have hb1 : 4 * L + ℓ ≤ (5 + 8 * La) * lam := by nlinarith
+  have hb2 : 2 * L + Real.sqrt X ≤ (4 + 4 * La) * lam * Real.sqrt X := by
+    have : 2 * L ≤ 2 * (1 + 2 * La) * lam * Real.sqrt X := by
+      have : 0 ≤ (1 + 2 * La) * lam := by positivity
+      nlinarith
+    nlinarith
+  have hC' : 0 ≤ C' := le_max_right _ _
+  have hs0 : 0 ≤ Real.sqrt X := Real.sqrt_nonneg _
+  calc Real.sqrt X * ℓ * (C' * (4 * L + ℓ)) + ℓ * (2 * L + Real.sqrt X)
+      ≤ Real.sqrt X * ℓ * (C' * ((5 + 8 * La) * lam)) +
+          ℓ * ((4 + 4 * La) * lam * Real.sqrt X) := by
+        gcongr
+    _ = thetaConst C a * Real.sqrt X * ℓ * lam := by
+        unfold thetaConst; ring
+
 end KField
 
 end Artin.Analytic
