@@ -14,9 +14,10 @@ remainder and the RH bound `|∫₀ᵗ ψ − t²/2| ≤ t^{3/2}/20 + 4t`. That 
 explicit formula of [erdos-985](https://github.com/senamakel/erdos-985), which is a lake
 dependency; here it is re-derived under RH instead of GRH.
 
-The range `5040 < n ≤ exp(e^{30})` is the one cited `sorry`: Morrill and Platt's unconditional
-verification of Robin's inequality for `n ≤ 10^{10^{13.11}}` (Integers 21 (2021),
-arXiv:1809.10813), extending Briggs (2006).
+The range `5040 < n ≤ exp(e^{30})` is the one cited `sorry`, `robin_small_range`: Morrill and
+Platt's unconditional verification of Robin's inequality for `5040 < n ≤ 10^{10^{13.11485}}`
+(Integers 21 (2021); arXiv:1809.10813, Theorem 13), extending Briggs (2006). The sorry-free form
+`Robin.robin_of_RH_of_verified` takes that range as an explicit hypothesis, `RobinVerifiedRange`.
 
 RH itself is a hypothesis; it is proved as `riemannHypothesis` in
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).

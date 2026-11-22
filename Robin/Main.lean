@@ -7,7 +7,7 @@ import Robin.Small
 /-!
 # Robin's theorem: RH implies `σ(n) < e^γ n log log n` for `n > 5040`
 
-* `5040 < n ≤ exp(e^{30})`: `robin_small_range` (cited computation of Morrill–Platt).
+* `5040 < n ≤ exp(e^{30})`: `RobinVerifiedRange`, the cited computation of Morrill–Platt (`robin_small_range`).
 * `log n > e^{30}`: put `x = log n`, `ε = log(1+1/x)/log x`. Then
   `log(σ(n)/n) ≤ ε(x − θ(x)) + Σ_{p≤x} c_p − Σ_{p≤x} min(1/p², ε log p)` (`log_sigma_div_le`),
   and the right side is `< γ + log log x` (`main_estimate`, which uses RH through `Ψ₁`).
@@ -24,11 +24,12 @@ theorem primeSum_eps_log (e x : ℝ) :
   rw [Finset.sum_sub_distrib, ← Finset.mul_sum, theta]
   congr 2
 
-/-- **Robin's theorem** (1984). -/
-theorem robin_of_RH (hRH : RiemannHypothesis) : RobinStatement := by
+/-- **Robin's theorem** (1984), with the computed range as an explicit hypothesis (no `sorry`). -/
+theorem robin_of_RH_of_verified (hRH : RiemannHypothesis) (hcomp : RobinVerifiedRange) :
+    RobinStatement := by
   intro n hn
   by_cases hsmall : Real.log n ≤ Real.exp 30
-  · exact robin_small_range n hn hsmall
+  · exact hcomp n hn hsmall
   push Not at hsmall
   have hn0 : (0 : ℝ) < n := by exact_mod_cast (show 0 < n by omega)
   have he30 : (3 : ℝ) ≤ Real.exp 30 := by
@@ -47,5 +48,9 @@ theorem robin_of_RH (hRH : RiemannHypothesis) : RobinStatement := by
   rw [Real.exp_log (div_pos hσpos hn0), Real.exp_add, Real.exp_log (Real.log_pos (by linarith))] at h
   rw [div_lt_iff₀ hn0] at h
   linarith [h]
+
+/-- **Robin's theorem** (1984). Uses the cited computation `robin_small_range`. -/
+theorem robin_of_RH (hRH : RiemannHypothesis) : RobinStatement :=
+  robin_of_RH_of_verified hRH robin_small_range
 
 end Robin

@@ -87,7 +87,7 @@ the optimal `2 + γ − log 4π ≈ 0.046`); at `x = e^{30}` the constants are
 ### 5. The range `5040 < n ≤ exp(e^{30})` (`Robin/Small.lean`, cited `sorry`)
 
 Morrill–Platt, *Robin's inequality for 20-free integers*, Integers 21 (2021), arXiv:1809.10813,
-Theorem 1: Robin's inequality holds unconditionally for `5040 < n ≤ 10^{10^{13.11485}}`
+Theorem 13: Robin's inequality holds unconditionally for `5040 < n ≤ 10^{10^{13.11485}}`
 (extending Briggs, Experiment. Math. 15 (2006), who checked all colossally abundant numbers up
 to `10^{10^{10}}`). Since `e^{30} < 1.07·10^{13}`, `log n ≤ e^{30}` gives
 `n ≤ 10^{4.64·10^{12}}`. This is a finite but enormous computation and is not replayed.
@@ -122,7 +122,7 @@ The single `sorryAx` is `Robin.robin_small_range` (§5). No `native_decide`, no 
 The remaining `sorry`, verbatim:
 
 ```lean
-/-- **Cited (Morrill–Platt 2021, Theorem 1).** Robin's inequality for `5040 < n ≤ exp(e^{30})`. -/
+/-- **Cited (Morrill–Platt 2021, arXiv:1809.10813, Theorem 13).** Robin's inequality for `5040 < n ≤ exp(e^{30})`. -/
 theorem robin_small_range (n : ℕ) (h1 : 5040 < n) (h2 : Real.log n ≤ Real.exp 30) :
     (σ 1 n : ℝ) < Real.exp Real.eulerMascheroniConstant * n * Real.log (Real.log n)
 ```
