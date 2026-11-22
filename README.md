@@ -15,6 +15,22 @@ The statement is the same as `erdos_985` in
 The project has no `sorry`. A write-up of the proof in mathematical terms is in
 [`paper/erdos985.pdf`](paper/erdos985.pdf).
 
+## How it was built
+
+The proof was built and solved with [OpenHuman](https://github.com/tinyhumansai/openhuman)
+agents running in an [RSI Ralph](https://github.com/tinyhumansai/rsi-ralph) loop. RSI Ralph
+keeps asking a team of agents to improve a working copy and only keeps a change when a score
+says it is better.
+
+The stack behind the agents:
+
+| Role | Provider |
+|---|---|
+| Memory | [LivingBrain](https://livingbrain.com) |
+| Search | [Exa](https://exa.ai) ([@ExaAILabs](https://x.com/ExaAILabs)) |
+| Inference | [GMI Cloud](https://www.gmicloud.ai) ([@gmi_cloud](https://x.com/gmi_cloud)) |
+| Models | [GLM](https://github.com/zai-org) models, served on GMI Cloud |
+
 ## How it uses the riemann-hypothesis formalization
 
 The argument needs the Generalized Riemann Hypothesis for Dirichlet L-functions. We take it
