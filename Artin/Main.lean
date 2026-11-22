@@ -1,4 +1,4 @@
-import Artin.Interfaces
+import Artin.SieveHalf
 
 /-! # Artin's conjecture under Hooley's hypothesis, assembled from the two halves -/
 
