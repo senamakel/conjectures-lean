@@ -14,5 +14,7 @@ import Artin.Analytic.Interface
 import Artin.Analytic.Splitting
 import Artin.Analytic.Discriminant
 import Artin.Analytic.Counting
+import Artin.Analytic.Continuation
 import Artin.SieveHalf
 import Artin.Main
+import Artin.MainContinuation

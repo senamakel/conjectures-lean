@@ -37,9 +37,21 @@ number).
 
 For `K = K_k`, `n = [K : ℚ]`, `d = |disc K|`:
 
-1. **Completed `ζ_K`** has order 1 and a Hadamard product. The functional equation
-   (Hecke) is in the riemann-hypothesis repo (`completedDedekindZeta_one_sub`) but not in
-   our Mathlib pin. Either port it (check licences) or prove it.
+0. **Hecke's continuation, as a hypothesis.** `HooleyHypothesis` constrains every `Z` that
+   continues `ζ_K` to `ℂ ∖ {1}`, but using it needs such a `Z`. The continuation and functional
+   equation (Hecke) are in the riemann-hypothesis repo (`completedDedekindZeta_one_sub`,
+   `differentiableAt_completedDedekindZeta`, `continuedDedekindZeta_eq`), which has no licence,
+   and are not in Mathlib. So `Artin/Analytic/Continuation.lean` defines
+   `DedekindContinuation K`: a `Z` with `IsDedekindZeta K Z` and an entire `ξ` with
+   `ξ(s) = s(s−1) |d_K|^{s/2} Γ_ℝ(s)^{r₁} Γ_ℂ(s)^{r₂} Z(s)` for `Re s > 0`, `s ≠ 1`,
+   `ξ(1−s) = ξ(s)`, and `‖ξ(s)‖ ≤ M (1+‖s‖)²` for `1/2 ≤ Re s ≤ 2` (Hecke's theta integral
+   bounds `Λ_K` in vertical strips away from its poles). The target becomes
+   `conditional_artin_primitive_roots.parts.i_of_continuation` (`Artin/MainContinuation.lean`),
+   which additionally assumes `DedekindContinuation (K_k)` for squarefree `k`. The original
+   `effectiveKummerChebotarev_of_hooley` (`Artin/Interfaces.lean`) stays sorried: it is true but
+   unprovable here without the continuation.
+1. **Completed `ζ_K`** has order 1 and a Hadamard product. Order 1 is derived from the strip
+   bound, the functional equation, and Stirling plus the Euler product for `Re s ≥ 2`.
 2. **Zero counting**: `#{ρ : |γ − T| ≤ 1} ≪ log d + n log(|T| + 2)`.
 3. **Explicit formula** for `ψ_K(x) = Σ_{N𝔞 < x} Λ_K(𝔞)` with weight `(1 − N𝔞/x)`, as
    erdos-985 does for Dirichlet L-functions (`Erdos985/Analytic/ExplicitFormula*`,
@@ -73,7 +85,8 @@ For `K = K_k`, `n = [K : ℚ]`, `d = |disc K|`:
 
 The arithmetic steps 5–7 are assembled in `effectiveKummerChebotarev_of_kummerPsiBounds`:
 `KummerPsiBounds a → EffectiveKummerChebotarev a` for `a ≠ 0` (sorry-free). The analytic core
-(steps 1–4) has to prove `KummerPsiBounds a` from `HooleyHypothesis a`, that is, for each
+(steps 1–4) has to prove `KummerPsiBounds a` from `HooleyHypothesis a` and
+`DedekindContinuation (K_k)` (`kummerPsiBounds_of_hooley_of_continuation`), that is, for each
 `K_k` the bound `PsiKBound` of `Artin/Analytic/Interface.lean`:
 `|ψ_K(x) − x| ≤ C √x (log |d_K| + n log x) log x` for real `x ≥ 2`, with
 `ψ_K(x) = Σ_{𝔭, m ≥ 1, N𝔭^m < x} log N𝔭` and one constant `C` for all squarefree `k`.
