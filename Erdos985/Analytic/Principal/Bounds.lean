@@ -1,5 +1,7 @@
 import Erdos985.Analytic.ExplicitFormula
 import Erdos985.Analytic.XiGrowth
+import Erdos985.Analytic.Principal.Bounds.Gamma
+import Erdos985.Analytic.Principal.Bounds.Xi
 
 /-!
 # Bach's principal bound (RH) from Hadamard for `ξ`  — interfaces
@@ -24,7 +26,7 @@ open Complex ArithmeticFunction
 /-- RH, i.e. GRH for the character mod 1: every zero of `ξ` lies on `Re s = 1/2`. -/
 theorem xiZeta_zero_re (hGRH : DirichletLNonvanishingRightOfHalf) {ρ : ℂ} (hρ : xiZeta ρ = 0) :
     ρ.re = 1 / 2 := by
-  sorry
+  exact PrincipalAux.xiZeta_zero_re' hGRH hρ
 
 /-- Under RH, `Σ_ρ m/|ρ(ρ+1)| ≤ 2 + γ − log 4π < 1/20`. -/
 theorem zeroSum_zeta_le (hGRH : DirichletLNonvanishingRightOfHalf) :
@@ -32,19 +34,19 @@ theorem zeroSum_zeta_le (hGRH : DirichletLNonvanishingRightOfHalf) :
         (analyticOrderNatAt xiZeta ρ : ℝ) / ‖(ρ : ℂ) * ((ρ : ℂ) + 1)‖) ∧
     ∑' ρ : {ρ : ℂ // xiZeta ρ = 0}, (analyticOrderNatAt xiZeta ρ : ℝ) / ‖(ρ : ℂ) * ((ρ : ℂ) + 1)‖
       ≤ 1 / 20 := by
-  sorry
+  exact PrincipalAux.zeroSum_zeta_le' hGRH
 
 /-- The gamma part for an even character nearly cancels `log x`. -/
 theorem gammaPart_one_bound (x : ℕ) (hx : 1 ≤ x) :
     (gammaPart (1 : DirichletCharacter ℂ 1) x).im = 0 ∧
     1 - 3 / (2 * (x : ℝ)) ≤ (gammaPart (1 : DirichletCharacter ℂ 1) x).re + Real.log x ∧
     (gammaPart (1 : DirichletCharacter ℂ 1) x).re + Real.log x ≤ 1 := by
-  sorry
+  exact PrincipalAux.gammaPart_one_bound' x hx
 
 /-- `ζ'/ζ(2) = −Σ Λ(n)/n² ∈ [−0.6, 0]`. -/
 theorem logDeriv_zeta_two_bound :
     (deriv riemannZeta 2 / riemannZeta 2).im = 0 ∧
     -0.6 ≤ (deriv riemannZeta 2 / riemannZeta 2).re ∧ (deriv riemannZeta 2 / riemannZeta 2).re ≤ 0 := by
-  sorry
+  exact PrincipalAux.logDeriv_zeta_two_bound'
 
 end Erdos985.Analytic
