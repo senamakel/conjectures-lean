@@ -10,5 +10,9 @@ import Artin.Sieve.Assembly
 import Artin.Kummer.Degree
 import Artin.Kummer.Conductor
 import Artin.Kummer.Density
+import Artin.Analytic.Interface
+import Artin.Analytic.Splitting
+import Artin.Analytic.Discriminant
+import Artin.Analytic.Counting
 import Artin.SieveHalf
 import Artin.Main

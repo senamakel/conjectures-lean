@@ -15,11 +15,13 @@ Let `K = K_k`, `n = [K_k : ℚ]` and `θ_k(x) = ∑ log p` over the primes `p < 
   `k a` can contribute anything else.
 * `theta_bound`: with `PsiKBound K_k C` and `log |d_{K_k}| ≤ 4 n log(k |a|)` (A6),
   `|θ_k(x) - x / n| ≤ C₁ √x log x log(k x)`, with `C₁` depending only on `C` and `a`.
-* `kummerCount_sub_le`: partial summation against `1 / log p`, applied to
-  `θ_k(x) - θ_1(x) / n`, gives `|kummerCount a k x - kummerCount a 1 x / n| ≤ 32 C₁ √x log(kx)`.
+* `abs_kummerCount_sub_le`: partial summation against `1 / log p`
+  (`abs_sum_le_of_abs_sum_log_le`, discrete, no integrals), applied to `θ_k(x) - θ_1(x) / n`,
+  gives `|kummerCount a k x - kummerCount a 1 x / n| ≤ 16 C₁ √x log(kx)`.
   The `k = 1` field is `ℚ` (`kummerDegree_one`), so `θ_1(x) = x + O(√x log² x)` comes from the
   same hypothesis; this is the place of `π(x) - li(x) = O(√x log x)` (blueprint A7), and no
   separate hypothesis on `π(x)` is needed.
+* `abs_kummerCount_one_sub_le`: `kummerCount a 1 x` is `π(x)` up to `2 log |a| + 1`;
 * `effectiveKummerChebotarev_of_kummerPsiBounds`: `KummerPsiBounds a → EffectiveKummerChebotarev a`
   for `a ≠ 0`.
 -/
@@ -571,5 +573,174 @@ lemma abs_sum_le_of_abs_sum_log_le (u : ℕ → ℝ) (hu0 : u 0 = 0) (hu1 : u 1 
     _ ≤ _ := by linarith
 
 end Abel
+
+/-! ### Assembly -/
+
+section Assembly
+
+variable {a : ℤ}
+
+lemma kummerDegree_one (ha : a ≠ 0) : kummerDegree a 1 = 1 := by
+  have h1 := kummerDegree_le ha one_ne_zero
+  have h2 : 0 < kummerDegree a 1 := Module.finrank_pos (R := ℚ) (M := KField a 1)
+  simp at h1
+  omega
+
+lemma kummerPred_one_iff {p : ℕ} : KummerPred a 1 p ↔ p.Prime ∧ ¬ (p : ℤ) ∣ a := by
+  constructor
+  · intro h; exact ⟨h.1, h.2.1⟩
+  · rintro ⟨hp, hpa⟩
+    have : Fact p.Prime := ⟨hp⟩
+    refine ⟨hp, hpa, one_dvd _, ?_⟩
+    rw [Nat.div_one]
+    apply ZMod.pow_card_sub_one_eq_one
+    rwa [Ne, ZMod.intCast_zmod_eq_zero_iff_dvd]
+
+lemma sum_log_eq_theta (k t : ℕ) :
+    ∑ m ∈ range t, (if KummerPred a k m then 1 else 0 : ℝ) * Real.log m = kummerTheta a k t := by
+  unfold kummerTheta kummerSet
+  rw [sum_filter]
+  exact sum_congr rfl fun m _ => by split_ifs <;> simp
+
+lemma sum_ind_eq_count (k t : ℕ) :
+    ∑ m ∈ range t, (if KummerPred a k m then 1 else 0 : ℝ) = kummerCount a k t := by
+  rw [kummerCount_eq_card, kummerSet, ← sum_boole]
+
+/-- `kummerCount a 1 x` is `π(x)` up to the primes dividing `a` and `x` itself. -/
+lemma abs_kummerCount_one_sub_le (ha : a ≠ 0) (x : ℕ) :
+    |(kummerCount a 1 x : ℝ) - Nat.primeCounting x| ≤ 2 * Real.log |(a : ℝ)| + 1 := by
+  rw [kummerCount_eq_card, ← Nat.primesLE_card_eq_primeCounting]
+  have hsub : kummerSet a 1 x ⊆ Nat.primesLE x := by
+    intro p hp
+    obtain ⟨hp1, hp2⟩ := mem_filter.1 hp
+    exact mem_filter.2 ⟨mem_range.2 (by have := mem_range.1 hp1; omega), hp2.1⟩
+  have hdiff : Nat.primesLE x \ kummerSet a 1 x ⊆ a.natAbs.primeFactors ∪ {x} := by
+    intro p hp
+    obtain ⟨hp1, hp2⟩ := mem_sdiff.1 hp
+    obtain ⟨hpx, hpp⟩ := mem_filter.1 hp1
+    have hpx' := mem_range.1 hpx
+    by_cases hx : p = x
+    · exact mem_union_right _ (mem_singleton.2 hx)
+    · apply mem_union_left
+      refine Nat.mem_primeFactors.2 ⟨hpp, ?_, Int.natAbs_ne_zero.2 ha⟩
+      by_contra hdvd
+      apply hp2
+      refine mem_filter.2 ⟨mem_range.2 (by omega), kummerPred_one_iff.2 ⟨hpp, fun h => hdvd ?_⟩⟩
+      exact Int.natCast_dvd.1 h
+  have hcard := card_sdiff_add_card_eq_card hsub
+  have hle := (card_le_card hdiff).trans (card_union_le _ _)
+  have hω := card_primeFactors_le_log (Int.natAbs_ne_zero.2 ha)
+  have hnat : ((a.natAbs : ℕ) : ℝ) = |(a : ℝ)| := by simp
+  rw [hnat] at hω
+  rw [abs_sub_comm, abs_of_nonneg (by
+    rw [sub_nonneg]; exact_mod_cast card_le_card hsub)]
+  have : ((Nat.primesLE x).card : ℝ) - (kummerSet a 1 x).card =
+      ((Nat.primesLE x \ kummerSet a 1 x).card : ℝ) := by
+    rw [← hcard]; push_cast; ring
+  rw [this]
+  calc ((Nat.primesLE x \ kummerSet a 1 x).card : ℝ) ≤ (a.natAbs.primeFactors.card + 1 : ℕ) := by
+        exact_mod_cast hle.trans (by simp)
+    _ ≤ _ := by push_cast; linarith
+
+/-- **Partial summation applied.** `|kummerCount a k x - kummerCount a 1 x / n| ≤ 16 C₁ √x log(kx)`. -/
+theorem abs_kummerCount_sub_le (ha : a ≠ 0) {k : ℕ} (hk : k ≠ 0) {C : ℝ}
+    (hψk : PsiKBound (KField a k) C) (hψ1 : PsiKBound (KField a 1) C) {x : ℕ} (hx : 2 ≤ x) :
+    |(kummerCount a k x : ℝ) - kummerCount a 1 x / kummerDegree a k| ≤
+      16 * thetaConst C a * Real.log (k * x) * Real.sqrt x := by
+  set n : ℝ := ((kummerDegree a k : ℕ) : ℝ) with hn_def
+  have hn : 1 ≤ n := by
+    rw [hn_def]; exact_mod_cast Module.finrank_pos (R := ℚ) (M := KField a k)
+  set C₁ := thetaConst C a
+  have hC₁ : 0 ≤ C₁ := thetaConst_nonneg C ha
+  set u : ℕ → ℝ := fun m =>
+    (if KummerPred a k m then 1 else 0 : ℝ) - (if KummerPred a 1 m then 1 else 0 : ℝ) / n
+  have hu : ∀ m, m < 2 → u m = 0 := by
+    intro m hm
+    have : ¬ m.Prime := fun h => by have := h.two_le; omega
+    simp [u, KummerPred, this]
+  have hk1 : (1 : ℝ) ≤ k := by exact_mod_cast Nat.one_le_iff_ne_zero.2 hk
+  have hX : (2 : ℝ) ≤ x := by exact_mod_cast hx
+  have hlam : 0 ≤ Real.log (k * x) := Real.log_nonneg (by nlinarith)
+  have key := abs_sum_le_of_abs_sum_log_le u (hu 0 (by norm_num)) (hu 1 (by norm_num)) hx
+    (B := 2 * C₁) (Λ := Real.log (k * x)) (by positivity) hlam (fun t ht htx => by
+      have hT : (2 : ℝ) ≤ t := by exact_mod_cast ht
+      have hlt : 0 ≤ Real.log t := Real.log_nonneg (by linarith)
+      have hsum : ∑ m ∈ range t, u m * Real.log m = kummerTheta a k t - kummerTheta a 1 t / n := by
+        simp only [u, sub_mul, sum_sub_distrib, div_mul_eq_mul_div, ← sum_div,
+          sum_log_eq_theta]
+      rw [hsum]
+      have h1 := theta_bound ha hk hψk ht
+      have h2 := theta_bound ha one_ne_zero hψ1 ht
+      rw [kummerDegree_one ha] at h2
+      simp only [Nat.cast_one, div_one, one_mul] at h2
+      have hkt : Real.log t ≤ Real.log (k * x) := Real.log_le_log (by linarith) (by
+        have : (t : ℝ) ≤ x := by exact_mod_cast htx
+        nlinarith)
+      have hkt' : Real.log (k * t) ≤ Real.log (k * x) := Real.log_le_log (by nlinarith) (by
+        have : (t : ℝ) ≤ x := by exact_mod_cast htx
+        nlinarith)
+      have hdecomp : kummerTheta a k t - kummerTheta a 1 t / n =
+          (kummerTheta a k t - t / n) - (kummerTheta a 1 t - t) / n := by ring
+      rw [hdecomp]
+      have hs : 0 ≤ C₁ * Real.sqrt t * Real.log t := by positivity
+      have h2' : |kummerTheta a 1 t - t| / n ≤ C₁ * Real.sqrt t * Real.log t * Real.log t := by
+        rw [div_le_iff₀ (by linarith)]
+        nlinarith [abs_nonneg (kummerTheta a 1 t - t)]
+      calc |(kummerTheta a k t - t / n) - (kummerTheta a 1 t - t) / n|
+          ≤ |kummerTheta a k t - t / n| + |(kummerTheta a 1 t - t) / n| := abs_sub _ _
+        _ = |kummerTheta a k t - t / n| + |kummerTheta a 1 t - t| / n := by
+            rw [abs_div, abs_of_pos (by linarith : (0 : ℝ) < n)]
+        _ ≤ C₁ * Real.sqrt t * Real.log t * Real.log (k * t) +
+            C₁ * Real.sqrt t * Real.log t * Real.log t := add_le_add h1 h2'
+        _ ≤ C₁ * Real.sqrt t * Real.log t * Real.log (k * x) +
+            C₁ * Real.sqrt t * Real.log t * Real.log (k * x) := by gcongr
+        _ = _ := by ring)
+  have hcount : ∑ m ∈ range x, u m = kummerCount a k x - kummerCount a 1 x / n := by
+    simp only [u, sum_sub_distrib, ← sum_div, sum_ind_eq_count]
+  rw [hcount] at key
+  calc _ ≤ 8 * (2 * C₁) * Real.log (k * x) * Real.sqrt x := key
+    _ = _ := by ring
+
+/-- The constant of `EffectiveKummerChebotarev` produced from `KummerPsiBounds`. -/
+noncomputable def chebotarevConst (C : ℝ) (a : ℤ) : ℝ :=
+  16 * thetaConst C a + 4 * Real.log |(a : ℝ)| + 2
+
+/-- **The analytic half, arithmetic part.** `PsiKBound` for every `K_k`, `k` squarefree, with
+one constant, gives effective Chebotarev for the Kummer fields in Hooley's form. -/
+theorem effectiveKummerChebotarev_of_kummerPsiBounds (ha : a ≠ 0) (h : KummerPsiBounds a) :
+    EffectiveKummerChebotarev a := by
+  obtain ⟨C, hC⟩ := h
+  refine ⟨chebotarevConst C a, fun k x hk hx => ?_⟩
+  have hk0 : k ≠ 0 := hk.ne_zero
+  have hψk := hC k hk
+  have hψ1 := hC 1 squarefree_one
+  set n : ℝ := ((kummerDegree a k : ℕ) : ℝ) with hn_def
+  have hn : 1 ≤ n := by
+    rw [hn_def]; exact_mod_cast Module.finrank_pos (R := ℚ) (M := KField a k)
+  have h1 := abs_kummerCount_sub_le ha hk0 hψk hψ1 hx
+  have h2 := abs_kummerCount_one_sub_le ha x
+  have hX : (2 : ℝ) ≤ x := by exact_mod_cast hx
+  have hk1 : (1 : ℝ) ≤ k := by exact_mod_cast Nat.one_le_iff_ne_zero.2 hk0
+  have hlog2 := Real.log_two_gt_d9
+  have hlam : Real.log 2 ≤ Real.log (k * x) := Real.log_le_log (by norm_num) (by nlinarith)
+  have hsqrt : 1 ≤ Real.sqrt x := by
+    rw [show (1 : ℝ) = Real.sqrt 1 by simp]; exact Real.sqrt_le_sqrt (by linarith)
+  have hLa : 0 ≤ Real.log |(a : ℝ)| := Real.log_nonneg (one_le_abs_cast ha)
+  have hprod : (1 : ℝ) / 2 ≤ Real.sqrt x * Real.log (k * x) := by nlinarith
+  have h3 : |(kummerCount a 1 x : ℝ) / n - Nat.primeCounting x / n| ≤
+      2 * Real.log |(a : ℝ)| + 1 := by
+    rw [← sub_div, abs_div, abs_of_pos (by linarith : (0 : ℝ) < n), div_le_iff₀ (by linarith)]
+    nlinarith [abs_nonneg ((kummerCount a 1 x : ℝ) - Nat.primeCounting x)]
+  calc |(kummerCount a k x : ℝ) - Nat.primeCounting x / n|
+      ≤ |(kummerCount a k x : ℝ) - kummerCount a 1 x / n| +
+          |(kummerCount a 1 x : ℝ) / n - Nat.primeCounting x / n| := abs_sub_le _ _ _
+    _ ≤ 16 * thetaConst C a * Real.log (k * x) * Real.sqrt x +
+          (2 * Real.log |(a : ℝ)| + 1) * (2 * (Real.sqrt x * Real.log (k * x))) := by
+        gcongr
+        nlinarith
+    _ = chebotarevConst C a * Real.sqrt x * Real.log (k * x) := by
+        unfold chebotarevConst; ring
+
+end Assembly
 
 end Artin.Analytic

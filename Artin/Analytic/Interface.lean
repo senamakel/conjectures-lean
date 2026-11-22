@@ -18,10 +18,10 @@ form the explicit formula produces. We write it with the rational prime `p` unde
 explicit, so that the sum is visibly finite: `N𝔭 ≥ p`, so `p ≤ x`, and `N𝔭 ≥ 2`, so `m ≤ x`.
 
 `PsiKBound K C` is `|ψ_K(x) - x| ≤ C √x (log |d_K| + n_K log x) log x` for real `x ≥ 2`. This is
-the Lagarias–Odlyzko bound under RH for `ζ_K` (J. C. Lagarias, A. M. Odlyzko, *Effective
-versions of the Chebotarev density theorem*, 1977, Theorem 9.2 for the trivial class; see also
-Serre, *Quelques applications du théorème de densité de Chebotarev*, 1981, §2.4, Théorème 4),
-with an absolute constant `C`. Blueprint step A3 gives the smoothed sum with error
+the shape of the Lagarias–Odlyzko bound under RH for `ζ_K`, with an absolute constant `C`
+(J. C. Lagarias, A. M. Odlyzko, *Effective versions of the Chebotarev density theorem*, 1977,
+the GRH case, for the trivial conjugacy class; see also Serre, *Quelques applications du
+théorème de densité de Chebotarev*, 1981, §2). Blueprint step A3 gives the smoothed sum with error
 `≪ √x (log d + n log x)`; unsmoothing (A4) costs the last factor `log x`. Hooley needs exactly
 this shape: with `log |d_{K_k}| ≪ n_k log(k |a|)` (A6) the error divided by `n_k` is
 `√x log x log(k x)`, and partial summation turns that into `√x log(k x)` for the count of
