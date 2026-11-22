@@ -5,8 +5,9 @@ import Artin.Interfaces
 
 The sieve assembly in `Artin/Sieve/Assembly.lean` needs two facts about the degrees
 `[K_k : ℚ] = kummerDegree a k` of the Kummer fields `K_k = ℚ(ζ_k, a^{1/k})`. They are stated here
-as hypotheses (`Prop`s), not as axioms or sorried theorems; `Artin/Kummer/` proves them, and the
-two halves are joined once both are in.
+as hypotheses (`Prop`s), not as axioms or sorried theorems; `Artin/Kummer/` proves them, and
+`Artin/SieveHalf.lean` discharges them there (`kummerDegreeLowerBound_of_ne`,
+`kummerDensityPos_of_not_isSquare`).
 
 * `KummerDegreeLowerBound a` (blueprint B5): `k φ(k) ≤ c · [K_k : ℚ]` for squarefree `k ≥ 1`.
   True for every `a ∉ {0, 1, -1}`: writing `a = ± b^h` with `h` maximal,

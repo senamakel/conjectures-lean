@@ -8,7 +8,7 @@ import Artin.Statement
 completely in the Kummer field `K_k = ℚ(ζ_k, a^{1/k})` is `π(x)/[K_k : ℚ] + O(√x log(kx))`.
 
 * Analytic half (`effectiveKummerChebotarev_of_hooley`): RH for `ζ_{K_k}` gives that count.
-* Sieve half (`artin_of_effectiveKummerChebotarev`): Hooley's sieve over `k` turns the counts
+* Sieve half (`artin_of_effectiveKummerChebotarev`, in `Artin/SieveHalf.lean`): Hooley's sieve over `k` turns the counts
   into the density of primes for which `a` is a primitive root, and Kummer theory shows that
   density is positive.
 
@@ -44,16 +44,9 @@ theorem effectiveKummerChebotarev_of_hooley (a : ℤ) (ha : a ≠ 0) (h : Hooley
     EffectiveKummerChebotarev a := by
   sorry
 
-/-- Sieve half: Hooley's sieve plus Kummer theory.
-
-The sieve part is proved in `Artin/Sieve/Assembly.lean` as
-`Artin.artin_of_effectiveKummerChebotarev_of_kummer`, which additionally takes the two
-Kummer-theory facts `KummerDegreeLowerBound a` and `KummerDensityPos a` from
-`Artin/Sieve/KummerInputs.lean` (blueprint B5, B6) as hypotheses. This theorem stays sorried until
-`Artin/Kummer/` proves those two facts; it then follows by applying that theorem. -/
-theorem artin_of_effectiveKummerChebotarev (a : ℤ) (ha : ¬IsSquare a) (ha' : a ≠ -1)
-    (h : EffectiveKummerChebotarev a) :
-    ∃ x > 0, (S a).HasDensity x {p | p.Prime} := by
-  sorry
+/-! The sieve half, `artin_of_effectiveKummerChebotarev (a : ℤ) (ha : ¬IsSquare a)
+(ha' : a ≠ -1) (h : EffectiveKummerChebotarev a) : ∃ x > 0, (S a).HasDensity x {p | p.Prime}`,
+is stated and proved in `Artin/SieveHalf.lean`: its proof uses the sieve (`Artin/Sieve/`) and
+Kummer theory (`Artin/Kummer/`), and both import this file, so it cannot live here. -/
 
 end Artin
