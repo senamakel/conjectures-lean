@@ -7,4 +7,5 @@ import Artin.Sieve.BrunTitchmarshLargePrimes
 import Artin.Sieve.Density
 import Artin.Main
 import Artin.Kummer.Degree
+import Artin.Kummer.Conductor
 import Artin.Kummer.Density

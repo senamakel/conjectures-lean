@@ -76,14 +76,22 @@ Write `N(x)` for the number of primes `p < x`, `p ∤ a`, with `a` a primitive r
    Mathlib has `FieldTheory/KummerExtension.lean` and `KummerPolynomial.lean`.
    *Done* (`Artin/Kummer/Degree.lean`): `kummerDegree_le` (`≤ k φ(k)`),
    `exists_mul_totient_le_kummerDegree` (`k φ(k) ≤ 4^|a| [K_k:ℚ]` for `a ∉ {0, ±1}`, `k`
-   squarefree), and the exact `kummerDegree_mul_kummerEps` for `a` not a perfect power, with
-   `ε(k)` stated as "`k` even and `√a ∈ ℚ(ζ_k)`".
+   squarefree), the exact `kummerDegree_mul_kummerEps` for `a` not a perfect power, with
+   `ε(k)` stated as "`k` even and `√a ∈ ℚ(ζ_k)`", and the exact degree for every `a ≠ 0`,
+   `kummerDegree_mul_kummerM` (`[K_k:ℚ] m(k) = k φ(k)`, `m(k)` the product of the primes
+   `q ∣ k` for which `a` is a `q`-th power in `ℚ(ζ_k)`). The conductor of `ℚ(√a)` is
+   `Artin/Kummer/Conductor.lean`: for `a = a₀ c²` and `k` squarefree, `√a ∈ ℚ(ζ_k)` iff
+   `a₀ ≡ 1 (mod 4)` and `|a₀| ∣ k` (`exists_sq_cyclotomicField_iff` in `Density.lean`). `⇐` is
+   quadratic Gauss sums; `⇒` uses Mathlib's `𝓞(ℚ(ζ_n)) = ℤ[ζ_n]` and the separability of
+   `Φ_n` mod `p ∤ n` (no ramification theory needed).
 6. **Positivity** of `δ(a) = Σ_k μ(k)/[K_k:ℚ]` for `a` not a square and not `−1`. This needs
    exact degrees, including the entanglement when `√a ∈ ℚ(ζ_k)`. Reference: Lenstra–Moree–
    Stevenhagen, *Character sums for primitive root densities*, arXiv:1112.4816.
-   *Done for `a` not a perfect power* (`Artin/Kummer/Density.lean`, `kummerDensity_pos`).
-   Open, stated with `sorry` there: the conductor of `ℚ(√a)` and positivity for perfect powers
-   (`kummerDensity_pos_of_not_isSquare`).
+   *Done* (`Artin/Kummer/Density.lean`, sorry-free): `kummerDensity_pos` for `a` not a perfect
+   power, and `kummerDensity_pos_of_not_isSquare` for every `a` not a square and not `−1`
+   (perfect powers included), via the exact degree, the conductor of `ℚ(√a)`, and an Euler
+   factorisation over the finitely many primes where the local factor differs from
+   `1 − 1/(q(q−1))`. Positivity only, not the closed form.
 7. **Density**: `N(x) = δ(a) π(x) + o(π(x))`, and `π(x) → ∞`, give `HasDensity δ(a)`
    relative to the primes. Primes dividing `a` are finitely many.
 
