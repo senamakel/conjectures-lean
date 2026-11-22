@@ -1,4 +1,4 @@
-import Artin.Kummer.Degree
+import Artin.Kummer.Conductor
 
 /-!
 # Positivity of the Artin density (blueprint step B6)
@@ -12,6 +12,21 @@ for odd `k` and `ε(2) = 1`. Pairing `k = j` with `k = 2j` for odd squarefree `j
 `μ(j) w(j) (1 - ε(2j)/2)`, which is `1/2` at `j = 1` and at least `-w(j)/2` otherwise. Since
 `∑_{j odd squarefree, j > 1} w(j) ≤ ∏_{p ≥ 3} (1 + 1/(p(p-1))) - 1 ≤ e^{1/2} - 1 < 1`, the sum is
 positive. No information about the conductor of `ℚ(√a)` is needed for positivity.
+
+**General `a` (perfect powers included).** `kummerDensity_pos_of_not_isSquare` proves `δ(a) > 0`
+for every `a` that is not a square and not `-1`. The crude bound above fails once `a = ± b^h` with
+`h` divisible by several small odd primes, so this uses the exact degree
+`[K_k : ℚ] m(k) = k φ(k)` (`kummerDegree_mul_kummerM`) and the conductor of `ℚ(√a)`
+(`exists_sq_cyclotomicField_iff`). For squarefree `k`,
+`μ(k) / [K_k : ℚ] = ε(k) ∏_{q ∣ k} (-x_q)` with `x_q = m_q / (q (q - 1))`, `m_q = q` if `a` is a
+`q`-th power in `ℤ` and `1` otherwise (`moebius_div_kummerDegree_eq_prod`). Pairing `j` with `2j`
+gives `δ(a) = ½ ∑_j g(j)`, where `g(j) = h(j) = ∏_{q ∣ j} (-x_q)` on odd squarefree `j`, except
+that `g(j) = 0` when `a₀ ≡ 1 (mod 4)` and `D = |a₀| ∣ j` (`a = a₀ c²`, `a₀` squarefree). Removing
+the finitely many primes `q` with `x_q ≠ 1/(q(q-1))` one at a time (`coprimeSum_hw_peel`) and the
+multiples of `D` (`tsum_dvd_hw`) writes `∑ g` as
+`∏ (1 - x_q) · (∏_{q ∣ D} (1 - x_q) - h(D)) · ∑_{(j, M) = 1} μ(j) w(j)`; every `x_q ≤ 1/2` with
+equality only at `q = 3` (`dfactor_pos`), and the last sum is positive by the crude bound
+(`coprimeSum_hw_pos`).
 -/
 
 namespace Artin.Kummer
@@ -371,39 +386,525 @@ theorem summable_moebius_div_kummerDegree_of_ne (ha0 : a ≠ 0) (ha1 : a ≠ 1) 
   · rw [moebius_div_kummerDegree_of_not_squarefree hk, abs_zero]
     exact mul_nonneg (by positivity) (sqfreeWeight_nonneg k)
 
-/-! ### What remains (stated, not proved)
+/-! ### The conductor of `ℚ(√a)` -/
 
-The two statements below are what the rest of the project needs beyond the non-perfect-power case.
-
-1. **Conductor of `ℚ(√a)`.** For squarefree `k`, `√a ∈ ℚ(ζ_k)` exactly when the discriminant of
-   `ℚ(√a)` divides `k`. With `a = a₀ c²`, `a₀` squarefree, that discriminant is `a₀` if
-   `a₀ ≡ 1 (mod 4)` and `4 a₀` otherwise, and `4 a₀` never divides a squarefree `k`. This turns
-   `kummerEps` into Hooley's explicit `ε(k)` and gives the closed form
-   `δ(a) = A (1 - μ(|a₀|) ∏_{q ∣ a₀} 1/(q² - q - 1))` for `a₀ ≡ 1 (mod 4)` (and `δ(a) = A`
-   otherwise), `A` = Artin's constant, when `a` is not a perfect power. Positivity above does
-   not need it. The `⇐` direction is a Gauss-sum computation (`gaussSum_sq`); the `⇒` direction
-   needs ramification in cyclotomic fields (or `ℚ(ζ_m) ∩ ℚ(ζ_n) = ℚ(ζ_{gcd(m,n)})`), which our
-   Mathlib pin does not provide.
-
-2. **Positivity for perfect powers.** For `a = ± b^h` with `h > 1` the exact degree is
-   `[K_k : ℚ] = k φ(k) / m(k)` with `m(k)` the largest divisor of `k` for which `a` is an
-   `m(k)`-th power in `ℚ(ζ_k)` (the proof of `exists_structure` gives this), and the odd part of
-   `m(k)` is `∏ q` over odd primes `q ∣ gcd(k, h)` with `a` a `q`-th power in `ℤ`. The crude bound
-   used in `kummerDensity_pos` fails once `h` has several small odd prime factors (e.g.
-   `h = 105`: the weights `q / (q (q - 1))` at `q = 3, 5, 7` push the comparison sum past `1`), so
-   the general case needs the exact set of `j` with `√a ∈ ℚ(ζ_{2j})`, i.e. item 1.
--/
-
-/-- **Not proved: conductor of `ℚ(√a)`.** See item 1 above. -/
+/-- **Conductor of `ℚ(√a)`.** For `a = a₀ c²` not a square, `a₀` squarefree, and `k` squarefree:
+`√a ∈ ℚ(ζ_k)` iff `a₀ ≡ 1 (mod 4)` and `|a₀| ∣ k` (`Artin/Kummer/Conductor.lean`). -/
 theorem exists_sq_cyclotomicField_iff {a₀ c : ℤ} (ha : ¬ IsSquare a) (h₀ : Squarefree a₀)
     (hac : a = a₀ * c ^ 2) {k : ℕ} (hk : Squarefree k) :
     (∃ β : CyclotomicField k ℚ, β ^ 2 = a) ↔ a₀ % 4 = 1 ∧ a₀.natAbs ∣ k := by
-  sorry
+  have hc : c ≠ 0 := by
+    rintro rfl; exact ha ⟨0, by simp [hac]⟩
+  have hc' : (c : CyclotomicField k ℚ) ≠ 0 := by exact_mod_cast hc
+  constructor
+  · rintro ⟨β, hβ⟩
+    refine mod_four_and_dvd_of_exists_sq hk h₀ (β := β / c) ?_
+    rw [div_pow, hβ, hac]; push_cast; field_simp
+  · rintro ⟨h4, hdvd⟩
+    obtain ⟨β, hβ⟩ := exists_sq_of_mod_four hk.ne_zero h₀ h4 hdvd
+    exact ⟨β * c, by rw [mul_pow, hβ, hac]; push_cast; ring⟩
 
-/-- **Not proved: positivity of `δ(a)` in general** (Hooley's hypothesis on `a` in the target
-theorem). Proved above (`kummerDensity_pos`) when `a` is not a perfect power. See item 2. -/
+/-! ### Positivity in general (perfect powers included) -/
+
+section Weights
+
+variable (P : ℕ → Prop) [DecidablePred P]
+
+/-- The local weight `x_p = m_p / (p (p - 1))`, `m_p = p` if `P p` and `1` otherwise. -/
+noncomputable def xw (p : ℕ) : ℝ := (if P p then (p : ℝ) else 1) * ((p : ℝ) * ((p : ℝ) - 1))⁻¹
+
+/-- `h(j) = ∏_{p ∣ j} (-x_p)` on odd squarefree `j`, and `0` otherwise. -/
+noncomputable def hw (j : ℕ) : ℝ :=
+  if Odd j ∧ Squarefree j then ∏ p ∈ j.primeFactors, -xw P p else 0
+
+/-- `∑_{(j, D) = 1} g(j)`. -/
+noncomputable def coprimeSum (g : ℕ → ℝ) (D : ℕ) : ℝ := ∑' j, if Nat.Coprime j D then g j else 0
+
+variable {P}
+
+lemma xw_pos {p : ℕ} (hp : p.Prime) : 0 < xw P p := by
+  have h2 : (2 : ℝ) ≤ p := by exact_mod_cast hp.two_le
+  unfold xw
+  apply mul_pos
+  · split_ifs <;> linarith
+  · apply inv_pos.2; nlinarith
+
+lemma xw_le {p : ℕ} (hp : p.Prime) : xw P p ≤ ((p : ℝ) - 1)⁻¹ := by
+  have h2 : (2 : ℝ) ≤ p := by exact_mod_cast hp.two_le
+  have hp0 : (0 : ℝ) < p := by linarith
+  have hp1 : (0 : ℝ) < p - 1 := by linarith
+  unfold xw
+  calc (if P p then (p : ℝ) else 1) * ((p : ℝ) * ((p : ℝ) - 1))⁻¹
+      ≤ p * ((p : ℝ) * ((p : ℝ) - 1))⁻¹ := by
+        apply mul_le_mul_of_nonneg_right _ (by positivity)
+        split_ifs <;> linarith
+    _ = ((p : ℝ) - 1)⁻¹ := by field_simp
+
+lemma xw_le_half {p : ℕ} (hp : p.Prime) (hp2 : p ≠ 2) : xw P p ≤ 1 / 2 := by
+  have h3 : (3 : ℝ) ≤ p := by have := hp.two_le; exact_mod_cast (by omega : 3 ≤ p)
+  refine (xw_le hp).trans ?_
+  calc ((p : ℝ) - 1)⁻¹ ≤ (2 : ℝ)⁻¹ := inv_anti₀ (by norm_num) (by linarith)
+    _ = 1 / 2 := by norm_num
+
+lemma xw_lt_half {p : ℕ} (hp : p.Prime) (hp2 : p ≠ 2) (hp3 : p ≠ 3) : xw P p < 1 / 2 := by
+  have h5 : (5 : ℝ) ≤ p := by
+    have := hp.two_le
+    have h4 : p ≠ 4 := by rintro rfl; exact absurd hp (by decide)
+    exact_mod_cast (by omega : 5 ≤ p)
+  refine (xw_le hp).trans_lt ?_
+  calc ((p : ℝ) - 1)⁻¹ ≤ (4 : ℝ)⁻¹ := inv_anti₀ (by norm_num) (by linarith)
+    _ < 1 / 2 := by norm_num
+
+lemma xw_two (hP2 : ¬ P 2) : xw P 2 = 1 / 2 := by
+  simp [xw, hP2]; norm_num
+
+lemma hw_one : hw P 1 = 1 := by simp [hw]
+
+lemma hw_of_not_odd {j : ℕ} (hj : ¬ Odd j) : hw P j = 0 := by simp [hw, hj]
+
+lemma hw_eq_prod {j : ℕ} (hj : Odd j) (hsq : Squarefree j) :
+    hw P j = ∏ p ∈ j.primeFactors, -xw P p := by simp [hw, hj, hsq]
+
+lemma hw_mul_prime {p j : ℕ} (hp : p.Prime) (hp2 : p ≠ 2) (hj : ¬ p ∣ j) :
+    hw P (p * j) = -xw P p * hw P j := by
+  have hj0 : j ≠ 0 := by rintro rfl; exact hj (dvd_zero p)
+  have hpodd : Odd p := hp.odd_of_ne_two hp2
+  have hcop : Nat.Coprime p j := (Nat.Prime.coprime_iff_not_dvd hp).2 hj
+  have hodd : Odd (p * j) ↔ Odd j := by rw [Nat.odd_mul]; simp [hpodd]
+  have hsq : Squarefree (p * j) ↔ Squarefree j := by
+    rw [Nat.squarefree_mul_iff]
+    exact ⟨fun h => h.2.2, fun h => ⟨hcop, hp.prime.squarefree, h⟩⟩
+  unfold hw
+  by_cases h : Odd j ∧ Squarefree j
+  · rw [ite_eq_left ⟨hodd.2 h.1, hsq.2 h.2⟩, ite_eq_left h, Nat.primeFactors_mul hp.ne_zero hj0,
+      hp.primeFactors, Finset.singleton_union,
+      Finset.prod_insert (fun h' => hj (Nat.dvd_of_mem_primeFactors h'))]
+  · rw [ite_eq_right (fun h' => h ⟨hodd.1 h'.1, hsq.1 h'.2⟩), ite_eq_right h, mul_zero]
+
+lemma hw_mul_prime_of_dvd {p j : ℕ} (hp : p.Prime) (hj : p ∣ j) : hw P (p * j) = 0 := by
+  unfold hw
+  rw [ite_eq_right]
+  rintro ⟨-, hsq⟩
+  obtain ⟨i, rfl⟩ := hj
+  have := hsq p ⟨i, by ring⟩
+  exact hp.one_lt.ne' (Nat.isUnit_iff.1 this)
+
+lemma hw_mul_of_coprime {m j : ℕ} (h : Nat.Coprime m j) : hw P (m * j) = hw P m * hw P j := by
+  rcases Nat.eq_zero_or_pos m with rfl | hm
+  · simp [hw]
+  rcases Nat.eq_zero_or_pos j with rfl | hj
+  · simp [hw]
+  have hsq : Squarefree (m * j) ↔ Squarefree m ∧ Squarefree j := by
+    rw [Nat.squarefree_mul_iff]
+    exact ⟨fun h' => ⟨h'.2.1, h'.2.2⟩, fun h' => ⟨h, h'.1, h'.2⟩⟩
+  unfold hw
+  by_cases h1 : Odd m ∧ Squarefree m <;> by_cases h2 : Odd j ∧ Squarefree j
+  · rw [ite_eq_left ⟨Nat.odd_mul.2 ⟨h1.1, h2.1⟩, hsq.2 ⟨h1.2, h2.2⟩⟩, ite_eq_left h1, ite_eq_left h2,
+      Nat.primeFactors_mul hm.ne' hj.ne', Finset.prod_union h.disjoint_primeFactors]
+  · rw [ite_eq_right (fun h' => h2 ⟨(Nat.odd_mul.1 h'.1).2, (hsq.1 h'.2).2⟩), ite_eq_right h2, mul_zero]
+  · rw [ite_eq_right (fun h' => h1 ⟨(Nat.odd_mul.1 h'.1).1, (hsq.1 h'.2).1⟩), ite_eq_right h1, zero_mul]
+  · rw [ite_eq_right (fun h' => h1 ⟨(Nat.odd_mul.1 h'.1).1, (hsq.1 h'.2).1⟩), ite_eq_right h1, zero_mul]
+
+lemma hw_mul_of_not_coprime {m j : ℕ} (h : ¬ Nat.Coprime m j) : hw P (m * j) = 0 := by
+  unfold hw
+  rw [ite_eq_right]
+  rintro ⟨-, hsq⟩
+  exact h (Nat.squarefree_mul_iff.1 hsq).1
+
+end Weights
+
+section Peel
+
+lemma summable_coprime {g : ℕ → ℝ} (hg : Summable g) (D : ℕ) :
+    Summable fun j => if Nat.Coprime j D then g j else 0 :=
+  Summable.of_norm_bounded hg.norm fun j => by split_ifs <;> simp
+
+/-- Removing one prime `p` from the support: if `g(p j) = c g(j)` for `p ∤ j` and `g(p j) = 0`
+for `p ∣ j`, then `∑_{(j,D)=1} g = (1 + c) ∑_{(j,pD)=1} g`. -/
+lemma coprimeSum_peel {g : ℕ → ℝ} (hg : Summable g) {p D : ℕ} (hp : p.Prime) (hpD : ¬ p ∣ D)
+    {c : ℝ} (hmul : ∀ j, ¬ p ∣ j → g (p * j) = c * g j) (hsq : ∀ j, p ∣ j → g (p * j) = 0) :
+    coprimeSum g D = (1 + c) * coprimeSum g (p * D) := by
+  set A : ℕ → ℝ := fun j => if Nat.Coprime j D then g j else 0 with hA_def
+  set B : ℕ → ℝ := fun j => if Nat.Coprime j (p * D) then g j else 0 with hB_def
+  set C : ℕ → ℝ := fun j => if p ∣ j then A j else 0 with hC_def
+  have hA : Summable A := summable_coprime hg D
+  have hB : Summable B := summable_coprime hg (p * D)
+  have hC : Summable C :=
+    Summable.of_norm_bounded hA.norm fun j => by simp only [C]; split_ifs <;> simp
+  have hcopD : Nat.Coprime p D := (Nat.Prime.coprime_iff_not_dvd hp).2 hpD
+  have hiff : ∀ j, Nat.Coprime j p ↔ ¬ p ∣ j := fun j =>
+    Nat.coprime_comm.trans hp.coprime_iff_not_dvd
+  have hsplit : A = B + C := by
+    funext j
+    simp only [A, B, C, Pi.add_apply, Nat.coprime_mul_iff_right, hiff]
+    by_cases hj : p ∣ j <;> simp [hj]
+  have hCsum : ∑' j, C j = c * ∑' j, B j := by
+    have hsupp : Function.support C ⊆ Set.range (p * ·) := by
+      intro j hj
+      simp only [Function.mem_support, C] at hj
+      split_ifs at hj with h
+      · obtain ⟨i, rfl⟩ := h; exact ⟨i, rfl⟩
+      · exact absurd rfl hj
+    rw [← (mul_right_injective₀ hp.ne_zero).tsum_eq hsupp, ← tsum_mul_left]
+    congr 1; funext i
+    simp only [C, A, B, dvd_mul_right, ite_true, Nat.coprime_mul_iff_left,
+      Nat.coprime_mul_iff_right, hiff]
+    by_cases hi : p ∣ i
+    · simp [hsq i hi, hi]
+    · simp only [hmul i hi, hi, not_false_eq_true]
+      by_cases hc : i.Coprime D
+      · rw [ite_eq_left ⟨hcopD, hc⟩, ite_eq_left ⟨trivial, hc⟩]
+      · rw [ite_eq_right (fun h => hc h.2), ite_eq_right (fun h => hc h.2), mul_zero]
+  unfold coprimeSum
+  change ∑' j, A j = (1 + c) * ∑' j, B j
+  rw [hsplit, show ∑' j, (B + C) j = ∑' j, (B j + C j) from rfl, hB.tsum_add hC, hCsum]; ring
+
+variable {P : ℕ → Prop} [DecidablePred P]
+
+/-- Removing a finite set `S` of odd primes from the support of `h`. -/
+lemma coprimeSum_hw_peel (hs : Summable (hw P)) (S : Finset ℕ) (hS : ∀ p ∈ S, p.Prime ∧ p ≠ 2)
+    {D : ℕ} (hSD : ∀ p ∈ S, ¬ p ∣ D) :
+    coprimeSum (hw P) D = (∏ p ∈ S, (1 - xw P p)) * coprimeSum (hw P) (D * ∏ p ∈ S, p) := by
+  induction S using Finset.induction_on generalizing D with
+  | empty => simp
+  | insert p S hpS ih =>
+    have hp := hS p (Finset.mem_insert_self p S)
+    rw [ih (fun q hq => hS q (Finset.mem_insert_of_mem hq))
+      (fun q hq => hSD q (Finset.mem_insert_of_mem hq))]
+    have hpD' : ¬ p ∣ D * ∏ q ∈ S, q := by
+      intro h
+      rcases (Nat.Prime.dvd_mul hp.1).1 h with h | h
+      · exact hSD p (Finset.mem_insert_self p S) h
+      · obtain ⟨q, hq, hpq⟩ := (hp.1.prime.dvd_finsetProd_iff _).1 h
+        have := (Nat.prime_dvd_prime_iff_eq hp.1 (hS q (Finset.mem_insert_of_mem hq)).1).1 hpq
+        exact hpS (this ▸ hq)
+    rw [coprimeSum_peel hs hp.1 hpD' (c := -xw P p) (fun j hj => hw_mul_prime hp.1 hp.2 hj)
+      (fun j hj => hw_mul_prime_of_dvd hp.1 hj), Finset.prod_insert hpS, Finset.prod_insert hpS,
+      show p * (D * ∏ q ∈ S, q) = D * (p * ∏ q ∈ S, q) by ring]
+    ring
+
+/-- The sum of `h` over multiples of `D`. -/
+lemma tsum_dvd_hw (D : ℕ) (hD : D ≠ 0) :
+    ∑' j, (if D ∣ j then hw P j else 0) = hw P D * coprimeSum (hw P) D := by
+  have hsupp : Function.support (fun j => if D ∣ j then hw P j else 0) ⊆ Set.range (D * ·) := by
+    intro j hj
+    simp only [Function.mem_support] at hj
+    split_ifs at hj with h
+    · obtain ⟨i, rfl⟩ := h; exact ⟨i, rfl⟩
+    · exact absurd rfl hj
+  rw [← (mul_right_injective₀ hD).tsum_eq hsupp, coprimeSum, ← tsum_mul_left]
+  congr 1; funext i
+  simp only [dvd_mul_right, ite_true]
+  by_cases hi : Nat.Coprime i D
+  · rw [ite_eq_left hi, hw_mul_of_coprime hi.symm]
+  · rw [ite_eq_right hi, hw_mul_of_not_coprime (fun h => hi h.symm), mul_zero]
+
+/-- `∑_{(j, M) = 1} h(j) > 0` once every prime with `P p` divides `M`: then `h(j) = μ(j) w(j)` on
+the support and the crude bound applies. -/
+lemma coprimeSum_hw_pos (hs : Summable (hw P)) {M : ℕ} (hM : ∀ p, p.Prime → P p → p ∣ M) :
+    0 < coprimeSum (hw P) M := by
+  have hlow : ∀ j, (if j = 1 then (1 : ℝ) else 0) - oddWeight j ≤
+      if Nat.Coprime j M then hw P j else 0 := by
+    intro j
+    by_cases h1 : j = 1
+    · subst h1; simp [hw_one, oddWeight]
+    simp only [h1, ↓reduceIte, zero_sub]
+    by_cases hgood : Nat.Coprime j M ∧ Odd j ∧ Squarefree j
+    · obtain ⟨hc, ho, hsq⟩ := hgood
+      rw [ite_eq_left hc, hw_eq_prod ho hsq]
+      have hw' : oddWeight j = ∏ p ∈ j.primeFactors, ((p : ℝ) * ((p : ℝ) - 1))⁻¹ := by
+        simp [oddWeight, sqfreeWeight, ho, h1, hsq]
+      have hx : ∀ p ∈ j.primeFactors, xw P p = ((p : ℝ) * ((p : ℝ) - 1))⁻¹ := by
+        intro p hp
+        have hp' := Nat.mem_primeFactors.1 hp
+        have hnP : ¬ P p := fun hP =>
+          hp'.1.one_lt.ne' (Nat.Coprime.eq_one_of_dvd (Nat.Coprime.coprime_dvd_left hp'.2.1 hc)
+            (hM p hp'.1 hP))
+        simp [xw, hnP]
+      have hprod : ∏ p ∈ j.primeFactors, -xw P p =
+          ∏ p ∈ j.primeFactors, -((p : ℝ) * ((p : ℝ) - 1))⁻¹ :=
+        Finset.prod_congr rfl fun p hp => by rw [hx p hp]
+      have habs : |∏ p ∈ j.primeFactors, -((p : ℝ) * ((p : ℝ) - 1))⁻¹| =
+          ∏ p ∈ j.primeFactors, ((p : ℝ) * ((p : ℝ) - 1))⁻¹ := by
+        rw [Finset.abs_prod]
+        exact Finset.prod_congr rfl fun p hp => by
+          rw [abs_neg, abs_of_nonneg (inv_mul_pred_nonneg (Nat.prime_of_mem_primeFactors hp).one_le)]
+      rw [hw', hprod]
+      linarith [neg_abs_le (∏ p ∈ j.primeFactors, -((p : ℝ) * ((p : ℝ) - 1))⁻¹)]
+    · have : (if Nat.Coprime j M then hw P j else 0) = 0 := by
+        split_ifs with hc
+        · unfold hw; rw [ite_eq_right (fun h => hgood ⟨hc, h⟩)]
+        · rfl
+      rw [this]; linarith [oddWeight_nonneg j]
+  have hs1 : Summable fun j : ℕ => (if j = 1 then (1 : ℝ) else 0) - oddWeight j :=
+    (summable_of_ne_finset_zero (s := {1}) fun j hj => by
+      rw [Finset.mem_singleton] at hj; simp [hj]).sub summable_oddWeight
+  have hs2 := summable_coprime hs M
+  have hle := hs1.tsum_le_tsum hlow hs2
+  rw [Summable.tsum_sub (summable_of_ne_finset_zero (s := {1}) fun j hj => by
+      rw [Finset.mem_singleton] at hj; simp [hj]) summable_oddWeight,
+    tsum_ite_eq 1 (fun _ => (1 : ℝ))] at hle
+  unfold coprimeSum
+  linarith [tsum_oddWeight_lt_one]
+
+end Peel
+
+section Main
+
+variable {P : ℕ → Prop} [DecidablePred P]
+
+/-- The factor `∏_{p ∣ D} (1 - x_p) - h(D)` coming from `√a ∈ ℚ(ζ_{2j}) ⟺ D ∣ j` is positive: all
+`x_p ≤ 1/2`, with equality only at `p = 3`. -/
+lemma dfactor_pos {D : ℕ} (hD : Squarefree D) (hodd : Odd D) (hD1 : D ≠ 1) :
+    0 < ∏ p ∈ D.primeFactors, (1 - xw P p) - hw P D := by
+  rw [hw_eq_prod hodd hD]
+  have hp2 : ∀ p ∈ D.primeFactors, p.Prime ∧ p ≠ 2 := fun p hp =>
+    ⟨Nat.prime_of_mem_primeFactors hp, by
+      rintro rfl
+      exact (Nat.not_even_iff_odd.2 hodd) (even_iff_two_dvd.2 (Nat.dvd_of_mem_primeFactors hp))⟩
+  by_cases h : ∃ p ∈ D.primeFactors, p ≠ 3
+  · have hlt : ∏ p ∈ D.primeFactors, xw P p < ∏ p ∈ D.primeFactors, (1 - xw P p) := by
+      refine Finset.prod_lt_prod₀ (fun p hp => xw_pos (hp2 p hp).1) (fun p hp => ?_) ?_
+      · linarith [xw_le_half (P := P) (hp2 p hp).1 (hp2 p hp).2]
+      · obtain ⟨p, hp, hp3⟩ := h
+        exact ⟨p, hp, by linarith [xw_lt_half (P := P) (hp2 p hp).1 (hp2 p hp).2 hp3]⟩
+    have habs : |∏ p ∈ D.primeFactors, -xw P p| = ∏ p ∈ D.primeFactors, xw P p := by
+      rw [Finset.abs_prod]
+      exact Finset.prod_congr rfl fun p hp => by rw [abs_neg, abs_of_pos (xw_pos (hp2 p hp).1)]
+    linarith [le_abs_self (∏ p ∈ D.primeFactors, -xw P p)]
+  · push Not at h
+    have hne : D.primeFactors.Nonempty := Nat.nonempty_primeFactors.2 (by
+      have := hD.ne_zero; omega)
+    have h3 : D.primeFactors = {3} := by
+      refine Finset.eq_singleton_iff_unique_mem.2 ⟨?_, h⟩
+      obtain ⟨p, hp⟩ := hne
+      exact h p hp ▸ hp
+    rw [h3]; simp
+
+open Classical in
+/-- For squarefree `k`: `μ(k) / [K_k : ℚ] = ε(k) ∏_{q ∣ k} (-x_q)`, with `x_q` built from
+`P q = (a is a q-th power in ℤ)`. -/
+lemma moebius_div_kummerDegree_eq_prod (ha0 : a ≠ 0) (hP2 : ¬ ∃ c : ℤ, c ^ 2 = a)
+    {k : ℕ} (hk : Squarefree k) :
+    (moebius k : ℝ) / kummerDegree a k =
+      kummerEps a k * ∏ q ∈ k.primeFactors, -xw (fun q => ∃ c : ℤ, c ^ q = a) q := by
+  set P : ℕ → Prop := fun q => ∃ c : ℤ, c ^ q = a with hP
+  have hk0 : k ≠ 0 := hk.ne_zero
+  have hM : (kummerM a k : ℝ) =
+      kummerEps a k * ∏ q ∈ k.primeFactors, (if P q then (q : ℝ) else 1) := by
+    unfold kummerM
+    rw [Finset.prod_filter]
+    push_cast
+    by_cases h2 : 2 ∣ k
+    · have h2m : 2 ∈ k.primeFactors := Nat.mem_primeFactors.2 ⟨Nat.prime_two, h2, hk0⟩
+      rw [← Finset.mul_prod_erase _ _ h2m, ← Finset.mul_prod_erase _ _ h2m]
+      have hB : (if P 2 then ((2 : ℕ) : ℝ) else 1) = 1 := ite_eq_right hP2
+      rw [hB, one_mul]
+      unfold kummerEps
+      simp only [↓reduceIte, h2, true_and]
+      congr 1
+      · split_ifs <;> simp
+      · refine Finset.prod_congr rfl fun x hx => ?_
+        have hx2 := Finset.ne_of_mem_erase hx
+        simp only [hx2, ↓reduceIte, P]
+    · rw [kummerEps_of_odd h2, Nat.cast_one, one_mul]
+      refine Finset.prod_congr rfl fun x hx => ?_
+      have hx2 : x ≠ 2 := by rintro rfl; exact h2 (Nat.dvd_of_mem_primeFactors hx)
+      simp only [hx2, ↓reduceIte, P]
+  have hdegR : (kummerDegree a k : ℝ) * kummerM a k = k * k.totient := by
+    exact_mod_cast kummerDegree_mul_kummerM ha0 hk
+  have hpos : (0 : ℝ) < k * k.totient := by
+    have := Nat.pos_of_ne_zero hk0
+    have := Nat.totient_pos.2 this
+    positivity
+  have hdeg0 : (kummerDegree a k : ℝ) ≠ 0 := by
+    intro h; rw [h, zero_mul] at hdegR; linarith
+  have hM0 : (kummerM a k : ℝ) ≠ 0 := by
+    intro h; rw [h, mul_zero] at hdegR; linarith
+  have hf : (moebius k : ℝ) / kummerDegree a k = moebius k * kummerM a k * sqfreeWeight k := by
+    rw [sqfreeWeight_eq hk, ← hdegR]; field_simp
+  have hμ : (moebius k : ℝ) = ∏ q ∈ k.primeFactors, (-1 : ℝ) := by
+    rw [moebius_apply_of_squarefree hk, Finset.prod_const,
+      ← (cardDistinctFactors_eq_cardFactors_iff_squarefree hk0).2 hk,
+      cardDistinctFactors_eq_card_primeFactors]
+    push_cast; ring
+  have hw : sqfreeWeight k = ∏ q ∈ k.primeFactors, ((q : ℝ) * ((q : ℝ) - 1))⁻¹ := by
+    simp [sqfreeWeight, hk]
+  rw [hf, hμ, hM, hw, Finset.prod_congr rfl (fun q _ => show -xw P q =
+    (-1) * (if P q then (q : ℝ) else 1) * ((q : ℝ) * ((q : ℝ) - 1))⁻¹ by unfold xw; ring),
+    Finset.prod_mul_distrib, Finset.prod_mul_distrib]
+  ring
+
+
+lemma prod_one_sub_xw_pos {S : Finset ℕ} (hS : ∀ p ∈ S, p.Prime ∧ p ≠ 2) :
+    0 < ∏ p ∈ S, (1 - xw P p) :=
+  Finset.prod_pos fun p hp => by linarith [xw_le_half (P := P) (hS p hp).1 (hS p hp).2]
+
+/-- **Positivity of the Artin density (B6) in general**: `δ(a) > 0` for every `a` that is not a
+square and not `-1`, perfect powers included. -/
 theorem kummerDensity_pos_of_not_isSquare (ha : ¬ IsSquare a) (ha' : a ≠ -1) :
     0 < kummerDensity a := by
-  sorry
+  classical
+  have ha0 : a ≠ 0 := by rintro rfl; exact ha ⟨0, by simp⟩
+  have ha1 : a ≠ 1 := by rintro rfl; exact ha ⟨1, by simp⟩
+  obtain ⟨a₀, c, h₀, hac⟩ : ∃ a₀ c : ℤ, Squarefree a₀ ∧ a = a₀ * c ^ 2 := by
+    obtain ⟨c, b, hbc, hb⟩ := exists_sq_mul_squarefree a.natAbs
+    rcases Int.natAbs_eq a with h | h
+    · exact ⟨b, c, Int.squarefree_natCast.2 hb, by rw [h, ← hbc]; push_cast; ring⟩
+    · exact ⟨-b, c, Int.squarefree_natAbs.1 (by simpa using hb), by rw [h, ← hbc]; push_cast; ring⟩
+  have hc0 : c ≠ 0 := by rintro rfl; exact ha ⟨0, by simp [hac]⟩
+  set P : ℕ → Prop := fun q => ∃ c : ℤ, c ^ q = a with hP
+  have hP2 : ¬ ∃ c : ℤ, c ^ 2 = a := fun ⟨c, hc⟩ => ha ⟨c, by rw [← hc]; ring⟩
+  have hPle : ∀ q, P q → q ≤ a.natAbs := fun q ⟨c, hc⟩ => le_natAbs_of_pow_eq c hc ha0 ha1 ha'
+  set D : ℕ := a₀.natAbs with hD
+  have hDsq : Squarefree D := Int.squarefree_natAbs.2 h₀
+  have hDodd : a₀ % 4 = 1 → Odd D := fun h => by
+    rw [hD, Int.natAbs_odd]; exact Int.odd_iff.2 (by omega)
+  have hD0 : D ≠ 0 := hDsq.ne_zero
+  set f : ℕ → ℝ := fun k => (moebius k : ℝ) / kummerDegree a k with hf_def
+  have hf : Summable f := summable_moebius_div_kummerDegree_of_ne ha0 ha1 ha'
+  have hform : ∀ k, Squarefree k → f k = kummerEps a k * ∏ q ∈ k.primeFactors, -xw P q :=
+    fun k hk => moebius_div_kummerDegree_eq_prod ha0 hP2 hk
+  have hf0 : ∀ k, ¬ Squarefree k → f k = 0 := fun k hk =>
+    moebius_div_kummerDegree_of_not_squarefree hk
+  have hodd_eq : ∀ j, Odd j → f j = hw P j := by
+    intro j hj
+    by_cases hsq : Squarefree j
+    · rw [hform j hsq, kummerEps_of_odd (fun h => (Nat.not_even_iff_odd.2 hj)
+        (even_iff_two_dvd.2 h)), hw_eq_prod hj hsq]
+      simp
+    · rw [hf0 j hsq]; simp [hw, hsq]
+  have hs : Summable (hw P) := Summable.of_norm_bounded hf.norm fun j => by
+    by_cases hj : Odd j
+    · rw [hodd_eq j hj]
+    · rw [hw_of_not_odd hj]; simp
+  set g : ℕ → ℝ := fun j => if a₀ % 4 = 1 ∧ D ∣ j then 0 else hw P j with hg_def
+  -- pairing `k = j` with `k = 2 j`
+  have hpair : ∀ j, f (2 * j) + (if Odd j then f j else 0) = g j / 2 := by
+    intro j
+    by_cases hgood : Odd j ∧ Squarefree j
+    · obtain ⟨hj, hsq⟩ := hgood
+      have h2sq : Squarefree (2 * j) := squarefree_two_mul hj hsq
+      rw [ite_eq_left hj, hodd_eq j hj]
+      have h2j : (2 : ℕ) ∉ j.primeFactors := fun h =>
+        (Nat.not_even_iff_odd.2 hj) (even_iff_two_dvd.2 (Nat.dvd_of_mem_primeFactors h))
+      have hf2 : f (2 * j) = kummerEps a (2 * j) * (-(1 / 2)) * hw P j := by
+        rw [hform _ h2sq, Nat.primeFactors_mul two_ne_zero hsq.ne_zero,
+          Nat.prime_two.primeFactors, Finset.singleton_union, Finset.prod_insert h2j,
+          xw_two hP2, hw_eq_prod hj hsq]
+        ring
+      have hiff : (2 ∣ 2 * j ∧ ∃ β : CyclotomicField (2 * j) ℚ, β ^ 2 = a) ↔
+          (a₀ % 4 = 1 ∧ D ∣ j) := by
+        rw [exists_sq_cyclotomicField_iff ha h₀ hac h2sq]
+        constructor
+        · rintro ⟨-, h4, hdvd⟩
+          exact ⟨h4, (Nat.Coprime.dvd_mul_left (Nat.coprime_two_right.2 (hDodd h4))).1 hdvd⟩
+        · rintro ⟨h4, hdvd⟩; exact ⟨dvd_mul_right 2 j, h4, hdvd.mul_left 2⟩
+      have hε : kummerEps a (2 * j) = if a₀ % 4 = 1 ∧ D ∣ j then 2 else 1 := by
+        unfold kummerEps
+        by_cases h : a₀ % 4 = 1 ∧ D ∣ j
+        · rw [ite_eq_left (hiff.2 h), ite_eq_left h]
+        · rw [ite_eq_right (fun h' => h (hiff.1 h')), ite_eq_right h]
+      rw [hf2, hε]
+      simp only [g]
+      split_ifs <;> push_cast <;> ring
+    · have h2 : ¬ Squarefree (2 * j) := by
+        intro h
+        by_cases hj : Odd j
+        · exact hgood ⟨hj, h.squarefree_of_dvd (dvd_mul_left j 2)⟩
+        · exact not_squarefree_two_mul_of_even (Nat.not_odd_iff_even.1 hj) h
+      have h1 : (if Odd j then f j else 0) = 0 := by
+        split_ifs with hj
+        · exact hf0 j fun h => hgood ⟨hj, h⟩
+        · rfl
+      have hg0 : g j = 0 := by
+        simp only [g]
+        split_ifs
+        · rfl
+        · unfold hw; rw [ite_eq_right hgood]
+      rw [hf0 _ h2, h1, hg0]; ring
+  -- `δ(a) = (∑ g) / 2`
+  have hs_e : Summable fun j => f (2 * j) :=
+    hf.comp_injective (mul_right_injective₀ two_ne_zero)
+  have hs_o : Summable fun j => f (2 * j + 1) :=
+    hf.comp_injective fun x y h => by simpa using h
+  set ind : ℕ → ℝ := fun j => if Odd j then f j else 0
+  have hs_i : Summable ind :=
+    Summable.of_norm_bounded hf.norm fun j => by
+      simp only [ind]; split_ifs <;> simp
+  have hind : ∑' j, ind j = ∑' j, f (2 * j + 1) := by
+    rw [← tsum_even_add_odd (hs_i.comp_injective (mul_right_injective₀ two_ne_zero))
+      (hs_i.comp_injective fun x y h => by simpa using h)]
+    have he : ∀ j, ind (2 * j) = 0 := fun j => by simp [ind]
+    have ho : ∀ j, ind (2 * j + 1) = f (2 * j + 1) := fun j => by simp [ind]
+    simp only [he, ho, tsum_zero, zero_add]
+  have hsum : kummerDensity a = ∑' j, g j / 2 := by
+    rw [kummerDensity, ← hf_def, ← tsum_even_add_odd hs_e hs_o, ← hind, ← hs_e.tsum_add hs_i]
+    exact tsum_congr hpair
+  rw [hsum, tsum_div_const]
+  refine div_pos ?_ two_pos
+  -- the bad primes
+  set H : Finset ℕ := (Finset.range (a.natAbs + 1)).filter fun q => q.Prime ∧ q ≠ 2 ∧ P q
+  have hH : ∀ p ∈ H, p.Prime ∧ p ≠ 2 := fun p hp => by
+    have := (Finset.mem_filter.1 hp).2; exact ⟨this.1, this.2.1⟩
+  have hPmem : ∀ p, p.Prime → P p → p ∈ H := by
+    intro p hp hPp
+    have hp2 : p ≠ 2 := by rintro rfl; exact hP2 hPp
+    exact Finset.mem_filter.2 ⟨Finset.mem_range.2 (Nat.lt_succ_of_le (hPle p hPp)), hp, hp2, hPp⟩
+  have hcs1 : ∑' j, hw P j = coprimeSum (hw P) 1 := by
+    unfold coprimeSum; simp
+  by_cases hE : a₀ % 4 = 1
+  · have hD1 : D ≠ 1 := by
+      intro h1
+      rcases Int.natAbs_eq a₀ with h | h <;> rw [← hD, h1] at h
+      · exact ha ⟨c, by rw [hac, h]; ring⟩
+      · rw [h] at hE; norm_num at hE
+    have hDo := hDodd hE
+    have hpfD : ∀ p ∈ D.primeFactors, p.Prime ∧ p ≠ 2 := fun p hp =>
+      ⟨Nat.prime_of_mem_primeFactors hp, by
+        rintro rfl
+        exact (Nat.not_even_iff_odd.2 hDo) (even_iff_two_dvd.2 (Nat.dvd_of_mem_primeFactors hp))⟩
+    have hgeq : g = fun j => hw P j - if D ∣ j then hw P j else 0 := by
+      funext j
+      simp only [g, hE, true_and]
+      split_ifs <;> ring
+    have hsD : Summable fun j => if D ∣ j then hw P j else 0 :=
+      Summable.of_norm_bounded hs.norm fun j => by split_ifs <;> simp
+    have h1 : coprimeSum (hw P) 1 =
+        (∏ p ∈ D.primeFactors, (1 - xw P p)) * coprimeSum (hw P) D := by
+      rw [coprimeSum_hw_peel hs D.primeFactors hpfD (D := 1) (fun p hp h =>
+        (Nat.prime_of_mem_primeFactors hp).one_lt.ne' (Nat.dvd_one.1 h)), one_mul,
+        Nat.prod_primeFactors_of_squarefree hDsq]
+    set S := H \ D.primeFactors
+    have hS : ∀ p ∈ S, p.Prime ∧ p ≠ 2 := fun p hp => hH p (Finset.mem_sdiff.1 hp).1
+    have hSD : ∀ p ∈ S, ¬ p ∣ D := fun p hp h =>
+      (Finset.mem_sdiff.1 hp).2 (Nat.mem_primeFactors.2 ⟨(hS p hp).1, h, hD0⟩)
+    have h2 := coprimeSum_hw_peel hs S hS hSD
+    have hpos : 0 < coprimeSum (hw P) (D * ∏ p ∈ S, p) := by
+      refine coprimeSum_hw_pos hs fun p hp hPp => ?_
+      by_cases hpD : p ∈ D.primeFactors
+      · exact (Nat.dvd_of_mem_primeFactors hpD).trans (dvd_mul_right _ _)
+      · exact (Finset.dvd_prod_of_mem (fun q : ℕ => q)
+          (Finset.mem_sdiff.2 ⟨hPmem p hp hPp, hpD⟩)).trans (dvd_mul_left _ _)
+    rw [hgeq]
+    show 0 < ∑' j, (hw P j - if D ∣ j then hw P j else 0)
+    rw [hs.tsum_sub hsD, tsum_dvd_hw D hD0, hcs1, h1, h2]
+    have hfac := dfactor_pos (P := P) hDsq hDo hD1
+    have hSpos := prod_one_sub_xw_pos (P := P) hS
+    have heq : (∏ p ∈ D.primeFactors, (1 - xw P p)) *
+          ((∏ p ∈ S, (1 - xw P p)) * coprimeSum (hw P) (D * ∏ p ∈ S, p)) -
+        hw P D * ((∏ p ∈ S, (1 - xw P p)) * coprimeSum (hw P) (D * ∏ p ∈ S, p)) =
+        (∏ p ∈ D.primeFactors, (1 - xw P p) - hw P D) *
+          ((∏ p ∈ S, (1 - xw P p)) * coprimeSum (hw P) (D * ∏ p ∈ S, p)) := by ring
+    rw [heq]
+    exact mul_pos hfac (mul_pos hSpos hpos)
+  · have hgeq : g = hw P := by
+      funext j; simp only [g, hE, false_and, ↓reduceIte]
+    rw [hgeq, hcs1, coprimeSum_hw_peel hs H hH (D := 1) (fun p hp h =>
+      (hH p hp).1.one_lt.ne' (Nat.dvd_one.1 h)), one_mul]
+    refine mul_pos (prod_one_sub_xw_pos hH) (coprimeSum_hw_pos hs fun p hp hPp => ?_)
+    exact Finset.dvd_prod_of_mem (fun q : ℕ => q) (hPmem p hp hPp)
+
+end Main
 
 end Artin.Kummer

@@ -17,7 +17,10 @@ Main results:
 * `exists_mul_totient_le_kummerDegree`: `k φ(k) ≤ c [K_k : ℚ]` for squarefree `k`, `a ∉ {0, ±1}`
   (with `c = 4^|a|`);
 * `kummerDegree_mul_kummerEps`: `[K_k : ℚ] ε(k) = k φ(k)` for squarefree `k` and `a` not a
-  perfect power, where `ε(k) = 2` if `k` is even and `√a ∈ ℚ(ζ_k)`, and `1` otherwise.
+  perfect power, where `ε(k) = 2` if `k` is even and `√a ∈ ℚ(ζ_k)`, and `1` otherwise;
+* `kummerDegree_mul_kummerM`: `[K_k : ℚ] m(k) = k φ(k)` for squarefree `k` and any `a ≠ 0`, where
+  `m(k)` is the product of the primes `q ∣ k` with `a` a `q`-th power in `ℚ(ζ_k)` (for odd `q`:
+  in `ℤ`).
 -/
 
 namespace Artin.Kummer
@@ -497,5 +500,114 @@ lemma kummerEps_two (hpp : NotPerfectPower a) : kummerEps a 2 = 1 := by
     rw [map_pow, hγ]; simp
   obtain ⟨c, hc⟩ := exists_int_pow_of_rat_pow two_ne_zero hr
   exact hpp c 2 le_rfl hc
+
+/-! ### Exact degrees in general -/
+
+open Classical in
+/-- `m(k)`: the product of the primes `q ∣ k` for which `a` is a `q`-th power in `ℚ(ζ_k)`. For odd
+`q` that means `a` is a `q`-th power in `ℤ` (`exists_int_pow_of_isAbelianGalois`); for `q = 2` it
+means `√a ∈ ℚ(ζ_k)`. -/
+noncomputable def kummerM (a : ℤ) (k : ℕ) : ℕ :=
+  ∏ q ∈ k.primeFactors.filter (fun q =>
+    if q = 2 then ∃ β : CyclotomicField k ℚ, β ^ 2 = a else ∃ c : ℤ, c ^ q = a), q
+
+section General
+
+variable {ζ α : KField a k}
+
+lemma pow_gcd_mem (ha : a ≠ 0) (hk : k ≠ 0) (hα : α ^ k = a) {i j : ℕ} (hi : α ^ i ∈ ℚ⟮ζ⟯)
+    (hj : α ^ j ∈ ℚ⟮ζ⟯) : α ^ Nat.gcd i j ∈ ℚ⟮ζ⟯ := by
+  have hα0 : α ≠ 0 := by
+    rintro rfl; rw [zero_pow hk] at hα; exact ha (by exact_mod_cast hα.symm)
+  have h1 : α ^ (Nat.gcd i j : ℤ) = (α ^ i) ^ (Nat.gcdA i j) * (α ^ j) ^ (Nat.gcdB i j) := by
+    rw [Nat.gcd_eq_gcd_ab, zpow_add₀ hα0, zpow_mul, zpow_mul]; simp
+  rw [← zpow_natCast, h1]
+  exact mul_mem (zpow_mem hi _) (zpow_mem hj _)
+
+/-- For a prime `q ∣ k`, `α^(k/q) ∈ ℚ(ζ_k)` iff `a` is a `q`-th power in `ℚ(ζ_k)`. -/
+lemma pow_div_mem_iff (ha : a ≠ 0) (hk : k ≠ 0) (hζ : IsPrimitiveRoot ζ k) (hα : α ^ k = a)
+    {q : ℕ} (hqk : q ∣ k) (hq0 : q ≠ 0) :
+    α ^ (k / q) ∈ ℚ⟮ζ⟯ ↔ ∃ γ ∈ ℚ⟮ζ⟯, γ ^ q = a := by
+  constructor
+  · intro h
+    refine ⟨_, h, ?_⟩
+    rw [← pow_mul, Nat.div_mul_cancel hqk, hα]
+  · rintro ⟨γ, hγ, hγq⟩
+    have hγ0 : γ ≠ 0 := by
+      rintro rfl; rw [zero_pow hq0] at hγq; exact ha (by exact_mod_cast hγq.symm)
+    have e1 : (α ^ (k / q)) ^ q = γ ^ q := by rw [← pow_mul, Nat.div_mul_cancel hqk, hα, hγq]
+    have hpow : (α ^ (k / q)) ^ k = γ ^ k := by
+      obtain ⟨t, ht⟩ := hqk
+      calc (α ^ (k / q)) ^ k = ((α ^ (k / q)) ^ q) ^ t := by rw [← pow_mul (α ^ (k / q)) q t, ← ht]
+        _ = (γ ^ q) ^ t := by rw [e1]
+        _ = γ ^ k := by rw [← pow_mul γ q t, ← ht]
+    have := div_mem_adjoin_zeta hk hζ hγ0 hpow
+    have heq : α ^ (k / q) = (α ^ (k / q) / γ) * γ := by field_simp
+    rw [heq]; exact mul_mem this hγ
+
+/-- **Exact Kummer degree** for squarefree `k` and `a ≠ 0`: `[K_k : ℚ] · m(k) = k φ(k)`. -/
+theorem kummerDegree_mul_kummerM (ha : a ≠ 0) (hk : Squarefree k) :
+    kummerDegree a k * kummerM a k = k * k.totient := by
+  classical
+  have hk0 : k ≠ 0 := hk.ne_zero
+  obtain ⟨ζ, α, d, hζ, hα, ⟨m, hm⟩, hd0, hdeg, hmem, hmin⟩ := exists_structure ha hk0
+  have hm0 : m ≠ 0 := by rintro rfl; simp at hm; exact hk0 hm
+  have hmsq : Squarefree m := hk.squarefree_of_dvd ⟨d, by rw [hm, mul_comm]⟩
+  -- `α^i ∈ ℚ(ζ)` iff `d ∣ i`, for `i > 0`
+  have hdvd_of : ∀ i, 0 < i → α ^ i ∈ ℚ⟮ζ⟯ → d ∣ i := by
+    intro i hi h
+    have hg := pow_gcd_mem ha hk0 hα hmem h
+    have := hmin _ (Nat.gcd_pos_of_pos_left _ hd0) hg
+    have hle := Nat.gcd_le_left i hd0
+    have : Nat.gcd d i = d := le_antisymm hle this
+    rw [← this]; exact Nat.gcd_dvd_right _ _
+  -- for a prime `q ∣ k`: `q ∣ m` iff `a` is a `q`-th power in `ℚ(ζ)`
+  have key : ∀ q ∈ k.primeFactors, q ∣ m ↔ ∃ γ ∈ ℚ⟮ζ⟯, γ ^ q = a := by
+    intro q hq
+    have hq' := Nat.mem_primeFactors.1 hq
+    rw [← pow_div_mem_iff ha hk0 hζ hα hq'.2.1 hq'.1.ne_zero]
+    constructor
+    · rintro ⟨t, rfl⟩
+      have : k / q = d * t := by
+        rw [hm, show d * (q * t) = q * (d * t) by ring,
+          Nat.mul_div_cancel_left _ hq'.1.pos]
+      rw [this, pow_mul]; exact pow_mem hmem _
+    · intro h
+      obtain ⟨t, ht⟩ := hdvd_of _ (Nat.div_pos (Nat.le_of_dvd (Nat.pos_of_ne_zero hk0) hq'.2.1)
+        hq'.1.pos) h
+      refine ⟨t, ?_⟩
+      have h1 : k = q * (d * t) := by rw [← ht, Nat.mul_div_cancel' hq'.2.1]
+      have : d * m = d * (q * t) := by rw [← hm, h1]; ring
+      exact Nat.eq_of_mul_eq_mul_left hd0 this
+  have hM : kummerM a k = m := by
+    rw [← Nat.prod_primeFactors_of_squarefree hmsq]
+    unfold kummerM
+    congr 1
+    ext q
+    rw [Finset.mem_filter, Nat.mem_primeFactors, Nat.mem_primeFactors]
+    constructor
+    · rintro ⟨⟨hq, hqk, -⟩, hP⟩
+      refine ⟨hq, (key q (Nat.mem_primeFactors.2 ⟨hq, hqk, hk0⟩)).2 ?_, hm0⟩
+      by_cases h2 : q = 2
+      · subst h2
+        simp only [↓reduceIte] at hP
+        exact (exists_sq_iff hk0 hζ).2 hP
+      · simp only [h2, ↓reduceIte] at hP
+        obtain ⟨c, hc⟩ := hP
+        exact ⟨c, intCast_mem _ c, by rw [← hc]; push_cast; ring⟩
+    · rintro ⟨hq, hqm, -⟩
+      have hqk : q ∣ k := hqm.trans ⟨d, by rw [hm, mul_comm]⟩
+      have hmem' := (key q (Nat.mem_primeFactors.2 ⟨hq, hqk, hk0⟩)).1 hqm
+      refine ⟨⟨hq, hqk, hk0⟩, ?_⟩
+      by_cases h2 : q = 2
+      · subst h2
+        simp only [↓reduceIte]
+        exact (exists_sq_iff hk0 hζ).1 hmem'
+      · simp only [h2, ↓reduceIte]
+        obtain ⟨γ, hγ, hγq⟩ := hmem'
+        exact exists_int_pow_of_mem_adjoin_zeta hk0 hζ hq h2 hγ hγq
+  rw [hdeg, hM, hm]; ring
+
+end General
 
 end Artin.Kummer
