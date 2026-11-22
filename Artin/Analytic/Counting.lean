@@ -427,4 +427,149 @@ theorem theta_bound (ha : a ≠ 0) (hk : k ≠ 0) {C : ℝ} (hψ : PsiKBound �
 
 end KField
 
+/-! ### Partial summation -/
+
+section Abel
+
+/-- `∑_{i ≤ N} 1 / √i ≤ 2 √N` (the `i = 0` term is `0`). -/
+lemma sum_inv_sqrt_le (N : ℕ) : ∑ i ∈ range (N + 1), 1 / Real.sqrt i ≤ 2 * Real.sqrt N := by
+  induction N with
+  | zero => simp
+  | succ N ih =>
+    rw [sum_range_succ]
+    have hs : 0 ≤ Real.sqrt N := Real.sqrt_nonneg _
+    have ht : 0 < Real.sqrt ((N + 1 : ℕ) : ℝ) := Real.sqrt_pos.2 (by positivity)
+    have hst : Real.sqrt ((N + 1 : ℕ) : ℝ) ^ 2 = Real.sqrt N ^ 2 + 1 := by
+      rw [Real.sq_sqrt (by positivity), Real.sq_sqrt (by positivity)]; push_cast; ring
+    have key : 1 / Real.sqrt ((N + 1 : ℕ) : ℝ) ≤
+        2 * (Real.sqrt ((N + 1 : ℕ) : ℝ) - Real.sqrt N) := by
+      rw [div_le_iff₀ ht]
+      nlinarith [sq_nonneg (Real.sqrt N - Real.sqrt ((N + 1 : ℕ) : ℝ))]
+    linarith
+
+/-- The weight `1 / log(max i 2)`. -/
+noncomputable def logWeight (i : ℕ) : ℝ := 1 / Real.log (max (i : ℝ) 2)
+
+lemma logWeight_of_two_le {i : ℕ} (hi : 2 ≤ i) : logWeight i = 1 / Real.log i := by
+  unfold logWeight
+  rw [max_eq_left (by exact_mod_cast hi)]
+
+lemma logWeight_diff_le {i : ℕ} (hi : 2 ≤ i) :
+    0 ≤ logWeight i - logWeight (i + 1) ∧
+      (logWeight i - logWeight (i + 1)) * (Real.sqrt (i + 1 : ℕ) * Real.log (i + 1 : ℕ)) ≤
+        3 / Real.sqrt i := by
+  rw [logWeight_of_two_le hi, logWeight_of_two_le (by omega)]
+  have hi' : (2 : ℝ) ≤ i := by exact_mod_cast hi
+  have hlog2 := Real.log_two_gt_d9
+  have hli : Real.log 2 ≤ Real.log i := Real.log_le_log (by norm_num) hi'
+  have hli1 : Real.log i ≤ Real.log (i + 1 : ℕ) :=
+    Real.log_le_log (by linarith) (by push_cast; linarith)
+  have hD : Real.log (i + 1 : ℕ) - Real.log i ≤ 1 / i := by
+    rw [← Real.log_div (by positivity) (by positivity)]
+    refine (Real.log_le_sub_one_of_pos (by positivity)).trans (le_of_eq ?_)
+    push_cast; field_simp; ring
+  have hpos : 0 < Real.log i := by linarith
+  have hpos1 : 0 < Real.log (i + 1 : ℕ) := by linarith
+  have hsi : 0 < Real.sqrt i := Real.sqrt_pos.2 (by linarith)
+  have hsqrt : Real.sqrt (i + 1 : ℕ) ≤ 2 * Real.sqrt i := by
+    rw [show (2 : ℝ) * Real.sqrt i = Real.sqrt (4 * i) by
+      rw [Real.sqrt_mul (by norm_num), show Real.sqrt 4 = 2 by
+        rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]]]
+    exact Real.sqrt_le_sqrt (by push_cast; linarith)
+  constructor
+  · rw [sub_nonneg]; exact one_div_le_one_div_of_le hpos hli1
+  · have heq : (1 / Real.log i - 1 / Real.log (i + 1 : ℕ)) *
+        (Real.sqrt (i + 1 : ℕ) * Real.log (i + 1 : ℕ)) =
+        (Real.log (i + 1 : ℕ) - Real.log i) * Real.sqrt (i + 1 : ℕ) / Real.log i := by
+      field_simp
+    rw [heq, div_le_div_iff₀ hpos hsi]
+    have hD0 : 0 ≤ Real.log (i + 1 : ℕ) - Real.log i := by linarith
+    have hii : Real.sqrt i * Real.sqrt i = i := Real.mul_self_sqrt (by linarith)
+    calc (Real.log (i + 1 : ℕ) - Real.log i) * Real.sqrt (i + 1 : ℕ) * Real.sqrt i
+        ≤ (1 / i) * (2 * Real.sqrt i) * Real.sqrt i := by gcongr
+      _ = 2 := by rw [mul_assoc, mul_assoc, hii]; field_simp
+      _ ≤ 3 * Real.log i := by linarith
+
+/-- **Partial summation.** If `A(t) = ∑_{m < t} u_m log m` satisfies
+`|A(t)| ≤ B √t log t Λ` for `2 ≤ t ≤ x`, then `|∑_{m < x} u_m| ≤ 8 B Λ √x`. -/
+lemma abs_sum_le_of_abs_sum_log_le (u : ℕ → ℝ) (hu0 : u 0 = 0) (hu1 : u 1 = 0) {x : ℕ}
+    (hx : 2 ≤ x) {B Λ : ℝ} (hB : 0 ≤ B) (hΛ : 0 ≤ Λ)
+    (hA : ∀ t, 2 ≤ t → t ≤ x →
+      |∑ m ∈ range t, u m * Real.log m| ≤ B * Real.sqrt t * Real.log t * Λ) :
+    |∑ m ∈ range x, u m| ≤ 8 * B * Λ * Real.sqrt x := by
+  set g : ℕ → ℝ := fun m => u m * Real.log m
+  have hsum : ∑ m ∈ range x, u m = ∑ m ∈ range x, logWeight m • g m := by
+    refine sum_congr rfl fun m _ => ?_
+    rcases Nat.lt_or_ge m 2 with h | h
+    · interval_cases m <;> simp [g, hu0, hu1]
+    · rw [logWeight_of_two_le h, smul_eq_mul]
+      have : Real.log m ≠ 0 := (Real.log_pos (by exact_mod_cast h)).ne'
+      simp only [g]; field_simp
+  rw [hsum, sum_range_by_parts]
+  have hlog2 := Real.log_two_gt_d9
+  have hX : (2 : ℝ) ≤ x := by exact_mod_cast hx
+  -- the boundary term
+  have hfirst : |logWeight (x - 1) • ∑ i ∈ range x, g i| ≤ 2 * B * Λ * Real.sqrt x := by
+    set m₀ : ℝ := max ((x - 1 : ℕ) : ℝ) 2
+    have hm₀ : (2 : ℝ) ≤ m₀ := le_max_right _ _
+    have hm₀' : ((x - 1 : ℕ) : ℝ) ≤ m₀ := le_max_left _ _
+    have hcast : ((x - 1 : ℕ) : ℝ) = x - 1 := by rw [Nat.cast_sub (by omega)]; simp
+    have hxm : (x : ℝ) ≤ m₀ ^ 2 := by nlinarith
+    have hlogm : Real.log x ≤ 2 * Real.log m₀ := by
+      have := Real.log_le_log (by linarith) hxm
+      rw [Real.log_pow] at this; push_cast at this; linarith
+    have hlm : 0 < Real.log m₀ := Real.log_pos (by linarith)
+    rw [smul_eq_mul, abs_mul]
+    have hw : |logWeight (x - 1)| = 1 / Real.log m₀ := by
+      unfold logWeight; rw [abs_of_pos (by positivity)]
+    rw [hw]
+    have := hA x hx le_rfl
+    calc 1 / Real.log m₀ * |∑ i ∈ range x, g i|
+        ≤ 1 / Real.log m₀ * (B * Real.sqrt x * Real.log x * Λ) := by gcongr
+      _ = B * Λ * Real.sqrt x * (Real.log x / Real.log m₀) := by ring
+      _ ≤ B * Λ * Real.sqrt x * 2 := by
+          gcongr
+          rw [div_le_iff₀ hlm]; linarith
+      _ = _ := by ring
+  -- the other terms
+  have hterm : ∀ i ∈ range (x - 1), |(logWeight (i + 1) - logWeight i) •
+      ∑ j ∈ range (i + 1), g j| ≤ 3 * B * Λ * (1 / Real.sqrt i) := by
+    intro i hi
+    have hi' := mem_range.1 hi
+    rcases Nat.lt_or_ge i 2 with h | h
+    · interval_cases i
+      · simp [g, hu0]
+      · have : logWeight 2 - logWeight 1 = 0 := by
+          unfold logWeight; norm_num
+        rw [this, zero_smul, abs_zero]; positivity
+    · obtain ⟨hd0, hd⟩ := logWeight_diff_le h
+      rw [smul_eq_mul, abs_mul, abs_sub_comm, abs_of_nonneg hd0]
+      have hA' := hA (i + 1) (by omega) (by omega)
+      calc (logWeight i - logWeight (i + 1)) * |∑ j ∈ range (i + 1), g j|
+          ≤ (logWeight i - logWeight (i + 1)) *
+              (B * Real.sqrt (i + 1 : ℕ) * Real.log (i + 1 : ℕ) * Λ) := by gcongr
+        _ = B * Λ * ((logWeight i - logWeight (i + 1)) *
+              (Real.sqrt (i + 1 : ℕ) * Real.log (i + 1 : ℕ))) := by ring
+        _ ≤ B * Λ * (3 / Real.sqrt i) := by gcongr
+        _ = _ := by ring
+  have hrest : |∑ i ∈ range (x - 1), (logWeight (i + 1) - logWeight i) •
+      ∑ j ∈ range (i + 1), g j| ≤ 6 * B * Λ * Real.sqrt x := by
+    refine (abs_sum_le_sum_abs _ _).trans ?_
+    refine (sum_le_sum hterm).trans ?_
+    rw [← mul_sum]
+    have h1 : ∑ i ∈ range (x - 1), 1 / Real.sqrt i ≤ ∑ i ∈ range (x - 1 + 1), 1 / Real.sqrt i :=
+      sum_le_sum_of_subset_of_nonneg (range_subset_range.2 (by omega)) fun _ _ _ => by positivity
+    have h2 := sum_inv_sqrt_le (x - 1)
+    have h3 : Real.sqrt ((x - 1 : ℕ) : ℝ) ≤ Real.sqrt x :=
+      Real.sqrt_le_sqrt (by exact_mod_cast Nat.sub_le x 1)
+    have : 0 ≤ 3 * B * Λ := by positivity
+    calc 3 * B * Λ * ∑ i ∈ range (x - 1), 1 / Real.sqrt i ≤ 3 * B * Λ * (2 * Real.sqrt x) := by
+          gcongr; linarith
+      _ = _ := by ring
+  calc _ ≤ |logWeight (x - 1) • ∑ i ∈ range x, g i| + |∑ i ∈ range (x - 1),
+        (logWeight (i + 1) - logWeight i) • ∑ j ∈ range (i + 1), g j| := abs_sub _ _
+    _ ≤ _ := by linarith
+
+end Abel
+
 end Artin.Analytic
