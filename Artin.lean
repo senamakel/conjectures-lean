@@ -6,3 +6,5 @@ import Artin.Sieve.BrunTitchmarsh
 import Artin.Sieve.BrunTitchmarshLargePrimes
 import Artin.Sieve.Density
 import Artin.Main
+import Artin.Kummer.Degree
+import Artin.Kummer.Density

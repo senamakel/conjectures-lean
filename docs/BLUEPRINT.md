@@ -74,9 +74,16 @@ Write `N(x)` for the number of primes `p < x`, `p ∤ a`, with `a` a primitive r
 5. **Kummer degrees**: `[K_k : ℚ] = k φ(k) / ε(k)`, with `ε(k) | 2h` where `a = ± b^h`.
    We need `[K_k : ℚ] ≥ c_a k φ(k)` for steps 1–2 and the tail of `Σ μ(k)/[K_k:ℚ]`.
    Mathlib has `FieldTheory/KummerExtension.lean` and `KummerPolynomial.lean`.
+   *Done* (`Artin/Kummer/Degree.lean`): `kummerDegree_le` (`≤ k φ(k)`),
+   `exists_mul_totient_le_kummerDegree` (`k φ(k) ≤ 4^|a| [K_k:ℚ]` for `a ∉ {0, ±1}`, `k`
+   squarefree), and the exact `kummerDegree_mul_kummerEps` for `a` not a perfect power, with
+   `ε(k)` stated as "`k` even and `√a ∈ ℚ(ζ_k)`".
 6. **Positivity** of `δ(a) = Σ_k μ(k)/[K_k:ℚ]` for `a` not a square and not `−1`. This needs
    exact degrees, including the entanglement when `√a ∈ ℚ(ζ_k)`. Reference: Lenstra–Moree–
    Stevenhagen, *Character sums for primitive root densities*, arXiv:1112.4816.
+   *Done for `a` not a perfect power* (`Artin/Kummer/Density.lean`, `kummerDensity_pos`).
+   Open, stated with `sorry` there: the conductor of `ℚ(√a)` and positivity for perfect powers
+   (`kummerDensity_pos_of_not_isSquare`).
 7. **Density**: `N(x) = δ(a) π(x) + o(π(x))`, and `π(x) → ∞`, give `HasDensity δ(a)`
    relative to the primes. Primes dividing `a` are finitely many.
 
