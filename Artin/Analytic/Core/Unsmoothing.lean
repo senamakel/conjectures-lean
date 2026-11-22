@@ -38,7 +38,29 @@ variable {K : Type*} [Field K] [NumberField K]
 /-- `y W_K(y) = ∑_{m=1}^{y} ψ_K(m)`. -/
 theorem mul_weightedPsiK_eq (y : ℕ) :
     (y : ℝ) * weightedPsiK K y = ∑ m ∈ Finset.Icc 1 y, psiK K m := by
-  sorry
+  have hS : ∀ y : ℕ, (y : ℝ) * weightedPsiK K y =
+      ∑ n ∈ Finset.range y, vonMangoldtK K n * ((y : ℝ) - n) := by
+    intro y
+    rcases Nat.eq_zero_or_pos y with rfl | hy
+    · simp [weightedPsiK]
+    have hy0 : (y : ℝ) ≠ 0 := by exact_mod_cast hy.ne'
+    rw [weightedPsiK, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun n _ => ?_
+    field_simp
+  rw [hS]
+  induction y with
+  | zero => simp
+  | succ y ih =>
+    rw [Finset.sum_Icc_succ_top (by omega), ← ih, psiK_natCast_eq_sum, Finset.sum_range_succ,
+      Finset.sum_range_succ (fun n => vonMangoldtK K n)]
+    push_cast
+    have : ∑ n ∈ Finset.range y, vonMangoldtK K n * ((y : ℝ) + 1 - n) =
+        ∑ n ∈ Finset.range y, vonMangoldtK K n * ((y : ℝ) - n) +
+          ∑ n ∈ Finset.range y, vonMangoldtK K n := by
+      rw [← Finset.sum_add_distrib]
+      exact Finset.sum_congr rfl fun n _ => by ring
+    rw [this]
+    ring
 
 /-- `ψ_K` is non-decreasing on the natural numbers. -/
 theorem psiK_natCast_mono : Monotone (fun m : ℕ => psiK K m) := by
@@ -132,6 +154,71 @@ give `PsiKBound K C`, with `C` absolute. -/
 theorem psiKBound_of_continuation :
     ∃ C : ℝ, ∀ (K : Type) [Field K] [NumberField K],
       DedekindZetaRH K → DedekindContinuation K → PsiKBound K C := by
-  sorry
+  obtain ⟨C, hC⟩ := psiK_natCast_le
+  set C' := max C 0
+  refine ⟨8 * C' + 3, fun K _ _ hRH ⟨D⟩ x hx => ?_⟩
+  have hx0 : (0 : ℝ) ≤ x := by linarith
+  set N : ℕ := ⌈x⌉₊ with hN
+  have hNx : x ≤ N := Nat.le_ceil x
+  have hNx1 : (N : ℝ) < x + 1 := Nat.ceil_lt_add_one hx0
+  have hN2 : 2 ≤ N := by exact_mod_cast (show (2 : ℝ) ≤ N by linarith)
+  have hψ : psiK K x = psiK K N := by
+    rw [psiK_eq_sum K hx0, psiK_natCast_eq_sum]
+  set n : ℝ := (Module.finrank ℚ K : ℝ)
+  set ld := Real.log |(discr K : ℝ)|
+  have hn : 1 ≤ n := one_le_finrank
+  have hld : 0 ≤ ld := log_abs_discr_nonneg
+  have hlx : Real.log 2 ≤ Real.log x := Real.log_le_log (by norm_num) hx
+  have hl2 := Real.log_two_gt_d9
+  have hlN : Real.log N ≤ 2 * Real.log x := by
+    rw [← Real.log_rpow (by linarith)]
+    exact Real.log_le_log (by linarith) (by norm_num; nlinarith)
+  have hlN0 : 0 ≤ Real.log N := Real.log_nonneg (by linarith)
+  have hsN : Real.sqrt N ≤ 2 * Real.sqrt x := by
+    have : Real.sqrt N ≤ Real.sqrt (4 * x) := Real.sqrt_le_sqrt (by linarith)
+    rwa [Real.sqrt_mul (by norm_num), show Real.sqrt 4 = 2 by
+      rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]] at this
+  have hsx : 1 ≤ Real.sqrt x := by
+    rw [show (1 : ℝ) = Real.sqrt 1 by simp]; exact Real.sqrt_le_sqrt (by linarith)
+  have hmain := hC K D hRH N hN2
+  have hC' : |psiK K N - N| ≤ C' * Real.sqrt N * (ld + n * Real.log N) * Real.log N := by
+    refine hmain.trans ?_
+    have hA : 0 ≤ ld + n * Real.log N := add_nonneg hld (mul_nonneg (by linarith) hlN0)
+    exact mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right
+      (le_max_left _ _) (Real.sqrt_nonneg _)) hA) hlN0
+  have hC'0 : 0 ≤ C' := le_max_right _ _
+  set P := ld + n * Real.log x
+  have hP : n * Real.log 2 ≤ P := by nlinarith
+  have hstep : C' * Real.sqrt N * (ld + n * Real.log N) * Real.log N ≤
+      8 * C' * (Real.sqrt x * P * Real.log x) := by
+    have h1 : ld + n * Real.log N ≤ 2 * P := by nlinarith
+    have h2 : C' * Real.sqrt N ≤ C' * (2 * Real.sqrt x) := mul_le_mul_of_nonneg_left hsN hC'0
+    have hA : 0 ≤ ld + n * Real.log N := add_nonneg hld (mul_nonneg (by linarith) hlN0)
+    have hB : 0 ≤ C' * (2 * Real.sqrt x) := by positivity
+    have hP0 : 0 ≤ P := by nlinarith
+    calc C' * Real.sqrt N * (ld + n * Real.log N) * Real.log N
+        ≤ C' * (2 * Real.sqrt x) * (ld + n * Real.log N) * Real.log N :=
+          mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right h2 hA) hlN0
+      _ ≤ C' * (2 * Real.sqrt x) * (2 * P) * Real.log N :=
+          mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left h1 hB) hlN0
+      _ ≤ C' * (2 * Real.sqrt x) * (2 * P) * (2 * Real.log x) :=
+          mul_le_mul_of_nonneg_left hlN (by positivity)
+      _ = 8 * C' * (Real.sqrt x * P * Real.log x) := by ring
+  have hone : 1 ≤ 3 * (Real.sqrt x * P * Real.log x) := by
+    have hP2 : Real.log 2 ≤ P := by nlinarith
+    have : Real.log 2 * Real.log 2 ≤ P * Real.log x :=
+      mul_le_mul hP2 hlx (by linarith) (by linarith)
+    have h3 : P * Real.log x ≤ Real.sqrt x * (P * Real.log x) := by
+      nlinarith
+    nlinarith
+  have htri : |psiK K x - x| ≤ |psiK K N - N| + 1 := by
+    rw [hψ]
+    calc |psiK K N - x| = |(psiK K N - N) + (N - x)| := by ring_nf
+      _ ≤ |psiK K N - N| + |(N : ℝ) - x| := abs_add_le _ _
+      _ ≤ |psiK K N - N| + 1 := by
+          gcongr; rw [abs_le]; constructor <;> linarith
+  calc |psiK K x - x| ≤ 8 * C' * (Real.sqrt x * P * Real.log x)
+        + 3 * (Real.sqrt x * P * Real.log x) := by linarith
+    _ = (8 * C' + 3) * Real.sqrt x * (ld + n * Real.log x) * Real.log x := by ring
 
 end Artin.Analytic
