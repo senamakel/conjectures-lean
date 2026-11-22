@@ -90,7 +90,7 @@ Every step's statement is fixed in its file; `Lindelof/Main.lean` already proves
 |---|---|---|
 | 1 | `Lindelof/RH.lean` | done |
 | 2 | `Lindelof/Monotone.lean` | done |
-| 3 | `Lindelof/GammaRatio.lean` | `norm_Gamma_le_rpow_mul` todo |
+| 3 | `Lindelof/GammaRatio.lean` | done |
 | 4 | `Lindelof/Transfer.lean` | done (modulo Steps 2–3) |
 | 5 | `Lindelof/LogZeta.lean` | `exists_log_zetaQ` todo |
 | 6 | `Lindelof/BorelCaratheodory.lean` | `norm_log_zetaQ_le` todo |
