@@ -6,8 +6,8 @@
 #   RH_REV pins the riemann-hypothesis commit (default: the one this was last checked against).
 #
 # The community cache contains outputs of untrusted builds: this links the two proofs, it does
-# not re-verify the GRH proof. Set RH_FULL_BUILD=1 to build the riemann-hypothesis tree from
-# source instead (many CPU hours).
+# not re-verify the GRH proof. Set RH_FULL_BUILD=1 to rebuild every riemann-hypothesis module
+# from source instead (only Mathlib comes from its official cache; many CPU hours).
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
@@ -33,10 +33,14 @@ if [ "$(cat "$RH/lean-toolchain")" != "$(cat "$HERE/lean-toolchain")" ]; then
   exit 1
 fi
 
-(cd "$RH" && lake exe cache get)
 if [ "${RH_FULL_BUILD:-0}" = 1 ]; then
+  # Only Mathlib comes from its official cache; every riemann-hypothesis module is rebuilt.
+  (cd "$RH" && lake env true)   # materialize dependencies
+  (cd "$RH/.lake/packages/mathlib" && lake exe cache get)
+  rm -rf "$RH/.lake/build"
   (cd "$RH" && lake build Main)
 else
+  (cd "$RH" && lake exe cache get)
   (cd "$RH" && lake build --no-build Main)
 fi
 
