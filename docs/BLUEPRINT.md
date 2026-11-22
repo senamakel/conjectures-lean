@@ -48,46 +48,52 @@ From Steps 2–3 with `ζ = ξ / (s(s-1) Γℝ(s))`:
 
 * `norm_zeta_half_le`: `∃ C, ∀ δ ∈ (0, 1/2], ∀ t ≥ 1,
   ‖ζ(1/2+it)‖ ≤ C t^{δ/2} ‖ζ(1/2+δ+it)‖`.
-* `norm_zeta_le_poly`: `∃ C, ∀ σ ∈ [1/2, 2], ∀ t ≥ 1, ‖ζ(σ+it)‖ ≤ C t`
-  (compare with `σ' = 2`, where `|ζ| ≤ ζ(2)`).
+* `norm_zeta_le_poly`: `∃ C, ∀ s, σ ≥ 1/2 → |t| ≥ 1 → ‖ζ(s)‖ ≤ C |t|`
+  (compare with `σ' = 2`, where `|ζ| ≤ ζ(2)`; `σ ≥ 2` is trivial; `t < 0` by `riemannZeta_conj`).
 
-## Step 5: a logarithm of ζ₁ on `σ > 1/2` (`Lindelof/LogZeta.lean`)
+## Step 5: a logarithm of `zetaQ = ζ₁/(s+1)` on `σ > 1/2` (`Lindelof/LogZeta.lean`)
 
-The half-plane `H = {σ > 1/2}` is convex, hence simply connected; `ζ₁` is continuous and
-nonvanishing there (Step 1). `Complex.exists_continuousOn_eqOn_exp_comp` gives a continuous `L`
-with `exp ∘ L = ζ₁` on `H`; it is holomorphic (local inverse of `exp`). Normalize by an integer
-multiple of `2πi` so that `L` agrees with `log(s-1) + Σ_p -log(1-p^{-s})` at `s = 2`, hence on
-`σ > 1` by connectedness, so `‖L(s)‖ ≤ C` for `2 ≤ σ ≤ 3`.
+The half-plane `H = {σ > 1/2}` is convex, hence simply connected; `zetaQ(s) = ζ₁(s)/(s+1)` is
+holomorphic and nonvanishing there (Step 1). `Complex.exists_continuousOn_eqOn_exp_comp` gives a
+continuous `M` with `exp ∘ M = zetaQ` on `H`; it is holomorphic (local inverse of `exp`).
+Normalize by an integer multiple of `2πi` so that `M` agrees with
+`Log((s-1)/(s+1)) + Σ_p -Log(1-p^{-s})` at `s = 2`, hence on `σ > 1` by connectedness, so
+`‖M(s)‖ ≤ C` for `2 ≤ σ ≤ 5`. (Dividing by `s+1` cancels the `log(s-1)` growth of `log ζ₁`,
+which would otherwise spoil Step 7; the pole of `ζ` at `1` is why `ζ₁` is used at all.)
 
 ## Step 6: Borel–Carathéodory (`Lindelof/BorelCaratheodory.lean`)
 
-`Re L = log|ζ₁| ≤ C log(|t|+2)` on `1/2 < σ ≤ 3` (Step 4 polynomial bound plus compactness for
+`Re M = log|zetaQ| ≤ C log(|t|+2)` on `1/2 < σ ≤ 5` (Step 4 polynomial bound plus compactness for
 small `|t|`). `Complex.borelCaratheodory` on discs centred at `5/2 + it` of radius `2 - δ/2`
-gives, for each `δ > 0`, `‖L(s)‖ ≤ C_δ log(|t|+2)` for `1/2+δ ≤ σ ≤ 3`.
+gives, for each `δ > 0`, `‖M(s)‖ ≤ C_δ log(|t|+2)` for `1/2+δ ≤ σ ≤ 2`.
 
 ## Step 7: Hadamard three-lines (`Lindelof/ThreeLines.lean`)
 
 Apply `Complex.HadamardThreeLines.norm_le_interpStrip_of_mem_verticalClosedStrip` to
-`F(s) = L(s) · exp((s - it₀)²)` on the strip `1/2+δ ≤ σ ≤ 2`. The Gaussian factor makes `F`
+`F(s) = M(s) · exp((s - it₀)²)` on the strip `1/2+δ ≤ σ ≤ 2`. The Gaussian factor makes `F`
 bounded and localizes it at height `t₀`: `|F| ≤ C log(t₀+2)` on the left edge and `|F| ≤ C` on the
-right. For `σ ≥ 1/2+2δ` this gives `‖L(σ+it₀)‖ ≤ C (log(t₀+2))^α` with
+right. For `σ ≥ 1/2+2δ` this gives `‖M(σ+it₀)‖ ≤ C (log(t₀+2))^α` with
 `α = (2-σ)/(2-1/2-δ) < 1`.
 
 ## Step 8: assembly (`Lindelof/Main.lean`)
 
 Given `ε`, take `δ = ε` in Step 4: `‖ζ(1/2+it)‖ ≤ C t^{ε/2} ‖ζ(1/2+ε+it)‖`, and
-`‖ζ(1/2+ε+it)‖ ≤ |exp L| / |s-1| ≤ exp(C (log t)^α) = O(t^{ε/2})` by Step 7, because
+`‖ζ(1/2+ε+it)‖ ≤ 3|exp M| ≤ 3 exp(C (log t)^α) = O(t^{ε/4})` by Step 7, because
 `(log t)^α = o(log t)`.
 
 ## Status
 
+Every step's statement is fixed in its file; `Lindelof/Main.lean` already proves
+`lindelof_of_RH` from them, so the plan is checked by Lean. Remaining work is the `sorry`s.
+
 | Step | File | Status |
 |---|---|---|
-| 1 | `Lindelof/RH.lean` | todo |
-| 2 | `Lindelof/Monotone.lean` | todo |
-| 3 | `Lindelof/GammaRatio.lean` | todo |
-| 4 | `Lindelof/Transfer.lean` | todo |
-| 5 | `Lindelof/LogZeta.lean` | todo |
-| 6 | `Lindelof/BorelCaratheodory.lean` | todo |
-| 7 | `Lindelof/ThreeLines.lean` | todo |
-| 8 | `Lindelof/Main.lean` | todo |
+| 1 | `Lindelof/RH.lean` | done |
+| 2 | `Lindelof/Monotone.lean` | `norm_xiZeta_le_of_half_le` todo |
+| 3 | `Lindelof/GammaRatio.lean` | `norm_Gamma_le_rpow_mul` todo |
+| 4 | `Lindelof/Transfer.lean` | `norm_zeta_half_le`, `norm_zeta_le_poly` todo |
+| 5 | `Lindelof/LogZeta.lean` | `exists_log_zetaQ` todo |
+| 6 | `Lindelof/BorelCaratheodory.lean` | `norm_log_zetaQ_le` todo |
+| 7 | `Lindelof/ThreeLines.lean` | `norm_le_log_rpow_of_strip` todo |
+| 8 | `Lindelof/Main.lean` | done (from Steps 1–7) |
+| stretch | `Lindelof/Dirichlet.lean` | `dirichletLindelof_of_GRH` todo |

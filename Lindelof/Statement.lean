@@ -3,6 +3,9 @@ import Erdos985.Statement
 /-!
 # The Lindelöf hypothesis (target statements — do not change the definitions)
 
+The deliverables are `Lindelof.lindelof_of_RH` (`Lindelof/Main.lean`) and, as a stretch goal,
+`Lindelof.dirichletLindelof_of_GRH` (`Lindelof/Dirichlet.lean`).
+
 Lindelöf (1908) conjectured that `ζ(1/2 + it) = O(|t|^ε)` for every `ε > 0`. Littlewood (1912)
 proved that it follows from the Riemann hypothesis (Titchmarsh, *The Theory of the Riemann
 Zeta-Function*, 2nd ed., §14.2).
@@ -30,14 +33,5 @@ def DirichletLindelofHypothesis : Prop :=
   ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N) (ε : ℝ), 0 < ε →
     (fun t : ℝ => ‖DirichletCharacter.LFunction χ (1 / 2 + t * I)‖) =O[atTop]
       fun t : ℝ => t ^ ε
-
-/-- Littlewood's theorem: RH implies the Lindelöf hypothesis. The main deliverable. -/
-theorem lindelof_of_RH (hRH : RiemannHypothesis) : LindelofHypothesis := by
-  sorry
-
-/-- GRH for Dirichlet L-functions implies the Lindelöf hypothesis for them (stretch goal). -/
-theorem dirichletLindelof_of_GRH (hGRH : Erdos985.DirichletLNonvanishingRightOfHalf) :
-    DirichletLindelofHypothesis := by
-  sorry
 
 end Lindelof
