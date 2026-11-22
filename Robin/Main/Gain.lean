@@ -1,4 +1,5 @@
 import Robin.RH.Psi1
+import Robin.Main.Gain.Core
 
 /-!
 # Lower bound for the gain `Σ_{p≤x} min(1/p², ε log p)` for `x ≥ e^{30}`
@@ -14,7 +15,8 @@ namespace Robin
 open Filter Topology Real Chebyshev MeasureTheory
 
 theorem gain_bound (hB : Psi1NatBound) {x : ℝ} (hx : Real.exp 30 ≤ x) :
-    (2.67 - 60 * x ^ (-(1 : ℝ) / 4)) / (√x * Real.log x) ≤ gainSum x := by
-  sorry
+    (2.67 - 60 * x ^ (-(1 : ℝ) / 4)) / (√x * Real.log x) ≤ gainSum x :=
+  Gain.gain_bound_of psi1 psi1_continuous psi1_hasDerivWithinAt
+    (fun _ ht => psi1_bound hB ht) hx
 
 end Robin
