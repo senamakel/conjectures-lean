@@ -43,6 +43,10 @@ Dirichlet characters, so the Chebotarev and Kummer-field parts have to be built 
 | `Artin/Kummer/Degree.lean` | blueprint B5: Kummer degrees, bounds and exact formulas `[K_k:ℚ] m(k) = k φ(k)` (sorry-free) |
 | `Artin/Kummer/Conductor.lean` | quadratic subfields of `ℚ(ζ_k)`: `√a ∈ ℚ(ζ_k)` iff `a₀ ≡ 1 (mod 4)` and `\|a₀\| ∣ k` (sorry-free) |
 | `Artin/Kummer/Density.lean` | blueprint B6: `δ(a) = Σ μ(k)/[K_k:ℚ]` converges and is positive for `a` not a square, `a ≠ -1` (sorry-free) |
+| `Artin/Analytic/Interface.lean` | the statement the analytic core (A1–A4) must prove: `psiK K x = Σ_{𝔭, m ≥ 1, N𝔭^m < x} log N𝔭`, `PsiKBound K C` (`\|ψ_K(x) − x\| ≤ C √x (log \|d_K\| + n_K log x) log x` for `x ≥ 2`) and the bundle `KummerPsiBounds a` (one `C` for all `K_k`, `k` squarefree); definitions only, no axioms |
+| `Artin/Analytic/Splitting.lean` | blueprint A5: for `p ∤ k a`, `p` splits completely in `K_k` iff `k ∣ p − 1` and `a^((p−1)/k) = 1` mod `p` (`kummerCond_iff_exists_absNorm_eq`, `split_of_kummerCond`), via the decomposition group rather than Dedekind–Kummer; at most `[K : ℚ]` primes above any `p` (sorry-free) |
+| `Artin/Analytic/Discriminant.lean` | blueprint A6: `log \|d_{K_k}\| ≤ 4 [K_k : ℚ] log(k \|a\|)` (`log_abs_discr_le`), by Hadamard's inequality on a basis of monomials `ζ^i α^j` (sorry-free) |
+| `Artin/Analytic/Counting.lean` | blueprint A5 counting and A7: `0 ≤ ψ_K(x) − n θ_k(x) ≤ n log x (2 log(k\|a\|) + √x)`, then `\|θ_k(x) − x/n\| ≪ √x log x log(kx)`, then discrete partial summation, giving `effectiveKummerChebotarev_of_kummerPsiBounds : KummerPsiBounds a → EffectiveKummerChebotarev a` for `a ≠ 0`; the `k = 1` field `ℚ` replaces a separate `π(x) − li(x)` hypothesis (sorry-free) |
 | `docs/BLUEPRINT.md` | the plan, step by step |
 
 ## Building

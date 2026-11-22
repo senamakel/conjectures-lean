@@ -47,9 +47,36 @@ For `K = K_k`, `n = [K : ℚ]`, `d = |disc K|`:
 4. **Unsmoothing** the weight by differencing at `x` and `x(1 + δ)`.
 5. **From ideals to rational primes**: primes that split completely contribute `n log p`.
    Prime powers and primes of residue degree ≥ 2 contribute `O(n √x log x)`.
+   *Done* (`Artin/Analytic/Splitting.lean`, `Counting.lean`, sorry-free). For `p ∤ k a`,
+   `p` splits completely in `K_k` iff `k ∣ p − 1` and `a^((p−1)/k) = 1` mod `p`
+   (`kummerCond_iff_exists_absNorm_eq`, `split_of_kummerCond`). Dedekind–Kummer needs a
+   monogenic order of index prime to `p`, which `K_k` need not have, so the proof uses the
+   decomposition group instead: under the condition every root of `X^k − a` is congruent to
+   an integer mod `𝔓`, so an element of the decomposition group fixes the roots (they stay
+   distinct mod `𝔓` since `p ∤ k a`), hence is trivial, and `|D| = e f` (Mathlib's
+   `Ideal.card_stabilizer_eq`) gives `e = f = 1`. Counting (`psiK_sub_theta`):
+   `0 ≤ ψ_K(x) − n θ_k(x) ≤ n log x (2 log(k|a|) + √x)`, where `θ_k(x)` is `kummerCount`
+   weighted by `log p`.
 6. **Discriminant bound** (Serre / Hensel): `log d ≤ n · log(n · k · |a|) + O(n)`, using
    that ramified primes divide `k a`.
+   *Done* (`Artin/Analytic/Discriminant.lean`, sorry-free) in the form
+   `log |d_{K_k}| ≤ 4 n log(k |a|)` (`log_abs_discr_le`). Serre's route needs the exponent
+   bound for the different, which Mathlib lacks; instead some monomials `ζ^i α^j` (`i, j < k`)
+   form a `ℚ`-basis of algebraic integers whose discriminant is a nonzero integer square
+   times `d_K`, and Hadamard's inequality bounds it by `(n! |a|^n)²`, with `n ≤ k²`.
 7. **π(x) − li(x) = O(√x log x)** from the `k = 1` case, which is RH.
+   *Done without `li`* (`Artin/Analytic/Counting.lean`): the `k = 1` Kummer field is `ℚ`, so
+   `KummerPsiBounds` already contains `θ(x) = x + O(√x log² x)`. Partial summation against
+   `1 / log p` (discrete, `abs_sum_le_of_abs_sum_log_le`) applied to `θ_k(x) − θ_1(x)/n`
+   compares `kummerCount a k x` with `kummerCount a 1 x / n` directly, and
+   `kummerCount a 1 x = π(x) + O(log |a|)`.
+
+The arithmetic steps 5–7 are assembled in `effectiveKummerChebotarev_of_kummerPsiBounds`:
+`KummerPsiBounds a → EffectiveKummerChebotarev a` for `a ≠ 0` (sorry-free). The analytic core
+(steps 1–4) has to prove `KummerPsiBounds a` from `HooleyHypothesis a`, that is, for each
+`K_k` the bound `PsiKBound` of `Artin/Analytic/Interface.lean`:
+`|ψ_K(x) − x| ≤ C √x (log |d_K| + n log x) log x` for real `x ≥ 2`, with
+`ψ_K(x) = Σ_{𝔭, m ≥ 1, N𝔭^m < x} log N𝔭` and one constant `C` for all squarefree `k`.
 
 This is the largest part. Steps 1–3 generalise the erdos-985 analytic library from Dirichlet
 L-functions to `ζ_K`.
