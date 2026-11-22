@@ -2,6 +2,8 @@ import Erdos985.Bach
 import Erdos985.Analytic.Hadamard
 import Erdos985.Analytic.Perron.Weighted
 import Erdos985.Analytic.Perron.Residue
+import Erdos985.Analytic.Perron
+import Erdos985.Analytic.Constants
 import Erdos985.Analytic.Digamma
 
 /-!
