@@ -20,20 +20,31 @@ independent verification is still in progress.
 
 ## What a reader has to trust
 
+The project contains no `sorry`. To accept `erdos_985_of_GRH`, a reader has to trust:
+
+1. Lean's kernel and its three standard axioms.
+2. Lean's compiler, for the 20 `native_decide` evaluations in the finite check.
+3. That the statement and the hypothesis say what they should. Both are short; see
+   `Erdos985/Statement.lean`.
+
+For the unconditional `erdos_985`, add the riemann-hypothesis proof of GRH (see below).
+
 `#print axioms Erdos985.erdos_985_of_GRH` prints:
 
 | Axiom | Where it comes from |
 |---|---|
 | `propext`, `Classical.choice`, `Quot.sound` | Lean's standard axioms |
-| `sorryAx` | the two cited Bach lemmas in `Erdos985/Bach.lean`, and nothing else |
 | 20 × `…native_decide.ax_*` | the finite check for `p < 10^8`, one per chunk |
 
-- **The Bach lemmas** are Lemma 1 of McGown, Treviño and Trudgian,
-  [*Resolving Grosswald's conjecture on GRH*](https://arxiv.org/abs/1508.05182). They follow
-  Bach, *Comments on search procedures for primitive roots*, Math. Comp. 66 (1997). Under GRH they give explicit bounds for
-  `Σ_{n<x} χ(n)Λ(n)(1 − n/x)`. Proving them in Lean needs an explicit formula for `ψ(x, χ)`
-  with explicit constants: the Hadamard product of the completed L-function and an explicit
-  zero count. Mathlib has neither yet, so this is the one gap in the proof.
+- **The Bach lemmas** (Lemma 1 of McGown, Treviño and Trudgian,
+  [*Resolving Grosswald's conjecture on GRH*](https://arxiv.org/abs/1508.05182), following
+  Bach, *Comments on search procedures for primitive roots*, Math. Comp. 66 (1997)) are
+  proved in Lean, with Bach's constants: `Erdos985.Analytic.bach_nonprincipal_of_GRH` and
+  `Erdos985.Analytic.bach_principal_of_GRH`. The proof goes through the Hadamard product of
+  the completed L-function, a weighted Perron formula with kernel `x^s/(s(s+1))`, and the
+  zero-sum identity at `s = 3/2`. The Hadamard factorization library in `Vendor/PNT` is
+  taken from [PrimeNumberTheoremAnd](https://github.com/AlexKontorovich/PrimeNumberTheoremAnd)
+  (Apache-2.0, see `Vendor/PNT/NOTICE.md`).
 - **The finite check** runs a checker whose soundness is proved
   (`Erdos985.Compute.checkAll_sound`, which uses only the standard axioms). It is evaluated
   with `native_decide`, which also trusts Lean's compiler. Replacing it with kernel-checked
@@ -44,7 +55,8 @@ independent verification is still in progress.
 | File | Content |
 |---|---|
 | `Erdos985/Statement.lean` | the hypothesis and the statement |
-| `Erdos985/Bach.lean` | the cited analytic input (MTT Lemma 1), stated at integer `x` |
+| `Erdos985/Bach.lean` | the weighted sums and Bach's constant `c(p, x)` |
+| `Erdos985/Analytic/` | Bach's bounds from GRH: Hadamard, growth of ξ, Perron, explicit formula, constants |
 | `Erdos985/Indicator.lean` | if no prime `q < x ≤ p` is a primitive root, then `S₀ ≤ (2^ω(p−1) − 1) · max_{χ≠1} ‖S_χ‖` |
 | `Erdos985/Numerics.lean` | for `p ≥ 10^8`, Bach's bounds make that inequality impossible |
 | `Erdos985/Compute.lean` | every odd prime `p < 10^8` has a prime primitive root `q < p` |
@@ -76,13 +88,7 @@ the default build. The community cache provides them, but that cache includes ou
 untrusted builds, so this links the two proofs and does not verify the GRH proof:
 
 ```bash
-# in a clone of leanprover-community/riemann-hypothesis
-lake exe cache get
-lake build --no-build Main
-# then, from this project
-RH=/path/to/riemann-hypothesis
-LEAN_PATH="$(cd $RH && lake env printenv LEAN_PATH):$PWD/.lake/build/lib/lean" \
-  lean Unconditional/Erdos985Unconditional.lean
+scripts/check-unconditional.sh /path/to/riemann-hypothesis   # clones it there if missing
 ```
 
 The import opens about 900,000 module files. On macOS, raise the limits first, until the next
@@ -91,5 +97,4 @@ reboot:
 then `ulimit -n 1400000` in the shell that runs `lean`.
 
 Result, checked on 2026-11-22: `erdos_985` compiles, and `#print axioms erdos_985` lists
-`propext`, `Classical.choice`, `Quot.sound`, `sorryAx` (Bach's lemma only) and the 20
-`native_decide` axioms. The riemann-hypothesis proof adds no axioms of its own.
+`propext`, `Classical.choice`, `Quot.sound` and the 20 `native_decide` axioms. The riemann-hypothesis proof adds no axioms of its own.
