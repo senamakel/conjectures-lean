@@ -21,4 +21,7 @@ arXiv:1809.10813), extending Briggs (2006).
 RH itself is a hypothesis; it is proved as `riemannHypothesis` in
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
 
+`Robin.lagarias_of_RH` derives Lagarias's form `σ(n) ≤ H_n + exp(H_n) log H_n` from it, with a
+finite check for `n ≤ 5040` (one documented `native_decide` over ℚ for `13 ≤ n ≤ 5040`).
+
 Build: `lake build Robin`.

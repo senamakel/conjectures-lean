@@ -127,4 +127,17 @@ theorem robin_small_range (n : ℕ) (h1 : 5040 < n) (h2 : Real.log n ≤ Real.ex
     (σ 1 n : ℝ) < Real.exp Real.eulerMascheroniConstant * n * Real.log (Real.log n)
 ```
 
-`LagariasStatement` (stretch goal) is not attempted.
+### Stretch goal: `Robin.lagarias_of_RH : RiemannHypothesis → LagariasStatement` (proved)
+
+`Robin/Lagarias.lean` (+`Lagarias/{Bounds,Finite}.lean`):
+* `n > 5040`: Robin plus `H_n ≥ log n + γ`, so `exp H_n ≥ e^γ n` and `log H_n ≥ log log n`.
+* `1 ≤ n ≤ 12`: exact rational `H_n` with certified rational exp/log bounds, `decide +kernel`.
+* `13 ≤ n ≤ 5040`: `σ(n) ≤ t + 0.57688 + exp(0.57688)·n·L` with certified `t ≤ log n`,
+  `L ≤ log(t + 0.57688)`, checked over ℚ by **`native_decide`** (`midCheck_range`, documented
+  finite check).
+
+```
+#print axioms Robin.lagarias_of_RH
+[propext, sorryAx, Classical.choice, Quot.sound,
+ Robin.Lagarias.midCheck_range._native.native_decide.ax_1_1]
+```
