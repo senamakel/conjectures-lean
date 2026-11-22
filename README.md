@@ -3,8 +3,16 @@
 Under GRH every odd composite `n` has a strong-pseudoprime witness `a ≤ 2 log² n` (Miller 1976;
 constant `2` by Bach, Math. Comp. 55 (1990)). This repository proves the **unconditional
 reduction**: Bach's subgroup bound implies Miller's statement and a correct primality test.
-Bach's bound itself is proved from GRH in the sibling `ankeny-grh` repository; see
-[`Miller/Unconditional/README.md`](Miller/Unconditional/README.md) for how the two connect.
+Bach's bound itself is proved from GRH, with constant `21/5`, in the sibling
+[`ankeny-grh`](https://github.com/senamakel/ankeny-grh) repository, which is a lake dependency.
+`Miller/GRH.lean` combines the two:
+
+- `Miller.miller_of_GRH : GRH → MillerStatement (21 / 5)`
+- `Miller.prime_iff_of_GRH`, and `Miller.millerTestGRH_iff_prime`, the executable test with
+  `3 · (⌊log₂ n⌋ + 1)²` bases, which is at least `(21/5) log² n`.
+
+Their axioms are the standard three plus the 8 `native_decide` chunks of ankeny-grh's finite
+check.
 
 `Miller/Statement.lean` fixes the target definitions (`BachSubgroupBound`,
 `IsStrongProbablePrime`, `MillerStatement`); they must not change.
