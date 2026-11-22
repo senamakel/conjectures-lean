@@ -12,7 +12,8 @@ theorem Erdos985.erdos_985_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
 
 The statement is the same as `erdos_985` in
 [`formal-conjectures`](https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/ErdosProblems/985.lean).
-The project has no `sorry`.
+The project has no `sorry`. A write-up of the proof in mathematical terms is in
+[`paper/erdos985.pdf`](paper/erdos985.pdf).
 
 ## How it uses the riemann-hypothesis formalization
 
