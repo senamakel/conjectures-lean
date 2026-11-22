@@ -1,6 +1,7 @@
 import Artin.SieveHalf
 import Artin.Analytic.Counting
 import Artin.Analytic.Continuation
+import Artin.Analytic.Core.Unsmoothing
 
 /-!
 # Artin's conjecture under Hooley's hypothesis and Hecke's continuation
@@ -16,8 +17,8 @@ for each Kummer field `K_k`, `k` squarefree. With Hecke's theorem formalised, a 
 The proof is the chain
 
 * `kummerPsiBounds_of_hooley_of_continuation`: RH and Hecke's continuation for every `ζ_{K_k}`
-  give `KummerPsiBounds a` (the analytic core, blueprint steps A1–A4,
-  `Artin/Analytic/Core/`);
+  give `KummerPsiBounds a`, by the per-field analytic core `psiKBound_of_continuation`
+  (blueprint steps A1–A4, `Artin/Analytic/Core/`), whose constant is absolute;
 * `effectiveKummerChebotarev_of_kummerPsiBounds` (`Artin/Analytic/Counting.lean`, sorry-free);
 * `artin_of_effectiveKummerChebotarev` (`Artin/SieveHalf.lean`, sorry-free).
 -/
@@ -32,7 +33,8 @@ for every Kummer field `K_k` gives the Lagarias–Odlyzko bound
 theorem kummerPsiBounds_of_hooley_of_continuation (a : ℤ) (h : HooleyHypothesis a)
     (hc : ∀ k : ℕ, Squarefree k → DedekindContinuation (Kummer.KField a k)) :
     KummerPsiBounds a := by
-  sorry
+  obtain ⟨C, hC⟩ := psiKBound_of_continuation
+  exact ⟨C, fun k hk => hC (Kummer.KField a k) (h k hk) (hc k hk)⟩
 
 /-- The analytic half, with Hecke's continuation as a hypothesis. -/
 theorem effectiveKummerChebotarev_of_hooley_of_continuation (a : ℤ) (ha : a ≠ 0)
