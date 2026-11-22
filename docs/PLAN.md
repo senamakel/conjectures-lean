@@ -94,18 +94,37 @@ to `10^{10^{10}}`). Since `e^{30} < 1.07·10^{13}`, `log n ≤ e^{30}` gives
 
 ## Status
 
+Everything is proved except the cited computation of §5.
+
+```
+#print axioms Robin.robin_of_RH
+'Robin.robin_of_RH' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+#print axioms Robin.main_estimate
+'Robin.main_estimate' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
+
+The single `sorryAx` is `Robin.robin_small_range` (§5). No `native_decide`, no new axioms.
+
 | File | Content | Status |
 |---|---|---|
 | `Robin/Defs.lean` | shared definitions | done |
 | `Robin/Elementary/SigmaBound.lean` | §1 | proved |
-| `Robin/Main.lean` | §2, `robin_of_RH` | proved from the lemmas below |
-| `Robin/RH/Bach.lean` | §3 explicit formula under RH | in progress |
-| `Robin/RH/Psi1.lean` | §3 `Ψ₁`, `ψ` bounds | in progress |
-| `Robin/Mertens/Abelian.lean` | §4a Mertens' constant `= γ` | in progress |
-| `Robin/Mertens/Identity.lean` (+`Identity/Abel.lean`) | Mertens with remainder | proved (modulo §4a) |
-| `Robin/Main/Tail.lean` | tail integral | in progress |
-| `Robin/Main/Gain.lean` | gain lower bound | in progress |
-| `Robin/Main/Estimate.lean` | §4 assembly and numerics | proved (modulo Tail, Gain) |
+| `Robin/Main.lean` | §2, `robin_of_RH` | proved |
+| `Robin/RH/Bach.lean` | §3 explicit formula under RH | proved |
+| `Robin/RH/Psi1.lean` | §3 `Ψ₁`, `ψ` bounds | proved |
+| `Robin/Mertens/Abelian.lean` (+`Abelian/{Limit,Mellin,Zeta}.lean`) | §4a Mertens' constant `= γ` | proved |
+| `Robin/Mertens/Identity.lean` (+`Identity/Abel.lean`) | Mertens with remainder | proved |
+| `Robin/Main/Tail.lean` | tail integral | proved |
+| `Robin/Main/Gain.lean` (+`Gain/{Basic,Y,Abel,Integrals,Errors,Core}.lean`) | gain lower bound | proved |
+| `Robin/Main/Estimate.lean` | §4 assembly and numerics | proved |
 | `Robin/Small.lean` | §5 | cited `sorry` (by design) |
+
+The remaining `sorry`, verbatim:
+
+```lean
+/-- **Cited (Morrill–Platt 2021, Theorem 1).** Robin's inequality for `5040 < n ≤ exp(e^{30})`. -/
+theorem robin_small_range (n : ℕ) (h1 : 5040 < n) (h2 : Real.log n ≤ Real.exp 30) :
+    (σ 1 n : ℝ) < Real.exp Real.eulerMascheroniConstant * n * Real.log (Real.log n)
+```
 
 `LagariasStatement` (stretch goal) is not attempted.
