@@ -44,7 +44,13 @@ theorem effectiveKummerChebotarev_of_hooley (a : ℤ) (ha : a ≠ 0) (h : Hooley
     EffectiveKummerChebotarev a := by
   sorry
 
-/-- Sieve half: Hooley's sieve plus Kummer theory. -/
+/-- Sieve half: Hooley's sieve plus Kummer theory.
+
+The sieve part is proved in `Artin/Sieve/Assembly.lean` as
+`Artin.artin_of_effectiveKummerChebotarev_of_kummer`, which additionally takes the two
+Kummer-theory facts `KummerDegreeLowerBound a` and `KummerDensityPos a` from
+`Artin/Sieve/KummerInputs.lean` (blueprint B5, B6) as hypotheses. This theorem stays sorried until
+`Artin/Kummer/` proves those two facts; it then follows by applying that theorem. -/
 theorem artin_of_effectiveKummerChebotarev (a : ℤ) (ha : ¬IsSquare a) (ha' : a ≠ -1)
     (h : EffectiveKummerChebotarev a) :
     ∃ x > 0, (S a).HasDensity x {p | p.Prime} := by

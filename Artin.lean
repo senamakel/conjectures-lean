@@ -5,4 +5,6 @@ import Artin.Sieve.HugePrimes
 import Artin.Sieve.BrunTitchmarsh
 import Artin.Sieve.BrunTitchmarshLargePrimes
 import Artin.Sieve.Density
+import Artin.Sieve.KummerInputs
+import Artin.Sieve.Assembly
 import Artin.Main

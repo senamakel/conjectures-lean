@@ -36,6 +36,8 @@ Dirichlet characters, so the Chebotarev and Kummer-field parts have to be built 
 | `Artin/Sieve/BrunTitchmarsh.lean` | Brun–Titchmarsh: `π(x; q, 1) ≤ 20000 x / (φ(q) log(x/q))` for `x > q ≥ 1` (sorry-free) |
 | `Artin/Sieve/BrunTitchmarshLargePrimes.lean` | blueprint B3: primes `q ∈ (√x / log² x, √x log x]` sift out `≤ 23040000 x log log x / log² x` primes for `x ≥ e^256`, so `o(π(x))` (sorry-free) |
 | `Artin/Sieve/HugePrimes.lean` | blueprint B4: primes sifted by `q > √x log x` number `≤ (\|a\|+1) x / log² x` (sorry-free) |
+| `Artin/Sieve/KummerInputs.lean` | blueprint B5/B6 as hypotheses: `KummerDegreeLowerBound` (`k φ(k) ≪ [K_k : ℚ]`) and `KummerDensityPos` (`Σ μ(k)/[K_k : ℚ] > 0`), proved in `Artin/Kummer/` |
+| `Artin/Sieve/Assembly.lean` | blueprint B1, B2 and the join with B3, B4, B7: `artin_of_effectiveKummerChebotarev_of_kummer`, the sieve half modulo the two Kummer inputs (sorry-free) |
 | `Artin/Sieve/Density.lean` | blueprint B7: `N(x)/π(x) → δ` gives `(S a).HasDensity δ` (sorry-free) |
 | `docs/BLUEPRINT.md` | the plan, step by step |
 

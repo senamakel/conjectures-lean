@@ -62,8 +62,13 @@ Write `N(x)` for the number of primes `p < x`, `p ∤ a`, with `a` a primitive r
 
 1. **Small primes** (`q ≤ ξ₁`): inclusion–exclusion over `k | ∏_{q ≤ ξ₁} q`, so
    `k ≤ x^{1/6 + o(1)}`, gives `Σ μ(k) kummerCount a k x = π(x) Σ μ(k)/[K_k:ℚ] + O(x^{2/3+ε})`.
+   Done in `Artin/Sieve/Assembly.lean`, with `ξ₁ = ⌊(1/6) log x⌋`: `ξ₁# ≤ 4^{ξ₁} ≤ x^{1/3}`, so
+   the error is `≤ x^{1/3} · C√x log(x^{4/3}) = o(π(x))`; the truncated density tends to `δ(a)`
+   since `Σ μ(k)/[K_k:ℚ]` converges absolutely (from B5 and `n ≤ 2φ(n)²`).
 2. **Medium primes** (`ξ₁ < q ≤ ξ₂`): `kummerCount a q x ≪ π(x)/q² + √x log x`, summed:
-   `o(π(x))`. Needs `[K_q : ℚ] ≫ q²`.
+   `o(π(x))`. Needs `[K_q : ℚ] ≫ q²`. Done in `Artin/Sieve/Assembly.lean` (`medium_le`): the
+   `π(x)/[K_q:ℚ]` terms sum to `≤ c π(x) Σ_{q > ξ₁} 1/(q φ(q)) = o(π(x))`, and the error terms
+   to `π(ξ₂) · 2C√x log x ≪ x / log² x` by Chebyshev's `π(y) ≤ (log 4 + 1) y / log y`.
 3. **Large primes** (`ξ₂ < q ≤ ξ₃`): Brun–Titchmarsh `π(x; q, 1) ≪ x/(q log(x/q))`, summed:
    `O(x log log x / log² x)`. Done: `Artin/Sieve/BrunTitchmarsh.lean` proves Brun–Titchmarsh
    with constant 20000 from the Selberg sieve vendored from PrimeNumberTheoremAnd, and
@@ -73,10 +78,14 @@ Write `N(x)` for the number of primes `p < x`, `p ∤ a`, with `a` a primitive r
    divides `∏_{m < √x/log x} (a^m − 1)`, which has `O(x / log² x)` prime factors. Elementary.
 5. **Kummer degrees**: `[K_k : ℚ] = k φ(k) / ε(k)`, with `ε(k) | 2h` where `a = ± b^h`.
    We need `[K_k : ℚ] ≥ c_a k φ(k)` for steps 1–2 and the tail of `Σ μ(k)/[K_k:ℚ]`.
+   Stated as `KummerDegreeLowerBound a` in `Artin/Sieve/KummerInputs.lean`.
    Mathlib has `FieldTheory/KummerExtension.lean` and `KummerPolynomial.lean`.
 6. **Positivity** of `δ(a) = Σ_k μ(k)/[K_k:ℚ]` for `a` not a square and not `−1`. This needs
    exact degrees, including the entanglement when `√a ∈ ℚ(ζ_k)`. Reference: Lenstra–Moree–
    Stevenhagen, *Character sums for primitive root densities*, arXiv:1112.4816.
+   Stated as `KummerDensityPos a` in `Artin/Sieve/KummerInputs.lean`; the sieve half
+   (`artin_of_effectiveKummerChebotarev_of_kummer`) is proved from B5, B6 and
+   `EffectiveKummerChebotarev`.
 7. **Density**: `N(x) = δ(a) π(x) + o(π(x))`, and `π(x) → ∞`, give `HasDensity δ(a)`
    relative to the primes. Primes dividing `a` are finitely many.
 
