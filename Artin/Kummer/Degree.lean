@@ -1,5 +1,25 @@
 import Artin.Interfaces
 
+/-!
+# Kummer degrees (blueprint step B5)
+
+`K_k` is the splitting field of `X^k - a` over `ℚ`. It contains a primitive `k`-th root of unity
+`ζ` and a root `α`, `F = ℚ(ζ)` has degree `φ(k)` and `K_k = F(α)`. Let `d = [K_k : F]`. The
+constant term of the minimal polynomial of `α` over `F` is a product of `d` roots `ζ^i α`, so
+`α^d ∈ F`; with `α^k = a ∈ F` this forces `d ∣ k`, and `a = (α^d)^m` is an `m`-th power in `F`,
+`m = k / d`. An integer that is a `q`-th power in an abelian field, `q` an odd prime, is a
+`q`-th power in `ℤ` (`exists_int_pow_of_isAbelianGalois`). So `m` is bounded in terms of `a`,
+and `m ∣ 2` when `a` is not a perfect power.
+
+Main results:
+
+* `kummerDegree_le`: `[K_k : ℚ] ≤ k φ(k)` for `a ≠ 0`, `k ≠ 0`;
+* `exists_mul_totient_le_kummerDegree`: `k φ(k) ≤ c [K_k : ℚ]` for squarefree `k`, `a ∉ {0, ±1}`
+  (with `c = 4^|a|`);
+* `kummerDegree_mul_kummerEps`: `[K_k : ℚ] ε(k) = k φ(k)` for squarefree `k` and `a` not a
+  perfect power, where `ε(k) = 2` if `k` is even and `√a ∈ ℚ(ζ_k)`, and `1` otherwise.
+-/
+
 namespace Artin.Kummer
 
 open Polynomial IntermediateField

@@ -344,4 +344,66 @@ theorem kummerDensity_pos (hpp : NotPerfectPower a) : 0 < kummerDensity a := by
     tsum_ite_eq 1 (fun _ => (1 / 2 : ℝ)), tsum_div_const]
   linarith [tsum_oddWeight_lt_one]
 
+
+/-- For every `a ∉ {0, ±1}` (perfect powers included) the series for `δ(a)` converges absolutely,
+by the lower bound `k φ(k) ≤ 4^|a| [K_k : ℚ]`. -/
+theorem summable_moebius_div_kummerDegree_of_ne (ha0 : a ≠ 0) (ha1 : a ≠ 1) (ha2 : a ≠ -1) :
+    Summable fun k : ℕ => (moebius k : ℝ) / kummerDegree a k := by
+  refine Summable.of_norm_bounded (summable_sqfreeWeight.mul_left ((4 : ℝ) ^ a.natAbs)) fun k => ?_
+  rw [Real.norm_eq_abs]
+  by_cases hk : Squarefree k
+  · have hle : (k * k.totient : ℝ) ≤ 4 ^ a.natAbs * kummerDegree a k := by
+      exact_mod_cast mul_totient_le_kummerDegree ha0 ha1 ha2 hk
+    have hpos : (0 : ℝ) < k * k.totient := by
+      have := Nat.pos_of_ne_zero hk.ne_zero
+      have := Nat.totient_pos.2 this
+      positivity
+    have hdeg : (0 : ℝ) < kummerDegree a k := by
+      by_contra h; push Not at h; nlinarith [pow_pos (show (0 : ℝ) < 4 by norm_num) a.natAbs]
+    rw [abs_div, abs_of_pos hdeg, sqfreeWeight_eq hk, div_le_iff₀ hdeg]
+    have hμ : |(moebius k : ℝ)| ≤ 1 := by exact_mod_cast abs_moebius_le_one
+    calc |(moebius k : ℝ)| ≤ 1 := hμ
+      _ = 4 ^ a.natAbs * ((k : ℝ) * k.totient)⁻¹ * (4 ^ a.natAbs)⁻¹ * ((k : ℝ) * k.totient) := by
+        field_simp; exact (div_self hpos.ne').symm
+      _ ≤ 4 ^ a.natAbs * ((k : ℝ) * k.totient)⁻¹ * (4 ^ a.natAbs)⁻¹ *
+          (4 ^ a.natAbs * kummerDegree a k) := by gcongr
+      _ = 4 ^ a.natAbs * ((k : ℝ) * k.totient)⁻¹ * kummerDegree a k := by field_simp
+  · rw [moebius_div_kummerDegree_of_not_squarefree hk, abs_zero]
+    exact mul_nonneg (by positivity) (sqfreeWeight_nonneg k)
+
+/-! ### What remains (stated, not proved)
+
+The two statements below are what the rest of the project needs beyond the non-perfect-power case.
+
+1. **Conductor of `ℚ(√a)`.** For squarefree `k`, `√a ∈ ℚ(ζ_k)` exactly when the discriminant of
+   `ℚ(√a)` divides `k`. With `a = a₀ c²`, `a₀` squarefree, that discriminant is `a₀` if
+   `a₀ ≡ 1 (mod 4)` and `4 a₀` otherwise, and `4 a₀` never divides a squarefree `k`. This turns
+   `kummerEps` into Hooley's explicit `ε(k)` and gives the closed form
+   `δ(a) = A (1 - μ(|a₀|) ∏_{q ∣ a₀} 1/(q² - q - 1))` for `a₀ ≡ 1 (mod 4)` (and `δ(a) = A`
+   otherwise), `A` = Artin's constant, when `a` is not a perfect power. Positivity above does
+   not need it. The `⇐` direction is a Gauss-sum computation (`gaussSum_sq`); the `⇒` direction
+   needs ramification in cyclotomic fields (or `ℚ(ζ_m) ∩ ℚ(ζ_n) = ℚ(ζ_{gcd(m,n)})`), which our
+   Mathlib pin does not provide.
+
+2. **Positivity for perfect powers.** For `a = ± b^h` with `h > 1` the exact degree is
+   `[K_k : ℚ] = k φ(k) / m(k)` with `m(k)` the largest divisor of `k` for which `a` is an
+   `m(k)`-th power in `ℚ(ζ_k)` (the proof of `exists_structure` gives this), and the odd part of
+   `m(k)` is `∏ q` over odd primes `q ∣ gcd(k, h)` with `a` a `q`-th power in `ℤ`. The crude bound
+   used in `kummerDensity_pos` fails once `h` has several small odd prime factors (e.g.
+   `h = 105`: the weights `q / (q (q - 1))` at `q = 3, 5, 7` push the comparison sum past `1`), so
+   the general case needs the exact set of `j` with `√a ∈ ℚ(ζ_{2j})`, i.e. item 1.
+-/
+
+/-- **Not proved: conductor of `ℚ(√a)`.** See item 1 above. -/
+theorem exists_sq_cyclotomicField_iff {a₀ c : ℤ} (ha : ¬ IsSquare a) (h₀ : Squarefree a₀)
+    (hac : a = a₀ * c ^ 2) {k : ℕ} (hk : Squarefree k) :
+    (∃ β : CyclotomicField k ℚ, β ^ 2 = a) ↔ a₀ % 4 = 1 ∧ a₀.natAbs ∣ k := by
+  sorry
+
+/-- **Not proved: positivity of `δ(a)` in general** (Hooley's hypothesis on `a` in the target
+theorem). Proved above (`kummerDensity_pos`) when `a` is not a perfect power. See item 2. -/
+theorem kummerDensity_pos_of_not_isSquare (ha : ¬ IsSquare a) (ha' : a ≠ -1) :
+    0 < kummerDensity a := by
+  sorry
+
 end Artin.Kummer
