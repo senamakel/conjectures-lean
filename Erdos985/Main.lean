@@ -1,6 +1,7 @@
 import Erdos985.Indicator
 import Erdos985.Numerics
 import Erdos985.Compute
+import Erdos985.Analytic.ExplicitFormula
 
 namespace Erdos985
 
@@ -21,7 +22,7 @@ theorem erdos_985_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : Erdos985St
     fun q hq hqp => hcon q hq hqp
   have hp1 : 1 ≤ p := hp.one_lt.le
   have key := principal_le_of_no_prime_primitive_root p hp2 p le_rfl
-    (bachC p p * √p * Real.log p) (fun χ hχ => bach_nonprincipal hGRH p χ hχ p hp1) hno
+    (bachC p p * √p * Real.log p) (fun χ hχ => Analytic.bach_nonprincipal_of_GRH hGRH p χ hχ p hp1) hno
   have hprin := bach_principal hGRH p hp1
   have hbig := bach_inequality_large p hp (not_lt.mp hlt)
   have := (abs_le.mp hprin).1
