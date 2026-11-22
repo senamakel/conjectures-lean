@@ -28,8 +28,8 @@ The stack behind the agents:
 |---|---|
 | Memory | [LivingBrain](https://livingbrain.com) |
 | Search | [Exa](https://exa.ai) ([@ExaAILabs](https://x.com/ExaAILabs)) |
-| Inference | [GMI Cloud](https://www.gmicloud.ai) ([@gmi_cloud](https://x.com/gmi_cloud)) |
-| Models | [GLM](https://github.com/zai-org) models, served on GMI Cloud |
+| Inference | [GMI Cloud](https://gmicloud.ai) ([@gmi_cloud](https://x.com/gmi_cloud)) |
+| Models | [GLM](https://z.ai) models by Z.ai, served on GMI Cloud |
 
 ## How it uses the riemann-hypothesis formalization
 
