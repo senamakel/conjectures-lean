@@ -84,3 +84,12 @@ RH=/path/to/riemann-hypothesis
 LEAN_PATH="$(cd $RH && lake env printenv LEAN_PATH):$PWD/.lake/build/lib/lean" \
   lean Unconditional/Erdos985Unconditional.lean
 ```
+
+The import opens about 900,000 module files. On macOS, raise the limits first, until the next
+reboot:
+`sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`,
+then `ulimit -n 1400000` in the shell that runs `lean`.
+
+Result, checked on 2026-11-22: `erdos_985` compiles, and `#print axioms erdos_985` lists
+`propext`, `Classical.choice`, `Quot.sound`, `sorryAx` (Bach's lemma only) and the 20
+`native_decide` axioms. The riemann-hypothesis proof adds no axioms of its own.
