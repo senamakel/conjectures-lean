@@ -31,6 +31,12 @@ Dirichlet characters, so the Chebotarev and Kummer-field parts have to be built 
 | `Artin/Statement.lean` | definitions copied word for word from formal-conjectures; do not change |
 | `Artin/Interfaces.lean` | the split: analytic half and sieve half, joined by `EffectiveKummerChebotarev` |
 | `Artin/Main.lean` | the target theorem, from the two halves |
+| `Artin/Sieve/PrimitiveRoot.lean` | primitive-root criterion and the inclusion–exclusion identity, exact and truncated (sorry-free) |
+| `Artin/Sieve/Selberg/` | the Selberg upper-bound sieve, vendored from PrimeNumberTheoremAnd (see Credits) |
+| `Artin/Sieve/BrunTitchmarsh.lean` | Brun–Titchmarsh: `π(x; q, 1) ≤ 20000 x / (φ(q) log(x/q))` for `x > q ≥ 1` (sorry-free) |
+| `Artin/Sieve/BrunTitchmarshLargePrimes.lean` | blueprint B3: primes `q ∈ (√x / log² x, √x log x]` sift out `≤ 23040000 x log log x / log² x` primes for `x ≥ e^256`, so `o(π(x))` (sorry-free) |
+| `Artin/Sieve/HugePrimes.lean` | blueprint B4: primes sifted by `q > √x log x` number `≤ (\|a\|+1) x / log² x` (sorry-free) |
+| `Artin/Sieve/Density.lean` | blueprint B7: `N(x)/π(x) → δ` gives `(S a).HasDensity δ` (sorry-free) |
 | `docs/BLUEPRINT.md` | the plan, step by step |
 
 ## Building
@@ -43,3 +49,13 @@ dependency. `.lake/packages` is a symlink to the shared package directory
 ```bash
 lake build Artin.Main
 ```
+
+## Credits
+
+`Artin/Sieve/Selberg/` is vendored from
+[PrimeNumberTheoremAnd](https://github.com/AlexKontorovich/PrimeNumberTheoremAnd) (commit
+`a4fb698`, files `PrimeNumberTheoremAnd/Mathlib/NumberTheory/Sieve/*.lean`, by Arend Mellendijk),
+under the Apache License 2.0; a copy of the licence is in `Artin/Sieve/Selberg/LICENSE`. The files
+are adapted to our Mathlib pin, and each starts with a NOTICE comment listing its changes. The
+arithmetic-progression set-up in `Artin/Sieve/BrunTitchmarsh.lean` follows the interval version in
+PrimeNumberTheoremAnd's `BrunTitchmarsh.lean`.

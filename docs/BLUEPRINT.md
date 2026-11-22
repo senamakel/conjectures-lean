@@ -65,9 +65,10 @@ Write `N(x)` for the number of primes `p < x`, `p ∤ a`, with `a` a primitive r
 2. **Medium primes** (`ξ₁ < q ≤ ξ₂`): `kummerCount a q x ≪ π(x)/q² + √x log x`, summed:
    `o(π(x))`. Needs `[K_q : ℚ] ≫ q²`.
 3. **Large primes** (`ξ₂ < q ≤ ξ₃`): Brun–Titchmarsh `π(x; q, 1) ≪ x/(q log(x/q))`, summed:
-   `O(x log log x / log² x)`. **Brun–Titchmarsh is not in our Mathlib pin.** Mathlib has
-   `NumberTheory/SelbergSieve.lean`, and PrimeNumberTheoremAnd has a Brun–Titchmarsh
-   development to vendor or port.
+   `O(x log log x / log² x)`. Done: `Artin/Sieve/BrunTitchmarsh.lean` proves Brun–Titchmarsh
+   with constant 20000 from the Selberg sieve vendored from PrimeNumberTheoremAnd, and
+   `Artin/Sieve/BrunTitchmarshLargePrimes.lean` sums it, using Chebyshev's `θ(y) ≤ y log 4` on
+   dyadic blocks for `∑ 1/q`.
 4. **Huge primes** (`q > ξ₃`): `a^m ≡ 1 (mod p)` with `m = (p−1)/q < √x / log x`, so `p`
    divides `∏_{m < √x/log x} (a^m − 1)`, which has `O(x / log² x)` prime factors. Elementary.
 5. **Kummer degrees**: `[K_k : ℚ] = k φ(k) / ε(k)`, with `ε(k) | 2h` where `a = ± b^h`.
