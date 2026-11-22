@@ -31,6 +31,8 @@ Fix `q`, a proper subgroup `H < (ℤ/q)ˣ`, and suppose every unit of residue `�
    `ω(q)` is bounded by `16^ω · 30030 ≤ q · 16^6` (`Erdos985.pow_card_primeFactors_mul_le`).
 7. **Finite range** `q < Q₀` (`Ankeny/Compute*.lean`): a verified checker shows that the units
    `≤ y_q` generate `(ℤ/q)ˣ`, with `y_q ≤ c log² q` certified by `log q ≥ ⌊log₂ q⌋ log 2`.
+   The checker marks only `1` and `r·g mod q` for marked `r` and generators `g ≤ y_q` coprime
+   to `q`, so every marked residue lies in the subgroup they generate.
 8. **Least non-residue**: `H = ` squares, proper for odd `p` since `x ↦ x²` is not injective.
 
 ## Constant
@@ -43,5 +45,13 @@ Target: the smallest `c` whose `Q₀` a verified checker can cover.
 
 ## Status
 
-- [ ] 1 Character  - [ ] 2-3 Split  - [ ] 4 Prime powers  - [ ] 5 Analytic bound
-- [ ] 6 Numerics   - [ ] 7 Finite check  - [ ] 8 Least non-residue  - [ ] README / axioms
+All steps done; no `sorry`. Constant achieved: `21/5` (analytic for `q ≥ 2^17`, verified
+computation below). The finite range uses `native_decide` in eight chunks
+(`Ankeny/Compute/Chunk*.lean`) on a core-Lean checker precompiled to native code; its soundness
+is proved in `Ankeny/Checker.lean`. Bach's `2` is not reached (see README).
+
+- [x] 1 Character (`Character.lean`)  - [x] 2-3 Split (`Split.lean`)
+- [x] 4 Prime powers (`PrimePowers.lean`)  - [x] 5 Analytic bound (`Analytic.lean`)
+- [x] 6 Numerics (`Numerics.lean`, `c = 21/5`, `Q₀ = 2^17`)
+- [x] 7 Finite check (`AnkenyCheck.lean`, `Checker.lean`, `Finite.lean`, `Compute*.lean`)
+- [x] 8 Least non-residue (`LeastNonresidue.lean`)  - [x] README / axioms

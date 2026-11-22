@@ -1,8 +1,10 @@
 import Mathlib
+import AnkenyCheck
 
 /-!
-# A verified generation checker for `(ZMod q)ˣ`
+# Soundness of the generation checker for `(ZMod q)ˣ`
 
+The executable definitions live in `AnkenyCheck.lean` (core Lean only, precompiled).
 `checkGen q y` runs a breadth-first search from `1` in `ZMod q`, multiplying by a few small
 generators `g ≤ y` coprime to `q`, and then checks that every residue coprime to `q` was
 reached. Soundness (`closure_eq_top_of_checkGen`): if it returns `true`, the units of residue
@@ -14,36 +16,6 @@ the search and the choice of generators matter only for completeness).
 -/
 
 namespace Ankeny.Checker
-
-/-- Is index `i` marked? -/
-def marked (arr : Array Bool) (i : ℕ) : Bool := arr[i]?.getD false
-
-/-- Multiply `r` by every generator; mark and enqueue the new residues. -/
-def bfsStep (q : ℕ) (gens : List ℕ) (r : ℕ) (st : Array Bool × List ℕ) : Array Bool × List ℕ :=
-  gens.foldl (fun acc g =>
-    let t := r * g % q
-    if marked acc.1 t then acc else (acc.1.setIfInBounds t true, t :: acc.2)) st
-
-/-- Breadth-first (well, depth-first) search with fuel. -/
-def bfs (q : ℕ) (gens : List ℕ) : ℕ → Array Bool → List ℕ → Array Bool
-  | 0, arr, _ => arr
-  | _ + 1, arr, [] => arr
-  | n + 1, arr, r :: rest =>
-    let st := bfsStep q gens r (arr, rest)
-    bfs q gens n st.1 st.2
-
-/-- Candidate generators: the first `k` primes `≤ y` (and `< q`) coprime to `q`. -/
-def gensFor (q y k : ℕ) : List ℕ :=
-  (((List.range (min (y + 1) q)).filter fun g => 2 ≤ g && g.minFac == g && Nat.gcd g q == 1)).take k
-
-/-- Does the search from `1` with generators `gens` reach every residue coprime to `q`? -/
-def reachesAll (q : ℕ) (gens : List ℕ) : Bool :=
-  let arr := bfs q gens (q + 1) ((Array.replicate q false).setIfInBounds 1 true) [1]
-  (List.range q).all fun a => Nat.gcd a q != 1 || marked arr a
-
-/-- The checker: try 3 generators, then 8, then all candidates. -/
-def checkGen (q y : ℕ) : Bool :=
-  reachesAll q (gensFor q y 3) || reachesAll q (gensFor q y 8) || reachesAll q (gensFor q y q)
 
 /-! ### Soundness -/
 
@@ -105,9 +77,8 @@ def smallUnits (q y : ℕ) : Set (ZMod q)ˣ := {u | (u : ZMod q).val ≤ y}
 
 lemma mem_gensFor {q y k g : ℕ} (h : g ∈ gensFor q y k) : g.Coprime q ∧ g ≤ y := by
   have h' := List.mem_of_mem_take h
-  simp only [List.mem_filter, List.mem_range, Bool.and_eq_true, beq_iff_eq,
-    decide_eq_true_eq] at h'
-  exact ⟨h'.2.2, by omega⟩
+  simp only [List.mem_filter, Bool.and_eq_true, beq_iff_eq, decide_eq_true_eq] at h'
+  exact ⟨h'.2.2, h'.2.1.1⟩
 
 lemma closure_eq_top_of_reachesAll (q y : ℕ) [NeZero q] (gens : List ℕ)
     (hgens : ∀ g ∈ gens, g.Coprime q ∧ g ≤ y) (h : reachesAll q gens = true) :
