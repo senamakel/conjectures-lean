@@ -31,6 +31,9 @@ Dirichlet characters, so the Chebotarev and Kummer-field parts have to be built 
 | `Artin/Statement.lean` | definitions copied word for word from formal-conjectures; do not change |
 | `Artin/Interfaces.lean` | the split: analytic half and sieve half, joined by `EffectiveKummerChebotarev` |
 | `Artin/Main.lean` | the target theorem, from the two halves |
+| `Artin/Sieve/PrimitiveRoot.lean` | primitive-root criterion and the inclusion–exclusion identity, exact and truncated (sorry-free) |
+| `Artin/Sieve/HugePrimes.lean` | blueprint B4: primes sifted by `q > √x log x` number `≤ (\|a\|+1) x / log² x` (sorry-free) |
+| `Artin/Sieve/Density.lean` | blueprint B7: `N(x)/π(x) → δ` gives `(S a).HasDensity δ` (sorry-free) |
 | `docs/BLUEPRINT.md` | the plan, step by step |
 
 ## Building
