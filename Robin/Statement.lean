@@ -23,8 +23,7 @@ def LagariasStatement : Prop :=
   ∀ n : ℕ, 1 ≤ n →
     (σ 1 n : ℝ) ≤ (harmonic n : ℝ) + Real.exp (harmonic n) * Real.log (harmonic n)
 
-/-- Robin's theorem: the main deliverable. -/
-theorem robin_of_RH (hRH : RiemannHypothesis) : RobinStatement := by
-  sorry
+-- The main theorem `Robin.robin_of_RH : RiemannHypothesis → RobinStatement` is proved in
+-- `Robin/Main.lean` (moved there so that it can import the proof modules).
 
 end Robin
