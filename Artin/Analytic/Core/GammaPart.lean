@@ -64,18 +64,11 @@ noncomputable def gammaPartP (a x : ℕ) : ℂ :=
 lemma gammaPartP_eq_gammaPart {N : ℕ} (χ : DirichletCharacter ℂ N) (x : ℕ) :
     gammaPartP (parity χ) x = gammaPart χ x := rfl
 
-/-- `gammaPartP a x = ∑_k tau x (2k + a)`. -/
-theorem gammaPartP_eq_tsum_tau (a x : ℕ) (hx : 1 ≤ x) :
-    gammaPartP a x = ((∑' k : ℕ, tau x (2 * k + a) : ℝ) : ℂ) := by
+lemma summable_integral_norm_gTerm (a x : ℕ) (hx : 1 ≤ x) :
+    Summable (fun k : ℕ => ∫ t, ‖gTerm x (2 * k + a) t‖) := by
   obtain ⟨C, hC0, hC⟩ := perron_pair_integral_norm_le (δ := 1) (θ := 1 / 2) one_pos
     (by norm_num) (by norm_num)
   have hx0 : (0 : ℝ) < x := by exact_mod_cast hx
-  have hsum : ∀ t : ℝ, (gR a (2 + t * I) - gR a 2) *
-      (x : ℂ) ^ ((2 : ℂ) + t * I) / (((2 : ℂ) + t * I) * ((2 : ℂ) + t * I + 1)) =
-      ∑' k : ℕ, gTerm x (2 * k + a) t := by
-    intro t
-    have hs : 1 < ((2 : ℂ) + t * I).re := by simp
-    exact (((hasSum_gR (a := a) hs).mul_right _).div_const _).tsum_eq.symm
   have hnorm : ∀ m : ℕ, ∫ t, ‖gTerm x m t‖ ≤
       C * (x : ℝ) ^ (2 : ℝ) * ((1 + (m : ℝ)) ^ (-(1 / 2 : ℝ)) / (2 + m)) := by
     intro m
@@ -91,22 +84,59 @@ theorem gammaPartP_eq_tsum_tau (a x : ℕ) (hx : 1 ≤ x) :
       _ ≤ 1 / (2 + (m : ℝ)) * (C * (x : ℝ) ^ (2 : ℝ) * (1 + (m : ℝ)) ^ (-(1 / 2 : ℝ))) := by
           gcongr
       _ = _ := by ring
-  have hsumm : Summable (fun k : ℕ => ∫ t, ‖gTerm x (2 * k + a) t‖) := by
-    refine Summable.of_nonneg_of_le (fun k => integral_nonneg (fun t => norm_nonneg _))
-      (fun k => (hnorm _).trans ?_) (summable_rpow32.mul_left (C * (x : ℝ) ^ (2 : ℝ)))
-    gcongr
-    exact rpow_bound k _ (by omega)
+  refine Summable.of_nonneg_of_le (fun k => integral_nonneg (fun t => norm_nonneg _))
+    (fun k => (hnorm _).trans ?_) (summable_rpow32.mul_left (C * (x : ℝ) ^ (2 : ℝ)))
+  gcongr
+  exact rpow_bound k _ (by omega)
+
+lemma hasSum_gTerm (a x : ℕ) (t : ℝ) :
+    HasSum (fun k : ℕ => gTerm x (2 * k + a) t) ((gR a (2 + t * I) - gR a 2) *
+      (x : ℂ) ^ ((2 : ℂ) + t * I) / (((2 : ℂ) + t * I) * ((2 : ℂ) + t * I + 1))) := by
+  have hs : 1 < ((2 : ℂ) + t * I).re := by simp
+  exact ((hasSum_gR (a := a) hs).mul_right _).div_const _
+
+/-- `gammaPartP a x = ∑_k tau x (2k + a)`. -/
+theorem gammaPartP_eq_tsum_tau (a x : ℕ) (hx : 1 ≤ x) :
+    gammaPartP a x = ((∑' k : ℕ, tau x (2 * k + a) : ℝ) : ℂ) := by
   have hgp : gammaPartP a x = (1 / (2 * Real.pi) : ℂ) *
       ∫ t : ℝ, ∑' k : ℕ, gTerm x (2 * k + a) t := by
     unfold gammaPartP
     congr 1
     congr 1
     funext t
-    exact hsum t
-  rw [hgp, ← integral_tsum_of_summable_integral_norm (fun k => integrable_gTerm x hx _) hsumm,
-    ← tsum_mul_left]
+    exact (hasSum_gTerm a x t).tsum_eq.symm
+  rw [hgp, ← integral_tsum_of_summable_integral_norm (fun k => integrable_gTerm x hx _)
+    (summable_integral_norm_gTerm a x hx), ← tsum_mul_left]
   simp_rw [integral_gTerm x hx]
   rw [← Complex.ofReal_tsum]
+
+lemma continuous_gR_line (a : ℕ) : Continuous fun t : ℝ => gR a (2 + t * I) := by
+  unfold gR
+  have hd := Erdos985.Analytic.BoundsAux.differentiableOn_digamma
+  have hl : Continuous fun t : ℝ => ((2 : ℂ) + t * I + a) / 2 := by fun_prop
+  have := hd.continuousOn.comp_continuous hl (fun t => by
+    simp only [Set.mem_setOf_eq, div_re, add_re, re_ofNat, mul_re, ofReal_re, I_re, mul_zero,
+      ofReal_im, I_im, mul_one, sub_self, add_zero, natCast_re]
+    norm_num; positivity)
+  exact continuous_const.add (continuous_const.mul this)
+
+/-- The integrand of `gammaPartP a x` is integrable on the line. -/
+lemma integrable_gR_part (a x : ℕ) (hx : 1 ≤ x) :
+    Integrable (fun t : ℝ => (gR a (2 + t * I) - gR a 2) * (x : ℂ) ^ ((2 : ℂ) + t * I)
+      / (((2 : ℂ) + t * I) * ((2 : ℂ) + t * I + 1))) := by
+  have hx0 : (0 : ℝ) < x := by exact_mod_cast hx
+  have hk := (Erdos985.Analytic.IdentityAux.integrable_kern hx0).1
+  have hmeas : AEStronglyMeasurable (fun t : ℝ => (gR a (2 + t * I) - gR a 2) *
+      (x : ℂ) ^ ((2 : ℂ) + t * I) / (((2 : ℂ) + t * I) * ((2 : ℂ) + t * I + 1))) := by
+    have hc : Continuous fun t : ℝ => gR a (2 + t * I) - gR a 2 :=
+      (continuous_gR_line a).sub continuous_const
+    have := hc.aestronglyMeasurable.mul hk
+    refine this.congr (Filter.Eventually.of_forall fun t => ?_)
+    simp only [Erdos985.Analytic.IdentityAux.kern, ofReal_natCast, Pi.mul_apply]
+    ring
+  exact Erdos985.Analytic.IdentityAux.integrable_of_hasSum hmeas
+    (fun k => integrable_gTerm x hx _) (summable_integral_norm_gTerm a x hx)
+    (hasSum_gTerm a x)
 
 /-- `|gammaPartP a x| ≤ log x + 1` for `a ≤ 1`. -/
 theorem norm_gammaPartP_le {a : ℕ} (ha : a ≤ 1) (x : ℕ) (hx : 1 ≤ x) :
