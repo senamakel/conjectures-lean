@@ -76,7 +76,12 @@ lemma norm_denom_ge (c : ℝ) (hc : 0 < c) (t : ℝ) :
 
 lemma continuous_inv_denom (c : ℝ) (hc : 0 < c) :
     Continuous fun t : ℝ => 1 / (((c : ℂ) + t * I) * ((c : ℂ) + t * I + 1)) :=
-  Continuous.div continuous_const (by fun_prop) (denom_ne_zero c hc)
+  by
+  have h1 : Continuous fun t : ℝ => ((c : ℂ) + t * I) * ((c : ℂ) + t * I + 1) := by
+    have h0 : Continuous fun t : ℝ => (c : ℂ) + t * I :=
+      continuous_const.add (continuous_ofReal.mul continuous_const)
+    exact h0.mul (h0.add continuous_const)
+  exact Continuous.div (f := fun _ => (1:ℂ)) continuous_const h1 (denom_ne_zero c hc)
 
 /-- The reciprocal of the denominator is integrable on the vertical line. -/
 lemma integrable_inv_denom (c : ℝ) (hc : 0 < c) :
@@ -103,16 +108,21 @@ theorem perron_cesaro_aux (y c : ℝ) (hy : 0 < y) (hc : 0 < c) :
     unfold VerticalIntegrable
     simp_rw [hmel]
     exact integrable_inv_denom c hc
-  have hinv := mellinInv_mellin_eq c cesaro (x := 1 / y) (by positivity) hconv hvert
+  have hinv := mellinInv_mellin_eq (E := ℂ) c cesaro (x := 1 / y) (by positivity) hconv hvert
     continuous_cesaro.continuousAt
-  unfold mellinInv cesaro at hinv
-  rw [← hinv]
-  simp only [smul_eq_mul]
-  push_cast
-  congr 1
-  refine integral_congr_ae (Filter.Eventually.of_forall fun t => ?_)
-  simp only
-  rw [hmel t, one_div (y : ℂ), inv_cpow_ofReal_nonneg hy.le, cpow_neg, inv_inv]
-  ring
+  have hint : (∫ t : ℝ,
+      (y : ℂ) ^ ((c : ℂ) + t * I) / (((c : ℂ) + t * I) * ((c : ℂ) + t * I + 1)))
+      = ∫ t : ℝ, (((1 / y : ℝ)) : ℂ) ^ (-((c : ℂ) + t * I)) • mellin cesaro ((c : ℂ) + t * I) := by
+    congr 1
+    funext t
+    rw [hmel t, smul_eq_mul, ofReal_div, ofReal_one, one_div (y : ℂ),
+      inv_cpow_ofReal_nonneg hy.le, cpow_neg, inv_inv]
+    ring
+  rw [hint]
+  unfold mellinInv at hinv
+  rw [Complex.real_smul] at hinv
+  have h2 : ((1 / (2 * Real.pi) : ℝ) : ℂ) = 1 / (2 * (Real.pi : ℂ)) := by push_cast; ring
+  rw [h2] at hinv
+  exact hinv
 
 end Erdos985.Analytic.PerronKernel
