@@ -12,3 +12,7 @@ rev = "fc4f59e577feb1a4956671bc04ac18aaaf8cd842"
 
 [[lean_lib]]
 name = "Erdos985"
+
+[[lean_lib]]
+name = "Vendor"
+globs = ["Vendor.+"]
