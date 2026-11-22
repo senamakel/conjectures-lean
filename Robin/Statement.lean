@@ -11,6 +11,7 @@ as `riemannHypothesis : RiemannHypothesis`.
 namespace Robin
 
 open ArithmeticFunction
+open scoped ArithmeticFunction.sigma
 
 /-- Robin's inequality. -/
 def RobinStatement : Prop :=
