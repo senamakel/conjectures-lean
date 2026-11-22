@@ -24,9 +24,25 @@ The statements and definitions are in `Grosswald/Statement.lean`. Two inputs are
 * **the finite range** `409 < p ≤ 2.5·10^15` (`VerifiedUpTo 2500000000000000`), which is the
   Cohen–Oliveira e Silva–Trudgian computation (about `7·10^13` primes) and is not redone here.
 
-There is no `sorry`. `#print axioms Grosswald.grosswald_of_GRH` lists `propext`,
-`Classical.choice`, `Quot.sound` and one auxiliary axiom per `native_decide` call (the ten
-computation lemmas in `Grosswald/Run/`).
+There is no `sorry`. `#print axioms Grosswald.grosswald_of_GRH` gives
+
+```
+[propext, Classical.choice, Quot.sound,
+ Grosswald.Run.first31_ok._native.native_decide.ax_1_1,
+ Grosswald.Run.n12._native.native_decide.ax_1_1,
+ Grosswald.Run.n13_A1._native.native_decide.ax_1_1,
+ Grosswald.Run.n13_A2._native.native_decide.ax_1_1,
+ Grosswald.Run.n13_B._native.native_decide.ax_1_1,
+ Grosswald.Run.n13_C._native.native_decide.ax_1_1,
+ Grosswald.Run.n13_D._native.native_decide.ax_1_1,
+ Grosswald.Run.n13_small._native.native_decide.ax_1_1,
+ Grosswald.Run.n14._native.native_decide.ax_1_1,
+ Grosswald.Run.roots_ok._native.native_decide.ax_1_1]
+```
+
+The last ten are the trust assumptions of the ten `native_decide` evaluations in
+`Grosswald/Run/`. Each one says that the compiled evaluation of a Boolean checker agrees with
+its definition. The checker's soundness is proved without them.
 
 ## How the proof goes
 
@@ -83,8 +99,8 @@ no prime `q < x` is a primitive root.
 lake build
 ```
 
-The `native_decide` files take about ten minutes of CPU in total. The largest single file
-(`Run/N13A1.lean`) takes a few minutes.
+The `native_decide` files take about ten minutes of CPU in total. Measured wall times: N13A1
+162 s, N13A2 101 s, N13B 92 s, N12 90 s, N13C 57 s, N13D 32 s, N14 about 20 s, Roots about 10 s.
 
 The analytic toolkit (explicit formula for Dirichlet L-functions with weight `(1 − n/x)`,
 Hadamard factorization, Perron formula, zero-sum bounds under GRH) comes from

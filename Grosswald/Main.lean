@@ -26,6 +26,7 @@ The range `409 < p ≤ 2.5·10^15` is the hypothesis `VerifiedUpTo 2500000000000
 namespace Grosswald
 
 open Alg
+open Erdos985 (DirichletLNonvanishingRightOfHalf)
 
 /-- The primes of a node all have a small prime primitive root (given `NoSieve`). -/
 def Covered (n : ℕ) (X Y : List ℕ) : Prop :=
@@ -90,7 +91,7 @@ lemma card_primeFactors_le_30 {p : ℕ} (hp : p < 10 ^ 47) : (p - 1).primeFactor
   have hle := Combi.prod_le_prod_of_dominates hc' hdom
   rw [List.prod_toFinset _ h2, List.map_id'] at hle
   have hFle : ∏ q ∈ F, q ≤ ∏ q ∈ (p - 1).primeFactors, q :=
-    Finset.prod_le_prod_of_subset_of_one_le' hF fun q hq _ =>
+    Finset.prod_le_prod_of_subset_of_one_le hF fun q hq _ =>
       (Nat.mem_primeFactors.mp hq).1.one_lt.le
   have hdvd : ∏ q ∈ (p - 1).primeFactors, q ≤ p - 1 :=
     Nat.le_of_dvd (Nat.pos_of_ne_zero hp1) (Nat.prod_primeFactors_dvd _)
