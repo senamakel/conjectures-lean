@@ -91,9 +91,9 @@ Every step's statement is fixed in its file; `Lindelof/Main.lean` already proves
 | 1 | `Lindelof/RH.lean` | done |
 | 2 | `Lindelof/Monotone.lean` | done |
 | 3 | `Lindelof/GammaRatio.lean` | done |
-| 4 | `Lindelof/Transfer.lean` | done (modulo Steps 2–3) |
-| 5 | `Lindelof/LogZeta.lean` | `exists_log_zetaQ` todo |
+| 4 | `Lindelof/Transfer.lean` | done |
+| 5 | `Lindelof/LogZeta.lean` | done |
 | 6 | `Lindelof/BorelCaratheodory.lean` | done |
 | 7 | `Lindelof/ThreeLines.lean` | done |
-| 8 | `Lindelof/Main.lean` | done (from Steps 1–7) |
+| 8 | `Lindelof/Main.lean` | done |
 | stretch | `Lindelof/Dirichlet.lean` | `dirichletLindelof_of_GRH` todo |
