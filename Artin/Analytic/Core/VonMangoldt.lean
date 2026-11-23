@@ -37,7 +37,84 @@ lemma vonMangoldtK_nonneg (n : ℕ) : 0 ≤ vonMangoldtK K n := by
 `(𝔭, m)` with `N𝔭^m < x`. -/
 theorem psiK_eq_sum {x : ℝ} (hx : 0 ≤ x) :
     psiK K x = ∑ n ∈ range ⌈x⌉₊, vonMangoldtK K n := by
-  sorry
+  classical
+  set X := ⌈x⌉₊
+  have key : ∀ {p : ℕ}, p.Prime → ∀ {P : Ideal (𝓞 K)}, P ∈ primesAbove K p → ∀ {m : ℕ}, 1 ≤ m →
+      p ≤ Ideal.absNorm P ^ m ∧ m < Ideal.absNorm P ^ m := by
+    intro p hp P hP m hm
+    have h2 : 2 ≤ Ideal.absNorm P := hp.two_le.trans (le_absNorm hp hP)
+    refine ⟨(le_absNorm hp hP).trans (Nat.le_self_pow (by omega) _), ?_⟩
+    exact (Nat.lt_two_pow_self).trans_le (Nat.pow_le_pow_left h2 m)
+  -- Step 1: each `Λ_K(n)`, `n < X`, as a sum over the box `p ≤ X`, `1 ≤ m ≤ X`.
+  have step1 : ∀ n ∈ range X, vonMangoldtK K n =
+      ∑ p ∈ (range (X + 1)).filter Nat.Prime, ∑ P ∈ primesAbove K p, ∑ m ∈ Icc 1 X,
+        if Ideal.absNorm P ^ m = n then Real.log (Ideal.absNorm P) else 0 := by
+    intro n hn
+    have hnX : n < X := mem_range.1 hn
+    unfold vonMangoldtK
+    rw [sum_subset (filter_subset_filter _ (range_subset_range.2 (by omega : n + 1 ≤ X + 1)))]
+    · refine sum_congr rfl fun p hp => sum_congr rfl fun P hP => ?_
+      have hp' := (mem_filter.1 hp).2
+      refine sum_subset (Icc_subset_Icc le_rfl hnX.le) fun m hm hm' => ?_
+      have hm1 : 1 ≤ m := (mem_Icc.1 hm).1
+      have hmn : n < m := by rw [mem_Icc] at hm'; omega
+      have := (key hp' hP hm1).2
+      rw [if_neg (by omega)]
+    · intro p hp hp'
+      have hpr := (mem_filter.1 hp).2
+      have hpn : n < p := by
+        by_contra hc; push Not at hc
+        exact hp' (mem_filter.2 ⟨mem_range.2 (by omega), hpr⟩)
+      refine sum_eq_zero fun P hP => sum_eq_zero fun m hm => ?_
+      have := (key hpr hP (mem_Icc.1 hm).1).1
+      rw [if_neg (by omega)]
+  rw [sum_congr rfl step1, sum_comm]
+  -- Step 2: the left side over the same box.
+  unfold psiK
+  rw [sum_subset (filter_subset_filter _ (range_subset_range.2
+    (by have := Nat.floor_le_ceil x; omega : ⌊x⌋₊ + 1 ≤ X + 1)))]
+  · refine sum_congr rfl fun p hp => ?_
+    have hpr := (mem_filter.1 hp).2
+    conv_rhs => rw [sum_comm]
+    refine sum_congr rfl fun P hP => ?_
+    conv_rhs => rw [sum_comm]
+    rw [sum_subset (Icc_subset_Icc le_rfl (Nat.floor_le_ceil x))]
+    · refine sum_congr rfl fun m hm => ?_
+      rw [sum_ite_eq]
+      have hiff : Ideal.absNorm P ^ m ∈ range X ↔ ((Ideal.absNorm P : ℕ) : ℝ) ^ m < x := by
+        rw [mem_range, ← Nat.cast_pow]; exact Nat.lt_ceil
+      by_cases hc : ((Ideal.absNorm P : ℕ) : ℝ) ^ m < x
+      · rw [if_pos hc, if_pos (hiff.2 hc)]
+      · rw [if_neg hc, if_neg (fun h => hc (hiff.1 h))]
+    · intro m hm hm'
+      have hm1 : 1 ≤ m := (mem_Icc.1 hm).1
+      have hmx : ⌊x⌋₊ < m := by rw [mem_Icc] at hm'; omega
+      have hxm : x < m := by
+        have := Nat.lt_floor_add_one x
+        have : ((⌊x⌋₊ + 1 : ℕ) : ℝ) ≤ m := by exact_mod_cast hmx
+        push_cast at this; linarith
+      have := (key hpr hP hm1).2
+      rw [if_neg]
+      intro h
+      have : ((m : ℕ) : ℝ) < ((Ideal.absNorm P ^ m : ℕ) : ℝ) := by exact_mod_cast this
+      push_cast at this
+      linarith
+  · intro p hp hp'
+    have hpr := (mem_filter.1 hp).2
+    have hpx : x < p := by
+      have hp2 : ⌊x⌋₊ + 1 ≤ p := by
+        by_contra hc; push Not at hc
+        exact hp' (mem_filter.2 ⟨mem_range.2 (by omega), hpr⟩)
+      have := Nat.lt_floor_add_one x
+      have : ((⌊x⌋₊ + 1 : ℕ) : ℝ) ≤ p := by exact_mod_cast hp2
+      push_cast at this; linarith
+    refine sum_eq_zero fun P hP => sum_eq_zero fun m hm => ?_
+    have := (key hpr hP (mem_Icc.1 hm).1).1
+    rw [if_neg]
+    intro h
+    have : ((p : ℕ) : ℝ) ≤ ((Ideal.absNorm P ^ m : ℕ) : ℝ) := by exact_mod_cast this
+    push_cast at this
+    linarith
 
 theorem psiK_natCast_eq_sum (x : ℕ) : psiK K x = ∑ n ∈ range x, vonMangoldtK K n := by
   rw [psiK_eq_sum K (Nat.cast_nonneg x), Nat.ceil_natCast]
