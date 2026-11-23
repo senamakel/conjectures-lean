@@ -105,3 +105,30 @@ The `native_decide` files take about ten minutes of CPU in total. Measured wall 
 The analytic toolkit (explicit formula for Dirichlet L-functions with weight `(1 − n/x)`,
 Hadamard factorization, Perron formula, zero-sum bounds under GRH) comes from
 [erdos-985](https://github.com/senamakel/erdos-985), required as a lake dependency.
+
+## Unconditional version
+
+`Unconditional/GrosswaldUnconditional.lean` imports [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
+(commit `507a75d`) and closes the hypothesis with its theorem:
+
+| Theorem | Statement | Axioms |
+|---|---|---|
+| `prime_primitive_root_large_unconditional` | every prime `p > 2.5·10^15` has a prime primitive root `q < √p − 2` | standard three + 10 `native_decide` |
+| `grosswald_of_verified` | `VerifiedUpTo 2500000000000000 → GrosswaldStatement` | same |
+
+The range `409 < p ≤ 2.5·10^15` stays the hypothesis `VerifiedUpTo` (the Cohen–Oliveira e
+Silva–Trudgian computation).
+
+To check it:
+
+```bash
+scripts/check-unconditional.sh /path/to/riemann-hypothesis   # cloned there if missing
+```
+
+The script uses that project's community cache, about 93 GB. The import opens around 900,000
+module files and needs about 19 GB of RAM. Raise the open-file limit first; on macOS:
+`sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`.
+
+The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
+builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
+verification is still pending.
