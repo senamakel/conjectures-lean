@@ -94,6 +94,29 @@ The arithmetic steps 5–7 are assembled in `effectiveKummerChebotarev_of_kummer
 This is the largest part. Steps 1–3 generalise the erdos-985 analytic library from Dirichlet
 L-functions to `ζ_K`.
 
+#### Status of the analytic core (`Artin/Analytic/Core/`)
+
+The chain `psiKBound_of_continuation → kummerPsiBounds_of_hooley_of_continuation →
+conditional_artin_primitive_roots.parts.i_of_continuation` is assembled and builds. These are
+proved: the explicit formula (A3), `Σ m_ρ/|ρ(ρ+1)| ≤ log |d_K| + 6n` and the local zero count (A2),
+Hadamard and the zero locations (A1), `ψ_K = Σ Λ_K`, and the whole unsmoothing argument (A4)
+except its two increment estimates. The remaining `sorry`s are each small, standard and
+documented with a reference in their docstrings:
+
+| Lemma | Statement | Route |
+|---|---|---|
+| `vonMangoldtK_le` | `Λ_K(n) ≤ [K:ℚ] Λ(n)` | `Σ_{𝔭∣p} f_𝔭 ≤ Σ e f = n` |
+| `LSeries_vonMangoldtK` | `Σ Λ_K(n) n^{-s} = −ζ_K'/ζ_K(s)`, `Re s > 1` | Euler product over prime ideals |
+| `dedekindZeta_ne_zero` | `ζ_K(s) ≠ 0`, `Re s > 1` | Euler product |
+| `Z_ne_zero_of_re_eq_one` | `ζ_K(1+it) ≠ 0`, `t ≠ 0` | Mertens' `3 + 4 cos θ + cos 2θ ≥ 0` |
+| `xi_growth` | `‖ξ_K(s)‖ ≤ C exp(C‖s‖ log(‖s‖+2))` | strip bound, functional equation, Stirling for `Re s ≥ 2` |
+| `re_digamma_le` | `Re ψ(w) ≤ log(‖w‖+1)`, `Re w ≥ 1` | digamma series or Stirling |
+| `gammaDiff_le` | `‖(y+h)Γ_K(y+h) − yΓ_K(y)‖ ≤ n h (log(y+h) + 8)` | explicit `tau` terms |
+| `zeroDiff_le` | `Σ m_ρ ‖(y+h) zeroTerm(y+h) − y zeroTerm(y)‖ ≪ h √y (log\|d_K\| + n log(y+2)) log(y+2)` | `zeroSum_le` plus `zeroCount_le` on unit windows, split at `\|Im ρ\| = y/h` |
+
+`effectiveKummerChebotarev_of_hooley` (without the continuation hypothesis) stays sorried in
+`Artin/Interfaces.lean`.
+
 ### B. Sieve half: `EffectiveKummerChebotarev a → density > 0`
 
 Write `N(x)` for the number of primes `p < x`, `p ∤ a`, with `a` a primitive root mod `p`.
