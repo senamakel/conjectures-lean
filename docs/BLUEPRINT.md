@@ -99,13 +99,12 @@ L-functions to `ζ_K`.
 The chain `psiKBound_of_continuation → kummerPsiBounds_of_hooley_of_continuation →
 conditional_artin_primitive_roots.parts.i_of_continuation` is assembled and builds. These are
 proved: the explicit formula (A3), `Σ m_ρ/|ρ(ρ+1)| ≤ log |d_K| + 6n` and the local zero count (A2),
-Hadamard and the zero locations (A1), `ψ_K = Σ Λ_K`, and the whole unsmoothing argument (A4)
+Hadamard and the zero locations (A1), `ψ_K = Σ Λ_K`, `Λ_K ≤ n Λ`, and the whole unsmoothing argument (A4)
 except its two increment estimates. The remaining `sorry`s are each small, standard and
 documented with a reference in their docstrings:
 
 | Lemma | Statement | Route |
 |---|---|---|
-| `vonMangoldtK_le` | `Λ_K(n) ≤ [K:ℚ] Λ(n)` | `Σ_{𝔭∣p} f_𝔭 ≤ Σ e f = n` |
 | `LSeries_vonMangoldtK` | `Σ Λ_K(n) n^{-s} = −ζ_K'/ζ_K(s)`, `Re s > 1` | Euler product over prime ideals |
 | `dedekindZeta_ne_zero` | `ζ_K(s) ≠ 0`, `Re s > 1` | Euler product |
 | `Z_ne_zero_of_re_eq_one` | `ζ_K(1+it) ≠ 0`, `t ≠ 0` | Mertens' `3 + 4 cos θ + cos 2θ ≥ 0` |

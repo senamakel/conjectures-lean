@@ -119,9 +119,91 @@ theorem psiK_eq_sum {x : ℝ} (hx : 0 ≤ x) :
 theorem psiK_natCast_eq_sum (x : ℕ) : psiK K x = ∑ n ∈ range x, vonMangoldtK K n := by
   rw [psiK_eq_sum K (Nat.cast_nonneg x), Nat.ceil_natCast]
 
+/-- `∑_{𝔭 ∣ p} f(𝔭) ≤ [K : ℚ]`, from `∑ e f = [K : ℚ]`. -/
+lemma sum_inertiaDeg_le {p : ℕ} (hp : p.Prime) :
+    ∑ P ∈ primesAbove K p, P.inertiaDeg ℤ ≤ Module.finrank ℚ K := by
+  classical
+  have : Fact p.Prime := ⟨hp⟩
+  have := Int.ideal_span_isMaximal_of_prime p
+  have : Fintype ((Ideal.span {(p : ℤ)}).primesOver (𝓞 K)) :=
+    (Algebra.QuasiFinite.finite_primesOver _).fintype
+  have hsum := Ideal.sum_ramification_inertia_eq_finrank (Ideal.span {(p : ℤ)}) (𝓞 K)
+  rw [← RingOfIntegers.rank K, ← hsum,
+    Finset.sum_subtype (primesAbove K p) (fun P => mem_primesAbove hp)]
+  apply Finset.sum_le_sum
+  intro q _
+  have := q.2.1
+  have := q.2.2
+  have h1 := Ideal.ramificationIdx_pos (R := ℤ) q.1
+  exact Nat.le_mul_of_pos_left _ h1
+
 /-- `Λ_K(n) ≤ [K : ℚ] Λ(n)`. -/
 theorem vonMangoldtK_le (n : ℕ) : vonMangoldtK K n ≤ Module.finrank ℚ K * Λ n := by
-  sorry
+  classical
+  unfold vonMangoldtK
+  by_cases hn : IsPrimePow n
+  · obtain ⟨q, k, hq, hk, rfl⟩ := (isPrimePow_nat_iff n).1 hn
+    rw [vonMangoldt_apply_pow hk.ne', vonMangoldt_apply_prime hq]
+    have hlq : 0 ≤ Real.log q := Real.log_natCast_nonneg q
+    -- each prime `p` contributes at most `[p = q] f(𝔭) log q` per `𝔭`
+    have hterm : ∀ p ∈ (range (q ^ k + 1)).filter Nat.Prime, ∀ P ∈ primesAbove K p,
+        ∑ m ∈ Icc 1 (q ^ k), (if Ideal.absNorm P ^ m = q ^ k then
+          Real.log (Ideal.absNorm P) else 0) ≤
+        if p = q then (P.inertiaDeg ℤ : ℝ) * Real.log q else 0 := by
+      intro p hp P hP
+      have hpr := (mem_filter.1 hp).2
+      have hN := absNorm_eq_pow hpr hP
+      have hf := one_le_inertiaDeg hpr hP
+      have h2 : 2 ≤ Ideal.absNorm P := hpr.two_le.trans (le_absNorm hpr hP)
+      split_ifs with hpq
+      · subst hpq
+        rw [Finset.sum_ite, Finset.sum_const_zero, add_zero, Finset.sum_const, nsmul_eq_mul]
+        have hcard : ((Icc 1 (p ^ k)).filter (fun m => Ideal.absNorm P ^ m = p ^ k)).card ≤ 1 := by
+          refine Finset.card_le_one.2 fun a ha b hb => ?_
+          have ha' := (mem_filter.1 ha).2
+          have hb' := (mem_filter.1 hb).2
+          exact Nat.pow_right_injective h2 (ha'.trans hb'.symm)
+        have hlog : Real.log (Ideal.absNorm P) = (P.inertiaDeg ℤ : ℕ) * Real.log p := by
+          rw [← hN, Nat.cast_pow, Real.log_pow]
+        rw [hlog]
+        have : (0 : ℝ) ≤ P.inertiaDeg ℤ * Real.log p := by positivity
+        calc (((Icc 1 (p ^ k)).filter (fun m => Ideal.absNorm P ^ m = p ^ k)).card : ℝ) *
+              ((P.inertiaDeg ℤ : ℕ) * Real.log p)
+            ≤ 1 * ((P.inertiaDeg ℤ : ℕ) * Real.log p) :=
+              mul_le_mul_of_nonneg_right (by exact_mod_cast hcard) this
+          _ = _ := one_mul _
+      · refine le_of_eq (Finset.sum_eq_zero fun m hm => if_neg fun h => hpq ?_)
+        have hm1 : 1 ≤ m := (mem_Icc.1 hm).1
+        have hdvd : p ∣ q ^ k := by
+          rw [← h, ← hN, ← pow_mul]
+          exact dvd_pow_self p (Nat.mul_ne_zero (by omega) (by omega))
+        exact (Nat.prime_dvd_prime_iff_eq hpr hq).1 (hpr.dvd_of_dvd_pow hdvd)
+    calc ∑ p ∈ (range (q ^ k + 1)).filter Nat.Prime, ∑ P ∈ primesAbove K p,
+          ∑ m ∈ Icc 1 (q ^ k), (if Ideal.absNorm P ^ m = q ^ k then
+            Real.log (Ideal.absNorm P) else 0)
+        ≤ ∑ p ∈ (range (q ^ k + 1)).filter Nat.Prime, ∑ P ∈ primesAbove K p,
+          (if p = q then (P.inertiaDeg ℤ : ℝ) * Real.log q else 0) :=
+          sum_le_sum fun p hp => sum_le_sum fun P hP => hterm p hp P hP
+      _ ≤ ∑ P ∈ primesAbove K q, (P.inertiaDeg ℤ : ℝ) * Real.log q := by
+          simp_rw [Finset.sum_ite_irrel, Finset.sum_const_zero]
+          rw [Finset.sum_ite_eq']
+          split_ifs
+          · exact le_rfl
+          · exact sum_nonneg fun P _ => by positivity
+      _ = (∑ P ∈ primesAbove K q, (P.inertiaDeg ℤ : ℝ)) * Real.log q := by rw [Finset.sum_mul]
+      _ ≤ Module.finrank ℚ K * Real.log q := by
+          gcongr
+          exact_mod_cast sum_inertiaDeg_le K hq
+  · have : ∀ p ∈ (range (n + 1)).filter Nat.Prime, ∀ P ∈ primesAbove K p, ∀ m ∈ Icc 1 n,
+        (if Ideal.absNorm P ^ m = n then Real.log (Ideal.absNorm P) else 0) = 0 := by
+      intro p hp P hP m hm
+      refine if_neg fun h => hn ?_
+      have hpr := (mem_filter.1 hp).2
+      have hf := one_le_inertiaDeg hpr hP
+      rw [← absNorm_eq_pow hpr hP, ← pow_mul] at h
+      exact (isPrimePow_nat_iff n).2 ⟨p, _, hpr, Nat.mul_pos (by omega) (mem_Icc.1 hm).1, h⟩
+    rw [sum_eq_zero fun p hp => sum_eq_zero fun P hP => sum_eq_zero fun m hm => this p hp P hP m hm]
+    exact mul_nonneg (Nat.cast_nonneg _) vonMangoldt_nonneg
 
 /-- The Dirichlet series of `Λ_K` converges absolutely for `Re s > 1`. -/
 theorem LSeriesSummable_vonMangoldtK {s : ℂ} (hs : 1 < s.re) :
