@@ -32,6 +32,7 @@ Lagarias–Odlyzko 1977, §9; Serre 1981, §2.4, Théorème 4).
 namespace Artin.Analytic
 
 open Complex NumberField ArtinPrimitiveRootsConjecture Filter Topology Erdos985.Analytic
+  Erdos985.Analytic.BoundsAux
 
 variable {K : Type*} [Field K] [NumberField K]
 
@@ -130,6 +131,118 @@ theorem zeroDiff_le :
 
 end ContinuationData
 
+lemma log_add_sub_log_le {y h : ℝ} (hy : 0 < y) (hh : 0 ≤ h) :
+    0 ≤ Real.log (y + h) - Real.log y ∧ y * (Real.log (y + h) - Real.log y) ≤ h := by
+  refine ⟨sub_nonneg.2 (Real.log_le_log hy (by linarith)), ?_⟩
+  rw [← Real.log_div (by linarith) hy.ne']
+  have := Real.log_le_sub_one_of_pos (show 0 < (y + h) / y by positivity)
+  have e : (y + h) / y - 1 = h / y := by field_simp; ring
+  rw [e] at this
+  calc y * Real.log ((y + h) / y) ≤ y * (h / y) := mul_le_mul_of_nonneg_left this hy.le
+    _ = h := by field_simp
+
+lemma mul_tau_incr_zero {y h : ℝ} (hy : 1 ≤ y) (hh : 0 ≤ h) :
+    |(y + h) * tau (y + h) 0 - y * tau y 0| ≤ h * (Real.log (y + h) + 2) := by
+  have e : ∀ x : ℝ, 0 < x → x * tau x 0 = (x - 1) / 2 - x * Real.log x + x - 1 := by
+    intro x hx; simp only [tau, ↓reduceIte]; field_simp; ring
+  rw [e _ (by linarith), e _ (by linarith)]
+  obtain ⟨h1, h2⟩ := log_add_sub_log_le (y := y) (h := h) (by linarith) hh
+  have hL : 0 ≤ Real.log (y + h) := Real.log_nonneg (by linarith)
+  have hyl : 0 ≤ y * (Real.log (y + h) - Real.log y) := mul_nonneg (by linarith) h1
+  rw [abs_le]; constructor <;> nlinarith
+
+lemma mul_tau_incr_one {y h : ℝ} (hy : 1 ≤ y) (hh : 0 ≤ h) :
+    |(y + h) * tau (y + h) 1 - y * tau y 1| ≤ h := by
+  have e : ∀ x : ℝ, 0 < x → x * tau x 1 = (x - 1) / 3 - x + 1 + Real.log x := by
+    intro x hx; simp only [tau, one_ne_zero, ↓reduceIte]; field_simp; ring
+  rw [e _ (by linarith), e _ (by linarith)]
+  obtain ⟨h1, h2⟩ := log_add_sub_log_le (y := y) (h := h) (by linarith) hh
+  have : Real.log (y + h) - Real.log y ≤ h := by nlinarith
+  rw [abs_le]; constructor <;> nlinarith
+
+lemma mul_tau_incr_ge_two {y h : ℝ} (hy : 1 ≤ y) (hh : 1 ≤ h) {m : ℕ} (hm : 2 ≤ m) :
+    |(y + h) * tau (y + h) m - y * tau y m| ≤ 3 * h / ((m : ℝ) * (m - 1)) := by
+  have hm0 : m ≠ 0 := by omega
+  have hm1 : m ≠ 1 := by omega
+  have hmR : (2 : ℝ) ≤ m := by exact_mod_cast hm
+  set A : ℝ → ℝ := fun x => x * (1 / x) ^ m with hA
+  have hAb : ∀ x : ℝ, 1 ≤ x → 0 ≤ A x ∧ A x ≤ 1 := by
+    intro x hx
+    have hx0 : 0 < x := by linarith
+    have e : A x = (1 / x) ^ (m - 1) := by
+      simp only [hA]
+      rw [show m = (m - 1) + 1 by omega, pow_succ]
+      simp only [Nat.add_sub_cancel]
+      field_simp
+    rw [e]
+    have h0 : 0 ≤ 1 / x := by positivity
+    have h1 : 1 / x ≤ 1 := by rw [div_le_one hx0]; exact hx
+    exact ⟨pow_nonneg h0 _, pow_le_one₀ h0 h1⟩
+  have e : ∀ x : ℝ, 0 < x → x * tau x m =
+      (x - 1) / (2 + m) - A x / (m * (m - 1)) - x / m + 1 / (m - 1) := by
+    intro x hx
+    simp only [tau, hm0, hm1, ↓reduceIte, hA]
+    have : (m : ℝ) - 1 ≠ 0 := by linarith
+    have : (m : ℝ) ≠ 0 := by linarith
+    field_simp
+    ring
+  rw [e _ (by linarith), e _ (by linarith)]
+  obtain ⟨a0, a1⟩ := hAb (y + h) (by linarith)
+  obtain ⟨b0, b1⟩ := hAb y hy
+  have hmm : 0 < (m : ℝ) * (m - 1) := by nlinarith
+  have key : (y + h - 1) / (2 + m) - A (y + h) / (m * (m - 1)) - (y + h) / m + 1 / (m - 1) -
+      ((y - 1) / (2 + m) - A y / (m * (m - 1)) - y / m + 1 / (m - 1)) =
+      -(2 * h / (m * (2 + m))) + (A y - A (y + h)) / (m * (m - 1)) := by
+    have : (m : ℝ) - 1 ≠ 0 := by linarith
+    have : (m : ℝ) ≠ 0 := by linarith
+    have : (2 : ℝ) + m ≠ 0 := by linarith
+    field_simp
+    ring
+  rw [key]
+  have t1 : 2 * h / (m * (2 + m)) ≤ 2 * h / ((m : ℝ) * (m - 1)) :=
+    div_le_div_of_nonneg_left (by linarith) hmm (by nlinarith)
+  have t2 : |(A y - A (y + h)) / (m * (m - 1))| ≤ h / ((m : ℝ) * (m - 1)) := by
+    rw [abs_div, abs_of_pos hmm]
+    exact div_le_div_of_nonneg_right (by rw [abs_le]; constructor <;> linarith) hmm.le
+  have t0 : 0 ≤ 2 * h / (m * (2 + m)) := by positivity
+  calc |-(2 * h / (m * (2 + m))) + (A y - A (y + h)) / (m * (m - 1))|
+      ≤ |-(2 * h / (m * (2 + m)))| + |(A y - A (y + h)) / (m * (m - 1))| := abs_add_le _ _
+    _ ≤ 2 * h / ((m : ℝ) * (m - 1)) + h / ((m : ℝ) * (m - 1)) := by
+        rw [abs_neg, abs_of_nonneg t0]; linarith
+    _ = 3 * h / ((m : ℝ) * (m - 1)) := by ring
+
+/-- Increment of `x ∑_k tau x (2k + a)`. -/
+lemma tsum_tau_incr_le {y h : ℝ} (hy : 1 ≤ y) (hh : 1 ≤ h) {a : ℕ} (ha : a ≤ 1) :
+    |(y + h) * ∑' k : ℕ, tau (y + h) (2 * k + a) - y * ∑' k : ℕ, tau y (2 * k + a)| ≤
+      |(y + h) * tau (y + h) a - y * tau y a| + 3 * h := by
+  obtain ⟨s1, -⟩ := tsum_tau_bound (y + h) (by linarith) a ha
+  obtain ⟨s2, -⟩ := tsum_tau_bound y hy a ha
+  set f : ℕ → ℝ := fun k => (y + h) * tau (y + h) (2 * k + a) - y * tau y (2 * k + a) with hf
+  have hfs : Summable f := (s1.mul_left (y + h)).sub (s2.mul_left y)
+  have e : (y + h) * ∑' k : ℕ, tau (y + h) (2 * k + a) - y * ∑' k : ℕ, tau y (2 * k + a) =
+      ∑' k, f k := by
+    rw [← tsum_mul_left, ← tsum_mul_left, ← (s1.mul_left (y + h)).tsum_sub (s2.mul_left y)]
+  rw [e, hfs.tsum_eq_zero_add]
+  have h0 : f 0 = (y + h) * tau (y + h) a - y * tau y a := by simp [hf]
+  rw [h0]
+  refine (abs_add_le _ _).trans (add_le_add_right ?_ _)
+  have hb : ∀ k : ℕ, ‖f (k + 1)‖ ≤ 3 * h * (1 / (((k : ℝ) + 1) * ((k : ℝ) + 2))) := by
+    intro k
+    rw [Real.norm_eq_abs]
+    have hm : 2 ≤ 2 * (k + 1) + a := by omega
+    refine (mul_tau_incr_ge_two hy hh hm).trans ?_
+    have hk : (0 : ℝ) ≤ k := k.cast_nonneg
+    have hm' : (2 * (k : ℝ) + 2) ≤ ((2 * (k + 1) + a : ℕ) : ℝ) := by push_cast; linarith
+    rw [mul_one_div, div_le_div_iff₀ (by nlinarith) (by positivity)]
+    have : ((k : ℝ) + 1) * (k + 2) ≤ ((2 * (k + 1) + a : ℕ) : ℝ) * (((2 * (k + 1) + a : ℕ) : ℝ) - 1) := by
+      nlinarith
+    nlinarith
+  have hsu := hasSum_u.summable.mul_left (3 * h)
+  calc |∑' k, f (k + 1)| = ‖∑' k, f (k + 1)‖ := (Real.norm_eq_abs _).symm
+    _ ≤ ∑' k : ℕ, 3 * h * (1 / (((k : ℝ) + 1) * ((k : ℝ) + 2))) :=
+        tsum_of_norm_bounded hsu.hasSum hb
+    _ = 3 * h := by rw [tsum_mul_left, hasSum_u.tsum_eq, mul_one]
+
 /-- **Gamma increments**: `|(y+h) Γ_K(y+h) - y Γ_K(y)| ≤ n h (log(y+h) + 8)` for `y ≥ 1`.
 Proof: `Γ_K = r₁ Γ⁰ + r₂ (Γ⁰ + Γ¹)` with `Γᵃ(y) = ∑_k tau y (2k+a)` (`gammaPartP_eq_tsum_tau`)
 and `r₁ + 2 r₂ = n`; termwise, `y tau(y, m)` is explicit: for `m = 0` it is
@@ -139,7 +252,53 @@ and `r₁ + 2 r₂ = n`; termwise, `y tau(y, m)` is explicit: for `m = 0` it is
 theorem gammaDiff_le (y h : ℕ) (hy : 1 ≤ y) :
     ‖((y + h : ℕ) : ℂ) * gammaPartK K (y + h) - (y : ℂ) * gammaPartK K y‖ ≤
       Module.finrank ℚ K * h * (Real.log (y + h) + 8) := by
-  sorry
+  rcases Nat.eq_zero_or_pos h with rfl | hh
+  · simp
+  have hyR : (1 : ℝ) ≤ y := by exact_mod_cast hy
+  have hhR : (1 : ℝ) ≤ h := by exact_mod_cast hh
+  set Y : ℝ := (y : ℝ) with hY
+  set H : ℝ := (h : ℝ) with hH
+  set Δ : ℕ → ℝ := fun a => (Y + H) * ∑' k : ℕ, tau (Y + H) (2 * k + a) -
+    Y * ∑' k : ℕ, tau Y (2 * k + a) with hΔ
+  have hL : 0 ≤ Real.log (Y + H) := Real.log_nonneg (by linarith)
+  have hΔ0 : |Δ 0| ≤ H * (Real.log (Y + H) + 5) := by
+    have := tsum_tau_incr_le hyR hhR (a := 0) (by norm_num)
+    have h0 := mul_tau_incr_zero hyR (by linarith : (0 : ℝ) ≤ H)
+    simp only [hΔ]; simp only [add_zero] at this ⊢
+    linarith
+  have hΔ1 : |Δ 1| ≤ 4 * H := by
+    have := tsum_tau_incr_le hyR hhR (a := 1) le_rfl
+    have h1 := mul_tau_incr_one hyR (by linarith : (0 : ℝ) ≤ H)
+    simp only [hΔ]; linarith
+  have hgp : ∀ (a x : ℕ), 1 ≤ x → gammaPartP a x = ((∑' k : ℕ, tau x (2 * k + a) : ℝ) : ℂ) :=
+    fun a x hx => gammaPartP_eq_tsum_tau a x hx
+  have e : ((y + h : ℕ) : ℂ) * gammaPartK K (y + h) - (y : ℂ) * gammaPartK K y =
+      (InfinitePlace.nrRealPlaces K : ℂ) * (Δ 0 : ℂ) +
+        (InfinitePlace.nrComplexPlaces K : ℂ) * ((Δ 0 : ℂ) + (Δ 1 : ℂ)) := by
+    simp only [gammaPartK, hgp 0 (y + h) (by omega), hgp 1 (y + h) (by omega), hgp 0 y hy,
+      hgp 1 y hy, hΔ, Y, H]
+    push_cast
+    ring
+  rw [e]
+  have hrk : (InfinitePlace.nrRealPlaces K : ℝ) + 2 * InfinitePlace.nrComplexPlaces K =
+      Module.finrank ℚ K := by exact_mod_cast InfinitePlace.card_add_two_mul_card_eq_rank K
+  have hr1 : (0 : ℝ) ≤ InfinitePlace.nrRealPlaces K := Nat.cast_nonneg _
+  have hr2 : (0 : ℝ) ≤ InfinitePlace.nrComplexPlaces K := Nat.cast_nonneg _
+  calc ‖(InfinitePlace.nrRealPlaces K : ℂ) * (Δ 0 : ℂ) +
+        (InfinitePlace.nrComplexPlaces K : ℂ) * ((Δ 0 : ℂ) + (Δ 1 : ℂ))‖
+      ≤ (InfinitePlace.nrRealPlaces K : ℝ) * |Δ 0| +
+          (InfinitePlace.nrComplexPlaces K : ℝ) * (|Δ 0| + |Δ 1|) := by
+        refine (norm_add_le _ _).trans (add_le_add ?_ ?_)
+        · rw [norm_mul, Complex.norm_natCast, Complex.norm_real, Real.norm_eq_abs]
+        · rw [norm_mul, Complex.norm_natCast]
+          refine mul_le_mul_of_nonneg_left ((norm_add_le _ _).trans ?_) hr2
+          rw [Complex.norm_real, Complex.norm_real, Real.norm_eq_abs, Real.norm_eq_abs]
+    _ ≤ (InfinitePlace.nrRealPlaces K : ℝ) * (H * (Real.log (Y + H) + 8)) +
+          (InfinitePlace.nrComplexPlaces K : ℝ) * (2 * (H * (Real.log (Y + H) + 8))) := by
+        gcongr
+        · linarith
+        · nlinarith
+    _ = Module.finrank ℚ K * H * (Real.log (Y + H) + 8) := by rw [← hrk]; ring
 
 namespace ContinuationData
 
