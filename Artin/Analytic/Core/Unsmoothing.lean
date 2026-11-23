@@ -14,7 +14,7 @@ the gamma factors and two elementary terms (`efError_eq`). Its increments over `
 (under RH, uniformly in `K`, with `L(y) = log |d_K| + n log(y + 2)`):
 
 * zeros (`zeroDiff_le`): `∑_ρ m_ρ |(y+h) zeroTerm(y+h, ρ) - y zeroTerm(y, ρ)| ≪ h √y L(y) log(y + 2)`;
-* gamma factors (`gammaDiff_le`): `|(y+h) Γ_K(y+h) - y Γ_K(y)| ≤ n h (log(y + h) + 4)`;
+* gamma factors (`gammaDiff_le`): `|(y+h) Γ_K(y+h) - y Γ_K(y)| ≤ n h (log(y + h) + 8)`;
 * elementary terms: `≤ h (log(y + h) + 1 + 7/2 + 0.6 n)`.
 
 Taking `h = ⌊√x⌋` gives `|ψ_K(x) - x| ≪ √x (log |d_K| + n log x) log x` (`psiK_natCast_le`), and
@@ -130,16 +130,191 @@ theorem zeroDiff_le :
 
 end ContinuationData
 
-/-- **Gamma increments**: `|(y+h) Γ_K(y+h) - y Γ_K(y)| ≤ n h (log(y+h) + 4)` for `y ≥ 2`.
+/-- **Gamma increments**: `|(y+h) Γ_K(y+h) - y Γ_K(y)| ≤ n h (log(y+h) + 8)` for `y ≥ 1`.
 Proof: `Γ_K = r₁ Γ⁰ + r₂ (Γ⁰ + Γ¹)` with `Γᵃ(y) = ∑_k tau y (2k+a)` (`gammaPartP_eq_tsum_tau`)
 and `r₁ + 2 r₂ = n`; termwise, `y tau(y, m)` is explicit: for `m = 0` it is
 `(y-1)/2 - y log y + y - 1`, for `m = 1` it is `(y-1)/3 - y + 1 + log y`, and for `m ≥ 2` it is
 `(y-1)/(m+2) - y^{1-m}/(m(m-1)) - y/m + 1/(m-1)`, whose increment is
-`≤ h (2/m² + 2^{1-m})`. -/
-theorem gammaDiff_le (y h : ℕ) (hy : 2 ≤ y) :
+`≤ 2h/m² + 1/(m(m-1))`. -/
+theorem gammaDiff_le (y h : ℕ) (hy : 1 ≤ y) :
     ‖((y + h : ℕ) : ℂ) * gammaPartK K (y + h) - (y : ℂ) * gammaPartK K y‖ ≤
-      Module.finrank ℚ K * h * (Real.log (y + h) + 4) := by
+      Module.finrank ℚ K * h * (Real.log (y + h) + 8) := by
   sorry
+
+namespace ContinuationData
+
+variable (D : ContinuationData K)
+
+lemma summable_zeroTerm (hRH : DedekindZetaRH K) (y : ℕ) (hy : 1 ≤ y) :
+    Summable (fun ρ : {ρ : ℂ // D.ξ ρ = 0} => (D.mult ρ : ℂ) * zeroTerm y ρ) := by
+  refine Summable.of_norm_bounded ((D.zeroSum_le hRH).1.mul_left (√(y : ℝ) + 2 + 3 / y))
+    fun ρ => ?_
+  rw [norm_mul, Complex.norm_natCast]
+  have h := norm_zeroTerm_le y hy (D.xi_zero_re_eq_half hRH ρ.2)
+  calc (D.mult ρ : ℝ) * ‖zeroTerm y ρ‖
+      ≤ (D.mult ρ : ℝ) * ((√(y : ℝ) + 2 + 3 / y) / ‖(ρ : ℂ) * ((ρ : ℂ) + 1)‖) :=
+        mul_le_mul_of_nonneg_left h (Nat.cast_nonneg _)
+    _ = _ := by ring
+
+lemma norm_zeroSum_diff_le (hRH : DedekindZetaRH K) (y h : ℕ) (hy : 1 ≤ y)
+    (hs : Summable (fun ρ : {ρ : ℂ // D.ξ ρ = 0} => (D.mult ρ : ℝ) *
+        ‖((y + h : ℕ) : ℂ) * zeroTerm (y + h) ρ - (y : ℂ) * zeroTerm y ρ‖)) :
+    ‖((y + h : ℕ) : ℂ) * D.zeroSum (y + h) - (y : ℂ) * D.zeroSum y‖ ≤
+      ∑' ρ : {ρ : ℂ // D.ξ ρ = 0}, (D.mult ρ : ℝ) *
+        ‖((y + h : ℕ) : ℂ) * zeroTerm (y + h) ρ - (y : ℂ) * zeroTerm y ρ‖ := by
+  have h1 := (D.summable_zeroTerm hRH (y + h) (by omega)).mul_left ((y + h : ℕ) : ℂ)
+  have h2 := (D.summable_zeroTerm hRH y hy).mul_left (y : ℂ)
+  have e : ((y + h : ℕ) : ℂ) * D.zeroSum (y + h) - (y : ℂ) * D.zeroSum y =
+      ∑' ρ : {ρ : ℂ // D.ξ ρ = 0}, (D.mult ρ : ℂ) *
+        (((y + h : ℕ) : ℂ) * zeroTerm (y + h) ρ - (y : ℂ) * zeroTerm y ρ) := by
+    rw [zeroSum, zeroSum, ← tsum_mul_left, ← tsum_mul_left, ← h1.tsum_sub h2]
+    exact tsum_congr fun ρ => by ring
+  rw [e]
+  refine (norm_tsum_le_tsum_norm ?_).trans (le_of_eq (tsum_congr fun ρ => ?_))
+  · refine hs.congr fun ρ => ?_
+    rw [norm_mul, Complex.norm_natCast]
+  · rw [norm_mul, Complex.norm_natCast]
+
+end ContinuationData
+
+set_option maxHeartbeats 1600000 in
+/-- Increments of `E`: `|E(y+h) - E(y)| ≤ C₁ h √y (log |d_K| + n log(y+2)) log(y+2)` for
+`1 ≤ h ≤ y`, with `C₁` absolute. -/
+theorem efError_diff_le :
+    ∃ C₁ : ℝ, 0 ≤ C₁ ∧ ∀ (K : Type) [Field K] [NumberField K] (D : ContinuationData K),
+      DedekindZetaRH K → ∀ y h : ℕ, 1 ≤ h → h ≤ y →
+      |efError K (y + h) - efError K y| ≤ C₁ * h * Real.sqrt y *
+        (Real.log |(discr K : ℝ)| + Module.finrank ℚ K * Real.log (y + 2)) * Real.log (y + 2) := by
+  obtain ⟨C₀, hC₀⟩ := ContinuationData.zeroDiff_le
+  set C₀' := max C₀ 0
+  refine ⟨C₀' + 18, by positivity, fun K _ _ D hRH y h hh hhy => ?_⟩
+  have hy1 : 1 ≤ y := hh.trans hhy
+  obtain ⟨hzs, hzb⟩ := hC₀ K D hRH y h hh hhy
+  have eA := D.efError_eq (y + h) (by omega)
+  have eB := D.efError_eq y hy1
+  set n : ℝ := (Module.finrank ℚ K : ℝ)
+  set ld := Real.log |(discr K : ℝ)|
+  set ℓ := Real.log ((y : ℝ) + 2)
+  have hn : 1 ≤ n := one_le_finrank
+  have hld : 0 ≤ ld := log_abs_discr_nonneg
+  have hyR : (1 : ℝ) ≤ y := by exact_mod_cast hy1
+  have hhR : (1 : ℝ) ≤ h := by exact_mod_cast hh
+  have hhyR : (h : ℝ) ≤ y := by exact_mod_cast hhy
+  have hℓ : 1 ≤ ℓ := by
+    rw [Real.le_log_iff_exp_le (by positivity)]
+    have := Real.exp_one_lt_d9; linarith
+  have hsy : 1 ≤ Real.sqrt y := by
+    rw [show (1 : ℝ) = Real.sqrt 1 by simp]; exact Real.sqrt_le_sqrt hyR
+  set B := ld + n * ℓ
+  have hB : n ≤ B := by
+    have : n ≤ n * ℓ := le_mul_of_one_le_right (by linarith) hℓ
+    simp only [B]; linarith
+  have hB0 : 0 ≤ B := by linarith
+  have hsB : B ≤ Real.sqrt y * B := le_mul_of_one_le_left hB0 hsy
+  -- zeros
+  have hZ : |((((y + h : ℕ) : ℂ) * D.zeroSum (y + h)).re - (((y : ℂ) * D.zeroSum y)).re)| ≤
+      C₀' * h * Real.sqrt y * B * ℓ := by
+    rw [← sub_re]
+    refine (abs_re_le_norm _).trans ((D.norm_zeroSum_diff_le hRH y h hy1 hzs).trans
+      (hzb.trans ?_))
+    have : 0 ≤ (h : ℝ) * Real.sqrt y * B * ℓ := by
+      have : 0 ≤ B := by linarith
+      positivity
+    have e1 : C₀ * h * Real.sqrt y * B * ℓ = C₀ * ((h : ℝ) * Real.sqrt y * B * ℓ) := by ring
+    have e2 : C₀' * h * Real.sqrt y * B * ℓ = C₀' * ((h : ℝ) * Real.sqrt y * B * ℓ) := by ring
+    rw [e1, e2]
+    exact mul_le_mul_of_nonneg_right (le_max_left _ _) this
+  -- gamma factors
+  have hlyh : Real.log ((y : ℝ) + h) ≤ 2 * ℓ := by
+    have : Real.log ((y : ℝ) + h) ≤ Real.log (((y : ℝ) + 2) ^ 2) :=
+      Real.log_le_log (by positivity) (by nlinarith)
+    rw [Real.log_pow] at this; push_cast at this; linarith
+  have hlyh0 : 0 ≤ Real.log ((y : ℝ) + h) := Real.log_nonneg (by linarith)
+  have hG : |((((y + h : ℕ) : ℂ) * gammaPartK K (y + h)).re - (((y : ℂ) * gammaPartK K y)).re)| ≤
+      10 * n * h * ℓ := by
+    rw [← sub_re]
+    refine (abs_re_le_norm _).trans ?_
+    have hg := gammaDiff_le (K := K) y h hy1
+    calc ‖((y + h : ℕ) : ℂ) * gammaPartK K (y + h) - (y : ℂ) * gammaPartK K y‖
+        ≤ n * h * (Real.log ((y : ℝ) + h) + 8) := hg
+      _ ≤ 10 * n * h * ℓ := by
+          have h1 : Real.log ((y : ℝ) + h) + 8 ≤ 10 * ℓ := by linarith
+          have h2 : 0 ≤ n * h := by positivity
+          calc n * h * (Real.log ((y : ℝ) + h) + 8) ≤ n * h * (10 * ℓ) :=
+                mul_le_mul_of_nonneg_left h1 h2
+            _ = 10 * n * h * ℓ := by ring
+  -- elementary terms
+  have hlog : |((y + h : ℕ) : ℝ) * Real.log ((y + h : ℕ) : ℝ) - y * Real.log y| ≤
+      h * (Real.log ((y : ℝ) + h) + 1) := by
+    push_cast
+    have hmono : y * Real.log y ≤ ((y : ℝ) + h) * Real.log ((y : ℝ) + h) := by
+      have := Real.log_le_log (by linarith : (0 : ℝ) < y) (by linarith : (y : ℝ) ≤ y + h)
+      have := Real.log_nonneg hyR
+      nlinarith
+    have hup : ((y : ℝ) + h) * Real.log ((y : ℝ) + h) - y * Real.log y ≤
+        h * (Real.log ((y : ℝ) + h) + 1) := by
+      have h1 : Real.log ((y : ℝ) + h) - Real.log y ≤ h / y := by
+        rw [← Real.log_div (by linarith) (by linarith)]
+        have := Real.log_le_sub_one_of_pos (show (0 : ℝ) < (y + h) / y by positivity)
+        have e : ((y : ℝ) + h) / y - 1 = h / y := by field_simp; ring
+        linarith
+      have h2 : (y : ℝ) * (Real.log ((y : ℝ) + h) - Real.log y) ≤ h := by
+        have := mul_le_mul_of_nonneg_left h1 (by linarith : (0 : ℝ) ≤ y)
+        rwa [mul_div_cancel₀ _ (by linarith : (y : ℝ) ≠ 0)] at this
+      nlinarith
+    rw [abs_le]; constructor <;> linarith
+  have hc2 : |(deriv D.Z 2 / D.Z 2).re| ≤ 0.6 * n :=
+    (abs_re_le_norm _).trans (D.norm_logDeriv_Z_le (by norm_num))
+  -- assemble
+  have hcast : ((y + h : ℕ) : ℝ) - 1 - (y - 1) = h := by push_cast; ring
+  have key : efError K (y + h) - efError K y =
+      (((((y + h : ℕ) : ℂ) * D.zeroSum (y + h)).re - (((y : ℂ) * D.zeroSum y)).re)) +
+      (((((y + h : ℕ) : ℂ) * gammaPartK K (y + h)).re - (((y : ℂ) * gammaPartK K y)).re)) +
+      (((y + h : ℕ) : ℝ) * Real.log ((y + h : ℕ) : ℝ) - y * Real.log y) - 7 / 2 * h -
+      h * (deriv D.Z 2 / D.Z 2).re := by
+    rw [eA, eB]; push_cast; ring
+  rw [key]
+  have hT1 : h * (Real.log ((y : ℝ) + h) + 1) ≤ 3 * h * ℓ := by
+    have : Real.log ((y : ℝ) + h) + 1 ≤ 3 * ℓ := by linarith
+    calc (h : ℝ) * (Real.log ((y : ℝ) + h) + 1) ≤ h * (3 * ℓ) :=
+          mul_le_mul_of_nonneg_left this (by positivity)
+      _ = 3 * h * ℓ := by ring
+  have hc2' : |(h : ℝ) * (deriv D.Z 2 / D.Z 2).re| ≤ h * (0.6 * n) := by
+    rw [abs_mul, abs_of_nonneg (by positivity : (0 : ℝ) ≤ h)]
+    exact mul_le_mul_of_nonneg_left hc2 (by positivity)
+  have hT2 : 7 / 2 * (h : ℝ) + h * (0.6 * n) ≤ 5 * n * h := by
+    have h1 : (h : ℝ) ≤ n * h := le_mul_of_one_le_left (by positivity) hn
+    have e : (h : ℝ) * (0.6 * n) = 0.6 * (n * h) := by ring
+    have e2 : 5 * n * (h : ℝ) = 5 * (n * h) := by ring
+    rw [e, e2]; linarith
+  have hX : (h : ℝ) * ℓ ≤ h * Real.sqrt y * B * ℓ := by
+    have h1 : 1 ≤ Real.sqrt y * B := by linarith
+    have h2 : 0 ≤ (h : ℝ) * ℓ := by positivity
+    calc (h : ℝ) * ℓ = (h * ℓ) * 1 := by ring
+      _ ≤ (h * ℓ) * (Real.sqrt y * B) := mul_le_mul_of_nonneg_left h1 h2
+      _ = h * Real.sqrt y * B * ℓ := by ring
+  have hY : n * h * ℓ ≤ h * Real.sqrt y * B * ℓ := by
+    have h1 : n ≤ Real.sqrt y * B := by linarith
+    have h2 : 0 ≤ (h : ℝ) * ℓ := by positivity
+    calc n * h * ℓ = (h * ℓ) * n := by ring
+      _ ≤ (h * ℓ) * (Real.sqrt y * B) := mul_le_mul_of_nonneg_left h1 h2
+      _ = h * Real.sqrt y * B * ℓ := by ring
+  have hW : n * h ≤ n * h * ℓ := by
+    have : 0 ≤ n * h := by positivity
+    calc n * h = n * h * 1 := by ring
+      _ ≤ n * h * ℓ := mul_le_mul_of_nonneg_left hℓ this
+  have h1 := abs_le.1 hZ
+  have h2 := abs_le.1 hG
+  have h3 := abs_le.1 (hlog.trans hT1)
+  have h4 := abs_le.1 hc2'
+  have hfin : C₀' * h * Real.sqrt y * B * ℓ + 10 * n * h * ℓ + 3 * h * ℓ + 5 * n * h ≤
+      (C₀' + 18) * h * Real.sqrt y * B * ℓ := by
+    have e : (C₀' + 18) * h * Real.sqrt y * B * ℓ =
+        C₀' * h * Real.sqrt y * B * ℓ + 18 * (h * Real.sqrt y * B * ℓ) := by ring
+    rw [e]
+    linarith
+  rw [abs_le]
+  constructor <;> linarith
 
 /-- **ψ_K at integers** under RH and Hecke's continuation, with an absolute constant. -/
 theorem psiK_natCast_le :
