@@ -26,3 +26,28 @@ RH itself is a hypothesis; it is proved as `riemannHypothesis` in
 finite check for `n ≤ 5040` (one documented `native_decide` over ℚ for `13 ≤ n ≤ 5040`).
 
 Build: `lake build Robin`.
+
+## Unconditional version
+
+`Unconditional/RobinUnconditional.lean` imports [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
+(commit `507a75d`) and closes the hypothesis with its theorem:
+
+| Theorem | Statement | Axioms |
+|---|---|---|
+| `robin_of_verified` | `RobinVerifiedRange → RobinStatement` | standard three only |
+| `robin_unconditional` | `RobinStatement` | standard three + `sorryAx` (the cited Morrill–Platt range) |
+| `lagarias_unconditional` | `LagariasStatement` | standard three + `sorryAx` + 1 `native_decide` |
+
+To check it:
+
+```bash
+scripts/check-unconditional.sh /path/to/riemann-hypothesis   # cloned there if missing
+```
+
+The script uses that project's community cache, about 93 GB. The import opens around 900,000
+module files and needs about 19 GB of RAM. Raise the open-file limit first; on macOS:
+`sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`.
+
+The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
+builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
+verification is still pending.
