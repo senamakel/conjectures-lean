@@ -29,13 +29,7 @@ def GrosswaldStatement : Prop :=
 def VerifiedUpTo (B : ℕ) : Prop :=
   ∀ p : ℕ, p.Prime → 409 < p → p ≤ B → HasSmallPrimitiveRoot p
 
-/-- MTT Theorem 1, GRH part: the main deliverable. -/
-theorem prime_primitive_root_of_GRH_large (hGRH : DirichletLNonvanishingRightOfHalf) :
-    ∀ p : ℕ, p.Prime → 2500000000000000 < p → HasSmallPrimePrimitiveRoot p := by
-  sorry
-
-theorem grosswald_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf)
-    (hcomp : VerifiedUpTo 2500000000000000) : GrosswaldStatement := by
-  sorry
+-- The two theorems `prime_primitive_root_of_GRH_large` and `grosswald_of_GRH` are proved, with
+-- these exact statements, in `Grosswald/Main.lean`.
 
 end Grosswald
