@@ -1,6 +1,7 @@
 import Erdos985.Analytic.Hadamard
 import Erdos985.Analytic.ExplicitFormula.ZeroSum
 import Artin.Analytic.Core.VonMangoldt
+import Artin.Analytic.Core.NonvanishingOne
 import Artin.Analytic.Core.GammaPart
 
 /-!
@@ -136,8 +137,8 @@ coefficients (Euler product), so `|ζ_K(σ)³ ζ_K(σ + it)⁴ ζ_K(σ + 2it)| �
 `1` (`ξ` is entire) and is holomorphic at `1 + 2it`. See Narkiewicz, *Elementary and Analytic
 Theory of Algebraic Numbers*, Lemma 7.4, or Lang, *Algebraic Number Theory*, XV §1. At `t = 0`,
 `ζ_K` has its pole: `(s - 1) Z(s)` tends to the positive residue. -/
-theorem Z_ne_zero_of_re_eq_one {s : ℂ} (hs : s.re = 1) (hs1 : s ≠ 1) : D.Z s ≠ 0 := by
-  sorry
+theorem Z_ne_zero_of_re_eq_one {s : ℂ} (hs : s.re = 1) (hs1 : s ≠ 1) : D.Z s ≠ 0 :=
+  D.Z_ne_zero_on_one_line hs hs1
 
 lemma gammaFactorK_one_ne_zero : gammaFactorK K 1 ≠ 0 := gammaFactorK_ne_zero (by norm_num)
 
