@@ -99,18 +99,18 @@ L-functions to `ζ_K`.
 The chain `psiKBound_of_continuation → kummerPsiBounds_of_hooley_of_continuation →
 conditional_artin_primitive_roots.parts.i_of_continuation` is assembled and builds. These are
 proved: the explicit formula (A3), `Σ m_ρ/|ρ(ρ+1)| ≤ log |d_K| + 9n` and the local zero count (A2),
-Hadamard and the zero locations (A1), `ψ_K = Σ Λ_K`, `Λ_K ≤ n Λ`, and the whole unsmoothing argument (A4)
-except its two increment estimates. The remaining `sorry`s are each small, standard and
-documented with a reference in their docstrings:
+Hadamard, the order-1 growth of `ξ_K` (`xi_growth`, `Artin/Analytic/Core/Growth.lean`) and the
+zero locations (A1), `ψ_K = Σ Λ_K`, `Λ_K ≤ n Λ`, and the whole unsmoothing argument (A4),
+including the gamma increments `gammaDiff_le` (explicit `tau` terms) and the zero increments
+`zeroDiff_le` (`Σ m_ρ Re 1/(σ_k − ρ) = Re ξ'/ξ(σ_k)` on the dyadic grid `σ_k = 3/2 + 2^k`,
+`k ≤ log₂ y`). The remaining `sorry`s are each small, standard and documented with a reference
+in their docstrings:
 
 | Lemma | Statement | Route |
 |---|---|---|
 | `LSeries_vonMangoldtK` | `Σ Λ_K(n) n^{-s} = −ζ_K'/ζ_K(s)`, `Re s > 1` | Euler product over prime ideals |
 | `dedekindZeta_ne_zero` | `ζ_K(s) ≠ 0`, `Re s > 1` | Euler product |
 | `Z_ne_zero_of_re_eq_one` | `ζ_K(1+it) ≠ 0`, `t ≠ 0` | Mertens' `3 + 4 cos θ + cos 2θ ≥ 0` |
-| `xi_growth` | `‖ξ_K(s)‖ ≤ C exp(C‖s‖ log(‖s‖+2))` | strip bound, functional equation, Stirling for `Re s ≥ 2` |
-| `gammaDiff_le` | `‖(y+h)Γ_K(y+h) − yΓ_K(y)‖ ≤ n h (log(y+h) + 8)` | explicit `tau` terms |
-| `zeroDiff_le` | `Σ m_ρ ‖(y+h) zeroTerm(y+h) − y zeroTerm(y)‖ ≪ h √y (log\|d_K\| + n log(y+2)) log(y+2)` | `zeroSum_le` plus `zeroCount_le` on unit windows, split at `\|Im ρ\| = y/h` |
 
 `effectiveKummerChebotarev_of_hooley` (without the continuation hypothesis) stays sorried in
 `Artin/Interfaces.lean`.

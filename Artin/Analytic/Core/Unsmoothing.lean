@@ -20,11 +20,15 @@ the gamma factors and two elementary terms (`efError_eq`). Its increments over `
 Taking `h = ⌊√x⌋` gives `|ψ_K(x) - x| ≪ √x (log |d_K| + n log x) log x` (`psiK_natCast_le`), and
 real `x` follows from `ψ_K(x) = ψ_K(⌈x⌉)` (`psiKBound_of_continuation`).
 
-Only `zeroDiff_le` uses local zero counting: the zero term is
+For `zeroDiff_le` the zero term's increment is
 `h (1/(2 - ρ) + 1/ρ) - ((y+h)^{ρ+1} - y^{ρ+1})/(ρ(ρ+1))`; the first part is `2h/|ρ(ρ+1)|` (on
-`Re ρ = 1/2`, `|2 - ρ| = |ρ + 1|`), summed by `zeroSum_le`; the second is
-`≤ min(√(2y) h/|ρ|, 2 (2y)^{3/2}/|ρ|²)`, and summing over unit windows `|Im ρ - j| ≤ 1` with
-`zeroCount_le`, splitting at `|Im ρ| = y/h`, gives `≪ h √y L(y) log(y + 2)`.
+`Re ρ = 1/2`, `|2 - ρ| = |ρ + 1|`), summed by `zeroSum_le`; the second is `≤ 2 h √y/|ρ|` (mean
+value theorem) and `≤ 5 y √y/|ρ|²`. Instead of counting zeros in windows, both are bounded by
+`20 h √y ∑_{k ≤ log₂ y} Re 1/(σ_k - ρ)` on the dyadic grid `σ_k = 3/2 + 2^k`
+(`zeroDiff_term_le`, via `grid_le` for `|Im ρ| ≤ 2^{K+1}` and `grid_tail` beyond), and
+`∑_ρ m_ρ Re 1/(σ_k - ρ) = Re ξ'/ξ(σ_k) ≤ 5 (log |d_K| + n log(y + 2))`
+(`re_logDeriv_xi_le_real`). With `log₂ y + 1 ≤ 3 log(y + 2)` this gives
+`≤ 318 h √y L(y) log(y + 2)` (`zeroDiff_le_aux`).
 This is the standard unsmoothing (Davenport, *Multiplicative Number Theory*, §17–18, for `ζ`;
 Lagarias–Odlyzko 1977, §9; Serre 1981, §2.4, Théorème 4).
 -/
@@ -512,10 +516,7 @@ theorem efError_eq (y : ℕ) (hy : 1 ≤ y) :
 /-- **Zero increments** (the analytic heart of A4; see the module docstring). Under RH, with an
 absolute constant, for `1 ≤ h ≤ y`:
 `∑_ρ m_ρ |(y+h) zeroTerm(y+h, ρ) - y zeroTerm(y, ρ)| ≤ C₀ h √y (log |d_K| + n log(y+2)) log(y+2)`.
-Proof: `zeroSum_le` for the part `h (1/(2-ρ) + 1/ρ)`; for the rest, `|w^{ρ+1}|` increments are
-`≤ |ρ+1| h (2y)^{1/2}` and `≤ 2 (2y)^{3/2}`, and `zeroCount_le` on the windows
-`|Im ρ - j| ≤ 1`, `j ∈ ℤ`, bounds `∑_{|Im ρ| ≤ y/h} m_ρ/|ρ|` by `≪ L log(y+2)` and
-`∑_{|Im ρ| > y/h} m_ρ/|ρ|² ≪ L h/y`. -/
+Proof: `zeroDiff_le_aux`, with `C₀ = 318` (see the module docstring). -/
 theorem zeroDiff_le :
     ∃ C₀ : ℝ, ∀ (K : Type) [Field K] [NumberField K] (D : ContinuationData K),
       DedekindZetaRH K → ∀ y h : ℕ, 1 ≤ h → h ≤ y →
