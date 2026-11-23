@@ -1,19 +1,40 @@
 # Artin's primitive root conjecture under Hooley's hypothesis, in Lean
 
-Work in progress.
-
-The target is Hooley's 1967 theorem, as stated in
-[formal-conjectures](https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/ArtinPrimitiveRootsConjecture.lean):
+Hooley's 1967 theorem is proved in Lean, with no `sorry`, once one standard analytic input is
+assumed: Hecke's analytic continuation of the Dedekind zeta functions involved.
 
 ```lean
-theorem conditional_artin_primitive_roots.parts.i (a : ℤ) (ha : ¬IsSquare a) (ha' : a ≠ -1)
-    (h : HooleyHypothesis a) :
+theorem conditional_artin_primitive_roots.parts.i_of_continuation (a : ℤ) (ha : ¬IsSquare a)
+    (ha' : a ≠ -1) (h : HooleyHypothesis a)
+    (hc : ∀ k : ℕ, Squarefree k → DedekindContinuation (Artin.Kummer.KField a k)) :
     ∃ x > 0, (S a).HasDensity x {p | p.Prime}
 ```
 
-That is: if `a` is not a square and not `-1`, and RH holds for the Dedekind zeta functions of
-the Kummer fields `ℚ(ζ_k, a^{1/k})` with `k` squarefree, then a positive proportion of primes
-`p` have `a` as a primitive root.
+`#print axioms` lists only `propext`, `Classical.choice` and `Quot.sound`.
+
+In words: if `a` is not a square and not `-1`, and RH holds for the Dedekind zeta functions of
+the Kummer fields `K_k = ℚ(ζ_k, a^{1/k})` with `k` squarefree, then a positive proportion of
+primes `p` have `a` as a primitive root.
+
+`HooleyHypothesis`, `S` and `HasDensity` are copied word for word from
+[formal-conjectures](https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/ArtinPrimitiveRootsConjecture.lean),
+whose `conditional_artin_primitive_roots.parts.i` is the same statement without `hc`.
+
+## Why the continuation is a hypothesis
+
+`HooleyHypothesis` is about every function that is holomorphic on `ℂ ∖ {1}` and agrees with
+`ζ_K` on `Re s > 1`. To use it, a proof needs such a function. Neither our Mathlib pin nor
+upstream Mathlib has the analytic continuation of `ζ_K`. `DedekindContinuation K`
+(`Artin/Analytic/Continuation.lean`) states what Hecke's theorem gives:
+* a continuation `Z`;
+* the entire function `ξ = s(s−1)·|d_K|^{s/2}·Γ_ℝ^{r₁}·Γ_ℂ^{r₂}·Z` with `ξ(1−s) = ξ(s)`;
+* a polynomial bound for `ξ` on `1/2 ≤ Re s ≤ 2`.
+
+The riemann-hypothesis repository proves the continuation and the functional equation, but not
+the strip bound. That repository has no licence, so none of its code is copied here. An
+`Unconditional/` module that imports it, as erdos-985 does, would still need the strip bound.
+The formal-conjectures statement without `hc` remains `sorry` in `Artin/Main.lean` (via
+`effectiveKummerChebotarev_of_hooley`) until Hecke's theorem is formalised.
 
 ## This result stays conditional
 
@@ -32,7 +53,7 @@ Dirichlet characters, so the Chebotarev and Kummer-field parts have to be built 
 | `Artin/Interfaces.lean` | the split: analytic half (sorried) and the definitions joining it to the sieve half, `EffectiveKummerChebotarev` |
 | `Artin/SieveHalf.lean` | the sieve half `artin_of_effectiveKummerChebotarev`: `EffectiveKummerChebotarev a → ∃ δ > 0, (S a).HasDensity δ` for `a` not a square, `a ≠ -1` (sorry-free) |
 | `Artin/Main.lean` | the target theorem, from the two halves |
-| `Artin/MainContinuation.lean` | `conditional_artin_primitive_roots.parts.i_of_continuation`: the target with Hecke's continuation `DedekindContinuation (K_k)` as an extra hypothesis, wired through `effectiveKummerChebotarev_of_kummerPsiBounds` and the sieve half; the analytic core is the one remaining step, `kummerPsiBounds_of_hooley_of_continuation` |
+| `Artin/MainContinuation.lean` | `conditional_artin_primitive_roots.parts.i_of_continuation`: the main result: the target with Hecke's continuation `DedekindContinuation (K_k)` as an extra hypothesis, through `kummerPsiBounds_of_hooley_of_continuation`, `effectiveKummerChebotarev_of_kummerPsiBounds` and the sieve half (sorry-free) |
 | `Artin/Sieve/PrimitiveRoot.lean` | primitive-root criterion and the inclusion–exclusion identity, exact and truncated (sorry-free) |
 | `Artin/Sieve/Selberg/` | the Selberg upper-bound sieve, vendored from PrimeNumberTheoremAnd (see Credits) |
 | `Artin/Sieve/BrunTitchmarsh.lean` | Brun–Titchmarsh: `π(x; q, 1) ≤ 20000 x / (φ(q) log(x/q))` for `x > q ≥ 1` (sorry-free) |
