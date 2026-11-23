@@ -70,6 +70,404 @@ theorem psiK_natCast_mono : Monotone (fun m : ℕ => psiK K m) := by
   exact Finset.sum_le_sum_of_subset_of_nonneg (Finset.range_subset_range.2 hab)
     (fun n _ _ => vonMangoldtK_nonneg K n)
 
+lemma re_gR_le_real {a : ℕ} (ha : a ≤ 1) {σ : ℝ} (hσ : 2 ≤ σ) :
+    (gR a σ).re ≤ (1 / 2) * (Real.log (σ + 3) + 3) := by
+  have e : ((σ : ℂ) + a) / 2 = (((σ + a) / 2 : ℝ) : ℂ) := by push_cast; ring
+  have hre : (gR a σ).re =
+      -(1 / 2) * Real.log Real.pi + (1 / 2) * (digamma ((((σ + a) / 2 : ℝ) : ℂ))).re := by
+    rw [gR, ← e]; simp
+  have ha0 : (0 : ℝ) ≤ a := Nat.cast_nonneg a
+  have ha1 : (a : ℝ) ≤ 1 := by exact_mod_cast ha
+  have hw : 1 ≤ ((((σ + a) / 2 : ℝ) : ℂ)).re := by rw [ofReal_re]; linarith
+  have hnorm : ‖((((σ + a) / 2 : ℝ) : ℂ))‖ ≤ (σ + 1) / 2 := by
+    rw [Complex.norm_real, Real.norm_of_nonneg (by linarith)]
+    linarith
+  have hd := re_digamma_le hw
+  have hlog : Real.log (‖((((σ + a) / 2 : ℝ) : ℂ))‖ + 1) ≤ Real.log (σ + 3) :=
+    Real.log_le_log (by positivity) (by linarith)
+  have hpi : 0 ≤ Real.log Real.pi := Real.log_nonneg (by linarith [Real.pi_gt_three])
+  rw [hre]
+  nlinarith
+
+namespace ContinuationData
+
+variable (D : ContinuationData K)
+
+/-- `Re ξ'/ξ(σ) ≤ 0.6 n + 3/2 + ½ log |d| + ½ n (log(σ + 3) + 3)` for real `σ ≥ 2`. -/
+theorem re_logDeriv_xi_le_real {σ : ℝ} (hσ : 2 ≤ σ) :
+    (deriv D.ξ σ / D.ξ σ).re ≤
+      0.6 * Module.finrank ℚ K + 3 / 2 + (1 / 2) * Real.log |(discr K : ℝ)| +
+        (1 / 2) * Module.finrank ℚ K * (Real.log (σ + 3) + 3) := by
+  have hsre : (σ : ℂ).re = σ := ofReal_re σ
+  have hL := D.logDeriv_Z_eq (s := σ) (by rw [hsre]; linarith)
+  have hD : deriv D.ξ σ / D.ξ σ = deriv D.Z σ / D.Z σ + 1 / (σ : ℂ) + 1 / ((σ : ℂ) - 1) +
+      gammaLogDerivK K σ := by rw [hL]; ring
+  rw [hD]
+  simp only [add_re]
+  have h1 : (deriv D.Z σ / D.Z σ).re ≤ 0.6 * Module.finrank ℚ K :=
+    (re_le_norm _).trans (D.norm_logDeriv_Z_le (by rw [hsre]; linarith))
+  have h2 : (1 / (σ : ℂ)).re ≤ 1 / 2 := by
+    have : (1 / (σ : ℂ)) = ((1 / σ : ℝ) : ℂ) := by push_cast; ring
+    rw [this, ofReal_re, div_le_div_iff₀ (by linarith) (by norm_num)]; linarith
+  have h3 : (1 / ((σ : ℂ) - 1)).re ≤ 1 := by
+    have : (1 / ((σ : ℂ) - 1)) = ((1 / (σ - 1) : ℝ) : ℂ) := by push_cast; ring
+    rw [this, ofReal_re, div_le_one (by linarith)]; linarith
+  have hG : (gammaLogDerivK K σ).re ≤ (1 / 2) * Real.log |(discr K : ℝ)| +
+      (1 / 2) * Module.finrank ℚ K * (Real.log (σ + 3) + 3) := by
+    have g0 := re_gR_le_real (a := 0) (by norm_num) hσ
+    have g1 := re_gR_le_real (a := 1) (by norm_num) hσ
+    have hrk : (InfinitePlace.nrRealPlaces K : ℝ) + 2 * InfinitePlace.nrComplexPlaces K =
+        Module.finrank ℚ K := by exact_mod_cast InfinitePlace.card_add_two_mul_card_eq_rank K
+    simp only [gammaLogDerivK, add_re, mul_re, natCast_re, natCast_im, zero_mul, sub_zero,
+      ofReal_re, ofReal_im]
+    norm_num
+    have hr1 : (0 : ℝ) ≤ InfinitePlace.nrRealPlaces K := Nat.cast_nonneg _
+    have hr2 : (0 : ℝ) ≤ InfinitePlace.nrComplexPlaces K := Nat.cast_nonneg _
+    rw [← hrk]
+    nlinarith
+  linarith
+
+end ContinuationData
+
+/-- Lower bound by the dyadic grid `u_k = 1 + 2^k`, for `|γ| ≤ 2^{K+1}`. -/
+lemma grid_le {γ r : ℝ} (hγr : |γ| ≤ r) (hr : 1 / 2 ≤ r) :
+    ∀ K : ℕ, |γ| ≤ 2 ^ (K + 1) → 1 / r ≤ 10 * ∑ k ∈ Finset.range (K + 1),
+      ((1 : ℝ) + 2 ^ k) / ((1 + 2 ^ k) ^ 2 + γ ^ 2) := by
+  have hnn : ∀ k : ℕ, 0 ≤ ((1 : ℝ) + 2 ^ k) / ((1 + 2 ^ k) ^ 2 + γ ^ 2) := fun k => by
+    positivity
+  intro K
+  induction K with
+  | zero =>
+    intro hγ
+    simp only [zero_add, pow_one, Finset.sum_range_one, pow_zero] at hγ ⊢
+    have hγ2 : γ ^ 2 ≤ 4 := by
+      have := sq_abs γ; nlinarith [abs_nonneg γ]
+    have h1 : 1 / r ≤ 2 := by rw [div_le_iff₀ (by linarith)]; linarith
+    have h2 : (1 : ℝ) / 4 ≤ (1 + 1) / ((1 + 1) ^ 2 + γ ^ 2) := by
+      rw [div_le_div_iff₀ (by norm_num) (by positivity)]; nlinarith
+    linarith
+  | succ K ih =>
+    intro hγ
+    rw [Finset.sum_range_succ]
+    by_cases hK : |γ| ≤ 2 ^ (K + 1)
+    · have := ih hK; have := hnn (K + 1); linarith
+    · push Not at hK
+      have hp : (2 : ℝ) ≤ 2 ^ (K + 1) := by
+        calc (2 : ℝ) = 2 ^ 1 := by norm_num
+          _ ≤ 2 ^ (K + 1) := pow_le_pow_right₀ (by norm_num) (by omega)
+      have hγ' : |γ| ≤ 2 * 2 ^ (K + 1) := by rw [← pow_succ']; exact hγ
+      set u : ℝ := 1 + 2 ^ (K + 1) with hu
+      have hu1 : |γ| / 2 ≤ u := by rw [hu]; linarith
+      have hu2 : u ≤ 2 * |γ| := by rw [hu]; linarith
+      have hg2 : γ ^ 2 = |γ| ^ 2 := (sq_abs γ).symm
+      have hpos : 0 < |γ| := by linarith
+      have hupos : 0 < u := by linarith
+      have key : 1 / r ≤ 10 * (u / (u ^ 2 + γ ^ 2)) := by
+        rw [hg2]
+        have h1 : 1 / r ≤ 1 / |γ| := one_div_le_one_div_of_le hpos hγr
+        have h2 : 1 / |γ| ≤ 10 * (u / (u ^ 2 + |γ| ^ 2)) := by
+          rw [mul_div_assoc', div_le_div_iff₀ hpos (by positivity)]
+          nlinarith [mul_nonneg (by linarith : (0 : ℝ) ≤ 2 * |γ| - u) hupos.le,
+            mul_nonneg (by linarith : (0 : ℝ) ≤ 2 * u - |γ|) hpos.le]
+        linarith
+      have hs := Finset.sum_nonneg (fun k (_ : k ∈ Finset.range (K + 1)) => hnn k)
+      linarith
+
+/-- The tail of the dyadic grid: for `|γ| > 2^{K+1}`, `1/r² ≤ 2 u_K/((u_K² + γ²) 2^K)`. -/
+lemma grid_tail {γ r : ℝ} (hγr : |γ| ≤ r) (K : ℕ) (hK : 2 ^ (K + 1) < |γ|) :
+    1 / r ^ 2 ≤ 2 * (((1 : ℝ) + 2 ^ K) / ((1 + 2 ^ K) ^ 2 + γ ^ 2)) / 2 ^ K := by
+  have hp : (1 : ℝ) ≤ 2 ^ K := one_le_pow₀ (by norm_num)
+  rw [pow_succ] at hK
+  set u : ℝ := 1 + 2 ^ K with hu
+  have hu1 : u ≤ |γ| := by rw [hu]; linarith
+  have hu2 : 2 ^ K ≤ u := by rw [hu]; linarith
+  have hpos : 0 < |γ| := by linarith
+  have hg2 : γ ^ 2 = |γ| ^ 2 := (sq_abs γ).symm
+  rw [hg2]
+  have h1 : 1 / r ^ 2 ≤ 1 / |γ| ^ 2 :=
+    one_div_le_one_div_of_le (by positivity) (pow_le_pow_left₀ (abs_nonneg _) hγr 2)
+  have h2 : 1 / |γ| ^ 2 ≤ 2 * (u / (u ^ 2 + |γ| ^ 2)) / 2 ^ K := by
+    rw [mul_div_assoc', div_div, div_le_div_iff₀ (by positivity) (by positivity)]
+    have hsq : u ^ 2 ≤ |γ| ^ 2 := pow_le_pow_left₀ (by linarith) hu1 2
+    nlinarith [mul_le_mul_of_nonneg_left hu2 (sq_nonneg |γ|),
+      mul_le_mul_of_nonneg_right hsq (by linarith : (0 : ℝ) ≤ 2 ^ K)]
+  linarith
+
+lemma re_inv_grid {ρ : ℂ} (hρ : ρ.re = 1 / 2) (u : ℝ) :
+    (1 / (((1 / 2 + u : ℝ) : ℂ) - ρ)).re = u / (u ^ 2 + ρ.im ^ 2) := by
+  rw [one_div, inv_re, normSq_apply]
+  simp [hρ]
+  ring
+
+lemma mul_zeroTerm_eq (x : ℕ) (hx : 1 ≤ x) {ρ : ℂ} (hρ : ρ.re = 1 / 2) :
+    (x : ℂ) * zeroTerm x ρ = ((x : ℂ) - 1) / (2 - ρ) - (x : ℂ) ^ (ρ + 1) / (ρ * (ρ + 1)) +
+      (x : ℂ) / ρ - 1 / (1 + ρ) := by
+  have h0 : ρ ≠ 0 := fun h => by rw [h] at hρ; norm_num at hρ
+  have h2 : (2 : ℂ) - ρ ≠ 0 := fun h => by
+    have := congrArg Complex.re h; simp [hρ] at this; norm_num at this
+  have h1 : (1 : ℂ) + ρ ≠ 0 := fun h => by
+    have := congrArg Complex.re h; simp [hρ] at this; norm_num at this
+  have h1' : ρ + 1 ≠ 0 := by rwa [add_comm]
+  have hx0 : (x : ℂ) ≠ 0 := by exact_mod_cast (show x ≠ 0 by omega)
+  unfold zeroTerm
+  rw [cpow_neg_one, cpow_add _ _ hx0, cpow_one]
+  field_simp
+  ring
+
+lemma zeroTerm_diff_eq (y h : ℕ) (hy : 1 ≤ y) {ρ : ℂ} (hρ : ρ.re = 1 / 2) :
+    ((y + h : ℕ) : ℂ) * zeroTerm (y + h) ρ - (y : ℂ) * zeroTerm y ρ =
+      (h : ℂ) * (2 / (ρ * (2 - ρ))) -
+        (((y + h : ℕ) : ℂ) ^ (ρ + 1) - (y : ℂ) ^ (ρ + 1)) / (ρ * (ρ + 1)) := by
+  have h0 : ρ ≠ 0 := fun h => by rw [h] at hρ; norm_num at hρ
+  have h2 : (2 : ℂ) - ρ ≠ 0 := fun h => by
+    have := congrArg Complex.re h; simp [hρ] at this; norm_num at this
+  have h1' : ρ + 1 ≠ 0 := fun h => by
+    have := congrArg Complex.re h; simp [hρ] at this; norm_num at this
+  rw [mul_zeroTerm_eq (y + h) (by omega) hρ, mul_zeroTerm_eq y hy hρ]
+  push_cast
+  field_simp
+  ring
+
+/-- Mean value bound: `|b^{ρ+1} - a^{ρ+1}| ≤ |ρ+1| √b (b - a)` for `Re ρ = 1/2`, `0 < a ≤ b`. -/
+lemma norm_cpow_succ_sub_le {ρ : ℂ} (hρ : ρ.re = 1 / 2) {a b : ℝ} (ha : 0 < a) (hab : a ≤ b) :
+    ‖(b : ℂ) ^ (ρ + 1) - (a : ℂ) ^ (ρ + 1)‖ ≤ ‖ρ + 1‖ * √b * (b - a) := by
+  have hρ1 : ρ + 1 ≠ 0 := fun h => by
+    have := congrArg Complex.re h; simp [hρ] at this; norm_num at this
+  have hd : ∀ x ∈ Set.Icc a b, HasDerivWithinAt (fun t : ℝ => (t : ℂ) ^ (ρ + 1))
+      ((ρ + 1) * (x : ℂ) ^ ρ) (Set.Icc a b) x := by
+    intro x hx
+    have hx0 : x ≠ 0 := (ha.trans_le hx.1).ne'
+    have := hasDerivAt_ofReal_cpow_const hx0 hρ1
+    rw [add_sub_cancel_right] at this
+    exact this.hasDerivWithinAt
+  have hb : ∀ x ∈ Set.Ico a b, ‖(ρ + 1) * (x : ℂ) ^ ρ‖ ≤ ‖ρ + 1‖ * √b := by
+    intro x hx
+    have hx0 : 0 < x := ha.trans_le hx.1
+    rw [norm_mul, Complex.norm_cpow_eq_rpow_re_of_pos hx0, hρ, ← Real.sqrt_eq_rpow]
+    gcongr
+    exact hx.2.le
+  exact norm_image_sub_le_of_norm_deriv_le_segment' hd hb b ⟨hab, le_rfl⟩
+
+lemma norm_natCast_cpow_succ {ρ : ℂ} (hρ : ρ.re = 1 / 2) {x : ℕ} (hx : 1 ≤ x) :
+    ‖(x : ℂ) ^ (ρ + 1)‖ = (x : ℝ) * √(x : ℝ) := by
+  have hx0 : (0 : ℝ) < x := by exact_mod_cast hx
+  rw [Complex.norm_natCast_cpow_of_pos (by omega), add_re, hρ, one_re,
+    show (1 / 2 + 1 : ℝ) = 1 + 1 / 2 by norm_num, Real.rpow_add hx0, Real.rpow_one,
+    ← Real.sqrt_eq_rpow]
+
+/-- One zero's increment: `‖Δ_ρ‖ ≤ 2h/|ρ(ρ+1)| + 20 h √y ∑_{k ≤ log₂ y} Re 1/(σ_k - ρ)`, with
+`σ_k = 3/2 + 2^k`. -/
+lemma zeroDiff_term_le (y h : ℕ) (hh : 1 ≤ h) (hhy : h ≤ y) {ρ : ℂ} (hρ : ρ.re = 1 / 2) :
+    ‖((y + h : ℕ) : ℂ) * zeroTerm (y + h) ρ - (y : ℂ) * zeroTerm y ρ‖ ≤
+      2 * h / ‖ρ * (ρ + 1)‖ + 20 * h * √(y : ℝ) * ∑ k ∈ Finset.range (Nat.log 2 y + 1),
+        (1 / (((1 / 2 + (1 + 2 ^ k) : ℝ) : ℂ) - ρ)).re := by
+  have hy : 1 ≤ y := hh.trans hhy
+  have h0 : ρ ≠ 0 := fun h => by rw [h] at hρ; norm_num at hρ
+  have h1' : ρ + 1 ≠ 0 := fun h => by
+    have := congrArg Complex.re h; simp [hρ] at this; norm_num at this
+  have hY1 : (1 : ℝ) ≤ y := by exact_mod_cast hy
+  have hH1 : (1 : ℝ) ≤ h := by exact_mod_cast hh
+  have hHY : (h : ℝ) ≤ y := by exact_mod_cast hhy
+  have hKy : (2 : ℝ) ^ Nat.log 2 y ≤ y := by exact_mod_cast Nat.pow_log_le_self 2 (by omega : y ≠ 0)
+  have hyK : (y : ℝ) < 2 ^ (Nat.log 2 y + 1) := by
+    exact_mod_cast Nat.lt_pow_succ_log_self (by norm_num : 1 < 2) y
+  set Y : ℝ := (y : ℝ) with hY
+  set H : ℝ := (h : ℝ) with hH
+  set r := ‖ρ‖ with hr
+  set q := ‖ρ + 1‖ with hq
+  have hrq : r ≤ q := norm_le_norm_add_one hρ
+  have hr2 : 1 / 2 ≤ r := by
+    have := abs_re_le_norm ρ; rw [hρ] at this; norm_num at this; linarith
+  have hγr : |ρ.im| ≤ r := abs_im_le_norm ρ
+  have hrpos : 0 < r := by linarith
+  have hqpos : 0 < q := by linarith
+  have hP : ‖ρ * (ρ + 1)‖ = r * q := norm_mul _ _
+  set Kl := Nat.log 2 y with hKl
+  set g : ℕ → ℝ := fun k => ((1 : ℝ) + 2 ^ k) / ((1 + 2 ^ k) ^ 2 + ρ.im ^ 2) with hg
+  have hgnn : ∀ k, 0 ≤ g k := fun k => by simp only [hg]; positivity
+  have hsum_eq : ∑ k ∈ Finset.range (Kl + 1), (1 / (((1 / 2 + (1 + 2 ^ k) : ℝ) : ℂ) - ρ)).re =
+      ∑ k ∈ Finset.range (Kl + 1), g k :=
+    Finset.sum_congr rfl fun k _ => by rw [re_inv_grid hρ]
+  rw [hsum_eq, zeroTerm_diff_eq y h hy hρ]
+  set S := ∑ k ∈ Finset.range (Kl + 1), g k with hS
+  have hSnn : 0 ≤ S := Finset.sum_nonneg fun k _ => hgnn k
+  have hsY : 1 ≤ √Y := by rw [Real.one_le_sqrt]; exact hY1
+  refine (norm_sub_le _ _).trans (add_le_add ?_ ?_)
+  · rw [norm_mul, norm_div, norm_mul, norm_two_sub_eq hρ, Complex.norm_natCast,
+      Complex.norm_two, hP]
+    rw [← hq]
+    apply le_of_eq; ring
+  · rw [norm_div, hP]
+    set A := ((y + h : ℕ) : ℂ) ^ (ρ + 1) - (y : ℂ) ^ (ρ + 1) with hA
+    have hcast : ((y + h : ℕ) : ℂ) = (((Y + H : ℝ)) : ℂ) := by rw [hY, hH]; push_cast; ring
+    have hcast' : ((y : ℕ) : ℂ) = ((Y : ℝ) : ℂ) := by rw [hY]; norm_cast
+    have hsq2 : √(Y + H) ≤ 2 * √Y := by
+      have : √(Y + H) ≤ √(4 * Y) := Real.sqrt_le_sqrt (by linarith)
+      rw [Real.sqrt_mul (by norm_num), show (4 : ℝ) = 2 ^ 2 by norm_num,
+        Real.sqrt_sq (by norm_num)] at this
+      exact this
+    by_cases hcase : |ρ.im| ≤ 2 ^ (Kl + 1)
+    · -- mean value bound
+      have hmv : ‖A‖ ≤ q * √(Y + H) * H := by
+        have := norm_cpow_succ_sub_le hρ (a := Y) (b := Y + H) (by linarith) (by linarith)
+        rw [hA, hcast, hcast']
+        simpa using this
+      have hgrid := grid_le hγr hr2 Kl hcase
+      calc ‖A‖ / (r * q) ≤ q * (2 * √Y) * H / (r * q) := by
+            gcongr
+            exact hmv.trans (by gcongr)
+        _ = 2 * H * √Y * (1 / r) := by field_simp
+        _ ≤ 2 * H * √Y * (10 * S) := by gcongr
+        _ = 20 * H * √Y * S := by ring
+    · -- trivial bound
+      push Not at hcase
+      have hA1 : ‖A‖ ≤ 5 * Y * √Y := by
+        have e1 := norm_natCast_cpow_succ hρ (x := y + h) (by omega)
+        have e2 := norm_natCast_cpow_succ hρ (x := y) hy
+        calc ‖A‖ ≤ ‖((y + h : ℕ) : ℂ) ^ (ρ + 1)‖ + ‖(y : ℂ) ^ (ρ + 1)‖ := norm_sub_le _ _
+          _ = (Y + H) * √(Y + H) + Y * √Y := by rw [e1, e2, hY, hH]; push_cast; ring
+          _ ≤ (2 * Y) * (2 * √Y) + Y * √Y := by gcongr; linarith
+          _ = 5 * Y * √Y := by ring
+      have ht := grid_tail hγr Kl hcase
+      have hgK : g Kl ≤ S := Finset.single_le_sum (fun k _ => hgnn k) (Finset.self_mem_range_succ Kl)
+      have hpK : (0 : ℝ) < 2 ^ Kl := by positivity
+      have hYK : Y / 2 ^ Kl ≤ 2 := by
+        rw [div_le_iff₀ hpK]; rw [pow_succ] at hyK; linarith
+      calc ‖A‖ / (r * q) ≤ 5 * Y * √Y / (r * r) := by
+            gcongr
+        _ = 5 * Y * √Y * (1 / r ^ 2) := by field_simp
+        _ ≤ 5 * Y * √Y * (2 * g Kl / 2 ^ Kl) := by gcongr
+        _ = 10 * √Y * g Kl * (Y / 2 ^ Kl) := by ring
+        _ ≤ 10 * √Y * g Kl * 2 := by gcongr
+        _ ≤ 20 * H * √Y * S := by
+            have : 0 ≤ √Y := Real.sqrt_nonneg _
+            nlinarith [mul_le_mul_of_nonneg_left hgK this, hgnn Kl,
+              mul_le_mul_of_nonneg_right hH1 (mul_nonneg this hSnn)]
+
+namespace ContinuationData
+
+variable (D : ContinuationData K)
+
+/-- `zeroDiff_le` for one field, with the explicit constant `318`. -/
+theorem zeroDiff_le_aux (hRH : DedekindZetaRH K) (y h : ℕ) (hh : 1 ≤ h) (hhy : h ≤ y) :
+    Summable (fun ρ : {ρ : ℂ // D.ξ ρ = 0} => (D.mult ρ : ℝ) *
+        ‖((y + h : ℕ) : ℂ) * zeroTerm (y + h) ρ - (y : ℂ) * zeroTerm y ρ‖) ∧
+      ∑' ρ : {ρ : ℂ // D.ξ ρ = 0}, (D.mult ρ : ℝ) *
+        ‖((y + h : ℕ) : ℂ) * zeroTerm (y + h) ρ - (y : ℂ) * zeroTerm y ρ‖ ≤
+      318 * h * Real.sqrt y * (Real.log |(discr K : ℝ)| + Module.finrank ℚ K * Real.log (y + 2)) *
+        Real.log (y + 2) := by
+  have hy : 1 ≤ y := hh.trans hhy
+  have hY1 : (1 : ℝ) ≤ y := by exact_mod_cast hy
+  have hH1 : (1 : ℝ) ≤ h := by exact_mod_cast hh
+  have hKy : (2 : ℝ) ^ Nat.log 2 y ≤ y := by
+    exact_mod_cast Nat.pow_log_le_self 2 (by omega : y ≠ 0)
+  set Kl := Nat.log 2 y with hKl
+  set σ : ℕ → ℝ := fun k => 1 / 2 + (1 + 2 ^ k) with hσ
+  set n : ℝ := (Module.finrank ℚ K : ℝ) with hn
+  set ld := Real.log |(discr K : ℝ)| with hld
+  set ℓ := Real.log ((y : ℝ) + 2) with hℓ
+  set L := ld + n * ℓ with hL
+  have hn1 : 1 ≤ n := one_le_finrank
+  have hld0 : 0 ≤ ld := log_abs_discr_nonneg
+  have hℓ1 : 1 ≤ ℓ := by
+    rw [hℓ, Real.le_log_iff_exp_le (by positivity)]
+    have := Real.exp_one_lt_d9
+    linarith
+  have hL0 : 0 ≤ L := by positivity
+  have hsY : 1 ≤ √(y : ℝ) := by rw [Real.one_le_sqrt]; exact hY1
+  -- the sums at the grid points
+  have hσre : ∀ k, D.ξ (σ k) ≠ 0 := fun k => D.xi_ne_zero_of_one_le_re (by
+    rw [ofReal_re, hσ]; have : (0 : ℝ) ≤ 2 ^ k := by positivity
+    linarith)
+  have hgrid : HasSum (fun ρ : {ρ : ℂ // D.ξ ρ = 0} => ∑ k ∈ Finset.range (Kl + 1),
+      (D.mult ρ : ℝ) * (1 / ((σ k : ℂ) - ρ)).re)
+      (∑ k ∈ Finset.range (Kl + 1), (deriv D.ξ (σ k) / D.ξ (σ k)).re) :=
+    hasSum_sum fun k _ => D.hasSum_re_logDeriv_xi hRH (hσre k)
+  obtain ⟨hzs, hzb⟩ := D.zeroSum_le hRH
+  set c : ℝ := 20 * h * √(y : ℝ) with hc
+  have hc0 : 0 ≤ c := by positivity
+  have hmaj : HasSum (fun ρ : {ρ : ℂ // D.ξ ρ = 0} =>
+      2 * h * ((D.mult ρ : ℝ) / ‖(ρ : ℂ) * ((ρ : ℂ) + 1)‖) +
+        c * ∑ k ∈ Finset.range (Kl + 1), (D.mult ρ : ℝ) * (1 / ((σ k : ℂ) - ρ)).re)
+      (2 * h * ∑' ρ : {ρ : ℂ // D.ξ ρ = 0}, (D.mult ρ : ℝ) / ‖(ρ : ℂ) * ((ρ : ℂ) + 1)‖ +
+        c * ∑ k ∈ Finset.range (Kl + 1), (deriv D.ξ (σ k) / D.ξ (σ k)).re) :=
+    (hzs.hasSum.mul_left _).add (hgrid.mul_left c)
+  have hle : ∀ ρ : {ρ : ℂ // D.ξ ρ = 0}, (D.mult ρ : ℝ) *
+      ‖((y + h : ℕ) : ℂ) * zeroTerm (y + h) ρ - (y : ℂ) * zeroTerm y ρ‖ ≤
+      2 * h * ((D.mult ρ : ℝ) / ‖(ρ : ℂ) * ((ρ : ℂ) + 1)‖) +
+        c * ∑ k ∈ Finset.range (Kl + 1), (D.mult ρ : ℝ) * (1 / ((σ k : ℂ) - ρ)).re := by
+    intro ρ
+    have hm : (0 : ℝ) ≤ D.mult ρ := Nat.cast_nonneg _
+    have := mul_le_mul_of_nonneg_left
+      (zeroDiff_term_le y h hh hhy (D.xi_zero_re_eq_half hRH ρ.2)) hm
+    rw [← Finset.mul_sum]
+    calc _ ≤ _ := this
+      _ = _ := by simp only [hc, hσ]; ring
+  have hnn : ∀ ρ : {ρ : ℂ // D.ξ ρ = 0}, 0 ≤ (D.mult ρ : ℝ) *
+      ‖((y + h : ℕ) : ℂ) * zeroTerm (y + h) ρ - (y : ℂ) * zeroTerm y ρ‖ :=
+    fun ρ => mul_nonneg (Nat.cast_nonneg _) (norm_nonneg _)
+  have hsum := Summable.of_nonneg_of_le hnn hle hmaj.summable
+  refine ⟨hsum, ?_⟩
+  have h1 := hsum.tsum_le_tsum hle hmaj.summable
+  rw [hmaj.tsum_eq] at h1
+  -- each grid value is `≤ 5 L`
+  have hgv : ∀ k ∈ Finset.range (Kl + 1), (deriv D.ξ (σ k) / D.ξ (σ k)).re ≤ 5 * L := by
+    intro k hk
+    have hk' : k ≤ Kl := Nat.lt_succ_iff.1 (Finset.mem_range.1 hk)
+    have h2k : (2 : ℝ) ^ k ≤ y := (pow_le_pow_right₀ (by norm_num) hk').trans hKy
+    have h2k0 : (0 : ℝ) ≤ 2 ^ k := by positivity
+    have h2k1 : (1 : ℝ) ≤ 2 ^ k := one_le_pow₀ (by norm_num)
+    have hσ2 : 2 ≤ σ k := by simp only [hσ]; linarith
+    have hb := D.re_logDeriv_xi_le_real hσ2
+    have hlog : Real.log (σ k + 3) ≤ 2 * ℓ := by
+      rw [hℓ, ← Real.log_rpow (by positivity)]
+      refine Real.log_le_log (by simp only [hσ]; positivity) ?_
+      rw [show (2 : ℝ) = ((2 : ℕ) : ℝ) by norm_num, Real.rpow_natCast]
+      simp only [hσ]; nlinarith
+    have : (1 / 2) * n * (Real.log (σ k + 3) + 3) ≤ (1 / 2) * n * (2 * ℓ + 3) := by gcongr
+    have : n ≤ n * ℓ := le_mul_of_one_le_right (by linarith) hℓ1
+    rw [← hn, ← hld] at hb
+    nlinarith
+  have hsumv : ∑ k ∈ Finset.range (Kl + 1), (deriv D.ξ (σ k) / D.ξ (σ k)).re ≤
+      ((Kl : ℝ) + 1) * (5 * L) := by
+    have := Finset.sum_le_sum hgv
+    rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul] at this
+    push_cast at this
+    exact this
+  -- `log₂ y + 1 ≤ 3 log(y + 2)`
+  have hK3 : (Kl : ℝ) + 1 ≤ 3 * ℓ := by
+    have hl2 : (0.69 : ℝ) < Real.log 2 := by
+      have := Real.log_two_gt_d9; linarith
+    have hKlog : (Kl : ℝ) * Real.log 2 ≤ ℓ := by
+      rw [← Real.log_pow]
+      exact Real.log_le_log (by positivity) (by linarith)
+    have hK0 : (0 : ℝ) ≤ Kl := Nat.cast_nonneg _
+    nlinarith
+  have hZ : 2 * (h : ℝ) * ∑' ρ : {ρ : ℂ // D.ξ ρ = 0},
+      (D.mult ρ : ℝ) / ‖(ρ : ℂ) * ((ρ : ℂ) + 1)‖ ≤ 18 * h * √(y : ℝ) * L * ℓ := by
+    have e1 : ld + 9 * n ≤ 9 * L := by
+      simp only [hL]; nlinarith
+    have : 9 * L ≤ 9 * (√(y : ℝ) * L * ℓ) := by
+      have : L ≤ √(y : ℝ) * L * ℓ := by
+        have := mul_le_mul hsY hℓ1 zero_le_one (by positivity)
+        nlinarith
+      linarith
+    calc 2 * (h : ℝ) * ∑' ρ : {ρ : ℂ // D.ξ ρ = 0}, (D.mult ρ : ℝ) / ‖(ρ : ℂ) * ((ρ : ℂ) + 1)‖
+        ≤ 2 * h * (ld + 9 * n) := by gcongr
+      _ ≤ 2 * h * (9 * (√(y : ℝ) * L * ℓ)) := by gcongr; linarith
+      _ = 18 * h * √(y : ℝ) * L * ℓ := by ring
+  have hG : c * ∑ k ∈ Finset.range (Kl + 1), (deriv D.ξ (σ k) / D.ξ (σ k)).re ≤
+      300 * h * √(y : ℝ) * L * ℓ := by
+    calc c * ∑ k ∈ Finset.range (Kl + 1), (deriv D.ξ (σ k) / D.ξ (σ k)).re
+        ≤ c * (((Kl : ℝ) + 1) * (5 * L)) := by gcongr
+      _ ≤ c * ((3 * ℓ) * (5 * L)) := by gcongr
+      _ = 300 * h * √(y : ℝ) * L * ℓ := by simp only [hc]; ring
+  calc _ ≤ _ := h1
+    _ ≤ 18 * h * √(y : ℝ) * L * ℓ + 300 * h * √(y : ℝ) * L * ℓ := add_le_add hZ hG
+    _ = 318 * h * √(y : ℝ) * L * ℓ := by ring
+
+end ContinuationData
+
 variable (K) in
 /-- `E(y) = y W_K(y) - y²/2`. -/
 noncomputable def efError (y : ℕ) : ℝ := (y : ℝ) * weightedPsiK K y - (y : ℝ) ^ 2 / 2
@@ -126,8 +524,8 @@ theorem zeroDiff_le :
       ∑' ρ : {ρ : ℂ // D.ξ ρ = 0}, (D.mult ρ : ℝ) *
         ‖((y + h : ℕ) : ℂ) * zeroTerm (y + h) ρ - (y : ℂ) * zeroTerm y ρ‖ ≤
       C₀ * h * Real.sqrt y * (Real.log |(discr K : ℝ)| + Module.finrank ℚ K * Real.log (y + 2)) *
-        Real.log (y + 2) := by
-  sorry
+        Real.log (y + 2) :=
+  ⟨318, fun _ _ _ D hRH y h hh hhy => D.zeroDiff_le_aux hRH y h hh hhy⟩
 
 end ContinuationData
 
