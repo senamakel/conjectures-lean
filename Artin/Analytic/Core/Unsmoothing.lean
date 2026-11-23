@@ -316,13 +316,145 @@ theorem efError_diff_le :
   rw [abs_le]
   constructor <;> linarith
 
+set_option maxHeartbeats 1600000 in
 /-- **ψ_K at integers** under RH and Hecke's continuation, with an absolute constant. -/
 theorem psiK_natCast_le :
     ∃ C : ℝ, ∀ (K : Type) [Field K] [NumberField K] (D : ContinuationData K),
       DedekindZetaRH K → ∀ x : ℕ, 2 ≤ x →
       |psiK K x - x| ≤ C * Real.sqrt x *
         (Real.log |(discr K : ℝ)| + Module.finrank ℚ K * Real.log x) * Real.log x := by
-  sorry
+  obtain ⟨C₁, hC₁0, hC₁⟩ := efError_diff_le
+  refine ⟨4 * C₁ + 2, fun K _ _ D hRH x hx => ?_⟩
+  set h := Nat.sqrt x with hhdef
+  have hh1 : 1 ≤ h := Nat.sqrt_pos.2 (by omega)
+  have hhh : h * h ≤ x := Nat.sqrt_le x
+  have h2h : 2 * h ≤ x := by
+    rcases Nat.lt_or_ge h 2 with h' | h'
+    · omega
+    · nlinarith
+  set n : ℝ := (Module.finrank ℚ K : ℝ)
+  set ld := Real.log |(discr K : ℝ)|
+  have hn : 1 ≤ n := one_le_finrank
+  have hld : 0 ≤ ld := log_abs_discr_nonneg
+  have hxR : (2 : ℝ) ≤ x := by exact_mod_cast hx
+  have hhR : (1 : ℝ) ≤ h := by exact_mod_cast hh1
+  have hhx : (h : ℝ) ≤ Real.sqrt x :=
+    Real.le_sqrt_of_sq_le (by have : ((h * h : ℕ) : ℝ) ≤ x := by exact_mod_cast hhh
+                              push_cast at this; nlinarith)
+  set Q := Real.sqrt x * (ld + n * Real.log ((x : ℝ) + 2)) * Real.log ((x : ℝ) + 2)
+  -- `T(y) = ∑_{m ≤ y} ψ(m) = y²/2 + E(y)`
+  have hT : ∀ y : ℕ, ∑ m ∈ Finset.Ioc 0 y, psiK K m = (y : ℝ) ^ 2 / 2 + efError K y := by
+    intro y
+    have e : Finset.Ioc 0 y = Finset.Icc 1 y := by
+      ext m; simp only [Finset.mem_Ioc, Finset.mem_Icc]; omega
+    rw [e, ← mul_weightedPsiK_eq, efError]; ring
+  have hmono := psiK_natCast_mono (K := K)
+  -- upper bound
+  have hup : (h : ℝ) * psiK K x ≤ (h : ℝ) * x + (h : ℝ) ^ 2 / 2 + C₁ * h * Q := by
+    have hs : ∑ m ∈ Finset.Ioc x (x + h), psiK K m =
+        ((x + h : ℕ) : ℝ) ^ 2 / 2 + efError K (x + h) - ((x : ℝ) ^ 2 / 2 + efError K x) := by
+      rw [← hT, ← hT, ← Finset.sum_Ioc_consecutive _ (Nat.zero_le x) (Nat.le_add_right x h)]
+      ring
+    have hge : (h : ℝ) * psiK K x ≤ ∑ m ∈ Finset.Ioc x (x + h), psiK K m := by
+      have := Finset.card_nsmul_le_sum (Finset.Ioc x (x + h)) (fun m : ℕ => psiK K m)
+        (psiK K x) (fun m hm => hmono (Finset.mem_Ioc.1 hm).1.le)
+      rw [Nat.card_Ioc, nsmul_eq_mul, Nat.add_sub_cancel_left] at this
+      exact this
+    have hE := hC₁ K D hRH x h hh1 (by omega)
+    have hE' := (abs_le.1 hE).2
+    have hQ : C₁ * h * Real.sqrt x * (ld + n * Real.log ((x : ℝ) + 2)) * Real.log ((x : ℝ) + 2)
+        = C₁ * h * Q := by simp only [Q]; ring
+    rw [hQ] at hE'
+    rw [hs] at hge
+    push_cast at hge
+    nlinarith
+  -- lower bound
+  have hlow : (h : ℝ) * x - (h : ℝ) ^ 2 / 2 - C₁ * h * Q ≤ (h : ℝ) * psiK K x := by
+    set y := x - h with hy
+    have hyx : y + h = x := by omega
+    have hs : ∑ m ∈ Finset.Ioc y x, psiK K m =
+        (x : ℝ) ^ 2 / 2 + efError K x - ((y : ℝ) ^ 2 / 2 + efError K y) := by
+      rw [← hT, ← hT, ← Finset.sum_Ioc_consecutive _ (Nat.zero_le y) (by omega : y ≤ x)]
+      ring
+    have hle : ∑ m ∈ Finset.Ioc y x, psiK K m ≤ (h : ℝ) * psiK K x := by
+      have := Finset.sum_le_card_nsmul (Finset.Ioc y x) (fun m : ℕ => psiK K m)
+        (psiK K x) (fun m hm => hmono (Finset.mem_Ioc.1 hm).2)
+      rw [Nat.card_Ioc, nsmul_eq_mul, show x - y = h by omega] at this
+      exact this
+    have hE := hC₁ K D hRH y h hh1 (by omega)
+    rw [hyx] at hE
+    have hE' := (abs_le.1 hE).1
+    have hyR : (y : ℝ) = x - h := by rw [hy]; push_cast [Nat.cast_sub (by omega : h ≤ x)]; ring
+    have hy2 : (y : ℝ) + 2 ≤ x + 2 := by rw [hyR]; linarith
+    have hy1 : (1 : ℝ) ≤ y := by rw [hyR]; have : ((2 * h : ℕ) : ℝ) ≤ x := by exact_mod_cast h2h
+                                 push_cast at this; linarith
+    have hmon : C₁ * h * Real.sqrt y * (ld + n * Real.log ((y : ℝ) + 2)) * Real.log ((y : ℝ) + 2)
+        ≤ C₁ * h * Q := by
+      have l1 : Real.log ((y : ℝ) + 2) ≤ Real.log ((x : ℝ) + 2) := Real.log_le_log (by linarith) hy2
+      have l0 : 0 ≤ Real.log ((y : ℝ) + 2) := Real.log_nonneg (by linarith)
+      have s1 : Real.sqrt y ≤ Real.sqrt x := Real.sqrt_le_sqrt (by rw [hyR]; linarith)
+      simp only [Q]
+      have a1 : 0 ≤ C₁ * h := by positivity
+      have a2 : ld + n * Real.log ((y : ℝ) + 2) ≤ ld + n * Real.log ((x : ℝ) + 2) := by
+        have := mul_le_mul_of_nonneg_left l1 (by linarith : (0 : ℝ) ≤ n); linarith
+      have a3 : 0 ≤ ld + n * Real.log ((y : ℝ) + 2) := add_nonneg hld (mul_nonneg (by linarith) l0)
+      calc C₁ * h * Real.sqrt y * (ld + n * Real.log ((y : ℝ) + 2)) * Real.log ((y : ℝ) + 2)
+          = (C₁ * h) * (Real.sqrt y * (ld + n * Real.log ((y : ℝ) + 2)) *
+              Real.log ((y : ℝ) + 2)) := by ring
+        _ ≤ (C₁ * h) * (Real.sqrt x * (ld + n * Real.log ((x : ℝ) + 2)) *
+              Real.log ((x : ℝ) + 2)) := by
+            apply mul_le_mul_of_nonneg_left _ a1
+            apply mul_le_mul (mul_le_mul s1 a2 a3 (Real.sqrt_nonneg _)) l1 l0
+            exact mul_nonneg (Real.sqrt_nonneg _) (by linarith)
+        _ = _ := by ring
+    rw [hs] at hle
+    rw [hyR] at hle
+    nlinarith
+  -- divide by `h`
+  have hhpos : (0 : ℝ) < h := by linarith
+  have hb : |psiK K x - x| ≤ (h : ℝ) / 2 + C₁ * Q := by
+    rw [abs_le]; constructor
+    · have : (h : ℝ) * (-(h / 2 + C₁ * Q)) ≤ h * (psiK K x - x) := by nlinarith
+      exact le_of_mul_le_mul_left this hhpos
+    · have : (h : ℝ) * (psiK K x - x) ≤ h * ((h : ℝ) / 2 + C₁ * Q) := by nlinarith
+      exact le_of_mul_le_mul_left this hhpos
+  -- compare logs
+  have hl2 := Real.log_two_gt_d9
+  have hlx : Real.log 2 ≤ Real.log x := Real.log_le_log (by norm_num) hxR
+  have hlx2 : Real.log ((x : ℝ) + 2) ≤ 2 * Real.log x := by
+    rw [← Real.log_rpow (by linarith)]
+    exact Real.log_le_log (by linarith) (by norm_num; nlinarith)
+  set P := ld + n * Real.log x
+  have hP2 : Real.log 2 ≤ P := by
+    have : Real.log 2 ≤ n * Real.log x := by nlinarith
+    simp only [P]; linarith
+  have hsx : 1 ≤ Real.sqrt x := by
+    rw [show (1 : ℝ) = Real.sqrt 1 by simp]; exact Real.sqrt_le_sqrt (by linarith)
+  have hQ : Q ≤ 4 * (Real.sqrt x * P * Real.log x) := by
+    have a1 : ld + n * Real.log ((x : ℝ) + 2) ≤ 2 * P := by
+      have := mul_le_mul_of_nonneg_left hlx2 (by linarith : (0 : ℝ) ≤ n)
+      simp only [P]; linarith
+    have a0 : 0 ≤ ld + n * Real.log ((x : ℝ) + 2) :=
+      add_nonneg hld (mul_nonneg (by linarith) (Real.log_nonneg (by linarith)))
+    simp only [Q]
+    calc Real.sqrt x * (ld + n * Real.log ((x : ℝ) + 2)) * Real.log ((x : ℝ) + 2)
+        ≤ Real.sqrt x * (2 * P) * (2 * Real.log x) := by
+          apply mul_le_mul (mul_le_mul_of_nonneg_left a1 (Real.sqrt_nonneg _)) hlx2
+            (Real.log_nonneg (by linarith))
+          exact mul_nonneg (Real.sqrt_nonneg _) (by linarith)
+      _ = 4 * (Real.sqrt x * P * Real.log x) := by ring
+  have hhalf : (h : ℝ) / 2 ≤ 2 * (Real.sqrt x * P * Real.log x) := by
+    have a : Real.log 2 * Real.log 2 ≤ P * Real.log x := mul_le_mul hP2 hlx (by linarith) (by linarith)
+    have c : 1 / 4 ≤ P * Real.log x := by nlinarith
+    calc (h : ℝ) / 2 ≤ Real.sqrt x / 2 := by linarith
+      _ = 2 * Real.sqrt x * (1 / 4) := by ring
+      _ ≤ 2 * Real.sqrt x * (P * Real.log x) :=
+          mul_le_mul_of_nonneg_left c (by positivity)
+      _ = 2 * (Real.sqrt x * P * Real.log x) := by ring
+  calc |psiK K x - x| ≤ (h : ℝ) / 2 + C₁ * Q := hb
+    _ ≤ 2 * (Real.sqrt x * P * Real.log x) + C₁ * (4 * (Real.sqrt x * P * Real.log x)) := by
+        gcongr
+    _ = (4 * C₁ + 2) * Real.sqrt x * (ld + n * Real.log x) * Real.log x := by ring
 
 /-- **The analytic core, per field** (blueprint A1–A4): RH for `ζ_K` and Hecke's continuation
 give `PsiKBound K C`, with `C` absolute. -/
