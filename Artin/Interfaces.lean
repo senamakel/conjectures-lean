@@ -39,7 +39,15 @@ def EffectiveKummerChebotarev (a : ℤ) : Prop :=
       ≤ C * Real.sqrt x * Real.log (k * x)
 
 /-- Analytic half: RH for the Dedekind zeta functions of the Kummer fields gives effective
-Chebotarev for them. -/
+Chebotarev for them.
+
+This is true (Hooley 1967, §3) but cannot be proved here as stated. `HooleyHypothesis` only
+speaks about functions `Z` that continue `ζ_{K_k}` to `ℂ ∖ {1}`; to use it one needs such a `Z`,
+together with the functional equation and growth in vertical strips (Hecke's theorem), and that
+is neither in our Mathlib pin nor in upstream Mathlib. The provable version takes Hecke's
+continuation as a hypothesis: `Artin.Analytic.effectiveKummerChebotarev_of_hooley_of_continuation`
+in `Artin/MainContinuation.lean`, with `DedekindContinuation` from
+`Artin/Analytic/Continuation.lean`. This `sorry` stays until Hecke's theorem is formalised. -/
 theorem effectiveKummerChebotarev_of_hooley (a : ℤ) (ha : a ≠ 0) (h : HooleyHypothesis a) :
     EffectiveKummerChebotarev a := by
   sorry

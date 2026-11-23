@@ -32,6 +32,7 @@ Dirichlet characters, so the Chebotarev and Kummer-field parts have to be built 
 | `Artin/Interfaces.lean` | the split: analytic half (sorried) and the definitions joining it to the sieve half, `EffectiveKummerChebotarev` |
 | `Artin/SieveHalf.lean` | the sieve half `artin_of_effectiveKummerChebotarev`: `EffectiveKummerChebotarev a → ∃ δ > 0, (S a).HasDensity δ` for `a` not a square, `a ≠ -1` (sorry-free) |
 | `Artin/Main.lean` | the target theorem, from the two halves |
+| `Artin/MainContinuation.lean` | `conditional_artin_primitive_roots.parts.i_of_continuation`: the target with Hecke's continuation `DedekindContinuation (K_k)` as an extra hypothesis, wired through `effectiveKummerChebotarev_of_kummerPsiBounds` and the sieve half; the analytic core is the one remaining step, `kummerPsiBounds_of_hooley_of_continuation` |
 | `Artin/Sieve/PrimitiveRoot.lean` | primitive-root criterion and the inclusion–exclusion identity, exact and truncated (sorry-free) |
 | `Artin/Sieve/Selberg/` | the Selberg upper-bound sieve, vendored from PrimeNumberTheoremAnd (see Credits) |
 | `Artin/Sieve/BrunTitchmarsh.lean` | Brun–Titchmarsh: `π(x; q, 1) ≤ 20000 x / (φ(q) log(x/q))` for `x > q ≥ 1` (sorry-free) |
@@ -47,7 +48,24 @@ Dirichlet characters, so the Chebotarev and Kummer-field parts have to be built 
 | `Artin/Analytic/Splitting.lean` | blueprint A5: for `p ∤ k a`, `p` splits completely in `K_k` iff `k ∣ p − 1` and `a^((p−1)/k) = 1` mod `p` (`kummerCond_iff_exists_absNorm_eq`, `split_of_kummerCond`), via the decomposition group rather than Dedekind–Kummer; at most `[K : ℚ]` primes above any `p` (sorry-free) |
 | `Artin/Analytic/Discriminant.lean` | blueprint A6: `log \|d_{K_k}\| ≤ 4 [K_k : ℚ] log(k \|a\|)` (`log_abs_discr_le`), by Hadamard's inequality on a basis of monomials `ζ^i α^j` (sorry-free) |
 | `Artin/Analytic/Counting.lean` | blueprint A5 counting and A7: `0 ≤ ψ_K(x) − n θ_k(x) ≤ n log x (2 log(k\|a\|) + √x)`, then `\|θ_k(x) − x/n\| ≪ √x log x log(kx)`, then discrete partial summation, giving `effectiveKummerChebotarev_of_kummerPsiBounds : KummerPsiBounds a → EffectiveKummerChebotarev a` for `a ≠ 0`; the `k = 1` field `ℚ` replaces a separate `π(x) − li(x)` hypothesis (sorry-free) |
+| `Artin/Analytic/Continuation.lean` | `DedekindContinuation K`: Hecke's theorem as a hypothesis (a continuation `Z` of `ζ_K`, `ξ(s) = s(s−1)\|d_K\|^{s/2}Γ_ℝ^{r₁}Γ_ℂ^{r₂}Z(s)` entire, `ξ(1−s) = ξ(s)`, `ξ = O((1+\|s\|)²)` on `1/2 ≤ Re s ≤ 2`); definitions only |
+| `Artin/Analytic/Core/VonMangoldt.lean` | `Λ_K(n)`, `ψ_K(x) = Σ_{n<x} Λ_K(n)` (`psiK_eq_sum`) and `Λ_K ≤ n Λ` (`vonMangoldtK_le`), proved; sorried: the Euler-product facts `-ζ_K'/ζ_K = Σ Λ_K(n) n^{-s}`, `ζ_K ≠ 0` on `Re s > 1` |
+| `Artin/Analytic/Core/GammaPart.lean` | `Γ_ℝ'/Γ_ℝ`, `Γ_ℂ'/Γ_ℂ` by parity, and their part of the explicit formula as `Σ_k tau x (2k+a)` (adapted from erdos-985, sorry-free) |
+| `Artin/Analytic/Core/Xi.lean` | blueprint A1: `ξ_K` from `DedekindContinuation`; `ξ(1) = γ_K(1)·Res ζ_K ≠ 0` (Mathlib's class number formula), zeros in `0 < Re ρ < 1` and on `Re ρ = 1/2` under RH, Hadamard (erdos-985), `ζ_K'/ζ_K = ξ'/ξ − 1/s − 1/(s−1) − G_K`, `Re ξ'/ξ(s) = Σ m_ρ Re 1/(s−ρ)`; sorried: `ζ_K(1+it) ≠ 0` and the order-1 growth of `ξ` |
+| `Artin/Analytic/Core/ZeroSum.lean` | blueprint A2: `Σ m_ρ/\|ρ(ρ+1)\| ≤ log \|d_K\| + 9n` and `#{ρ : \|Im ρ − T\| ≤ 1} ≤ 9(log \|d_K\| + n log(\|T\|+3))` under RH (proved from A1 and the Euler-product facts) |
+| `Artin/Analytic/Core/ExplicitFormula.lean` | blueprint A3: the weighted explicit formula for `Σ_{n<x} Λ_K(n)(1 − n/x)` (proved from the above) |
+| `Artin/Analytic/Core/Unsmoothing.lean` | blueprint A4: differencing `y W_K(y) = Σ_{m≤y} ψ_K(m)` at `x ± √x`, giving `psiKBound_of_continuation` (`∃ C, ∀ K, RH → DedekindContinuation K → PsiKBound K C`); sorried: the zero increments `zeroDiff_le` (local zero counting over unit windows) and the gamma increments `gammaDiff_le` |
 | `docs/BLUEPRINT.md` | the plan, step by step |
+
+## The continuation hypothesis
+
+`HooleyHypothesis` only constrains functions `Z` that continue `ζ_K` to `ℂ ∖ {1}`. Using it needs
+such a `Z`, with the functional equation, and neither our Mathlib pin nor upstream Mathlib has
+Hecke's continuation of `ζ_K`. As in erdos-985, the library takes it as an explicit hypothesis,
+`DedekindContinuation` (`Artin/Analytic/Continuation.lean`), and proves
+`conditional_artin_primitive_roots.parts.i_of_continuation`. The statement of `Artin/Main.lean`
+without that hypothesis stays sorried (`effectiveKummerChebotarev_of_hooley`). A later
+`Unconditional/` module could discharge the hypothesis from a formalisation of Hecke's theorem.
 
 ## Building
 
