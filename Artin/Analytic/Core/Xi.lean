@@ -3,6 +3,7 @@ import Erdos985.Analytic.ExplicitFormula.ZeroSum
 import Artin.Analytic.Core.VonMangoldt
 import Artin.Analytic.Core.NonvanishingOne
 import Artin.Analytic.Core.GammaPart
+import Artin.Analytic.Core.Growth
 
 /-!
 # The entire function `ξ_K` (blueprint A1)
@@ -13,7 +14,7 @@ For `D : ContinuationData K`, `D.ξ(s) = s (s - 1) Λ_K(s)` is entire with `ξ(1
   `NumberField.tendsto_sub_one_mul_dedekindZeta_nhdsGT`; hence `ξ(0) = ξ(1) ≠ 0`.
 * `xi_zero_re_mem`: every zero `ρ` of `ξ` has `0 < Re ρ < 1` (`ζ_K ≠ 0` on `Re s ≥ 1`, and the
   functional equation); under `DedekindZetaRH K`, `Re ρ = 1/2` (`xi_zero_re_eq_half`).
-* `xi_growth`: `ξ` has order at most `1` (left as `sorry`, see its docstring).
+* `xi_growth`: `ξ` has order at most `1` (proved in `Artin/Analytic/Core/Growth.lean`).
 * `hadamard`: Hadamard's product in logarithmic-derivative form, from erdos-985's
   `hadamard_logDeriv`.
 * `logDeriv_Z_eq`: `ζ_K'/ζ_K = ξ'/ξ - 1/s - 1/(s - 1) - G_K(s)` for `Re s > 1`, with
@@ -228,8 +229,8 @@ theorem xi_zero_re_eq_half (hRH : DedekindZetaRH K) {ρ : ℂ} (hρ : D.ξ ρ = 
 Theory*, XVII §1, for `ζ_K`.) The constant `C` may depend on `K`: only the existence of the
 Hadamard product uses it. -/
 theorem xi_growth :
-    ∃ C : ℝ, ∀ s : ℂ, ‖D.ξ s‖ ≤ C * Real.exp (C * ‖s‖ * Real.log (‖s‖ + 2)) := by
-  sorry
+    ∃ C : ℝ, ∀ s : ℂ, ‖D.ξ s‖ ≤ C * Real.exp (C * ‖s‖ * Real.log (‖s‖ + 2)) :=
+  D.xi_growth_aux
 
 /-- The multiplicity of a zero of `ξ`. -/
 noncomputable def mult (ρ : {ρ : ℂ // D.ξ ρ = 0}) : ℕ := analyticOrderNatAt D.ξ ρ

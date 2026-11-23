@@ -17,6 +17,7 @@ import Artin.Analytic.Counting
 import Artin.Analytic.Continuation
 import Artin.Analytic.Core.VonMangoldt
 import Artin.Analytic.Core.GammaPart
+import Artin.Analytic.Core.Growth
 import Artin.Analytic.Core.Xi
 import Artin.Analytic.Core.ZeroSum
 import Artin.Analytic.Core.ExplicitFormula
