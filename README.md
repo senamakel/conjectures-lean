@@ -47,3 +47,27 @@ See [`docs/PLAN.md`](docs/PLAN.md).
 ## Building
 
 `lake build` (Lean v4.36.0, Mathlib via the `erdos-985` dependency).
+
+## Unconditional version
+
+`Unconditional/MillerUnconditional.lean` imports [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
+(commit `507a75d`) and closes the hypothesis with its theorem:
+
+| Theorem | Statement | Axioms |
+|---|---|---|
+| `miller_unconditional` | `Miller.MillerStatement (21 / 5)` | standard three + ankeny-grh's 8 `native_decide` |
+| `millerTestGRH_iff_prime_unconditional` | `millerTestGRH n = true ↔ n.Prime` for odd `n > 1` | same |
+
+To check it:
+
+```bash
+scripts/check-unconditional.sh /path/to/riemann-hypothesis   # cloned there if missing
+```
+
+The script uses that project's community cache, about 93 GB. The import opens around 900,000
+module files and needs about 19 GB of RAM. Raise the open-file limit first; on macOS:
+`sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`.
+
+The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
+builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
+verification is still pending.
