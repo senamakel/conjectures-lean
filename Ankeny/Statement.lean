@@ -23,15 +23,7 @@ def LeastNonresidueBound (c : ℝ) : Prop :=
   ∀ p : ℕ, p.Prime → p ≠ 2 →
     ∃ n : ℕ, 0 < n ∧ (n : ℝ) ≤ c * Real.log p ^ 2 ∧ ¬ IsSquare (n : ZMod p)
 
-/-- Bach's theorem with Bach's constant: the main deliverable. -/
-theorem bach_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : BachSubgroupBound 2 := by
-  sorry
-
-theorem leastNonresidue_of_bach {c : ℝ} (h : BachSubgroupBound c) : LeastNonresidueBound c := by
-  sorry
-
-theorem leastNonresidue_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
-    LeastNonresidueBound 2 :=
-  leastNonresidue_of_bach (bach_of_GRH hGRH)
+-- The theorems `bach_of_GRH`, `leastNonresidue_of_bach` and `leastNonresidue_of_GRH` are proved
+-- in `Ankeny/Main.lean`.
 
 end Ankeny
