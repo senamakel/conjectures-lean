@@ -32,14 +32,7 @@ def MillerStatement (c : ℝ) : Prop :=
   ∀ n : ℕ, Odd n → 1 < n → ¬ n.Prime →
     ∃ a : ℕ, 0 < a ∧ (a : ℝ) ≤ c * Real.log n ^ 2 ∧ ¬ IsStrongProbablePrime n a
 
-/-- Unconditional group theory: the main deliverable of this repository. -/
-theorem miller_of_bach {c : ℝ} (h : BachSubgroupBound c) : MillerStatement c := by
-  sorry
-
-/-- The resulting primality test is correct: for odd `n > 1`, `n` is prime iff it is a strong
-probable prime to every base `1 ≤ a ≤ c log² n` with `a < n`. -/
-theorem prime_iff_of_bach {c : ℝ} (h : BachSubgroupBound c) (n : ℕ) (hn : Odd n) (h1 : 1 < n) :
-    n.Prime ↔ ∀ a : ℕ, 0 < a → a < n → (a : ℝ) ≤ c * Real.log n ^ 2 → IsStrongProbablePrime n a := by
-  sorry
+-- The theorems `miller_of_bach` and `prime_iff_of_bach` are stated and proved in
+-- `Miller/Reduction.lean`.
 
 end Miller
