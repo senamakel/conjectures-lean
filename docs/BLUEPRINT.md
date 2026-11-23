@@ -98,7 +98,7 @@ L-functions to `ζ_K`.
 
 The chain `psiKBound_of_continuation → kummerPsiBounds_of_hooley_of_continuation →
 conditional_artin_primitive_roots.parts.i_of_continuation` is assembled and builds. These are
-proved: the explicit formula (A3), `Σ m_ρ/|ρ(ρ+1)| ≤ log |d_K| + 6n` and the local zero count (A2),
+proved: the explicit formula (A3), `Σ m_ρ/|ρ(ρ+1)| ≤ log |d_K| + 9n` and the local zero count (A2),
 Hadamard and the zero locations (A1), `ψ_K = Σ Λ_K`, `Λ_K ≤ n Λ`, and the whole unsmoothing argument (A4)
 except its two increment estimates. The remaining `sorry`s are each small, standard and
 documented with a reference in their docstrings:
@@ -109,7 +109,6 @@ documented with a reference in their docstrings:
 | `dedekindZeta_ne_zero` | `ζ_K(s) ≠ 0`, `Re s > 1` | Euler product |
 | `Z_ne_zero_of_re_eq_one` | `ζ_K(1+it) ≠ 0`, `t ≠ 0` | Mertens' `3 + 4 cos θ + cos 2θ ≥ 0` |
 | `xi_growth` | `‖ξ_K(s)‖ ≤ C exp(C‖s‖ log(‖s‖+2))` | strip bound, functional equation, Stirling for `Re s ≥ 2` |
-| `re_digamma_le` | `Re ψ(w) ≤ log(‖w‖+1)`, `Re w ≥ 1` | digamma series or Stirling |
 | `gammaDiff_le` | `‖(y+h)Γ_K(y+h) − yΓ_K(y)‖ ≤ n h (log(y+h) + 8)` | explicit `tau` terms |
 | `zeroDiff_le` | `Σ m_ρ ‖(y+h) zeroTerm(y+h) − y zeroTerm(y)‖ ≪ h √y (log\|d_K\| + n log(y+2)) log(y+2)` | `zeroSum_le` plus `zeroCount_le` on unit windows, split at `\|Im ρ\| = y/h` |
 

@@ -5,15 +5,15 @@ import Artin.Analytic.Core.Xi
 
 Under RH for `ζ_K`, with `n = [K : ℚ]` and `d = d_K`:
 
-* `zeroSum_le`: `∑_ρ m_ρ / |ρ(ρ+1)| ≤ log |d| + 6 n`;
-* `zeroCount_le`: `∑_{|Im ρ - T| ≤ 1} m_ρ ≤ 6 (log |d| + n log(|T| + 3))`.
+* `zeroSum_le`: `∑_ρ m_ρ / |ρ(ρ+1)| ≤ log |d| + 9 n`;
+* `zeroCount_le`: `∑_{|Im ρ - T| ≤ 1} m_ρ ≤ 9 (log |d| + n log(|T| + 3))`.
 
 Both come from `Re ξ'/ξ(s) = ∑_ρ m_ρ Re 1/(s - ρ)` (`hasSum_re_logDeriv_xi`, all terms `≥ 0`) at
 `s = 2 + iT`, and the upper bound
 `Re ξ'/ξ(2 + iT) = Re ζ_K'/ζ_K + Re 1/s + Re 1/(s - 1) + Re G_K(s)
-  ≤ 0.6 n + 3/2 + ½ log |d| + ½ n log(|T| + 3)` (`re_logDeriv_xi_le`), using
+  ≤ 0.6 n + 3/2 + ½ log |d| + ½ n (log(|T| + 3) + 3)` (`re_logDeriv_xi_le`), using
 `|ζ_K'/ζ_K(s)| ≤ n ∑ Λ(m)/m² ≤ 0.6 n` (`norm_logDeriv_Z_le`, from `Λ_K ≤ n Λ` and erdos-985's
-`S2_le`) and `Re ψ(w) ≤ log(|w| + 1)` for `Re w ≥ 1` (`re_digamma_le`). For `Re ρ = 1/2`,
+`S2_le`) and `Re ψ(w) ≤ log(|w| + 1) + 3` for `Re w ≥ 1` (`re_digamma_le`). For `Re ρ = 1/2`,
 `1/|ρ(ρ+1)| ≤ 2 Re 1/(2 - ρ)`, and `Re 1/(2 + iT - ρ) ≥ 6/13` when `|Im ρ - T| ≤ 1`.
 This is the argument of Davenport, *Multiplicative Number Theory*, §15, for `ζ`, and of
 Lagarias–Odlyzko (1977), Lemma 5.4, for `ζ_K`.
@@ -25,17 +25,117 @@ open Complex NumberField ArtinPrimitiveRootsConjecture Filter Topology Arithmeti
 
 variable {K : Type*} [Field K] [NumberField K]
 
-/-- `Re ψ(w) ≤ log(|w| + 1)` for `Re w ≥ 1`. From Stirling's series
-`ψ(w) = log w - 1/(2w) - ∫_0^∞ (⌊t⌋ - t + ½)/(t + w)² dt`, valid for `Re w > 0`, whose last term is
-`≤ 1/(4 Re w)` hmm in modulus; a cruder route is `ψ(w) - ψ(1) = ∑_k (1/(k+1) - 1/(k+w))`
-(erdos-985's `hasSum_digamma`) compared with `∑_{k < |w|} 1/(k+1) ≤ log(|w|+1) + 1` and a tail
-`O(1)`. See Whittaker–Watson, *Modern Analysis*, 12.33, or Olver, *Asymptotics and Special
-Functions*, Ch. 8 §4. -/
-theorem re_digamma_le {w : ℂ} (hw : 1 ≤ w.re) : (digamma w).re ≤ Real.log (‖w‖ + 1) := by
-  sorry
+/-- `Re ψ(w) ≤ log(|w| + 1) + 3` for `Re w ≥ 1`. Elementary route: by erdos-985's
+`hasSum_digamma`, `Re ψ(w) = -γ + ∑_k (1/(k+1) - Re 1/(k+w))`. With `N = ⌈|w|⌉`, the terms
+`k < N` are `≤ 1/(k+1)` (as `Re(k+w) > 0`), summing to `≤ 1 + log N ≤ 1 + log(|w|+1)`
+(`harmonic_le_one_add_log`); the terms `k ≥ N` are `Re((w-1)/((k+1)(k+w))) ≤ (|w|+1)/(k+1)²`
+(as `|k+w| ≥ k+1`), summing to `≤ (|w|+1)/N ≤ 2`. (Sharper: Stirling,
+`Re ψ(w) = log |w| + O(1/|w|)`; Whittaker–Watson, *Modern Analysis*, 12.33.) -/
+theorem re_digamma_le {w : ℂ} (hw : 1 ≤ w.re) : (digamma w).re ≤ Real.log (‖w‖ + 1) + 3 := by
+  have hS := Complex.reCLM.hasSum
+    (Erdos985.Analytic.BoundsAux.hasSum_digamma (w := w) (by linarith))
+  simp only [Complex.reCLM_apply, sub_re, digamma_one, neg_re, ofReal_re] at hS
+  set a : ℕ → ℝ := fun k => (1 / ((k : ℂ) + 1)).re - (1 / ((k : ℂ) + w)).re with ha
+  have hwn : 1 ≤ ‖w‖ := hw.trans (re_le_norm w)
+  set N : ℕ := ⌈‖w‖⌉₊ with hN
+  have hN1 : (1 : ℝ) ≤ N := hwn.trans (Nat.le_ceil _)
+  have hNw : (N : ℝ) < ‖w‖ + 1 := Nat.ceil_lt_add_one (by linarith)
+  have hwN : ‖w‖ ≤ N := Nat.le_ceil _
+  -- the two bounds on `a k`
+  have hre1 : ∀ k : ℕ, (1 / ((k : ℂ) + 1)).re = 1 / ((k : ℝ) + 1) := fun k => by
+    rw [show ((k : ℂ) + 1) = (((k : ℝ) + 1 : ℝ) : ℂ) by push_cast; ring, ← ofReal_one,
+      ← ofReal_div, ofReal_re]
+  have hpos : ∀ k : ℕ, 0 ≤ (1 / ((k : ℂ) + w)).re := fun k => by
+    rw [one_div, inv_re]
+    exact div_nonneg (by simp; linarith [(k.cast_nonneg : (0 : ℝ) ≤ k)]) (normSq_nonneg _)
+  have hA : ∀ k : ℕ, a k ≤ 1 / ((k : ℝ) + 1) := fun k => by
+    simp only [ha, hre1]; linarith [hpos k]
+  have hB : ∀ k : ℕ, a k ≤ (‖w‖ + 1) / ((k : ℝ) + 1) ^ 2 := fun k => by
+    have hk0 : (0 : ℝ) ≤ k := k.cast_nonneg
+    have h1 : ((k : ℂ) + 1) ≠ 0 := by
+      intro h; have := congrArg re h; simp at this; linarith
+    have h2 : ((k : ℂ) + w) ≠ 0 := by
+      intro h; have := congrArg re h; simp at this; linarith
+    have e : 1 / ((k : ℂ) + 1) - 1 / ((k : ℂ) + w) = (w - 1) / (((k : ℂ) + 1) * ((k : ℂ) + w)) := by
+      field_simp; ring
+    have hkw : (k : ℝ) + 1 ≤ ‖(k : ℂ) + w‖ := by
+      refine le_trans ?_ (re_le_norm _); simp; linarith
+    have hk1 : ‖(k : ℂ) + 1‖ = (k : ℝ) + 1 := by
+      rw [show ((k : ℂ) + 1) = (((k : ℝ) + 1 : ℝ) : ℂ) by push_cast; ring, norm_real,
+        Real.norm_of_nonneg (by linarith)]
+    calc a k = ((w - 1) / (((k : ℂ) + 1) * ((k : ℂ) + w))).re := by
+          simp only [ha, ← sub_re, e]
+      _ ≤ ‖(w - 1) / (((k : ℂ) + 1) * ((k : ℂ) + w))‖ := re_le_norm _
+      _ = ‖w - 1‖ / (((k : ℝ) + 1) * ‖(k : ℂ) + w‖) := by rw [norm_div, norm_mul, hk1]
+      _ ≤ (‖w‖ + 1) / (((k : ℝ) + 1) * ((k : ℝ) + 1)) := by
+          gcongr
+          · exact (norm_sub_le _ _).trans (by simp)
+      _ = (‖w‖ + 1) / ((k : ℝ) + 1) ^ 2 := by ring
+  -- a summable majorant
+  set b : ℕ → ℝ := fun k => if k < N then 1 / ((k : ℝ) + 1) else (‖w‖ + 1) / ((k : ℝ) + 1) ^ 2
+  have hab : ∀ k, a k ≤ b k := fun k => by
+    simp only [b]; split_ifs
+    · exact hA k
+    · exact hB k
+  have hsq : Summable fun k : ℕ => 1 / ((k : ℝ) + 1) ^ 2 :=
+    Erdos985.Analytic.BoundsAux.summable_inv_sq_succ
+  have hb_sum : Summable b := by
+    refine Summable.of_nonneg_of_le (fun k => ?_) (fun k => ?_) (hsq.mul_left (N + ‖w‖ + 1))
+    · simp only [b]; split_ifs <;> positivity
+    · simp only [b]
+      have hk0 : (0 : ℝ) ≤ k := k.cast_nonneg
+      split_ifs with hk
+      · have hkN : (k : ℝ) + 1 ≤ N := by exact_mod_cast hk
+        rw [mul_one_div, div_le_div_iff₀ (by positivity) (by positivity)]
+        nlinarith
+      · rw [mul_one_div]; gcongr; linarith
+  have hle : ∑' k, a k ≤ ∑' k, b k := hS.summable.tsum_le_tsum hab hb_sum
+  -- evaluate the majorant
+  have hsplit := hb_sum.sum_add_tsum_nat_add N
+  have hhead : ∑ i ∈ Finset.range N, b i = (harmonic N : ℝ) := by
+    simp only [b, harmonic]
+    push_cast
+    refine Finset.sum_congr rfl fun i hi => ?_
+    rw [if_pos (Finset.mem_range.1 hi)]; ring
+  have htail : ∑' j, b (j + N) ≤ (‖w‖ + 1) / N := by
+    have hfin : ∀ M : ℕ, ∑ j ∈ Finset.range M, 1 / (((j + N : ℕ) : ℝ) + 1) ^ 2 ≤
+        1 / N - 1 / ((M : ℝ) + N) := by
+      intro M
+      induction M with
+      | zero => simp
+      | succ M ih =>
+        rw [Finset.sum_range_succ]
+        have hMN : (0 : ℝ) < (M : ℝ) + N := by linarith [(M.cast_nonneg : (0 : ℝ) ≤ M)]
+        have : 1 / (((M + N : ℕ) : ℝ) + 1) ^ 2 ≤ 1 / ((M : ℝ) + N) - 1 / (((M + 1 : ℕ) : ℝ) + N) := by
+          push_cast
+          rw [div_sub_div _ _ hMN.ne' (by positivity), div_le_div_iff₀ (by positivity) (by positivity)]
+          nlinarith
+        linarith
+    have hterm : ∀ j : ℕ, b (j + N) = (‖w‖ + 1) * (1 / (((j + N : ℕ) : ℝ) + 1) ^ 2) := fun j => by
+      simp only [b, if_neg (show ¬ (j + N < N) by omega)]; push_cast; ring
+    simp_rw [hterm]
+    rw [tsum_mul_left, div_eq_mul_one_div (‖w‖ + 1)]
+    refine mul_le_mul_of_nonneg_left ?_ (by positivity)
+    refine Real.tsum_le_of_sum_range_le (fun j => by positivity) fun M => (hfin M).trans ?_
+    have : 0 ≤ 1 / ((M : ℝ) + N) := by positivity
+    linarith
+  have hH := harmonic_le_one_add_log N
+  have hHR : (harmonic N : ℝ) ≤ 1 + Real.log N := by exact_mod_cast hH
+  have hlogN : Real.log N ≤ Real.log (‖w‖ + 1) := Real.log_le_log (by linarith) hNw.le
+  have hfrac : (‖w‖ + 1) / N ≤ 2 := by
+    rw [div_le_iff₀ (by linarith)]; linarith
+  have hγ := Real.one_half_lt_eulerMascheroniConstant
+  have hval : (digamma w).re = -Real.eulerMascheroniConstant + ∑' k, a k := by
+    rw [hS.tsum_eq]; ring
+  have hsum : ∑' k, a k ≤ (harmonic N : ℝ) + (‖w‖ + 1) / N := by
+    calc ∑' k, a k ≤ ∑' k, b k := hle
+      _ = ∑ i ∈ Finset.range N, b i + ∑' j, b (j + N) := hsplit.symm
+      _ ≤ (harmonic N : ℝ) + (‖w‖ + 1) / N := by rw [hhead]; linarith
+  rw [hval]
+  linarith
 
 lemma re_gR_le {a : ℕ} (ha : a ≤ 1) (T : ℝ) :
-    (gR a (2 + T * I)).re ≤ (1 / 2) * Real.log (|T| + 3) := by
+    (gR a (2 + T * I)).re ≤ (1 / 2) * (Real.log (|T| + 3) + 3) := by
   have hre : (gR a (2 + T * I)).re =
       -(1 / 2) * Real.log Real.pi + (1 / 2) * (digamma ((2 + T * I + a) / 2)).re := by
     simp [gR]
@@ -130,11 +230,11 @@ theorem norm_logDeriv_Z_le {s : ℂ} (hs : 2 ≤ s.re) :
     _ ≤ n * 0.6 := mul_le_mul_of_nonneg_left Erdos985.Analytic.BoundsAux.S2_le (by positivity)
     _ = 0.6 * n := by ring
 
-/-- `Re ξ'/ξ(2 + iT) ≤ 0.6 n + 3/2 + ½ log |d| + ½ n log(|T| + 3)`. -/
+/-- `Re ξ'/ξ(2 + iT) ≤ 0.6 n + 3/2 + ½ log |d| + ½ n (log(|T| + 3) + 3)`. -/
 theorem re_logDeriv_xi_le (T : ℝ) :
     (deriv D.ξ (2 + T * I) / D.ξ (2 + T * I)).re ≤
       0.6 * Module.finrank ℚ K + 3 / 2 + (1 / 2) * Real.log |(discr K : ℝ)| +
-        (1 / 2) * Module.finrank ℚ K * Real.log (|T| + 3) := by
+        (1 / 2) * Module.finrank ℚ K * (Real.log (|T| + 3) + 3) := by
   set s : ℂ := 2 + T * I with hs
   have hsre : s.re = 2 := by simp [hs]
   have hL := D.logDeriv_Z_eq (s := s) (by rw [hsre]; norm_num)
@@ -154,7 +254,7 @@ theorem re_logDeriv_xi_le (T : ℝ) :
     have e2 : (s - 1).im = T := by simp [hs]
     rw [e1, e2, div_le_iff₀ (by nlinarith [sq_nonneg T])]; nlinarith [sq_nonneg T]
   have hG : (gammaLogDerivK K s).re ≤ (1 / 2) * Real.log |(discr K : ℝ)| +
-      (1 / 2) * Module.finrank ℚ K * Real.log (|T| + 3) := by
+      (1 / 2) * Module.finrank ℚ K * (Real.log (|T| + 3) + 3) := by
     have g0 := re_gR_le (a := 0) (by norm_num) T
     have g1 := re_gR_le (a := 1) (by norm_num) T
     rw [← hs] at g0 g1
@@ -169,11 +269,11 @@ theorem re_logDeriv_xi_le (T : ℝ) :
     nlinarith
   linarith
 
-/-- **Zero sum** (blueprint A2): `∑_ρ m_ρ / |ρ(ρ+1)| ≤ log |d_K| + 6 n` under RH. -/
+/-- **Zero sum** (blueprint A2): `∑_ρ m_ρ / |ρ(ρ+1)| ≤ log |d_K| + 9 n` under RH. -/
 theorem zeroSum_le (hRH : DedekindZetaRH K) :
     Summable (fun ρ : {ρ : ℂ // D.ξ ρ = 0} => (D.mult ρ : ℝ) / ‖(ρ : ℂ) * ((ρ : ℂ) + 1)‖) ∧
     ∑' ρ : {ρ : ℂ // D.ξ ρ = 0}, (D.mult ρ : ℝ) / ‖(ρ : ℂ) * ((ρ : ℂ) + 1)‖ ≤
-      Real.log |(discr K : ℝ)| + 6 * Module.finrank ℚ K := by
+      Real.log |(discr K : ℝ)| + 9 * Module.finrank ℚ K := by
   have h2 : ((2 : ℂ)) = 2 + ((0 : ℝ) : ℂ) * I := by simp
   have hξ2 : D.ξ 2 ≠ 0 := D.xi_ne_zero_of_one_le_re (by norm_num)
   have hS := D.hasSum_re_logDeriv_xi hRH hξ2
@@ -203,13 +303,13 @@ theorem zeroSum_le (hRH : DedekindZetaRH K) :
   have hn := one_le_finrank (K := K)
   nlinarith
 
-/-- **Local zero count** (blueprint A2): `∑_{|Im ρ - T| ≤ 1} m_ρ ≤ 6 (log |d_K| + n log(|T| + 3))`
+/-- **Local zero count** (blueprint A2): `∑_{|Im ρ - T| ≤ 1} m_ρ ≤ 9 (log |d_K| + n log(|T| + 3))`
 under RH. -/
 theorem zeroCount_le (hRH : DedekindZetaRH K) (T : ℝ) :
     Summable (fun ρ : {ρ : ℂ // D.ξ ρ = 0} =>
         if |(ρ : ℂ).im - T| ≤ 1 then (D.mult ρ : ℝ) else 0) ∧
     ∑' ρ : {ρ : ℂ // D.ξ ρ = 0}, (if |(ρ : ℂ).im - T| ≤ 1 then (D.mult ρ : ℝ) else 0) ≤
-      6 * (Real.log |(discr K : ℝ)| + Module.finrank ℚ K * Real.log (|T| + 3)) := by
+      9 * (Real.log |(discr K : ℝ)| + Module.finrank ℚ K * Real.log (|T| + 3)) := by
   set s : ℂ := 2 + T * I with hs
   have hξs : D.ξ s ≠ 0 := D.xi_ne_zero_of_one_le_re (by simp [hs])
   have hS := D.hasSum_re_logDeriv_xi hRH hξs
