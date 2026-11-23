@@ -103,14 +103,14 @@ Hadamard, the order-1 growth of `ξ_K` (`xi_growth`, `Artin/Analytic/Core/Growth
 zero locations (A1), `ψ_K = Σ Λ_K`, `Λ_K ≤ n Λ`, and the whole unsmoothing argument (A4),
 including the gamma increments `gammaDiff_le` (explicit `tau` terms) and the zero increments
 `zeroDiff_le` (`Σ m_ρ Re 1/(σ_k − ρ) = Re ξ'/ξ(σ_k)` on the dyadic grid `σ_k = 3/2 + 2^k`,
-`k ≤ log₂ y`). The remaining `sorry`s are each small, standard and documented with a reference
-in their docstrings:
+`k ≤ log₂ y`). The Euler-product facts and the non-vanishing on `Re s = 1` are proved too, so the
+analytic core has no `sorry` left:
 
-| Lemma | Statement | Route |
+| Lemma | Statement | Proof |
 |---|---|---|
-| `LSeries_vonMangoldtK` | `Σ Λ_K(n) n^{-s} = −ζ_K'/ζ_K(s)`, `Re s > 1` | Euler product over prime ideals |
-| `dedekindZeta_ne_zero` | `ζ_K(s) ≠ 0`, `Re s > 1` | Euler product |
-| `Z_ne_zero_of_re_eq_one` | `ζ_K(1+it) ≠ 0`, `t ≠ 0` | Mertens' `3 + 4 cos θ + cos 2θ ≥ 0` |
+| `LSeries_vonMangoldtK` | `Σ Λ_K(n) n^{-s} = −ζ_K'/ζ_K(s)`, `Re s > 1` | the convolution identity `log · a = Λ_K ⋆ a` for the ideal count `a(n)` (`log_mul_idealCount`, unique factorisation of ideals), then `LSeries_convolution'` and `LSeries_deriv` (`VonMangoldt.lean`) |
+| `dedekindZeta_ne_zero` | `ζ_K(s) ≠ 0`, `Re s > 1` | `ζ_K = exp(Σ Λ_K(n)/log n · n^{-s})` (`dedekindZeta_eq_exp`): both sides have log-derivative `−L(Λ_K, s)` on the half-plane and tend to `1` at `+∞`; no Euler product needed |
+| `Z_ne_zero_of_re_eq_one` | `ζ_K(1+it) ≠ 0`, `t ≠ 0` | Mertens' `3 + 4 cos θ + cos 2θ ≥ 0` on the coefficients of `log ζ_K`, the simple pole at `1` (class number formula) and holomorphy of `Z` at `1 + 2it`, adapted from Mathlib's proof for Dirichlet `L`-functions (`NonvanishingOne.lean`) |
 
 `effectiveKummerChebotarev_of_hooley` (without the continuation hypothesis) stays sorried in
 `Artin/Interfaces.lean`.
