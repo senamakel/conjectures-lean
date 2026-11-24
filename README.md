@@ -187,12 +187,28 @@ independently verified.
 
 | Theorem | Statement | Axioms |
 |---|---|---|
-| `leastNonresidueBelowLogSq_unconditional` | `LLS.LeastNonresidueBelowLogSq` | see below |
-| `bach_unconditional` | `Ankeny.BachSubgroupBound (11 / 4)` | see below |
-| `leastNonresidue_unconditional` | `Ankeny.LeastNonresidueBound (11 / 4)` | see below |
-| `miller_unconditional` | `Miller.MillerStatement (11 / 4)` | see below |
+| `leastNonresidueBelowLogSq_unconditional` | `LLS.LeastNonresidueBelowLogSq` | standard three |
+| `bach_unconditional` | `Ankeny.BachSubgroupBound (11 / 4)` | standard three + 16 `native_decide` |
+| `leastNonresidue_unconditional` | `Ankeny.LeastNonresidueBound (11 / 4)` | standard three + 16 `native_decide` |
+| `miller_unconditional` | `Miller.MillerStatement (11 / 4)` | standard three + 16 `native_decide` |
 
-UNCONDITIONAL_AXIOMS
+Real output of `scripts/check-unconditional.sh /home/ubuntu/work/personal/riemann-hypothesis`
+(2026-11-24, this commit, 36 min wall, most of it importing the riemann-hypothesis modules):
+
+```
+'leastNonresidueBelowLogSq_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+'bach_unconditional' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ LLS.chunk114_ok_0._native.native_decide.ax_1_1,
+ …,
+ LLS.chunk114_ok_9._native.native_decide.ax_1_1]
+'leastNonresidue_unconditional' depends on axioms: (the same nineteen)
+'miller_unconditional' depends on axioms: (the same nineteen)
+```
+
+The sixteen elided lines are `LLS.chunk114_ok_i._native.native_decide.ax_1_1` for every
+`0 ≤ i ≤ 15`, exactly as in the main-library output above.
 
 ```bash
 scripts/check-unconditional.sh /path/to/riemann-hypothesis   # cloned there if missing
