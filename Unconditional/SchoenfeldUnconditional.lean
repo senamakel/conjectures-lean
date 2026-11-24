@@ -60,6 +60,25 @@ theorem schoenfeld_statement_of_cited (hR : Schoenfeld.RosserZeroCount)
     (hC : Schoenfeld.PsiCert) : Schoenfeld.SchoenfeldStatement :=
   Schoenfeld.schoenfeld_of_RH_of_cited riemannHypothesis hR hC
 
+/-! ### PsiCert discharged
+
+`PsiCert` is proved in the main library (`Schoenfeld.psiCert`, `Schoenfeld/PsiCert/`), so
+Rosser's zero count is the only hypothesis left. -/
+
+theorem schoenfeld_psi_of_rosser (hR : Schoenfeld.RosserZeroCount) : Schoenfeld.SchoenfeldPsi :=
+  Schoenfeld.schoenfeldPsi_of_RH_of_rosser riemannHypothesis hR
+
+theorem schoenfeld_theta_of_rosser (hR : Schoenfeld.RosserZeroCount) :
+    Schoenfeld.SchoenfeldTheta :=
+  Schoenfeld.schoenfeldTheta_of_RH_of_rosser riemannHypothesis hR
+
+theorem schoenfeld_pi_of_rosser (hR : Schoenfeld.RosserZeroCount) : Schoenfeld.SchoenfeldPi :=
+  Schoenfeld.schoenfeldPi_of_RH_of_rosser riemannHypothesis hR
+
+theorem schoenfeld_statement_of_rosser (hR : Schoenfeld.RosserZeroCount) :
+    Schoenfeld.SchoenfeldStatement :=
+  Schoenfeld.schoenfeld_of_RH_of_rosser riemannHypothesis hR
+
 #print axioms psi_bound
 #print axioms theta_bound
 #print axioms pi_bound
@@ -71,3 +90,7 @@ theorem schoenfeld_statement_of_cited (hR : Schoenfeld.RosserZeroCount)
 #print axioms schoenfeld_theta_of_cited
 #print axioms schoenfeld_pi_of_cited
 #print axioms schoenfeld_statement_of_cited
+#print axioms schoenfeld_psi_of_rosser
+#print axioms schoenfeld_theta_of_rosser
+#print axioms schoenfeld_pi_of_rosser
+#print axioms schoenfeld_statement_of_rosser
