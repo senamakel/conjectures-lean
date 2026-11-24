@@ -1,17 +1,17 @@
 # Nicolas' inequality under RH in Lean
 
-Nicolas (*Petites valeurs de la fonction d'Euler*, J. Number Theory 17 (1983) 375–388) proved
-that the Riemann hypothesis is equivalent to `N_k/φ(N_k) > e^γ log log N_k` for every `k ≥ 1`,
-where `N_k = p_1 ⋯ p_k` is the product of the first `k` primes (see also Nicolas, Acta Arith.
-155 (2012)). Nicolas also showed that if RH fails, the inequality holds for infinitely many `k`
-and fails for infinitely many. This repository is a complete Lean 4 + Mathlib proof of the
-direction RH ⇒ inequality for every `k ≥ 1`, with the 9591 primes `3 ≤ p ≤ 10^5` covered by a
-proved-sound interval checker. `Unconditional/` proves the inequality for
-every primorial unconditionally in Lean, with RH supplied by the certified proof in
-leanprover-community/riemann-hypothesis.
+Lean proves Nicolas' inequality `N_k/φ(N_k) > e^γ log log N_k` for every `k ≥ 1`, where
+`N_k = p_1 ⋯ p_k` is the product of the first `k` primes. `nicolas_unconditional` is proved
+unconditionally in Lean, with RH supplied by the certified proof in
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
+The main library holds a complete Lean proof that RH implies the inequality for every `k ≥ 1`,
+with the 9591 primes `3 ≤ p ≤ 10^5` covered by a proved-sound interval checker.
 
-**Literature status: RH-equivalent.** The criterion is Nicolas (1983). The inequality for all `k`
-is equivalent to RH (Nicolas), so this theorem is RH in another form.
+**Literature status: RH-equivalent.** Nicolas (*Petites valeurs de la fonction d'Euler*,
+J. Number Theory 17 (1983) 375-388) proved that RH is equivalent to this inequality for all
+`k ≥ 1` (see also Nicolas, Acta Arith. 155 (2012)), so the theorem is RH in another form.
+Nicolas also showed that if RH fails, the inequality holds for infinitely many `k` and fails
+for infinitely many. This repository proves the direction RH ⇒ inequality.
 
 ## Headline theorem
 
@@ -26,6 +26,9 @@ def NicolasStatement : Prop :=
 
 -- Nicolas/Main.lean
 theorem Nicolas.nicolas_of_RH (hRH : RiemannHypothesis) : NicolasStatement
+
+-- Unconditional/NicolasUnconditional.lean
+theorem nicolas_unconditional : Nicolas.NicolasStatement
 ```
 
 ## Tier and provenance
@@ -90,7 +93,7 @@ Put `q = p_k`, `S(x) = Σ_{p≤x} c_p` with `c_p = −log(1 − 1/p)`, `w(t) = (
 | `Nicolas/Statement.lean` | target statement (do not edit) |
 | `Nicolas/Primorial.lean` | step 1 |
 | `Nicolas/Mertens.lean` | step 2 |
-| `Nicolas/Tail.lean` | steps 3–4, `tail_lower` |
+| `Nicolas/Tail.lean` | steps 3 and 4, `tail_lower` |
 | `Nicolas/Analytic.lean` | step 5, `sum_cp_gt_large` |
 | `Nicolas/Check/Defs.lean` | the checker (computable) |
 | `Nicolas/Check/Sound.lean` | its soundness and the `native_decide` |
