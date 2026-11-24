@@ -1,37 +1,37 @@
 # Selberg's bound for Erdős Problem 233 and primes in almost all short intervals under RH in Lean
 
-**Literature status: RH-consequence** (Cramér 1936; Selberg, *Arch. Math. Naturvid.* 47
-(1943)). `Unconditional/` proves `Σ_{n<N} d_n² = O(N log⁴ N)` unconditionally in Lean, with RH
-supplied by the certified proof in leanprover-community/riemann-hypothesis.
+This repository proves, in Lean, that the sum of squares of the first `N` prime gaps is
+`O(N log⁴ N)`. `erdos_233_upper_bound` is proved unconditionally, with RH supplied by the
+certified proof in
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis),
+and the main library holds a complete Lean proof that RH implies the bound, following Selberg
+(*Arch. Math. Naturvid.* 47 (1943)). Label: **RH-consequence**.
 
 [Erdős Problem 233](https://www.erdosproblems.com/233) concerns the sum of squares of prime
-gaps `d_n = p_{n+1} − p_n`. Heath-Brown conjectured `Σ_{n<N} d_n² ≍ N log² N`; the lower bound
-`≫ N log² N` follows from the prime number theorem, and the conjectured upper bound is open,
-also under the Riemann hypothesis. Under RH, Cramér gave an earlier upper bound (formal-conjectures
-attributes the `N log⁴ N` form to him; we have not checked the exact power), and Selberg proved `Σ_{p_n ≤ x} d_n² ≪ x log³ x`, which is
-`Σ_{n<N} d_n² ≪ N log⁴ N` in index form because `p_N ≍ N log N`. formal-conjectures lists this
-bound as the variant `erdos_233.variants.upper_bound` (tagged `research solved`, i.e. known under RH). An
-explicit version is Cully-Hugill–Dudek, [arXiv:2206.00433](https://arxiv.org/abs/2206.00433).
+gaps `d_n = p_{n+1} − p_n`. Heath-Brown conjectured `Σ_{n<N} d_n² ≍ N log² N`. The lower bound
+`≫ N log² N` follows from the prime number theorem; the conjectured upper bound is open, also
+under the Riemann hypothesis. Under RH, Cramér gave an earlier upper bound (formal-conjectures
+attributes the `N log⁴ N` form to him), and Selberg proved `Σ_{p_n ≤ x} d_n² ≪ x log³ x`, which
+is `Σ_{n<N} d_n² ≪ N log⁴ N` in index form because `p_N ≍ N log N`. formal-conjectures lists
+this bound as the variant `erdos_233.variants.upper_bound`, tagged `research solved` (known under
+RH). Cully-Hugill and Dudek give an explicit version,
+[arXiv:2206.00433](https://arxiv.org/abs/2206.00433). Erdős 233 itself (`≪ N log² N`) remains
+open, and this repository does not prove it.
 
-The main library is a complete Lean proof that RH implies `Σ_{n<N} d_n² ≪ N log⁴ N`, following
-Selberg (1943), and `Unconditional/` closes the RH hypothesis in one line. Erdős 233
-itself (`≪ N log² N`) stays open.
-
-**Primes in almost all short intervals (literature status: RH-consequence).** Selberg's
-1943 paper (A. Selberg, *On the normal density of primes in small intervals, and the difference
-between consecutive primes*, Arch. Math. Naturvid. 47 (6) (1943) 87–105) also proves, under
-RH, that almost all intervals `(x, x + Φ(x) log² x]` contain a prime whenever `Φ(x) → ∞`, and
-that `π(x + h) − π(x) ~ h/log x` for almost all `x` in that range. We read these statements in
-secondary sources, not in the paper: Huang–Liu–Rudnick ([arXiv:1903.04005](https://arxiv.org/abs/1903.04005), §1),
-Cully-Hugill–Dudek ([arXiv:2206.00433](https://arxiv.org/abs/2206.00433), §1: increasing
-`h = o(x)` with `h/log² x → ∞`; "almost all" means an exceptional set of measure `o(x)`,
-Selberg's footnote 4, p. 161), and H. Maier's foreword to *Irregularities in the Distribution
-of Prime Numbers* (Springer, 2018), which states the asymptotic form. Unconditionally the best
-known is primes in almost all intervals `[x, x + x^{1/20+ε}]` (Jia, as quoted by
-Cully-Hugill–Dudek). The main library is a Lean proof that RH implies the existence form,
-following Selberg (1943); `Unconditional/` proves it unconditionally, with RH supplied by the certified proof in
-leanprover-community/riemann-hypothesis. The
-asymptotic form is **not** proved here; a smoothed version of it is (see below).
+The same paper of Selberg (*On the normal density of primes in small intervals, and the
+difference between consecutive primes*, Arch. Math. Naturvid. 47 (6) (1943) 87-105) proves,
+under RH, that almost all intervals `(x, x + Φ(x) log² x]` contain a prime whenever
+`Φ(x) → ∞`, and that `π(x + h) − π(x) ~ h/log x` for almost all `x` in that range (label:
+**RH-consequence**). The statements here follow the secondary accounts in Huang, Liu and Rudnick
+([arXiv:1903.04005](https://arxiv.org/abs/1903.04005), §1), Cully-Hugill and Dudek
+([arXiv:2206.00433](https://arxiv.org/abs/2206.00433), §1: increasing `h = o(x)` with
+`h/log² x → ∞`; "almost all" means an exceptional set of measure `o(x)`, Selberg's footnote 4,
+p. 161), and H. Maier's foreword to *Irregularities in the Distribution of Prime Numbers*
+(Springer, 2018), which states the asymptotic form. Without RH, the best known result is primes
+in almost all intervals `[x, x + x^{1/20+ε}]` (Jia, as quoted by Cully-Hugill and Dudek). The
+main library proves that RH implies the existence form, following Selberg (1943), and
+`Unconditional/` proves it unconditionally with the certified proof of RH. The asymptotic form
+(`SelbergAsymptoticStatement`) is not proved; a smoothed version of it is (see below).
 
 ```lean
 theorem Erdos233.erdos_233_upper_bound_of_RH (hRH : RiemannHypothesis) :
@@ -87,36 +87,39 @@ theorem Erdos233.large_gaps_of_RH (hRH : RiemannHypothesis) : ∃ C X₀ : ℝ, 
 
 ### Why this formulation
 
-* "Almost all" is Selberg's: the exceptional set has Lebesgue measure `o(X)`. We measure it
-  inside the dyadic block `[X, 2X]` (`volume`, an outer measure, so no measurability side
-  condition is needed); summing blocks gives the same statement inside `[1, X]`.
-* The existence form assumes only `h(x)/log² x → ∞`. Monotonicity and `h = o(x)`, which
-  Cully-Hugill–Dudek include, are not needed for existence (a larger `h` only helps), and the
-  proof does not use them.
-* The asymptotic form keeps both (`Monotone h`, `h(x)/x → 0`): without `h = o(x)` the main term
-  `h/log x` is wrong (take `h = x²`), and the literature states it for increasing `h`.
-* `SmoothedSelbergStatement` counts primes and prime powers with the tent weight of `D2`
-  (`D2 δ y = Σ_n Λ(n) w(n)`, `w` the tent of height `δy` on `(y, y(1+2δ))`, see
-  `Erdos233/Basic.lean`), at step `δ = H(X)/X` fixed across the block. It is a genuine
-  almost-all asymptotic for a smoothed count, not the sharp count `π(x+h) − π(x)`.
+"Almost all" is Selberg's notion: the exceptional set has Lebesgue measure `o(X)`. The
+statements measure it inside the dyadic block `[X, 2X]` with `volume`, an outer measure, so no
+measurability side condition is needed. Summing blocks gives the same statement inside `[1, X]`.
+
+The existence form assumes only `h(x)/log² x → ∞`. Cully-Hugill and Dudek also assume
+monotonicity and `h = o(x)`, but existence does not need them (a larger `h` only helps), and the
+proof does not use them. The asymptotic form keeps both (`Monotone h`, `h(x)/x → 0`): without
+`h = o(x)` the main term `h/log x` is wrong (take `h = x²`), and the literature states it for
+increasing `h`.
+
+`SmoothedSelbergStatement` counts primes and prime powers with the tent weight of `D2`
+(`D2 δ y = Σ_n Λ(n) w(n)`, `w` the tent of height `δy` on `(y, y(1+2δ))`, see
+`Erdos233/Basic.lean`), at step `δ = H(X)/X` fixed across the block. It is an almost-all
+asymptotic for this smoothed count. The sharp count `π(x+h) − π(x)` is the subject of
+`SelbergAsymptoticStatement`.
 
 ## Tier and provenance
 
-* `Erdos233.erdos_233_upper_bound_of_RH` is **tier C**: RH is the explicit hypothesis
-  `RiemannHypothesis`, Mathlib's own definition (as in formal-conjectures), not restated.
-* `erdos_233_upper_bound` is **tier U**: it closes RH with `riemannHypothesis` from
-  [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
-  in one line.
+`Erdos233.erdos_233_upper_bound_of_RH` is tier C: RH is the explicit hypothesis
+`RiemannHypothesis`, Mathlib's own definition (as in formal-conjectures). `erdos_233_upper_bound`
+is tier U: it closes RH in one line with `riemannHypothesis` from
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
+`selberg_almost_all_of_RH`, `primeless_measure_le`, `smoothed_asymptotic_of_RH` and
+`large_gaps_of_RH` are tier C (same `RiemannHypothesis`); `selberg_almost_all`,
+`smoothed_selberg_asymptotic` and `large_gaps` in `Unconditional/` are tier U.
+`SelbergAsymptoticStatement` is a fixed target with no proof.
+
 * `Erdos233UpperBoundStatement` and `primeGap` are copied verbatim from formal-conjectures
   [`ErdosProblems/233.lean`](https://github.com/google-deepmind/formal-conjectures/blob/d9f6ffa8dd7fc2b8b597dd1f7a824d27b12b88af/FormalConjectures/ErdosProblems/233.lean)
   (`erdos_233.variants.upper_bound`) and
   [`NumberTheory/PrimeGap.lean`](https://github.com/google-deepmind/formal-conjectures/blob/86a2f58a4d7a3a0637d15d5b2ce627592b54b956/FormalConjecturesForMathlib/NumberTheory/PrimeGap.lean).
   `Erdos233Statement` (the open `erdos_233`, `N log² N`) is copied too, for reference; nothing
   here proves it.
-* `selberg_almost_all_of_RH`, `primeless_measure_le`, `smoothed_asymptotic_of_RH` and
-  `large_gaps_of_RH` are **tier C** (same `RiemannHypothesis`); `selberg_almost_all`,
-  `smoothed_selberg_asymptotic` and `large_gaps` in `Unconditional/` are **tier U**.
-  `SelbergAsymptoticStatement` is a fixed target with no proof.
 * formal-conjectures has no statement of Selberg's almost-all theorem (searched 2026-11-24 for
   "Selberg", "short interval", "almost all" and `primeCounting`), so the definitions in
   `Erdos233/Statement2.lean` are this repository's own.
@@ -136,7 +139,7 @@ theorem Erdos233.large_gaps_of_RH (hRH : RiemannHypothesis) : ∃ C X₀ : ℝ, 
 'Erdos233.large_gaps_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
-No `sorry`, no `native_decide`, no `axiom` or `opaque` declarations.
+The repository has no `sorry`, no `native_decide` and no `axiom` or `opaque` declarations.
 
 ## Proof outline
 
@@ -160,7 +163,7 @@ formula converges absolutely, so no truncated Perron formula is needed.
 9. Dyadic levels `h = 2^i h₀`: `Σ_{x ≤ p_n < 2x} d_n² ≪ x log³ x` (`Dyadic.lean`).
 10. Dyadic blocks in `x` and `p_N ≤ 18 N log N` (Chebyshev, Mathlib) give `≪ N log⁴ N` (`Main.lean`).
 
-Selberg's almost-all theorem reuses Steps 1–7 (`AlmostAll.lean`):
+Selberg's almost-all theorem reuses Steps 1 to 7 (`AlmostAll.lean`):
 
 11. `window_forces`: if `(y, y(1+2δ))` has no prime, `X ≤ y ≤ 4X`, `16 log²(5X)/log 2 ≤ δX`
     and `δ ≤ 1/8`, then `y^{3/2}|F δ (log y)| ≥ (δX)²/2` (the core of Step 8).
@@ -196,7 +199,7 @@ threshold `h/log² x → ∞` with no extra logarithms.
 | `Erdos233/Dyadic.lean` | Step 9 |
 | `Erdos233/Main.lean` | Step 10, `erdos_233_upper_bound_of_RH` |
 | `Erdos233/Statement2.lean` | Selberg's almost-all statements (this repository's own) |
-| `Erdos233/AlmostAll.lean` | Steps 11–16 |
+| `Erdos233/AlmostAll.lean` | Steps 11 to 16 |
 | `Unconditional/Erdos233Unconditional.lean` | `erdos_233_upper_bound` (not in the default build) |
 
 ## Deviations from the literature
@@ -217,8 +220,8 @@ threshold `h/log² x → ∞` with no extra logarithms.
   need sharpening. We prove the smoothed form `SmoothedSelbergStatement` instead.
 * `large_gaps_of_RH` is the dyadic-block form of the large-gap bound used inside Selberg's
   `Σ d_n²` argument, with explicit thresholds `256 log²(5x)/log 2 ≤ h ≤ 2x`.
-* This is **not** a proof of `erdos_233` (`N log² N`), which is open even under RH; see the
-  last section of `docs/BLUEPRINT.md`.
+* `erdos_233` itself (`N log² N`) is not proved and is open even under RH; see the last
+  section of `docs/BLUEPRINT.md`.
 
 ## Building
 
@@ -231,7 +234,7 @@ lake env lean scripts/axioms.lean
 Clean `lake build` of this package (Mathlib and erdos-985 already built), 2026-11-24, 95-core
 box: about 4 minutes wall, 176 CPU-seconds. No module takes more than a minute; the largest
 are `Erdos233.Explicit.Formula` (53 s), `Erdos233.Gaps` (45 s) and `Erdos233.Main` (39 s).
-There are no `native_decide` modules. `Erdos233.AlmostAll` (round 5) elaborates in about 23 s
+No module uses `native_decide`. `Erdos233.AlmostAll` (round 5) elaborates in about 23 s
 wall, 31 CPU-seconds, on the same box under load.
 
 ## Unconditional version
