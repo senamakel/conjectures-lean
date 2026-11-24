@@ -105,3 +105,25 @@ works but is unnecessary.
 | I | `Mertens/HardyLittlewood.lean` | done |
 | J | `Mertens/Riesz.lean` | done |
 | stretch | Franel–Landau (Farey sequences) | not started |
+
+## Round 5: Titchmarsh's bound `M(x) ≤ √x exp(C log x / log log x)` (`Mertens/Sharp*.lean`)
+
+Targets: `Mertens/Statement3.lean`. Notation: `L = log x` (Dirichlet-polynomial length of
+littlewood-rh's explicit formula), `s₀ = σ₀ + it`, `η = σ₀ - 1/2`, `W = Re ξ'/ξ(s₀)`,
+`C = (x+1)L² + x + 1 + Σ 1/k²`.
+
+1. `integral_zero_term_ge`, `integral_zeroSum_ge` (RH, `ηL ≥ 1`):
+   `∫_{σ₀}^2 Re zeroSum(σ+it, x) dσ ≥ -2W`.
+2. `re_logDeriv_xi_le` (RH, `t ≥ 1`, `ηL ≥ 4`): `W ≤ 2C/L + 2‖R(s₀)‖`;
+   `norm_archR_le`: `‖R(s)‖ ≤ log(3+|t|) + 5` on `0 ≤ σ ≤ 2`, `|t| ≥ 1`.
+3. `norm_inv_zeta_le_large` (RH, `t ≥ 1`, `x ≥ e²`, `σ₀ ≤ 2`, `ηL ≥ 4`):
+   `‖ζ(s₀)⁻¹‖ ≤ exp(A + (4C + 4 log(3+t) + 20)/L)`.
+4. `re_logDeriv_xi_le_two`, `log_norm_xi_ge`, `norm_invZ_le_small` (RH, `|t| ≤ 1`):
+   `‖invZ s‖ ≤ K₁ (3/(2η))^{K₂}`.
+5. `norm_invZ_le_sharp` (RH, `l ≥ 2`, `1/2 + 4/l ≤ σ ≤ 2`, all `t`):
+   `‖invZ s‖ ≤ exp(A(l² e^l + 1)) (|t|+3)^{4/l}`; `invZetaSharpWith_of_RH : InvZetaSharpBoundWith 8`
+   with `l = ½ log log t`.
+6. `norm_diff_F_le_of`, `integral_one_add_abs_rpow_neg` (`∫ (1+|t|)^{-(1+α)} = 2/α`),
+   `abs_mertens_nat_le_sharp` (`l ≥ 8`): `|M(N)| ≤ 8 l e^{A(l²e^l+1)} (N+1)^{1/2+12/l}`.
+7. `eventually_le_div_log`: `A((log u)² √u + 1) + B ≤ u/log u` eventually
+   (`(log u)³ = o(√u)`); `mertensSharp_of_RH` with `l = ½ log log x`, `C = 25`.
