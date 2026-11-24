@@ -5,6 +5,10 @@ proved under GRH that every proper subgroup of `(ℤ/q)ˣ` omits a unit below `2
 particular the least quadratic non-residue mod an odd prime `p` is at most `2 log² p`.
 Unconditionally only Burgess-type bounds `p^{1/(4√e)+ε}` are known.
 
+**Literature status: RH-consequence.** The GRH ⇒ `log² p` bound is Ankeny (1952), made explicit
+by Bach (1990, constant 2). This is a Lean proof that GRH implies it, following Ankeny and Bach;
+our constant `21/5` is weaker than Bach's `2`. It is not new mathematics.
+
 This repository proves, assuming GRH for Dirichlet L-functions
 (`Erdos985.DirichletLNonvanishingRightOfHalf`, copied verbatim from
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)):
