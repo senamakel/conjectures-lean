@@ -213,12 +213,16 @@ there from Mathlib and erdos-985.
 'Cramer.primeInShortInterval_three_halves_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Cramer.primeGapExplicit_three_halves_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Cramer.primeInClosedInterval_three_halves_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Cramer.primeInShortInterval_107_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Cramer.primeGapExplicit_107_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Cramer.primeInClosedInterval_107_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
-`scripts/check-axioms.sh` reruns this and fails unless all ten use only the standard axioms.
+`scripts/check-axioms.sh` reruns this and fails unless all thirteen use only the standard axioms.
 No `sorry`, no `native_decide`, no `axiom` declarations. The finite checks (`Cramer/Small.lean`,
-`Cramer/Sharp/Small.lean`) use kernel `decide` (`decide +kernel` for the 696-prime chain) and
-`norm_num`, which add no axioms.
+`Cramer/Sharp/Small.lean`, `Cramer/Shift/Small.lean`, `Cramer/Shift/Data.lean`,
+`Cramer/Shift/Facts.lean`) use kernel `decide` (`decide +kernel` for the prime chains and the
+4033 majorant cells) and `norm_num`, which add no axioms.
 
 ## Proof outline
 
@@ -519,15 +523,24 @@ about 40 s wall (62 s CPU: kernel `decide` over the 696-entry chain and 696 `nor
 primality proofs, in 18 chunks), `Cramer.Sharp.Large` about 33 s, the others under 20 s each;
 `lake build` of the whole library after adding them took 1 min 16 s wall.
 
+The constant-`107/100` modules (Round 8, same box, load average about 80): `Cramer.Shift.Data`
+393 s wall (kernel `decide` over the 4033 cells, 53 Lorentzian pairs each, in 10 chunks),
+`Cramer.Shift.Small` 182 s (the 1176-entry chain and 1176 `norm_num` primality proofs),
+`Cramer.Vendor.Digamma` about 10 s, the others under 40 s each; `lake build` of the whole
+library after adding them took 7 min 7 s wall.
+
 ## Unconditional version
 
-`Unconditional/CramerUnconditional.lean` proves Cramér's gap bound with constant `3/2` (and `2`) and his
+`Unconditional/CramerUnconditional.lean` proves Cramér's gap bound with constant `107/100` (and `3/2`, `2`) and his
 mean-square bounds and asymptotic unconditionally in Lean, with the certified proof of RH. It imports
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
 (commit `507a75d91d`) and discharges the hypothesis with `riemannHypothesis`:
 
 | Theorem | Statement | Axioms |
 |---|---|---|
+| `cramer_primeInShortInterval_107` | `Cramer.PrimeInShortInterval (107 / 100)` | `propext`, `Classical.choice`, `Quot.sound` |
+| `cramer_primeGapExplicit_107` | `Cramer.PrimeGapExplicit (107 / 100)` | `propext`, `Classical.choice`, `Quot.sound` |
+| `cramer_primeInClosedInterval_107` | `Cramer.PrimeInClosedInterval 2 (107 / 100)` | `propext`, `Classical.choice`, `Quot.sound` |
 | `cramer_primeInShortInterval_three_halves` | `Cramer.PrimeInShortInterval (3 / 2)` | `propext`, `Classical.choice`, `Quot.sound` |
 | `cramer_primeGapExplicit_three_halves` | `Cramer.PrimeGapExplicit (3 / 2)` | `propext`, `Classical.choice`, `Quot.sound` |
 | `cramer_primeInClosedInterval_three_halves` | `Cramer.PrimeInClosedInterval 2 (3 / 2)` | `propext`, `Classical.choice`, `Quot.sound` |
@@ -544,8 +557,8 @@ scripts/check-unconditional.sh [RH_DIR]
 ```
 
 Run on 2026-11-24 against riemann-hypothesis `507a75d91d` (cache build, not `RH_FULL_BUILD`),
-library and `Unconditional/` as of cramer-rh commit `4f7655c` (Round 7, constant `3/2`
-included); 23 min 54 s wall, most of it restoring and loading the RH cache. Output:
+library and `Unconditional/` as of cramer-rh commit `3ab896d` (Round 8, constant `107/100`
+included); 14 min 31 s wall, most of it restoring and loading the RH cache. Output:
 
 ```
 'cramer_primeInShortInterval' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -558,6 +571,9 @@ included); 23 min 54 s wall, most of it restoring and loading the RH cache. Outp
 'cramer_primeInShortInterval_three_halves' depends on axioms: [propext, Classical.choice, Quot.sound]
 'cramer_primeGapExplicit_three_halves' depends on axioms: [propext, Classical.choice, Quot.sound]
 'cramer_primeInClosedInterval_three_halves' depends on axioms: [propext, Classical.choice, Quot.sound]
+'cramer_primeInShortInterval_107' depends on axioms: [propext, Classical.choice, Quot.sound]
+'cramer_primeGapExplicit_107' depends on axioms: [propext, Classical.choice, Quot.sound]
+'cramer_primeInClosedInterval_107' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 The import needs about 93 GB of cache, about 19 GB of RAM and roughly 900k open files (raise the
@@ -586,4 +602,10 @@ This check links against the community build cache and does not repeat those ker
   [robin-rh](https://github.com/senamakel/robin-rh) `Robin/RH/Bach.lean`. Same author.
 * `primeGap` and the `CramerGapBound` statement: google-deepmind/formal-conjectures, commit
   `86a2f58a`, Apache License 2.0.
+* `Cramer/Vendor/Digamma.lean`: Dirichlet's integral for `ψ` and the bound
+  `Re ψ(σ + it) ≤ log σ + ½ log(1 + t²/(σ−1)²)` (`re_digamma_le`), vendored from
+  [calr3/ternary-goldbach](https://github.com/calr3/ternary-goldbach)
+  `TernaryGoldbach/Explicit/Digamma.lean` at commit `330a61c7`, Copyright 2026 Charlie Reams,
+  Apache License 2.0; the licence and NOTICE are in `Cramer/Vendor/`. Changes: namespace, the
+  file stops at `re_digamma_le`, two `fun_prop` continuity steps written out for this Mathlib pin.
 * Nothing is vendored from riemann-hypothesis; it is imported only by `Unconditional/`.
