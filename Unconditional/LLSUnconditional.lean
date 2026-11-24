@@ -15,7 +15,9 @@ number formula, a theorem not involving RH) from riemann-hypothesis's
 `σ : K →+* ℂ` and, for each ideal class, a point `τ c` of the upper half-plane representing it
 (`IsIdealClassPoint`); the bridge supplies both, from Mathlib's `Nonempty (K →+* ℂ)` and the
 repository's `exists_isIdealClassPoint`. Its `IsKroneckerChar χ` is, by definition, the
-condition `∀ n, Odd n → χ n = J(−q | n)` of `LLS.ClassNumberFormula`.
+condition `∀ n, Odd n → χ n = J(−q | n)` of `LLS.ClassNumberFormula`, for every `q`, odd or
+even; the same discharge serves the round-5 bounds (odd discriminants) and the round-6 bounds
+`ClassNumberUpperBoundWith 5`, `ClassNumberLowerBoundWith 5` (every imaginary quadratic field).
 -/
 
 theorem leastNonresidueBelowLogSq_unconditional : LLS.LeastNonresidueBelowLogSq :=
@@ -50,6 +52,14 @@ theorem classNumberLowerBoundOddWith_unconditional : LLS.ClassNumberLowerBoundOd
   LLS.classNumberLowerBoundOddWith_of_GRH_of_formula LFunction_ne_zero_of_half_lt_re
     classNumberFormula
 
+theorem classNumberUpperBoundWith_unconditional : LLS.ClassNumberUpperBoundWith 5 :=
+  LLS.classNumberUpperBoundWith_of_GRH_of_formula LFunction_ne_zero_of_half_lt_re
+    classNumberFormula
+
+theorem classNumberLowerBoundWith_unconditional : LLS.ClassNumberLowerBoundWith 5 :=
+  LLS.classNumberLowerBoundWith_of_GRH_of_formula LFunction_ne_zero_of_half_lt_re
+    classNumberFormula
+
 #print axioms leastNonresidueBelowLogSq_unconditional
 #print axioms bach_unconditional
 #print axioms leastNonresidue_unconditional
@@ -59,3 +69,5 @@ theorem classNumberLowerBoundOddWith_unconditional : LLS.ClassNumberLowerBoundOd
 #print axioms classNumberFormula
 #print axioms classNumberUpperBoundOddWith_unconditional
 #print axioms classNumberLowerBoundOddWith_unconditional
+#print axioms classNumberUpperBoundWith_unconditional
+#print axioms classNumberLowerBoundWith_unconditional
