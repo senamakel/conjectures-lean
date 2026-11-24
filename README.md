@@ -246,8 +246,8 @@ independently verified.
 | `bach_unconditional` | `Ankeny.BachSubgroupBound (11 / 4)` | standard three + 16 `native_decide` |
 | `leastNonresidue_unconditional` | `Ankeny.LeastNonresidueBound (11 / 4)` | standard three + 16 `native_decide` |
 | `miller_unconditional` | `Miller.MillerStatement (11 / 4)` | standard three + 16 `native_decide` |
-| `l1UpperBoundWith_unconditional` | `LLS.L1UpperBoundWith 5` | see the output below |
-| `l1LowerBoundWith_unconditional` | `LLS.L1LowerBoundWith 5` | see the output below |
+| `l1UpperBoundWith_unconditional` | `LLS.L1UpperBoundWith 5` | standard three |
+| `l1LowerBoundWith_unconditional` | `LLS.L1LowerBoundWith 5` | standard three |
 
 Real output of `scripts/check-unconditional.sh /home/ubuntu/work/personal/riemann-hypothesis`
 (2026-11-24, this commit, 36 min wall, most of it importing the riemann-hypothesis modules):
@@ -262,7 +262,11 @@ Real output of `scripts/check-unconditional.sh /home/ubuntu/work/personal/rieman
  LLS.chunk114_ok_9._native.native_decide.ax_1_1]
 'leastNonresidue_unconditional' depends on axioms: (the same nineteen)
 'miller_unconditional' depends on axioms: (the same nineteen)
+'l1UpperBoundWith_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+'l1LowerBoundWith_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
+
+(The last two lines are from the rerun at `6f10c52`, 44 min wall on a loaded box.)
 
 The sixteen elided lines are `LLS.chunk114_ok_i._native.native_decide.ax_1_1` for every
 `0 ≤ i ≤ 15`, exactly as in the main-library output above.
