@@ -14,6 +14,10 @@ unconditionally, as a library for other projects.
 theorem DensityHypothesis.densityHypothesis_of_RH (hRH : RiemannHypothesis) :
     DensityHypothesis.Statement
 
+-- the Guth–Maynard *statement*, as a corollary of RH (not Guth–Maynard's proof)
+theorem DensityHypothesis.guthMaynard_of_RH (hRH : RiemannHypothesis) :
+    DensityHypothesis.GuthMaynardStatement
+
 -- unconditional zero counting (namespace `Density`)
 theorem Density.zeroCountOn_riemannZeta_le_of_subset_strip :
     ∃ C : ℝ, 0 < C ∧ ∀ T : ℝ, 2 ≤ T → ∀ S : Set ℂ,
@@ -40,7 +44,19 @@ def DensityHypothesis.Statement : Prop :=
   ∀ ε : ℝ, 0 < ε →
     ∃ C : ℝ, 0 < C ∧ ∀ σ T : ℝ, 1 / 2 ≤ σ → σ ≤ 1 → 2 ≤ T →
       (zetaZeroCount σ T : ℝ) ≤ C * T ^ (2 * (1 - σ) + ε)
+
+def DensityHypothesis.GuthMaynardStatement : Prop :=
+  ∀ ε : ℝ, 0 < ε →
+    ∃ C : ℝ, 0 < C ∧ ∀ σ T : ℝ, 1 / 2 ≤ σ → σ ≤ 1 → 2 ≤ T →
+      (zetaZeroCount σ T : ℝ) ≤ C * T ^ ((30 / 13 : ℝ) * (1 - σ) + ε)
 ```
+
+**About `GuthMaynardStatement`.** This is formal-conjectures' `guth_maynard_zero_density`, the
+statement of the Guth–Maynard bound (exponent `30/13`). Here it is obtained only as a corollary of
+RH, through the density hypothesis, since `T^{2(1-σ)+ε} ≤ T^{(30/13)(1-σ)+ε}` for `T ≥ 2` and
+`σ ≤ 1`. Its tier-U version rests on the riemann-hypothesis repository. This is **not** a
+formalisation of Guth and Maynard's unconditional proof (large-value estimates for Dirichlet
+polynomials), and nothing here proves the `30/13` bound without RH.
 
 ## Tier and provenance
 
@@ -48,12 +64,16 @@ def DensityHypothesis.Statement : Prop :=
 |---|---|---|
 | `DensityHypothesis.densityHypothesis_of_RH` | C | `RiemannHypothesis` (Mathlib's statement) |
 | `density_hypothesis` (`Unconditional/`) | U | none; RH from riemann-hypothesis |
+| `DensityHypothesis.guthMaynard_of_RH` | C | `RiemannHypothesis` (corollary of the line above it) |
+| `guth_maynard_zero_density` (`Unconditional/`) | U | none; RH from riemann-hypothesis (not Guth–Maynard's proof) |
 | `Density.zeroCountOn_riemannZeta_le_of_subset_strip` | D | none |
 | `Density.zeroCountOn_riemannZeta_le_of_subset_box` | D | none |
 
 The statement is formal-conjectures'
 [`density_hypothesis_zeta_zeros`](https://github.com/google-deepmind/formal-conjectures/blob/86a2f58a4d7a3a0637d15d5b2ce627592b54b956/FormalConjectures/Wikipedia/DensityHypothesis.lean)
-(`research open` there), and `zeroCountOn` is from
+(`research open` there) and
+[`guth_maynard_zero_density`](https://github.com/google-deepmind/formal-conjectures/blob/86a2f58a4d7a3a0637d15d5b2ce627592b54b956/FormalConjectures/Wikipedia/DensityHypothesis.lean)
+(`research solved` there, proof `sorry`), and `zeroCountOn` is from
 [`FormalConjecturesForMathlib/NumberTheory/RiemannZetaZeros.lean`](https://github.com/google-deepmind/formal-conjectures/blob/86a2f58a4d7a3a0637d15d5b2ce627592b54b956/FormalConjecturesForMathlib/NumberTheory/RiemannZetaZeros.lean),
 both copied word for word at commit `86a2f58`; the only edits (dropped `module`/`public`
 markers and `@[category]` attributes, the open theorem turned into a `Prop`) are listed in the
@@ -68,6 +88,7 @@ riemann-hypothesis.
 
 ```
 'DensityHypothesis.densityHypothesis_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'DensityHypothesis.guthMaynard_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Density.zeroCountOn_riemannZeta_le_of_subset_strip' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Density.zeroCountOn_xiZeta_le' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Density.zeroCountOn_le_of_jensen' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -100,7 +121,8 @@ Write `ξ(s) = s(s-1)Λ(s)` for erdos-985's entire `Erdos985.Analytic.xiZeta`.
    `|ζ'/ζ(2+iT)| ≤ Σ Λ(n)/n²`.
 5. **Assembly** (`Density/Main.lean`): under RH, `ζ(s) ≠ 0` for `Re s > 1/2`, `Im s ≠ 0`, so
    `N(σ, T) = 0` for `σ > 1/2`. At `σ = 1/2` the exponent is `1 + ε`, and Step 3 with
-   `log T ≤ T^ε/ε` gives `N(1/2, T) ≤ (C/ε) T^{1+ε}`.
+   `log T ≤ T^ε/ε` gives `N(1/2, T) ≤ (C/ε) T^{1+ε}`. The Guth–Maynard statement follows with the
+   same constant, because `2(1-σ) ≤ (30/13)(1-σ)` and `T ≥ 1` (`guthMaynard_of_statement`).
 
 ## Layout
 
@@ -112,7 +134,7 @@ Write `ξ(s) = s(s-1)Λ(s)` for erdos-985's entire `Erdos985.Analytic.xiZeta`.
 | `Density/ZeroCount/Global.lean` | Step 3 |
 | `Density/ZeroCount/Local.lean` | Step 4 |
 | `Density/ZeroCount.lean` | The zero-counting library (imports Steps 1–4) |
-| `Density/Main.lean` | Step 5: `densityHypothesis_of_RH` |
+| `Density/Main.lean` | Step 5: `densityHypothesis_of_RH`, `guthMaynard_of_RH` |
 | `Density/AxiomCheck.lean` | `#guard_msgs` allow-list of the headline axioms |
 | `Unconditional/DensityUnconditional.lean` | One-line discharge from riemann-hypothesis |
 
@@ -149,11 +171,12 @@ is no `native_decide`.
 ## Unconditional version
 
 `Unconditional/DensityUnconditional.lean` imports riemann-hypothesis and closes the hypothesis in
-one line:
+one line each:
 
 | Theorem | Statement | Axioms |
 |---|---|---|
 | `density_hypothesis` | `DensityHypothesis.Statement` | `propext`, `Classical.choice`, `Quot.sound` |
+| `guth_maynard_zero_density` | `DensityHypothesis.GuthMaynardStatement` | UNCOND_GM |
 
 Checked against riemann-hypothesis commit `507a75d91d` on 2026-11-24 with
 
