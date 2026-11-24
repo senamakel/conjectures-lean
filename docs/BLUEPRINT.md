@@ -83,3 +83,31 @@ RH: the RH mean square in Step 6 is sharp up to constants for this method, and t
 lost to the dyadic levels in Step 9 is the gap between `log³` and `log²` (in `p_n ≤ x`
 indexing). Removing it needs input beyond RH, e.g. pair correlation of zeros (Heath-Brown,
 Goldston–Montgomery style arguments).
+
+## Round 5: primes in almost all short intervals (Selberg 1943)
+
+Statements: `Erdos233/Statement2.lean`. Proofs: `Erdos233/AlmostAll.lean`. Everything reuses
+Steps 1–7; no new analytic input.
+
+1. `window_forces`. If `(y, y(1+2δ))` has no prime, `X ≤ y ≤ 4X`, `16 L ≤ δX`
+   (`L = log²(5X)/log 2`), `16 L ≤ √X` and `δ ≤ 1/8`: `D2 δ y ≤ δy · (ψ − θ)|_y^{y(1+2δ)} ≤
+   (δy)²/4 + δy L` (`D2_le`, `psi_sub_theta_window`), and `D2_bound` gives
+   `y^{3/2}|F δ (log y)| ≥ (δy)²/2 ≥ (δX)²/2`.
+2. `large_wave_measure`. `mul_meas_ge_le_integral_of_nonneg` (Chebyshev) on
+   `W y = (y^{3/2}|F δ (log y)|)²` over `volume.restrict (Ioc X 4X)`, with `mean_square`:
+   `|{y ∈ [X,2X] : t ≤ y^{3/2}|F|}| ≤ C X⁴δ³ log²(2/δ)/t²` (the point `y = X` is null).
+3. `primeless_measure_le`. `δ = H/(4X)` makes `y(1+2δ) ≤ y + H` on `[X, 2X]`; with
+   `t = (H/4)²/2`, `X⁴δ³/t² = 16 X/H` and `log(2/δ) ≤ 2 log X`, so the bound is
+   `64 C X log² X / H` for `64 L ≤ H ≤ X/2`.
+4. `selberg_almost_all_of_RH`. Given `η`, take `K = max(512, 2C/η)`; eventually
+   `h(y) ≥ K log² y ≥ K log² X =: H` on `[X, 2X]` and `H ≤ X/2`; `64 L ≤ H` because
+   `log²(5X) ≤ 4 log² X` and `512 log 2 > 256`. Proportion `≤ C/K ≤ η/2`.
+5. `smoothed_asymptotic_of_RH`. With `δ = H(X)/X`, `|D2 − δ²y²| > εδ²y²` forces
+   `y^{3/2}|F| ≥ εδ²X² − 6 ≥ εH²/2` once `εH ≥ 12`. Step 2 gives proportion
+   `≤ 4C log²(2/δ)/(ε²H) ≤ 16 C log² X/(ε² H)`.
+6. `large_gaps_of_RH`. `gap_sum` at `h/16`.
+
+Not done: the sharp `SelbergAsymptoticStatement`. It needs the sharp count `ψ(y + h(y)) − ψ(y)`
+in mean square (a first difference with additive step: new zero coefficients
+`((1 + h/y)^{ρ} − 1)/ρ`-type bounds replacing `Coeff/`), the Saffari–Vaughan averaging over the
+step to let `h` vary with `y`, and partial summation from `θ` to `π`. Estimated several days.
