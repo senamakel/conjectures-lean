@@ -111,19 +111,32 @@ Inputs (tier H, `Schoenfeld/Inputs.lean`, `Schoenfeld/SmallRange.lean`): `Rosser
     `pi_mid` covers `[4·10⁵, 10¹⁰]`: `(3.9252/u + 12.96/u²)√x + 49.9 < √x u/(8π)` for
     `u ≥ 12.82`.
 
+## The finite inputs (round 7)
+
+* `PsiSmallRange`, `ThetaSmallRange` (`Schoenfeld/Check/Step.lean`, `PsiTheta.lean`): the cell
+  checker `checkA` over the integers, jumps at prime powers (ψ) or primes (θ), with rational
+  enclosures of `log p` (Mathlib's `log(1 − y)` series, 40 terms, `2^{-64}` rounding).
+* `PiSmallRange` (`Schoenfeld/Check/Li.lean`, `Pi.lean`): `li(2657)` from two certified meshes
+  (`li(2)` from the vendored integrand, then `∫₂^{2657} dt/log t`), then `checkB` over the primes
+  to `4·10⁵`.
+* `PsiCert` (`SchoenfeldCompute/Psi.lean`, `Schoenfeld/PsiCert/`): `checkA` with `(4/5)√x` on
+  `[1500, 10⁶]`; an exact segmented sieve with prime-power exponents on `(10⁶, 10¹⁰]`, blocks
+  of about `√a/256`, guards `ψ(b) − a ≤ (4/5)√a`, `b − ψ(a) ≤ (4/5)√a`. 20 chunks; about
+  14 CPU-minutes compiled.
+
 ## What remains for an unconditional `1/(8π)`
 
 * `RosserZeroCount`: proved in Lean (`TernaryGoldbach.RSBounds.Rosser1941.zero_count_bounds`,
   teorth/IEANTN `Solutions/Schoenfeld1976Numerics.v1`, Lean `v4.34.0-rc2`, Mathlib `71a80585`):
-  219 files, about 95,000 lines in its import closure (Backlund's argument, Jensen's formula,
-  digamma and Stirling estimates, Hardy-function certificates for the 29 zeros below 100).
-  Porting it to this pin is the way to discharge it.
-* `PsiCert`: proved in Lean by a kernel-checked campaign (Garald1/RSBounds,
-  `PsiFinite.psi_abs_sub_le_four_fifths_sqrt`, about 960 modules, Lean `v4.35.0`) up to
-  `10¹⁰`. This proof needs PsiCert only up to `10¹⁰` for ψ itself, and for θ and π uses it
-  through the same range.
-* The three small ranges are finite checks of the target: `ψ` at the prime powers up to 1500
-  (about 240 primes), `θ` at the primes up to `3·10⁴` (3245 primes) and `π − li` at the primes
-  up to `4·10⁵` (33,860 primes). Each needs certified enclosures of `log p` (and, for π, of
-  `li` at each prime); we estimate (not measured) that a compiled checker runs in well under a second and a
-  kernel `decide` replay in minutes. None is implemented here.
+  219 files, about 95,000 lines in its import closure: 113 files / 24,844 lines for `T ≥ 100`
+  (Backlund, Jensen, digamma and Stirling estimates; Mathlib only), 106 files / about 70,000
+  lines for the 29 Hardy-function zero certificates below height 100. No `sorry`, `axiom` or
+  `native_decide`; licences Apache-2.0 and MIT. Port from the Lean `v4.35.0` originals
+  (Garald1/RSBounds `82d7a55`, calr3/ternary-goldbach `192ca57`): of 14 sampled files, 8
+  compiled unchanged and 6 needed 10 small fixes (a changed Jensen API, `whnf` timeouts from
+  lemmas restated for `f / g`). Estimate: 2–3 days for `T ≥ 100`, 3–6 more for the
+  certificates.
+* Only the upper half of Rosser's bound is used, through the constant of `Gsum_le_Ub`. By a
+  floating-point model of the budget, any `N(T) ≤ main + 7/8 + a log T + b` for all `T ≥ 4.4`
+  with `2.48 a + b ≤ 3.31` suffices (Rosser: `2.33`; the binding case is π just above `10¹⁰`).
+  A bound valid only for `T ≥ 100` also needs a count below 100 (for instance `N(50) ≤ 10`).
