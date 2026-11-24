@@ -9,8 +9,10 @@ zero-free region).
 
 **Literature status: RH-equivalent.** Nothing here is new mathematics. The main library is a
 Lean proof that RH implies these bounds, following Littlewood (1912), Riesz (1916) and
-Hardy–Littlewood (1916). Each of the Mertens, Riesz and Hardy–Littlewood bounds is equivalent to
-RH, so the unconditional theorems in `Unconditional/` say nothing beyond the RH claim: they are
+Hardy–Littlewood (1916), together with the convergence of `∑ μ(n) n^{-s}` on `Re s > 1/2`
+(Littlewood 1912), the bound `∑_{n ≤ x} λ(n) = O(x^{1/2+ε})` for the Liouville function, and
+the Farey-sequence bounds of Franel (1924) and Landau (1924). Each of these is equivalent to RH,
+so the unconditional theorems in `Unconditional/` say nothing beyond the RH claim: they are
 these bounds, given the Lean proof of RH in leanprover-community/riemann-hypothesis, which has not
 been independently verified. Redheffer's identity `det R_n = M(n)` is **known** (Redheffer 1977,
 no hypothesis); this is a Lean formalisation of it.
@@ -23,7 +25,17 @@ The project formalises Littlewood's implication together with its standard compa
 * Hardy–Littlewood (Acta Math. 41 (1916) 119–196): `∑_n μ(n)/n · e^{-x/n²}` converges and is
   `O(x^{-1/4+ε})` under RH;
 * Redheffer (1977): `det R_n = M(n)` for Redheffer's matrix (no hypothesis), hence
-  `det R_n = O(n^{1/2+ε})` under RH.
+  `det R_n = O(n^{1/2+ε})` under RH;
+* Littlewood (1912): under RH, `∑ μ(n) n^{-s}` converges to `1/ζ(s)` for every `Re s > 1/2`
+  (Titchmarsh, ch. 14). The series converges only conditionally for `1/2 < Re s ≤ 1`, so the
+  statement is about the limit of its partial sums;
+* the Liouville function: under RH, `L(x) = ∑_{n ≤ x} λ(n) = O(x^{1/2+ε})`. The equivalence with
+  RH comes from `ζ(2s)/ζ(s) = s ∫₁^∞ L(t) t^{-s-1} dt` (stated, e.g., in Humphries, J. Number
+  Theory 133 (2013) 545–582, arXiv:1108.1524; this attribution was not checked against an older
+  primary source);
+* Franel (Göttinger Nachrichten 1924, 198–201) and Landau (same volume, 202–206): with
+  `f_1 < ⋯ < f_A` the Farey fractions of order `N` in `(0, 1]`, under RH
+  `∑_k (f_k − k/A)² = O(N^{−1+ε})` (Franel) and `∑_k |f_k − k/A| = O(N^{1/2+ε})` (Landau).
 
 Only the RH ⇒ bound directions are in scope.
 
@@ -34,6 +46,16 @@ theorem Mertens.riesz_of_RH (hRH : RiemannHypothesis) : Mertens.RieszBound
 theorem Mertens.hardyLittlewood_of_RH (hRH : RiemannHypothesis) : Mertens.HardyLittlewoodBound
 theorem Mertens.det_redheffer (n : ℕ) (hn : 1 ≤ n) : (Mertens.redheffer n).det = Mertens.mertens n
 theorem Mertens.redheffer_of_RH (hRH : RiemannHypothesis) : Mertens.RedhefferBound
+theorem Mertens.moebiusSeries_of_mertensBound (hMB : Mertens.MertensBound) :
+    Mertens.MoebiusSeriesConverges
+theorem Mertens.moebiusSeries_of_RH (hRH : RiemannHypothesis) : Mertens.MoebiusSeriesConverges
+theorem Mertens.liouville_of_mertensBound (hMB : Mertens.MertensBound) : Mertens.LiouvilleBound
+theorem Mertens.liouville_of_RH (hRH : RiemannHypothesis) : Mertens.LiouvilleBound
+theorem Mertens.franel_of_mertensBound (hMB : Mertens.MertensBound) : Mertens.FranelBound
+theorem Mertens.franel_of_RH (hRH : RiemannHypothesis) : Mertens.FranelBound
+theorem Mertens.franelLandau_of_mertensBound (hMB : Mertens.MertensBound) :
+    Mertens.FranelLandauBound
+theorem Mertens.franelLandau_of_RH (hRH : RiemannHypothesis) : Mertens.FranelLandauBound
 ```
 
 The statements are fixed in [`Mertens/Statement.lean`](Mertens/Statement.lean), e.g.
@@ -45,22 +67,68 @@ def MertensBound : Prop :=
   ∀ ε : ℝ, 0 < ε → (fun x : ℝ => (mertens x : ℝ)) =O[atTop] fun x : ℝ => x ^ (1 / 2 + ε)
 ```
 
+The second batch of targets is in [`Mertens/Statement2.lean`](Mertens/Statement2.lean):
+
+```lean
+noncomputable def moebiusPartial (s : ℂ) (N : ℕ) : ℂ :=
+  ∑ n ∈ Finset.range N, (μ n : ℂ) / (n : ℂ) ^ s
+
+def MoebiusSeriesConverges : Prop :=
+  (∀ s : ℂ, 1 / 2 < s.re → s ≠ 1 → Tendsto (moebiusPartial s) atTop (𝓝 (riemannZeta s)⁻¹)) ∧
+  Tendsto (moebiusPartial 1) atTop (𝓝 0)
+
+noncomputable def liouvilleSum (x : ℝ) : ℤ := ∑ n ∈ Finset.Icc 1 ⌊x⌋₊, liouville n
+
+def LiouvilleBound : Prop :=
+  ∀ ε : ℝ, 0 < ε → (fun x : ℝ => (liouvilleSum x : ℝ)) =O[atTop] fun x : ℝ => x ^ (1 / 2 + ε)
+```
+
+and for Farey fractions
+
+```lean
+def farey (N : ℕ) : Finset ℚ :=
+  ((Finset.Icc 1 N ×ˢ Finset.Icc 1 N).filter fun pq => pq.1 ≤ pq.2).image
+    fun pq => (pq.1 : ℚ) / pq.2
+
+def fareyFrac (N : ℕ) (i : Fin (farey N).card) : ℚ := (farey N).orderEmbOfFin rfl i
+
+noncomputable def franelL1 (N : ℕ) : ℝ :=
+  ∑ i : Fin (farey N).card, |(fareyFrac N i : ℝ) - ((i : ℕ) + 1 : ℝ) / (farey N).card|
+
+noncomputable def franelL2 (N : ℕ) : ℝ :=
+  ∑ i : Fin (farey N).card, ((fareyFrac N i : ℝ) - ((i : ℕ) + 1 : ℝ) / (farey N).card) ^ 2
+
+def FranelLandauBound : Prop :=
+  ∀ ε : ℝ, 0 < ε → franelL1 =O[atTop] fun N : ℕ => (N : ℝ) ^ (1 / 2 + ε)
+
+def FranelBound : Prop :=
+  ∀ ε : ℝ, 0 < ε → franelL2 =O[atTop] fun N : ℕ => (N : ℝ) ^ (-1 + ε)
+```
+
+Mathlib's `riemannZeta 1` is a junk value rather than the pole, so at `s = 1` the statement is
+the true value `∑ μ(n)/n = 0`. `liouville` is Mathlib's `ArithmeticFunction.liouville`.
+`fareyFrac N i` is `f_{i+1}`, the `(i+1)`-st smallest element of `F_N`.
+
 ## Tier and provenance
 
 | Theorem | Tier |
 |---|---|
 | `invZeta_bound_of_RH`, `mertens_of_RH`, `riesz_of_RH`, `hardyLittlewood_of_RH`, `redheffer_of_RH` | **C** (RH is an explicit argument) |
+| `moebiusSeries_of_RH`, `liouville_of_RH`, `franel_of_RH`, `franelLandau_of_RH` | **C** |
+| `moebiusSeries_of_mertensBound`, `liouville_of_mertensBound`, `franel_of_mertensBound`, `franelLandau_of_mertensBound` | **C** (the hypothesis is the Mertens bound, itself equivalent to RH) |
 | `det_redheffer` | **D** |
-| `invZeta_bound`, `mertens_bound`, `riesz_bound`, `hardyLittlewood_bound`, `redheffer_bound` in `Unconditional/` | **U** |
+| `invZeta_bound`, `mertens_bound`, `riesz_bound`, `hardyLittlewood_bound`, `redheffer_bound`, `moebius_series`, `liouville_bound`, `franel_bound`, `franelLandau_bound` in `Unconditional/` | **U** |
 
 `RiemannHypothesis` is Mathlib's definition; the main library never imports
 riemann-hypothesis. No target has a formal-conjectures counterpart (checked against
 google-deepmind/formal-conjectures `86a2f58`: no Mertens, Redheffer, Riesz or Hardy–Littlewood
-entry), so the targets are this project's own. There are no cited (tier H) hypotheses.
+entry; checked again at `9097e2f` for the Möbius Dirichlet series, the Liouville sum and
+Farey discrepancy: none), so the targets are this project's own. There are no cited (tier H) hypotheses.
 
 ## Axioms
 
-From `lake env lean scripts/print-axioms.lean` (commit `1191f36`):
+From `lake env lean scripts/print-axioms.lean` (the first six at commit `1191f36`, the last eight
+on branch `finality`, 2026-11-24):
 
 ```
 'Mertens.invZeta_bound_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -69,6 +137,14 @@ From `lake env lean scripts/print-axioms.lean` (commit `1191f36`):
 'Mertens.hardyLittlewood_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Mertens.det_redheffer' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Mertens.redheffer_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mertens.moebiusSeries_of_mertensBound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mertens.moebiusSeries_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mertens.liouville_of_mertensBound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mertens.liouville_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mertens.franel_of_mertensBound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mertens.franel_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mertens.franelLandau_of_mertensBound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mertens.franelLandau_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 No `native_decide`, no `sorry`, no `axiom` or `opaque` declarations.
@@ -99,6 +175,35 @@ The full plan, with each step's Lean statement, is in [`docs/BLUEPRINT.md`](docs
 8. **Hardy–Littlewood** (`Mertens/HardyLittlewood.lean`): `P = -1/4 + 2ε`.
 9. **Riesz** (`Mertens/Riesz.lean`): `riesz x = ∑ μ(n)(x/n²)e^{-x/n²}` (swap of an absolutely
    convergent double series), then `P = 1/4 + 2ε`.
+10. **Uniform Mertens bound** (`Mertens/Uniform.lean`): from `MertensBound`, for every `β > 1/2`,
+    `|M(n)| ≤ K (n+1)^β` for all `n` (the trivial `|M(n)| ≤ n` below the threshold).
+11. **Möbius series** (`Mertens/MoebiusSeries.lean`). Abel summation with `w_s(n) = n^{-s}`,
+    `|w_s(n+1) - w_s(n)| ≤ |s| n^{-Re s - 1}` and `β = (1/2 + σ₁)/2`: the partial sums converge
+    to `T(s) = -∑ M(n)(w_s(n+1) - w_s(n))`, uniformly on `{σ₁ < Re s, |s| < R}`, so `T` is
+    holomorphic on `Re s > 1/2`. With `Z(s) = (s-1)ζ(s)` (removable singularity filled, `Z(1) = 1`),
+    `T Z = s - 1` on `Re s > 1` (Mathlib's `L(μ,s) ζ(s) = 1`), hence on the half-plane by the
+    identity theorem. So `T = 1/ζ` off `s = 1`, and `T(1) = 0`. No RH beyond the Mertens bound.
+12. **Liouville** (`Mertens/Liouville.lean`). `λ * 1 = 1_{squares}` (both multiplicative, equal at
+    prime powers), so `λ = 1_{squares} * μ` and `L(N) = ∑_{d² ≤ N} M(⌊N/d²⌋)`; with
+    `β = 1/2 + ε`, `|L(N)| ≤ K 2^β N^β ∑_d d^{-2β}`.
+13. **Farey counting** (`Mertens/FareyCount.lean`). Two Farey fractions of order `N` are at least
+    `1/N²` apart, and for `0 ≤ x ≤ 1`, `#{f ∈ F_N : f ≤ x} = ∑_{q ≤ N} ⌊q x⌋ M(N/q)` (count the
+    coprime `p ≤ qx` by Möbius over `d ∣ q`, then swap the convolution). Also `∑_{q ≤ N} M(N/q) = 1`.
+14. **The key integral** (`Mertens/FareyAlg.lean`, `Mertens/FareyIntegral.lean`):
+    `∫₀¹ {qx}{rx} dx = 1/4 + gcd(q,r)²/(12qr)`. Hermite's identity
+    `{qx} = ∑_{i<q} {x + i/q} − (q−1)/2` reduces it to `∫₀¹ {x+a}{x+b} dx = 1/4 + B₂({b−a})/2`;
+    the distribution relation `∑_{j<r} B₂({u + j/r}) = B₂({ru})/r` and
+    `∑_{i<q} B₂({ri/q}) = gcd(r,q)²/(6q)` (multiplication by a unit permutes residues) finish it.
+15. **Discrete versus continuous** (`Mertens/FareyDiscrete.lean`). With
+    `G(x) = ∑_{q ≤ N} M(N/q){qx} = A x − #{f ≤ x}`, the `(i+1)`-st fraction satisfies
+    `f − (i+1)/A = G(f)/A`. On `[f − 1/N², f)` no other Farey fraction occurs, so
+    `G(f) = G(x) + A(f − x) − 1` there; integrating over these disjoint intervals gives
+    `∑_f G(f)² ≤ 3N² ∫₀¹ G² + 3A(A²/N⁴ + 1)`.
+16. **Franel and Landau** (`Mertens/Franel.lean`). `∫₀¹ G² = 1/4 + (1/12)∑ c_q c_r gcd(q,r)²/(qr)`,
+    and `|c_q| ≤ K 2^β N^β q^{−β}` with `∑_{q,r} gcd(q,r)² (qr)^{−1−β} ≤ ζ(1+β)² ζ(2β)` (write
+    `gcd² ≤ ∑_{d∣q, d∣r} d²`) gives `∫₀¹ G² ≪ N^{2β}`. With `N²/8 ≤ A ≤ N²` (the coprime pairs
+    number `∑ μ(d)⌊N/d⌋² ≥ N²/4`), `∑_k δ_k² = A^{−2}∑_f G(f)² ≪ N^{2β−2}`; Cauchy–Schwarz gives
+    `(∑_k |δ_k|)² ≤ A ∑_k δ_k² ≪ N^{2β}`.
 
 | File | Content |
 |---|---|
@@ -114,6 +219,15 @@ The full plan, with each step's Lean statement, is in [`docs/BLUEPRINT.md`](docs
 | `Mertens/Weights.lean` | Step 7, the two weights and their differences |
 | `Mertens/HardyLittlewood.lean` | Step 8, `hardyLittlewood_of_RH` |
 | `Mertens/Riesz.lean` | Step 9, `riesz_eq`, `riesz_of_RH` |
+| `Mertens/Statement2.lean` | second batch of target definitions |
+| `Mertens/Uniform.lean` | Step 10, `abs_mertens_le_of_mertensBound` |
+| `Mertens/MoebiusSeries.lean` | Step 11, `moebiusSeries_of_RH` |
+| `Mertens/Liouville.lean` | Step 12, `liouville_of_RH` |
+| `Mertens/FareyCount.lean` | Step 13, separation and the counting identity |
+| `Mertens/FareyAlg.lean` | Step 14, Hermite, distribution relation, `∑ B₂({ri/q})` |
+| `Mertens/FareyIntegral.lean` | Step 14, `integral_fract_mul_fract_mul` |
+| `Mertens/FareyDiscrete.lean` | Step 15, `sum_G_sq_le` |
+| `Mertens/Franel.lean` | Step 16, `franel_of_RH`, `franelLandau_of_RH` |
 | `Unconditional/MertensUnconditional.lean` | one-line discharges of RH |
 
 ## Deviations from the literature
@@ -128,7 +242,12 @@ The full plan, with each step's Lean statement, is in [`docs/BLUEPRINT.md`](docs
   Mathlib's junk value `0`.)
 * The Riesz and Hardy–Littlewood bounds are derived from the Mertens bound by partial
   summation rather than by a Mellin–Barnes contour shift; the exponents are the classical ones.
-* Franel–Landau (Farey sequences) is not formalised.
+* The Möbius-series and Liouville theorems are derived from the Mertens bound alone, not from a
+  contour integral for `1/ζ`; the classical statements are the same.
+* Franel–Landau. Franel's exact identity for `∑ δ_k²` (via Dedekind sums) is not used: the
+  discrete sum is compared with `∫₀¹ G²` on intervals of length `1/N²`, which costs constant
+  factors only. Landau's L¹ bound is deduced from Franel's by Cauchy–Schwarz. The exponents are
+  the classical ones.
 
 ## Building
 
@@ -162,14 +281,18 @@ nothing beyond the RH claim.
 | `riesz_bound` | `Mertens.RieszBound` | `[propext, Classical.choice, Quot.sound]` |
 | `hardyLittlewood_bound` | `Mertens.HardyLittlewoodBound` | `[propext, Classical.choice, Quot.sound]` |
 | `redheffer_bound` | `Mertens.RedhefferBound` | `[propext, Classical.choice, Quot.sound]` |
+| `moebius_series` | `Mertens.MoebiusSeriesConverges` | `[propext, Classical.choice, Quot.sound]` |
+| `liouville_bound` | `Mertens.LiouvilleBound` | `[propext, Classical.choice, Quot.sound]` |
+| `franel_bound` | `Mertens.FranelBound` | `[propext, Classical.choice, Quot.sound]` |
+| `franelLandau_bound` | `Mertens.FranelLandauBound` | `[propext, Classical.choice, Quot.sound]` |
 
 ```
 scripts/check-unconditional.sh [RH_DIR]
 ```
 
-Last run 2026-11-24 on this project's commit `1191f36` against riemann-hypothesis `507a75d91d`
-(linked from the community cache, not rebuilt): exit 0, 49 min wall time (most of it waiting
-for a free slot and loading the RH import), output
+Last run 2026-11-24 on this project's commit `c87ad7d` against riemann-hypothesis `507a75d91d`
+(linked from the community cache, not rebuilt): exit 0, 20 min wall time on a heavily loaded box,
+output
 
 ```
 'invZeta_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -177,6 +300,10 @@ for a free slot and loading the RH import), output
 'riesz_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
 'hardyLittlewood_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
 'redheffer_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'moebius_series' depends on axioms: [propext, Classical.choice, Quot.sound]
+'liouville_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'franel_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'franelLandau_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 The import needs about 93 GB of riemann-hypothesis cache, about 19 GB of RAM and roughly 900k

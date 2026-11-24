@@ -6,3 +6,11 @@ import Mertens
 #print axioms Mertens.hardyLittlewood_of_RH
 #print axioms Mertens.det_redheffer
 #print axioms Mertens.redheffer_of_RH
+#print axioms Mertens.moebiusSeries_of_mertensBound
+#print axioms Mertens.moebiusSeries_of_RH
+#print axioms Mertens.liouville_of_mertensBound
+#print axioms Mertens.liouville_of_RH
+#print axioms Mertens.franel_of_mertensBound
+#print axioms Mertens.franel_of_RH
+#print axioms Mertens.franelLandau_of_mertensBound
+#print axioms Mertens.franelLandau_of_RH
