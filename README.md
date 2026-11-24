@@ -13,9 +13,10 @@ unconditionally, as a library for other projects.
 **Literature status, two labels.** (1) The zero-counting bounds `N(T) ≪ T log T` and
 `N(T + 1) - N(T) ≪ log T` are **known** (von Mangoldt 1905); no RH is used, and this is a Lean
 formalisation of them. (2) The density hypothesis is an **RH-consequence**: it is immediate from
-RH (and from Lindelöf). The Lean proof is conditional on RH, and its unconditional form is only
-as reliable as the Lean proof of RH in leanprover-community/riemann-hypothesis, which has not been
-independently verified. It is not new mathematics.
+RH (and from Lindelöf). The main library is a complete Lean proof that RH implies the
+formal-conjectures statement, and `Unconditional/` proves the density hypothesis unconditionally
+in Lean, with RH supplied by the certified proof in leanprover-community/riemann-hypothesis, from
+the standard three axioms only.
 
 ```lean
 theorem DensityHypothesis.densityHypothesis_of_RH (hRH : RiemannHypothesis) :
@@ -178,9 +179,7 @@ riemann-hypothesis at 507a75d91d131d627b380df4e32f6e9fb21dd067
 The import needs about 93 GB of cache, about 19 GB of RAM and roughly 900k open files (raise the
 open-file limit first, e.g. `prlimit --nofile=2000000:2000000`).
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
