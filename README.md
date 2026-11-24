@@ -5,8 +5,17 @@ Let `M(x) = ∑_{n ≤ x} μ(n)` be the Mertens function. Littlewood (C. R. Acad
 the Riemann hypothesis implies `M(x) = O(x^{1/2+ε})` for every `ε > 0` (the converse also holds
 and is not formalised here). The best unconditional bound is of the form
 `M(x) ≪ x exp(-c (log x)^{3/5} (log log x)^{-1/5})` (Walfisz, via the Vinogradov–Korobov
-zero-free region). This project formalises Littlewood's
-implication together with its standard companions:
+zero-free region).
+
+**Literature status: RH-equivalent.** Nothing here is new mathematics. The main library is a
+Lean proof that RH implies these bounds, following Littlewood (1912), Riesz (1916) and
+Hardy–Littlewood (1916). Each of the Mertens, Riesz and Hardy–Littlewood bounds is equivalent to
+RH, so the unconditional theorems in `Unconditional/` say nothing beyond the RH claim: they are
+these bounds, given the Lean proof of RH in leanprover-community/riemann-hypothesis, which has not
+been independently verified. Redheffer's identity `det R_n = M(n)` is **known** (Redheffer 1977,
+no hypothesis); this is a Lean formalisation of it.
+
+The project formalises Littlewood's implication together with its standard companions:
 
 * `1/ζ(s) ≪_{ε,δ} |t|^ε` on `Re s ≥ 1/2 + δ`, `|t| ≥ 1`, under RH (Titchmarsh §14.2);
 * Riesz (Acta Math. 40 (1916)): the Riesz function `∑_{k≥1} (-1)^{k+1} x^k / ((k-1)! ζ(2k))` is
@@ -141,19 +150,33 @@ dependencies are built; the slowest are `Mertens.Littlewood` (30–100 s), `Mert
 
 `Unconditional/MertensUnconditional.lean` imports both this project and
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
-(commit `507a75d91d`), which proves `riemannHypothesis : RiemannHypothesis`, and closes the
-hypothesis in one line each:
+(commit `507a75d91d`), which contains a Lean proof `riemannHypothesis : RiemannHypothesis`, and
+closes the hypothesis in one line each. Each row is the stated bound, given that Lean proof of
+RH, which has not been independently verified; since the bounds are equivalent to RH, they add
+nothing beyond the RH claim.
 
 | Theorem | Statement | Axioms |
 |---|---|---|
-| `invZeta_bound` | `Mertens.InvZetaBound` | UNCHECKED |
-| `mertens_bound` | `Mertens.MertensBound` | UNCHECKED |
-| `riesz_bound` | `Mertens.RieszBound` | UNCHECKED |
-| `hardyLittlewood_bound` | `Mertens.HardyLittlewoodBound` | UNCHECKED |
-| `redheffer_bound` | `Mertens.RedhefferBound` | UNCHECKED |
+| `invZeta_bound` | `Mertens.InvZetaBound` | `[propext, Classical.choice, Quot.sound]` |
+| `mertens_bound` | `Mertens.MertensBound` | `[propext, Classical.choice, Quot.sound]` |
+| `riesz_bound` | `Mertens.RieszBound` | `[propext, Classical.choice, Quot.sound]` |
+| `hardyLittlewood_bound` | `Mertens.HardyLittlewoodBound` | `[propext, Classical.choice, Quot.sound]` |
+| `redheffer_bound` | `Mertens.RedhefferBound` | `[propext, Classical.choice, Quot.sound]` |
 
 ```
 scripts/check-unconditional.sh [RH_DIR]
+```
+
+Last run 2026-11-24 on this project's commit `1191f36` against riemann-hypothesis `507a75d91d`
+(linked from the community cache, not rebuilt): exit 0, 49 min wall time (most of it waiting
+for a free slot and loading the RH import), output
+
+```
+'invZeta_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'mertens_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'riesz_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'hardyLittlewood_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'redheffer_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 The import needs about 93 GB of riemann-hypothesis cache, about 19 GB of RAM and roughly 900k
