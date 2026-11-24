@@ -66,6 +66,7 @@ inputs: the range below the analytic threshold is checked in Lean.
 'Cramer.cramer_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
+`scripts/check-axioms.sh` reruns this and fails unless all three use only the standard axioms.
 No `sorry`, no `native_decide`, no `axiom` declarations. The finite check (`Cramer/Small.lean`)
 uses kernel `decide` and `norm_num`, which add no axioms.
 
