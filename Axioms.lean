@@ -20,3 +20,8 @@ import LLS
 #print axioms LLS.classNumberLowerBoundWith_of_GRH_of_formula
 #print axioms LLS.discr_isFundamentalDiscr
 #print axioms LLS.kroneckerChar_isPrimitive
+#print axioms LLS.bach2_of_GRH
+#print axioms LLS.leastNonresidue2_of_GRH
+#print axioms LLS.miller2_of_GRH
+#print axioms LLS.Check.checkChunk_sound
+#print axioms LLS.goodQ_tail2

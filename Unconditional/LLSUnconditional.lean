@@ -32,6 +32,15 @@ theorem leastNonresidue_unconditional : Ankeny.LeastNonresidueBound (11 / 4) :=
 theorem miller_unconditional : Miller.MillerStatement (11 / 4) :=
   LLS.miller_of_GRH LFunction_ne_zero_of_half_lt_re
 
+theorem bach2_unconditional : Ankeny.BachSubgroupBound 2 :=
+  LLS.bach2_of_GRH LFunction_ne_zero_of_half_lt_re
+
+theorem leastNonresidue2_unconditional : Ankeny.LeastNonresidueBound 2 :=
+  LLS.leastNonresidue2_of_GRH LFunction_ne_zero_of_half_lt_re
+
+theorem miller2_unconditional : Miller.MillerStatement 2 :=
+  LLS.miller2_of_GRH LFunction_ne_zero_of_half_lt_re
+
 theorem l1UpperBoundWith_unconditional : LLS.L1UpperBoundWith 5 :=
   LLS.l1UpperBoundWith_of_GRH LFunction_ne_zero_of_half_lt_re
 
@@ -71,3 +80,6 @@ theorem classNumberLowerBoundWith_unconditional : LLS.ClassNumberLowerBoundWith 
 #print axioms classNumberLowerBoundOddWith_unconditional
 #print axioms classNumberUpperBoundWith_unconditional
 #print axioms classNumberLowerBoundWith_unconditional
+#print axioms bach2_unconditional
+#print axioms leastNonresidue2_unconditional
+#print axioms miller2_unconditional
