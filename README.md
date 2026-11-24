@@ -251,8 +251,8 @@ longer (its `Compute` chunks with `native_decide` are not imported here).
 |---|---|---|
 | `ankenyType_unconditional` | `Shoup.AnkenyTypeStatement` | see below |
 | `leastPrimitiveRoot_le_unconditional` | `g(p) ≤ 1089 (2^{ω(p−1)} log p)²` for odd prime `p` | see below |
-| `polyOmega7_unconditional` | `Shoup.PolyOmegaStatement 7` | see below |
-| `leastPrimitiveRoot_le_seven_unconditional` | `g(p) ≤ C7total · ω(p−1)^7 (log p)²` for odd prime `p` | see below |
+| `polyOmega7_unconditional` | `Shoup.PolyOmegaStatement 7` | standard three |
+| `leastPrimitiveRoot_le_seven_unconditional` | `g(p) ≤ C7total · ω(p−1)^7 (log p)²` for odd prime `p` | standard three |
 | `polyOmega_unconditional` | `Shoup.PolyOmegaStatement 136` | standard three |
 | `leastPrimitiveRoot_le_poly_unconditional` | `g(p) ≤ polyC · ω(p−1)^136 (log p)²` for odd prime `p` | standard three |
 
@@ -270,6 +270,8 @@ Real output (2026-11-24, riemann-hypothesis `507a75d91d`, community cache, not r
 'leastPrimitiveRoot_le_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
 'polyOmega_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
 'leastPrimitiveRoot_le_poly_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+'polyOmega7_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+'leastPrimitiveRoot_le_seven_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 The import needs about 93 GB of cache, about 19 GB of RAM and roughly 900k open files (raise the
