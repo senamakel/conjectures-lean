@@ -1,31 +1,43 @@
 # The average number of Goldbach representations under RH in Lean
 
-**Literature status: RH-equivalent.** With `Λ` the von Mangoldt function and
-`G(n) = Σ_{a+b=n} Λ(a)Λ(b)`, Fujii (*An additive problem of prime numbers*, Acta Arith. **58**
-(1991), 173–179) proved that the Riemann hypothesis implies `Σ_{n≤x} G(n) = x²/2 + O(x^{3/2})`,
-and in part II (Proc. Japan Acad. **67A** (1991), 248–252) the secondary term
-`−2 Σ_ρ x^{ρ+1}/(ρ(ρ+1))` with error `O((x log x)^{4/3})`. Bhowmik–Schlage-Puchta (Nagoya Math.
-J. **200** (2010), 27–33) reduced the error to `O(x log⁵ x)`, and Languasco–Zaccagnini (Proc.
-AMS **140** (2012), 795–804) and Goldston–Yang to `O(x log³ x)`; the error is `Ω(x log log x)`.
-Granville (*Refinements of Goldbach's conjecture, and the generalized Riemann hypothesis*,
-Funct. Approx. Comment. Math. **37** (2007), 159–173, Theorem 1A) stated that the estimate
-`Σ_{n≤x} G(n) = x²/2 + O(x^{3/2+o(1)})` is **equivalent** to RH; his proof of the converse was
-incomplete and was finished by Bhowmik–Ruzsa (*Average Goldbach and the Quasi-Riemann
-Hypothesis*, arXiv:1711.06442). This repository proves **Fujii's theorem**: RH implies
-`|Σ_{n≤x} G(n) − x²/2| ≤ C·x^{3/2}` for all large `x` (`fujii_of_RH`), and `Unconditional/`
-proves it unconditionally in Lean, with RH supplied by the certified proof in
-leanprover-community/riemann-hypothesis (L. Alpöge, 2026). It also proves the explicit
-`|Σ_{n≤x} G(n) − x²/2| ≤ 4000·x^{3/2} log² x` for every `x ≥ 2`. The estimate is equivalent to RH
-(Granville; Bhowmik–Ruzsa), so these theorems are RH in another form.
+With `Λ` the von Mangoldt function and `G(n) = Σ_{a+b=n} Λ(a)Λ(b)`, Lean proves Fujii's theorem
 
-This repository proves the direction RH ⇒ bound. The explicit bound follows the simple argument
-noted in Bhowmik–Schlage-Puchta's introduction (if `ψ(x) = x + O(f(x))` then
-`Σ_{n≤x} G(n) = x²/2 + O(x f(x))`). Fujii's bound comes from Cramér's mean square
+    Σ_{n≤x} G(n) = x²/2 + O(x^{3/2}),
+
+and the explicit bound
+
+    |Σ_{n≤x} G(n) − x²/2| ≤ 4000·x^{3/2} log² x    for every real x ≥ 2.
+
+`fujii_bound`, `fujii`, `goldbach_average_sharp` and `goldbach_average` are proved
+unconditionally in Lean, from the standard three axioms, with RH supplied by the certified proof
+in [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
+(L. Alpöge, 2026). The main library holds complete Lean proofs that RH implies each bound.
+
+**Literature status: RH-equivalent.** Fujii (*An additive problem of prime numbers*, Acta Arith.
+58 (1991), 173-179) proved that RH implies `Σ_{n≤x} G(n) = x²/2 + O(x^{3/2})`, and in part II
+(Proc. Japan Acad. 67A (1991), 248-252) gave the secondary term `−2 Σ_ρ x^{ρ+1}/(ρ(ρ+1))` with
+error `O((x log x)^{4/3})`. Bhowmik–Schlage-Puchta (Nagoya Math. J. 200 (2010), 27-33) reduced
+the error to `O(x log⁵ x)`, and Languasco–Zaccagnini (Proc. AMS 140 (2012), 795-804) and
+Goldston–Yang to `O(x log³ x)`; the error is `Ω(x log log x)`. Granville (*Refinements of
+Goldbach's conjecture, and the generalized Riemann hypothesis*, Funct. Approx. Comment. Math. 37
+(2007), 159-173, Theorem 1A) stated that `Σ_{n≤x} G(n) = x²/2 + O(x^{3/2+o(1)})` is equivalent
+to RH; his proof of the converse was incomplete and was finished by Bhowmik–Ruzsa (*Average
+Goldbach and the Quasi-Riemann Hypothesis*, arXiv:1711.06442). The estimate is therefore RH in
+another form. Fujii's `O(x^{3/2})` is proved here with an existential constant; see "Deviations".
+
+The proof here takes the direction RH ⇒ bound. The explicit bound follows the argument noted in
+Bhowmik–Schlage-Puchta's introduction: if `ψ(x) = x + O(f(x))` then
+`Σ_{n≤x} G(n) = x²/2 + O(x f(x))`. Fujii's bound comes from Cramér's mean square
 `∫_1^X (ψ(t) − t)² dt ≪ X²` under RH (proved in [cramer-rh](https://github.com/senamakel/cramer-rh))
-and the monotonicity of `ψ`, with no explicit formula (see "Proof outline"). **Goldbach's conjecture itself is a separate question**: the
-statement concerns an average of `G(n)`, which is compatible with `G(n) = 0` at some even `n`.
+and the monotonicity of `ψ`, with no explicit formula (see "Proof outline"). The statement is about the average of `G(n)` and is
+compatible with `G(n) = 0` at some even `n`, so it does not bear on Goldbach's conjecture itself.
 
 ```lean
+theorem fujii_bound : GoldbachAverage.FujiiBound                             -- Unconditional/
+theorem fujii : GoldbachAverage.FujiiStatement                               -- Unconditional/
+theorem goldbach_average_sharp : GoldbachAverage.GoldbachAverageSharp 4000   -- Unconditional/
+theorem goldbach_average : GoldbachAverage.GoldbachAverageBound             -- Unconditional/
+
 theorem GoldbachAverage.fujii_of_RH (hRH : RiemannHypothesis) : GoldbachAverage.FujiiBound
 
 theorem GoldbachAverage.fujiiStatement_of_RH (hRH : RiemannHypothesis) :
@@ -59,7 +71,11 @@ def GoldbachAverageSharp (C : ℝ) : Prop :=
     |goldbachSum x - x ^ 2 / 2| ≤ C * (x * Real.sqrt x * Real.log x ^ 2)
 ```
 
-Fujii's targets, fixed in `GoldbachAverage/Statement2.lean` (Round 6):
+No formal-conjectures statement exists (searched 2026-11-24:
+`FormalConjectures/Wikipedia/GoldbachConjecture.lean` is the only Goldbach file and has no von Mangoldt average), so these statements are written here.
+`GoldbachAverageBound` is the target and follows from `GoldbachAverageSharp 4000`.
+
+Fujii's targets, fixed in `GoldbachAverage/Statement2.lean` (added in Round 6):
 
 ```lean
 def FujiiBound : Prop :=
@@ -69,15 +85,11 @@ def FujiiStatement : Prop :=
   (fun x : ℝ => goldbachSum x - x ^ 2 / 2) =O[atTop] fun x : ℝ => x ^ ((3 : ℝ) / 2)
 ```
 
-The statement was checked against Languasco–Zaccagnini, arXiv:1011.3198 (Proc. AMS 140 (2012)),
-Theorem 1 and its introduction, which credit the first result of this kind to Fujii (1991): their
-`R(n) = Σ_{h₁+h₂=n} Λ(h₁)Λ(h₂)` is `goldbachWeight n`, and since `Σ_ρ 1/|ρ(ρ+1)|` converges
+The statement was checked against Languasco–Zaccagnini (arXiv:1011.3198), Theorem 1 and its
+introduction, which credit the first result of this kind to Fujii (1991). Their
+`R(n) = Σ_{h₁+h₂=n} Λ(h₁)Λ(h₂)` is `goldbachWeight n`, and because `Σ_ρ 1/|ρ(ρ+1)|` converges,
 their Theorem 1 gives `Σ_{n≤N} R(n) = N²/2 + O(N^{3/2})` under RH. Fujii's paper itself was not
 read.
-
-No formal-conjectures statement exists (searched 2026-11-24: `FormalConjectures/Wikipedia/GoldbachConjecture.lean`
-is the only Goldbach file and has no von Mangoldt average), so these statements are written here.
-`GoldbachAverageBound` is the target and follows from `GoldbachAverageSharp 4000`.
 
 ## Tier and provenance
 
@@ -131,50 +143,66 @@ No `native_decide`, no `sorry`, no `axiom` or `opaque` declarations.
 Fujii's bound (`GoldbachAverage/Fujii.lean`), with `E(t) = ψ(t) − t` and `h = ⌊√N⌋`:
 
 6. `sample`: `ψ` is nondecreasing, so `E(c) ≤ E(t) + h` for `t ∈ [c, c+h]` and
-   `E(c) ≥ E(t) − h` for `t ∈ [c−h, c]`; hence `h E(c)² ≤ 2 ∫_{c−h}^{c+h} E² + 2h³` for every
+   `E(c) ≥ E(t) − h` for `t ∈ [c−h, c]`. Hence `h E(c)² ≤ 2 ∫_{c−h}^{c+h} E² + 2h³` for every
    real `c`. `sampleSum` sums this along a progression of step `h`:
    `h Σ_{j<K} E(s+jh)² ≤ 4 ∫_{s−h}^{s+Kh} E² + 2Kh³`.
-7. `blocks_le`: cut `a ∈ [1, N]` into blocks `(jh, jh+h]`. On a block `N − a` lies within `h`
+7. `blocks_le`: cut `a ∈ [1, N]` into blocks `(jh, jh+h]`. On a block, `N − a` lies within `h`
    of both `N − jh` and `N − jh − h`, so `|E(N−a)| ≤ |E(N−jh)| + |E(N−jh−h)| + h`, and the block
    carries `Λ`-mass `ψ(jh+h) − ψ(jh) = h + E(jh+h) − E(jh)`. This replaces the pointwise bound
-   `|E| ≪ √N log² N` (which loses `log² N`) by sampled values of `E`.
+   `|E| ≪ √N log² N` (which costs `log² N`) by sampled values of `E`.
 8. `fujii_nat_of_meanSquare`: `xy ≤ (x² + y²)/2` turns the block sum into four sampled sums
    of `E²` at step `h`, each `≤ (4/h) ∫_{−2h}^{N+2h} E² + 2Kh² ≪ N²/h`; the sum `Σ_{k<N} E(k)` is
    the same estimate at step `1`. With `∫_1^X E² ≤ C X²` this gives
    `|S(N) − N²/2| ≤ (688 + 468 C)·N^{3/2}` for `N ≥ max(4, X₀)`.
-9. `fujiiBound_of_meanSquare`: pass from `N = ⌊x⌋` to real `x`; `fujii_of_RH` feeds it
+9. `fujiiBound_of_meanSquare`: pass from `N = ⌊x⌋` to real `x`. `fujii_of_RH` feeds it
    `Cramer.meanSquare_of_RH`.
+
+## Layout
 
 | File | Content |
 |---|---|
 | `GoldbachAverage/Statement.lean` | Fixed targets |
 | `GoldbachAverage/Sum.lean` | Convolution identities |
 | `GoldbachAverage/Main.lean` | The explicit `x^{3/2} log² x` bound under RH |
-| `GoldbachAverage/Statement2.lean` | Fujii's targets (Round 6) |
+| `GoldbachAverage/Statement2.lean` | Fujii's targets |
 | `GoldbachAverage/Fujii.lean` | Fujii's `O(x^{3/2})` from Cramér's mean square |
 | `Unconditional/GoldbachAverageUnconditional.lean` | One-line discharge of RH |
 
 ## Deviations from the literature
 
-- Fujii's `O(x^{3/2})` is proved with an existential constant: `C = 688 + 468·C_Cramér + 1`,
-  where `C_Cramér` is the (non-explicit) constant of cramer-rh's `CramerMeanSquare`. The
-  explicit theorem is the weaker `GoldbachAverageSharp 4000` (`x^{3/2} log² x`, every `x ≥ 2`).
-- The secondary term `−2 Σ_ρ x^{ρ+1}/(ρ(ρ+1))` and the error `O(x log³ x)`
-  (Languasco–Zaccagnini, Goldston–Yang; `O(x log⁵ x)` Bhowmik–Schlage-Puchta) are not proved.
-  The mean-square route stops at `x^{3/2}`: the term `Σ_{k<N} (ψ(k) − k)` is genuinely of size
-  `N^{3/2}`, and isolating it as the zero sum needs the explicit formula for `ψ₁`.
-- The constant `4000` is not optimised (it absorbs a crude bound of `400` on `|ψ(k) − k|` for
-  `k < 74` and the loss from real to integer `x`).
-- The converse (bound ⇒ RH, Granville 2007 and Bhowmik–Ruzsa) is not formalised.
+Fujii's `O(x^{3/2})` is proved with an existential constant `688 + 468·C + 1`, where `C` is
+the (non-explicit) constant of cramer-rh's `CramerMeanSquare`. The explicit theorem is the
+weaker `GoldbachAverageSharp 4000` (`x^{3/2} log² x`, every `x ≥ 2`).
+
+The secondary term `−2 Σ_ρ x^{ρ+1}/(ρ(ρ+1))` with error `O(x log³ x)` (Languasco–Zaccagnini,
+Goldston–Yang; `O(x log⁵ x)` Bhowmik–Schlage-Puchta) is not proved. The mean-square route stops
+at `x^{3/2}`: the term `Σ_{k<N} (ψ(k) − k)` is genuinely of that size, and identifying it with the
+zero sum needs the explicit formula for `ψ₁`.
+
+The constant `4000` is not optimised. It absorbs a crude bound of `400` on `|ψ(k) − k|` for
+`k < 74` and the loss from real to integer `x`.
+
+The converse (bound ⇒ RH, Granville 2007 and Bhowmik–Ruzsa) is not formalised.
 
 ## Building
 
-Toolchain Lean `v4.36.0`, Mathlib `fc4f59e5`. `lake build` builds `GoldbachAverage`;
-`GoldbachAverage/Fujii.lean` takes about 2 min (123 s on a loaded box), the other modules about
-20 s, once the dependencies are built (schoenfeld-rh about 4.5 min wall cold; cramer-rh's
-`Cramer.MeanSquare.Main` with erdos-233 and erdos-985 about 30 CPU-minutes cold).
+Lean `v4.36.0`, Mathlib `fc4f59e5` (via erdos-985 `9538edb`), schoenfeld-rh `14df2ce`,
+cramer-rh `1b5144f` (with erdos-233 `1ff9f39`).
+
+```bash
+lake exe cache get
+lake build            # target `GoldbachAverage`
+scripts/check-axioms.sh
+```
+
+`GoldbachAverage/Fujii.lean` takes about 2 min (123 s on a loaded box); the other modules about
+20 s together, once the dependencies are built. Cold, schoenfeld-rh is about 4.5 min wall and
+cramer-rh's `Cramer.MeanSquare.Main` (with erdos-233 and erdos-985) about 30 CPU-minutes.
 
 ## Unconditional version
+
+`Unconditional/GoldbachAverageUnconditional.lean` imports riemann-hypothesis and closes the RH
+hypothesis with its `riemannHypothesis` in one line each:
 
 | Theorem | Statement | Axioms |
 |---|---|---|
@@ -183,7 +211,8 @@ Toolchain Lean `v4.36.0`, Mathlib `fc4f59e5`. `lake build` builds `GoldbachAvera
 | `goldbach_average_sharp` | `GoldbachAverageSharp 4000` | `propext`, `Classical.choice`, `Quot.sound` |
 | `goldbach_average` | `GoldbachAverageBound` | `propext`, `Classical.choice`, `Quot.sound` |
 
-Output of `scripts/check-unconditional.sh` (29.7 min wall on a loaded box, exit 0):
+Output of `scripts/check-unconditional.sh` on 2026-11-24 (commit `0903f33`, riemann-hypothesis
+`507a75d91d`, 29.7 min wall on a loaded box, exit 0):
 
 ```
 'goldbach_average_sharp' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -192,16 +221,18 @@ Output of `scripts/check-unconditional.sh` (29.7 min wall on a loaded box, exit 
 'fujii' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
-Checked 2026-11-24 against riemann-hypothesis commit `507a75d91d` (`scripts/check-unconditional.sh`
-exited 0; real `#print axioms` output above). Run `scripts/check-unconditional.sh [RH_DIR]`. It needs
-about 93 GB of cache, about 19 GB of RAM and roughly 900k open files (raise the open-file limit
-first).
+```bash
+scripts/check-unconditional.sh /path/to/riemann-hypothesis
+```
+
+The import needs about 93 GB of cache, about 19 GB of RAM and roughly 900k open files. Raise the
+open-file limit first; on Linux `sudo prlimit --pid $$ --nofile=2000000:2000000`.
 
 The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
-No vendored files. Depends on [erdos-985](https://github.com/senamakel/erdos-985) and
-[erdos-233](https://github.com/senamakel/erdos-233) (via schoenfeld-rh and cramer-rh),
+No files are vendored. The lake dependencies are [erdos-985](https://github.com/senamakel/erdos-985)
+and [erdos-233](https://github.com/senamakel/erdos-233) (through schoenfeld-rh and cramer-rh),
 [schoenfeld-rh](https://github.com/senamakel/schoenfeld-rh) and
 [cramer-rh](https://github.com/senamakel/cramer-rh).
