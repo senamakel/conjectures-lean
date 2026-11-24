@@ -1,31 +1,32 @@
 # Cramér's prime-gap and mean-square theorems under RH in Lean
 
-This repository proves in Lean, with the explicit hypothesis `RiemannHypothesis`, two theorems of
-Cramér, and proves both unconditionally in `Unconditional/` with the certified Lean proof of RH
-(L. Alpöge, 2026):
+This repository proves two theorems of Cramér in Lean with `RiemannHypothesis` as an explicit
+hypothesis, and `Unconditional/` proves both unconditionally with the certified Lean proof of RH
+(L. Alpöge, 2026).
 
-* **prime gaps** (Cramér 1920, *Arkiv för Matematik, Astronomi och Fysik* **15**, no. 5):
-  every interval `(x, x + 2√x log x]` with `x ≥ 2` contains a prime, so
-  `p_{n+1} − p_n ≤ 2√p_n log p_n` and `p_{n+1} − p_n = O(√p_n log p_n)`;
-* **the mean square of `ψ(x) − x`** (Cramér 1922, *Ein Mittelwertsatz in der Primzahltheorie*,
-  *Math. Z.* **12**, 147–153; Montgomery–Vaughan, *Multiplicative Number Theory I*, Thm 13.5):
-  `∫_X^{2X} (ψ(x) − x)² dx ≪ X²`, `∫_1^X (ψ(x) − x)² dx ≪ X²` and
-  `∫_1^X ((ψ(x) − x)/x)² dx ≪ log X`.
+The first is the prime-gap bound (Cramér 1920, *Arkiv för Matematik, Astronomi och Fysik* **15**,
+no. 5). Every interval `(x, x + 2√x log x]` with `x ≥ 2` contains a prime, so
+`p_{n+1} − p_n ≤ 2√p_n log p_n` and `p_{n+1} − p_n = O(√p_n log p_n)`.
+
+The second is the mean square of `ψ(x) − x` (Cramér 1922, *Ein Mittelwertsatz in der
+Primzahltheorie*, *Math. Z.* **12**, 147-153; Montgomery–Vaughan, *Multiplicative Number
+Theory I*, Thm 13.5): `∫_X^{2X} (ψ(x) − x)² dx ≪ X²`, `∫_1^X (ψ(x) − x)² dx ≪ X²` and
+`∫_1^X ((ψ(x) − x)/x)² dx ≪ log X`.
 
 **Literature status: RH-consequence** for both. The prime-gap bound is Cramér's; explicit forms
-are due to Dudek (2015, *Int. J. Number Theory* **11**, 771–778) and
-Carneiro–Milinovich–Soundararajan (2019, *Comment. Math. Helv.* **94**, 533–568), who reach
+are due to Dudek (2015, *Int. J. Number Theory* **11**, 771-778) and
+Carneiro–Milinovich–Soundararajan (2019, *Comment. Math. Helv.* **94**, 533-568), who reach
 `p_{n+1} − p_n < (22/25) √p_n log p_n` for `p_n > 3` (our constant is `2`, see "Deviations").
 Without RH the best gap exponent is Baker–Harman–Pintz (2001), `O(p_n^{0.525})`. The mean-square
-bound is Cramér's; Brent–Platt–Trudgian (2022, *J. Number Theory* **238**, 740–762) give the
+bound is Cramér's; Brent–Platt–Trudgian (2022, *J. Number Theory* **238**, 740-762) give the
 constant `0.8603` for `lim sup X^{-2} ∫_X^{2X}`, and Montgomery–Vaughan (Thm 13.6, Ex. 13.1.1.3)
-the asymptotic `∫_1^X ((ψ − x)/x)² ∼ (Σ_ρ m_ρ/|ρ|²) log X`. This is Cramér's theorem, not his
-1936 conjecture `p_{n+1} − p_n = O(log² p_n)`.
+the asymptotic `∫_1^X ((ψ − x)/x)² ∼ (Σ_ρ m_ρ/|ρ|²) log X`. Cramér's 1936 conjecture
+`p_{n+1} − p_n = O(log² p_n)` is a separate, stronger statement and is not proved here.
 
 The main library is a complete Lean proof that RH implies Cramér's bounds. The gap bound follows
 Cramér (1920) through a triangular (Fejér-type) weight, the second difference of `ψ₁`. The mean
-square follows the classical route through the explicit formula and the convergence of
-`Σ_ρ log|γ|/|ρ|²`:
+square goes through the explicit formula and the convergence of `Σ_ρ log|γ|/|ρ|²`, as in the
+classical proof:
 
 ```lean
 theorem Cramer.primeInShortInterval_of_RH (hRH : RiemannHypothesis) :
@@ -100,8 +101,8 @@ and `CramerGapBound` is the conclusion of `cramer_conjecture.variants.conditiona
 forms `PrimeInShortInterval` and `PrimeGapExplicit` are this repository's own, and so are the
 three mean-square statements: formal-conjectures has no mean-square statement for `ψ`
 (searched 2026-11-24 at `9097e2f9`). The main library
-takes RH as a hypothesis and never imports riemann-hypothesis. No cited-hypothesis (tier H)
-inputs: the range below the gap theorem's analytic threshold is checked in Lean, and the
+takes RH as a hypothesis and never imports riemann-hypothesis. There are no tier-H inputs. The
+range below the gap theorem's analytic threshold is checked in Lean, and the
 mean-square proof uses erdos-233's real-`x` explicit formula and zero-density lemma, both proved
 there from Mathlib and erdos-985.
 
@@ -139,7 +140,7 @@ product for `ξ`.
    `ΔΨ₁ ≥ h² − 2h²a^{−1/2}σ(L(1/2+σ) + 1/40) − 3` (`Cramer/Identity.lean`).
 5. Proper prime powers in `[a, b)`, `b ≤ 2a`, weigh at most
    `log b ((√b − √a + 1) + (b^{1/3} + 1))` (`Cramer/PrimePowers.lean`).
-6. With `σ = 2b/h`, Steps 1–5 give a prime in `[a, a+2h)` once one explicit inequality holds
+6. With `σ = 2b/h`, Steps 1 to 5 give a prime in `[a, a+2h)` once one explicit inequality holds
    (`Cramer/Interval.lean`).
 7. For `x ≥ 10^6`, `a = ⌊x⌋ + 1`, `h = ⌈√x log x⌉ − 1`: writing `x = t⁶`, the inequality
    reduces to `(ℓ+0.7)(ℓ+2+1.26t²) + 2ℓ² + 3 < 5.84t³`, `ℓ = log x` (`Cramer/Large.lean`).
@@ -193,7 +194,9 @@ converges absolutely, so no truncated Perron formula is needed.
 
 ## Deviations from the literature
 
-**Constant `2` instead of `22/25`.** The weight used in Step 3,
+### Constant `2` instead of `22/25`
+
+The weight used in Step 3,
 `min(A, B/q) ≤ 2Aσ²/(σ² + γ²)`, is the best of its form (`min(1, 1/t) ≤ α/(1 + t/β)` forces
 `α√β ≥ 2`), and with it the method gives exactly `p_{n+1} − p_n ≤ (2 + o(1))√p_n log p_n`; the
 lower-order margin is about `2√x log(π log x)`, so `c = 2` holds from `x ≈ 2·10^3` on, while any
@@ -204,14 +207,18 @@ formula for general test functions; erdos-985 provides only the Riesz-weighted o
 (`Σ Λ(n)(1 − n/x)`). The statements are parametrised by `c` (`PrimeInShortInterval c`,
 `PrimeGapExplicit c`), so a sharper constant can be added later without touching them.
 
-**Mean square: `O`-constants, no asymptotic.** The three mean-square theorems are `IsBigO`
+### Mean square: `O`-constants, no asymptotic
+
+The three mean-square theorems are `IsBigO`
 statements with an existential constant; it is not computed (it passes through erdos-233's
 zero-density constant). Brent–Platt–Trudgian's `0.8603` and Montgomery–Vaughan's asymptotic
 `∼ c₁ log X`, `c₁ = Σ_ρ m_ρ/|ρ|² ≈ 0.046`, are not proved here: the asymptotic needs the
 off-diagonal terms `∫ y^{i(γ−γ')}` to average out, which this block-by-block argument with a
 `Y`-dependent smoothing does not give.
 
-**Analytic threshold `10^6`.** The exact form of the Step 6 inequality already holds with
+### Analytic threshold `10^6`
+
+The exact form of the Step 6 inequality already holds with
 `c = 2` from about `1.9·10^3`; Step 7 uses simpler polynomial bounds that need `x ≥ 10^6`. The
 range below is covered by the 99-prime chain, so no cited computation remains.
 
@@ -232,7 +239,7 @@ primality proofs), `Cramer.Identity` 23 s.
 
 The mean-square modules (Round 5, 2026-11-24, on a box at load average about 80): erdos-233's
 modules took about 3 min wall to build here; each of `Cramer.MeanSquare.{Coeff, Explicit, Psi,
-Block, Main}` elaborates in about 15 s wall. No `native_decide`, no finite computation.
+Block, Main}` elaborates in about 15 s wall. They use no `native_decide` and no finite computation.
 
 ## Unconditional version
 
