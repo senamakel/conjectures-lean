@@ -84,32 +84,34 @@ The asymptotic margin is Robin's: gain `2√2 ≈ 2.83` against `2` from the pri
 the optimal `2 + γ − log 4π ≈ 0.046`); at `x = e^{30}` the constants are
 `2.678 > 2.38 + o(1)`.
 
-### 5. The range `5040 < n ≤ exp(e^{30})` (`Robin/Small.lean`, cited `sorry`)
+### 5. The range `5040 < n ≤ exp(e^{30})` (`Robin/Small.lean`, hypothesis `RobinVerifiedRange`)
 
 Morrill–Platt, *Robin's inequality for 20-free integers*, Integers 21 (2021), arXiv:1809.10813,
 Theorem 13: Robin's inequality holds unconditionally for `5040 < n ≤ 10^{10^{13.11485}}`
 (extending Briggs, Experiment. Math. 15 (2006), who checked all colossally abundant numbers up
 to `10^{10^{10}}`). Since `e^{30} < 1.07·10^{13}`, `log n ≤ e^{30}` gives
-`n ≤ 10^{4.64·10^{12}}`. This is a finite but enormous computation and is not replayed.
+`n ≤ 10^{4.64·10^{12}}`. This is a finite but enormous computation and is not replayed; it enters as the explicit
+hypothesis `RobinVerifiedRange` (no `sorry`).
 
 ## Status
 
-Everything is proved except the cited computation of §5.
+Everything is proved; the computed range of §5 is an explicit hypothesis. There is no `sorry`
+in the repository. Output of `#print axioms` (2026-11-24):
 
 ```
-#print axioms Robin.robin_of_RH
-'Robin.robin_of_RH' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
-#print axioms Robin.main_estimate
+'Robin.robin_of_RH_of_verified' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Robin.lagarias_of_RH_of_verified' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Robin.Lagarias.midCheck_range._native.native_decide.ax_1_1]
 'Robin.main_estimate' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
-
-The single `sorryAx` is `Robin.robin_small_range` (§5). No `native_decide`, no new axioms.
 
 | File | Content | Status |
 |---|---|---|
 | `Robin/Defs.lean` | shared definitions | done |
 | `Robin/Elementary/SigmaBound.lean` | §1 | proved |
-| `Robin/Main.lean` | §2, `robin_of_RH` | proved |
+| `Robin/Main.lean` | §2, `robin_of_RH_of_verified` | proved |
 | `Robin/RH/Bach.lean` | §3 explicit formula under RH | proved |
 | `Robin/RH/Psi1.lean` | §3 `Ψ₁`, `ψ` bounds | proved |
 | `Robin/Mertens/Abelian.lean` (+`Abelian/{Limit,Mellin,Zeta}.lean`) | §4a Mertens' constant `= γ` | proved |
@@ -117,17 +119,9 @@ The single `sorryAx` is `Robin.robin_small_range` (§5). No `native_decide`, no 
 | `Robin/Main/Tail.lean` | tail integral | proved |
 | `Robin/Main/Gain.lean` (+`Gain/{Basic,Y,Abel,Integrals,Errors,Core}.lean`) | gain lower bound | proved |
 | `Robin/Main/Estimate.lean` | §4 assembly and numerics | proved |
-| `Robin/Small.lean` | §5 | cited `sorry` (by design) |
+| `Robin/Small.lean` | §5 | `RobinVerifiedRange` (a `Prop`, used as a hypothesis) |
 
-The remaining `sorry`, verbatim:
-
-```lean
-/-- **Cited (Morrill–Platt 2021, arXiv:1809.10813, Theorem 13).** Robin's inequality for `5040 < n ≤ exp(e^{30})`. -/
-theorem robin_small_range (n : ℕ) (h1 : 5040 < n) (h2 : Real.log n ≤ Real.exp 30) :
-    (σ 1 n : ℝ) < Real.exp Real.eulerMascheroniConstant * n * Real.log (Real.log n)
-```
-
-### Stretch goal: `Robin.lagarias_of_RH : RiemannHypothesis → LagariasStatement` (proved)
+### Stretch goal: `Robin.lagarias_of_RH_of_verified : RiemannHypothesis → RobinVerifiedRange → LagariasStatement` (proved)
 
 `Robin/Lagarias.lean` (+`Lagarias/{Bounds,Finite}.lean`):
 * `n > 5040`: Robin plus `H_n ≥ log n + γ`, so `exp H_n ≥ e^γ n` and `log H_n ≥ log log n`.
@@ -135,9 +129,3 @@ theorem robin_small_range (n : ℕ) (h1 : 5040 < n) (h2 : Real.log n ≤ Real.ex
 * `13 ≤ n ≤ 5040`: `σ(n) ≤ t + 0.57688 + exp(0.57688)·n·L` with certified `t ≤ log n`,
   `L ≤ log(t + 0.57688)`, checked over ℚ by **`native_decide`** (`midCheck_range`, documented
   finite check).
-
-```
-#print axioms Robin.lagarias_of_RH
-[propext, sorryAx, Classical.choice, Quot.sound,
- Robin.Lagarias.midCheck_range._native.native_decide.ax_1_1]
-```
