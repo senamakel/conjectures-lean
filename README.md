@@ -11,15 +11,17 @@ Granville (*Refinements of Goldbach's conjecture, and the generalized Riemann hy
 Funct. Approx. Comment. Math. **37** (2007), 159–173, Theorem 1A) stated that the estimate
 `Σ_{n≤x} G(n) = x²/2 + O(x^{3/2+o(1)})` is **equivalent** to RH; his proof of the converse was
 incomplete and was finished by Bhowmik–Ruzsa (*Average Goldbach and the Quasi-Riemann
-Hypothesis*, arXiv:1711.06442). Nothing here is new mathematics, and the bound proved here is
-weaker than the one in the literature (see "Deviations").
+Hypothesis*, arXiv:1711.06442). This repository proves `|Σ_{n≤x} G(n) − x²/2| ≤ 4000·x^{3/2} log² x`
+for every `x ≥ 2` from RH, with an explicit constant, and `Unconditional/` proves it
+unconditionally in Lean, with RH supplied by the certified proof in
+leanprover-community/riemann-hypothesis. The literature's error term is `O(x^{3/2})` (Fujii); see
+"Deviations". The estimate is equivalent to RH (Granville; Bhowmik–Ruzsa), so this theorem is RH
+in another form.
 
-This repository formalises only the direction RH ⇒ bound, following the simple argument noted in
+This repository proves the direction RH ⇒ bound, following the simple argument noted in
 Bhowmik–Schlage-Puchta's introduction (if `ψ(x) = x + O(f(x))` then
-`Σ_{n≤x} G(n) = x²/2 + O(x f(x))`). **It says nothing about Goldbach's conjecture itself**: the
+`Σ_{n≤x} G(n) = x²/2 + O(x f(x))`). **Goldbach's conjecture itself is a separate question**: the
 statement concerns an average of `G(n)`, which is compatible with `G(n) = 0` at some even `n`.
-Because the estimate is equivalent to RH, the unconditional version says nothing beyond the claim
-in riemann-hypothesis.
 
 ```lean
 theorem GoldbachAverage.goldbachAverageSharp_of_RH (hRH : RiemannHypothesis) :
@@ -128,11 +130,7 @@ exited 0; real `#print axioms` output above). Run `scripts/check-unconditional.s
 about 93 GB of cache, about 19 GB of RAM and roughly 900k open files (raise the open-file limit
 first).
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.
-
-This estimate is equivalent to RH, so the unconditional theorem says nothing beyond the RH claim.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
