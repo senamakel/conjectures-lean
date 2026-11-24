@@ -10,7 +10,11 @@ Cramér, and proves both unconditionally in `Unconditional/` with the certified 
 * **the mean square of `ψ(x) − x`** (Cramér 1922, *Ein Mittelwertsatz in der Primzahltheorie*,
   *Math. Z.* **12**, 147–153; Montgomery–Vaughan, *Multiplicative Number Theory I*, Thm 13.5):
   `∫_X^{2X} (ψ(x) − x)² dx ≪ X²`, `∫_1^X (ψ(x) − x)² dx ≪ X²` and
-  `∫_1^X ((ψ(x) − x)/x)² dx ≪ log X`.
+  `∫_1^X ((ψ(x) − x)/x)² dx ≪ log X`;
+* **Cramér's mean-square asymptotic** (Cramér 1922; Montgomery–Vaughan Thm 13.6 and
+  Ex. 13.1.1.3, as quoted by Brent–Platt–Trudgian 2022, §5.1):
+  `∫_1^X ((ψ(x) − x)/x)² dx ∼ c₁ log X` with `c₁ = Σ_ρ m_ρ/|ρ|² ≈ 0.046`, zeros counted with
+  multiplicity, and the series for `c₁` convergent.
 
 **Literature status: RH-consequence** for both. The prime-gap bound is Cramér's; explicit forms
 are due to Dudek (2015, *Int. J. Number Theory* **11**, 771–778) and
@@ -18,9 +22,11 @@ Carneiro–Milinovich–Soundararajan (2019, *Comment. Math. Helv.* **94**, 533�
 `p_{n+1} − p_n < (22/25) √p_n log p_n` for `p_n > 3` (our constant is `2`, see "Deviations").
 Without RH the best gap exponent is Baker–Harman–Pintz (2001), `O(p_n^{0.525})`. The mean-square
 bound is Cramér's; Brent–Platt–Trudgian (2022, *J. Number Theory* **238**, 740–762) give the
-constant `0.8603` for `lim sup X^{-2} ∫_X^{2X}`, and Montgomery–Vaughan (Thm 13.6, Ex. 13.1.1.3)
-the asymptotic `∫_1^X ((ψ − x)/x)² ∼ (Σ_ρ m_ρ/|ρ|²) log X`. This is Cramér's theorem, not his
-1936 conjecture `p_{n+1} − p_n = O(log² p_n)`.
+constant `0.8603` for `lim sup X^{-2} ∫_X^{2X}`. The asymptotic `∼ c₁ log X` goes back to Cramér (1922),
+in the form of Montgomery–Vaughan Theorem 13.6 / Exercise 13.1.1.3; we checked the statement and
+the convention for multiplicities against Brent–Platt–Trudgian (arXiv:2008.06140, §5.1 eq. (18)
+and the proof of their Theorem 5), and cite Montgomery–Vaughan through them. This is Cramér's
+theorem, not his 1936 conjecture `p_{n+1} − p_n = O(log² p_n)`.
 
 The main library is a complete Lean proof that RH implies Cramér's bounds. The gap bound follows
 Cramér (1920) through a triangular (Fejér-type) weight, the second difference of `ψ₁`. The mean
@@ -42,6 +48,9 @@ theorem Cramer.dyadicMeanSquare_of_RH (hRH : RiemannHypothesis) :
 theorem Cramer.meanSquare_of_RH (hRH : RiemannHypothesis) : Cramer.CramerMeanSquare
 
 theorem Cramer.logMeanSquare_of_RH (hRH : RiemannHypothesis) : Cramer.CramerLogMeanSquare
+
+theorem Cramer.logMeanSquareAsymptotic_of_RH (hRH : RiemannHypothesis) :
+    Cramer.CramerLogMeanSquareAsymptotic
 ```
 
 The targets, fixed in `Cramer/Statement.lean`:
@@ -75,6 +84,29 @@ def CramerLogMeanSquare : Prop :=
   (fun X : ℝ => ∫ x in (1 : ℝ)..X, ((ψ x - x) / x) ^ 2) =O[Filter.atTop] Real.log
 ```
 
+The asymptotic target, fixed in `Cramer/Statement3.lean`, uses Mathlib's `riemannZeta` and
+`analyticOrderNatAt` only:
+
+```lean
+def NontrivialZeros : Set ℂ := {ρ | 0 < ρ.re ∧ ρ.re < 1 ∧ riemannZeta ρ = 0}
+
+noncomputable def cramerTerm (ρ : NontrivialZeros) : ℝ :=
+  (analyticOrderNatAt riemannZeta (ρ : ℂ) : ℝ) ^ 2 / ‖(ρ : ℂ)‖ ^ 2
+
+noncomputable def cramerConstant : ℝ := ∑' ρ : NontrivialZeros, cramerTerm ρ
+
+def CramerLogMeanSquareAsymptotic : Prop :=
+  Summable cramerTerm ∧
+    Tendsto (fun X : ℝ => (∫ x in (1 : ℝ)..X, ((ψ x - x) / x) ^ 2) / Real.log X) atTop
+      (𝓝 cramerConstant)
+```
+
+`NontrivialZeros` lists each zero once, so the classical `c₁ = Σ_ρ m_ρ/|ρ|²`, in which
+(Brent–Platt–Trudgian §5.1) "each zero ρ is counted according to its multiplicity m_ρ", is
+`Σ_{ρ distinct} m_ρ²/|ρ|²`. That is also the mean square of the almost periodic function
+`−Σ_{ρ distinct} (m_ρ/ρ) e^{iγu}` that `(ψ(e^u) − e^u)e^{−u/2}` approximates. The statement
+asserts convergence of the series, so `cramerConstant` is not `∑'`'s junk value.
+
 ## Tier and provenance
 
 | Theorem | Tier | Hypothesis |
@@ -91,6 +123,8 @@ def CramerLogMeanSquare : Prop :=
 | `cramer_dyadicMeanSquare` (`Unconditional/`) | U | none; RH from riemann-hypothesis |
 | `cramer_meanSquare` (`Unconditional/`) | U | none; RH from riemann-hypothesis |
 | `cramer_logMeanSquare` (`Unconditional/`) | U | none; RH from riemann-hypothesis |
+| `Cramer.logMeanSquareAsymptotic_of_RH` | C | `RiemannHypothesis` |
+| `cramer_logMeanSquareAsymptotic` (`Unconditional/`) | U | none; RH from riemann-hypothesis |
 
 `primeGap` is copied word for word from google-deepmind/formal-conjectures,
 [`FormalConjecturesForMathlib/NumberTheory/PrimeGap.lean`](https://github.com/google-deepmind/formal-conjectures/blob/86a2f58a4d7a3a0637d15d5b2ce627592b54b956/FormalConjecturesForMathlib/NumberTheory/PrimeGap.lean),
@@ -98,7 +132,7 @@ and `CramerGapBound` is the conclusion of `cramer_conjecture.variants.conditiona
 [`FormalConjectures/Wikipedia/CramerConjecture.lean`](https://github.com/google-deepmind/formal-conjectures/blob/86a2f58a4d7a3a0637d15d5b2ce627592b54b956/FormalConjectures/Wikipedia/CramerConjecture.lean)
 (commit `86a2f58a`), whose hypothesis is Mathlib's `RiemannHypothesis`, as here. The explicit
 forms `PrimeInShortInterval` and `PrimeGapExplicit` are this repository's own, and so are the
-three mean-square statements: formal-conjectures has no mean-square statement for `ψ`
+four mean-square statements: formal-conjectures has no mean-square statement for `ψ`
 (searched 2026-11-24 at `9097e2f9`). The main library
 takes RH as a hypothesis and never imports riemann-hypothesis. No cited-hypothesis (tier H)
 inputs: the range below the gap theorem's analytic threshold is checked in Lean, and the
@@ -116,9 +150,10 @@ there from Mathlib and erdos-985.
 'Cramer.dyadicMeanSquare_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Cramer.meanSquare_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Cramer.logMeanSquare_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Cramer.logMeanSquareAsymptotic_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
-`scripts/check-axioms.sh` reruns this and fails unless all six use only the standard axioms.
+`scripts/check-axioms.sh` reruns this and fails unless all seven use only the standard axioms.
 No `sorry`, no `native_decide`, no `axiom` declarations. The finite check (`Cramer/Small.lean`)
 uses kernel `decide` and `norm_num`, which add no axioms.
 
@@ -169,6 +204,36 @@ converges absolutely, so no truncated Perron formula is needed.
    `∫_2^X (ψ − y)² ≤ C' X²` and `∫_2^X ((ψ − y)/y)² ≤ C' + (C'/log 4) log X`
    (`Cramer/MeanSquare/Main.lean`).
 
+### Mean-square asymptotic
+
+Write `f(y) = (ψ(y) − y)/y` and, for a finite set `S` of zeros,
+`g_S(y) = y^{−1/2} W_S(log y)` with `W_S(u) = Σ_{ρ∈S} (m_ρ/ρ) e^{iγu}`.
+
+1. The first-difference identity of Step 2 kept with its sign: on `[Y, 4Y]`, `δ = 1/Y`,
+   `‖(ψ(y) − y) + √y G(log y)‖ ≤ B + 4 log(y+4)` (`Cramer/MeanSquare/Approx.lean`).
+2. A finite sum with distinct frequencies (distinct ordinates, since under RH `ρ = ½ + iγ`):
+   `|∫_a^b |W_S|² − (b − a) Σ_{ρ∈S} m_ρ²/|ρ|²| ≤ Σ_{ρ≠ρ'} 2 m_ρ m_ρ'/(|ρ||ρ'||γ − γ'|)`, a bound
+   independent of `a, b`; and `acoef δ ρ → 1/ρ` as `δ → 0⁺` (`Cramer/MeanSquare/Finite.lean`).
+3. `G = Σ_{ρ∈S} m_ρ acoef δ ρ e^{iγu} + (tail)`, the finite part is within
+   `η_S(δ) = Σ_{ρ∈S} m_ρ |acoef δ ρ − 1/ρ| → 0` of `W_S`, and the tail has
+   `∫_U^{U+2} |tail|² ≤ C Σ_{ρ∉S} m_ρ log(|γ|+2)/|ρ|²` uniformly in `δ` and `U` (erdos-233's
+   mean value theorem); `m_ρ ≪ log(|γ|+2)` makes `Σ m_ρ²/|ρ|²` converge
+   (`Cramer/MeanSquare/Tail.lean`).
+4. On a block, `f + g_S = ((ψ − y) + √y G)/y − (G − W_S)/√y`, so
+   `∫_Y^{4Y} |f + g_S|² ≤ K/√Y + 9 η_S(1/Y)² + 3C·tail(S)`; summing blocks from `Y₀` on,
+   `∫_1^X |f + g_S|² ≤ K' + ε log X` once `S` and `Y₀` are large. With `y = e^u`,
+   `∫_1^X |g_S|² = ∫_0^{log X} |W_S|²` (`Cramer/MeanSquare/Asymptotic.lean`).
+5. `f² ≤ (1+t)|g_S|² + (1+1/t)|f + g_S|²` and its mirror, integrated, squeeze
+   `(∫_1^X f²)/log X` to `Σ_ρ m_ρ²/|ρ|²` (`Cramer/MeanSquare/Limit.lean`,
+   `Cramer/MeanSquare/Asymptotic.lean`).
+6. The zeros of erdos-985's `ξ` are the nontrivial zeros of `ζ` with the same multiplicities,
+   which moves the constant to `cramerConstant` (`Cramer/MeanSquare/Zeros.lean`,
+   `Cramer/MeanSquare/Main3.lean`).
+
+No smoothing independent of the block is needed: the off-diagonal terms are handled only for the
+finite part `W_S`, whose coefficients do not depend on `δ`, and the infinite tail is small in
+mean square uniformly in `δ`.
+
 ## Layout
 
 | File | Content |
@@ -189,6 +254,14 @@ converges absolutely, so no truncated Perron formula is needed.
 | `Cramer/MeanSquare/Psi.lean` | Mean square, Step 3 |
 | `Cramer/MeanSquare/Block.lean` | Mean square, Step 4 |
 | `Cramer/MeanSquare/Main.lean` | Mean square, Step 5; headline theorems |
+| `Cramer/Statement3.lean` | Mean-square asymptotic target definitions (fixed) |
+| `Cramer/MeanSquare/Approx.lean` | Asymptotic, Step 1 |
+| `Cramer/MeanSquare/Finite.lean` | Asymptotic, Step 2 |
+| `Cramer/MeanSquare/Tail.lean` | Asymptotic, Step 3 |
+| `Cramer/MeanSquare/Limit.lean` | Asymptotic, Step 5 (the squeeze) |
+| `Cramer/MeanSquare/Asymptotic.lean` | Asymptotic, Steps 4–5 |
+| `Cramer/MeanSquare/Zeros.lean` | Asymptotic, Step 6 (zeros of `ζ` and `ξ`) |
+| `Cramer/MeanSquare/Main3.lean` | Asymptotic headline theorem |
 | `Unconditional/CramerUnconditional.lean` | One-line discharges from riemann-hypothesis |
 
 ## Deviations from the literature
@@ -204,12 +277,12 @@ formula for general test functions; erdos-985 provides only the Riesz-weighted o
 (`Σ Λ(n)(1 − n/x)`). The statements are parametrised by `c` (`PrimeInShortInterval c`,
 `PrimeGapExplicit c`), so a sharper constant can be added later without touching them.
 
-**Mean square: `O`-constants, no asymptotic.** The three mean-square theorems are `IsBigO`
-statements with an existential constant; it is not computed (it passes through erdos-233's
-zero-density constant). Brent–Platt–Trudgian's `0.8603` and Montgomery–Vaughan's asymptotic
-`∼ c₁ log X`, `c₁ = Σ_ρ m_ρ/|ρ|² ≈ 0.046`, are not proved here: the asymptotic needs the
-off-diagonal terms `∫ y^{i(γ−γ')}` to average out, which this block-by-block argument with a
-`Y`-dependent smoothing does not give.
+**Mean square: `O`-constants.** The three mean-square bounds are `IsBigO` statements with an
+existential constant; it is not computed (it passes through erdos-233's zero-density constant).
+Brent–Platt–Trudgian's `0.8603` for `lim sup X^{-2} ∫_X^{2X} (ψ − x)²` is not proved. The
+asymptotic `∫_1^X ((ψ − x)/x)² ∼ c₁ log X` is proved with the exact constant `c₁`, but with
+`o(log X)` error: Montgomery–Vaughan's `O(1)` error term is not proved, and the numerical value
+`c₁ ≈ 0.046` is not computed in Lean.
 
 **Analytic threshold `10^6`.** The exact form of the Step 6 inequality already holds with
 `c = 2` from about `1.9·10^3`; Step 7 uses simpler polynomial bounds that need `x ≥ 10^6`. The
@@ -234,10 +307,14 @@ The mean-square modules (Round 5, 2026-11-24, on a box at load average about 80)
 modules took about 3 min wall to build here; each of `Cramer.MeanSquare.{Coeff, Explicit, Psi,
 Block, Main}` elaborates in about 15 s wall. No `native_decide`, no finite computation.
 
+The asymptotic modules (Round 6, same box and load): `Cramer.MeanSquare.Approx` 25 s,
+`Finite` 14 s, `Asymptotic` 16 s, the others under 10 s each; `lake build` of the whole
+library after a change to them took 42 s wall.
+
 ## Unconditional version
 
 `Unconditional/CramerUnconditional.lean` proves Cramér's gap bound with constant `2` and his
-mean-square bounds unconditionally in Lean, with the certified proof of RH. It imports
+mean-square bounds and asymptotic unconditionally in Lean, with the certified proof of RH. It imports
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
 (commit `507a75d91d`) and discharges the hypothesis with `riemannHypothesis`:
 
@@ -249,6 +326,7 @@ mean-square bounds unconditionally in Lean, with the certified proof of RH. It i
 | `cramer_dyadicMeanSquare` | `Cramer.CramerDyadicMeanSquare` | `propext`, `Classical.choice`, `Quot.sound` |
 | `cramer_meanSquare` | `Cramer.CramerMeanSquare` | `propext`, `Classical.choice`, `Quot.sound` |
 | `cramer_logMeanSquare` | `Cramer.CramerLogMeanSquare` | `propext`, `Classical.choice`, `Quot.sound` |
+| `cramer_logMeanSquareAsymptotic` | `Cramer.CramerLogMeanSquareAsymptotic` | `propext`, `Classical.choice`, `Quot.sound` |
 
 ```
 scripts/check-unconditional.sh [RH_DIR]
@@ -284,6 +362,10 @@ This check links against the community build cache and does not repeat those ker
   `series_bound` and the `CoeffAux` derivative bounds. `Cramer/MeanSquare/Coeff.lean`
   (`sq_log_sums`) and `Cramer/MeanSquare/Block.lean` (`G_mean_square`) adapt the proofs of
   erdos-233's `coef_sums` and `mean_square`. Same author, no licence file yet.
+* `Cramer/MeanSquare/Zeros.lean` repeats the proofs of `xiZeta_eq_zero_of_mem` and
+  `mem_strip_of_xiZeta_eq_zero` from [li-criterion-rh](https://github.com/senamakel/li-criterion-rh)
+  `LiCriterion/Zeros.lean` and of `analyticOrderNatAt_riemannZeta_eq_xiZeta` from
+  [density-rh](https://github.com/senamakel/density-rh) `Density/ZeroCount/Xi.lean`. Same author.
 * `Cramer.xiZeta_ne_zero_of_half_lt_RH` and `Cramer.xiZeta_zero_re_RH` (`Cramer/ZeroSum.lean`)
   repeat the proofs of the same-named lemmas in
   [robin-rh](https://github.com/senamakel/robin-rh) `Robin/RH/Bach.lean`. Same author.
