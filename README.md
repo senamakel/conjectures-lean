@@ -8,22 +8,23 @@ whether, for every `ε > 0` and all large `n`, `P(n) > n^ε` implies `h(n) = P(n
 formal-conjectures statement is `erdos_770.parts.iii`
 ([source](https://github.com/google-deepmind/formal-conjectures/blob/86a2f58a4d7a3a0637d15d5b2ce627592b54b956/FormalConjectures/ErdosProblems/770.lean)).
 
-**Status in the literature: RH-consequence.** Erdős 770 is open. Unconditionally, part (iii) is
-claimed only for `ε > 1/2` (Zeng, 2026) and for `ε > 1/(4√e)` (Korsky, in the notes to his
-5 August 2026 manuscript on Erdős 769); both are unrefereed. Under GRH, the bound
-`h(n) ≤ max{P(n), C (log n)²}` is stated without proof in those notes of Korsky, and a
-self-published note (Zenodo 10.5281/zenodo.23608372, October 2026) proves the asymptotic statement
-under a weaker "quasi-RH" hypothesis. This repository is a complete Lean proof that GRH implies
-770(iii), following those sources, and of an explicit form valid for every `n ≥ 2` with the
-constant `420`, which we did not find in those sources (searched 2026-11-24; the sources were read
-through secondary pages, see `docs/scoping` in the conjectures repo; the Korsky notes in
-particular were not opened in the original). The constant is not optimised. `Unconditional/`
-proves part (iii) and the explicit bound unconditionally in Lean, with GRH supplied by the
-certified proof in
+This repository proves 770(iii) under GRH in Lean, in an explicit form: `h(n) ≤ max(P(n),
+⌈420 (log n)²⌉)` for every `n ≥ 2`. `Unconditional/` proves part (iii) and the explicit bound
+unconditionally in Lean, with GRH supplied by the certified proof in
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
-Parts (i) and (ii) of Erdős 770 stay open.
+Parts (i) and (ii) of Erdős 770 are open and are not treated here.
 
-## Results
+**Status in the literature: RH-consequence.** Unconditionally, part (iii) is claimed for
+`ε > 1/2` (Zeng, 2026) and for `ε > 1/(4√e)` (Korsky, in the notes to his 5 August 2026
+manuscript on Erdős 769); both are unrefereed. Under GRH, Korsky's notes state the bound
+`h(n) ≤ max{P(n), C (log n)²}` without proof, and a self-published note (Zenodo
+10.5281/zenodo.23608372, October 2026) proves the asymptotic statement under a weaker
+"quasi-RH" hypothesis. The Lean proof follows those sources. The explicit form with `C = 420`,
+valid for every `n ≥ 2`, was not found in them (searched 2026-11-24). Those sources were read
+through secondary pages (see `docs/scoping` in the conjectures repo), and the Korsky notes were
+not opened in the original.
+
+## Main theorems
 
 ```lean
 theorem Erdos770.explicitBound_of_bach (hB : Ankeny.BachSubgroupBound (21 / 5)) :
@@ -49,14 +50,14 @@ def Erdos770Part3 : Prop :=
     p > (n : ℝ) ^ (ε : ℝ) → h n = p
 ```
 
-So `ExplicitBound 420 2` says `h(n) ≤ max(P(n), ⌈420 (log n)²⌉)` for every `n ≥ 2`. There is no
-`sorry`. `n = 1` is excluded because `h 1 = 3` while `P 1 = 2` and `⌈420 log² 1⌉ = 0`.
+So `ExplicitBound 420 2` says `h(n) ≤ max(P(n), ⌈420 (log n)²⌉)` for every `n ≥ 2`. The
+repository has no `sorry`. `n = 1` is excluded because `h 1 = 3` while `P 1 = 2` and `⌈420 log² 1⌉ = 0`.
 
-### Tiers and provenance
+## Tiers and provenance
 
 | Theorem | Tier | Hypothesis |
 |---|---|---|
-| `explicitBound_of_bach`, `erdos_770_iii_of_bach` | H | `Ankeny.BachSubgroupBound (21 / 5)`, proved under GRH by [ankeny-grh](https://github.com/senamakel/ankeny-grh) (not a cited result: its proof is in that repo) |
+| `explicitBound_of_bach`, `erdos_770_iii_of_bach` | H | `Ankeny.BachSubgroupBound (21 / 5)`, proved under GRH by [ankeny-grh](https://github.com/senamakel/ankeny-grh) (its proof is in that repo, not cited) |
 | `explicitBound_of_GRH`, `erdos_770_iii_of_GRH` | C | `DirichletLNonvanishingRightOfHalf` (`Erdos985`), copied word for word from riemann-hypothesis `src/Statements.lean` |
 | `Erdos770.Unconditional.explicitBound`, `Erdos770.Unconditional.erdos_770_iii` | U | none; the GRH hypothesis is closed by riemann-hypothesis (see below) |
 
@@ -145,8 +146,8 @@ The literature (Korsky's notes) states `h(n) ≤ max{P(n), C (log n)²}` under G
 constant is `2`, see ankeny-grh), and `10` is the exponent at which the proof splits the prime `r`
 into `r ≤ n¹⁰` and `r > n¹⁰`. Taking `10` rather than a value near `3` makes the counting
 inequality of step 6 hold for every `n ≥ 3` with crude bounds, so no finite check of `h n` for
-small `n` is needed. A smaller `C` is possible with sharper bookkeeping; it was not attempted.
-The statement is for `n ≥ 2` only.
+small `n` is needed. Sharper bookkeeping would give a smaller `C`; this repository does not attempt it. The
+statement covers `n ≥ 2`.
 
 ## Building
 
