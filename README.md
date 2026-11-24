@@ -1,7 +1,11 @@
 # Erdős Problem 985 in Lean
 
 [Erdős Problem 985](https://www.erdosproblems.com/985) asks whether every odd prime `p` has a
-prime primitive root `q < p`. This project proves in Lean that it does:
+prime primitive root `q < p`. This project is a Lean proof that GRH implies it, and, with GRH
+taken from [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
+(not independently verified), a proof of the unconditional statement:
+
+**Literature status:** GRH implies Erdős 985 is proved in this repo and its paper; no earlier published proof is known to us (not yet checked); not a solution of Erdős 985.
 
 ```lean
 theorem erdos_985 : Erdos985.Erdos985Statement   -- Unconditional/Erdos985Unconditional.lean
@@ -11,8 +15,9 @@ theorem Erdos985.erdos_985_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
 ```
 
 **Tiers.** `Erdos985.erdos_985_of_GRH` is tier C: GRH for Dirichlet L-functions is the explicit
-hypothesis `DirichletLNonvanishingRightOfHalf`. `erdos_985` is tier U: it closes that hypothesis
-with `LFunction_ne_zero_of_half_lt_re` from riemann-hypothesis, whose build has not been
+hypothesis `DirichletLNonvanishingRightOfHalf`. `erdos_985` is tier U: it is the same statement,
+given the Lean proof of GRH in leanprover-community/riemann-hypothesis, which has not been
+independently verified. It closes the hypothesis with `LFunction_ne_zero_of_half_lt_re`; that build has not been
 independently re-verified (see "Axioms and unconditional version" below).
 
 The statement is the same as `erdos_985` in
@@ -22,7 +27,7 @@ The project has no `sorry`. A write-up of the proof in mathematical terms is in
 
 ## How it was built
 
-The proof was built and solved with [OpenHuman](https://github.com/tinyhumansai/openhuman)
+The Lean development was built with [OpenHuman](https://github.com/tinyhumansai/openhuman)
 agents running in an [RSI Ralph](https://github.com/tinyhumansai/rsi-ralph) loop. RSI Ralph
 keeps asking a team of agents to improve a working copy and only keeps a change when a score
 says it is better.
