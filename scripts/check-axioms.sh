@@ -14,12 +14,15 @@ import Shoup
 #print axioms Shoup.leastPrimitiveRoot_le_poly_of_GRH
 #print axioms Shoup.polyOmega7_of_GRH
 #print axioms Shoup.leastPrimitiveRoot_le_seven_of_GRH
+#print axioms Shoup.polyOmega6_of_GRH
+#print axioms Shoup.leastPrimitiveRoot_le_six_of_GRH
+#print axioms Shoup.wang_of_GRH
 LEAN
 out="$(lake env lean "$tmp/Axioms.lean")"
 echo "$out"
 n="$(grep -c "depends on axioms: \[propext, Classical.choice, Quot.sound\]$" <<<"$out" || true)"
-if [ "$n" != 7 ]; then
-  echo "axiom check FAILED: expected 7 theorems on the standard axioms only" >&2
+if [ "$n" != 10 ]; then
+  echo "axiom check FAILED: expected 10 theorems on the standard axioms only" >&2
   exit 1
 fi
 echo "axiom check passed"

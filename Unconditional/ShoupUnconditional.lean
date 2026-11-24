@@ -31,9 +31,23 @@ theorem leastPrimitiveRoot_le_seven_unconditional (p : ℕ) (hp : p.Prime) (hp2 
     Shoup.HasPrimitiveRootLE p (Shoup.C7total * (ω (p - 1) : ℝ) ^ 7 * Real.log p ^ 2) :=
   Shoup.leastPrimitiveRoot_le_seven_of_GRH LFunction_ne_zero_of_half_lt_re p hp hp2
 
+theorem polyOmega6_unconditional : Shoup.PolyOmegaStatement 6 :=
+  Shoup.polyOmega6_of_GRH LFunction_ne_zero_of_half_lt_re
+
+theorem leastPrimitiveRoot_le_six_unconditional (p : ℕ) (hp : p.Prime) (hp2 : p ≠ 2) :
+    Shoup.HasPrimitiveRootLE p (Shoup.C6total * (ω (p - 1) : ℝ) ^ 6 * Real.log p ^ 2) :=
+  Shoup.leastPrimitiveRoot_le_six_of_GRH LFunction_ne_zero_of_half_lt_re p hp hp2
+
+/-- Wang Yuan's bound `g(p) = O(ω(p-1)^6 (log p)²)`, unconditionally. -/
+theorem wang_unconditional : Shoup.WangStatement :=
+  Shoup.wang_of_GRH LFunction_ne_zero_of_half_lt_re
+
 #print axioms ankenyType_unconditional
 #print axioms leastPrimitiveRoot_le_unconditional
 #print axioms polyOmega_unconditional
 #print axioms leastPrimitiveRoot_le_poly_unconditional
 #print axioms polyOmega7_unconditional
 #print axioms leastPrimitiveRoot_le_seven_unconditional
+#print axioms polyOmega6_unconditional
+#print axioms leastPrimitiveRoot_le_six_unconditional
+#print axioms wang_unconditional
