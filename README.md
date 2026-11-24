@@ -44,7 +44,7 @@ def SchoenfeldStatement : Prop :=
 ## Tier and provenance
 
 * All three theorems are **tier C** in the main library (RH is an explicit argument) and
-  **tier U** in `Unconditional/` (RH discharged by riemann-hypothesis), for the constants
+  **tier U** in `Unconditional/` (checked, see below) (RH discharged by riemann-hypothesis), for the constants
   `1/8`, `1/4`, `9/20`. Schoenfeld's exact `SchoenfeldStatement` (constant `1/(8π)`) is the
   fixed target and is **not** proved; see "Deviations from the literature".
 * `RiemannHypothesis` is Mathlib's definition, used as is.
@@ -147,11 +147,21 @@ which has not been independently verified. `Unconditional/SchoenfeldUnconditiona
 
 | Theorem | Statement | Axioms |
 |---|---|---|
-| `psi_bound` | `Schoenfeld.PsiBound (1 / 8) 73.2` | pending (see below) |
-| `theta_bound` | `Schoenfeld.ThetaBound (1 / 4) 599` | pending (see below) |
-| `pi_bound` | `Schoenfeld.PiBound (9 / 20) 2657` | pending (see below) |
+| `psi_bound` | `Schoenfeld.PsiBound (1 / 8) 73.2` | standard three |
+| `theta_bound` | `Schoenfeld.ThetaBound (1 / 4) 599` | standard three |
+| `pi_bound` | `Schoenfeld.PiBound (9 / 20) 2657` | standard three |
 
-The check has not been run yet on this branch; the axioms column will be filled in from its output.
+Checked 2026-11-24 with `scripts/check-unconditional.sh` against riemann-hypothesis
+`507a75d91d` (library at commit `a72aed5`): the build succeeded and `#print axioms` printed
+
+```
+'psi_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'theta_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'pi_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
+
+The run took 44.5 min wall (200 s user CPU), dominated by importing riemann-hypothesis on a
+loaded machine.
 
 To check it:
 
