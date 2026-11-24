@@ -12,3 +12,13 @@ rev = "9538edb73dc72c8fdc04b4e0df076c8930ee2fba"
 
 [[lean_lib]]
 name = "LLS"
+
+[[require]]
+name = "Ankeny"
+git = "https://github.com/senamakel/ankeny-grh.git"
+rev = "129ad575cc65def1860a32a691e106dfe1601bd7"
+
+[[require]]
+name = "Miller"
+git = "https://github.com/senamakel/miller-grh.git"
+rev = "b484d444b20cd5693d6a7117389eb6adc6ccfec4"
