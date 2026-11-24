@@ -1,7 +1,14 @@
 # Deterministic Miller–Rabin under GRH in Lean
 
 Under GRH every odd composite `n` has a strong-pseudoprime witness `a ≤ 2 log² n` (Miller 1976;
-constant `2` by Bach, Math. Comp. 55 (1990)). This repository proves the **unconditional
+constant `2` by Bach, Math. Comp. 55 (1990)).
+
+**Literature status: RH-consequence.** Miller's test is conditional on GRH (Miller 1976); this
+repository is a Lean proof that GRH implies it, following Miller and Bach, with our constant
+`21/5` weaker than Bach's `2`. It is not new mathematics. Unconditional polynomial-time primality
+testing is Agrawal–Kayal–Saxena (2002), by a different method.
+
+This repository proves the **unconditional
 reduction**: Bach's subgroup bound implies Miller's statement and a correct primality test.
 Bach's bound itself is proved from GRH, with constant `21/5`, in the sibling
 [`ankeny-grh`](https://github.com/senamakel/ankeny-grh) repository, which is a lake dependency.
