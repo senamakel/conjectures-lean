@@ -2,7 +2,7 @@ import Main      -- leanprover-community/riemann-hypothesis: `riemannHypothesis`
 import Mertens
 
 /-!
-# Mertens, Riesz, Hardy–Littlewood and Redheffer bounds, with RH supplied by the
+# Mertens, Riesz, Hardy–Littlewood, Redheffer, Möbius-series and Liouville bounds, with RH supplied by the
 # riemann-hypothesis repository
 
 Not part of the default build: it needs the riemann-hypothesis project's compiled modules.
@@ -24,8 +24,16 @@ theorem hardyLittlewood_bound : Mertens.HardyLittlewoodBound :=
 theorem redheffer_bound : Mertens.RedhefferBound :=
   Mertens.redheffer_of_RH riemannHypothesis
 
+theorem moebius_series : Mertens.MoebiusSeriesConverges :=
+  Mertens.moebiusSeries_of_RH riemannHypothesis
+
+theorem liouville_bound : Mertens.LiouvilleBound :=
+  Mertens.liouville_of_RH riemannHypothesis
+
 #print axioms invZeta_bound
 #print axioms mertens_bound
 #print axioms riesz_bound
 #print axioms hardyLittlewood_bound
 #print axioms redheffer_bound
+#print axioms moebius_series
+#print axioms liouville_bound
