@@ -246,19 +246,25 @@ mean-square bounds unconditionally in Lean, with the certified proof of RH. It i
 | `cramer_primeInShortInterval` | `Cramer.PrimeInShortInterval 2` | `propext`, `Classical.choice`, `Quot.sound` |
 | `cramer_primeGapExplicit` | `Cramer.PrimeGapExplicit 2` | `propext`, `Classical.choice`, `Quot.sound` |
 | `cramer_gapBound` | `Cramer.CramerGapBound` | `propext`, `Classical.choice`, `Quot.sound` |
+| `cramer_dyadicMeanSquare` | `Cramer.CramerDyadicMeanSquare` | `propext`, `Classical.choice`, `Quot.sound` |
+| `cramer_meanSquare` | `Cramer.CramerMeanSquare` | `propext`, `Classical.choice`, `Quot.sound` |
+| `cramer_logMeanSquare` | `Cramer.CramerLogMeanSquare` | `propext`, `Classical.choice`, `Quot.sound` |
 
 ```
 scripts/check-unconditional.sh [RH_DIR]
 ```
 
 Run on 2026-11-24 against riemann-hypothesis `507a75d91d` (cache build, not `RH_FULL_BUILD`),
-library and `Unconditional/` as of cramer-rh commit `a8cbd47` (unchanged since); 48 min wall, most of it waiting for and
-loading the RH cache. Output:
+library and `Unconditional/` as of cramer-rh commit `7daadad` (Round 5, mean square included);
+33 min wall, most of it restoring and loading the RH cache. Output:
 
 ```
 'cramer_primeInShortInterval' depends on axioms: [propext, Classical.choice, Quot.sound]
 'cramer_primeGapExplicit' depends on axioms: [propext, Classical.choice, Quot.sound]
 'cramer_gapBound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'cramer_dyadicMeanSquare' depends on axioms: [propext, Classical.choice, Quot.sound]
+'cramer_meanSquare' depends on axioms: [propext, Classical.choice, Quot.sound]
+'cramer_logMeanSquare' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 The import needs about 93 GB of cache, about 19 GB of RAM and roughly 900k open files (raise the
