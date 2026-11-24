@@ -323,12 +323,14 @@ scripts/check-unconditional.sh [RH_DIR]
 ```
 
 Run on 2026-11-24 against riemann-hypothesis `507a75d91d` (cache build, not `RH_FULL_BUILD`),
-library and `Unconditional/` as of erdos-969 commit `13e153c`; 27 min wall, most of it waiting
+library and `Unconditional/` as of erdos-969 commit `79aa3ec`; 13 min wall, most of it waiting
 for and loading the RH cache. Output:
 
 ```
 'axer_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
 'axerKFree_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+'montgomeryVaughan_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+'squarefreeError_mv_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 The import needs about 93 GB of cache, about 19 GB of RAM and roughly 900k open files (raise the
