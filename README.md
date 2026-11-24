@@ -500,6 +500,23 @@ and:
 The sixteen elided lines are `LLS.chunk114_ok_i._native.native_decide.ax_1_1` for every
 `0 ≤ i ≤ 15`, exactly as in the main-library output above.
 
+The rerun on branch `round7` (6 min wall) printed the same lines for all eleven theorems above
+and:
+
+```
+'bach2_unconditional' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ LLS.chunk2_ok_0._native.native_decide.ax_1_1,
+ …,
+ LLS.chunk2_ok_9._native.native_decide.ax_1_1]
+'leastNonresidue2_unconditional' depends on axioms: (the same eighteen)
+'miller2_unconditional' depends on axioms: (the same eighteen)
+```
+
+The fifteen elided `chunk2` lines are `LLS.chunk2_ok_i._native.native_decide.ax_1_1` for every
+`0 ≤ i ≤ 14`, exactly as in the main-library output above.
+
 ```bash
 scripts/check-unconditional.sh /path/to/riemann-hypothesis   # cloned there if missing
 ```
