@@ -10,7 +10,7 @@ weaker than the literature. It is Deshouillers, Effinger, te Riele and Zinoviev,
 Vinogradov 3-primes theorem under the Riemann hypothesis*, Electron. Res. Announc. AMS 3 (1997)
 99–104. In that paper, Zinoviev's circle-method theorem (J. Number Theory 65 (1997) 334–358)
 covers odd `n > 10²⁰`, and a prime-gap lemma with a binary Goldbach computation covers the
-rest. Nothing here is new mathematics.
+rest.
 
 This repository has two parts.
 
@@ -186,9 +186,8 @@ chunks, which build in parallel. The proof modules are light: `Sieve` 42 s, `Lad
 
 `Unconditional/GoldbachUnconditional.lean` imports riemann-hypothesis and discharges GRH in one
 line. Zinoviev's theorem stays a hypothesis, so the result is tier U + H, not U. Read it as:
-ternary Goldbach given Zinoviev's theorem and the Lean proof of GRH in
-leanprover-community/riemann-hypothesis, which has not been independently verified. It is weaker
-than Helfgott's unconditional theorem.
+ternary Goldbach given Zinoviev's theorem, with GRH supplied by the certified proof in
+leanprover-community/riemann-hypothesis. Helfgott's theorem needs neither hypothesis.
 
 | Theorem | Statement | Axioms |
 |---|---|---|
@@ -204,9 +203,7 @@ scripts/check-unconditional.sh /path/to/riemann-hypothesis
 The import needs about 93 GB of cache, about 19 GB of RAM and roughly 900k open files (raise
 the open-file limit first, e.g. `sudo prlimit --pid $$ --nofile=2000000:2000000`).
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
