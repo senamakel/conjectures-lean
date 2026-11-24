@@ -1,12 +1,23 @@
-# Idoneal numbers and class number one under GRH in Lean
+# Completeness of Euler's idoneal numbers under GRH in Lean
 
 Euler called `n` *idoneal* if it cannot be written as `ab + bc + ca` with `0 < a < b < c`
 (equivalently, every genus of forms of discriminant `−4n` is a single class), and found 65 of
-them, the largest `1848`. P. J. Weinberger (*Exponents of the class groups of complex quadratic
-fields*, Acta Arith. 22 (1973), 117–124) showed that the list is complete under GRH, and
-unconditionally that at most two more exist (sometimes misquoted as one). The unconditional
-question is open. The class number one problem for imaginary quadratic fields is settled
-unconditionally (Heegner 1952, Baker 1966, Stark 1967).
+them, the largest `1848`.
+
+**Literature status.** Two results, with different labels:
+
+- **Idoneal numbers: RH-consequence.** P. J. Weinberger (*Exponents of the class groups of
+  complex quadratic fields*, Acta Arith. 22 (1973), 117–124) proved that Euler's list is complete
+  under GRH. Unconditionally he showed that at most two more exist (sometimes misquoted as one),
+  and completeness is still open; formal-conjectures lists it as open. This repository is a
+  Lean proof that GRH implies completeness, following Weinberger's 1973 result. The analytic
+  step is a count of small split primes rather than his `L(1, χ)` and genus-theory argument.
+  `Unconditional/` gives the completeness of the list, given the Lean proof of GRH in
+  leanprover-community/riemann-hypothesis, which has not been independently verified.
+- **Class number one: known, via GRH here; not a target.** The nine imaginary quadratic fields
+  of class number one were found unconditionally by Heegner (1952), Baker (1966) and Stark (1967).
+  The side result kept here assumes GRH and two cited classical inputs, so it is weaker than the
+  literature. No further work on it is planned.
 
 This repository proves, assuming GRH for Dirichlet L-functions:
 
@@ -18,13 +29,21 @@ theorem Weinberger.isIdoneal_iff_of_GRH (hGRH : DirichletLNonvanishingRightOfHal
     IsIdoneal n ↔ n ∈ knownIdonealNumbers
 
 theorem Weinberger.knownIdonealNumbers_are_idoneal : ∀ n ∈ knownIdonealNumbers, IsIdoneal n
+```
 
+The headline is the idoneal-numbers statement. The repository also contains a side result that
+is **not a target**:
+
+```lean
+-- known, via GRH here; not a target (Heegner 1952, Baker 1966, Stark 1967 proved it outright)
 theorem Weinberger.ClassNumber.starkHeegner_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf)
     (hPS : ClassNumberOneNorms) (hH : HeegnerClassNumberOne) : StarkHeegnerStatement
 ```
 
-and, with GRH supplied by riemann-hypothesis (`Unconditional/WeinbergerUnconditional.lean`),
-`idoneal_completeness : Idoneal.IdonealCompletenessStatement`. There is no `sorry`.
+and, in `Unconditional/WeinbergerUnconditional.lean`,
+`idoneal_completeness : Idoneal.IdonealCompletenessStatement`, given the Lean proof of GRH in
+leanprover-community/riemann-hypothesis, which has not been independently verified. There is no
+`sorry`.
 
 ## Tier and provenance
 
@@ -33,8 +52,8 @@ and, with GRH supplied by riemann-hypothesis (`Unconditional/WeinbergerUnconditi
 | `idoneal_completeness_of_GRH`, `isIdoneal_iff_of_GRH` | C | GRH |
 | `idoneal_completeness`, `isIdoneal_iff` (`Unconditional/`) | U | none |
 | `knownIdonealNumbers_are_idoneal` | D | none |
-| `starkHeegner_of_GRH` | C + H | GRH, `ClassNumberOneNorms`, `HeegnerClassNumberOne` |
-| `starkHeegner_of_cited` (`Unconditional/`) | U + H | `ClassNumberOneNorms`, `HeegnerClassNumberOne` |
+| `starkHeegner_of_GRH` (not a target) | C + H | GRH, `ClassNumberOneNorms`, `HeegnerClassNumberOne` |
+| `starkHeegner_of_cited` (`Unconditional/`, not a target) | U + H | `ClassNumberOneNorms`, `HeegnerClassNumberOne` |
 
 - GRH is `Erdos985.DirichletLNonvanishingRightOfHalf`, from the
   [erdos-985](https://github.com/senamakel/erdos-985) dependency, which copies it word for word
@@ -55,7 +74,8 @@ and, with GRH supplied by riemann-hypothesis (`Unconditional/WeinbergerUnconditi
   `ClassNumberOneNorms` (if `ℚ(√d)` has class number one and `p ∣ N(t + ω)`, then `p = N(u + vω)`
   for some integers `u, v`) and `HeegnerClassNumberOne` (the nine fields have class number one).
   See `docs/SCOPING.md` and the end of `docs/BLUEPRINT.md` for what proving them would take.
-  So part B is **not** proved outright: it is proved under GRH given these two facts.
+  So part B is not proved outright here. It is proved under GRH given these two facts, which is
+  weaker than the unconditional Heegner–Baker–Stark theorem.
 
 ## Axioms
 
@@ -192,7 +212,52 @@ from scratch adds about 1 min 20 s wall (4 CPU-minutes).
 | `isIdoneal_iff` | `∀ n, IsIdoneal n ↔ n ∈ knownIdonealNumbers` | standard three + 11 `native_decide` |
 | `starkHeegner_of_cited` | `ClassNumberOneNorms → HeegnerClassNumberOne → StarkHeegnerStatement` | standard three + 10 `native_decide` |
 
-UNCONDITIONAL_OUTPUT
+Real output of `scripts/check-unconditional.sh /home/ubuntu/work/personal/riemann-hypothesis`
+(2026-11-24, riemann-hypothesis `507a75d91d`, 42 min wall including the wait for the shared
+lock; no errors):
+
+```
+'idoneal_completeness' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Weinberger.Compute.chunk_ok_0._native.native_decide.ax_1_1,
+ Weinberger.Compute.chunk_ok_1._native.native_decide.ax_1_1,
+ Weinberger.Compute.chunk_ok_2._native.native_decide.ax_1_1,
+ Weinberger.Compute.chunk_ok_3._native.native_decide.ax_1_1,
+ Weinberger.Compute.chunk_ok_4._native.native_decide.ax_1_1,
+ Weinberger.Compute.chunk_ok_5._native.native_decide.ax_1_1,
+ Weinberger.Compute.chunk_ok_6._native.native_decide.ax_1_1,
+ Weinberger.Compute.chunk_ok_7._native.native_decide.ax_1_1,
+ Weinberger.Compute.chunk_ok_8._native.native_decide.ax_1_1,
+ Weinberger.Compute.chunk_ok_9._native.native_decide.ax_1_1]
+'isIdoneal_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Weinberger.Compute.chunk_ok_0._native.native_decide.ax_1_1,
+ Weinberger.Compute.chunk_ok_1._native.native_decide.ax_1_1,
+ Weinberger.Compute.chunk_ok_2._native.native_decide.ax_1_1,
+ Weinberger.Compute.chunk_ok_3._native.native_decide.ax_1_1,
+ Weinberger.Compute.chunk_ok_4._native.native_decide.ax_1_1,
+ Weinberger.Compute.chunk_ok_5._native.native_decide.ax_1_1,
+ Weinberger.Compute.chunk_ok_6._native.native_decide.ax_1_1,
+ Weinberger.Compute.chunk_ok_7._native.native_decide.ax_1_1,
+ Weinberger.Compute.chunk_ok_8._native.native_decide.ax_1_1,
+ Weinberger.Compute.chunk_ok_9._native.native_decide.ax_1_1,
+ Weinberger.Compute.known_noRep._native.native_decide.ax_1_1]
+'starkHeegner_of_cited' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Weinberger.ClassNumber.chunkB_ok_0._native.native_decide.ax_1_1,
+ Weinberger.ClassNumber.chunkB_ok_1._native.native_decide.ax_1_1,
+ Weinberger.ClassNumber.chunkB_ok_2._native.native_decide.ax_1_1,
+ Weinberger.ClassNumber.chunkB_ok_3._native.native_decide.ax_1_1,
+ Weinberger.ClassNumber.chunkB_ok_4._native.native_decide.ax_1_1,
+ Weinberger.ClassNumber.chunkB_ok_5._native.native_decide.ax_1_1,
+ Weinberger.ClassNumber.chunkB_ok_6._native.native_decide.ax_1_1,
+ Weinberger.ClassNumber.chunkB_ok_7._native.native_decide.ax_1_1,
+ Weinberger.ClassNumber.chunkB_ok_8._native.native_decide.ax_1_1,
+ Weinberger.ClassNumber.chunkB_ok_9._native.native_decide.ax_1_1]
+```
 
 To check it:
 

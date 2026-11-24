@@ -46,7 +46,7 @@ Target (`Weinberger/Statement.lean`, copied from formal-conjectures):
    shows the 65 numbers have no representation.
 8. **Assembly** (`Weinberger/Main.lean`). `idoneal_completeness_of_GRH`, `isIdoneal_iff_of_GRH`.
 
-## Part B: class number one
+## Part B: class number one (known, via GRH here; not a target, no further work planned)
 
 Target: `ClassNumberProblem.StarkHeegnerStatement` (formal-conjectures). Cited inputs
 (`Weinberger/ClassNumber/Hypotheses.lean`, tier H): `ClassNumberOneNorms` (class number one ⇒
