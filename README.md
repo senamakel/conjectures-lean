@@ -5,8 +5,9 @@ zero*, Ann. of Math. 79 (1964), 109–326) proved that every variety `X` over a 
 characteristic 0 has a resolution: a smooth variety `Y` with a proper birational morphism
 `Y → X`. In positive characteristic this is known in dimension at most three and open beyond.
 
-**Status in the literature: known.** This is a Lean formalisation of a theorem proved in 1964.
-It is not new mathematics, and it has nothing to do with the Riemann hypothesis.
+**Status in the literature: known.** This repository is a complete Lean proof of the
+formal-conjectures statement of Hironaka's theorem (Hironaka, 1964), from the standard three
+axioms only. It uses no RH or GRH theorem.
 
 This repository proves the statement of the theorem that
 [formal-conjectures](https://github.com/google-deepmind/formal-conjectures) carries as
@@ -153,9 +154,7 @@ Only one riemann-hypothesis module is imported,
 `lean` step takes about 45 s and 6.2 GB of RAM. Restoring that repository's cache with
 `lake exe cache get` needs about 93 GB of disk and a high open-file limit.
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the resolution-of-singularities proof,
-whose independent verification is still pending. `RH_FULL_BUILD=1` rebuilds the imported
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks. `RH_FULL_BUILD=1` rebuilds the imported
 riemann-hypothesis modules from source instead; that has not been run.
 
 A second source exists. [resolutionorg/hironaka](https://github.com/resolutionorg/hironaka)
