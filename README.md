@@ -5,12 +5,13 @@ the least quadratic non-residue and related problems*, Math. Comp. 84 (2015) 239
 [arXiv:1309.3595](https://arxiv.org/abs/1309.3595)) proved under GRH that the least quadratic
 non-residue mod a prime `q ≥ 5` is below `(log q)²` (their Corollary 1.2), and that the least
 prime `ℓ ∤ q` outside a proper subgroup of `(ℤ/q)ˣ` is at most `(log q + B(q))²` (Theorem 1.1).
-Unconditionally only Burgess-type bounds `q^{1/(4√e)+ε}` are known. This repository is a Lean
-proof that GRH implies LLS Corollary 1.2, following LLS, and a Lean proof that GRH implies
-Bach's subgroup bound with constant `11/4` (Bach, Math. Comp. 55 (1990), proved `2`; the companion
-ankeny-grh repository proves `21/5`). Our constant `11/4` is weaker than Bach's `2`. It is also a
-Lean proof that GRH implies bounds of the shape of LLS Theorem 1.5 for `L(1, χ)`, `χ` primitive
-mod `q ≥ 10¹⁰`, with weaker constants than the paper's: `|L(1,χ)| ≤ 2e^γ(log log q + 5)` (LLS:
+Unconditionally only Burgess-type bounds `q^{1/(4√e)+ε}` are known. This repository is a complete
+Lean proof that GRH implies LLS Corollary 1.2, following LLS, and a Lean proof that GRH implies
+Bach's subgroup bound with constant `11/4`, with every `4 ≤ q < 2^18` covered by ankeny-grh's
+proved-sound checker (Bach, Math. Comp. 55 (1990), proved `2`; the companion ankeny-grh
+repository proves `21/5`). Our constant is `11/4`; Bach's is `2`. It is also a Lean proof that
+GRH implies bounds of the shape of LLS Theorem 1.5 for `L(1, χ)`, `χ` primitive mod `q ≥ 10¹⁰`,
+with these constants: `|L(1,χ)| ≤ 2e^γ(log log q + 5)` (LLS:
 `2e^γ(log log q − log 2 + 1/2 + 1/log log q)`) and `1/|L(1,χ)| ≤ 2e^γ(log log q + 5)` (LLS:
 `(12e^γ/π²)(log log q − log 2 + 1/2 + …)`). Combined with Dirichlet's class number formula, it is
 a Lean proof that GRH implies bounds of the shape of LLS Corollary 1.3 for the class number
@@ -21,7 +22,9 @@ a Lean proof that GRH implies bounds of the shape of LLS Corollary 1.3 for the c
 class-number of the corpus P(√−k)*, Proc. London Math. Soc. (2) 27 (1928) 358–372), in
 asymptotic form. Unconditionally the upper bound `h(−q) ≪ √q log q` is elementary, and the best
 lower bounds are Siegel's ineffective `h(−q) ≫_ε q^{1/2−ε}` and an effective bound of order
-`log q` (Goldfeld, Gross–Zagier, Oesterlé). See "Deviations".
+`log q` (Goldfeld, Gross–Zagier, Oesterlé). See "Deviations". `Unconditional/` proves all of
+these unconditionally in Lean, with GRH supplied by the certified proof in
+leanprover-community/riemann-hypothesis.
 
 ```lean
 theorem LLS.leastNonresidueBelowLogSq_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
@@ -304,9 +307,8 @@ per module.
 
 `Unconditional/LLSUnconditional.lean` imports
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
-(commit `507a75d`) and closes the GRH hypothesis in one line. These are the statements above,
-given the Lean proof of GRH in leanprover-community/riemann-hypothesis, which has not been
-independently verified.
+(commit `507a75d`) and closes the GRH hypothesis in one line. These are the statements above
+with no hypothesis left.
 
 | Theorem | Statement | Axioms |
 |---|---|---|
@@ -367,9 +369,7 @@ The script uses that project's community cache, about 93 GB. The import opens ar
 module files and needs about 19 GB of RAM; raise the open-file limit first (Linux:
 `sudo prlimit --pid $$ --nofile=2000000:2000000`).
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
