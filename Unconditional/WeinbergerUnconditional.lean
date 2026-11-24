@@ -1,5 +1,6 @@
 import Main      -- leanprover-community/riemann-hypothesis: `LFunction_ne_zero_of_half_lt_re`
 import Weinberger.Main
+import Weinberger.ClassNumber.Main
 
 /-!
 # Euler's idoneal numbers are complete, with GRH supplied by the riemann-hypothesis repository
