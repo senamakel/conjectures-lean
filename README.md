@@ -415,7 +415,7 @@ longer (its `Compute` chunks with `native_decide` are not imported here).
 scripts/check-unconditional.sh /path/to/riemann-hypothesis
 ```
 
-Real output (2026-11-24, at `1b21202`, riemann-hypothesis `507a75d91d`, community cache, not rebuilt):
+Real output (2026-11-24, at `944b0fb`, riemann-hypothesis `507a75d91d`, community cache, not rebuilt):
 
 ```
 'ankenyType_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -427,6 +427,9 @@ Real output (2026-11-24, at `1b21202`, riemann-hypothesis `507a75d91d`, communit
 'polyOmega6_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
 'leastPrimitiveRoot_le_six_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
 'wang_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+'polyOmegaReal_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+'leastPrimitiveRoot_le_real_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+'polyOmega5_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 The import needs about 93 GB of cache, about 19 GB of RAM and roughly 900k open files (raise the
