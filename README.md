@@ -136,11 +136,11 @@ min, the 15-interval case split) and `Schoenfeld.Pi`.
 
 | Theorem | Statement | Axioms |
 |---|---|---|
-| `psi_bound` | `Schoenfeld.PsiBound (1 / 8) 73.2` | UNCONDITIONAL_PSI |
-| `theta_bound` | `Schoenfeld.ThetaBound (1 / 2) 599` | UNCONDITIONAL_THETA |
-| `pi_bound` | `Schoenfeld.PiBound (3 / 5) 2657` | UNCONDITIONAL_PI |
+| `psi_bound` | `Schoenfeld.PsiBound (1 / 8) 73.2` | pending (see below) |
+| `theta_bound` | `Schoenfeld.ThetaBound (1 / 2) 599` | pending (see below) |
+| `pi_bound` | `Schoenfeld.PiBound (3 / 5) 2657` | pending (see below) |
 
-UNCONDITIONAL_RUN
+The check has not been run yet on this branch; the axioms column will be filled in from its output.
 
 To check it:
 
