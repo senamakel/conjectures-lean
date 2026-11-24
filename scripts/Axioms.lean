@@ -5,3 +5,5 @@ import Speiser
 #print axioms Speiser.re_archimedean_pos
 #print axioms Speiser.speiserBelow_of_RH
 #print axioms Speiser.speiser_of_RH_of_band
+#print axioms Speiser.Band.speiserBand
+#print axioms Speiser.speiser_of_RH

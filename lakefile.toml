@@ -12,3 +12,8 @@ rev = "9538edb73dc72c8fdc04b4e0df076c8930ee2fba"
 
 [[lean_lib]]
 name = "Speiser"
+
+[[lean_lib]]
+name = "SpeiserCompute"
+globs = ["SpeiserCompute.*"]
+precompileModules = true

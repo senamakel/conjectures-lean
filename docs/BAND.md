@@ -2,9 +2,9 @@
 
 `SpeiserBand (5/2) 7` asks for `ζ'(s) ≠ 0` on `0 < σ < 1/2`, `5/2 ≤ |t| < 7`. The analytic
 arguments in `Speiser/Gamma.lean` (above 7) and `Speiser/Low.lean` (below 5/2) cannot reach it
-(README, "Deviations"). This file records the options considered, the one chosen, and the
-sizing. Numbers come from float prototypes (`mpmath` for reference values); nothing here is a
-proof.
+(README, "Deviations"). This file records the options considered, the one chosen and implemented, and the
+sizing. The sizing numbers in the options section come from float prototypes (`mpmath` for
+reference values); the proof is the implemented computation described in the last section.
 
 Numerics on the band (grid step 0.02, `mpmath`): `min |ζ'| ≈ 0.1685` (at `σ = 1/2`,
 `t ≈ 4.66`), `max |ζ'| ≈ 0.26`, `max |ζ''| ≈ 0.124`. So `ζ'` stays well away from 0, and
@@ -33,64 +33,61 @@ needed. Certifying them needs (i) the same `ζ` evaluator, on the critical line 
 (b), and (ii) needs Backlund/Turing-type explicit `S(T)` bounds, which nothing here provides.
 Not chosen.
 
-## The chosen design, option (b)
+## The chosen design, option (b), as implemented
 
-**Euler–Maclaurin with a positive kernel.** For `f(x) = x^{−s}` and `n ≥ 1` let
-`K(u) = u²(1−u)²/24` (`K ≥ 0`, `K ≤ 1/384`). One application of the fundamental theorem of
-calculus to `G(u) = K f'''(n+u) − K' f''(n+u) + K'' f'(n+u) − K''' f(n+u) + F(n+u)`, where
-`F' = f` and `K'''' = 1`, gives
+**Status: implemented and run.** `Speiser.Band.speiserBand : SpeiserBand (5/2) 7` is proved
+with standard axioms plus 2 `native_decide` (`Speiser/Band/Run.lean`), 186 s of CPU.
 
-`r_n(s) := (f(n) + f(n+1))/2 − ∫_n^{n+1} f − (f'(n+1) − f'(n))/12 = −∫_0^1 K(u) f''''(n+u) du`,
+**Euler–Maclaurin with a positive kernel** (`Speiser/Band/EulerMaclaurin.lean`). For
+`f(x) = x^{−s}` and `n > 0` let `K(u) = u²(1−u)²/24` (`0 ≤ K ≤ 1/384`). One application of the
+fundamental theorem of calculus to `G = K f‴ − K′ f″ + K″ f′ − K‴ f + F`, where `F′ = f` and
+`K⁗ = 1`, gives
 
-so `|r_n(s)| ≤ |s(s+1)(s+2)(s+3)| n^{−σ−4}/384` for `σ ≥ −4`. Summing and telescoping for
-`Re s > 1`:
+`r_n(s) := (f(n) + f(n+1))/2 − ∫_n^{n+1} f − (f′(n+1) − f′(n))/12 = −∫_0^1 K(u) f⁗(n+u) du`,
 
-`ζ(s) = Σ_{n<N} n^{−s} + N^{−s}/2 + N^{1−s}/(s−1) + s N^{−s−1}/12 + T_N(s)`, with
-`T_N(s) = Σ_{n≥N} r_n(s)`.
+so `|r_n(s)| ≤ |s(s+1)(s+2)(s+3)| n^{−σ−4}/384` for `σ ≥ −4`.
 
-The right side is holomorphic on `Re s > −3`, `s ≠ 1` (the tail converges locally uniformly by
-the bound above), so the identity theorem on the convex sets `{−1 < σ < 2, 1 < t < 10}` and
-their conjugates carries it into the band. The prototype matches `mpmath`'s `ζ'` to `2·10⁻⁶` at
-`N = 8`.
+**ζ on boxes** (`Zeta.lean`). Telescoping for `Re s > 1` gives
 
-**The cell test.** For a cell disc `D(c, r)` and a tail radius `ρ`:
+`ζ(s) = Σ_{n<N} n^{−s} + N^{−s}/2 + N^{1−s}/(s−1) + s N^{−s−1}/12 + Σ_{n≥N} r_n(s)`.
 
-- `M'(c)` (the derivative of the explicit main part) by complex disc arithmetic;
-- `|T'(s)| ≤ max_{D(c, r+ρ)} |T| / ρ` at `s = c` and at every `s ∈ D(c, r)` (Cauchy's estimate,
-  `Complex.norm_deriv_le_of_forall_mem_sphere_norm_le`), with
-  `max |T| ≤ |P₄|max / (384 (σ_min + 3) (N−1)^{σ_min+3})`;
-- `|M'(s) − M'(c)| ≤ r · sup_{D(c,r)} |M''|`, from termwise bounds `|n^{−s}| ≤ n^{−(σ_c − r)}`;
+The tail is holomorphic on `Re s > −2`, so the identity theorem carries the formula to the boxes
+`U± = {−1 < σ < 2, 1 < ±t < 10}`. The code uses `N = 9`.
 
-and accept when `|M'(c)| > 2 max|T|/ρ + r · sup|M''|`.
+**The cell test** (`Deriv.lean`, `Check.lean`). For a box with centre `c` and `ℓ¹` half-width `r`:
 
-**Sizing** (float prototype `em2.py`, adaptive bisection of `[0, 1/2] × [5/2, 7]`, no
-failures; the `t < 0` half is the mirror image, so double these counts):
+- `ζ' = M1 + T'` on `U±`, with `M1` the explicit derivative of the main part;
+- `‖M1(s) − M1(c)‖ ≤ r · sup_{D(c,r)} ‖M2‖` (mean value inequality, `M2 = M1'` explicit and
+  bounded term by term);
+- `‖T'(s)‖ ≤ P(‖s‖ + ρ)/(147456 ρ)` by Cauchy's estimate with `ρ = 2/5`, from
+  `‖T(z)‖ ≤ P(‖z‖)/147456` for `Re z ≥ −1/2` (`Σ_{n≥9} n^{−7/2} ≤ (1/3)·Σ_{n≥9} n^{−3} ≤ 1/384`),
+  where `P(a) = a(a+1)(a+2)(a+3)`.
 
-| `N` | `ρ` | cells (`t > 0`) | smallest cell radius | prototype time |
-|---|---|---|---|---|
-| 4 | 0.3 | 2,896 | 0.0029 | < 0.1 s |
-| 5 | 0.4 | 3,146 | 0.0118 | < 0.1 s |
-| 6 | 0.5 | 5,600 | 0.0090 | 0.1 s |
-| 8 | 0.5 | 15,724 | 0.0059 | 0.2 s |
-| 12 | 0.5 | 63,244 | 0.0029 | 0.9 s |
+The cell is accepted when `|M1(c)|` exceeds the sum of `M1(c)`'s enclosure radius and those two
+bounds.
 
-With `N = 5`: about 6,300 cells in all, each needing about 10 complex exponentials
-`n^{−c} = exp(−c log n)` (`n ≤ 5`) at about 30 bits (`2^{−40}` dyadic rounding keeps the
-numbers small; the error budget is `|ζ'| ≥ 0.168` against tails of about `0.01`). That is about
-`6·10⁴` disc operations: **seconds of CPU** in a compiled checker, far under the 10-minute
-limit. The `ρ`/`N` choice moves the count by a factor 2, not more.
+**Arithmetic** (`SpeiserCompute/Core.lean`, core only, `precompileModules`). Fixed point
+`2^{−64}` in `Int`, with complex discs. Products are rounded down and radii up. `exp` is computed
+by a 16-term Taylor series (Mathlib's `Complex.exp_bound`) after dividing by `2^6`, followed by
+six squarings, and `‖exp u − 1‖ ≤ 2‖u‖` covers the split. The enclosures of `log 2, 3, 5, 7`,
+with width `5·10⁻¹²`, come from `Real.abs_log_sub_add_sum_range_le`. Soundness of each operation
+is in `Sound.lean`.
 
-**Lean cost.** About 1,700 lines:
+**Run** (`Run.lean`). `coverOK` bisects `[0, 1/2] × [5/2, 7]` and its mirror image, at most 40
+levels: **71,223 accepted cells per half, 186 s of CPU in all.**
 
-| Part | Content | Lines (estimate) |
+The first prototype used exact `Rat` arithmetic and was about 25× slower, about 70 minutes; that
+is why the code moved to fixed point.
+
+**Lean size.** About 2,000 lines across `Speiser/Band/` and `SpeiserCompute/`.
+
+**Sizing, earlier float prototype** (for reference; `t > 0` half; the counts depend on the tail
+bound used):
+
+| `N` | `ρ` | cells |
 |---|---|---|
-| Euler–Maclaurin | `r_n` identity (one FTC), the `r_n` bound, telescoping for `Re s > 1`, local uniform summability, identity theorem on two convex boxes | 500 |
-| Disc arithmetic | `ℚ × ℚ` centres, `ℚ` radii, add, mul, inverse, dyadic rounding; `exp` on a disc by `exp(z) = exp(z/2^k)^{2^k}` and `Complex.exp_bound`; `log 2`, `log 3`, `log 5` enclosures (Mathlib's `log_two` bounds and series) | 600 |
-| Checker | cell list, per-cell test as a `Bool`, soundness `test c r = true → ∀ s ∈ D(c,r), ζ'(s) ≠ 0` | 400 |
-| Glue | covering of the band by the cell list (an interval-cover check on rationals), conjugate half, `SpeiserBand (5/2) 7` | 200 |
-
-The checker runs by `native_decide` (about 6,300 cells; or kernel `decide` after splitting
-into chunks, which is slower but avoids `native_decide`), following robin-rh's pattern:
-a core-only checker with a separate soundness proof. The result `SpeiserBand (5/2) 7` is tier
-D; with `speiserBelow_of_RH` and `speiserAbove_of_RH` it gives `SpeiserStatement` under RH, so
-`Unconditional/` would close the full target.
+| 5 | 0.4 | 3,146 |
+| 8 | 0.5 | 15,724 |
+| 9 (Lean tail bound) | 0.5 | 59,674 |
+| 12 | 0.5 | 63,244 |
+| 16 (Lean tail bound) | 0.5 | 334,397 |
