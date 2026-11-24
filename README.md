@@ -17,6 +17,15 @@ theorem Grosswald.grosswald_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf)
     (hcomp : VerifiedUpTo 2500000000000000) : GrosswaldStatement
 ```
 
+## Tier and provenance
+
+* `prime_primitive_root_of_GRH_large`: tier **C** (GRH is an explicit argument); tier **U** through
+  `Unconditional/` (see below).
+* `grosswald_of_GRH`: tier **C + H**. Besides GRH it takes the finite range as the cited
+  hypothesis `VerifiedUpTo 2500000000000000`. Through `Unconditional/` it becomes
+  `grosswald_of_verified`, tier **U + H**. The full `GrosswaldStatement` is therefore not proved
+  unconditionally here; see "Why the range below `2.5·10^15` stays a hypothesis".
+
 The statements and definitions are in `Grosswald/Statement.lean`. Two inputs are hypotheses:
 
 * **GRH** for Dirichlet L-functions (`DirichletLNonvanishingRightOfHalf`, copied verbatim from
@@ -91,7 +100,23 @@ no prime `q < x` is a primitive root.
 | `Grosswald/Run/*.lean` | `native_decide` evaluations |
 | `Grosswald/Main.lean` | assembly |
 | `docs/PLAN.md` | map from MTT to Lean |
-| `scripts/*.py` | float prototypes used to size the computation (not part of the proof) |
+| `scripts/*.py`, `scripts/uncovered.c` | float prototypes used to size the computation (not part of the proof) |
+
+## Why the range below `2.5·10^15` stays a hypothesis
+
+`2.5·10^15` is where the Cohen–Oliveira e Silva–Trudgian computation ends; MTT start their GRH
+argument there, and so does this repo. Replaying the range inside Lean is out of reach:
+
+* even with the exact factorisation of every `p - 1`, the sieve inequality fails for about
+  `6.2·10^9` primes in `(409, 2.5·10^15)` (92% of primes near `10^8`, 17% near `10^11`, 0.13%
+  near `10^13`), and each of them needs an explicit Lucas certificate;
+* lowering Algorithm 1's start to `10^13` already enumerates about `1.1·10^11` candidates, and
+  every prime below the start (`π(10^12) = 3.8·10^10`) has to be visited;
+* under `native_decide`, one modular exponentiation at `p ≈ 10^12` costs about 16 µs.
+
+The best split costs an estimated 10–100 CPU-days and needs a proved segmented sieve that does
+not exist here. The numbers, the scripts that produced them, and what would have to improve
+are in [`docs/PLAN.md`](docs/PLAN.md#can-the-range-below-2510-15-be-computed-here-sized-2026-11-24).
 
 ## Building
 
@@ -99,8 +124,11 @@ no prime `q < x` is a primitive root.
 lake build
 ```
 
-The `native_decide` files take about ten minutes of CPU in total. Measured wall times: N13A1
-162 s, N13A2 101 s, N13B 92 s, N12 90 s, N13C 57 s, N13D 32 s, N14 about 20 s, Roots about 10 s.
+Toolchain Lean `v4.36.0` (`lean-toolchain`), Mathlib `fc4f59e5` (through erdos-985, pinned at
+`9538edb`). Run `lake exe cache get` once before the first build. The `native_decide` files take
+about eight minutes of CPU in total. Measured on 2026-11-24 (95-core x86-64 box, full `lake build`
+of this repo after the Mathlib cache: 3 min 44 s wall, 787 s CPU, 7.3 GB peak RSS): N13A1 130 s,
+N13A2 83 s, N12 80 s, N13B 70 s, N13C 47 s, N13D 24 s, N14 21 s, Roots 4 s.
 
 The analytic toolkit (explicit formula for Dirichlet L-functions with weight `(1 − n/x)`,
 Hadamard factorization, Perron formula, zero-sum bounds under GRH) comes from
