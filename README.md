@@ -1,20 +1,23 @@
 # Littlewood's bound for ζ(1/2 + it) under RH in Lean
 
+Lean proves Littlewood's bound
+
+    |ζ(1/2 + it)| ≤ exp(4 log t / log log t)    for all large t.
+
+`littlewood_bound` is proved unconditionally in Lean, from the standard three axioms, with RH
+supplied by the certified proof in
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
+The main library holds a complete Lean proof that RH implies the bound with the explicit
+constant `C = 4`.
+
 **Literature status: RH-consequence.** Littlewood (*On the zeros of the Riemann
-zeta-function*, Proc. Cambridge Philos. Soc. 22 (1924), 295–318) proved that the Riemann
-hypothesis implies
-
-    |ζ(1/2 + it)| ≤ exp(C log t / log log t)    for all large t,
-
-for some absolute constant `C`. Titchmarsh's 1930 tract *The Zeta-Function of Riemann*
-gives it as Theorem 63 (§5.72); the second edition of *The Theory of the Riemann Zeta-Function*
-has it in §14.14. Chandee and Soundararajan (Bull. LMS 43 (2011)) showed that any
-`C > (log 2)/2` works. Without RH, the best known bounds are powers of `t` (Bourgain 2017:
-`t^{13/84+ε}`). This repository's main library is a complete Lean proof that RH implies
-Littlewood's bound with the explicit constant `C = 4`, following Littlewood (1924), with an
-explicit-formula argument in the style of Soundararajan (2009). `Unconditional/` proves the bound
-unconditionally in Lean, with RH supplied by the certified proof in
-leanprover-community/riemann-hypothesis, from the standard three axioms only.
+zeta-function*, Proc. Cambridge Philos. Soc. 22 (1924), 295-318) proved that RH implies
+`|ζ(1/2 + it)| ≤ exp(C log t / log log t)` for large `t`, for some absolute constant `C`.
+Titchmarsh's 1930 tract *The Zeta-Function of Riemann* gives it as Theorem 63 (§5.72); the
+second edition of *The Theory of the Riemann Zeta-Function* has it in §14.14. Chandee and
+Soundararajan (Bull. LMS 43 (2011)) showed that any `C > (log 2)/2` works. Without RH, the best
+known bounds are powers of `t` (Bourgain 2017: `t^{13/84+ε}`). The proof here follows
+Littlewood (1924), with an explicit-formula argument in the style of Soundararajan (2009).
 
 ```lean
 /-- `Littlewood/Statement.lean` -/
@@ -37,8 +40,8 @@ theorem log_norm_zeta_le (hRH : RiemannHypothesis) :
 
 | Theorem | Tier |
 |---|---|
-| `Littlewood.littlewood_of_RH` | **C** (RH is an explicit hypothesis) |
-| `littlewood_bound` (`Unconditional/`) | **U** |
+| `Littlewood.littlewood_of_RH` | C (RH is an explicit hypothesis) |
+| `littlewood_bound` (`Unconditional/`) | U |
 
 * `RiemannHypothesis` is Mathlib's definition, used unchanged. leanprover-community/riemann-hypothesis
   proves it as `riemannHypothesis : RiemannHypothesis`.
@@ -58,34 +61,34 @@ From `lake env lean` on a file containing `import Littlewood` and the `#print ax
 'Littlewood.explicit_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
-Only the standard three. There is no `native_decide`.
+These are the standard three axioms. There is no `native_decide`.
 
 ## Proof outline
 
 The full blueprint, with every step's Lean statement, is in [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
 Notation: `s = σ + it`, `ρ = 1/2 + iγ` runs over the zeros of `ξ` with multiplicity `m_ρ`.
 
-1. **Transfer to the half line** (lindelof-rh, `Lindelof.norm_zeta_half_le`). Under RH,
+1. Transfer to the half line (lindelof-rh, `Lindelof.norm_zeta_half_le`). Under RH,
    `|ξ(σ+it)|` increases in `σ ≥ 1/2`, so `|ζ(1/2+it)| ≤ C₁ t^{δ/2} |ζ(1/2+δ+it)|`. It is
    used with `δ = 1/log x`, at a cost of `log t / (2 log x)`.
-2. **Perron kernels** (`Kernel.lean`). `(1/2π)∫ y^w/w² = log y` and
+2. Perron kernels (`Kernel.lean`). `(1/2π)∫ y^w/w² = log y` and
    `(1/2π)∫ y^w/((w-b)w) = (y^b-1)/b` on `Re w = 2`, by Mellin inversion (erdos-985 `perron_prof`).
-3. **Term-by-term Perron** (`Termwise.lean`). If `G(z) - G(s) = Σ m_i (1/(z-a_i) - 1/(s-a_i))`,
+3. Term-by-term Perron (`Termwise.lean`). If `G(z) - G(s) = Σ m_i (1/(z-a_i) - 1/(s-a_i))`,
    then `(1/2π)∫ G(s+w) x^w/w² = G(s) log x + Σ m_i (x^{a_i-s}-1)/(a_i-s)²`. No contour is shifted.
-4. **The three expansions.** `L(Λ, ·)` (`Dirichlet.lean`) gives `Σ_{n≤x} Λ(n) n^{-s} log(x/n)`.
+4. The three expansions. `L(Λ, ·)` (`Dirichlet.lean`) gives `Σ_{n≤x} Λ(n) n^{-s} log(x/n)`.
    `-ξ'/ξ` (`XiSide.lean`, Hadamard from erdos-985) gives the zero terms. The archimedean factor
    `R(s) = 1/(s-1) - ½ log π + ½ ψ(1+s/2)` (`GammaSide.lean`, digamma series) gives
    `E_R` with `|E_R| ≤ x + 1 + Σ 1/(k+1)²`.
-5. **Explicit formula** (`Explicit.lean`):
+5. Explicit formula (`Explicit.lean`):
    `log x · (-ζ'/ζ(s)) = D(s,x) + Σ_ρ m_ρ (x^{ρ-s}-1)/(ρ-s)² - E_R(s,x)` for `Re s > 1/2`.
-6. **Integrate over `σ ∈ [σ₀, 2]`** (`ZeroIntegral.lean`, `Integrate.lean`, `Bound.lean`).
+6. Integrate over `σ ∈ [σ₀, 2]` (`ZeroIntegral.lean`, `Integrate.lean`, `Bound.lean`).
    `log|ζ(σ₀+it)| - log|ζ(2+it)| = ∫ Re(-ζ'/ζ)`. For each zero, `-1/(ρ-s)²` integrates exactly
    to `Re 1/(2+it-ρ) - Re 1/(s₀-ρ)`, and `x^{ρ-s}/(ρ-s)²` integrates to at most
    `1/(log x |s₀-ρ|²)`. Under RH, `Re 1/(s₀-ρ) = (σ₀-1/2)/|s₀-ρ|²`, so the second term is absorbed
    once `(σ₀ - 1/2) log x ≥ 1`. What remains is `Σ m_ρ Re 1/(2+it-ρ) = Re ξ'/ξ(2+it) ≤ log t + O(1)`.
    Result (`key_bound`):
    `log x · (log|ζ(σ₀+it)| - log|ζ(2+it)|) ≤ 2((x+1)(log x)² + x + 1 + S) + Re ξ'/ξ(2+it)`.
-7. **Constants** (`Main.lean`, `Asymptotic.lean`). Take `σ₀ = 1/2 + 1/log x` and `x = √(log t)`,
+7. Constants (`Main.lean`, `Asymptotic.lean`). Take `σ₀ = 1/2 + 1/log x` and `x = √(log t)`,
    so `log x = ½ log log t`. The exponent is `3 log t / log log t + O(√(log t) log log t)`,
    hence at most `4 log t / log log t` for large `t`.
 
@@ -109,13 +112,14 @@ Notation: `s = σ + it`, `ρ = 1/2 + iγ` runs over the zeros of `ξ` with multi
 
 ## Deviations from the literature
 
-* **Constant.** The proof gives `C = 4`. Littlewood's theorem asks only for some `C`, so this is
-  the full target. The sharp `(log 2)/2 + ε` (Chandee–Soundararajan) needs the Guinand–Weil
-  formula with Beurling–Selberg majorants and is not attempted.
-* **Route.** Littlewood and Titchmarsh go through `S₁(t) = ∫ S`. Here we integrate an explicit
-  formula for `ζ'/ζ` in `σ`, as in Soundararajan (Ann. Math. 170 (2009)). A shorter "three
-  circles" proof using lindelof-rh's machinery does not reach `log t / log log t`; see the
-  blueprint, "Why not three circles".
+The proof gives `C = 4`. Littlewood's theorem asks only for some `C`, so this is the full
+target. The sharp constant `(log 2)/2 + ε` (Chandee–Soundararajan) needs the Guinand–Weil
+formula with Beurling–Selberg majorants and is not attempted.
+
+The route differs. Littlewood and Titchmarsh go through `S₁(t) = ∫ S`. This proof integrates an
+explicit formula for `ζ'/ζ` in `σ`, as in Soundararajan (Ann. Math. 170 (2009)). A shorter
+"three circles" proof using lindelof-rh's machinery does not reach `log t / log log t`; see the
+blueprint, "Why not three circles".
 
 ## Building
 
@@ -155,7 +159,7 @@ Output:
 ```
 
 The import needs about 93 GB of cache, about 19 GB of RAM and roughly 900k open files. Raise
-the open-file limit first, e.g. `prlimit --nofile=2000000:2000000`.
+the open-file limit first; on Linux `sudo prlimit --pid $$ --nofile=2000000:2000000`.
 
 The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
