@@ -1,11 +1,26 @@
 # Erdős Problem 985 in Lean
 
 [Erdős Problem 985](https://www.erdosproblems.com/985) asks whether every odd prime `p` has a
-prime primitive root `q < p`. This project is a Lean proof that GRH implies it, and, with GRH
-taken from [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
-(not independently verified), a proof of the unconditional statement:
+prime primitive root `q < p`. This project is a Lean proof that GRH for Dirichlet L-functions
+implies it. `Unconditional/` then derives the statement from the Lean proof of GRH in
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis),
+which has not been independently verified:
 
-**Literature status:** GRH implies Erdős 985 is proved in this repo and its paper; no earlier published proof is known to us (not yet checked); not a solution of Erdős 985.
+**Status in the literature.** Erdős Problem 985 is open: unconditionally it is not even
+known that every sufficiently large prime has a prime primitive root below `p` (the best
+uniform bound is Ha's `ĝ(p) ≪ p^{3.1}`, J. Number Theory 133 (2013)). The implication proved
+here, "GRH for Dirichlet L-functions implies Erdős 985", is not new: it is an immediate
+corollary of Theorem 1 of McGown, Treviño and Trudgian, *Resolving Grosswald's conjecture on
+GRH*, Funct. Approx. Comment. Math. 55 (2016) 215–225 (arXiv:1508.05182). Under GRH that
+theorem gives a prime primitive root below `√p − 2` for every prime `p > 2791`, and the
+primes up to 2791 are a finite check. Our proof follows the argument of their Theorem 2, with
+the search range `[1, p)` in place of `[1, √p − 2)`, so the analysis closes at `p ≥ 10^8`
+without their sieve and the rest is a machine check. What this repository adds is a Lean
+proof: `erdos_985_of_GRH`, with GRH as an explicit hypothesis (label **RH-consequence**,
+tier C), including a complete proof of the Bach-type estimate that McGown–Treviño–Trudgian
+state as their Lemma 1 without proof. `Unconditional/` derives `erdos_985` from the Lean proof
+of GRH in leanprover-community/riemann-hypothesis, which has not been independently
+verified, so Erdős 985 should not be described as solved.
 
 ```lean
 theorem erdos_985 : Erdos985.Erdos985Statement   -- Unconditional/Erdos985Unconditional.lean
