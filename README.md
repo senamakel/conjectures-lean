@@ -6,8 +6,11 @@ particular the least quadratic non-residue mod an odd prime `p` is at most `2 lo
 Unconditionally only Burgess-type bounds `p^{1/(4√e)+ε}` are known.
 
 **Literature status: RH-consequence.** The GRH ⇒ `log² p` bound is Ankeny (1952), made explicit
-by Bach (1990, constant 2). This is a Lean proof that GRH implies it, following Ankeny and Bach;
-our constant `21/5` is weaker than Bach's `2`. It is not new mathematics.
+by Bach (1990, constant 2). This repository is a complete Lean proof that GRH implies the bound
+with constant `21/5`, following Ankeny and Bach, with every modulus `q < 2^17` covered by a
+proved-sound checker. `Unconditional/` proves `BachSubgroupBound (21/5)` unconditionally in Lean,
+with GRH supplied by the certified proof in leanprover-community/riemann-hypothesis. Our constant
+is `21/5`; Bach's is `2` (see "Why `21/5`").
 
 This repository proves, assuming GRH for Dirichlet L-functions
 (`Erdos985.DirichletLNonvanishingRightOfHalf`, copied verbatim from
@@ -114,6 +117,4 @@ The script uses that project's community cache, about 93 GB. The import opens ar
 module files and needs about 19 GB of RAM. Raise the open-file limit first; on macOS:
 `sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`.
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
