@@ -10,5 +10,10 @@ name = "Erdos985"
 git = "https://github.com/senamakel/erdos-985.git"
 rev = "9538edb73dc72c8fdc04b4e0df076c8930ee2fba"
 
+[[require]]
+name = "Schoenfeld"
+git = "https://github.com/senamakel/schoenfeld-rh.git"
+rev = "14df2ce0b613a76bc53100b1c3e2f1b946b4810c"
+
 [[lean_lib]]
 name = "GoldbachAverage"

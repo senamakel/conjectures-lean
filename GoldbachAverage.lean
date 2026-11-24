@@ -1,1 +1,2 @@
-import GoldbachAverage.Statement
+import GoldbachAverage.Sum
+import GoldbachAverage.Main
