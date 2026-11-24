@@ -1,13 +1,18 @@
 # Cramér's prime-gap theorem under RH in Lean
 
-Cramér (1920, *Arkiv för Matematik, Astronomi och Fysik* **15**, no. 5) proved that the Riemann
-hypothesis implies `p_{n+1} − p_n = O(√p_n log p_n)`. This is his theorem, not his 1936
-conjecture `p_{n+1} − p_n = O(log² p_n)`, which is open even under RH. The best explicit form is
-Carneiro–Milinovich–Soundararajan (2019, *Comment. Math. Helv.* **94**, 533–568):
-`p_{n+1} − p_n < (22/25) √p_n log p_n` for every `p_n > 3`, under RH. Unconditionally the best
-exponent is Baker–Harman–Pintz (2001): `p_{n+1} − p_n = O(p_n^{0.525})`.
+**Literature status: RH-consequence.** Cramér (1920, *Arkiv för Matematik, Astronomi och
+Fysik* **15**, no. 5) proved that the Riemann hypothesis implies
+`p_{n+1} − p_n = O(√p_n log p_n)`; explicit forms are due to Dudek (2015, *Int. J. Number
+Theory* **11**, 771–778) and Carneiro–Milinovich–Soundararajan (2019, *Comment. Math. Helv.*
+**94**, 533–568), the latter with `p_{n+1} − p_n < (22/25) √p_n log p_n` for every `p_n > 3`.
+This is Cramér's theorem, not his 1936 conjecture `p_{n+1} − p_n = O(log² p_n)`, which is open
+even under RH. Unconditionally the best exponent is Baker–Harman–Pintz (2001):
+`p_{n+1} − p_n = O(p_n^{0.525})`. Nothing here is new mathematics.
 
-This project proves Cramér's theorem under RH with the explicit constant `2`:
+The main library is a Lean proof that RH implies Cramér's bound, following Cramér (1920): the
+classical argument through a triangular (Fejér-type) weight, here the second difference of
+`ψ₁`, with the explicit constant `2` (weaker
+than `22/25`, see "Deviations"):
 
 ```lean
 theorem Cramer.primeInShortInterval_of_RH (hRH : RiemannHypothesis) :
@@ -144,7 +149,9 @@ primality proofs), `Cramer.Identity` 23 s.
 
 ## Unconditional version
 
-`Unconditional/CramerUnconditional.lean` imports
+`Unconditional/CramerUnconditional.lean` states Cramér's bound with constant `2`, given the Lean
+proof of RH in leanprover-community/riemann-hypothesis, which has not been independently
+verified. It imports
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
 (commit `507a75d91d`) and discharges the hypothesis with `riemannHypothesis`:
 
