@@ -3,7 +3,7 @@ import Mathlib
 /-!
 # Step 3: a ratio bound for `Γ` on vertical lines
 
-`|Γ(b + iy)| ≤ C |y|^{b-a} |Γ(a + iy)|` for `1/4 ≤ a ≤ b ≤ 1`, `|y| ≥ 1`, with `C` absolute.
+`|Γ(b + iy)| ≤ C |y|^{b-a} |Γ(a + iy)|` for `0 ≤ a ≤ b ≤ 1`, `|y| ≥ 1`, with `C` absolute.
 See `docs/BLUEPRINT.md`, Step 3 (Gauss product `Complex.GammaSeq_tendsto_Gamma`).
 
 ## Proof
@@ -12,7 +12,7 @@ Write `d = b - a`, `D_j = (b+j)² + y²` and `t_j = (a+b+2j)/D_j`. Then
 `|a+j+iy|² = D_j (1 - d t_j) ≤ D_j e^{-d t_j}`, so
 `∏_{j≤n} |a+j+iy| ≤ e^{-(d/2) S_n} ∏_{j≤n} |b+j+iy|` with `S_n = Σ_{j≤n} t_j`.
 Comparing `t_j` with the telescoping increments of `log D_j + 8/(j+1)` gives
-`S_n ≥ 2 log n - 2 log |y| - 9`, hence `|GammaSeq (b+iy) n| ≤ e⁴ |y|^d |GammaSeq (a+iy) n|`
+`S_n ≥ 2 log n - 2 log |y| - 9`, hence `|GammaSeq (b+iy) n| ≤ e⁵ |y|^d |GammaSeq (a+iy) n|`
 for all `n ≥ 1`, and the bound passes to the limit.
 -/
 
@@ -47,7 +47,7 @@ private lemma norm_factor_le (a b y : ℝ) (j : ℕ) (hy : 1 ≤ |y|) :
   nlinarith [norm_nonneg ((a : ℂ) + y * I + j)]
 
 /-- The sum `S_n = Σ_{j≤n} t_j` grows like `2 log n`. -/
-private lemma sum_ge (a b y : ℝ) (n : ℕ) (ha : 1 / 4 ≤ a) (hab : a ≤ b) (hb : b ≤ 1)
+private lemma sum_ge (a b y : ℝ) (n : ℕ) (ha : 0 ≤ a) (hab : a ≤ b) (hb : b ≤ 1)
     (hy : 1 ≤ |y|) (hn : 1 ≤ n) :
     2 * Real.log n - 2 * Real.log |y| - 9 ≤
       ∑ j ∈ Finset.range (n + 1), (a + b + 2 * j) / ((b + j) ^ 2 + y ^ 2) := by
@@ -102,12 +102,12 @@ private lemma sum_ge (a b y : ℝ) (n : ℕ) (ha : 1 / 4 ≤ a) (hab : a ≤ b) 
   linarith
 
 theorem norm_Gamma_le_rpow_mul :
-    ∃ C : ℝ, ∀ a b y : ℝ, 1 / 4 ≤ a → a ≤ b → b ≤ 1 → 1 ≤ |y| →
+    ∃ C : ℝ, ∀ a b y : ℝ, 0 ≤ a → a ≤ b → b ≤ 1 → 1 ≤ |y| →
       ‖Gamma (b + y * I)‖ ≤ C * |y| ^ (b - a) * ‖Gamma (a + y * I)‖ := by
-  refine ⟨Real.exp 4, fun a b y ha hab hb hy => ?_⟩
+  refine ⟨Real.exp 5, fun a b y ha hab hb hy => ?_⟩
   have hy0 : 0 < |y| := by linarith
   have hyne : y ≠ 0 := abs_pos.1 hy0
-  set K := Real.exp 4 * |y| ^ (b - a) with hK
+  set K := Real.exp 5 * |y| ^ (b - a) with hK
   have hseq : ∀ n : ℕ, 1 ≤ n →
       ‖GammaSeq (b + y * I) n‖ ≤ K * ‖GammaSeq (a + y * I) n‖ := by
     intro n hn
@@ -136,7 +136,7 @@ theorem norm_Gamma_le_rpow_mul :
         rw [← Real.rpow_add hnr]; ring_nf
       rw [hsplit, hK, Real.rpow_def_of_pos hnr, Real.rpow_def_of_pos hy0]
       have : Real.exp (Real.log n * (b - a)) * Real.exp (-((b - a) / 2) * S) ≤
-          Real.exp 4 * Real.exp (Real.log |y| * (b - a)) := by
+          Real.exp 5 * Real.exp (Real.log |y| * (b - a)) := by
         rw [← Real.exp_add, ← Real.exp_add]
         apply Real.exp_le_exp.2
         nlinarith
@@ -144,7 +144,7 @@ theorem norm_Gamma_le_rpow_mul :
       calc Real.exp (Real.log n * (b - a)) * (n : ℝ) ^ a * Real.exp (-((b - a) / 2) * S)
           = Real.exp (Real.log n * (b - a)) * Real.exp (-((b - a) / 2) * S) * (n : ℝ) ^ a := by
             ring
-        _ ≤ Real.exp 4 * Real.exp (Real.log |y| * (b - a)) * (n : ℝ) ^ a :=
+        _ ≤ Real.exp 5 * Real.exp (Real.log |y| * (b - a)) * (n : ℝ) ^ a :=
             mul_le_mul_of_nonneg_right this hna
     have hnormb : ‖GammaSeq (b + y * I) n‖ = (n : ℝ) ^ b * (Nat.factorial n : ℝ) / P' := by
       rw [GammaSeq, norm_div, norm_mul, norm_natCast_cpow_of_pos hn0, norm_prod]

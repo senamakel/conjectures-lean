@@ -32,10 +32,10 @@ lemma norm_Gammaℝ_eq (σ t : ℝ) :
 
 /-- The Gamma ratio bound of Step 3, extended to `|y| ≥ 1/2` by compactness. -/
 lemma norm_Gamma_le_rpow_mul' :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ a b y : ℝ, 1 / 4 ≤ a → a ≤ b → b ≤ 1 → 1 / 2 ≤ |y| →
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ a b y : ℝ, 0 ≤ a → a ≤ b → b ≤ 1 → 1 / 2 ≤ |y| →
       ‖Gamma (b + y * I)‖ ≤ C * (2 * |y|) ^ (b - a) * ‖Gamma (a + y * I)‖ := by
   obtain ⟨C₀, hC₀⟩ := norm_Gamma_le_rpow_mul
-  set K : Set ℂ := {z | 1 / 4 ≤ z.re ∧ z.re ≤ 1 ∧ 1 / 2 ≤ |z.im| ∧ |z.im| ≤ 1} with hK
+  set K : Set ℂ := {z | 0 ≤ z.re ∧ z.re ≤ 1 ∧ 1 / 2 ≤ |z.im| ∧ |z.im| ≤ 1} with hK
   have hKcl : IsClosed K :=
     (isClosed_le continuous_const continuous_re).inter
       ((isClosed_le continuous_re continuous_const).inter
@@ -50,18 +50,19 @@ lemma norm_Gamma_le_rpow_mul' :
     rw [abs_of_nonneg (by linarith)] at this
     linarith
   have hKc : IsCompact K := Metric.isCompact_of_isClosed_isBounded hKcl hKb
-  have hcont : ContinuousOn (fun z => ‖Gamma z‖) K := by
-    intro z hz
-    refine (differentiableAt_Gamma z (fun m hm => ?_)).continuousAt.norm.continuousWithinAt
-    have := hz.1
+  have hnpole : ∀ z ∈ K, ∀ m : ℕ, z ≠ -m := by
+    intro z hz m hm
+    have := hz.2.2.1
     rw [hm] at this
     simp at this
-    linarith [(Nat.cast_nonneg m : (0 : ℝ) ≤ m)]
+    linarith
+  have hcont : ContinuousOn (fun z => ‖Gamma z‖) K := fun z hz =>
+    (differentiableAt_Gamma z (hnpole z hz)).continuousAt.norm.continuousWithinAt
   have hne : K.Nonempty := ⟨(1 / 2 : ℂ) + I, by norm_num [hK]⟩
   obtain ⟨z₀, hz₀K, hz₀⟩ := hKc.exists_isMinOn hne hcont
   obtain ⟨M, hM⟩ := hKc.exists_bound_of_continuousOn hcont
   have hm : 0 < ‖Gamma z₀‖ :=
-    norm_pos_iff.2 (Gamma_ne_zero_of_re_pos (by linarith [hz₀K.1]))
+    norm_pos_iff.2 (Gamma_ne_zero (hnpole z₀ hz₀K))
   set m := ‖Gamma z₀‖
   refine ⟨max C₀ 0 + max M 0 / m, add_nonneg (le_max_right _ _)
     (div_nonneg (le_max_right _ _) hm.le), ?_⟩
@@ -100,6 +101,70 @@ lemma norm_Gamma_le_rpow_mul' :
       _ ≤ (max C₀ 0 + max M 0 / m) * (2 * |y|) ^ (b - a) * ‖Gamma (a + y * I)‖ := by
           rw [mul_right_comm]
           exact le_mul_of_one_le_right (by positivity) hpow1
+
+/-- `‖Γ(x + 1 + iy)‖ = ‖x + iy‖ ‖Γ(x + iy)‖` off the real axis. -/
+lemma norm_Gamma_add_one_eq (x y : ℝ) (hy : y ≠ 0) :
+    ‖Gamma ((x + 1 : ℝ) + y * I)‖ = ‖(x : ℂ) + y * I‖ * ‖Gamma (x + y * I)‖ := by
+  have hne : (x : ℂ) + y * I ≠ 0 := fun h => hy (by simpa using congrArg Complex.im h)
+  have : ((x + 1 : ℝ) : ℂ) + y * I = ((x : ℂ) + y * I) + 1 := by push_cast; ring
+  rw [this, Gamma_add_one _ hne, norm_mul]
+
+/-- The Gamma ratio bound on the wider range `0 ≤ a ≤ b ≤ 2`, from `Γ(s + 1) = s Γ(s)`. -/
+lemma norm_Gamma_le_rpow_mul_two :
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ a b y : ℝ, 0 ≤ a → a ≤ b → b ≤ 2 → 1 / 2 ≤ |y| →
+      ‖Gamma (b + y * I)‖ ≤ C * (2 * |y|) ^ (b - a) * ‖Gamma (a + y * I)‖ := by
+  obtain ⟨C, hC0, hC⟩ := norm_Gamma_le_rpow_mul'
+  refine ⟨C + 3 * C + 3 * C ^ 2, by positivity, fun a b y ha hab hb hy => ?_⟩
+  have hy0 : y ≠ 0 := fun h => by rw [h, abs_zero] at hy; norm_num at hy
+  have hpow : ∀ e : ℝ, 0 ≤ (2 * |y|) ^ e := fun e => Real.rpow_nonneg (by positivity) e
+  -- both arguments at least `1`: shift down by one
+  have hhigh : ∀ a b : ℝ, 1 ≤ a → a ≤ b → b ≤ 2 →
+      ‖Gamma (b + y * I)‖ ≤ 3 * C * (2 * |y|) ^ (b - a) * ‖Gamma (a + y * I)‖ := by
+    intro a b ha hab hb
+    have e1 := norm_Gamma_add_one_eq (a - 1) y hy0
+    have e2 := norm_Gamma_add_one_eq (b - 1) y hy0
+    rw [show a - 1 + 1 = a by ring] at e1
+    rw [show b - 1 + 1 = b by ring] at e2
+    rw [e1, e2]
+    have hG := hC (a - 1) (b - 1) y (by linarith) (by linarith) (by linarith) hy
+    rw [show b - 1 - (a - 1) = b - a by ring] at hG
+    have hlin : ‖((b - 1 : ℝ) : ℂ) + y * I‖ ≤ 3 * ‖((a - 1 : ℝ) : ℂ) + y * I‖ := by
+      have hy' : 1 / 2 ≤ ‖((a - 1 : ℝ) : ℂ) + y * I‖ :=
+        hy.trans (by simpa using abs_im_le_norm (((a - 1 : ℝ) : ℂ) + y * I))
+      have : ((b - 1 : ℝ) : ℂ) + y * I = (((a - 1 : ℝ) : ℂ) + y * I) + ((b - a : ℝ) : ℂ) := by
+        push_cast; ring
+      rw [this]
+      refine (norm_add_le _ _).trans ?_
+      rw [norm_real, Real.norm_of_nonneg (by linarith)]
+      linarith
+    calc ‖((b - 1 : ℝ) : ℂ) + y * I‖ * ‖Gamma (((b - 1 : ℝ) : ℂ) + y * I)‖
+        ≤ (3 * ‖((a - 1 : ℝ) : ℂ) + y * I‖) *
+            (C * (2 * |y|) ^ (b - a) * ‖Gamma (((a - 1 : ℝ) : ℂ) + y * I)‖) :=
+          mul_le_mul hlin hG (norm_nonneg _) (by positivity)
+      _ = 3 * C * (2 * |y|) ^ (b - a) *
+            (‖((a - 1 : ℝ) : ℂ) + y * I‖ * ‖Gamma (((a - 1 : ℝ) : ℂ) + y * I)‖) := by ring
+  have hG0 : 0 ≤ ‖Gamma (a + y * I)‖ := norm_nonneg _
+  by_cases hb1 : b ≤ 1
+  · refine (hC a b y ha hab hb1 hy).trans ?_
+    gcongr
+    nlinarith
+  by_cases ha1 : 1 ≤ a
+  · refine (hhigh a b ha1 hab hb).trans ?_
+    gcongr
+    nlinarith
+  push Not at hb1 ha1
+  have h1 := hhigh 1 b le_rfl hb1.le hb
+  have h2 := hC a 1 y ha ha1.le le_rfl hy
+  have hsplit : (2 * |y|) ^ (b - a) = (2 * |y|) ^ (b - 1) * (2 * |y|) ^ (1 - a) := by
+    rw [← Real.rpow_add (by positivity)]; ring_nf
+  have h1' : ‖Gamma ((1 : ℝ) + y * I)‖ ≤ C * (2 * |y|) ^ (1 - a) * ‖Gamma (a + y * I)‖ := h2
+  calc ‖Gamma (b + y * I)‖ ≤ 3 * C * (2 * |y|) ^ (b - 1) * ‖Gamma ((1 : ℝ) + y * I)‖ := h1
+    _ ≤ 3 * C * (2 * |y|) ^ (b - 1) * (C * (2 * |y|) ^ (1 - a) * ‖Gamma (a + y * I)‖) := by
+        gcongr
+    _ = 3 * C ^ 2 * (2 * |y|) ^ (b - a) * ‖Gamma (a + y * I)‖ := by rw [hsplit]; ring
+    _ ≤ _ := by
+        gcongr
+        nlinarith
 
 /-- Under RH, a bound for the factor `s (s - 1) Γℝ(s)` moves bounds for `ζ` leftwards. -/
 lemma norm_zeta_le_of_factor (hRH : RiemannHypothesis) {σ σ' t K : ℝ} (hσ : 1 / 2 ≤ σ)

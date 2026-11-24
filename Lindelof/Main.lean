@@ -6,6 +6,10 @@ import Lindelof.ThreeLines
 
 For `0 < ε ≤ 1/2`: Step 4 gives `‖ζ(1/2+it)‖ ≤ C t^{ε/2} ‖ζ(1/2+ε+it)‖`; Steps 5–7 give
 `‖ζ(1/2+ε+it)‖ ≤ 3 exp(C (log (t+2))^α)` with `α < 1`, which is `O(t^{ε/4})`.
+
+The argument is stated once for any `f` satisfying `LogBounds f` (`isBigO_rpow_of_logBounds`);
+`ζ` (`logBounds_riemannZeta`) and primitive Dirichlet L-functions (`logBounds_LFunction`) are
+the two instances.
 -/
 
 namespace Lindelof
@@ -63,13 +67,25 @@ theorem eventually_mul_log_rpow_le {α C c : ℝ} (hα : α < 1) (hc : 0 < c) :
     _ = (|C| * x ^ (-(1 - α))) * x := by rw [hsplit]; ring
     _ ≤ c * x := by gcongr
 
-/-- Lindelöf for `0 < ε ≤ 1/2`. -/
-theorem lindelof_small (hRH : RiemannHypothesis) {ε : ℝ} (hε : 0 < ε) (hε' : ε ≤ 1 / 2) :
-    (fun t : ℝ => ‖riemannZeta (1 / 2 + t * I)‖) =O[atTop] fun t : ℝ => t ^ ε := by
-  obtain ⟨C₁, hC₁⟩ := norm_zeta_half_le hRH
-  obtain ⟨M, hMd, hexp, hbd⟩ := exists_log_zetaQ hRH
-  obtain ⟨C₂, hC₂⟩ := norm_log_zetaQ_le hRH hMd hexp hbd (ε / 2) (by positivity)
-  obtain ⟨C₀, hC₀⟩ := hbd
+/-- The hypotheses of the generic Lindelöf argument (Steps 4–8) for a function `f`:
+`M` is a holomorphic logarithm of `g` on `σ > 1/2`, `g` grows at most linearly on
+`1/2 ≤ σ ≤ 5`, `M` is bounded on `2 ≤ σ ≤ 5`, `‖f‖ ≤ A exp ‖M‖` away from the real axis, and
+`f` on the critical line is controlled by `f` slightly to the right (Step 4). -/
+structure LogBounds (f : ℂ → ℂ) : Prop where
+  exists_bounds : ∃ (g M : ℂ → ℂ) (A K C₀ C₁ : ℝ), 1 ≤ K ∧
+    (∀ s : ℂ, 1 / 2 ≤ s.re → s.re ≤ 5 → ‖g s‖ ≤ K * (|s.im| + 2)) ∧
+    DifferentiableOn ℂ M halfPlane ∧ (∀ s ∈ halfPlane, exp (M s) = g s) ∧
+    (∀ s : ℂ, 2 ≤ s.re → s.re ≤ 5 → ‖M s‖ ≤ C₀) ∧
+    (∀ s ∈ halfPlane, 1 ≤ |s.im| → ‖f s‖ ≤ A * Real.exp ‖M s‖) ∧
+    (∀ δ : ℝ, 0 < δ → δ ≤ 1 / 2 → ∀ t : ℝ, 1 ≤ t →
+      ‖f (1 / 2 + t * I)‖ ≤ C₁ * t ^ (δ / 2) * ‖f ((1 / 2 + δ : ℝ) + t * I)‖)
+
+/-- **Generic Step 8**, for `0 < ε ≤ 1/2`. -/
+theorem isBigO_of_logBounds {f : ℂ → ℂ} (hf : LogBounds f) {ε : ℝ} (hε : 0 < ε)
+    (hε' : ε ≤ 1 / 2) :
+    (fun t : ℝ => ‖f (1 / 2 + t * I)‖) =O[atTop] fun t : ℝ => t ^ ε := by
+  obtain ⟨g, M, A, K, C₀, C₁, hK1, hKb, hMd, hexp, hC₀, hfM, hC₁⟩ := hf.exists_bounds
+  obtain ⟨C₂, hC₂⟩ := norm_log_le_of_bounds hK1 hKb hMd hexp ⟨C₀, hC₀⟩ (ε / 2) (by positivity)
   set a : ℝ := 1 / 2 + ε / 2 with ha
   have hab : a < 2 := by linarith
   have hsub : {s : ℂ | a ≤ s.re ∧ s.re ≤ 2} ⊆ halfPlane := fun s hs => by
@@ -81,7 +97,7 @@ theorem lindelof_small (hRH : RiemannHypothesis) {ε : ℝ} (hε : 0 < ε) (hε'
   have hα1 : α < 1 := by
     rw [hα, div_lt_one (by linarith)]; linarith
   have hev := eventually_mul_log_rpow_le (C := C₃) hα1 (show 0 < ε / 4 by positivity)
-  refine IsBigO.of_bound (9 * |C₁|) ?_
+  refine IsBigO.of_bound (3 * |A| * |C₁|) ?_
   filter_upwards [hev, eventually_ge_atTop (1 : ℝ)] with t hlog ht
   have ht0 : 0 < t := by linarith
   -- the bound at `σ + it`
@@ -90,7 +106,7 @@ theorem lindelof_small (hRH : RiemannHypothesis) {ε : ℝ} (hε : 0 < ε) (hε'
     norm_num; linarith
   have him : 1 ≤ |((σ : ℂ) + t * I).im| := by
     simp [abs_of_pos ht0]; linarith
-  have hζσ := norm_riemannZeta_le_exp hexp hs him
+  have hfσ := hfM _ hs him
   have hMσ := hC₃ σ t (by linarith) (by linarith)
   rw [abs_of_pos ht0] at hMσ
   -- `exp (C₃ log(t+2)^α) ≤ (t+2)^{ε/4} ≤ 3 t^{ε/4}`
@@ -113,26 +129,43 @@ theorem lindelof_small (hRH : RiemannHypothesis) {ε : ℝ} (hε : 0 < ε) (hε'
     rw [← Real.rpow_add ht0]
     exact Real.rpow_le_rpow_of_exponent_le ht (by linarith)
   rw [Real.norm_eq_abs, Real.norm_eq_abs, abs_norm, abs_of_pos (Real.rpow_pos_of_pos ht0 ε)]
-  calc ‖riemannZeta (1 / 2 + t * I)‖
-      ≤ C₁ * t ^ (ε / 2) * ‖riemannZeta ((1 / 2 + ε : ℝ) + t * I)‖ := hhalf
-    _ ≤ |C₁| * t ^ (ε / 2) * ‖riemannZeta ((1 / 2 + ε : ℝ) + t * I)‖ := by
+  have hfσ' : ‖f ((1 / 2 + ε : ℝ) + t * I)‖ ≤ |A| * (3 * t ^ (ε / 4)) :=
+    hfσ.trans (mul_le_mul (le_abs_self A) hexp_le (Real.exp_pos _).le (abs_nonneg A))
+  calc ‖f (1 / 2 + t * I)‖
+      ≤ C₁ * t ^ (ε / 2) * ‖f ((1 / 2 + ε : ℝ) + t * I)‖ := hhalf
+    _ ≤ |C₁| * t ^ (ε / 2) * ‖f ((1 / 2 + ε : ℝ) + t * I)‖ := by
         gcongr; exact le_abs_self C₁
-    _ ≤ |C₁| * t ^ (ε / 2) * (3 * (3 * t ^ (ε / 4))) := by
-        gcongr
-        exact hζσ.trans (by gcongr)
-    _ = 9 * |C₁| * (t ^ (ε / 2) * t ^ (ε / 4)) := by ring
-    _ ≤ 9 * |C₁| * t ^ ε := by gcongr
+    _ ≤ |C₁| * t ^ (ε / 2) * (|A| * (3 * t ^ (ε / 4))) := by gcongr
+    _ = 3 * |A| * |C₁| * (t ^ (ε / 2) * t ^ (ε / 4)) := by ring
+    _ ≤ 3 * |A| * |C₁| * t ^ ε := by gcongr
 
-/-- **Littlewood's theorem**: RH implies the Lindelöf hypothesis. -/
-theorem lindelof_of_RH (hRH : RiemannHypothesis) : LindelofHypothesis := by
-  intro ε hε
+/-- **Generic Step 8**: `LogBounds f` gives `f(1/2 + it) = O(t^ε)` for every `ε > 0`. -/
+theorem isBigO_rpow_of_logBounds {f : ℂ → ℂ} (hf : LogBounds f) {ε : ℝ} (hε : 0 < ε) :
+    (fun t : ℝ => ‖f (1 / 2 + t * I)‖) =O[atTop] fun t : ℝ => t ^ ε := by
   have hε' : 0 < min ε (1 / 2) := lt_min hε (by norm_num)
-  refine (lindelof_small hRH hε' (min_le_right _ _)).trans ?_
+  refine (isBigO_of_logBounds hf hε' (min_le_right _ _)).trans ?_
   refine IsBigO.of_bound 1 ?_
   filter_upwards [eventually_ge_atTop (1 : ℝ)] with t ht
   have ht0 : 0 ≤ t := by linarith
   rw [Real.norm_eq_abs, Real.norm_eq_abs, abs_of_nonneg (Real.rpow_nonneg ht0 _),
     abs_of_nonneg (Real.rpow_nonneg ht0 _), one_mul]
   exact Real.rpow_le_rpow_of_exponent_le ht (min_le_left _ _)
+
+/-- Under RH, `ζ` satisfies the hypotheses of the generic argument. -/
+theorem logBounds_riemannZeta (hRH : RiemannHypothesis) : LogBounds riemannZeta := by
+  obtain ⟨C₁, hC₁⟩ := norm_zeta_half_le hRH
+  obtain ⟨M, hMd, hexp, C₀, hC₀⟩ := exists_log_zetaQ hRH
+  obtain ⟨K, hK1, hKb⟩ := norm_zetaQ_le hRH
+  exact ⟨zetaQ, M, 3, K, C₀, C₁, hK1, hKb, hMd, hexp, hC₀,
+    fun s hs him => norm_riemannZeta_le_exp hexp hs him, hC₁⟩
+
+/-- Lindelöf for `0 < ε ≤ 1/2`. -/
+theorem lindelof_small (hRH : RiemannHypothesis) {ε : ℝ} (hε : 0 < ε) (hε' : ε ≤ 1 / 2) :
+    (fun t : ℝ => ‖riemannZeta (1 / 2 + t * I)‖) =O[atTop] fun t : ℝ => t ^ ε :=
+  isBigO_of_logBounds (logBounds_riemannZeta hRH) hε hε'
+
+/-- **Littlewood's theorem**: RH implies the Lindelöf hypothesis. -/
+theorem lindelof_of_RH (hRH : RiemannHypothesis) : LindelofHypothesis := fun _ hε =>
+  isBigO_rpow_of_logBounds (logBounds_riemannZeta hRH) hε
 
 end Lindelof
