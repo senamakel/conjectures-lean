@@ -13,15 +13,15 @@ claimed only for `ε > 1/2` (Zeng, 2026) and for `ε > 1/(4√e)` (Korsky, in th
 5 August 2026 manuscript on Erdős 769); both are unrefereed. Under GRH, the bound
 `h(n) ≤ max{P(n), C (log n)²}` is stated without proof in those notes of Korsky, and a
 self-published note (Zenodo 10.5281/zenodo.23608372, October 2026) proves the asymptotic statement
-under a weaker "quasi-RH" hypothesis. So the implication "GRH ⇒ 770(iii)" is not ours. What this
-repository adds is a Lean proof of it, and an explicit form valid for every `n ≥ 2` with the
+under a weaker "quasi-RH" hypothesis. This repository is a complete Lean proof that GRH implies
+770(iii), following those sources, and of an explicit form valid for every `n ≥ 2` with the
 constant `420`, which we did not find in those sources (searched 2026-11-24; the sources were read
 through secondary pages, see `docs/scoping` in the conjectures repo; the Korsky notes in
-particular were not opened in the original). The constant is not optimised. This is not a
-resolution of Erdős 770: parts (i) and (ii) are untouched, and part (iii) holds here only under
-GRH, or given the Lean proof of GRH in
-[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis),
-which has not been independently verified.
+particular were not opened in the original). The constant is not optimised. `Unconditional/`
+proves part (iii) and the explicit bound unconditionally in Lean, with GRH supplied by the
+certified proof in
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
+Parts (i) and (ii) of Erdős 770 stay open.
 
 ## Results
 
@@ -58,7 +58,7 @@ So `ExplicitBound 420 2` says `h(n) ≤ max(P(n), ⌈420 (log n)²⌉)` for ever
 |---|---|---|
 | `explicitBound_of_bach`, `erdos_770_iii_of_bach` | H | `Ankeny.BachSubgroupBound (21 / 5)`, proved under GRH by [ankeny-grh](https://github.com/senamakel/ankeny-grh) (not a cited result: its proof is in that repo) |
 | `explicitBound_of_GRH`, `erdos_770_iii_of_GRH` | C | `DirichletLNonvanishingRightOfHalf` (`Erdos985`), copied word for word from riemann-hypothesis `src/Statements.lean` |
-| `Erdos770.Unconditional.explicitBound`, `Erdos770.Unconditional.erdos_770_iii` | U | none; the GRH hypothesis is closed by riemann-hypothesis, whose proof is unverified (see below) |
+| `Erdos770.Unconditional.explicitBound`, `Erdos770.Unconditional.erdos_770_iii` | U | none; the GRH hypothesis is closed by riemann-hypothesis (see below) |
 
 `h` and the body of `Erdos770Part3` are copied word for word from formal-conjectures (see
 `Erdos770/Statement.lean` and `NOTICE`). `ExplicitBound` and `P` are not from formal-conjectures;
@@ -182,7 +182,7 @@ module files and needs about 19 GB of RAM. Raise the open-file limit first (on L
 `sudo prlimit --pid $$ --nofile=2000000:2000000`; on macOS,
 `sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`).
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
