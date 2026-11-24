@@ -1,19 +1,23 @@
 # Robin's inequality from RH in Lean
 
+Robin's inequality `σ(n) < e^γ n log log n` holds for every `n > 5040`, and so does Lagarias's
+form `σ(n) ≤ H_n + exp(H_n) log H_n` for every `n ≥ 1`: `robin_unconditional` and
+`lagarias_unconditional` prove both unconditionally in Lean, with RH supplied by the certified
+proof in
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
+(L. Alpöge, 2026). The main library is a complete Lean 4 + Mathlib proof that RH implies Robin's
+inequality, following Robin (1984), and that RH implies Lagarias's form. The range below the
+analytic threshold (`5040 < n`, `log n ≤ e^30`) is checked here by a proved-sound segmented
+sieve (624 `native_decide` chunks), so no hypothesis besides RH remains.
+
 **Literature status: RH-equivalent.** Robin (*Grandes valeurs de la fonction somme des
 diviseurs et hypothèse de Riemann*, J. Math. Pures Appl. 63 (1984)) proved that the Riemann
 hypothesis is equivalent to `σ(n) < e^γ n log log n` for every `n > 5040`; Lagarias (Amer. Math.
-Monthly 109 (2002)) gave the equivalent form `σ(n) ≤ H_n + exp(H_n) log H_n`. This repository is a
-complete Lean 4 + Mathlib proof that RH implies Robin's inequality, following Robin (1984), and
-that RH implies Lagarias's form. The range below the analytic threshold (`5040 < n`,
-`log n ≤ e^30`) is checked here by a proved-sound segmented sieve (624 `native_decide`
-chunks), so no hypothesis besides RH remains. `Unconditional/` proves both inequalities
-unconditionally in Lean, with RH supplied by the certified proof in
-leanprover-community/riemann-hypothesis. Robin's inequality is equivalent to RH (Robin), so this
-theorem is RH in another form. Before the 2026 proof of RH the inequality was known for
-`5040 < n ≤ 10^{10^{13.11485}}` (Morrill–Platt, Integers 21 (2021), extending Briggs, Experiment.
-Math. 15 (2006)), for odd `n > 9` and squarefree `n > 30` (Choie–Lichiardopol–Moree–Solé 2007),
-and Robin proved `σ(n) < e^γ n log log n + 0.6483 n/log log n` for `n ≥ 3`.
+Monthly 109 (2002)) gave the equivalent form. These theorems are RH in another form. Before the
+2026 proof of RH the inequality was known for `5040 < n ≤ 10^{10^{13.11485}}` (Morrill–Platt,
+Integers 21 (2021), extending Briggs, Experiment. Math. 15 (2006)), for odd `n > 9` and
+squarefree `n > 30` (Choie–Lichiardopol–Moree–Solé 2007), and Robin proved
+`σ(n) < e^γ n log log n + 0.6483 n/log log n` for `n ≥ 3`.
 
 ## Headline theorems
 
@@ -55,9 +59,9 @@ theorem Robin.lagarias_of_RH_of_verified (hRH : RiemannHypothesis) (hcomp : Robi
 
 * `RiemannHypothesis` is Mathlib's definition, the one leanprover-community/riemann-hypothesis
   proves as `riemannHypothesis`.
-* `RobinVerifiedRange` is Robin's inequality for `5040 < n`, `log n ≤ e^{30}`. It used to be a
-  cited hypothesis (Morrill–Platt); here it is proved in Lean by the computation in
-  `Robin/Compute/` and `RobinCompute/`.
+* `RobinVerifiedRange` is Robin's inequality for `5040 < n`, `log n ≤ e^{30}`, a range inside
+  Morrill–Platt's. It is proved in Lean by the computation in `Robin/Compute/` and
+  `RobinCompute/`.
 * `RobinStatement` and `LagariasStatement` are not in formal-conjectures.
 
 ## Axioms
@@ -110,19 +114,19 @@ checkers and their soundness theorems use no extra axioms.
 
 Full blueprint and constants: [`docs/PLAN.md`](docs/PLAN.md). Put `x = log n`.
 
-1. **Analytic range `x ≥ e^{30}`** (`Robin/Main.lean`), unchanged: with
+1. Analytic range `x ≥ e^{30}` (`Robin/Main.lean`). With
    `ε = log(1+1/x)/log x`, `log(σ(n)/n) ≤ ε log n + Σ_{p≤x}(c_p − ε log p) − Σ_{p≤x} min(1/p², ε log p)`
    (`Robin/Elementary/SigmaBound.lean`); the RH bound `|Ψ₁(t) − t²/2| ≤ t^{3/2}/20 + 4t`
    (`Robin/RH/`, from erdos-985's explicit formula); Mertens with remainder (`Robin/Mertens/`);
    tail `≤ (2.4 + 3.3x^{−1/8} + 26x^{−1/4})/(√x log x)` and gain `≥ (2.67 − 60x^{−1/4})/(√x log x)`
    (`Robin/Main/`); for `r = x^{−1/8} ≤ 1/40`, `1.39r⁴ + 2.4 + 3.3r + 26r² < 2.67 − 60r²`.
-2. **Finite range `5040 < n`, `x ≤ e^{30}`** (`Robin/Compute/`, `RobinCompute/`):
-   * Envelope (`Envelope.lean`): for every `ε > 0` and `n ≥ 1`,
+2. Finite range `5040 < n`, `x ≤ e^{30}` (`Robin/Compute/`, `RobinCompute/`):
+   * The envelope (`Envelope.lean`). For every `ε > 0` and `n ≥ 1`,
      `log(σ(n)/n) ≤ ε log n + Σ_p max_k (log(σ(p^k)/p^k) − kε log p)`, the bound that defines
      colossally abundant numbers. With `log(σ(p^k)/p^k) = Σ_{j<k} log(1 + 1/a_j)`,
      `a_j = p + ⋯ + p^{j+1}`, primes `p ≥ B` contribute nothing when `log(1+1/B) ≤ ε log B`,
      and each `p < B` contributes `log(1+1/p) − ε log p` plus prime-power extras for `p < Q`.
-   * Line test: the envelope is a line `εx + C` in `x = log n`; `log log x` is concave, so
+   * The line test. The envelope is a line `εx + C` in `x = log n`; `log log x` is concave, so
      `εx + C < γ + log log x` at both ends of `[lo, hi]` gives it on all of `[lo, hi]`, hence
      Robin's inequality for every `n` with `log n ∈ [lo, hi]`.
    * The computation streams over `m < 1.0703·10^{13}` with a segmented sieve, accumulating
@@ -139,7 +143,7 @@ Full blueprint and constants: [`docs/PLAN.md`](docs/PLAN.md). Put `x = log n`.
    * `5040 < n ≤ 10000` is checked directly (`σ(n)` by trial division, certified logs).
    * `Robin/Compute/Range.lean` assembles `RobinVerifiedRange`: the final covered interval
      reaches `x = 1.07104·10^{13} > e^{30} ≈ 1.0686·10^{13}`.
-3. **Lagarias** (`Robin/Lagarias.lean`): Robin plus `H_n ≥ log n + γ` for `n > 5040`; one
+3. Lagarias's form (`Robin/Lagarias.lean`): Robin plus `H_n ≥ log n + γ` for `n > 5040`; one
    `native_decide` over `ℚ` for `13 ≤ n ≤ 5040`, `decide +kernel` for `n ≤ 12`.
 
 ## Layout
@@ -157,7 +161,7 @@ Full blueprint and constants: [`docs/PLAN.md`](docs/PLAN.md). Put `x = log n`.
 | `Robin/Compute/Envelope.lean` | the envelope, monotonicity, concavity line test |
 | `Robin/Compute/Sieve.lean` | sieve and scan soundness |
 | `Robin/Compute/Step.lean`, `Checkpoint.lean`, `Run.lean` | the invariant `Valid` and its preservation; direct check |
-| `Robin/Compute/Chunks/C000–C622.lean`, `Small.lean` | the `native_decide` checks (generated) |
+| `Robin/Compute/Chunks/C000.lean` to `C622.lean`, `Small.lean` | the `native_decide` checks (generated) |
 | `Robin/Compute/Chain.lean`, `Range.lean` | chaining the chunks; `RobinVerifiedRange` |
 | `Robin/Verified.lean` | `robin_verified_range`, `robin_of_RH`, `lagarias_of_RH` |
 | `Robin/Lagarias.lean`, `Robin/Lagarias/` | Lagarias's form |
@@ -183,8 +187,8 @@ lake exe cache get
 lake build Robin RobinChecks
 ```
 
-A full build (Mathlib from cache) took **1 h 06 min wall, 194 148 s user CPU (≈ 54 core-hours)**
-on a 95-core machine shared with other jobs (load 100–240). The 623 chunk modules account
+A full build (Mathlib from cache) took 1 h 06 min wall, 194 148 s user CPU (≈ 54 core-hours)
+on a 95-core machine shared with other jobs (load 100 to 240). The 623 chunk modules account
 for almost all of it; everything else builds in a few minutes. Chunk modules import only
 `RobinCompute.Data` (Lean core), so each chunk process needs about 0.7 GB of RAM.
 
@@ -198,9 +202,9 @@ transition is re-checked by `native_decide`.
 
 `Unconditional/RobinUnconditional.lean` imports
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
-(commit `507a75d91d`) and closes the RH hypothesis with its `riemannHypothesis`. It gives Robin's
-and Lagarias's inequalities with no hypothesis left. Both are equivalent to RH, so these
-theorems are RH in another form.
+(commit `507a75d91d`) and closes the RH hypothesis with its `riemannHypothesis`. This proves
+Robin's and Lagarias's inequalities unconditionally in Lean, with no hypothesis left. Both
+are equivalent to RH, so these theorems are RH in another form.
 
 Run on 2026-11-24 against riemann-hypothesis `507a75d91d` (full output in
 [`docs/unconditional-axioms.txt`](docs/unconditional-axioms.txt)):
