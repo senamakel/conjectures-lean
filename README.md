@@ -153,12 +153,19 @@ one line:
 
 | Theorem | Statement | Axioms |
 |---|---|---|
-| `density_hypothesis` | `DensityHypothesis.Statement` | AXIOMS_DH |
+| `density_hypothesis` | `DensityHypothesis.Statement` | `propext`, `Classical.choice`, `Quot.sound` |
 
-Checked against riemann-hypothesis commit `507a75d91d` on CHECK_DATE with
+Checked against riemann-hypothesis commit `507a75d91d` on 2026-11-24 with
 
 ```
 scripts/check-unconditional.sh /path/to/riemann-hypothesis
+```
+
+which printed (about 20 min wall time, mostly waiting on the import):
+
+```
+riemann-hypothesis at 507a75d91d131d627b380df4e32f6e9fb21dd067
+'density_hypothesis' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 The import needs about 93 GB of cache, about 19 GB of RAM and roughly 900k open files (raise the
