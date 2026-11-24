@@ -1,19 +1,20 @@
 # Artin's primitive root conjecture under Hooley's hypothesis, in Lean
 
-Artin (1927) conjectured that every integer `a` that is neither `-1` nor a square is a primitive
-root modulo infinitely many primes, indeed modulo a positive proportion of them. Hooley (1967,
-*On Artin's conjecture*, J. reine angew. Math. 225, 209–220) proved this under the Riemann
-hypothesis for the Dedekind zeta functions of the Kummer fields `K_k = ℚ(ζ_k, a^{1/k})`. It is
-open unconditionally; Heath-Brown (1986) showed that at most two primes `a` fail it.
+This repository is a complete Lean proof of Hooley's theorem: for every integer `a` that is
+neither `-1` nor a square, the Riemann hypothesis for the Dedekind zeta functions of the Kummer
+fields `K_k = ℚ(ζ_k, a^{1/k})` (`HooleyHypothesis a`) implies that `a` is a primitive root
+modulo a set of primes of positive density. Hecke's continuation of the Dedekind zeta functions
+comes from the Tate-thesis modules of
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis),
+so `HooleyHypothesis a` is the only hypothesis left, and the axioms are the standard three.
 
-**Literature status: RH-consequence (tier C stays).** The conditional theorem is Hooley (1967).
-This repository is a complete Lean proof of Hooley's theorem: for every `a` that is neither `-1`
-nor a square, the Riemann hypothesis for the Kummer fields (`HooleyHypothesis a`) implies that
-`a` is a primitive root modulo a set of primes of positive density. Hecke's continuation of the
-Dedekind zeta functions is taken from riemann-hypothesis's Tate-thesis modules, so
-`HooleyHypothesis a` is the only hypothesis left, and the axioms are the standard three. That
-remaining hypothesis is RH for the Kummer fields `K_k`, which are non-abelian for odd prime `k`,
-and the certified proof covers ζ and Dirichlet L-functions only, so the result stays tier C.
+Artin (1927) conjectured that every such `a` is a primitive root modulo infinitely many primes,
+indeed modulo a positive proportion of them. Hooley (1967, *On Artin's conjecture*, J. reine
+angew. Math. 225, 209-220) proved this under RH for the fields `K_k` (label
+**RH-consequence**). Unconditionally, Heath-Brown (1986) showed that at most two primes `a` fail
+it. The remaining hypothesis is RH for the fields `K_k`, which are non-abelian for odd prime `k`, and the
+certified proof of RH and GRH by L. Alpöge covers ζ and Dirichlet L-functions only, so the
+result is tier C (see "This result stays conditional").
 
 ```lean
 -- Artin/MainContinuation.lean (main library)
@@ -33,7 +34,7 @@ theorem Artin.Unconditional.conditional_artin_primitive_roots_parts_i (a : ℤ) 
 
 In words: if `a` is not a square and not `-1`, and RH holds for `ζ_{K_k}` for every squarefree
 `k`, then a positive proportion of primes `p` have `a` as a primitive root. This is Hooley's
-theorem under his hypothesis. It is not a proof of Artin's conjecture.
+theorem under his hypothesis; Artin's conjecture itself stays open.
 
 ## Tier and provenance
 
@@ -54,7 +55,7 @@ the statement of `Artin.Unconditional.conditional_artin_primitive_roots_parts_i`
 
 The repository contains no `sorry`. The main library, which may not import
 riemann-hypothesis, proves the formal-conjectures statement only with `DedekindContinuation` as
-an extra hypothesis; the hypothesis-free form lives in `Unconditional/` (see "Hecke's theorem
+an extra hypothesis; the form without it lives in `Unconditional/` (see "Hecke's theorem
 inside the main library" for what a Mathlib-only proof would need).
 
 ## Axioms
@@ -75,7 +76,7 @@ Main library, from `lake env lean` on a file that imports `Artin` and runs `#pri
 'Artin.Analytic.exists_norm_Λ₀_le' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
-No `native_decide` anywhere.
+The repository uses no `native_decide`.
 
 ## Proof outline
 
@@ -99,6 +100,43 @@ The full plan is [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
    `π^{-r₂}|d_K|^{s/2}Λ_P(s)` for a Mathlib `WeakFEPair` `P`; the entire part `Λ₀` is bounded on
    `a ≤ Re s ≤ b` by `∫_0^∞ |f_modif(t)| (t^{a−1} + t^{b−1}) dt`, which gives the strip bound.
 
+## Layout
+
+| File | Content |
+|---|---|
+| `Artin/Statement.lean` | definitions copied word for word from formal-conjectures; do not change |
+| `Artin/Interfaces.lean` | the split: the definitions joining the analytic half to the sieve half, `EffectiveKummerChebotarev` |
+| `Artin/SieveHalf.lean` | the sieve half `artin_of_effectiveKummerChebotarev`: `EffectiveKummerChebotarev a → ∃ δ > 0, (S a).HasDensity δ` for `a` not a square, `a ≠ -1` (sorry-free) |
+| `Artin/MainContinuation.lean` | `conditional_artin_primitive_roots.parts.i_of_continuation`: the main result: the target with Hecke's continuation `DedekindContinuation (K_k)` as an extra hypothesis, through `kummerPsiBounds_of_hooley_of_continuation`, `effectiveKummerChebotarev_of_kummerPsiBounds` and the sieve half (sorry-free) |
+| `Artin/Sieve/PrimitiveRoot.lean` | primitive-root criterion and the inclusion-exclusion identity, exact and truncated (sorry-free) |
+| `Artin/Sieve/Selberg/` | the Selberg upper-bound sieve, vendored from PrimeNumberTheoremAnd (see Credits) |
+| `Artin/Sieve/BrunTitchmarsh.lean` | Brun–Titchmarsh: `π(x; q, 1) ≤ 20000 x / (φ(q) log(x/q))` for `x > q ≥ 1` (sorry-free) |
+| `Artin/Sieve/BrunTitchmarshLargePrimes.lean` | blueprint B3: primes `q ∈ (√x / log² x, √x log x]` sift out `≤ 23040000 x log log x / log² x` primes for `x ≥ e^256`, so `o(π(x))` (sorry-free) |
+| `Artin/Sieve/HugePrimes.lean` | blueprint B4: primes sifted by `q > √x log x` number `≤ (\|a\|+1) x / log² x` (sorry-free) |
+| `Artin/Sieve/KummerInputs.lean` | blueprint B5/B6 as hypotheses: `KummerDegreeLowerBound` (`k φ(k) ≪ [K_k : ℚ]`) and `KummerDensityPos` (`Σ μ(k)/[K_k : ℚ] > 0`), discharged from `Artin/Kummer/` in `Artin/SieveHalf.lean` |
+| `Artin/Sieve/Assembly.lean` | blueprint B1, B2 and the join with B3, B4, B7: `artin_of_effectiveKummerChebotarev_of_kummer`, the sieve half modulo the two Kummer inputs (sorry-free) |
+| `Artin/Sieve/Density.lean` | blueprint B7: `N(x)/π(x) → δ` gives `(S a).HasDensity δ` (sorry-free) |
+| `Artin/Kummer/Degree.lean` | blueprint B5: Kummer degrees, bounds and exact formulas `[K_k:ℚ] m(k) = k φ(k)` (sorry-free) |
+| `Artin/Kummer/Conductor.lean` | quadratic subfields of `ℚ(ζ_k)`: `√a ∈ ℚ(ζ_k)` iff `a₀ ≡ 1 (mod 4)` and `\|a₀\| ∣ k` (sorry-free) |
+| `Artin/Kummer/Density.lean` | blueprint B6: `δ(a) = Σ μ(k)/[K_k:ℚ]` converges and is positive for `a` not a square, `a ≠ -1` (sorry-free) |
+| `Artin/Analytic/Interface.lean` | the statement the analytic core (A1 to A4) must prove: `psiK K x = Σ_{𝔭, m ≥ 1, N𝔭^m < x} log N𝔭`, `PsiKBound K C` (`\|ψ_K(x) − x\| ≤ C √x (log \|d_K\| + n_K log x) log x` for `x ≥ 2`) and the bundle `KummerPsiBounds a` (one `C` for all `K_k`, `k` squarefree); definitions only, no axioms |
+| `Artin/Analytic/Splitting.lean` | blueprint A5: for `p ∤ k a`, `p` splits completely in `K_k` iff `k ∣ p − 1` and `a^((p−1)/k) = 1` mod `p` (`kummerCond_iff_exists_absNorm_eq`, `split_of_kummerCond`), via the decomposition group rather than Dedekind–Kummer; at most `[K : ℚ]` primes above any `p` (sorry-free) |
+| `Artin/Analytic/Discriminant.lean` | blueprint A6: `log \|d_{K_k}\| ≤ 4 [K_k : ℚ] log(k \|a\|)` (`log_abs_discr_le`), by Hadamard's inequality on a basis of monomials `ζ^i α^j` (sorry-free) |
+| `Artin/Analytic/Counting.lean` | blueprint A5 counting and A7: `0 ≤ ψ_K(x) − n θ_k(x) ≤ n log x (2 log(k\|a\|) + √x)`, then `\|θ_k(x) − x/n\| ≪ √x log x log(kx)`, then discrete partial summation, giving `effectiveKummerChebotarev_of_kummerPsiBounds : KummerPsiBounds a → EffectiveKummerChebotarev a` for `a ≠ 0`; the `k = 1` field `ℚ` replaces a separate `π(x) − li(x)` hypothesis (sorry-free) |
+| `Artin/Analytic/ContinuationOfFEPair.lean` | `exists_norm_Λ₀_le` (the entire part `Λ₀` of any Mathlib `WeakFEPair` is bounded on vertical strips) and `dedekindContinuation_of_weakFEPair` (a completed zeta `c \|d_K\|^{s/2} Λ_P(s)` with functional equation and a continuation `Z` gives `DedekindContinuation K`); Mathlib only, sorry-free |
+| `Artin/Analytic/Continuation.lean` | `DedekindContinuation K`: Hecke's theorem as a hypothesis (a continuation `Z` of `ζ_K`, `ξ(s) = s(s−1)\|d_K\|^{s/2}Γ_ℝ^{r₁}Γ_ℂ^{r₂}Z(s)` entire, `ξ(1−s) = ξ(s)`, `ξ = O((1+\|s\|)²)` on `1/2 ≤ Re s ≤ 2`); definitions only |
+| `Artin/Analytic/Core/VonMangoldt.lean` | `Λ_K(n)`, `ψ_K(x) = Σ_{n<x} Λ_K(n)` (`psiK_eq_sum`) and `Λ_K ≤ n Λ` (`vonMangoldtK_le`), the convolution identity `log · a = Λ_K ⋆ a` for the ideal count `a(n)`, `-ζ_K'/ζ_K = Σ Λ_K(n) n^{-s}` and `ζ_K = exp(Σ Λ_K(n)/log n · n^{-s}) ≠ 0` on `Re s > 1` (sorry-free) |
+| `Artin/Analytic/Core/NonvanishingOne.lean` | `ζ_K(1+it) ≠ 0` for `t ≠ 0` (`Z_ne_zero_on_one_line`), Mertens' `3 + 4 cos θ + cos 2θ ≥ 0` argument adapted from Mathlib's `LFunction_ne_zero_of_re_eq_one` (sorry-free) |
+| `Artin/Analytic/Core/GammaPart.lean` | `Γ_ℝ'/Γ_ℝ`, `Γ_ℂ'/Γ_ℂ` by parity, and their part of the explicit formula as `Σ_k tau x (2k+a)` (adapted from erdos-985, sorry-free) |
+| `Artin/Analytic/Core/Growth.lean` | `ξ_K` has order at most 1 (`xi_growth_aux`): strip bound, functional equation, and for `Re s ≥ 2` the bounds `\|Γ(w)\| ≤ Γ(Re w)`, `Γ(σ) ≤ (σ+1)^{σ+1}` and `\|ζ_K(s)\| ≤ ζ_K(2)`, through erdos-985's `LogGrowth` (sorry-free) |
+| `Artin/Analytic/Core/Xi.lean` | blueprint A1: `ξ_K` from `DedekindContinuation`; `ξ(1) = γ_K(1)·Res ζ_K ≠ 0` (Mathlib's class number formula), zeros in `0 < Re ρ < 1` and on `Re ρ = 1/2` under RH, Hadamard (erdos-985), `ζ_K'/ζ_K = ξ'/ξ − 1/s − 1/(s−1) − G_K`, `Re ξ'/ξ(s) = Σ m_ρ Re 1/(s−ρ)` (sorry-free) |
+| `Artin/Analytic/Core/ZeroSum.lean` | blueprint A2: `Σ m_ρ/\|ρ(ρ+1)\| ≤ log \|d_K\| + 9n` and `#{ρ : \|Im ρ − T\| ≤ 1} ≤ 9(log \|d_K\| + n log(\|T\|+3))` under RH (proved from A1 and the Euler-product facts) |
+| `Artin/Analytic/Core/ExplicitFormula.lean` | blueprint A3: the weighted explicit formula for `Σ_{n<x} Λ_K(n)(1 − n/x)` (proved from the above) |
+| `Artin/Analytic/Core/Unsmoothing.lean` | blueprint A4: differencing `y W_K(y) = Σ_{m≤y} ψ_K(m)` at `x ± √x`, giving `psiKBound_of_continuation` (`∃ C, ∀ K, RH → DedekindContinuation K → PsiKBound K C`); the increment estimates `gammaDiff_le` (explicit `tau` terms) and `zeroDiff_le` (`Re ξ'/ξ` on a dyadic grid of real points) are proved |
+| `Unconditional/ArtinUnconditional.lean` | not in the default build: imports the Tate-thesis modules of riemann-hypothesis, proves `DedekindContinuation K` for every number field and the formal-conjectures statement from `HooleyHypothesis` alone |
+| `scripts/check-unconditional.sh` | builds and checks the module above |
+| `docs/BLUEPRINT.md` | the plan, step by step |
+
 ## Deviations from the literature
 
 Hooley's hypothesis is used as formal-conjectures states it (RH for `ζ_{K_k}`, `k` squarefree).
@@ -106,6 +144,19 @@ The main library also assumes Hecke's continuation, a theorem, because neither o
 nor upstream Mathlib has it; `Unconditional/` removes that assumption. Constants are not
 optimised (Brun–Titchmarsh constant `20000`, sieve threshold `x ≥ e^256`); they only affect the
 error terms, not the density.
+
+## Building
+
+Lean v4.36.0, Mathlib `fc4f59e5` (through erdos-985, required at
+`9538edb73dc72c8fdc04b4e0df076c8930ee2fba` over HTTPS). From a fresh clone:
+
+```bash
+lake exe cache get   # Mathlib's cache
+lake build           # the whole library; ~2.7 min wall (550 s CPU) on 16 cores, with erdos-985
+```
+
+Build one module at a time while iterating, e.g. `lake build Artin.MainContinuation`. No module
+here is expensive; the slowest take a few seconds each.
 
 ## Unconditional version
 
@@ -190,56 +241,6 @@ lines on top of Mathlib. Specialising to Kummer fields does not help: their zeta
 not products of `ζ` and Dirichlet L-functions. This is a multi-week formalisation and is not
 attempted here.
 
-## Layout
-
-| File | Content |
-|---|---|
-| `Artin/Statement.lean` | definitions copied word for word from formal-conjectures; do not change |
-| `Artin/Interfaces.lean` | the split: the definitions joining the analytic half to the sieve half, `EffectiveKummerChebotarev` |
-| `Artin/SieveHalf.lean` | the sieve half `artin_of_effectiveKummerChebotarev`: `EffectiveKummerChebotarev a → ∃ δ > 0, (S a).HasDensity δ` for `a` not a square, `a ≠ -1` (sorry-free) |
-| `Artin/MainContinuation.lean` | `conditional_artin_primitive_roots.parts.i_of_continuation`: the main result: the target with Hecke's continuation `DedekindContinuation (K_k)` as an extra hypothesis, through `kummerPsiBounds_of_hooley_of_continuation`, `effectiveKummerChebotarev_of_kummerPsiBounds` and the sieve half (sorry-free) |
-| `Artin/Sieve/PrimitiveRoot.lean` | primitive-root criterion and the inclusion–exclusion identity, exact and truncated (sorry-free) |
-| `Artin/Sieve/Selberg/` | the Selberg upper-bound sieve, vendored from PrimeNumberTheoremAnd (see Credits) |
-| `Artin/Sieve/BrunTitchmarsh.lean` | Brun–Titchmarsh: `π(x; q, 1) ≤ 20000 x / (φ(q) log(x/q))` for `x > q ≥ 1` (sorry-free) |
-| `Artin/Sieve/BrunTitchmarshLargePrimes.lean` | blueprint B3: primes `q ∈ (√x / log² x, √x log x]` sift out `≤ 23040000 x log log x / log² x` primes for `x ≥ e^256`, so `o(π(x))` (sorry-free) |
-| `Artin/Sieve/HugePrimes.lean` | blueprint B4: primes sifted by `q > √x log x` number `≤ (\|a\|+1) x / log² x` (sorry-free) |
-| `Artin/Sieve/KummerInputs.lean` | blueprint B5/B6 as hypotheses: `KummerDegreeLowerBound` (`k φ(k) ≪ [K_k : ℚ]`) and `KummerDensityPos` (`Σ μ(k)/[K_k : ℚ] > 0`), discharged from `Artin/Kummer/` in `Artin/SieveHalf.lean` |
-| `Artin/Sieve/Assembly.lean` | blueprint B1, B2 and the join with B3, B4, B7: `artin_of_effectiveKummerChebotarev_of_kummer`, the sieve half modulo the two Kummer inputs (sorry-free) |
-| `Artin/Sieve/Density.lean` | blueprint B7: `N(x)/π(x) → δ` gives `(S a).HasDensity δ` (sorry-free) |
-| `Artin/Kummer/Degree.lean` | blueprint B5: Kummer degrees, bounds and exact formulas `[K_k:ℚ] m(k) = k φ(k)` (sorry-free) |
-| `Artin/Kummer/Conductor.lean` | quadratic subfields of `ℚ(ζ_k)`: `√a ∈ ℚ(ζ_k)` iff `a₀ ≡ 1 (mod 4)` and `\|a₀\| ∣ k` (sorry-free) |
-| `Artin/Kummer/Density.lean` | blueprint B6: `δ(a) = Σ μ(k)/[K_k:ℚ]` converges and is positive for `a` not a square, `a ≠ -1` (sorry-free) |
-| `Artin/Analytic/Interface.lean` | the statement the analytic core (A1–A4) must prove: `psiK K x = Σ_{𝔭, m ≥ 1, N𝔭^m < x} log N𝔭`, `PsiKBound K C` (`\|ψ_K(x) − x\| ≤ C √x (log \|d_K\| + n_K log x) log x` for `x ≥ 2`) and the bundle `KummerPsiBounds a` (one `C` for all `K_k`, `k` squarefree); definitions only, no axioms |
-| `Artin/Analytic/Splitting.lean` | blueprint A5: for `p ∤ k a`, `p` splits completely in `K_k` iff `k ∣ p − 1` and `a^((p−1)/k) = 1` mod `p` (`kummerCond_iff_exists_absNorm_eq`, `split_of_kummerCond`), via the decomposition group rather than Dedekind–Kummer; at most `[K : ℚ]` primes above any `p` (sorry-free) |
-| `Artin/Analytic/Discriminant.lean` | blueprint A6: `log \|d_{K_k}\| ≤ 4 [K_k : ℚ] log(k \|a\|)` (`log_abs_discr_le`), by Hadamard's inequality on a basis of monomials `ζ^i α^j` (sorry-free) |
-| `Artin/Analytic/Counting.lean` | blueprint A5 counting and A7: `0 ≤ ψ_K(x) − n θ_k(x) ≤ n log x (2 log(k\|a\|) + √x)`, then `\|θ_k(x) − x/n\| ≪ √x log x log(kx)`, then discrete partial summation, giving `effectiveKummerChebotarev_of_kummerPsiBounds : KummerPsiBounds a → EffectiveKummerChebotarev a` for `a ≠ 0`; the `k = 1` field `ℚ` replaces a separate `π(x) − li(x)` hypothesis (sorry-free) |
-| `Artin/Analytic/ContinuationOfFEPair.lean` | `exists_norm_Λ₀_le` (the entire part `Λ₀` of any Mathlib `WeakFEPair` is bounded on vertical strips) and `dedekindContinuation_of_weakFEPair` (a completed zeta `c \|d_K\|^{s/2} Λ_P(s)` with functional equation and a continuation `Z` gives `DedekindContinuation K`); Mathlib only, sorry-free |
-| `Artin/Analytic/Continuation.lean` | `DedekindContinuation K`: Hecke's theorem as a hypothesis (a continuation `Z` of `ζ_K`, `ξ(s) = s(s−1)\|d_K\|^{s/2}Γ_ℝ^{r₁}Γ_ℂ^{r₂}Z(s)` entire, `ξ(1−s) = ξ(s)`, `ξ = O((1+\|s\|)²)` on `1/2 ≤ Re s ≤ 2`); definitions only |
-| `Artin/Analytic/Core/VonMangoldt.lean` | `Λ_K(n)`, `ψ_K(x) = Σ_{n<x} Λ_K(n)` (`psiK_eq_sum`) and `Λ_K ≤ n Λ` (`vonMangoldtK_le`), the convolution identity `log · a = Λ_K ⋆ a` for the ideal count `a(n)`, `-ζ_K'/ζ_K = Σ Λ_K(n) n^{-s}` and `ζ_K = exp(Σ Λ_K(n)/log n · n^{-s}) ≠ 0` on `Re s > 1` (sorry-free) |
-| `Artin/Analytic/Core/NonvanishingOne.lean` | `ζ_K(1+it) ≠ 0` for `t ≠ 0` (`Z_ne_zero_on_one_line`), Mertens' `3 + 4 cos θ + cos 2θ ≥ 0` argument adapted from Mathlib's `LFunction_ne_zero_of_re_eq_one` (sorry-free) |
-| `Artin/Analytic/Core/GammaPart.lean` | `Γ_ℝ'/Γ_ℝ`, `Γ_ℂ'/Γ_ℂ` by parity, and their part of the explicit formula as `Σ_k tau x (2k+a)` (adapted from erdos-985, sorry-free) |
-| `Artin/Analytic/Core/Growth.lean` | `ξ_K` has order at most 1 (`xi_growth_aux`): strip bound, functional equation, and for `Re s ≥ 2` the bounds `\|Γ(w)\| ≤ Γ(Re w)`, `Γ(σ) ≤ (σ+1)^{σ+1}` and `\|ζ_K(s)\| ≤ ζ_K(2)`, through erdos-985's `LogGrowth` (sorry-free) |
-| `Artin/Analytic/Core/Xi.lean` | blueprint A1: `ξ_K` from `DedekindContinuation`; `ξ(1) = γ_K(1)·Res ζ_K ≠ 0` (Mathlib's class number formula), zeros in `0 < Re ρ < 1` and on `Re ρ = 1/2` under RH, Hadamard (erdos-985), `ζ_K'/ζ_K = ξ'/ξ − 1/s − 1/(s−1) − G_K`, `Re ξ'/ξ(s) = Σ m_ρ Re 1/(s−ρ)` (sorry-free) |
-| `Artin/Analytic/Core/ZeroSum.lean` | blueprint A2: `Σ m_ρ/\|ρ(ρ+1)\| ≤ log \|d_K\| + 9n` and `#{ρ : \|Im ρ − T\| ≤ 1} ≤ 9(log \|d_K\| + n log(\|T\|+3))` under RH (proved from A1 and the Euler-product facts) |
-| `Artin/Analytic/Core/ExplicitFormula.lean` | blueprint A3: the weighted explicit formula for `Σ_{n<x} Λ_K(n)(1 − n/x)` (proved from the above) |
-| `Artin/Analytic/Core/Unsmoothing.lean` | blueprint A4: differencing `y W_K(y) = Σ_{m≤y} ψ_K(m)` at `x ± √x`, giving `psiKBound_of_continuation` (`∃ C, ∀ K, RH → DedekindContinuation K → PsiKBound K C`); the increment estimates `gammaDiff_le` (explicit `tau` terms) and `zeroDiff_le` (`Re ξ'/ξ` on a dyadic grid of real points) are proved |
-| `Unconditional/ArtinUnconditional.lean` | not in the default build: imports the Tate-thesis modules of riemann-hypothesis, proves `DedekindContinuation K` for every number field and the formal-conjectures statement from `HooleyHypothesis` alone |
-| `scripts/check-unconditional.sh` | builds and checks the module above |
-| `docs/BLUEPRINT.md` | the plan, step by step |
-
-## Building
-
-Lean v4.36.0, Mathlib `fc4f59e5` (through erdos-985, required at
-`9538edb73dc72c8fdc04b4e0df076c8930ee2fba` over HTTPS). From a fresh clone:
-
-```bash
-lake exe cache get   # Mathlib's cache
-lake build           # the whole library; ~2.7 min wall (550 s CPU) on 16 cores, with erdos-985
-```
-
-Build one module at a time while iterating, e.g. `lake build Artin.MainContinuation`. No module
-here is expensive; the slowest take a few seconds each.
-
 ## Credits
 
 `Artin/Sieve/Selberg/` is vendored from
@@ -249,3 +250,9 @@ under the Apache License 2.0; a copy of the licence is in `Artin/Sieve/Selberg/L
 are adapted to our Mathlib pin, and each starts with a NOTICE comment listing its changes. The
 arithmetic-progression set-up in `Artin/Sieve/BrunTitchmarsh.lean` follows the interval version in
 PrimeNumberTheoremAnd's `BrunTitchmarsh.lean`.
+
+The definitions in `Artin/Statement.lean` are copied from
+[formal-conjectures](https://github.com/google-deepmind/formal-conjectures)
+`FormalConjectures/Wikipedia/ArtinPrimitiveRootsConjecture.lean` (commit `c8dd64f`,
+Apache-2.0). riemann-hypothesis is imported only from `Unconditional/`, and nothing is copied
+from it.
