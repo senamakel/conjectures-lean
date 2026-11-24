@@ -14,7 +14,7 @@ open Lean Elab Command
 elab "#assert_axioms " id:ident : command => do
   let n ← liftCoreM (realizeGlobalConstNoOverloadWithInfo id)
   let axs ← liftCoreM (Lean.collectAxioms n)
-  let mut nd := 0
+  let mut nd : Nat := 0
   for a in axs do
     if a == ``propext || a == ``Classical.choice || a == ``Quot.sound then continue
     if (a.toString.splitOn "._native.native_decide.ax_").length > 1 then

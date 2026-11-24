@@ -58,7 +58,49 @@ theorem Robin.lagarias_of_RH_of_verified (hRH : RiemannHypothesis) (hcomp : Robi
 
 ## Axioms
 
-AXIOMS_BLOCK
+Real output of `lake env lean` on a file with `#print axioms` for each headline theorem
+(2026-11-24, this commit). The full lists are in [`docs/axioms.txt`](docs/axioms.txt); the
+`native_decide` names are abbreviated here.
+
+```
+'Robin.robin_of_RH_of_verified' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Robin.lagarias_of_RH_of_verified' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Robin.Lagarias.midCheck_range._native.native_decide.ax_1_1]
+'Robin.robin_verified_range' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ RobinCompute.chunk_0._native.native_decide.ax_1_1,
+ RobinCompute.chunk_1._native.native_decide.ax_1_1,
+ ...                                   (chunk_0 … chunk_622: 623 axioms)
+ RobinCompute.small_ok._native.native_decide.ax_1_1]
+'Robin.robin_of_RH'     -- the same 627 axioms as robin_verified_range
+'Robin.lagarias_of_RH'  -- those 627 and Robin.Lagarias.midCheck_range._native.native_decide.ax_1_1
+```
+
+`lake build RobinChecks` checks these lists mechanically (`#guard_msgs` for the first two, an
+allow-list command for the others) and reports:
+
+```
+Robin.robin_verified_range: 627 axioms, 624 of them native_decide; all allowed
+Robin.robin_of_RH: 627 axioms, 624 of them native_decide; all allowed
+Robin.lagarias_of_RH: 628 axioms, 625 of them native_decide; all allowed
+```
+
+The `native_decide` axioms, 625 in all:
+
+* `RobinCompute.chunk_i` (`i < 623`, `Robin/Compute/Chunks/C<i>.lean`): `runChunk Gc s_i ((i+1)·2^{34}) = s_{i+1}`,
+  the sieve-and-checkpoint computation over `[i·2^{34}, (i+1)·2^{34})`. Soundness:
+  `runChunk_valid` (`Robin/Compute/Run.lean`). About 560 s each on a loaded machine
+  (C000, which also runs the exact small-`B` mode and most of the 15 746 checkpoints, 1 192 s).
+* `RobinCompute.small_ok`: `directOK n` for `5041 ≤ n ≤ 10000` and `x0·D ≤ XS·logLo(10001)`.
+  Soundness: `robinAt_of_directOK`. 2.4 s.
+* `Robin.Lagarias.midCheck_range`: Lagarias's inequality for `13 ≤ n ≤ 5040` over `ℚ`
+  (soundness `ineq_of_midCheck`), 37 s.
+
+Each one trusts the Lean compiler and runtime to evaluate the stated `Bool` correctly; the
+checkers and their soundness theorems use no extra axioms.
 
 ## Proof outline
 
@@ -84,7 +126,7 @@ Full blueprint and constants: [`docs/PLAN.md`](docs/PLAN.md). Put `x = log n`.
      numbers (a superset of the primes; a marked number is a proper multiple, so the sieve
      needs no completeness proof). Above `2^{26}` each segment of length `h ≤ 2^{22}` is
      summarised by its count, `Σi` and `Σi²`, using `2/(2m+1) ≤ (2/b)(1 − t + t²)` and
-     `log(1+t) ≥ t − t²/2`. At about CK_COUNT checkpoints (spacing `2^{⌊(3/4)log₂ B⌋}`) it picks
+     `log(1+t) ≥ t − t²/2`. At about 15 746 checkpoints (spacing `2^{⌊(3/4)log₂ B⌋}`) it picks
      `ε`, computes the extras and extends the covered interval of `x`.
    * All logarithms are fixed-point (`D = 2^{96}`) partial sums of Mathlib's
      `log(1 + 1/a) = Σ 2/(2k+1)·(2a+1)^{−2k−1}`, with the geometric tail for upper bounds
@@ -92,7 +134,7 @@ Full blueprint and constants: [`docs/PLAN.md`](docs/PLAN.md). Put `x = log n`.
      trapezoid rule makes this sequence increasing), giving `γ > 0.5772156649014`.
    * `5040 < n ≤ 10000` is checked directly (`σ(n)` by trial division, certified logs).
    * `Robin/Compute/Range.lean` assembles `RobinVerifiedRange`: the final covered interval
-     reaches `x = FINAL_COV > e^{30} ≈ 1.0686·10^{13}`.
+     reaches `x = 1.07104·10^{13} > e^{30} ≈ 1.0686·10^{13}`.
 3. **Lagarias** (`Robin/Lagarias.lean`): Robin plus `H_n ≥ log n + γ` for `n > 5040`; one
    `native_decide` over `ℚ` for `13 ≤ n ≤ 5040`, `decide +kernel` for `n ≤ 12`.
 
@@ -137,12 +179,16 @@ lake exe cache get
 lake build Robin RobinChecks
 ```
 
-BUILD_TIMES
+A full build (Mathlib from cache) took **1 h 06 min wall, 194 148 s user CPU (≈ 54 core-hours)**
+on a 95-core machine shared with other jobs (load 100–240). The 623 chunk modules account
+for almost all of it; everything else builds in a few minutes. Chunk modules import only
+`RobinCompute.Data` (Lean core), so each chunk process needs about 0.7 GB of RAM.
 
 `RobinCompute` is a core-only library with `precompileModules = true`, so `native_decide`
 runs it as native code (the interpreter is about 75× slower). To regenerate the chunk states,
-run the same code as an executable over the chunks and write `RobinCompute/Data.lean`; the
-scripts used are described in `docs/PLAN.md`.
+run the same code as an executable over the chunks and write `RobinCompute/Data.lean`, with
+the programs in `scripts/compute/` (see `docs/PLAN.md`). The states are untrusted input: every
+transition is re-checked by `native_decide`.
 
 ## Unconditional version
 

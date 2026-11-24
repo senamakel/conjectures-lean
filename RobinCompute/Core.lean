@@ -230,15 +230,13 @@ def extrasScan (arr : ByteArray) (εn εd : Nat) : Nat → Option Nat
     | some r =>
       if 2 ≤ n ∧ arr[n]! == 0 then (extrasFor εn εd n).map (r + ·) else some r
 
-/-- Tail-recursive `extrasScan` (what runs). -/
+/-- Tail-recursive `extrasScan` (what runs). Written with `Option.bind` rather than a `match`
+with the recursive call inside, which keeps its equation lemmas cheap to generate. -/
 def extrasScanTR (arr : ByteArray) (εn εd : Nat) : Nat → Nat → Option Nat
   | 0, acc => some acc
   | n + 1, acc =>
-    if 2 ≤ n ∧ arr[n]! == 0 then
-      match extrasFor εn εd n with
-      | none => none
-      | some e => extrasScanTR arr εn εd n (acc + e)
-    else extrasScanTR arr εn εd n acc
+    (if 2 ≤ n ∧ arr[n]! == 0 then (extrasFor εn εd n).map (acc + ·) else some acc).bind
+      (fun a => extrasScanTR arr εn εd n a)
 
 def extras (εn εd Q : Nat) : Option Nat :=
   extrasScanTR (sieveSeg ((List.range (Nat.sqrt Q + 2)).toArray) 0 Q) εn εd Q 0

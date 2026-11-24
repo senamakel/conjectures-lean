@@ -110,6 +110,13 @@ Instead the whole range is computed:
 * Pass 1 (untrusted executable, same code) produced the 624 boundary states; it took
   `≈ 109` process-hours wall on a heavily shared machine (load 120–220).
 
+**Regenerating the states** (`scripts/compute/`): build `Pass1.lean` and `Combine.lean` as
+executables against `RobinCompute.Core` (e.g. a scratch lake package with `lean_exe` targets),
+run `run_pass1.sh` (623 independent jobs: per chunk the sums and, at each checkpoint boundary,
+`ckEps`), then `combine 623 9657846 states.txt` (sequential `applyCk`, minutes), then
+`gen.py states.txt <repo> 9657846` to write `RobinCompute/Data.lean`, the chunk files and
+`Robin/Compute/Chain.lean`. `Verify.lean` re-runs one chunk natively and compares.
+
 **Checker** (`RobinCompute/Core.lean`): fixed point `D = 2^{96}`; segments `[B, B+h)`,
 `h = 2^{min(22, ⌊log₂B⌋−10)}`; exact per-prime logs below `2^{26}`, moments `(count, Σi, Σi²)`
 above; chunk `i` is `[i·2^{34}, (i+1)·2^{34})`, `i < 623`; `5040 < n ≤ 10^4` checked directly;
@@ -121,8 +128,9 @@ above; chunk `i` is `[i·2^{34}, (i+1)·2^{34})`, `i < 623`; `5040 < n ≤ 10^4`
 
 ## Status
 
-Everything is proved; the computed range of §5 is an explicit hypothesis. There is no `sorry`
-in the repository. Output of `#print axioms` (2026-11-24):
+Everything is proved, including the range of §5 (`Robin.robin_verified_range`); there is no
+`sorry` in the repository. `Robin.robin_of_RH` and `Robin.lagarias_of_RH` take only RH.
+Full `#print axioms` output: `docs/axioms.txt`. For the analytic part (2026-11-24):
 
 ```
 'Robin.robin_of_RH_of_verified' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -145,9 +153,10 @@ in the repository. Output of `#print axioms` (2026-11-24):
 | `Robin/Main/Tail.lean` | tail integral | proved |
 | `Robin/Main/Gain.lean` (+`Gain/{Basic,Y,Abel,Integrals,Errors,Core}.lean`) | gain lower bound | proved |
 | `Robin/Main/Estimate.lean` | §4 assembly and numerics | proved |
-| `Robin/Small.lean` | §5 | `RobinVerifiedRange` (a `Prop`, used as a hypothesis) |
+| `Robin/Small.lean` | §5 statement | `RobinVerifiedRange` |
+| `RobinCompute/`, `Robin/Compute/` | §5 computation and soundness | proved (625 `native_decide`) |
 
-### Stretch goal: `Robin.lagarias_of_RH_of_verified : RiemannHypothesis → RobinVerifiedRange → LagariasStatement` (proved)
+### Stretch goal: `Robin.lagarias_of_RH : RiemannHypothesis → LagariasStatement` (proved)
 
 `Robin/Lagarias.lean` (+`Lagarias/{Bounds,Finite}.lean`):
 * `n > 5040`: Robin plus `H_n ≥ log n + γ`, so `exp H_n ≥ e^γ n` and `log H_n ≥ log log n`.

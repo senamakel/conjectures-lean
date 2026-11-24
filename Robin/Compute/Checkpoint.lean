@@ -204,10 +204,10 @@ theorem extrasScanTR_spec (arr : ByteArray) (εn εd : ℕ) :
       (∀ m ∈ Wset arr n, ∃ e, extrasFor εn εd m = some e) ∧
       E = acc + ∑ m ∈ Wset arr n, (extrasFor εn εd m).getD 0
   | 0, acc, E, h => by
-    unfold extrasScanTR at h
+    rw [extrasScanTR] at h
     simp only [Option.some.injEq] at h; subst h; simp [Wset]
   | n + 1, acc, E, h => by
-    unfold extrasScanTR at h
+    rw [extrasScanTR] at h
     have hW : Wset arr (n + 1) = if 2 ≤ n ∧ arr[n]! = 0 then insert n (Wset arr n)
         else Wset arr n := by
       unfold Wset; rw [Finset.range_add_one, Finset.filter_insert]
@@ -218,7 +218,7 @@ theorem extrasScanTR_spec (arr : ByteArray) (εn εd : ℕ) :
       rcases he : extrasFor εn εd n with _ | e
       · rw [he] at h; exact absurd h (by simp)
       rw [he] at h
-      dsimp only at h
+      simp only [Option.map_some, Option.bind_some] at h
       obtain ⟨hall, hE⟩ := extrasScanTR_spec arr εn εd n (acc + e) E h
       rw [hW, if_pos hc]
       refine ⟨?_, ?_⟩
@@ -230,6 +230,7 @@ theorem extrasScanTR_spec (arr : ByteArray) (εn εd : ℕ) :
     · have hc' : ¬ (2 ≤ n ∧ (arr[n]! == 0) = true) := by
         intro h'; exact hc ⟨h'.1, by simpa using h'.2⟩
       rw [if_neg hc'] at h
+      simp only [Option.bind_some] at h
       rw [hW, if_neg hc]
       exact extrasScanTR_spec arr εn εd n acc E h
 
