@@ -1,0 +1,14 @@
+name = "Erdos770"
+defaultTargets = ["Erdos770"]
+
+[leanOptions]
+pp.unicode.fun = true
+autoImplicit = false
+
+[[require]]
+name = "Ankeny"
+git = "https://github.com/senamakel/ankeny-grh.git"
+rev = "4f00a7395c7d290e5953ca9605472178a77758e6"
+
+[[lean_lib]]
+name = "Erdos770"
