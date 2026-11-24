@@ -4,9 +4,11 @@ Target (fixed, `Schoenfeld/Statement.lean`): Schoenfeld 1976, under RH,
 `|ψ(x) − x| < √x log² x/(8π)` (`x ≥ 73.2`), `|θ(x) − x| < √x log² x/(8π)` (`x ≥ 599`),
 `|π(x) − li(x)| < √x log x/(8π)` (`x ≥ 2657`).
 
-Proved (`Schoenfeld/Main.lean`): the same three bounds, same thresholds, constants `1/8`, `1/4`,
-`9/20`. Everything is under Mathlib's `RiemannHypothesis`; no `native_decide`, no hypotheses
-beyond RH.
+Proved (`Schoenfeld/Main.lean`, steps 1–5): the same three bounds, same thresholds, constants
+`1/8`, `1/4`, `9/20`, under Mathlib's `RiemannHypothesis` alone; no `native_decide`.
+
+Proved (`Schoenfeld/PiSharp.lean`, step 6): the target itself, `SchoenfeldStatement`, under RH
+and five named inputs (Rosser's zero count, PsiCert, three finite ranges).
 
 Notation: `ξ = xiZeta` (erdos-985), zeros `ρ = 1/2 + iγ` with multiplicity `m`;
 `F(T) = Σ_ρ m · min(1/|ρ|, T/|ρ|²)`; `Ψ₁(t) = Σ_{n ≤ t} Λ(n)(t − n)`.
@@ -71,18 +73,57 @@ Notation: `ξ = xiZeta` (erdos-985), zeros `ρ = 1/2 + iγ` with multiplicity `m
     `integral_large`: `|∫_599^x| ≤ √x/2` (integrand `≤ (1/4)/√t`); `0 ≤ li(2) ≤ 2`.
     `piBound_of_RH`: `< (9/20) √x log x` for `x ≥ 2657` (`0.40` at `2657`).
 
-## Closing the gap to `1/(8π)`
+## Step 6. The constant `1/(8π)` (round 5)
 
-What separates the proved constants from Schoenfeld's:
+Inputs (tier H, `Schoenfeld/Inputs.lean`, `Schoenfeld/SmallRange.lean`): `RosserZeroCount`
+(Rosser 1941, Theorem 19, statement verbatim from IEANTN), `PsiCert` (`|ψ(x) − x| ≤ 0.8√x` on
+`[1500, 10¹⁰]`, verbatim from RSBounds), and `PsiSmallRange`, `ThetaSmallRange`,
+`PiSmallRange` (the target on `[73.2, 1500]`, `[599, 3·10⁴]`, `[2657, 4·10⁵]`).
 
-* **ψ.** The method is asymptotically within `1.41×` of `1/(8π)` in the leading term
-  (step 8), but its lower-order terms (`√x log x`) are large: the ratio to `√x log² x/8` is
-  `0.82` at `2^18` and `0.45` only at `x ≈ e^{300}`. Reaching `1/(8π)` from `x = 73.2` needs
-  Schoenfeld's actual input: Rosser's explicit `N(T) = (T/2π) log(T/2πe) + 7/8 + O(log T)` with
-  explicit error, the first zero ordinates (`γ₁ = 14.13…`) and a truncated explicit formula.
-  None of these is in Mathlib or erdos-985. Proving the explicit `N(T)` (argument principle,
-  Backlund's bound for `arg ζ`) is a project of its own; a verified list of the first zeros is
-  another large computation.
-* **θ.** ψ's `1/8` plus `ψ − θ ≤ √x log² x/8`; the true `ψ − θ` is about `√x`, so for large
-  `x` θ inherits ψ's constant, but not uniformly from `599` with these estimates.
-* **π.** θ's `1/4` plus the tail integral (`2 · (1/4)/log x`) plus `∫₂^599 dt/log² t ≈ 26`.
+18. `ZeroCount.lean`: `analyticOrderAt_zeta_eq_xi` (in `Im s > 0`, `ζ = (Γℝ(s) s (s−1))⁻¹ ξ`
+    with an analytic non-vanishing factor), so `positiveZeroCount T = Σ_{0<γ≤T} m` (`cnt`).
+    `ρ ↦ 1 − ρ` preserves `ξ`'s orders (`analyticOrderAt_comp_of_deriv_ne_zero`) and, under RH,
+    negates `γ`, so `F(T) ≤ 2 G(T)` with `G(T) = Σ_{γ>0} m min(1/γ, T/γ²)`
+    (`fmin_tsum_le_two_Gsum`, using `|ρ| ≥ |γ|`).
+19. `CountSum.lean`: for `γ > 0` (hence `γ > 4.4`),
+    `min(1/γ, T/γ²) = ∫_{(4.4,T]} 1[γ<t] dt/t² + ∫_{(T,∞)} 1[γ<t] 2T dt/t³`; summing
+    (`integral_tsum_of_summable_integral_norm`) gives
+    `G(T) = ∫_{4.4}^T N(t)/t² + 2T ∫_T^∞ N(t)/t³`. Rosser and `log log t ≤ log t/e` give
+    `N(t) ≤ Nc(t) = (t/2π)(log t − log 2π − 1) + 2.463 + 0.3 log t`, and both integrals are
+    elementary: `G(T) ≤ Ub(T) ≤ log² T/(4π) + (1 − log 2π) log T/(2π) + 0.65`
+    (`Gsum_le_Ub`, `Ub_le_quad`; the constant is `−log 2π/π − P1(4.4) ≈ 0.6385`).
+20. `PsiSharp.lean`: step 12 with `h = ⌈2√8 √x⌉` (`T ≈ √x/√8`, `log T ≤ u/2 − 1.0396`) gives
+    `|ψ(x) − x| ≤ √x (u²/(8π) − 0.2985 u + 4.62)` for `x ≥ 10¹⁰` (`psi_explicit`; ratio to the
+    target `0.90` at `10¹⁰`, tending to `1` from below like `1 − c/u`).
+21. `ThetaSharp.lean`: `ψ(y) ≤ 1.0026 y` (`y ≥ 10⁵`) and `ψ(z) ≤ 1.0173 z` (`z ≥ 2154`) from
+    PsiCert and step 20, and `x^{1/3} ≤ 0.02155 √x`: `ψ − θ ≤ 1.047 √x`, so
+    `|θ(x) − x| ≤ √x (u²/(8π) − 0.2985 u + 5.667)` for `x ≥ 10¹⁰` (`theta_explicit`). On
+    `[3·10⁴, 10¹⁰]`, PsiCert and Mathlib's `ψ(y) ≤ log 4 · y + 2√y log y` give
+    `|θ(x) − x| ≤ 3.9252 √x` (`theta_mid_abs`, in `a = x^{1/12} ≥ 2.36`).
+22. `PiSharp.lean`: the decomposition of step 16, with
+    `|∫₂^599| ≤ 33`, `|∫_599^{3·10⁴}| ≤ 14` (`ThetaSmallRange`: `|g| ≤ 1/(8π√t)`),
+    `|∫_{3·10⁴}^b| ≤ 3.9252 · (10.15/6.15) · 2√b/log² b` (`∫ dt/(√t log² t)` against
+    `d(2√t/log² t)`), and for `x ≥ 10¹⁰`
+    `|∫_{10¹⁰}^x| ≤ 2√x r(log x) − 2·10⁵ r(log 10¹⁰)`, `r(ℓ) = 1/(8π) − 0.2985/ℓ + 6.2/ℓ²`
+    (`d/dt[2√t r(ℓ)] ≥ (1/(8π) − 0.2985/ℓ + 5.667/ℓ²)/√t` for `ℓ ≥ 22`). The remainder is
+    `√x ((2/(8π) − 0.2985) + 5.07/u + 12.4/u²) < 5148`, checked on `[23.01, 24]`, `[24, 25]`,
+    `[25, 26]` (with `√x ≤ e^{12}, e^{12.5}, e^{13}`) and `[26, ∞)`.
+    `pi_mid` covers `[4·10⁵, 10¹⁰]`: `(3.9252/u + 12.96/u²)√x + 49.9 < √x u/(8π)` for
+    `u ≥ 12.82`.
+
+## What remains for an unconditional `1/(8π)`
+
+* `RosserZeroCount`: proved in Lean (`TernaryGoldbach.RSBounds.Rosser1941.zero_count_bounds`,
+  teorth/IEANTN `Solutions/Schoenfeld1976Numerics.v1`, Lean `v4.34.0-rc2`, Mathlib `71a80585`):
+  219 files, about 95,000 lines in its import closure (Backlund's argument, Jensen's formula,
+  digamma and Stirling estimates, Hardy-function certificates for the 29 zeros below 100).
+  Porting it to this pin is the way to discharge it.
+* `PsiCert`: proved in Lean by a kernel-checked campaign (Garald1/RSBounds,
+  `PsiFinite.psi_abs_sub_le_four_fifths_sqrt`, about 960 modules, Lean `v4.35.0`) up to
+  `10¹⁰`. This proof needs PsiCert only up to `10¹⁰` for ψ itself, and for θ and π uses it
+  through the same range.
+* The three small ranges are finite checks of the target: `ψ` at the prime powers up to 1500
+  (about 240 primes), `θ` at the primes up to `3·10⁴` (3245 primes) and `π − li` at the primes
+  up to `4·10⁵` (33,860 primes). Each needs certified enclosures of `log p` (and, for π, of
+  `li` at each prime); we estimate (not measured) that a compiled checker runs in well under a second and a
+  kernel `decide` replay in minutes. None is implemented here.
