@@ -179,8 +179,8 @@ has (see [`docs/SCOPING.md`](docs/SCOPING.md)).
 
 ### Threshold `10^8`
 
-Weinberger's analytic argument goes through `L(1, χ)` and genus theory. Here the analytic step is a GRH count of small split primes, with the erdos-985 constants, and
-reaches `n ≥ 10^8` (`3·10^7` would do with the same bounds; `10^8` leaves a 17% margin). A
+Weinberger's analytic argument goes through `L(1, χ)` and genus theory. Here the analytic step is a GRH
+count of small split primes, with the erdos-985 constants, and it reaches `n ≥ 10^8` (`3·10^7` would do with the same bounds; `10^8` leaves a 17% margin). A
 computation of about 10 CPU-minutes checks the range below.
 
 ### Part B uses two cited facts
