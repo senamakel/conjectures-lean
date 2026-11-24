@@ -1,4 +1,4 @@
-# Axer's bound for the squarefree error term under RH in Lean
+# Axer's bound for squarefree and k-free numbers under RH in Lean
 
 **Literature status: RH-consequence.** Let `Q(x)` count the squarefree integers up to `x` and
 `E(x) = Q(x) − (6/π²)x`. The Riemann hypothesis implies `E(x) = O(x^{2/5+ε})` for every `ε > 0`;
@@ -12,6 +12,18 @@ exist**: `1/3`, `9/28` (Montgomery–Vaughan 1981), `8/25` (Graham 1981), `7/22`
 being the best known. This repository formalises the oldest and simplest of them, at exponent
 `2/5`. It does not touch **Erdős Problem 969**, which asks for the true order of `E(x)` (probably
 `x^{1/4}`) and is open even under RH. Nothing here is new mathematics.
+
+**`k`-free numbers (literature status: RH-consequence).** For `k ≥ 2` let `Q_k(x)` count the
+`k`-free integers up to `x` and `E_k(x) = Q_k(x) − x/ζ(k)`. Under RH, Axer (1911) has
+`E_k(x) = O(x^{2/(2k+1)+ε})`, and Montgomery and Vaughan (*The distribution of squarefree
+numbers*, Recent Progress in Analytic Number Theory, Vol. 1, Durham 1979, Academic Press 1981,
+pp. 247–256) improved this to `O(x^{1/(k+1)+ε})`. Both attributions are taken from secondary
+sources (Pappalardi, *A survey on k-freeness*, 2003, §1; Meng, arXiv:1408.0429, §1); neither
+original paper was read. Unconditionally `E_k(x) ≪ x^{1/k} exp(−c k^{−8/5} (log x)^{3/5}
+(log log x)^{−1/5})` (Walfisz 1963, as quoted by Meng). This repository proves Axer's exponent
+`2/(2k+1)` for every `k ≥ 2` from RH (at `k = 2` it is the `2/5` above). **Montgomery–Vaughan's
+`1/(k+1)` is stated (`MontgomeryVaughanBound`) but not proved**; see "Deviations from the
+literature".
 
 The main library is a Lean proof that RH implies Axer's bound, following Axer (1911):
 
@@ -27,6 +39,19 @@ theorem Erdos969.squarefreeError_le {K α : ℝ} (hα0 : 0 ≤ α) (hα2 : α < 
 -- a free corollary under RH
 theorem Erdos969.erdos_969_prime_number_theorem_of_RH (hRH : RiemannHypothesis) :
     (fun x => |Erdos969.squarefreeCountingError x|) =o[Filter.atTop] (fun x : ℕ => (x : ℝ).sqrt)
+
+-- k-free numbers, every k ≥ 2 (Erdos969/KFree/Main.lean)
+theorem Erdos969.KFree.axerKFree_of_RH (hRH : RiemannHypothesis) {k : ℕ} (hk : 2 ≤ k) :
+    Erdos969.AxerKFreeBound k
+
+-- the reduction, with no RH: a Mertens exponent α < k gives the exponent 1/(k+1-α)
+theorem Erdos969.KFree.kFreeError_le {k : ℕ} (hk : 2 ≤ k) {K α : ℝ} (hα0 : 0 ≤ α) (hαk : α < k)
+    (hM : Erdos969.MBound K α) :
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ N : ℕ, 1 ≤ N →
+      |Erdos969.kFreeCountingError k N| ≤ C * (N : ℝ) ^ (1 / ((k : ℝ) + 1 - α))
+
+-- consistency: at k = 2 the new target is the old one
+theorem Erdos969.KFree.axerKFreeBound_two_iff : Erdos969.AxerKFreeBound 2 ↔ Erdos969.AxerBound
 ```
 
 The targets, fixed in `Erdos969/Statement.lean`:
@@ -43,6 +68,33 @@ def AxerBound : Prop :=
     (fun x : ℕ => |squarefreeCountingError x|) =O[atTop] fun x : ℕ => (x : ℝ) ^ (2 / 5 + ε)
 ```
 
+and, for `k`-free numbers, in `Erdos969/Statement2.lean`:
+
+```lean
+def Powerfree (k : ℕ) (m : M) : Prop :=
+  ∀ ⦃x : M⦄, x ^ k ∣ m → IsUnit x
+
+noncomputable def kFreeCounting (k x : ℕ) : ℕ :=
+  ((Finset.Icc 1 x).filter (Powerfree k)).card
+
+noncomputable def kFreeCountingError (k x : ℕ) : ℝ :=
+  (kFreeCounting k x : ℝ) - x / (riemannZeta k).re
+
+def AxerKFreeBound (k : ℕ) : Prop :=
+  ∀ ε : ℝ, 0 < ε →
+    (fun x : ℕ => |kFreeCountingError k x|) =O[atTop]
+      fun x : ℕ => (x : ℝ) ^ (2 / (2 * (k : ℝ) + 1) + ε)
+
+-- not proved here
+def MontgomeryVaughanBound (k : ℕ) : Prop :=
+  ∀ ε : ℝ, 0 < ε →
+    (fun x : ℕ => |kFreeCountingError k x|) =O[atTop]
+      fun x : ℕ => (x : ℝ) ^ (1 / ((k : ℝ) + 1) + ε)
+```
+
+`(riemannZeta k).re` is `ζ(k)`: for an integer `k ≥ 2` the value is real
+(`KFree.hasSum_moebius_pow` proves `∑ μ(n)/n^k = 1/(riemannZeta k).re`).
+
 ## Tier and provenance
 
 | Theorem | Tier | Hypothesis | Literature |
@@ -51,12 +103,21 @@ def AxerBound : Prop :=
 | `Erdos969.axer_of_RH` | C | `RiemannHypothesis` (Mathlib's statement) | RH-consequence (Axer 1911) |
 | `Erdos969.erdos_969_prime_number_theorem_of_RH` | C | `RiemannHypothesis` | known, via GRH here (see below) |
 | `axer_unconditional` (`Unconditional/`) | U | none; RH from riemann-hypothesis | RH-consequence |
+| `Erdos969.KFree.kFreeError_le` | C | `MBound K α`, as above | Axer's reduction for `k`-free numbers |
+| `Erdos969.KFree.axerKFree_of_RH` | C | `RiemannHypothesis` | RH-consequence (Axer 1911) |
+| `Erdos969.KFree.axerKFreeBound_two_iff` | D | none (a consistency check of the definitions) | — |
+| `axerKFree_unconditional` (`Unconditional/`) | U | none; RH from riemann-hypothesis | RH-consequence |
+| `MontgomeryVaughanBound k` | not proved | — | RH-consequence (Montgomery–Vaughan 1981) |
 
 `squarefreeCounting` and `squarefreeCountingError` are copied word for word from
 google-deepmind/formal-conjectures,
 [`FormalConjectures/ErdosProblems/969.lean`](https://github.com/google-deepmind/formal-conjectures/blob/86a2f58a4d7a3a0637d15d5b2ce627592b54b956/FormalConjectures/ErdosProblems/969.lean)
 (commit `86a2f58a`). That file has no RH-conditional statement, so `AxerBound` is this repository's
-own. The main library takes RH as a hypothesis and never imports riemann-hypothesis. The Mertens
+own. `Powerfree` is copied word for word from formal-conjectures,
+[`FormalConjecturesForMathlib/Algebra/Powerfree.lean`](https://github.com/google-deepmind/formal-conjectures/blob/9097e2f90e66d2f6244209cb1c07f7120d17ec53/FormalConjecturesForMathlib/Algebra/Powerfree.lean)
+(commit `9097e2f9`), placed in the `Erdos969` namespace; formal-conjectures has no statement on
+the count of `k`-free numbers, so `kFreeCounting`, `kFreeCountingError`, `AxerKFreeBound` and
+`MontgomeryVaughanBound` are this repository's own. The main library takes RH as a hypothesis and never imports riemann-hypothesis. The Mertens
 bound comes from [mertens-rh](https://github.com/senamakel/mertens-rh) (`98c6eab`,
 `Mertens.abs_mertens_nat_le`), which proves it from RH.
 
@@ -73,6 +134,9 @@ falls out of `axer_of_RH` with `ε = 1/20`. No other formal-conjectures statemen
 'Erdos969.squarefreeError_le' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Erdos969.axer_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Erdos969.erdos_969_prime_number_theorem_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos969.KFree.kFreeError_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos969.KFree.axerKFree_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos969.KFree.axerKFreeBound_two_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 No `sorry`, no `native_decide`, no `axiom` declarations, no finite computation.
@@ -89,6 +153,12 @@ The full plan is in [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
    `C N Y^{α−2}` using `M` at `⌊√(N/m)⌋` (`Erdos969/Hyperbola.lean`).
 4. `|E(N)| ≤ Y + C N Y^{α−2}`; take `Y ≍ N^{1/(3−α)}` (`Erdos969/Main.lean`).
 5. Under RH, `α = 1/2 + 3ε'` and `1/(3−α) ≤ 2/5 + ε'` for `ε' ≤ 1/12`.
+6. `k`-free numbers (`Erdos969/KFree/`), the same five steps with `d²` replaced by `d^k`:
+   `Q_k(N) = ∑ μ(d)⌊N/d^k⌋` (the `d` with `d^k ∣ n` are the divisors of Mathlib's
+   `Nat.floorRoot k n`); `|1/ζ(k) − ∑_{d≤Y} μ(d)/d^k| ≤ C Y^{α−k}` (weights
+   `|1/(u+1)^k − 1/u^k| ≤ k/u^{k+1}`); the hyperbola split over `Y < d ≤ ⌊(N/m)^{1/k}⌋`
+   gives `C N Y^{α−k}`; `|E_k(N)| ≤ Y + C N Y^{α−k}`, `Y ≍ N^{1/(k+1−α)}`. Under RH,
+   `α = 1/2 + ε'` and `1/(k+1/2−ε') ≤ 2/(2k+1) + ε'` for `ε' ≤ 1/12`.
 
 ## Layout
 
@@ -99,6 +169,11 @@ The full plan is in [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
 | `Erdos969/Series.lean` | Step 2 |
 | `Erdos969/Hyperbola.lean` | Step 3 |
 | `Erdos969/Main.lean` | Steps 4–5, headline theorems |
+| `Erdos969/Statement2.lean` | `k`-free target definitions (fixed) |
+| `Erdos969/KFree/Identity.lean` | `Q_k(N) = ∑ μ(d)⌊N/d^k⌋`; the `k = 2` consistency lemmas |
+| `Erdos969/KFree/Series.lean` | `∑ μ(n)/n^k = 1/ζ(k)` and its tail |
+| `Erdos969/KFree/Hyperbola.lean` | Hyperbola split with integer `k`-th roots |
+| `Erdos969/KFree/Main.lean` | `k`-free headline theorems |
 | `Unconditional/Erdos969Unconditional.lean` | One-line discharge from riemann-hypothesis |
 
 ## Deviations from the literature
@@ -108,6 +183,22 @@ The full plan is in [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
 expansion of the sawtooth function, van der Corput's method, exponent pairs, a Vaughan-type
 decomposition of `μ`), none of which is in Mathlib. The order `x^{1/4}` that would settle
 Erdős 969 is not known under RH by any method.
+
+**`k`-free numbers: exponent `2/(2k+1)`, not Montgomery–Vaughan's `1/(k+1)`.** The target
+`MontgomeryVaughanBound` is stated and not proved. The gap is in the `d > Y` part,
+`∑_{Y<d} μ(d)⌊x/d^k⌋ − x ∑_{d>Y} μ(d)/d^k`. At the balancing point `Y = x^{1/(k+1)}` the
+`m`-range of the hyperbola sum is `m ≤ X = x/Y^k = Y`, and both the hyperbola sum
+`∑_{m ≤ X} (M((x/m)^{1/k}) − M(Y))` and the scaled series tail must be `O(x^{1/(k+1)+ε})`.
+Bounding each `M` separately by `M(t) ≪ t^{1/2+ε}`, as here, gives `x^{1/(2k)} X^{1−1/(2k)}` and
+`x Y^{1/2−k}`, both `x^{3/(2(k+1))}`: a factor `x^{1/(2(k+1))}` too large. So the `d > Y` part
+needs square-root cancellation on average over `m`, which no pointwise bound on `M` supplies. The Montgomery–Vaughan paper was not available, so their
+argument was not read. The natural route (our reconstruction, not taken from the paper) writes
+that double sum as a Perron integral of `(∑_{m ≤ X} m^{−s}) · ∑_{d > Y} μ(d) d^{−ks}` and uses RH
+through `1/ζ(σ+it) ≪ |t|^ε` for `σ > 1/2` together with a mean-value estimate for the Dirichlet
+polynomial. In Lean that needs a truncated Perron formula with an explicit error term and a
+mean-value theorem for Dirichlet polynomials; neither is in Mathlib at this pin, and
+`1/ζ ≪ |t|^ε` is in mertens-rh (`invZeta_bound_of_RH`) but has not been connected to a Perron
+formula anywhere in this workspace. Even `k = 2` (exponent `1/3`) needs the same input.
 
 **`x^{2/5+ε}`, not `x^{2/5}`.** The Mertens bound `M(x) = O(x^{1/2+ε})` costs an `ε`, which
 passes to the exponent. Whether the textbook exercise has an `ε` or a logarithm was not checked.
@@ -124,6 +215,8 @@ lake build            # target `Erdos969`
 A clean build of the four `Erdos969` modules (mertens-rh and erdos-985 already built) took about
 7 min wall on a box at load average over 200 (about 130 s for `Identity`, 140 s for `Series`,
 75 s for `Hyperbola`, 60 s for `Main`; most of that was queueing). No module is expensive.
+The five `k`-free modules (`Statement2`, `KFree.*`) built one at a time on 2026-11-24 at load
+average about 80, each in under 40 s.
 
 ## Unconditional version
 
@@ -164,5 +257,7 @@ verification is still pending.
   and `Mertens.abel_identity`. Same author.
 * `squarefreeCounting` and `squarefreeCountingError`: google-deepmind/formal-conjectures, commit
   `86a2f58a`, Apache License 2.0.
+* `Powerfree` (the definition only): google-deepmind/formal-conjectures,
+  `FormalConjecturesForMathlib/Algebra/Powerfree.lean`, commit `9097e2f9`, Apache License 2.0.
 * Nothing is vendored from riemann-hypothesis, Woett/Lean-files or PrimeNumberTheoremAnd; the
   identity `Q(N) = ∑ μ(d) ⌊N/d²⌋` is reproved here from Mathlib.

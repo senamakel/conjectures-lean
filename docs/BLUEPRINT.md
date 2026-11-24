@@ -47,3 +47,29 @@ Under RH, `Mertens.abs_mertens_nat_le` gives `MBound K (1/2 + 3ε')` for `ε' �
 The exponent `1/(3−α)` is the limit of this method: with `α = 1/2` it is exactly `2/5`. The
 exponents `1/3`, `9/28`, `8/25`, `7/22`, `17/54` and `11/35` need the truncated Fourier expansion
 of the sawtooth function and van der Corput exponent pairs, which Mathlib does not have.
+
+## 5. `k`-free numbers (`Erdos969/KFree/`)
+
+The same argument with `d²` replaced by `d^k`, `k ≥ 2`, `0 ≤ α < k`:
+
+* Identity (`KFree/Identity.lean`): `{d : d^k ∣ n} = divisors (Nat.floorRoot k n)`
+  (`Nat.pow_dvd_iff_dvd_floorRoot`), and `n` is `k`-free iff `Nat.floorRoot k n = 1`, so
+  `∑_{d^k ∣ n} μ(d) = [n k-free]` and `Q_k(N) = ∑_{d ≤ N} μ(d)⌊N/d^k⌋` (`kFreeCounting_eq`).
+  `kFreeCounting_two`, `kFreeCountingError_two` (`ζ(2) = π²/6`) tie `k = 2` to `Statement.lean`.
+* Series (`KFree/Series.lean`): `∑ μ(n)/n^k = 1/(riemannZeta k).re` from
+  `LSeries_zeta_mul_Lseries_moebius` (the `L`-value is real because the terms are). Weights:
+  `(u+1)^k − u^k ≤ k(u+1)^{k−1}` (geometric sum), so `|1/(u+1)^k − 1/u^k| ≤ k/u^{k+1}`. Abel
+  summation gives the tail `≤ 2K 2^α (1 + k/(k−α)) Y^{α−k}` (`abs_tail_le_pow`).
+* Hyperbola (`KFree/Hyperbola.lean`): `iroot k n = Nat.findGreatest (· ^ k ≤ n) n`, with
+  `d ≤ iroot k n ↔ d^k ≤ n`. `T = ∑_{m ≤ N/Y^k} ∑_{Y < d ≤ iroot k ⌊N/m⌋} μ(d)`,
+  `(iroot k ⌊N/m⌋ + 1)^α ≤ 2^α (N/m)^{α/k}`, `β = α/k < 1`, and
+  `N^β (N/Y^k)^{1−β} = N Y^{α−k}`: `|T| ≤ K 2^α (1/(1−α/k) + 1) N Y^{α−k}` (`abs_T_le_pow`).
+* Assembly (`KFree/Main.lean`): `|E_k(N)| ≤ Y + C N Y^{α−k}`, `Y = ⌈N^θ⌉`, `θ = 1/(k+1−α)`
+  (`kFreeError_le`). Under RH, `α = 1/2 + ε₁`, `ε₁ = min(ε, 1/12)`, from
+  `Mertens.abs_mertens_nat_le` at `ε₁/3`; with `t = 2/(2k+1)`,
+  `(t + ε₁)(k + 1/2 − ε₁) = 1 + ε₁(k + 1/2 − t − ε₁) ≥ 1`, so `θ ≤ t + ε` (`axerKFree_of_RH`).
+
+Montgomery–Vaughan's `1/(k+1)` (`MontgomeryVaughanBound`, stated, not proved) needs
+cancellation in the `d > Y` part on average over `m`; see the README's "Deviations from the
+literature" for the sizes and the missing Lean infrastructure (truncated Perron formula,
+mean-value theorem for Dirichlet polynomials).
