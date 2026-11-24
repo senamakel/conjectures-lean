@@ -20,7 +20,15 @@ theorem leastNonresidue_unconditional : Ankeny.LeastNonresidueBound (11 / 4) :=
 theorem miller_unconditional : Miller.MillerStatement (11 / 4) :=
   LLS.miller_of_GRH LFunction_ne_zero_of_half_lt_re
 
+theorem l1UpperBoundWith_unconditional : LLS.L1UpperBoundWith 5 :=
+  LLS.l1UpperBoundWith_of_GRH LFunction_ne_zero_of_half_lt_re
+
+theorem l1LowerBoundWith_unconditional : LLS.L1LowerBoundWith 5 :=
+  LLS.l1LowerBoundWith_of_GRH LFunction_ne_zero_of_half_lt_re
+
 #print axioms leastNonresidueBelowLogSq_unconditional
 #print axioms bach_unconditional
 #print axioms leastNonresidue_unconditional
 #print axioms miller_unconditional
+#print axioms l1UpperBoundWith_unconditional
+#print axioms l1LowerBoundWith_unconditional

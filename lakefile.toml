@@ -22,3 +22,8 @@ rev = "129ad575cc65def1860a32a691e106dfe1601bd7"
 name = "Miller"
 git = "https://github.com/senamakel/miller-grh.git"
 rev = "b484d444b20cd5693d6a7117389eb6adc6ccfec4"
+
+[[require]]
+name = "Robin"
+git = "https://github.com/senamakel/robin-rh.git"
+rev = "dfa8d63d0b935d1d17e8960c2291ba562bf60905"
