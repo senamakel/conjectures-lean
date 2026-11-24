@@ -1,21 +1,21 @@
 # Hironaka's resolution of singularities in characteristic 0 in Lean
 
-Hironaka (*Resolution of singularities of an algebraic variety over a field of characteristic
-zero*, Ann. of Math. 79 (1964), 109–326) proved that every variety `X` over a field of
-characteristic 0 has a resolution: a smooth variety `Y` with a proper birational morphism
-`Y → X`. In positive characteristic this is known in dimension at most three and open beyond.
+This repository proves Hironaka's theorem in the form that
+[formal-conjectures](https://github.com/google-deepmind/formal-conjectures) states as
+`resolution_of_singularities_of_charZero` (there with `sorry`): every integral scheme that is
+separated and of finite type over a field of characteristic 0 has a resolution, a smooth
+integral `Y` with a proper birational morphism `Y → X`.
+`Hironaka.Unconditional.resolution_of_singularities_of_charZero` is a complete Lean proof from
+the standard three axioms. It uses no RH or GRH theorem.
 
-**Status in the literature: known.** This repository is a complete Lean proof of the
-formal-conjectures statement of Hironaka's theorem (Hironaka, 1964), from the standard three
-axioms only. It uses no RH or GRH theorem.
-
-This repository proves the statement of the theorem that
-[formal-conjectures](https://github.com/google-deepmind/formal-conjectures) carries as
-`resolution_of_singularities_of_charZero`, where it is stated with `sorry`. It does not formalise
-Hironaka's argument. The resolution algorithm is imported from
+The theorem is Hironaka's (*Resolution of singularities of an algebraic variety over a field of
+characteristic zero*, Ann. of Math. 79 (1964), 109-326; label **known**). In positive
+characteristic resolution is known in dimension at most three and open beyond. The resolution
+algorithm comes from
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis),
-which proves it on the way to something else. What is proved here is the passage from that
-theorem to the formal-conjectures statement.
+which proves it on the way to other results. This repository proves the passage from that
+theorem to the formal-conjectures statement: the smooth modification it supplies is integral and
+birational over `X`.
 
 ## Main theorems
 
@@ -96,17 +96,17 @@ There is no `sorry`, no `native_decide` and no `axiom` declaration.
 Given `X` integral, separated and of finite type over a field `k` of characteristic 0, with
 structure morphism `sX`, and `π : Y ⟶ X` from `SmoothModification`:
 
-1. **The smooth locus `U` of `X` is dense.** Mathlib's generic smoothness over a perfect field,
+1. The smooth locus `U` of `X` is dense, by Mathlib's generic smoothness over a perfect field,
    `Scheme.Hom.dense_smoothLocus_of_perfectField` (`Hironaka/Main.lean`).
-2. **`Y` is irreducible.** `π ⁻¹ᵁ U` is isomorphic to `U`, an open subscheme of the integral `X`,
+2. `Y` is irreducible: `π ⁻¹ᵁ U` is isomorphic to `U`, an open subscheme of the integral `X`,
    so it is irreducible. It is dense in `Y`, so `Y` is irreducible (`Hironaka/Main.lean`).
-3. **`Y` is reduced.** A scheme smooth over an integral scheme is reduced,
+3. `Y` is reduced, because a scheme smooth over an integral scheme is reduced,
    `isReduced_of_smooth_of_isIntegral` (`Hironaka/SmoothReduced.lean`). Mathlib at the pin lacks
    this. The proof takes a standard smooth chart, which is étale over a polynomial ring;
    `isReduced_of_etale_of_isDomain` shows an étale algebra over a domain is reduced, by embedding
    it into its base change to the fraction field.
-4. **`Y` is integral**, by Mathlib's `isIntegral_of_irreducibleSpace_of_isReduced`.
-5. **`π` is birational over `X`.** The `Scheme.PartialIso` has source `π ⁻¹ᵁ U`, target `U` and
+4. `Y` is integral, by Mathlib's `isIntegral_of_irreducibleSpace_of_isReduced`.
+5. `π` is birational over `X`: the `Scheme.PartialIso` has source `π ⁻¹ᵁ U`, target `U` and
    the isomorphism `π ∣_ U`.
 
 Properness and smoothness of `Y` over `k` come straight from the input.
