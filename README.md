@@ -290,9 +290,9 @@ nothing beyond the RH claim.
 scripts/check-unconditional.sh [RH_DIR]
 ```
 
-Last run 2026-11-24 on branch `finality` (the commit that adds the Möbius-series and Liouville
-theorems) against riemann-hypothesis `507a75d91d` (linked from the community cache, not rebuilt):
-exit 0, 34 min wall time on a heavily loaded box (load average about 180), output
+Last run 2026-11-24 on this project's commit `c87ad7d` against riemann-hypothesis `507a75d91d`
+(linked from the community cache, not rebuilt): exit 0, 20 min wall time on a heavily loaded box,
+output
 
 ```
 'invZeta_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -302,6 +302,8 @@ exit 0, 34 min wall time on a heavily loaded box (load average about 180), outpu
 'redheffer_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
 'moebius_series' depends on axioms: [propext, Classical.choice, Quot.sound]
 'liouville_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'franel_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'franelLandau_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 The import needs about 93 GB of riemann-hypothesis cache, about 19 GB of RAM and roughly 900k
