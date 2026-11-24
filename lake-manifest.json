@@ -3,26 +3,26 @@
  "packagesDir": ".lake/packages",
  "packages": [
   {
-   "url": "git@github.com:senamakel/erdos-985.git",
+   "url": "https://github.com/senamakel/erdos-985.git",
    "type": "git",
    "subDir": null,
    "scope": "",
-   "rev": "63d68188f2e425e8928d7c8861abd0a1ded0b58c",
+   "rev": "9538edb73dc72c8fdc04b4e0df076c8930ee2fba",
    "name": "Erdos985",
    "manifestFile": "lake-manifest.json",
-   "inputRev": "63d68188f2e425e8928d7c8861abd0a1ded0b58c",
+   "inputRev": "9538edb73dc72c8fdc04b4e0df076c8930ee2fba",
    "inherited": false,
    "configFile": "lakefile.toml"
   },
   {
-   "url": "git@github.com:senamakel/ankeny-grh.git",
+   "url": "https://github.com/senamakel/ankeny-grh.git",
    "type": "git",
    "subDir": null,
    "scope": "",
-   "rev": "035c7aadd94a0ec5286c05083ca0396ceae63dc7",
+   "rev": "129ad575cc65def1860a32a691e106dfe1601bd7",
    "name": "Ankeny",
    "manifestFile": "lake-manifest.json",
-   "inputRev": "035c7aadd94a0ec5286c05083ca0396ceae63dc7",
+   "inputRev": "129ad575cc65def1860a32a691e106dfe1601bd7",
    "inherited": false,
    "configFile": "lakefile.toml"
   },
