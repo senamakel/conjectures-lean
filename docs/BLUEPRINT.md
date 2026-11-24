@@ -14,9 +14,23 @@ arXiv:math/0412262, §3.
 leanprover-community/riemann-hypothesis proves RH for ζ and GRH for Dirichlet L-functions
 (`DirichletLNonvanishingRightOfHalf`). `K_k` is not abelian over ℚ for `k > 2`, so `ζ_{K_k}`
 is not a product of Dirichlet L-functions, and that repository does not discharge
-`HooleyHypothesis`. As far as we can tell it proves nothing about zeros of `ζ_K` beyond the
-functional equation and the pole at `s = 1`. The result here therefore stays conditional,
-unlike `erdos_985`. The `k = 1` instance of `HooleyHypothesis` is RH itself.
+`HooleyHypothesis`. Checked at commit `507a75d91d` (2026-11-24): its Tate-thesis
+formalisation (`src/GroundTheory/GlobalFields/TateThesis/`) gives the continuation and
+functional equation of Hecke L-functions of any number field, including `ζ_K`, and
+nonvanishing on `Re s ≥ 1`, but no statement anywhere in the repository locates zeros of `ζ_K`
+or of a Hecke L-function in the critical strip; its only zero-location results are for `ζ` and
+Dirichlet L-functions (`src/Main.lean`). The only factorisation of a Dedekind zeta function
+into Dirichlet L-functions it contains is for imaginary quadratic fields
+(`dedekindZeta_eq_mul_LFunction`, finrank 2, negative discriminant). The result here therefore
+stays conditional on `HooleyHypothesis`, unlike `erdos_985`. The `k = 1` instance of
+`HooleyHypothesis` is RH itself; for `k = 2` the field is quadratic and its RH would follow from
+RH and GRH for the Kronecker character; for every odd prime `k = q` with `a` not a `q`-th power,
+`K_q` has Galois group `ℤ/q ⋊ (ℤ/q)ˣ`, which is not abelian.
+
+What it does supply is Hecke's continuation: `Unconditional/ArtinUnconditional.lean` discharges
+`DedekindContinuation` from its Tate-thesis modules (the strip bound is proved here, from its
+`WeakFEPair` representation of `Λ_K`, in `Artin/Analytic/ContinuationOfFEPair.lean`), which
+recovers the formal-conjectures statement with `HooleyHypothesis` as its only hypothesis.
 
 ## Split
 
