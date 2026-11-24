@@ -9,10 +9,12 @@ gets stuck and its limit is a Mills number.
 
 **Literature status.** The enclosure is an *RH-consequence* (Caldwell–Cheng 2005; listed as open
 in formal-conjectures; it follows from RH). The lower bound `A > 1.3063778838` is *known*
-unconditionally (Caldwell–Cheng). The main library is a Lean proof that RH implies the enclosure,
-following Caldwell–Cheng. `Unconditional/` gives the enclosure *given the Lean proof of RH in
-leanprover-community/riemann-hypothesis, which has not been independently verified*. Without RH
-only existence (Mills) and irrationality (Saito, Mathematika 71, 2025) are known.
+unconditionally (Caldwell–Cheng). The main library is a complete Lean proof that RH implies the
+enclosure, following Caldwell–Cheng, with a prime between consecutive cubes from `x₀ = 10^9`
+and the primality of 2521008887 checked by a Lucas certificate. `Unconditional/` proves the
+enclosure unconditionally in Lean, with RH supplied by the certified proof in
+leanprover-community/riemann-hypothesis. Before the 2026 proof of RH only existence (Mills) and
+irrationality (Saito, Mathematika 71, 2025) were known.
 
 ```lean
 -- Mills/Final.lean
@@ -151,9 +153,7 @@ lake build            # target `Mills`; the four modules take about 15 s once Ma
 
 Checked against riemann-hypothesis commit `507a75d91d` with
 `scripts/check-unconditional.sh /path/to/riemann-hypothesis` (needs about 93 GB of cache, about
-19 GB of RAM and a limit of roughly 900k open files). The riemann-hypothesis proof adds no axioms of its
-own. The cache contains outputs of untrusted builds, so this links the proofs but does not
-re-verify the RH/GRH proof, whose independent verification is still pending.
+19 GB of RAM and a limit of roughly 900k open files). The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
