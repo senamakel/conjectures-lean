@@ -25,5 +25,4 @@ import Artin.Analytic.Core.ZeroSum
 import Artin.Analytic.Core.ExplicitFormula
 import Artin.Analytic.Core.Unsmoothing
 import Artin.SieveHalf
-import Artin.Main
 import Artin.MainContinuation

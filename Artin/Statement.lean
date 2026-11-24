@@ -11,8 +11,10 @@ Do not change the definitions in this file. They are copied word for word from
 * `IsDedekindZeta`, `DedekindZetaRH`, `HooleyHypothesis`, `S`, `ArtinConstant` from
   `FormalConjectures/Wikipedia/ArtinPrimitiveRootsConjecture.lean`.
 
-The target, `conditional_artin_primitive_roots.parts.i` in `Artin/Main.lean`, is that file's
-theorem of the same name: Hooley (1967), *On Artin's conjecture*, J. reine angew. Math. 225,
+The target is that file's theorem `conditional_artin_primitive_roots.parts.i`, proved as
+`Artin.Unconditional.conditional_artin_primitive_roots_parts_i` in
+`Unconditional/ArtinUnconditional.lean`; the main library proves it with Hecke's continuation as
+an extra hypothesis (`Artin/MainContinuation.lean`). Hooley (1967), *On Artin's conjecture*, J. reine angew. Math. 225,
 209–220.
 -/
 

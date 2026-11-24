@@ -32,7 +32,6 @@ theorem under his hypothesis. It is not a proof of Artin's conjecture.
 |---|---|---|
 | `conditional_artin_primitive_roots.parts.i_of_continuation` | C + H | `HooleyHypothesis a` (open), `DedekindContinuation` (Hecke's theorem, cited) |
 | `Artin.Unconditional.conditional_artin_primitive_roots_parts_i` | C, with Hecke's theorem taken from riemann-hypothesis | `HooleyHypothesis a` (open) |
-| `conditional_artin_primitive_roots.parts.i` (`Artin/Main.lean`) | **not a result**: carries `sorryAx` | `HooleyHypothesis a` |
 
 `HooleyHypothesis`, `DedekindZetaRH`, `IsDedekindZeta`, `S` and `HasDensity` are copied word
 for word from
@@ -44,10 +43,10 @@ the statement of `Artin.Unconditional.conditional_artin_primitive_roots_parts_i`
 `‖ξ(s)‖ ≤ M(1+‖s‖)²` on `1/2 ≤ Re s ≤ 2`. In the main library it is a cited hypothesis (tier H);
 `Unconditional/` discharges it.
 
-`conditional_artin_primitive_roots.parts.i` in `Artin/Main.lean` keeps the formal-conjectures
-name inside the main library, which may not import riemann-hypothesis. Its proof goes through
-`effectiveKummerChebotarev_of_hooley` (`Artin/Interfaces.lean`), a `sorry` that stays until
-Hecke's theorem is formalised without that repository (see "Closing the main-library `sorry`").
+The repository contains no `sorry`. The main library, which may not import
+riemann-hypothesis, proves the formal-conjectures statement only with `DedekindContinuation` as
+an extra hypothesis; the hypothesis-free form lives in `Unconditional/` (see "Hecke's theorem
+inside the main library" for what a Mathlib-only proof would need).
 
 ## Axioms
 
@@ -59,15 +58,15 @@ Main library, from `lake env lean` on a file that imports `Artin` and runs `#pri
  Classical.choice,
  Quot.sound]
 'Artin.artin_of_effectiveKummerChebotarev' depends on axioms: [propext, Classical.choice, Quot.sound]
-'Artin.Analytic.psiKBound_of_continuation' depends on axioms: [propext, Classical.choice, Quot.sound]
-'Artin.Analytic.dedekindContinuation_of_weakFEPair' depends on axioms: [propext, Classical.choice, Quot.sound]
-'ArtinPrimitiveRootsConjecture.conditional_artin_primitive_roots.parts.i' depends on axioms: [propext,
- sorryAx,
+'Artin.Analytic.effectiveKummerChebotarev_of_hooley_of_continuation' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
+'Artin.Analytic.psiKBound_of_continuation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Artin.Analytic.dedekindContinuation_of_weakFEPair' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Artin.Analytic.exists_norm_Λ₀_le' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
-No `native_decide` anywhere. The last line is the sorried target described above.
+No `native_decide` anywhere.
 
 ## Proof outline
 
@@ -159,9 +158,10 @@ riemann-hypothesis repository does not claim it. Only the `k = 1` instance of `H
 project has no tier-U version; its strongest result is the formal-conjectures statement with
 `HooleyHypothesis` as its only hypothesis.
 
-## Closing the main-library `sorry`
+## Hecke's theorem inside the main library
 
-`effectiveKummerChebotarev_of_hooley` needs `DedekindContinuation (K_k)` inside the main library.
+Dropping `hc` from the main-library theorem needs `DedekindContinuation (K_k)` proved without
+riemann-hypothesis.
 Mathlib at `fc4f59e5` has `NumberField.dedekindZeta` (the series, `Re s > 1`),
 `dedekindZeta_residue` and `tendsto_sub_one_mul_dedekindZeta_nhdsGT` (the class number formula),
 `NumberField.HeckeCharacter.LFunction` (as an arithmetic function only), the fundamental cone of
@@ -187,9 +187,8 @@ attempted here.
 | File | Content |
 |---|---|
 | `Artin/Statement.lean` | definitions copied word for word from formal-conjectures; do not change |
-| `Artin/Interfaces.lean` | the split: analytic half (sorried) and the definitions joining it to the sieve half, `EffectiveKummerChebotarev` |
+| `Artin/Interfaces.lean` | the split: the definitions joining the analytic half to the sieve half, `EffectiveKummerChebotarev` |
 | `Artin/SieveHalf.lean` | the sieve half `artin_of_effectiveKummerChebotarev`: `EffectiveKummerChebotarev a → ∃ δ > 0, (S a).HasDensity δ` for `a` not a square, `a ≠ -1` (sorry-free) |
-| `Artin/Main.lean` | the target theorem, from the two halves |
 | `Artin/MainContinuation.lean` | `conditional_artin_primitive_roots.parts.i_of_continuation`: the main result: the target with Hecke's continuation `DedekindContinuation (K_k)` as an extra hypothesis, through `kummerPsiBounds_of_hooley_of_continuation`, `effectiveKummerChebotarev_of_kummerPsiBounds` and the sieve half (sorry-free) |
 | `Artin/Sieve/PrimitiveRoot.lean` | primitive-root criterion and the inclusion–exclusion identity, exact and truncated (sorry-free) |
 | `Artin/Sieve/Selberg/` | the Selberg upper-bound sieve, vendored from PrimeNumberTheoremAnd (see Credits) |
