@@ -9,11 +9,12 @@ function) plus Littlewood's bound `M(x) = O(x^{1/2+ε})` under RH. Unconditional
 bound is `E(x) ≪ x^{1/2−o(1)}` (Walfisz, 1963). **Better published RH-conditional exponents
 exist**: `1/3`, `9/28` (Montgomery–Vaughan 1981), `8/25` (Graham 1981), `7/22` (Baker–Pintz
 1985), `17/54` (Jia 1993) and `11/35` (H.-Q. Liu, *J. Number Theory* **159** (2016)), the last
-being the best known. This repository formalises the oldest and simplest of them, at exponent
-`2/5`. It does not touch **Erdős Problem 969**, which asks for the true order of `E(x)` (probably
-`x^{1/4}`) and is open even under RH. Nothing here is new mathematics.
+being the best known. This repository proves the first of them, Axer's exponent `2/5`, and
+`Unconditional/` proves `E(x) = O(x^{2/5+ε})` unconditionally in Lean, with RH supplied by the
+certified proof in leanprover-community/riemann-hypothesis. **Erdős Problem 969**, which asks for
+the true order of `E(x)` (probably `x^{1/4}`), stays open, also under RH.
 
-The main library is a Lean proof that RH implies Axer's bound, following Axer (1911):
+The main library is a complete Lean proof that RH implies Axer's bound, following Axer (1911):
 
 ```lean
 theorem Erdos969.axer_of_RH (hRH : RiemannHypothesis) : Erdos969.AxerBound
@@ -127,8 +128,7 @@ A clean build of the four `Erdos969` modules (mertens-rh and erdos-985 already b
 
 ## Unconditional version
 
-`Unconditional/Erdos969Unconditional.lean` states Axer's bound, given the Lean proof of RH in
-leanprover-community/riemann-hypothesis, which has not been independently verified. It imports
+`Unconditional/Erdos969Unconditional.lean` proves Axer's bound with no hypothesis. It imports
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
 (commit `507a75d91d`) and discharges the hypothesis with `riemannHypothesis`:
 
@@ -151,9 +151,7 @@ for and loading the RH cache. Output:
 The import needs about 93 GB of cache, about 19 GB of RAM and roughly 900k open files (raise the
 open-file limit first, e.g. `ulimit -n 2000000` or `nofile` in `/etc/security/limits.conf`).
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
