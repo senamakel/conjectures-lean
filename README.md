@@ -13,16 +13,19 @@ are of the form `x exp(−c (log x)^{3/5} (log log x)^{−1/5})`.
 
 **Literature status: RH-consequence** (von Koch 1901; Schoenfeld 1976). This repository is a
 complete Lean proof that RH implies these bounds, following von Koch and Schoenfeld; a bound
-`ψ(x) − x = O(√x log² x)` is RH in another form. It contains two results:
+`ψ(x) − x = O(√x log² x)` is RH in another form. With the certified Lean proof of RH (Alpöge,
+2026), `Unconditional/` proves Schoenfeld's Theorem 10 and Corollary 1 unconditionally in Lean,
+with his constant `1/(8π)` and his thresholds. It contains two results:
 
-* from RH alone, all three bounds with Schoenfeld's thresholds and the constants `1/8`, `1/4`,
-  `9/20`;
-* Schoenfeld's exact statement, constant `1/(8π)` and his thresholds, from RH and one cited
-  input, Rosser's explicit zero count (Rosser 1941, Theorem 19). The other numerical inputs
-  are proved here by proved-sound checkers run with `native_decide`: PsiCert
-  (`|ψ(x) − x| ≤ (4/5)√x` on `[1500, 10¹⁰]`, an exact segmented sieve over every integer up to
-  `10¹⁰`) and the target itself on the three finite ranges `[73.2, 1500]`, `[599, 3·10⁴]`,
-  `[2657, 4·10⁵]`.
+* `schoenfeld_of_RH : RiemannHypothesis → SchoenfeldStatement`: Schoenfeld's exact statement
+  from RH alone. Its numerical inputs are all proved in this repository: Rosser's explicit zero
+  count (Rosser 1941, Theorem 19, `rosserZeroCount`, by the vendored Lean proof of
+  Garald1/RSBounds, calr3/ternary-goldbach and teal-sea/zeta-lab, see `Vendor/Rosser/`),
+  PsiCert (`|ψ(x) − x| ≤ (4/5)√x` on `[1500, 10¹⁰]`, an exact segmented sieve over every integer
+  up to `10¹⁰`) and the target itself on the three finite ranges `[73.2, 1500]`, `[599, 3·10⁴]`,
+  `[2657, 4·10⁵]`; the last two by proved-sound checkers run with `native_decide`;
+* `schoenfeld_weak_of_RH`: all three bounds with Schoenfeld's thresholds and the constants `1/8`,
+  `1/4`, `9/20`, from RH with no computation at all.
 
 ```lean
 theorem Schoenfeld.psiBound_of_RH (hRH : RiemannHypothesis) : PsiBound (1 / 8) 73.2
@@ -31,20 +34,20 @@ theorem Schoenfeld.piBound_of_RH (hRH : RiemannHypothesis) : PiBound (9 / 20) 26
 theorem Schoenfeld.schoenfeld_weak_of_RH (hRH : RiemannHypothesis) :
     PsiBound (1 / 8) 73.2 ∧ ThetaBound (1 / 4) 599 ∧ PiBound (9 / 20) 2657
 
-theorem Schoenfeld.schoenfeldPsi_of_RH (hRH : RiemannHypothesis) (hR : RosserZeroCount)
-    (hC : PsiCert) (hS : PsiSmallRange) : SchoenfeldPsi
-theorem Schoenfeld.schoenfeldTheta_of_RH (hRH : RiemannHypothesis) (hR : RosserZeroCount)
-    (hC : PsiCert) (hS : ThetaSmallRange) : SchoenfeldTheta
-theorem Schoenfeld.schoenfeldPi_of_RH (hRH : RiemannHypothesis) (hR : RosserZeroCount)
-    (hC : PsiCert) (hSθ : ThetaSmallRange) (hSπ : PiSmallRange) : SchoenfeldPi
-theorem Schoenfeld.schoenfeld_of_RH (hRH : RiemannHypothesis) (hR : RosserZeroCount)
-    (hC : PsiCert) (hSψ : PsiSmallRange) (hSθ : ThetaSmallRange) (hSπ : PiSmallRange) :
-    SchoenfeldStatement
+theorem Schoenfeld.schoenfeldPsi_of_RH (hRH : RiemannHypothesis) : SchoenfeldPsi
+theorem Schoenfeld.schoenfeldTheta_of_RH (hRH : RiemannHypothesis) : SchoenfeldTheta
+theorem Schoenfeld.schoenfeldPi_of_RH (hRH : RiemannHypothesis) : SchoenfeldPi
+theorem Schoenfeld.schoenfeld_of_RH (hRH : RiemannHypothesis) : SchoenfeldStatement
 
+theorem Schoenfeld.rosserZeroCount : RosserZeroCount
 theorem Schoenfeld.Check.psiSmallRange : PsiSmallRange
 theorem Schoenfeld.Check.thetaSmallRange : ThetaSmallRange
 theorem Schoenfeld.Check.piSmallRange : PiSmallRange
 theorem Schoenfeld.psiCert : PsiCert
+
+theorem Schoenfeld.schoenfeld_of_RH_of_inputs (hRH : RiemannHypothesis) (hR : RosserZeroCount)
+    (hC : PsiCert) (hSψ : PsiSmallRange) (hSθ : ThetaSmallRange) (hSπ : PiSmallRange) :
+    SchoenfeldStatement
 
 theorem Schoenfeld.schoenfeldPsi_of_RH_of_rosser (hRH : RiemannHypothesis)
     (hR : RosserZeroCount) : SchoenfeldPsi
@@ -99,24 +102,32 @@ def PiSmallRange : Prop :=
 
 | Theorem | Tier | Hypotheses |
 |---|---|---|
+| `schoenfeldPsi_of_RH` (`1/(8π)`, `x ≥ 73.2`) | C | RH |
+| `schoenfeldTheta_of_RH` (`1/(8π)`, `x ≥ 599`) | C | RH |
+| `schoenfeldPi_of_RH` (`1/(8π)`, `x ≥ 2657`) | C | RH |
+| `schoenfeld_of_RH` (`SchoenfeldStatement`) | C | RH |
 | `psiBound_of_RH`, `thetaBound_of_RH`, `piBound_of_RH` (constants `1/8`, `1/4`, `9/20`) | C | RH |
+| `rosserZeroCount` (`RosserZeroCount`) | D | none |
 | `Check.psiSmallRange`, `Check.thetaSmallRange`, `Check.piSmallRange` | D | none |
 | `psiCert` (`PsiCert`) | D | none |
-| `schoenfeldPsi_of_RH_of_rosser` (`1/(8π)`, `x ≥ 73.2`) | C + H | RH, `RosserZeroCount` |
-| `schoenfeldTheta_of_RH_of_rosser` (`1/(8π)`, `x ≥ 599`) | C + H | RH, `RosserZeroCount` |
-| `schoenfeldPi_of_RH_of_rosser` (`1/(8π)`, `x ≥ 2657`) | C + H | RH, `RosserZeroCount` |
-| `schoenfeld_of_RH_of_rosser` (`SchoenfeldStatement`) | C + H | RH, `RosserZeroCount` |
-| `schoenfeld_of_RH` (the same with all five inputs as arguments) | C + H | RH and the five inputs |
+| `schoenfeld_of_RH_of_rosser` and its parts | C + H | RH, `RosserZeroCount` |
+| `schoenfeld_of_RH_of_inputs` and its parts (all five inputs as arguments) | C + H | RH and the five inputs |
 
-In `Unconditional/` RH is discharged by riemann-hypothesis: the first row becomes tier U and the
-`_of_rosser` rows U + H. The one input still cited is `RosserZeroCount`.
+In `Unconditional/` RH is discharged by riemann-hypothesis, and every `_of_RH` row becomes
+tier U: `schoenfeld_statement : SchoenfeldStatement` has no hypothesis. The `_of_rosser` and
+`_of_inputs` versions are kept for downstream use with other inputs.
 
 * `RiemannHypothesis` is Mathlib's definition, used as is.
 * `RosserZeroCount` is Rosser's explicit Riemann–von Mangoldt formula (J. B. Rosser, *Explicit
   bounds for some functions of prime numbers*, Amer. J. Math. 63 (1941), 211–232, Theorem 19).
   `positiveZeroCount` and the statement are copied verbatim from
-  `TernaryGoldbach.RSBounds.Rosser1941` in [teorth/IEANTN](https://github.com/teorth/IEANTN),
-  where `Rosser1941.zero_count_bounds` proves it with no hypothesis (Lean `v4.34.0-rc2`).
+  `TernaryGoldbach.RSBounds.Rosser1941` in [teorth/IEANTN](https://github.com/teorth/IEANTN).
+  It is proved here (`Schoenfeld.rosserZeroCount`, `Schoenfeld/Rosser.lean`) by
+  `TernaryGoldbach.RSBounds.Rosser1941.zero_count_bounds`, vendored with its whole import
+  closure (216 files, about 95,000 lines) from the Lean `v4.35.0` originals in
+  [Garald1/RSBounds](https://github.com/Garald1/RSBounds) `82d7a55`, whose
+  `RosserCountDefinition.lean` has the same `positiveZeroCount`, so the two statements are the
+  same term. See [`Vendor/Rosser/README.md`](Vendor/Rosser/README.md).
 * `PsiCert` is copied verbatim from `Goals.Schoenfeld1976.PsiCert` in
   [Garald1/RSBounds](https://github.com/Garald1/RSBounds), where a kernel-checked campaign also
   proves it (Lean `v4.35.0`). It is proved here (`Schoenfeld.psiCert`) by our own checker; no
@@ -130,7 +141,8 @@ In `Unconditional/` RH is discharged by riemann-hypothesis: the first row become
   formal-conjectures has no statement of Schoenfeld's bounds (checked 2026-11-24), so
   `PsiBound`, `ThetaBound`, `PiBound` are written here.
 * `native_decide`: 24 calls, each evaluating a checker whose soundness is proved in Lean (see
-  Axioms). The RH-only theorems and `schoenfeld_of_RH` use none.
+  Axioms). `schoenfeld_weak_of_RH`, `rosserZeroCount` and `schoenfeld_of_RH_of_inputs` use
+  none; the vendored Rosser proof has no `native_decide`.
 
 ## Axioms
 
@@ -138,7 +150,7 @@ In `Unconditional/` RH is discharged by riemann-hypothesis: the first row become
 
 ```
 'Schoenfeld.schoenfeld_weak_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
-'Schoenfeld.schoenfeld_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Schoenfeld.schoenfeld_of_RH_of_inputs' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Schoenfeld.Check.psiSmallRange' depends on axioms: [propext,
  Classical.choice,
  Quot.sound,
@@ -284,10 +296,115 @@ In `Unconditional/` RH is discharged by riemann-hypothesis: the first row become
  Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
  Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
  Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'Schoenfeld.rosserZeroCount' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Schoenfeld.schoenfeldPsi_of_RH' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psi._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'Schoenfeld.schoenfeldTheta_of_RH' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'Schoenfeld.schoenfeldPi_of_RH' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkB_pi._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'Schoenfeld.schoenfeld_of_RH' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psi._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkB_pi._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
 ```
 
-The RH-only theorems and `schoenfeld_of_RH` use the standard three axioms only. The finite
-inputs add 24 `native_decide` axioms, each the evaluation of a checker proved sound in Lean:
+`schoenfeld_weak_of_RH`, `rosserZeroCount` and `schoenfeld_of_RH_of_inputs` use the standard
+three axioms only. The finite inputs add 24 `native_decide` axioms to `schoenfeld_of_RH`, each the
+evaluation of a checker proved sound in Lean:
 
 | `native_decide` | Checks | Soundness | Time |
 |---|---|---|---|
@@ -376,6 +493,17 @@ The finite inputs (steps 11–13), each a checker with a soundness proof, run by
     `native_decide`. Smallest margin (a floating-point replay in C) `67`, i.e. `0.0064 √a`, at
     `a ≈ 1.1·10⁸`.
 
+The last input:
+
+14. **Rosser's zero count** (`Rosser.lean`, `Vendor/Rosser/`). `rosserZeroCount` is the vendored
+    `Rosser1941.zero_count_bounds`: for `T ≥ 100`, Backlund's argument
+    (`RSBounds/BacklundHighCount.lean`: the argument principle on the rectangle with corners
+    `1/2`, `5/4`, `5/4 + iT`, `1/2 + iT`, Jensen's formula on circles centred on `σ = 5/4` for
+    the variation of `arg ζ`, Stirling for the Gamma factor and an Euler–Maclaurin bound for `ζ`);
+    for `T ≤ 100`, zeta-lab's certificate that the 29 zeros of height at most 100 are simple and
+    lie in explicit rational brackets on the critical line (`RHHeight100/`, `HardyTenZeros/`,
+    `RSBounds/BacklundLowCount.lean`), from which `N(T)` is known exactly below 100.
+
 ## Layout
 
 | File | Content |
@@ -390,14 +518,14 @@ The finite inputs (steps 11–13), each a checker with a soundness proof, run by
 | `Schoenfeld/Theta.lean` | Costa Pereira bound for `ψ − θ`, `thetaBound_of_RH` |
 | `Schoenfeld/Pi.lean` | `li` by parts, `piBound_of_RH` |
 | `Schoenfeld/Main.lean` | `schoenfeld_weak_of_RH` |
-| `Schoenfeld/Inputs.lean` | `positiveZeroCount`, `RosserZeroCount`, `PsiCert` (tier H, verbatim) |
-| `Schoenfeld/SmallRange.lean` | `PsiSmallRange`, `ThetaSmallRange`, `PiSmallRange` (tier H) |
+| `Schoenfeld/Inputs.lean` | `positiveZeroCount`, `RosserZeroCount`, `PsiCert` (input statements, verbatim) |
+| `Schoenfeld/SmallRange.lean` | `PsiSmallRange`, `ThetaSmallRange`, `PiSmallRange` (input statements) |
 | `Schoenfeld/ZeroCount.lean` | `ζ`/`ξ` orders, `positiveZeroCount = cnt`, `F(T) ≤ 2 G(T)` |
 | `Schoenfeld/CountSum.lean` | `G(T)` as an integral of `N(t)`, `Gsum_le_Ub` |
 | `Schoenfeld/PsiSharp.lean` | `psi_explicit`, `psi_sharp_large` |
 | `Schoenfeld/ThetaSharp.lean` | `theta_explicit`, `theta_mid_abs`, `theta_sharp_large` |
-| `Schoenfeld/Sharp.lean` | `schoenfeldPsi_of_RH`, `schoenfeldTheta_of_RH` |
-| `Schoenfeld/PiSharp.lean` | the `π − li` integrals, `schoenfeldPi_of_RH`, `schoenfeld_of_RH` |
+| `Schoenfeld/Sharp.lean` | `schoenfeldPsi_of_RH_of_inputs`, `schoenfeldTheta_of_RH_of_inputs` |
+| `Schoenfeld/PiSharp.lean` | the `π − li` integrals, `schoenfeldPi_of_RH_of_inputs`, `schoenfeld_of_RH_of_inputs` |
 | `Schoenfeld/Check/Basic.lean` | Rational enclosures of `log`, `√`, `1/x` and the right-hand sides, with soundness |
 | `Schoenfeld/Check/Step.lean` | `checkA`, the cell checker for a step function against an increasing `F`, and `checkA_sound` |
 | `Schoenfeld/Check/PsiTheta.lean` | `psiSmallRange`, `thetaSmallRange` (2 `native_decide`) |
@@ -413,6 +541,8 @@ The finite inputs (steps 11–13), each a checker with a soundness proof, run by
 | `Schoenfeld/PsiCert/Data.lean`, `Chunks/C00`–`C19`, `Chain.lean` | Chunk states and the 20 transitions (20 `native_decide`) |
 | `Schoenfeld/PsiCert/Final.lean` | `psiCert` |
 | `Schoenfeld/WithRosser.lean` | `schoenfeld_of_RH_of_rosser` and its three parts |
+| `Schoenfeld/Rosser.lean` | `rosserZeroCount`; `schoenfeld_of_RH` and its three parts |
+| `Vendor/Rosser/` | the vendored proof of Rosser's count (216 files; `README.md`, `PORTING.md`, `licenses/`) |
 | `scripts/Axioms.lean` | `#print axioms` for every headline theorem |
 | `Unconditional/SchoenfeldUnconditional.lean` | RH discharged by riemann-hypothesis |
 
@@ -438,17 +568,11 @@ error term `0.137 log t + 0.443 log log t + 1.588`, integrated against `dt/t²`,
 multiple of `√x`, which the `−0.2985 u √x` term absorbs from `x = 10¹⁰` on. The π bound has the
 least slack, smallest near `x ≈ e^{25}` (the four-range check in step 10).
 
-**Not proved here: `RosserZeroCount`.** It is proved in Lean in teorth/IEANTN
-(`Rosser1941.zero_count_bounds`, Lean `v4.34.0-rc2`), whose import closure is 219 files and
-about 95,000 lines: about 25,000 lines for `T ≥ 100` (Backlund's argument) and about 70,000 for
-the 29 zero certificates below height 100. A sample of 14 of its files (4,375 lines, from the
-Lean `v4.35.0` originals in Garald1/RSBounds and calr3/ternary-goldbach) compiled against this
-Mathlib pin with 6 files needing a one- or two-line fix each; the full port is estimated at one
-to two weeks. The proof here only uses the upper half of Rosser's bound, and only through a
-constant. A floating-point model of the error budget (not a Lean proof) indicates that any
-explicit count `N(T) ≤ (T/2π) log(T/2π) − T/2π + 7/8 + a log T + b` valid for all
-`T ≥ 4.4` with `2.48 a + b ≤ 3.31` would do (Rosser's uses `2.33`); the binding constraint is
-the π bound just above `10¹⁰`.
+**Rosser's zero count** comes from the vendored proof (see Credits). The proof here uses only its upper half, and only through a constant. A floating-point model of
+the error budget (not a Lean proof) indicates that any explicit count
+`N(T) ≤ (T/2π) log(T/2π) − T/2π + 7/8 + a log T + b` valid for all `T ≥ 4.4` with
+`2.48 a + b ≤ 3.31` would also do (Rosser's uses `2.33`); the binding constraint is the π bound
+just above `10¹⁰`.
 
 ## Building
 
@@ -467,6 +591,13 @@ caches the analytic library takes about 4.5 CPU-minutes; per module (user CPU):
 Build the chunks one at a time on a shared machine (`lake build Schoenfeld.PsiCert.Chunks.C00`
 and so on).
 
+The vendored proof of Rosser's count (`Vendor/Rosser/`, six `lean_lib`s in `lakefile.toml`)
+took about 3 CPU-hours from a cold `.lake` (10,700 s user CPU reported by `lake build`, 8.5 min
+wall with `LEAN_NUM_THREADS=12` on a loaded 95-core machine). It is dominated by zeta-lab's
+height-100 certificate: the 28 `RHHeight100` modules take about 2,800 s of elaboration in all
+(the largest `Box*` modules up to 200 s each), `HardyTenZeros` about 600 s, `HardyFirstZero` about
+250 s; the Backlund half (`RSBounds/`, `TernaryGoldbach/`) about 330 s.
+
 The chunk states in `Schoenfeld/PsiCert/Data.lean` were produced by running
 `runSegs basePrimes 477` from `init` twenty times with the compiled code; they are data, and
 each transition is re-checked when its chunk module builds.
@@ -476,34 +607,36 @@ each transition is re-checked when its chunk module builds.
 `Unconditional/SchoenfeldUnconditional.lean` imports
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
 (commit `507a75d91d`) and closes the RH hypothesis with its `riemannHypothesis` (Alpöge's
-proof). The first three bounds are then proved unconditionally in Lean, and Schoenfeld's
-`1/(8π)` bounds are proved from Rosser's zero count alone.
+proof). Every bound is then proved unconditionally in Lean, Schoenfeld's `1/(8π)` bounds
+included (`schoenfeld_statement`, no hypothesis).
 
 | Theorem | Statement | Axioms |
 |---|---|---|
+| `schoenfeld_statement` | `Schoenfeld.SchoenfeldStatement` | standard three + 24 `native_decide` |
+| `schoenfeld_psi` | `Schoenfeld.SchoenfeldPsi` | standard three + 22 `native_decide` |
+| `schoenfeld_theta` | `Schoenfeld.SchoenfeldTheta` | standard three + 22 `native_decide` |
+| `schoenfeld_pi` | `Schoenfeld.SchoenfeldPi` | standard three + 23 `native_decide` |
 | `psi_bound` | `Schoenfeld.PsiBound (1 / 8) 73.2` | standard three |
 | `theta_bound` | `Schoenfeld.ThetaBound (1 / 4) 599` | standard three |
 | `pi_bound` | `Schoenfeld.PiBound (9 / 20) 2657` | standard three |
-| `schoenfeld_psi_of_rosser` | `RosserZeroCount → SchoenfeldPsi` | standard three + 22 `native_decide` |
-| `schoenfeld_theta_of_rosser` | `RosserZeroCount → SchoenfeldTheta` | standard three + 22 `native_decide` |
-| `schoenfeld_pi_of_rosser` | `RosserZeroCount → SchoenfeldPi` | standard three + 23 `native_decide` |
 | `schoenfeld_statement_of_rosser` | `RosserZeroCount → SchoenfeldStatement` | standard three + 24 `native_decide` |
 | `schoenfeld_statement_of_cited` | `RosserZeroCount → PsiCert → SchoenfeldStatement` | standard three + 3 `native_decide` |
-| `schoenfeld_statement` | the five inputs `→ SchoenfeldStatement` | standard three |
+| `schoenfeld_statement_of_inputs` | the five inputs `→ SchoenfeldStatement` | standard three |
 
-(and the parts `schoenfeld_psi`, `schoenfeld_theta`, `schoenfeld_pi`,
-`schoenfeld_*_of_cited`). Checked 2026-11-24 with `scripts/check-unconditional.sh` against
-riemann-hypothesis `507a75d91d` (library at commit `40513b3`): the build succeeded, no
-`sorryAx` appeared, and `#print axioms` printed
+(and the parts `schoenfeld_*_of_rosser`, `schoenfeld_*_of_cited`, `schoenfeld_*_of_inputs`).
+So Schoenfeld's Theorem 10 and Corollary 1, with his constant `1/(8π)` and his thresholds, are
+proved unconditionally in Lean. Checked 2026-11-24 with `scripts/check-unconditional.sh` against
+riemann-hypothesis `507a75d91d`: the build succeeded, no `sorryAx` appeared, and
+`#print axioms` printed
 
 ```
 'psi_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
 'theta_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
 'pi_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
-'schoenfeld_psi' depends on axioms: [propext, Classical.choice, Quot.sound]
-'schoenfeld_theta' depends on axioms: [propext, Classical.choice, Quot.sound]
-'schoenfeld_pi' depends on axioms: [propext, Classical.choice, Quot.sound]
-'schoenfeld_statement' depends on axioms: [propext, Classical.choice, Quot.sound]
+'schoenfeld_psi_of_inputs' depends on axioms: [propext, Classical.choice, Quot.sound]
+'schoenfeld_theta_of_inputs' depends on axioms: [propext, Classical.choice, Quot.sound]
+'schoenfeld_pi_of_inputs' depends on axioms: [propext, Classical.choice, Quot.sound]
+'schoenfeld_statement_of_inputs' depends on axioms: [propext, Classical.choice, Quot.sound]
 'schoenfeld_psi_of_cited' depends on axioms: [propext,
  Classical.choice,
  Quot.sound,
@@ -626,9 +759,113 @@ riemann-hypothesis `507a75d91d` (library at commit `40513b3`): the build succeed
  Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
  Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
  Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'schoenfeld_psi' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psi._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'schoenfeld_theta' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'schoenfeld_pi' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkB_pi._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'schoenfeld_statement' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psi._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkB_pi._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
 ```
 
-The run took 5.0 min wall (127 s user CPU), dominated by importing riemann-hypothesis.
+The run took 11.2 min wall (130 s user CPU) on a loaded machine, dominated by importing
+riemann-hypothesis.
 
 To check it:
 
@@ -671,5 +908,25 @@ This check links against the community build cache and does not repeat those ker
   (`Solutions/Schoenfeld1976Numerics.v1/Proof/RSBounds/RosserCountDefinition.lean`,
   `Rosser1941.lean`, commit `cd9c2dd`), Apache License 2.0. The statement of `PsiCert` is copied
   verbatim from [Garald1/RSBounds](https://github.com/Garald1/RSBounds)
-  (`RSBounds/Schoenfeld1976TargetsExtra.lean`, commit `82d7a55`), Apache License 2.0. No proof
-  is copied from either. See [`NOTICE`](NOTICE).
+  (`RSBounds/Schoenfeld1976TargetsExtra.lean`, commit `82d7a55`), Apache License 2.0. See
+  [`NOTICE`](NOTICE).
+* `Vendor/Rosser/` (216 files): the proof of Rosser's zero count, vendored with its import closure.
+  Every file starts with a comment naming its source repository, commit and path, and keeps its
+  author and licence header.
+  * `Vendor/Rosser/RSBounds/` (82 files): [Garald1/RSBounds](https://github.com/Garald1/RSBounds)
+    at `82d7a55f02e52cd071cd8ed800cc889a23ad3e61`, Apache License 2.0 (eleven files MIT, as their
+    headers say); RSBounds itself adapts code from teorth/IEANTN, gersh/ternary-goldbach-lean,
+    calr3/ternary-goldbach and Mathlib, as its `THIRD_PARTY_NOTICES.md` records.
+  * `Vendor/Rosser/TernaryGoldbach/` (35 files):
+    [calr3/ternary-goldbach](https://github.com/calr3/ternary-goldbach) at
+    `192ca57362fa3ee737cd83205cb9ea99526c4553`, Apache License 2.0, © 2026 Charlie Reams (with
+    material from PrimeNumberTheoremAnd, Apache License 2.0).
+  * `Vendor/Rosser/{Zeta23,ZetaLean,RHHeight,RHHeight100,HardyFirstZero,HardyTenZeros}/`
+    (99 files): RSBounds' `vendor/rh100/`, the closure of `RHHeight100.Main100` from
+    [teal-sea/zeta-lab](https://github.com/teal-sea/zeta-lab) at
+    `b09fa4dd2f2182cf14b248e7ffc64ff03df2c534` with RSBounds' documented adaptations; MIT, ©
+    2026 Thomas Lince, with the Zeta23 files under Apache License 2.0.
+
+  The licence texts and notices are in `Vendor/Rosser/licenses/`. 28 files were edited to compile
+  at this Lean and Mathlib pin (proof repairs only, no statement changed); every edit is listed
+  in [`Vendor/Rosser/PORTING.md`](Vendor/Rosser/PORTING.md).

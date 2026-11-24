@@ -22,22 +22,22 @@ theorem pi_bound : Schoenfeld.PiBound (9 / 20) 2657 :=
 RH is supplied by riemann-hypothesis; the cited inputs stay hypotheses: Rosser's zero count
 (`RosserZeroCount`), PsiCert, and the finite ranges. -/
 
-theorem schoenfeld_psi (hR : Schoenfeld.RosserZeroCount) (hC : Schoenfeld.PsiCert)
+theorem schoenfeld_psi_of_inputs (hR : Schoenfeld.RosserZeroCount) (hC : Schoenfeld.PsiCert)
     (hS : Schoenfeld.PsiSmallRange) : Schoenfeld.SchoenfeldPsi :=
-  Schoenfeld.schoenfeldPsi_of_RH riemannHypothesis hR hC hS
+  Schoenfeld.schoenfeldPsi_of_RH_of_inputs riemannHypothesis hR hC hS
 
-theorem schoenfeld_theta (hR : Schoenfeld.RosserZeroCount) (hC : Schoenfeld.PsiCert)
+theorem schoenfeld_theta_of_inputs (hR : Schoenfeld.RosserZeroCount) (hC : Schoenfeld.PsiCert)
     (hS : Schoenfeld.ThetaSmallRange) : Schoenfeld.SchoenfeldTheta :=
-  Schoenfeld.schoenfeldTheta_of_RH riemannHypothesis hR hC hS
+  Schoenfeld.schoenfeldTheta_of_RH_of_inputs riemannHypothesis hR hC hS
 
-theorem schoenfeld_pi (hR : Schoenfeld.RosserZeroCount) (hC : Schoenfeld.PsiCert)
+theorem schoenfeld_pi_of_inputs (hR : Schoenfeld.RosserZeroCount) (hC : Schoenfeld.PsiCert)
     (hSθ : Schoenfeld.ThetaSmallRange) (hSπ : Schoenfeld.PiSmallRange) : Schoenfeld.SchoenfeldPi :=
-  Schoenfeld.schoenfeldPi_of_RH riemannHypothesis hR hC hSθ hSπ
+  Schoenfeld.schoenfeldPi_of_RH_of_inputs riemannHypothesis hR hC hSθ hSπ
 
-theorem schoenfeld_statement (hR : Schoenfeld.RosserZeroCount) (hC : Schoenfeld.PsiCert)
+theorem schoenfeld_statement_of_inputs (hR : Schoenfeld.RosserZeroCount) (hC : Schoenfeld.PsiCert)
     (hSψ : Schoenfeld.PsiSmallRange) (hSθ : Schoenfeld.ThetaSmallRange)
     (hSπ : Schoenfeld.PiSmallRange) : Schoenfeld.SchoenfeldStatement :=
-  Schoenfeld.schoenfeld_of_RH riemannHypothesis hR hC hSψ hSθ hSπ
+  Schoenfeld.schoenfeld_of_RH_of_inputs riemannHypothesis hR hC hSψ hSθ hSπ
 
 /-! ### The finite ranges discharged
 
@@ -79,13 +79,30 @@ theorem schoenfeld_statement_of_rosser (hR : Schoenfeld.RosserZeroCount) :
     Schoenfeld.SchoenfeldStatement :=
   Schoenfeld.schoenfeld_of_RH_of_rosser riemannHypothesis hR
 
+/-! ### Rosser's zero count discharged
+
+`RosserZeroCount` is proved in the main library (`Schoenfeld.rosserZeroCount`, from the vendored
+`Vendor/Rosser/` closure), so RH is the only input, and it is supplied here. -/
+
+theorem schoenfeld_psi : Schoenfeld.SchoenfeldPsi :=
+  Schoenfeld.schoenfeldPsi_of_RH riemannHypothesis
+
+theorem schoenfeld_theta : Schoenfeld.SchoenfeldTheta :=
+  Schoenfeld.schoenfeldTheta_of_RH riemannHypothesis
+
+theorem schoenfeld_pi : Schoenfeld.SchoenfeldPi :=
+  Schoenfeld.schoenfeldPi_of_RH riemannHypothesis
+
+theorem schoenfeld_statement : Schoenfeld.SchoenfeldStatement :=
+  Schoenfeld.schoenfeld_of_RH riemannHypothesis
+
 #print axioms psi_bound
 #print axioms theta_bound
 #print axioms pi_bound
-#print axioms schoenfeld_psi
-#print axioms schoenfeld_theta
-#print axioms schoenfeld_pi
-#print axioms schoenfeld_statement
+#print axioms schoenfeld_psi_of_inputs
+#print axioms schoenfeld_theta_of_inputs
+#print axioms schoenfeld_pi_of_inputs
+#print axioms schoenfeld_statement_of_inputs
 #print axioms schoenfeld_psi_of_cited
 #print axioms schoenfeld_theta_of_cited
 #print axioms schoenfeld_pi_of_cited
@@ -94,3 +111,7 @@ theorem schoenfeld_statement_of_rosser (hR : Schoenfeld.RosserZeroCount) :
 #print axioms schoenfeld_theta_of_rosser
 #print axioms schoenfeld_pi_of_rosser
 #print axioms schoenfeld_statement_of_rosser
+#print axioms schoenfeld_psi
+#print axioms schoenfeld_theta
+#print axioms schoenfeld_pi
+#print axioms schoenfeld_statement
