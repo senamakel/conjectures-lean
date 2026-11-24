@@ -39,6 +39,27 @@ theorem schoenfeld_statement (hR : Schoenfeld.RosserZeroCount) (hC : Schoenfeld.
     (hSπ : Schoenfeld.PiSmallRange) : Schoenfeld.SchoenfeldStatement :=
   Schoenfeld.schoenfeld_of_RH riemannHypothesis hR hC hSψ hSθ hSπ
 
+/-! ### The finite ranges discharged
+
+`PsiSmallRange`, `ThetaSmallRange` and `PiSmallRange` are proved in the main library
+(`Schoenfeld/Check/`); Rosser's zero count and PsiCert remain hypotheses. -/
+
+theorem schoenfeld_psi_of_cited (hR : Schoenfeld.RosserZeroCount) (hC : Schoenfeld.PsiCert) :
+    Schoenfeld.SchoenfeldPsi :=
+  Schoenfeld.schoenfeldPsi_of_RH_of_cited riemannHypothesis hR hC
+
+theorem schoenfeld_theta_of_cited (hR : Schoenfeld.RosserZeroCount) (hC : Schoenfeld.PsiCert) :
+    Schoenfeld.SchoenfeldTheta :=
+  Schoenfeld.schoenfeldTheta_of_RH_of_cited riemannHypothesis hR hC
+
+theorem schoenfeld_pi_of_cited (hR : Schoenfeld.RosserZeroCount) (hC : Schoenfeld.PsiCert) :
+    Schoenfeld.SchoenfeldPi :=
+  Schoenfeld.schoenfeldPi_of_RH_of_cited riemannHypothesis hR hC
+
+theorem schoenfeld_statement_of_cited (hR : Schoenfeld.RosserZeroCount)
+    (hC : Schoenfeld.PsiCert) : Schoenfeld.SchoenfeldStatement :=
+  Schoenfeld.schoenfeld_of_RH_of_cited riemannHypothesis hR hC
+
 #print axioms psi_bound
 #print axioms theta_bound
 #print axioms pi_bound
@@ -46,3 +67,7 @@ theorem schoenfeld_statement (hR : Schoenfeld.RosserZeroCount) (hC : Schoenfeld.
 #print axioms schoenfeld_theta
 #print axioms schoenfeld_pi
 #print axioms schoenfeld_statement
+#print axioms schoenfeld_psi_of_cited
+#print axioms schoenfeld_theta_of_cited
+#print axioms schoenfeld_pi_of_cited
+#print axioms schoenfeld_statement_of_cited
