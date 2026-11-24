@@ -54,19 +54,4 @@ theorem densityHypothesis_of_RH (hRH : RiemannHypothesis) : Statement := by
     calc C * T * Real.log T ≤ C * T * (T ^ ε / ε) := by gcongr
       _ = C / ε * (T * T ^ ε) := by ring
 
-/-- The density hypothesis implies the Guth–Maynard bound: for `T ≥ 2` and `σ ≤ 1`,
-`T^{2(1-σ)+ε} ≤ T^{(30/13)(1-σ)+ε}`. -/
-theorem guthMaynard_of_statement (h : Statement) : GuthMaynardStatement := by
-  intro ε hε
-  obtain ⟨C, hC, hb⟩ := h ε hε
-  refine ⟨C, hC, fun σ T hσ hσ1 hT => (hb σ T hσ hσ1 hT).trans ?_⟩
-  gcongr
-  · linarith
-  · linarith
-
-/-- **The Guth–Maynard zero-density statement from RH** (as a corollary of the density
-hypothesis, not via Guth–Maynard's unconditional argument). -/
-theorem guthMaynard_of_RH (hRH : RiemannHypothesis) : GuthMaynardStatement :=
-  guthMaynard_of_statement (densityHypothesis_of_RH hRH)
-
 end DensityHypothesis

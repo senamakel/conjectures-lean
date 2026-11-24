@@ -30,7 +30,3 @@ The build fails if any headline theorem picks up an axiom beyond the standard th
 /-- info: 'Density.zeroCountOn_riemannZeta_le_of_subset_box' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms Density.zeroCountOn_riemannZeta_le_of_subset_box
-
-/-- info: 'DensityHypothesis.guthMaynard_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound] -/
-#guard_msgs in
-#print axioms DensityHypothesis.guthMaynard_of_RH

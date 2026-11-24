@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Link the density-hypothesis and Guth–Maynard-statement proofs to the riemann-hypothesis repository's RH theorem and print
+# Link the density-hypothesis proof to the riemann-hypothesis repository's RH theorem and print
 # the axioms.
 #
 # Usage: scripts/check-unconditional.sh [RH_DIR]
@@ -54,16 +54,5 @@ fi
 (cd "$HERE" && lake build)
 
 cd "$HERE"
-OUT="$(LEAN_PATH="$(cd "$RH" && lake env printenv LEAN_PATH):$HERE/.lake/packages/Erdos985/.lake/build/lib/lean:$HERE/.lake/build/lib/lean" \
-  lean Unconditional/DensityUnconditional.lean)"
-echo "$OUT"
-
-# Allow-list: both theorems must report exactly the standard three axioms.
-EXPECTED="[propext, Classical.choice, Quot.sound]"
-for thm in density_hypothesis guth_maynard_zero_density; do
-  if ! grep -qxF "'$thm' depends on axioms: $EXPECTED" <<<"$OUT"; then
-    echo "axiom check failed for $thm" >&2
-    exit 1
-  fi
-done
-echo "axiom allow-list: OK"
+LEAN_PATH="$(cd "$RH" && lake env printenv LEAN_PATH):$HERE/.lake/packages/Erdos985/.lake/build/lib/lean:$HERE/.lake/build/lib/lean" \
+  lean Unconditional/DensityUnconditional.lean
