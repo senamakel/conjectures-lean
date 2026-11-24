@@ -10,5 +10,14 @@ name = "Erdos985"
 git = "https://github.com/senamakel/erdos-985.git"
 rev = "9538edb73dc72c8fdc04b4e0df076c8930ee2fba"
 
+[[require]]
+name = "Robin"
+git = "https://github.com/senamakel/robin-rh.git"
+rev = "dfa8d63d0b935d1d17e8960c2291ba562bf60905"
+
 [[lean_lib]]
 name = "Nicolas"
+
+[[lean_lib]]
+name = "NicolasChecks"
+globs = ["NicolasChecks.+"]
