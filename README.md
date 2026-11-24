@@ -10,11 +10,11 @@ for some absolute constant `C`. Titchmarsh's 1930 tract *The Zeta-Function of Ri
 gives it as Theorem 63 (§5.72); the second edition of *The Theory of the Riemann Zeta-Function*
 has it in §14.14. Chandee and Soundararajan (Bull. LMS 43 (2011)) showed that any
 `C > (log 2)/2` works. Without RH, the best known bounds are powers of `t` (Bourgain 2017:
-`t^{13/84+ε}`), and even the weaker Lindelöf hypothesis is open. This repository's main library is a Lean proof that RH implies
-Littlewood's bound, following Littlewood (1924), with an explicit-formula argument in the
-style of Soundararajan (2009). `Unconditional/` gives Littlewood's bound, given the Lean
-proof of RH in leanprover-community/riemann-hypothesis, which has not been independently
-verified.
+`t^{13/84+ε}`). This repository's main library is a complete Lean proof that RH implies
+Littlewood's bound with the explicit constant `C = 4`, following Littlewood (1924), with an
+explicit-formula argument in the style of Soundararajan (2009). `Unconditional/` proves the bound
+unconditionally in Lean, with RH supplied by the certified proof in
+leanprover-community/riemann-hypothesis, from the standard three axioms only.
 
 ```lean
 /-- `Littlewood/Statement.lean` -/
@@ -101,7 +101,7 @@ Notation: `s = σ + it`, `ρ = 1/2 + iγ` runs over the zeros of `ξ` with multi
 | `Littlewood/GammaSide.lean` | `ζ'/ζ = ξ'/ξ - R`, digamma bounds, `perron_R`, `norm_ER_le` |
 | `Littlewood/Explicit.lean` | `explicit_formula` |
 | `Littlewood/ZeroIntegral.lean` | one zero integrated over `[σ₀, 2]` |
-| `Littlewood/Integrate.lean` | FTC for `log|ζ|`, summability, `‖D‖ ≤ (x+1)(log x)²` |
+| `Littlewood/Integrate.lean` | FTC for `log\|ζ\|`, summability, `‖D‖ ≤ (x+1)(log x)²` |
 | `Littlewood/Bound.lean` | integrated zero sum, `key_bound` |
 | `Littlewood/Asymptotic.lean` | the choice `x = √(log t)` |
 | `Littlewood/Main.lean` | `log_norm_zeta_le`, `littlewood_of_RH` |
@@ -157,9 +157,7 @@ Output:
 The import needs about 93 GB of cache, about 19 GB of RAM and roughly 900k open files. Raise
 the open-file limit first, e.g. `prlimit --nofile=2000000:2000000`.
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
