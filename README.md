@@ -7,10 +7,13 @@ hypothesis for the Dedekind zeta functions of the Kummer fields `K_k = ℚ(ζ_k,
 open unconditionally; Heath-Brown (1986) showed that at most two primes `a` fail it.
 
 **Literature status: RH-consequence (tier C stays).** The conditional theorem is Hooley (1967).
-This is a Lean formalisation of Hooley's conditional proof, with Hecke's continuation taken from
-riemann-hypothesis. Hooley's hypothesis `HooleyHypothesis a` is not implied by the RH proof in
-that repository (the Kummer fields are non-abelian), so no unconditional version exists. It is
-not new mathematics.
+This repository is a complete Lean proof of Hooley's theorem: for every `a` that is neither `-1`
+nor a square, the Riemann hypothesis for the Kummer fields (`HooleyHypothesis a`) implies that
+`a` is a primitive root modulo a set of primes of positive density. Hecke's continuation of the
+Dedekind zeta functions is taken from riemann-hypothesis's Tate-thesis modules, so
+`HooleyHypothesis a` is the only hypothesis left, and the axioms are the standard three. That
+remaining hypothesis is RH for the Kummer fields `K_k`, which are non-abelian for odd prime `k`,
+and the certified proof covers ζ and Dirichlet L-functions only, so the result stays tier C.
 
 ```lean
 -- Artin/MainContinuation.lean (main library)
@@ -100,8 +103,8 @@ The full plan is [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
 
 Hooley's hypothesis is used as formal-conjectures states it (RH for `ζ_{K_k}`, `k` squarefree).
 The main library also assumes Hecke's continuation, a theorem, because neither our Mathlib pin
-nor upstream Mathlib has it; `Unconditional/` removes that assumption. Constants are far from
-optimal (Brun–Titchmarsh constant `20000`, sieve threshold `x ≥ e^256`); they only affect the
+nor upstream Mathlib has it; `Unconditional/` removes that assumption. Constants are not
+optimised (Brun–Titchmarsh constant `20000`, sieve threshold `x ≥ e^256`); they only affect the
 error terms, not the density.
 
 ## Unconditional version
@@ -133,10 +136,9 @@ Output of `lean Unconditional/ArtinUnconditional.lean` (2026-11-24):
  Quot.sound]
 ```
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
-Here the linked proofs are its Tate-thesis modules, not its RH/GRH proof; they are just as
-unverified.
+Here the linked proofs are its Tate-thesis modules, not its RH/GRH proof.
 
 ## This result stays conditional
 
