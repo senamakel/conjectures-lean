@@ -13,7 +13,7 @@ rev = "9538edb73dc72c8fdc04b4e0df076c8930ee2fba"
 [[require]]
 name = "Schoenfeld"
 git = "https://github.com/senamakel/schoenfeld-rh.git"
-rev = "14df2ce0b613a76bc53100b1c3e2f1b946b4810c"
+rev = "b2c31374576f5f9e5be841b99b3011122b30361e"
 
 [[lean_lib]]
 name = "Mills"
