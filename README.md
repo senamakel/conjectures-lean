@@ -1,19 +1,24 @@
 # The Lindelöf hypothesis from RH and GRH in Lean
 
-The [Lindelöf hypothesis](https://en.wikipedia.org/wiki/Lindel%C3%B6f_hypothesis) (Lindelöf,
-1908) says that `ζ(1/2 + it) = O(t^ε)` for every `ε > 0`. Littlewood (1912) proved that it
-follows from the Riemann hypothesis (Titchmarsh, *The Theory of the Riemann Zeta-Function*, 2nd
-ed., §14.2); the same argument gives `L(1/2 + it, χ) = O_{χ,ε}(t^ε)` for every Dirichlet
-character `χ` under GRH. Unconditionally only subconvexity bounds are known (for `ζ`, Bourgain
-2017: `ζ(1/2 + it) = O(t^{13/84 + ε})`). This project formalises both implications.
+Lean proves the [Lindelöf hypothesis](https://en.wikipedia.org/wiki/Lindel%C3%B6f_hypothesis)
+`ζ(1/2 + it) = O(t^ε)` for every `ε > 0`, and its analogue `L(1/2 + it, χ) = O_{χ,ε}(t^ε)` for
+every Dirichlet character `χ`. `lindelof_hypothesis` and `dirichletLindelof` are proved
+unconditionally in Lean, from the standard three axioms, with RH and GRH supplied by the
+certified proof in
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
+The main library holds complete Lean proofs that RH implies the hypothesis for `ζ` and that GRH
+implies it for every Dirichlet L-function.
 
-**Literature status: RH-consequence.** Both implications are classical (Littlewood 1912, in
-Titchmarsh). This repository is a complete Lean proof that RH implies the Lindelöf hypothesis
-for ζ and that GRH implies it for every Dirichlet L-function, following Littlewood.
-`Unconditional/` proves both statements unconditionally in Lean, with RH and GRH supplied by the
-certified proof in leanprover-community/riemann-hypothesis, from the standard three axioms only.
+**Literature status: RH-consequence.** Lindelöf stated the hypothesis in 1908. Littlewood
+(1912) proved that it follows from RH (Titchmarsh, *The Theory of the Riemann Zeta-Function*,
+2nd ed., §14.2), and the same argument gives the Dirichlet version under GRH. The proofs here
+follow Littlewood. Without RH, only subconvexity bounds are known; for `ζ`, Bourgain (2017) proved
+`ζ(1/2 + it) = O(t^{13/84 + ε})`.
 
 ```lean
+theorem lindelof_hypothesis : Lindelof.LindelofHypothesis        -- Unconditional/
+theorem dirichletLindelof : Lindelof.DirichletLindelofHypothesis -- Unconditional/
+
 theorem Lindelof.lindelof_of_RH (hRH : RiemannHypothesis) : Lindelof.LindelofHypothesis
 
 theorem Lindelof.dirichletLindelof_of_GRH
@@ -88,7 +93,7 @@ each `≤ 2` in norm on `σ = 1/2`), and to `ζ` when `χ = 1`. For primitive `�
 `Λ(s, χ')`: conjugation symmetry `conj Λ(s̄, χ) = Λ(s, χ⁻¹)` and the functional equation give
 `Λ'/Λ(1 - z̄) = -log N - conj Λ'/Λ(z)`, so `‖Λ(σ+it)‖ ≤ N^{(σ'-σ)/2} ‖Λ(σ'+it)‖`
 (`Lindelof/DirichletCompleted.lean`). Then `L = Λ/Γℝ(s+κ)`, `‖L - 1‖ ≤ π²/6 - 1` on `σ ≥ 2`, and a
-logarithm of `L` itself feed Steps 6–8 (`Lindelof/DirichletBounds.lean`).
+logarithm of `L` itself feed Steps 6 to 8 (`Lindelof/DirichletBounds.lean`).
 
 ## Layout
 
@@ -104,7 +109,7 @@ logarithm of `L` itself feed Steps 6–8 (`Lindelof/DirichletBounds.lean`).
 | `Lindelof/ThreeLines.lean` | Step 7 |
 | `Lindelof/Main.lean` | Step 8: `LogBounds`, `lindelof_of_RH` |
 | `Lindelof/DirichletCompleted.lean` | Dirichlet Step 2: conjugation, log-derivative identity, monotonicity |
-| `Lindelof/DirichletBounds.lean` | Dirichlet Steps 4–5, primitive case |
+| `Lindelof/DirichletBounds.lean` | Dirichlet Steps 4 and 5, primitive case |
 | `Lindelof/Dirichlet.lean` | Reduction to primitive characters, `dirichletLindelof_of_GRH` |
 | `Unconditional/LindelofUnconditional.lean` | One-line discharges from riemann-hypothesis |
 
@@ -154,7 +159,7 @@ Output:
 ```
 
 The import needs about 93 GB of cache, about 19 GB of RAM and roughly 900k open files (raise
-the open-file limit first, e.g. `prlimit --nofile=2000000:2000000`).
+the open-file limit first, on Linux `sudo prlimit --pid $$ --nofile=2000000:2000000`).
 
 The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
