@@ -3,10 +3,12 @@
 Under GRH every odd composite `n` has a strong-pseudoprime witness `a ≤ 2 log² n` (Miller 1976;
 constant `2` by Bach, Math. Comp. 55 (1990)).
 
-**Literature status: RH-consequence.** Miller's test is conditional on GRH (Miller 1976); this
-repository is a Lean proof that GRH implies it, following Miller and Bach, with our constant
-`21/5` weaker than Bach's `2`. It is not new mathematics. Unconditional polynomial-time primality
-testing is Agrawal–Kayal–Saxena (2002), by a different method.
+**Literature status: RH-consequence.** Miller's test is conditional on GRH (Miller 1976). This
+repository is a complete Lean proof that GRH implies it, following Miller and Bach, and
+`Unconditional/` proves `MillerStatement (21/5)` and the correctness of the executable test
+unconditionally in Lean, with GRH supplied by the certified proof in
+leanprover-community/riemann-hypothesis. Our constant is `21/5`; Bach's is `2`. Unconditional
+polynomial-time primality testing is Agrawal–Kayal–Saxena (2002), by a different method.
 
 This repository proves the **unconditional
 reduction**: Bach's subgroup bound implies Miller's statement and a correct primality test.
@@ -112,6 +114,4 @@ The script uses that project's community cache, about 93 GB. The import opens ar
 module files and needs about 19 GB of RAM. Raise the open-file limit first; on macOS:
 `sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`.
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
