@@ -1,6 +1,7 @@
 import Speiser.Statement
 import Speiser.Xi
 import Speiser.Gamma
+import Speiser.Low
 
 /-!
 # RH ⇒ `ζ'(s) ≠ 0` for `0 < Re s < 1/2`, `|Im s| ≥ 7`
@@ -44,5 +45,11 @@ literature settles numerically). -/
 theorem speiser_of_RH_of_below (hRH : RiemannHypothesis) (hB : SpeiserBelow 7) :
     SpeiserStatement :=
   speiserStatement_of_above_of_below (speiserAbove_of_RH hRH) hB
+
+/-- The full target, given only the band `5/2 ≤ |Im s| < 7` (tier H: the region that needs a
+certified computation of `ζ'`). -/
+theorem speiser_of_RH_of_band (hRH : RiemannHypothesis) (hM : SpeiserBand (5 / 2) 7) :
+    SpeiserStatement :=
+  speiserStatement_of_band (speiserBelow_of_RH hRH) hM (speiserAbove_of_RH hRH)
 
 end Speiser
