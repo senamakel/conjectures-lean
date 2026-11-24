@@ -9,12 +9,15 @@ cat > "$tmp/Axioms.lean" <<'LEAN'
 import GoldbachAverage
 #print axioms GoldbachAverage.goldbachAverageSharp_of_RH
 #print axioms GoldbachAverage.goldbachAverage_of_RH
+#print axioms GoldbachAverage.fujii_of_RH
+#print axioms GoldbachAverage.fujiiStatement_of_RH
+#print axioms GoldbachAverage.fujiiBound_of_meanSquare
 LEAN
 out="$(lake env lean "$tmp/Axioms.lean")"
 echo "$out"
 n="$(grep -c "depends on axioms: \[propext, Classical.choice, Quot.sound\]$" <<<"$out" || true)"
-if [ "$n" != 2 ]; then
-  echo "axiom check FAILED: expected 2 theorems on the standard axioms only" >&2
+if [ "$n" != 5 ]; then
+  echo "axiom check FAILED: expected 5 theorems on the standard axioms only" >&2
   exit 1
 fi
 echo "axiom check passed"
