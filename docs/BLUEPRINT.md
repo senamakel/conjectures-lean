@@ -127,3 +127,32 @@ littlewood-rh's explicit formula), `s₀ = σ₀ + it`, `η = σ₀ - 1/2`, `W =
    `abs_mertens_nat_le_sharp` (`l ≥ 8`): `|M(N)| ≤ 8 l e^{A(l²e^l+1)} (N+1)^{1/2+12/l}`.
 7. `eventually_le_div_log`: `A((log u)² √u + 1) + B ≤ u/log u` eventually
    (`(log u)³ = o(√u)`); `mertensSharp_of_RH` with `l = ½ log log x`, `C = 25`.
+
+## Round 6: Titchmarsh's bound for `L`, and `1/ζ` on `σ ≥ 1/2 + 1/log log t`
+
+Targets: `Mertens/Statement4.lean` (`LiouvilleSharpBound`) and the fixed round-5 target
+`InvZetaSharpBound` (`Mertens/Statement3.lean`).
+
+1. `sum_sqInd_rpow_le_log` (`β ≥ 1/2`): `∑_{n ≤ N} 1_□(n) n^{-β} ≤ 1 + log N` (via
+   `harmonic_le_one_add_log`); `abs_liouvilleSum_nat_le_of`: a bound `|M(n)| ≤ K(n+1)^β` for all
+   `n ≥ 1` gives `|L(N)| ≤ K 2^β N^β (1 + log N)`.
+2. `liouvilleSharp_of_RH`: step 1 with `abs_mertens_nat_le_sharp` at `l = ½ log log x`, and
+   `eventually_le_div_log (A+2) 5`; `C = 25`.
+3. `sum_inv_sqrt_le`: `∑_{n ≤ N} (√n)⁻¹ ≤ 2√N`; `norm_dirPoly_le_half` (`Re s ≥ 1/2`):
+   `‖D(s,x)‖ ≤ 2√x (log x)²`; `norm_ER_le_half`: `‖E_R(s,x)‖ ≤ √x + 1 + S`.
+4. `norm_zeroTerm_le_sharp` (`ηL ≥ 3/2`): `‖zeroTerm x t ρ σ₀‖ ≤ (5/4) m_ρ/|ρ - s₀|²`
+   (`e^{-3/2} ≤ 1/4`).
+5. `re_logDeriv_xi_le_half` (`t ≥ 1`, `ηL ≥ 3/2`): `W ≤ 6 Chalf(x)/L + 6‖R(s₀)‖`,
+   `Chalf x = 2√x L² + √x + 1 + S`.
+6. `norm_inv_zeta_le_large_half` (`t ≥ 1`, `x ≥ e²`, `σ₀ ≤ 2`, `ηL ≥ 3/2`):
+   `‖ζ(s₀)⁻¹‖ ≤ exp(A + (8 Chalf(x) + 12 log(3+t) + 60)/L)`.
+7. `eventually_le_div_log_rpow` (`0 ≤ α < 1`): `A((log u)² u^α + 1) + B ≤ u/log u` eventually;
+   `invZetaSharp_of_RH` with `L = (3/2) log log t`, `α = 3/4`, `C = 9`.
+8. `InvZetaSharpBoundWith.mono`: the bound for `c` gives it for every `c' ≥ c`.
+
+Why round 5 stopped at `c > 4`: Selberg's device absorbed `2W/η` into `LW/2`, which needs
+`ηL ≥ 4`, and `C ≈ x L²` forces `x ≤ log t/(log log t)²`, i.e. `L < log log t`. Steps 3–4 lower
+the first requirement to `ηL ≥ 3/2` (any `ηL > 1.28`, the root of `a = 1 + e^{-a}`, would do) and
+replace `x` by `√x` in the second (`L < 2 log log t`). `c = 1` uses `ηL = 3/2`,
+`L = (3/2) log log t`. The same argument would reach any `c > 0.64` (`c ≈ a/2` with
+`a > 1.28`); only `c = 1` is stated and proved.

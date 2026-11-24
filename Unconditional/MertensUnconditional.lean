@@ -2,7 +2,7 @@ import Main      -- leanprover-community/riemann-hypothesis: `riemannHypothesis`
 import Mertens
 
 /-!
-# Mertens, Riesz, Hardy–Littlewood, Redheffer, Möbius-series, Liouville and Franel–Landau bounds, with RH supplied by the
+# Mertens, Riesz, Hardy–Littlewood, Redheffer, Möbius-series, Liouville, Franel–Landau and Titchmarsh bounds, with RH supplied by the
 # riemann-hypothesis repository
 
 Not part of the default build: it needs the riemann-hypothesis project's compiled modules.
@@ -42,6 +42,12 @@ theorem mertens_sharp_bound : Mertens.MertensSharpBound :=
 theorem invZeta_sharp_bound : Mertens.InvZetaSharpBoundWith 8 :=
   Mertens.invZetaSharpWith_of_RH riemannHypothesis
 
+theorem liouville_sharp_bound : Mertens.LiouvilleSharpBound :=
+  Mertens.liouvilleSharp_of_RH riemannHypothesis
+
+theorem invZeta_sharp_bound_titchmarsh : Mertens.InvZetaSharpBound :=
+  Mertens.invZetaSharp_of_RH riemannHypothesis
+
 #print axioms invZeta_bound
 #print axioms mertens_bound
 #print axioms riesz_bound
@@ -53,3 +59,5 @@ theorem invZeta_sharp_bound : Mertens.InvZetaSharpBoundWith 8 :=
 #print axioms franelLandau_bound
 #print axioms mertens_sharp_bound
 #print axioms invZeta_sharp_bound
+#print axioms liouville_sharp_bound
+#print axioms invZeta_sharp_bound_titchmarsh

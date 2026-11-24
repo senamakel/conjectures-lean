@@ -12,12 +12,15 @@ of RH (Alpöge 2026) from
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
 It also proves Titchmarsh's sharper bound `|M(x)| ≤ √x · exp(25 log x / log log x)` for all
 large `x` (Titchmarsh, J. London Math. Soc. 2 (1927) 247–254, improving Landau, Rend. Circ.
-Mat. Palermo 48 (1924) 277–280), and the bound `1/|ζ(σ+it)| ≤ exp(C log t / log log t)` on
-`σ ≥ 1/2 + 8/log log t` that it rests on.
+Mat. Palermo 48 (1924) 277–280), the bound `1/|ζ(σ+it)| ≤ exp(9 log t / log log t)` on
+Titchmarsh's region `σ ≥ 1/2 + 1/log log t`, and the same bound
+`|L(x)| ≤ √x · exp(25 log x / log log x)` for the summatory Liouville function. Titchmarsh's
+1927 paper was read only through Maier–Montgomery (Bull. LMS 41 (2009) 213–226) and Simonič
+(arXiv:2109.11744), who state these results and attribute them to it.
 
-Literature status: RH-equivalent (Titchmarsh's bound: RH-consequence). The main library is a
-complete Lean proof that RH implies these bounds, following Littlewood (1912), Riesz (1916),
-Hardy–Littlewood (1916), Landau (1924) and Titchmarsh (1927), together with the convergence of
+Literature status: RH-equivalent (Titchmarsh's bounds for `M`, `L` and `1/ζ`: RH-consequence).
+The main library is a complete Lean proof that RH implies these bounds, following Littlewood
+(1912), Riesz (1916), Hardy–Littlewood (1916), Landau (1924) and Titchmarsh (1927), together with the convergence of
 `∑ μ(n) n^{-s}` on `Re s > 1/2` (Littlewood 1912), the bound `∑_{n ≤ x} λ(n) = O(x^{1/2+ε})` for
 the Liouville function, and the Farey-sequence bounds of Franel (1924) and Landau (1924); each
 of the `x^{1/2+ε}`-type bounds is RH in another form. `Unconditional/` proves every one of them
@@ -71,9 +74,22 @@ theorem Mertens.abs_mertens_nat_le_sharp (hRH : RiemannHypothesis) : ∃ A : ℝ
       |(mertens N : ℝ)| ≤ 8 * l * Real.exp (A * (l ^ 2 * Real.exp l + 1)) *
         ((N : ℝ) + 1) ^ (1 / 2 + 12 / l)
 theorem Mertens.mertensSharp_of_RH (hRH : RiemannHypothesis) : Mertens.MertensSharpBound
+theorem Mertens.abs_liouvilleSum_nat_le_of {K β : ℝ} (hK0 : 0 ≤ K) (hβ : 1 / 2 ≤ β)
+    (hK : ∀ n : ℕ, 1 ≤ n → |(mertens n : ℝ)| ≤ K * ((n : ℝ) + 1) ^ β) (N : ℕ) :
+    |(liouvilleSum N : ℝ)| ≤ K * 2 ^ β * (N : ℝ) ^ β * (1 + Real.log N)
+theorem Mertens.liouvilleSharp_of_RH (hRH : RiemannHypothesis) : Mertens.LiouvilleSharpBound
+theorem Mertens.InvZetaSharpBoundWith.mono {c c' : ℝ} (h : Mertens.InvZetaSharpBoundWith c)
+    (hc : c ≤ c') : Mertens.InvZetaSharpBoundWith c'
+theorem Mertens.norm_inv_zeta_le_large_half (hRH : RiemannHypothesis) : ∃ A : ℝ, 0 ≤ A ∧
+    ∀ t x σ₀ : ℝ, 1 ≤ t → Real.exp 2 ≤ x → 1 / 2 < σ₀ → σ₀ ≤ 2 →
+      3 / 2 ≤ (σ₀ - 1 / 2) * Real.log x →
+      ‖(riemannZeta ((σ₀ : ℂ) + t * I))⁻¹‖ ≤
+        Real.exp (A + (8 * Chalf x + 12 * Real.log (3 + t) + 60) / Real.log x)
+theorem Mertens.invZetaSharp_of_RH (hRH : RiemannHypothesis) : Mertens.InvZetaSharpBound
 ```
 
-(`mertensSharp_of_RH` is proved with `C = 25`, and `invZ s = (s - 1)/ζ₁(s)` equals `1/ζ(s)` for
+(`mertensSharp_of_RH` and `liouvilleSharp_of_RH` are proved with `C = 25`, `invZetaSharp_of_RH`
+with `C = 9`; `Chalf x = 2√x (log x)² + √x + 1 + Σ_k 1/(k+1)²`; `invZ s = (s - 1)/ζ₁(s)` equals `1/ζ(s)` for
 `s ≠ 1`.)
 
 The statements are fixed in [`Mertens/Statement.lean`](Mertens/Statement.lean), e.g.
@@ -138,9 +154,18 @@ def InvZetaSharpBoundWith (c : ℝ) : Prop :=
 def InvZetaSharpBound : Prop := InvZetaSharpBoundWith 1
 ```
 
-`MertensSharpBound` is proved in full. `InvZetaSharpBound` (Titchmarsh's region
-`σ ≥ 1/2 + 1/log log t`) is the fixed target; `InvZetaSharpBoundWith 8` is proved (see
-Deviations).
+Both are proved in full: `MertensSharpBound` by `mertensSharp_of_RH`, and `InvZetaSharpBound`
+(Titchmarsh's region `σ ≥ 1/2 + 1/log log t`) by `invZetaSharp_of_RH`. The round-5 theorem
+`invZetaSharpWith_of_RH : InvZetaSharpBoundWith 8` is kept; it also follows from the `c = 1`
+theorem by `InvZetaSharpBoundWith.mono`.
+
+The fourth batch is in [`Mertens/Statement4.lean`](Mertens/Statement4.lean):
+
+```lean
+def LiouvilleSharpBound : Prop :=
+  ∃ C x₀ : ℝ, ∀ x : ℝ, x₀ ≤ x →
+    |(liouvilleSum x : ℝ)| ≤ Real.sqrt x * Real.exp (C * Real.log x / Real.log (Real.log x))
+```
 
 Mathlib's `riemannZeta 1` is a junk value rather than the pole, so at `s = 1` the statement is
 the true value `∑ μ(n)/n = 0`. `liouville` is Mathlib's `ArithmeticFunction.liouville`.
@@ -154,20 +179,24 @@ the true value `∑ μ(n)/n = 0`. `liouville` is Mathlib's `ArithmeticFunction.l
 | `moebiusSeries_of_RH`, `liouville_of_RH`, `franel_of_RH`, `franelLandau_of_RH` | C |
 | `moebiusSeries_of_mertensBound`, `liouville_of_mertensBound`, `franel_of_mertensBound`, `franelLandau_of_mertensBound` | C (the hypothesis is the Mertens bound, itself equivalent to RH) |
 | `norm_invZ_le_sharp`, `invZetaSharpWith_of_RH`, `abs_mertens_nat_le_sharp`, `mertensSharp_of_RH` | C |
+| `liouvilleSharp_of_RH`, `norm_inv_zeta_le_large_half`, `invZetaSharp_of_RH` | C |
+| `abs_liouvilleSum_nat_le_of`, `InvZetaSharpBoundWith.mono` | D (no hypothesis beyond the stated bound) |
 | `det_redheffer` | D |
-| `invZeta_bound`, `mertens_bound`, `riesz_bound`, `hardyLittlewood_bound`, `redheffer_bound`, `moebius_series`, `liouville_bound`, `franel_bound`, `franelLandau_bound`, `mertens_sharp_bound`, `invZeta_sharp_bound` in `Unconditional/` | U |
+| `invZeta_bound`, `mertens_bound`, `riesz_bound`, `hardyLittlewood_bound`, `redheffer_bound`, `moebius_series`, `liouville_bound`, `franel_bound`, `franelLandau_bound`, `mertens_sharp_bound`, `invZeta_sharp_bound`, `liouville_sharp_bound`, `invZeta_sharp_bound_titchmarsh` in `Unconditional/` | U |
 
 `RiemannHypothesis` is Mathlib's definition; the main library never imports
 riemann-hypothesis. No target has a formal-conjectures counterpart (checked against
 google-deepmind/formal-conjectures `86a2f58`: no Mertens, Redheffer, Riesz or Hardy–Littlewood
 entry; checked again at `9097e2f` for the Möbius Dirichlet series, the Liouville sum and
 Farey discrepancy: none; searched again 2026-11-24 for Mertens and `1/ζ` bounds near the half
-line: none), so the targets are this project's own. There are no cited (tier H) hypotheses.
+line: none; searched again 2026-11-24 for Liouville-function bounds: none), so the targets are
+this project's own. There are no cited (tier H) hypotheses.
 
 ## Axioms
 
 From `lake env lean scripts/print-axioms.lean` (the first six at commit `1191f36`, the next eight
-on branch `finality`, the last four on branch `round5`, all 2026-11-24):
+on branch `finality`, the next four on branch `round5`, the last six on branch `round6`, all
+2026-11-24):
 
 ```
 'Mertens.invZeta_bound_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -188,6 +217,12 @@ on branch `finality`, the last four on branch `round5`, all 2026-11-24):
 'Mertens.invZetaSharpWith_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Mertens.abs_mertens_nat_le_sharp' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Mertens.mertensSharp_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mertens.abs_liouvilleSum_nat_le_of' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mertens.liouvilleSharp_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mertens.InvZetaSharpBoundWith.mono' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mertens.re_logDeriv_xi_le_half' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mertens.norm_inv_zeta_le_large_half' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mertens.invZetaSharp_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 Every theorem uses the standard three axioms. The project has no `native_decide`, no `sorry`
@@ -268,6 +303,23 @@ The full plan, with each step's Lean statement, is in [`docs/BLUEPRINT.md`](docs
     With `l = ½ log log x`, `e^l = √(log x)`, the exponent is
     `½ log x + 24 log x/log log x + O(√(log x)(log log x)²)`, at most `½ log x + 25 log x/log log x`
     for large `x`.
+22. Titchmarsh's bound for `L` (`Mertens/SharpLiouville.lean`). The bound of Step 21 holds
+    for every `n ≥ 1` with the same `l`, so through `L(N) = ∑_{d² ≤ N} M(N/d²)` (Step 12) and
+    `∑_{d ≤ N} d^{-2β} ≤ ∑_{d ≤ N} 1/d ≤ 1 + log N`,
+    `|L(N)| ≤ 8 l e^{A(l²e^l+1)} 2^β N^β (1 + log N)`, `β = 1/2 + 12/l`. With `l = ½ log log x`
+    the factor `1 + log x ≤ e^{1 + log log x}` is absorbed: `C = 25` again.
+23. The explicit formula on the half line (`Mertens/SharpInvZetaHalf.lean`). On `Re s ≥ 1/2`,
+    `‖D(s,x)‖ ≤ 2√x (log x)²` (`Λ(n) n^{-σ} log(x/n) ≤ (log x)² n^{-1/2}` and
+    `∑_{n ≤ N} n^{-1/2} ≤ 2√N`) and `‖E_R(s,x)‖ ≤ √x + 1 + Σ 1/k²` (the pole term is
+    `x^{1-σ} ≤ √x`). At `s₀` itself each zero term is at most `(1 + x^{-η}) m_ρ/|ρ - s₀|²` and
+    `x^{-η} ≤ e^{-3/2} ≤ 1/4` once `ηL ≥ 3/2`. Selberg's device then needs only `ηL ≥ 3/2`:
+    `LW ≤ C + (5/4)W/η + L‖R‖ ≤ C + (5/6)LW + L‖R‖`, so `W ≤ 6C/L + 6‖R‖`
+    (`re_logDeriv_xi_le_half`), and `1/|ζ(s₀)| ≤ exp(A + (8C + 12 log(3+t) + 60)/L)`
+    (`norm_inv_zeta_le_large_half`).
+24. Titchmarsh's region (`invZetaSharp_of_RH`). Take `log x = (3/2) log log t`. On
+    `σ ≥ 1/2 + 1/log log t`, `ηL ≥ 3/2`, and `√x = (log t)^{3/4}`, so the `√x (log x)` terms are
+    `o(log t/log log t)` (`eventually_le_div_log_rpow`, `(log u)³ = o(u^{1/4})`) and
+    `12 log(3+t)/L ≤ 8 log t/log log t + O(1)`: `C = 9`. For `σ > 2`, `1/|ζ|` is bounded.
 
 | File | Content |
 |---|---|
@@ -297,6 +349,9 @@ The full plan, with each step's Lean statement, is in [`docs/BLUEPRINT.md`](docs
 | `Mertens/SharpSmall.lean` | Step 19, `norm_invZ_le_small` |
 | `Mertens/SharpInvZeta.lean` | Step 20, `norm_invZ_le_sharp`, `invZetaSharpWith_of_RH` |
 | `Mertens/SharpMain.lean` | Step 21, `mertensSharp_of_RH` |
+| `Mertens/Statement4.lean` | fourth batch of target definitions |
+| `Mertens/SharpLiouville.lean` | Step 22, `liouvilleSharp_of_RH` |
+| `Mertens/SharpInvZetaHalf.lean` | Steps 23–24, `invZetaSharp_of_RH`, `InvZetaSharpBoundWith.mono` |
 | `Unconditional/MertensUnconditional.lean` | one-line discharges of RH |
 
 ## Deviations from the literature
@@ -320,17 +375,15 @@ The full plan, with each step's Lean statement, is in [`docs/BLUEPRINT.md`](docs
 * Titchmarsh's bound, constant. `MertensSharpBound` asks for some `C`; the proof gives
   `C = 25` (and `x₀` from a `Filter.Eventually` argument, not explicit). Simonič
   (arXiv:2109.11744) has an explicit `C ≈ 5.23` for `x ≥ 10^{10^{4.487}}`.
-* The `1/ζ` region. Our constant is `c = 8`; Titchmarsh's is `c = 1`. `InvZetaSharpBound`
-  (`σ ≥ 1/2 + 1/log log t`) is not proved; `InvZetaSharpBoundWith 8` is. The argument needs
-  `(σ - 1/2) log x ≥ 4` (Selberg's device absorbs `2W/(η log x) ≤ W/2`), and the crude Dirichlet
-  polynomial bound `‖D‖ ≤ (x+1)(log x)²` forces `log x ≤ (1 - δ) log log t`; so any `c > 4` is
-  within reach of this method and `c = 1` is not. Closing the gap needs `‖D‖ ≪ x^{1/2}(log x)²`
-  (Chebyshev) and a kernel without the `-1/(ρ-s)²` term (Selberg's `Λ_x`), giving `c > 2`, or
-  Titchmarsh's own route through `log ζ` and three circles. The Mertens bound does not depend on
-  `c`: Step 21 uses the uniform bound of Step 20 at a fixed line, not the region.
-* Liouville. The `L(x) = √x exp(C log x / log log x)` analogue is not stated or proved;
-  `L(N) = ∑_{d² ≤ N} M(N/d²)` gives it once the bound for `M` is made uniform in `y ≤ x`
-  (monotonicity of `log y / log log y`).
+* The `1/ζ` region. `InvZetaSharpBound` (`c = 1`, Titchmarsh's region) is proved with
+  `C = 9`. The round-5 route (`Mertens/SharpLower.lean`) used `‖D‖ ≤ (x+1)(log x)²` and
+  `(σ - 1/2) log x ≥ 4` and reached `c = 8` (any `c > 4` with that method); Steps 23–24 replace
+  the Dirichlet-polynomial and pole bounds by their half-line forms (`√x` in place of `x`) and
+  sharpen the zero term at `s₀`, which allows `log x = (3/2) log log t`. No Selberg `Λ_x` kernel
+  and no three-circles argument are needed. The Mertens bound does not depend on `c`.
+* Liouville. `LiouvilleSharpBound` is derived from the Mertens bound of Step 21, not from a
+  contour integral for `ζ(2s)/ζ(s)`; the cost is a factor `1 + log x`, absorbed in the constant
+  (`C = 25`, the same as for `M`).
 * Route. Step 17 is littlewood-rh's integrated explicit formula with the inequality reversed
   (`integral_zero_term_ge` follows the proof of littlewood-rh's `integral_zero_term_le`), not
   Titchmarsh's three-circles argument for `log ζ`.
@@ -352,6 +405,8 @@ dependencies are built; the slowest are `Mertens.Littlewood` (30 to 100 s), `Mer
 (up to 65 s, mostly the Mathlib import) and `Mertens.InvZeta` (10 to 35 s). There is no
 `native_decide`. The round-5 modules (`Mertens.Sharp*`) build in about 2 minutes of wall time
 on the loaded box; `Mertens.SharpInvZeta` (42 s) and `Mertens.SharpLower` (33 s) are the slowest.
+The round-6 modules `Mertens.SharpLiouville` and `Mertens.SharpInvZetaHalf` take about 30 s
+each (load average about 80).
 
 ## Unconditional version
 
@@ -380,14 +435,16 @@ certified proof of RH.
 | `franelLandau_bound` | `Mertens.FranelLandauBound` | `[propext, Classical.choice, Quot.sound]` |
 | `mertens_sharp_bound` | `Mertens.MertensSharpBound` | `[propext, Classical.choice, Quot.sound]` |
 | `invZeta_sharp_bound` | `Mertens.InvZetaSharpBoundWith 8` | `[propext, Classical.choice, Quot.sound]` |
+| `liouville_sharp_bound` | `Mertens.LiouvilleSharpBound` | `[propext, Classical.choice, Quot.sound]` |
+| `invZeta_sharp_bound_titchmarsh` | `Mertens.InvZetaSharpBound` | `[propext, Classical.choice, Quot.sound]` |
 
 ```
 scripts/check-unconditional.sh [RH_DIR]
 ```
 
-Last run 2026-11-24 on this project's commit `95be863` (branch `round5`) against
-riemann-hypothesis `507a75d91d` (linked from the community cache, not rebuilt): exit 0, 29 min
-wall time on a heavily loaded box, output
+Last run 2026-11-24 on this project's commit `4e9a6ba` (branch `round6`) against
+riemann-hypothesis `507a75d91d` (linked from the community cache, not rebuilt): exit 0, about
+40 min wall time on a heavily loaded box, output
 
 ```
 'invZeta_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -401,6 +458,8 @@ wall time on a heavily loaded box, output
 'franelLandau_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
 'mertens_sharp_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
 'invZeta_sharp_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'liouville_sharp_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'invZeta_sharp_bound_titchmarsh' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 The import needs about 93 GB of riemann-hypothesis cache, about 19 GB of RAM and roughly 900k
