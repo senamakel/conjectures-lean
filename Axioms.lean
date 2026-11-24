@@ -10,3 +10,6 @@ import LLS
 #print axioms LLS.re_logSum_le
 #print axioms LLS.re_cesShift_le
 #print axioms LLS.Z2_eq
+#print axioms LLS.l1UpperBoundWith_of_GRH
+#print axioms LLS.l1LowerBoundWith_of_GRH
+#print axioms LLS.log_norm_L1_le

@@ -69,3 +69,27 @@ analytic argument with these constants needs `q ≥ 2^12.3` for `c = 3`, `2^16.9
 (`llp ≤ (l − ½ log p)²/2`, `β = l²/(2 log 17) + K/8`), `c = 11/4` fails just above `2^17` but
 holds from `2^18` (so the finite check runs to `2^18`); `c = 5/2` would need `2^20`. Prime moduli work with `c = 1` from
 `q ≈ 2600`; the certificates start at `2^12`.
+
+## `L(1, χ)`: LLS Theorem 1.5 with weaker constants
+
+For `χ` primitive mod `q ≥ 10¹⁰` (`χ ≠ 1`), `x ≥ 10⁵`, `l = log x`, `Z = Σ m_ρ/|ρ|²`:
+
+1. `LLS.shifted_log_bound` (`LLS/L1/Shift.lean`): for `σ > 1`,
+   `‖Σ_{n≤x} χΛ(n) n^{−σ} log(x/n) + (L'/L)(σ) log x + (L'/L)'(σ)‖ ≤ x^{1/2−σ} Z + 2x^{−σ}`.
+2. `LLS.log_norm_L1_le` (`Integrate.lean`, LLS Lemma 2.5):
+   `|log |L(1,χ)| − Re l1Sum χ x + Re (L'/L)(1)/l| ≤ (Z/√x + 2/x)/l²`.
+3. `LLS.re_cesShift_ge`, `LLS.D_one_eq` (`CesLower.lean`): Lemma 2.3 from below with
+   `EshiftLo x = −½(1−1/x) log π − γ/2 − log 2 − 1/x`; `Λ'/Λ(1) = G(1) + L'/L(1)`.
+4. `LLS.l1Sum1_le`, `LLS.vonMangoldt_ces_le` (`Principal.lean`): `l1Sum1 x ≤ log l + γ − 1 + 3/l`
+   (`x ≥ 10⁵`, via robin-rh's `mertens_RH`), `P₂(x) ≤ l − 1 + 1/x`.
+5. `LLS.Z2_le_general`, `LLS.l1_core` (`Assembly.lean`), `LLS.log_norm_L1_le_c`,
+   `LLS.neg_log_norm_L1_le_c` (`Weak.lean`): `±log |L(1,χ)| ≤ log l + γ + c/l` with `c` explicit.
+6. `LLS.c_le`, `LLS.setup`, `LLS.final_exp` (`Final.lean`): `c ≤ 2.91 + 1.095 Zb/√x ≤ 4.11`,
+   `x = 10⁵` or `⌊log² q⌋`, `e^{log l + γ + c/l} ≤ e^γ (l + c + c²/l) ≤ 2e^γ (log log q + 5)`.
+   Headlines: `LLS.l1UpperBoundWith_of_GRH : L1UpperBoundWith 5`,
+   `LLS.l1LowerBoundWith_of_GRH : L1LowerBoundWith 5`.
+
+What the paper's constants would need: LLS Lemma 2.4 (`P₂(x) = l − 1 − γ + O(x^{−1/2})` under
+RH, a shifted Cesàro formula for `ζ`), Lemma 2.6 (`l1Sum1 x = log l + γ − 1 + γ/l + O(x^{−1/2})`
+under RH), Lemma 5.1 (`χ(p) = −1` is extremal) and `x = (log q)²/4` down to `x ≈ 132`; their
+bound has a margin of about `0.004` at `q = 10¹⁰`.

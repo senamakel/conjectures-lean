@@ -8,8 +8,11 @@ prime `ℓ ∤ q` outside a proper subgroup of `(ℤ/q)ˣ` is at most `(log q + 
 Unconditionally only Burgess-type bounds `q^{1/(4√e)+ε}` are known. This repository is a Lean
 proof that GRH implies LLS Corollary 1.2, following LLS, and a Lean proof that GRH implies
 Bach's subgroup bound with constant `11/4` (Bach, Math. Comp. 55 (1990), proved `2`; the companion
-ankeny-grh repository proves `21/5`). Our constant `11/4` is weaker than Bach's `2`; see
-"Deviations".
+ankeny-grh repository proves `21/5`). Our constant `11/4` is weaker than Bach's `2`. It is also a
+Lean proof that GRH implies bounds of the shape of LLS Theorem 1.5 for `L(1, χ)`, `χ` primitive
+mod `q ≥ 10¹⁰`, with weaker constants than the paper's: `|L(1,χ)| ≤ 2e^γ(log log q + 5)` (LLS:
+`2e^γ(log log q − log 2 + 1/2 + 1/log log q)`) and `1/|L(1,χ)| ≤ 2e^γ(log log q + 5)` (LLS:
+`(12e^γ/π²)(log log q − log 2 + 1/2 + …)`). See "Deviations".
 
 ```lean
 theorem LLS.leastNonresidueBelowLogSq_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
@@ -18,6 +21,8 @@ theorem LLS.bach_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : Ankeny.Bach
 theorem LLS.leastNonresidue_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
     Ankeny.LeastNonresidueBound (11 / 4)
 theorem LLS.miller_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : Miller.MillerStatement (11 / 4)
+theorem LLS.l1UpperBoundWith_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : L1UpperBoundWith 5
+theorem LLS.l1LowerBoundWith_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : L1LowerBoundWith 5
 ```
 
 where (`LLS/Statement.lean`, transcribed from the paper)
@@ -29,7 +34,18 @@ def LLS.LeastNonresidueBelowLogSq : Prop :=
 ```
 
 and `Ankeny.BachSubgroupBound c`, `Ankeny.LeastNonresidueBound c`, `Miller.MillerStatement c`
-are the target definitions of ankeny-grh and miller-grh, used unchanged.
+are the target definitions of ankeny-grh and miller-grh, used unchanged. The weaker forms of
+LLS Theorem 1.5 are stated in `LLS/L1/Weak.lean` (`LLS/Statement.lean`'s `L1UpperBound`,
+`L1LowerBound` are unchanged and not proved):
+
+```lean
+def LLS.L1UpperBoundWith (C : ℝ) : Prop :=
+  ∀ (q : ℕ) [NeZero q], (10 : ℝ) ^ 10 ≤ q → ∀ χ : DirichletCharacter ℂ q, χ.IsPrimitive →
+    ‖DirichletCharacter.LFunction χ 1‖ ≤ 2 * exp eulerMascheroniConstant * (log (log q) + C)
+def LLS.L1LowerBoundWith (C : ℝ) : Prop :=
+  ∀ (q : ℕ) [NeZero q], (10 : ℝ) ^ 10 ≤ q → ∀ χ : DirichletCharacter ℂ q, χ.IsPrimitive →
+    1 / ‖DirichletCharacter.LFunction χ 1‖ ≤ 2 * exp eulerMascheroniConstant * (log (log q) + C)
+```
 
 ## Tier and provenance
 
@@ -37,12 +53,14 @@ are the target definitions of ankeny-grh and miller-grh, used unchanged.
 |---|---|---|
 | `leastNonresidueBelowLogSq_of_GRH` | C (U in `Unconditional/`) | GRH |
 | `bach_of_GRH`, `leastNonresidue_of_GRH`, `miller_of_GRH` | C (U in `Unconditional/`) | GRH |
+| `l1UpperBoundWith_of_GRH`, `l1LowerBoundWith_of_GRH` | C (U in `Unconditional/`) | GRH |
 
 GRH is `Erdos985.DirichletLNonvanishingRightOfHalf`, copied word for word in erdos-985 from
 `src/Statements.lean` of [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
 No other hypothesis appears. `LLS/Statement.lean` also fixes, as targets not proved here,
 Theorem 1.1 (`LeastPrimeOutsideSubgroup`, with LLS's `A(q)`, `B(q)`), Theorem 1.1 (2),
-Theorem 1.4 (`LeastPrimeInCoset`) and Theorem 1.5 (`L1UpperBound`, `L1LowerBound`).
+Theorem 1.4 (`LeastPrimeInCoset`) and Theorem 1.5 with the paper's constants (`L1UpperBound`,
+`L1LowerBound`).
 
 ## Axioms
 
@@ -75,6 +93,9 @@ Real output of `lake env lean Axioms.lean` (2026-11-24, after a clean `lake buil
 'LLS.re_logSum_le' depends on axioms: [propext, Classical.choice, Quot.sound]
 'LLS.re_cesShift_le' depends on axioms: [propext, Classical.choice, Quot.sound]
 'LLS.Z2_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LLS.l1UpperBoundWith_of_GRH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LLS.l1LowerBoundWith_of_GRH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LLS.log_norm_L1_le' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 Corollary 1.2 uses the standard three axioms only: its finite range `5 ≤ q < 2^12` is a list
@@ -120,6 +141,20 @@ The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.
 5. **Finite ranges**: primes `5 ≤ q < 2^12` by Euler-criterion certificates
    (`LLS/NonresidueCert.lean`, `scripts/emit_small.py`); `q < 2^18` for the subgroup bound by
    ankeny-grh's checker (`LLS/Finite114.lean`, `LLS/Compute/C114_*.lean`).
+6. **`L(1, χ)`** (`LLS/L1/`), for `χ` primitive mod `q ≥ 10¹⁰`:
+   * `Shift.lean`: for real `σ > 1`, the log-kernel formula with coefficients `χ(n)Λ(n)n^{−σ}`
+     gives `|S_σ + (L'/L)(σ) log x + (L'/L)'(σ)| ≤ x^{1/2−σ} Z + 2x^{−σ}` (zeros at `ρ − σ`,
+     gamma poles at `−(σ + m_k)`, `(L'/L)'` by termwise differentiation of the Hadamard series);
+   * `Integrate.lean` (LLS Lemma 2.5): `|log |L(1,χ)| − Re Σ_{n≤x} χΛ(n)/(n log n) · log(x/n)/log x
+     + Re (L'/L)(1)/log x| ≤ (Z/√x + 2/x)/log² x`, by monotonicity of
+     `Re A(σ) + log x · log |L(σ)| + Re (L'/L)(σ) ± ∫ bound` on `[1, ∞)` and the limits at `∞`;
+   * `CesLower.lean`: Lemma 2.3 in the other direction, and `Λ'/Λ(1) = G(1) + L'/L(1)`;
+   * `Principal.lean`: `Σ Λ(n)/(n log n) · log(x/n)/log x ≤ log log x + γ − 1 + 3/log x` for
+     `x ≥ 10⁵` (Mertens under RH via robin-rh), and `Σ_{n<x} Λ(n)/n (1 − n/x) ≤ log x − 1 + 1/x`;
+   * `Assembly.lean`, `Weak.lean`: `log |L(1,χ)|^{±1} ≤ log log x + γ + c/log x`, with `c`
+     explicit in `x` and the zero sum `Z ≤ (log q + 2 log x)/(1 − 2/√x)`;
+   * `Final.lean`: `x = 10⁵` if `log² q < 10⁵`, else `x = ⌊log² q⌋`; then `c ≤ 4.11` and
+     `e^γ (l + c + c²/l) ≤ 2e^γ (log log q + 5)`.
 
 ## Layout
 
@@ -137,6 +172,10 @@ The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.
 | `LLS/Numerics/Prime.lean`, `IntervalsP.lean`, `TailP.lean` | Prime moduli, `c = 1`, `q ≥ 2^12` |
 | `LLS/NonresidueCert.lean`, `LLS/Nonresidue.lean` | Corollary 1.2 |
 | `LLS/Compute/C114_*.lean`, `LLS/Finite114.lean`, `LLS/BachCore.lean`, `LLS/Bach114.lean`, `LLS/Main.lean` | Subgroup bound with `c = 11/4` |
+| `LLS/L1/Shift.lean`, `ShiftAux/*.lean` | The shifted log-kernel formula |
+| `LLS/L1/Integrate.lean` | LLS Lemma 2.5 |
+| `LLS/L1/CesLower.lean`, `Principal.lean`, `PrinAux/*.lean` | Lemma 2.3 (lower), principal sums |
+| `LLS/L1/Assembly.lean`, `Weak.lean`, `Final.lean` | `L(1, χ)` bounds |
 | `scripts/*.py` | Generators for the certificates and the sizing computations |
 
 ## Deviations from the literature
@@ -156,11 +195,27 @@ The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.
   `Σ Λ(n) χ̃(n)/n (1 − n/X)` as if `χ̃(p) = 1` for primes `p ∣ q`, `p ∤ q̃`; for such `p`
   `χ̃(p)` is unknown. Our `LLS.key` charges these primes twice and absorbs them through
   `log f ≤ log q − Σ log p`.
-* **Theorem 1.4 (cosets) and Theorem 1.5 (`L(1, χ)`) are not proved.** Theorem 1.5 needs LLS
-  Lemma 2.5 (the log-weighted formula for `L'/L(σ + s)`, integrated over `σ ≥ 1`) and Lemma 2.6
-  under RH; the log-kernel machinery of `LLS/Analytic/Log/` is the main input. The class-number
-  corollary would also need Dirichlet's class number formula for imaginary quadratic fields,
-  which Mathlib does not have at this pin.
+* **Theorem 1.5 with weaker constants.** We prove LLS Lemma 2.5 (`LLS.log_norm_L1_le`, standard
+  axioms only) and combine it with Lemma 2.3 in both directions, but the remaining inputs are
+  cruder than the paper's:
+  * the principal sum `Σ Λ(n)/(n log n) · log(x/n)/log x ≤ log log x + γ − 1 + 3/log x`
+    (`LLS.l1Sum1_le`, from robin-rh's Mertens theorem under RH, for `x ≥ 10⁵`; LLS Lemma 2.6
+    gives `+ γ/log x`);
+  * `Σ_{n<x} Λ(n)/n (1 − n/x) ≤ log x − 1 + 1/x` unconditionally (LLS Lemma 2.4 under RH:
+    `log x − 1 − γ + …`);
+  * for the lower bound we use `|χ(n)| ≤ 1` instead of LLS Lemma 5.1 (the extremality of
+    `χ(p) = −1`, which needs a trigonometric computation at `p = 2`), so the leading constant
+    is `2e^γ` instead of `12e^γ/π² ≈ 1.216 e^γ`;
+  * `x ≥ 10⁵` (LLS: `x = (log q)²/4`), so for `log² q < 10⁵` we take `x = 10⁵`, which costs most
+    of the additive constant.
+
+  The result is `|L(1,χ)|^{±1} ≤ e^γ (l + c + c²/l)` with `l = log x` and `c ≤ 4.11`, which gives
+  `2e^γ(log log q + 5)` for every `q ≥ 10¹⁰`. LLS's own constants are within `0.004` of failing at
+  `q = 10¹⁰` (`e^γ(log x + 1 + 3.1/log x)` against `2e^γ(log log q − log 2 + 1/2 + 1/log log q)`),
+  so they need all of Lemmas 2.4, 2.6 and 5.1 at full precision.
+* **Corollary 1.3 (class numbers) is not attempted**: it needs Dirichlet's class number formula
+  for imaginary quadratic fields, which Mathlib does not have at this pin.
+* **Theorem 1.4 (cosets) is not proved.**
 * Corollary 1.2 is proved exactly as stated (`LeastNonresidueBelowLogSq`).
 
 ## Building
@@ -172,7 +227,7 @@ lake env lean Axioms.lean
 ```
 
 Lean `v4.36.0`, Mathlib `fc4f59e5` (via erdos-985 `9538edb`; also requires ankeny-grh
-`129ad57` and miller-grh `b484d44`). On a 95-core box with warm caches: the eight
+`129ad57`, miller-grh `b484d44` and robin-rh `dfa8d63`). On a 95-core box with warm caches: the sixteen
 `native_decide` chunks take about 2.3 CPU-hours (the slowest, `C114_15`, 1884 s); the certified
 intervals take 141 s (`Intervals114`) and 77 s (`IntervalsP`); everything else is under a minute
 per module.
@@ -191,6 +246,8 @@ independently verified.
 | `bach_unconditional` | `Ankeny.BachSubgroupBound (11 / 4)` | standard three + 16 `native_decide` |
 | `leastNonresidue_unconditional` | `Ankeny.LeastNonresidueBound (11 / 4)` | standard three + 16 `native_decide` |
 | `miller_unconditional` | `Miller.MillerStatement (11 / 4)` | standard three + 16 `native_decide` |
+| `l1UpperBoundWith_unconditional` | `LLS.L1UpperBoundWith 5` | see the output below |
+| `l1LowerBoundWith_unconditional` | `LLS.L1LowerBoundWith 5` | see the output below |
 
 Real output of `scripts/check-unconditional.sh /home/ubuntu/work/personal/riemann-hypothesis`
 (2026-11-24, this commit, 36 min wall, most of it importing the riemann-hypothesis modules):
@@ -230,4 +287,6 @@ verification is still pending.
 * The generation checker and its soundness proof are ankeny-grh's (`AnkenyCheck.lean`,
   `Ankeny/Checker.lean`, `Ankeny/Finite.lean`), used as a dependency, not copied;
   `Ankeny.exists_dirichletCharacter_trivial_on` and `Ankeny.leastNonresidue_of_bach'` likewise.
+* Mertens' third theorem under RH (`Robin.mertens_RH`, `Robin.psi_upper`, `Robin.psi_lower`,
+  `Robin.psi1NatBound_of_bachBound`) is robin-rh's (`dfa8d63`), a lake dependency.
 * No files are vendored.
