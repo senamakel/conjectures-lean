@@ -11,10 +11,13 @@ with `li` the principal-value logarithmic integral. These are explicit forms of 
 1901 theorem `π(x) = li(x) + O(√x log x)` under RH. Unconditionally the best known error terms
 are of the form `x exp(−c (log x)^{3/5} (log log x)^{−1/5})`.
 
-**Literature status: RH-consequence** (von Koch 1901; Schoenfeld 1976). Nothing here is new
-mathematics. This is a Lean proof that RH implies these bounds, following von Koch and
-Schoenfeld, with weaker constants. A bound `ψ(x) − x = O(√x log² x)` is in fact equivalent to
-RH, so this says nothing beyond the RH claim.
+**Literature status: RH-consequence** (von Koch 1901; Schoenfeld 1976). This repository is a
+complete Lean proof that RH implies explicit bounds of this form at Schoenfeld's thresholds,
+following von Koch and Schoenfeld, with constants `1/8` for ψ, `1/4` for θ and `9/20` for
+`π − li`; Schoenfeld's constant is `1/(8π)` in all three. `Unconditional/` proves the three
+bounds unconditionally in Lean, with RH supplied by the certified proof in
+leanprover-community/riemann-hypothesis. A bound `ψ(x) − x = O(√x log² x)` is equivalent to RH,
+so these theorems are RH in another form.
 
 The main library proves all three bounds under RH, with the same thresholds and larger
 constants:
@@ -96,7 +99,7 @@ Full blueprint with every constant: [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
 |---|---|
 | `Schoenfeld/LogIntegral.lean` | `Real.logIntegral`, vendored from formal-conjectures |
 | `Schoenfeld/Statement.lean` | Target statements `PsiBound`, `ThetaBound`, `PiBound`, `SchoenfeldStatement` |
-| `Schoenfeld/ZeroSums.lean` | RH for `ξ`, `Σ m/|ρ|²`, the Poisson-kernel bound |
+| `Schoenfeld/ZeroSums.lean` | RH for `ξ`, `Σ m/\|ρ\|²`, the Poisson-kernel bound |
 | `Schoenfeld/Density.lean` | The zero sum `F(T)`: trivial and log² bounds |
 | `Schoenfeld/Psi1.lean` | `Ψ₁` and monotone differencing (from robin-rh) |
 | `Schoenfeld/PsiInt.lean` | Explicit formula for `Ψ₁`, `ψ` at integers and real `x` |
@@ -140,8 +143,7 @@ caches the library takes about 2.5 CPU-minutes; per module (user CPU): `Schoenfe
 
 ## Unconditional version
 
-The theorems below hold given the Lean proof of RH in leanprover-community/riemann-hypothesis,
-which has not been independently verified. `Unconditional/SchoenfeldUnconditional.lean` imports
+The theorems below have no hypothesis. `Unconditional/SchoenfeldUnconditional.lean` imports
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
 (commit `507a75d91d`) and closes the hypothesis with its `riemannHypothesis`:
 
@@ -174,9 +176,7 @@ module files and needs about 19 GB of RAM. Raise the open-file limit first; on L
 `nofile` (for example `sudo prlimit --pid $$ --nofile=2000000:2000000`); on macOS:
 `sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`.
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
