@@ -11,9 +11,11 @@ This repository proves in Lean, following LLS:
 
 - LLS Corollary 1.2 exactly as stated: for every prime `q ≥ 5` there is a quadratic non-residue
   `≤ (log q)²`.
-- Bach's subgroup bound with constant `11/4`: every proper subgroup of `(ℤ/q)ˣ` omits a unit
-  `≤ (11/4) log² q`, with every `4 ≤ q < 2^18` covered by ankeny-grh's proved-sound checker.
-  Bach (Math. Comp. 55 (1990)) proved `2`; the companion ankeny-grh repository proves `21/5`.
+- Bach's subgroup bound with Bach's own constant `2` (Bach, *Explicit bounds for primality
+  testing and related problems*, Math. Comp. 55 (1990) 355–380): every proper subgroup of
+  `(ℤ/q)ˣ` omits a unit `≤ 2 log² q`, for every modulus `q`. Consequences: the least quadratic
+  non-residue mod an odd prime `p` is `≤ 2 log² p`, and Miller's deterministic primality test
+  with witnesses `a ≤ 2 log² n` is correct. The earlier form with constant `11/4` remains.
 - Bounds of the shape of LLS Theorem 1.5 for `L(1, χ)`, `χ` primitive mod `q ≥ 10¹⁰`:
   `|L(1,χ)| ≤ 2e^γ(log log q + 5)` (LLS: `2e^γ(log log q − log 2 + 1/2 + 1/log log q)`) and
   `1/|L(1,χ)| ≤ 2e^γ(log log q + 5)` (LLS: `(12e^γ/π²)(log log q − log 2 + 1/2 + …)`).
@@ -42,6 +44,10 @@ theorem LLS.bach_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : Ankeny.Bach
 theorem LLS.leastNonresidue_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
     Ankeny.LeastNonresidueBound (11 / 4)
 theorem LLS.miller_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : Miller.MillerStatement (11 / 4)
+theorem LLS.bach2_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : Ankeny.BachSubgroupBound 2
+theorem LLS.leastNonresidue2_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
+    Ankeny.LeastNonresidueBound 2
+theorem LLS.miller2_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : Miller.MillerStatement 2
 theorem LLS.l1UpperBoundWith_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : L1UpperBoundWith 5
 theorem LLS.l1LowerBoundWith_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : L1LowerBoundWith 5
 theorem LLS.classNumberUpperBoundOddWith_of_GRH_of_formula
@@ -123,6 +129,7 @@ def LLS.ClassNumberLowerBoundWith (C : ℝ) : Prop :=
 |---|---|---|
 | `leastNonresidueBelowLogSq_of_GRH` | C (U in `Unconditional/`) | GRH |
 | `bach_of_GRH`, `leastNonresidue_of_GRH`, `miller_of_GRH` | C (U in `Unconditional/`) | GRH |
+| `bach2_of_GRH`, `leastNonresidue2_of_GRH`, `miller2_of_GRH` | C (U in `Unconditional/`) | GRH |
 | `l1UpperBoundWith_of_GRH`, `l1LowerBoundWith_of_GRH` | C (U in `Unconditional/`) | GRH |
 | `classNumberUpperBoundOddWith_of_GRH_of_formula`, `classNumberLowerBoundOddWith_of_GRH_of_formula` | C + H (U + U₀ in `Unconditional/`) | GRH, `ClassNumberFormula` |
 | `classNumberUpperBoundWith_of_GRH_of_formula`, `classNumberLowerBoundWith_of_GRH_of_formula` | C + H (U + U₀ in `Unconditional/`) | GRH, `ClassNumberFormula` |
@@ -188,6 +195,40 @@ Round 6 (2026-11-24, `lake build LLS.ClassNumberAll`, then `#print axioms`):
 'LLS.discr_isFundamentalDiscr' depends on axioms: [propext, Classical.choice, Quot.sound]
 'LLS.kroneckerChar_isPrimitive' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
+
+Round 7 (2026-11-24, `lake build`, then `lake env lean Axioms.lean`):
+
+```
+'LLS.bach2_of_GRH' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ LLS.chunk2_ok_0._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_1._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_10._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_11._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_12._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_13._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_14._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_2._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_3._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_4._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_5._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_6._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_7._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_8._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_9._native.native_decide.ax_1_1]
+'LLS.leastNonresidue2_of_GRH' depends on axioms: (the same eighteen as bach2_of_GRH)
+'LLS.miller2_of_GRH' depends on axioms: (the same eighteen as bach2_of_GRH)
+'LLS.Check.checkChunk_sound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LLS.goodQ_tail2' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
+
+The fifteen `native_decide` axioms of the constant-`2` bound evaluate `LLS.Check.checkChunk`
+(`LLSCheck.lean`, core Lean only, precompiled) on fifteen ranges covering `3 ≤ q < 2^2500`;
+its soundness `LLS.Check.checkChunk_sound` uses the standard three axioms only. The chunks took
+between 2 s (`C2_14`, `2^100 ≤ q < 2^2500`) and 334 s (`C2_10`, `2^24 ≤ q < 2^25`); `time lake
+build` reported 1342 s of user time for all fifteen (6 min wall on a loaded 95-core box). Most of
+it is the generation search for the moduli the per-modulus budget misses.
 
 Corollary 1.2 uses the standard three axioms only: its finite range `5 ≤ q < 2^12` is a list
 of Euler-criterion certificates checked by `decide +kernel`. The sixteen `native_decide` axioms
@@ -266,6 +307,23 @@ The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.
      (`χ₄(n) = −1` or `χ₈'(n) = −1`) and a CRT lift of a non-residue mod `p` for odd `p`.
    * The class number formula and step 6 give both bounds, exactly as in step 7.
 
+9. Bach's constant `2` (`LLS/Bach2/`, `LLSCheck.lean`):
+   * `keyP` is the key inequality of step 2 with any lower bound `Pc` for the Cesàro sum;
+     `budgetQ_nonpos` charges each prime `p ≤ x` dividing `q` its cost `W_p(x)`,
+     `budgetU_nonpos` lists the primes `p < 53` and charges the others `β log p`,
+     `β = (log x)²/(2 log 53) + 2K/52`.
+   * `LLSCheck.checkChunk m w lo hi` (core Lean, exact `Rat` arithmetic) splits `[lo, hi)` into
+     blocks `[a, a + a/2^w)`, takes `x = ⌊2 La²⌋` with `La ≤ log a` (from `2^k ≤ a^m`), bounds
+     `√x`, `log x`, `log p` and `log b`, computes `Pc` as the exact Cesàro sum with certified
+     lower bounds for `Λ(n)` (for `x < 2000`; else `log x − 2`), and accepts the block if the
+     uniform budget is positive; otherwise it tries each `q` with its own primes (integer form
+     scaled by `2^32`), and failing that runs `Ankeny.Checker.checkGen q x`.
+   * `checkChunk_sound` proves that a `true` result gives, for every `q` in the range, either
+     generation of `(ZMod q)ˣ` by the units `≤ x ≤ 2 log² q` or a positive budget;
+     `bach_of_good2` turns either into the bound under GRH.
+   * 15 chunks cover `3 ≤ q < 2^2500` (`LLS/Compute2/`); `goodQ_tail2` covers `q ≥ 2^2500`
+     with the uniform budget `Φ` of step 3 (`x = ⌊2L²⌋`, `z = x^{1/8} ≥ 7`).
+
 ## Layout
 
 | File | Content |
@@ -292,20 +350,32 @@ The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.
 | `LLS/FundamentalDiscr.lean` | `discr K` of a quadratic field is a fundamental discriminant |
 | `LLS/Kronecker.lean` | Kronecker character `χ_{−q}` for `4 ∣ q`, its primitivity |
 | `LLS/ClassNumberAll.lean` | Class-number bounds for every imaginary quadratic field |
+| `LLS/Bach2/KeyP.lean`, `Budget.lean` | Key inequality with any Cesàro lower bound; per-modulus and uniform budgets |
+| `LLSCheck.lean` | Executable checker for constant `2` (core Lean, rational arithmetic, precompiled) |
+| `LLS/Bach2/SoundBasic.lean`, `SoundBounds.lean`, `Sound.lean` | Its soundness proof (`checkChunk_sound`) |
+| `LLS/Compute2/C2_*.lean`, `LLS/Bach2/Finite2.lean` | The 15 checked chunks, `3 ≤ q < 2^2500` |
+| `LLS/Bach2/Tail2.lean`, `Core.lean`, `Main2.lean` | `q ≥ 2^2500`; assembly of `bach2_of_GRH` |
 | `scripts/*.py` | Generators for the certificates and the sizing computations |
 
 ## Deviations from the literature
 
-* Subgroup bound: our constant is `11/4`; LLS have `(log q + B(q))²` and Bach has `2`. We prove
-  the LLS method with somewhat weaker constants: the principal sum is bounded by summation by parts
-  (`x − 0.15√x − 3 log x − 3` instead of LLS Lemma 2.1's `x − 0.046√x − 1.84 log x − 1`), the
-  Mertens-type sum unconditionally (`log x − 2` instead of `log x − 1.577`), and the cost of a
-  prime factor `p ≥ 17` of `q` crudely (`β log p`). Moduli with many small prime factors are
-  the worst case. With exact prime-power losses the analytic argument would need `q ≥ 2^16.9`
-  for `c = 5/2`, `2^21` for `9/4` and `2^28.7` for `2`; the finite check is a graph search over
-  `(ℤ/q)ˣ`, about `2.3` CPU-hours up to `2^18` at `c = 11/4`, growing like `q²`. So `c = 2`
-  is out of reach by this route; with the bounds formalised here `c = 5/2` needs the
-  computation to about `2^20` (roughly 16 times the current one) and `c = 11/4` is what fits.
+* Subgroup bound: Bach's constant `2` is proved (`bach2_of_GRH`). The analytic inequality
+  alone does not reach `2` uniformly in `q` below about `2^27`: with the constants formalised
+  here, moduli divisible by many small primes are the worst case, and the budget uniform in `q`
+  (primes `p < 53` listed, `β log p` for the rest) is positive only from `q ≈ 2^27`
+  (`2^38.6` with the old cut-off at `17` and the unconditional Cesàro bound `log x − 2`). Three
+  changes close the gap:
+  * the Cesàro sum `Σ_{n ≤ x} Λ(n)/n (1 − n/x)` is summed exactly (with certified lower bounds for
+    `log p`) for every `x < 2000` instead of being bounded by `log x − 2`; its true value is
+    about `log x − 1 − γ`, and the gain `0.42 · 2K ≈ 0.85 √x` is the largest single term;
+  * below `2^27` the budget is evaluated for each modulus with its own prime factors
+    (`costQ`, the cost `W_p` of each prime `p ≤ x` dividing `q`), and that is positive for all
+    but about 7,500 moduli `q < 2^26` (their sum is about `4.4·10^9`);
+  * those moduli are checked by ankeny-grh's generation search with `x = ⌊2 La²⌋`.
+  The analytic part is LLS's argument with weaker constants than the paper's: the principal sum
+  is bounded by summation by parts (`x − 0.15√x − 3 log x − 3` instead of LLS Lemma 2.1's
+  `x − 0.046√x − 1.84 log x − 1`), and the cost of a prime factor `p ≥ 53` of `q` crudely
+  (`β log p`). The paper's own Theorem 1.1 bound `(log q + B(q))²` is not proved.
 * Theorem 1.1 as stated is not proved. Our constants are weaker than LLS's, so we do not
   get `ℓ ≤ (log q + B(q))²`. Also, as written, the proof of LLS Theorem 1.1 appears to bound
   `Σ Λ(n) χ̃(n)/n (1 − n/X)` as if `χ̃(p) = 1` for primes `p ∣ q`, `p ∤ q̃`; for such `p`
@@ -352,7 +422,9 @@ lake env lean Axioms.lean
 
 Lean `v4.36.0`, Mathlib `fc4f59e5` (via erdos-985 `9538edb`; also requires ankeny-grh
 `129ad57`, miller-grh `b484d44` and robin-rh `dfa8d63`). On a 95-core box with warm caches: the sixteen
-`native_decide` chunks take about 2.3 CPU-hours (the slowest, `C114_15`, 1884 s); the certified
+`native_decide` chunks for `11/4` take about 2.3 CPU-hours (the slowest, `C114_15`, 1884 s),
+the fifteen for `2` (`lake build LLS.Bach2.Main2`) about 22 CPU-minutes (the slowest, `C2_10`,
+334 s); the certified
 intervals take 141 s (`Intervals114`) and 77 s (`IntervalsP`); everything else is under a minute
 per module.
 
@@ -369,6 +441,9 @@ with no hypothesis left.
 | `bach_unconditional` | `Ankeny.BachSubgroupBound (11 / 4)` | standard three + 16 `native_decide` |
 | `leastNonresidue_unconditional` | `Ankeny.LeastNonresidueBound (11 / 4)` | standard three + 16 `native_decide` |
 | `miller_unconditional` | `Miller.MillerStatement (11 / 4)` | standard three + 16 `native_decide` |
+| `bach2_unconditional` | `Ankeny.BachSubgroupBound 2` | standard three + 15 `native_decide` |
+| `leastNonresidue2_unconditional` | `Ankeny.LeastNonresidueBound 2` | standard three + 15 `native_decide` |
+| `miller2_unconditional` | `Miller.MillerStatement 2` | standard three + 15 `native_decide` |
 | `l1UpperBoundWith_unconditional` | `LLS.L1UpperBoundWith 5` | standard three |
 | `l1LowerBoundWith_unconditional` | `LLS.L1LowerBoundWith 5` | standard three |
 | `classNumberFormula` (U₀) | `LLS.ClassNumberFormula` | standard three |

@@ -93,3 +93,20 @@ What the paper's constants would need: LLS Lemma 2.4 (`P₂(x) = l − 1 − γ 
 RH, a shifted Cesàro formula for `ζ`), Lemma 2.6 (`l1Sum1 x = log l + γ − 1 + γ/l + O(x^{−1/2})`
 under RH), Lemma 5.1 (`χ(p) = −1` is extremal) and `x = (log q)²/4` down to `x ≈ 132`; their
 bound has a margin of about `0.004` at `q = 10¹⁰`.
+
+## Bach's constant `2` (round 7)
+
+1. `LLS.bach2_of_GRH : GRH → Ankeny.BachSubgroupBound 2`: `q ≤ 2` trivial; `3 ≤ q < 2^2500` by
+   `LLS.good2_range` and `LLS.bach_of_good2`; `q ≥ 2^2500` by `LLS.goodQ_tail2` and
+   `LLS.bach_of_goodQ`.
+2. `LLS.keyP`: `LLS.key` with `log x − 2` replaced by any `Pc ≤ cesSum x`.
+3. `LLS.budget_nonpos`: `base2 x Pc − κ log q − C ≤ 0` for every `C` bounding the prime costs;
+   `budgetQ_nonpos` (`C = costQ x q = Σ_{p ∣ q, p ≤ x} W_p`) and `budgetU_nonpos`
+   (`C = Σ_{p<53} max(0, W_p − β log p) + β log q`, `β = l²/(2 log 53) + 2K/52`, `β ≤ κ`).
+4. `LLS.Check.checkChunk_sound`: `checkChunk m w lo hi = true → ∀ q ∈ [lo, hi), Good2 q`, from
+   `blockOK_sound` (per block) and `go_sound` (the block loop). The interval bounds are
+   `Side.core`, `Side.base`, `Side.Wp_le`, `Side.bet`, with the casts `cast_K1`, …, `cast_Wup`;
+   `logLo_le`, `le_logHi`, `isPrimeB_iff`, `lamLo_le`, `cesLo_le` are the primitive facts.
+5. Sizing (c = 2, this checker): the uniform budget holds on every block from `2^27` on; below
+   that about 7,500 moduli fail the per-modulus budget (sum `≈ 4.4·10^9`, the largest
+   `≈ 3.9·10^7`) and go to the generation search.
