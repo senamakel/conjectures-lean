@@ -125,7 +125,17 @@ including the `native_decide`).
 
 | Theorem | Statement | Axioms |
 |---|---|---|
-| `nicolas_unconditional` | `NicolasStatement` | not yet run on this commit |
+| `nicolas_unconditional` | `NicolasStatement` | standard three + `Nicolas.Check.loop_ok` (`native_decide`) |
+
+Output of `scripts/check-unconditional.sh` on 2026-11-24 (commit `8be0212`, riemann-hypothesis
+`507a75d91d` linked from its community cache; 29 min wall, mostly waiting for a free RAM slot):
+
+```
+'nicolas_unconditional' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Nicolas.Check.loop_ok._native.native_decide.ax_1_1]
+```
 
 ```bash
 scripts/check-unconditional.sh /path/to/riemann-hypothesis   # cloned there if missing
