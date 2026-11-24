@@ -7,6 +7,10 @@ ed., §14.2); the same argument gives `L(1/2 + it, χ) = O_{χ,ε}(t^ε)` for ev
 character `χ` under GRH. Unconditionally only subconvexity bounds are known (for `ζ`, Bourgain
 2017: `ζ(1/2 + it) = O(t^{13/84 + ε})`). This project formalises both implications.
 
+**Literature status: RH-consequence.** Both implications are classical (Littlewood 1912, in
+Titchmarsh). This is a Lean proof that RH, respectively GRH, implies them, following Littlewood;
+it is not new mathematics.
+
 ```lean
 theorem Lindelof.lindelof_of_RH (hRH : RiemannHypothesis) : Lindelof.LindelofHypothesis
 
