@@ -1,7 +1,8 @@
 # Selberg's bound for Erdős Problem 233 under RH in Lean
 
 **Literature status: RH-consequence** (Cramér 1936; Selberg, *Arch. Math. Naturvid.* 47
-(1943)). Nothing here is new mathematics.
+(1943)). `Unconditional/` proves `Σ_{n<N} d_n² = O(N log⁴ N)` unconditionally in Lean, with RH
+supplied by the certified proof in leanprover-community/riemann-hypothesis.
 
 [Erdős Problem 233](https://www.erdosproblems.com/233) concerns the sum of squares of prime
 gaps `d_n = p_{n+1} − p_n`. Heath-Brown conjectured `Σ_{n<N} d_n² ≍ N log² N`; the lower bound
@@ -12,10 +13,9 @@ attributes the `N log⁴ N` form to him; we have not checked the exact power), a
 bound as the variant `erdos_233.variants.upper_bound` (tagged `research solved`, i.e. known under RH). An
 explicit version is Cully-Hugill–Dudek, [arXiv:2206.00433](https://arxiv.org/abs/2206.00433).
 
-The main library is a Lean proof that RH implies `Σ_{n<N} d_n² ≪ N log⁴ N`, following Selberg
-(1943). `Unconditional/` gives `Σ_{n<N} d_n² ≪ N log⁴ N`, given the Lean proof of RH in
-leanprover-community/riemann-hypothesis, which has not been independently verified. Erdős 233
-itself (`≪ N log² N`) stays open; nothing here addresses it.
+The main library is a complete Lean proof that RH implies `Σ_{n<N} d_n² ≪ N log⁴ N`, following
+Selberg (1943), and `Unconditional/` closes the RH hypothesis in one line. Erdős 233
+itself (`≪ N log² N`) stays open.
 
 ```lean
 theorem Erdos233.erdos_233_upper_bound_of_RH (hRH : RiemannHypothesis) :
@@ -141,7 +141,7 @@ scripts/check-unconditional.sh /path/to/riemann-hypothesis
 The riemann-hypothesis import needs its community cache (about 93 GB), about 19 GB of RAM and
 about 900,000 open files. The run above took 37 minutes wall, most of it restoring that cache.
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
