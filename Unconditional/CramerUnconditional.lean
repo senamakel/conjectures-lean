@@ -33,6 +33,18 @@ theorem cramer_logMeanSquare : Cramer.CramerLogMeanSquare :=
 theorem cramer_logMeanSquareAsymptotic : Cramer.CramerLogMeanSquareAsymptotic :=
   Cramer.logMeanSquareAsymptotic_of_RH riemannHypothesis
 
+/-- Under the certified RH: every `(x, x + (3/2)√x log x]`, `x ≥ 2`, contains a prime. -/
+theorem cramer_primeInShortInterval_three_halves : Cramer.PrimeInShortInterval (3 / 2) :=
+  Cramer.primeInShortInterval_three_halves_of_RH riemannHypothesis
+
+/-- `p_{n+1} − p_n ≤ (3/2)√p_n log p_n` for every `n`. -/
+theorem cramer_primeGapExplicit_three_halves : Cramer.PrimeGapExplicit (3 / 2) :=
+  Cramer.primeGapExplicit_three_halves_of_RH riemannHypothesis
+
+/-- Every closed interval `[x, x + (3/2)√x log x]`, `x ≥ 2`, contains a prime. -/
+theorem cramer_primeInClosedInterval_three_halves : Cramer.PrimeInClosedInterval 2 (3 / 2) :=
+  Cramer.primeInClosedInterval_three_halves_of_RH riemannHypothesis
+
 #print axioms cramer_primeInShortInterval
 #print axioms cramer_primeGapExplicit
 #print axioms cramer_gapBound
@@ -40,3 +52,6 @@ theorem cramer_logMeanSquareAsymptotic : Cramer.CramerLogMeanSquareAsymptotic :=
 #print axioms cramer_meanSquare
 #print axioms cramer_logMeanSquare
 #print axioms cramer_logMeanSquareAsymptotic
+#print axioms cramer_primeInShortInterval_three_halves
+#print axioms cramer_primeGapExplicit_three_halves
+#print axioms cramer_primeInClosedInterval_three_halves

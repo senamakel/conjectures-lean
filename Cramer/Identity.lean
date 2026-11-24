@@ -77,16 +77,16 @@ lemma psi1N_formula (n : ℕ) (hn : 1 ≤ n) :
     sub_zero]
   ring
 
-/-- **The analytic step.** Under RH, for `a, h ≥ 1` and any `σ > 3/2` with
-`4(a+2h)^{3/2} ≤ (h² a^{−1/2}) σ²`:
-`Ψ₁(a+2h) − 2Ψ₁(a+h) + Ψ₁(a) ≥ h² − 2 (h² a^{−1/2}) σ (L(1/2+σ) + 1/40) − 3`. -/
-theorem psi1N_second_diff_ge (hRH : RiemannHypothesis) {a h : ℕ} (ha : 1 ≤ a) (hh : 1 ≤ h)
-    {σ : ℝ} (hσ : 3 / 2 < σ)
-    (hB : 4 * ((a : ℝ) + 2 * h) ^ (3 / 2 : ℝ) ≤ (h : ℝ) ^ 2 * (a : ℝ) ^ (-(1 / 2 : ℝ)) * σ ^ 2) :
-    (h : ℝ) ^ 2 - 2 * ((h : ℝ) ^ 2 * (a : ℝ) ^ (-(1 / 2 : ℝ))) * σ * (Lup (1 / 2 + σ) + 1 / 40) - 3
-      ≤ psi1N (a + 2 * h) - 2 * psi1N (a + h) + psi1N a := by
-  set A : ℝ := (h : ℝ) ^ 2 * (a : ℝ) ^ (-(1 / 2 : ℝ))
-  set B : ℝ := 4 * ((a : ℝ) + 2 * h) ^ (3 / 2 : ℝ)
+/-- **The analytic step, for any bound on the zero sum.** Under RH, for `a, h ≥ 1`, if
+`Σ_ρ m_ρ ‖D_ρ‖ ≤ Z` (`D_ρ = g(a+2h) − 2g(a+h) + g(a)`), then
+`Ψ₁(a+2h) − 2Ψ₁(a+h) + Ψ₁(a) ≥ h² − Z − 3`. -/
+theorem psi1N_second_diff_ge_of_zeroSum (hRH : RiemannHypothesis) {a h : ℕ} (ha : 1 ≤ a)
+    (hh : 1 ≤ h) {Z : ℝ}
+    (hsumD : Summable fun ρ : {ρ : ℂ // xiZeta ρ = 0} => (analyticOrderNatAt xiZeta ρ : ℝ) *
+      ‖gρ ρ ((a : ℝ) + 2 * h) - 2 * gρ ρ ((a : ℝ) + h) + gρ ρ a‖)
+    (hD : ∑' ρ : {ρ : ℂ // xiZeta ρ = 0}, (analyticOrderNatAt xiZeta ρ : ℝ) *
+      ‖gρ ρ ((a : ℝ) + 2 * h) - 2 * gρ ρ ((a : ℝ) + h) + gρ ρ a‖ ≤ Z) :
+    (h : ℝ) ^ 2 - Z - 3 ≤ psi1N (a + 2 * h) - 2 * psi1N (a + h) + psi1N a := by
   have haR : (0 : ℝ) < a := by exact_mod_cast ha
   have hhR : (0 : ℝ) ≤ h := h.cast_nonneg
   set m : {ρ : ℂ // xiZeta ρ = 0} → ℂ := fun ρ => (analyticOrderNatAt xiZeta ρ : ℂ)
@@ -100,14 +100,9 @@ theorem psi1N_second_diff_ge (hRH : RiemannHypothesis) {a h : ℕ} (ha : 1 ≤ a
     have := hcrit ρ
     have h2 : ((ρ : ℂ) + 1).re = 0 := by rw [h]; simp
     simp [this] at h2; norm_num at h2
-  -- the zero sum
-  obtain ⟨hsumD, hD⟩ := weighted_zeroSum_le hRH (σ := σ) (A := A) (B := B) hσ (by positivity)
-    (by positivity) hB (fun ρ => ‖D ρ‖) (fun _ => norm_nonneg _)
-    (fun ρ => norm_second_diff_gρ_le (hcrit ρ) haR hhR)
-    (fun ρ => norm_second_diff_gρ_le' (hcrit ρ) haR hhR)
   have hsumD' : Summable fun ρ : {ρ : ℂ // xiZeta ρ = 0} => ‖m ρ * D ρ‖ := by
     refine hsumD.congr fun ρ => ?_
-    simp [m]
+    simp [m, D]
   -- summability of each zero series
   have hsq : Summable fun ρ : {ρ : ℂ // xiZeta ρ = 0} =>
       (analyticOrderNatAt xiZeta ρ : ℝ) / ‖(ρ : ℂ) * ((ρ : ℂ) + 1)‖ := by
@@ -150,7 +145,7 @@ theorem psi1N_second_diff_ge (hRH : RiemannHypothesis) {a h : ℕ} (ha : 1 ≤ a
     have := V_second_diff (h := h) ha (hρ0 ρ) (hρ1 ρ)
     simp only [D]
     linear_combination (m ρ) * this
-  have hZ : -(∑' ρ, m ρ * D ρ).re ≥ -(2 * A * σ * (Lup (1 / 2 + σ) + 1 / 40)) := by
+  have hZ : -(∑' ρ, m ρ * D ρ).re ≥ -Z := by
     have h1 : (∑' ρ, m ρ * D ρ).re ≤ ‖∑' ρ, m ρ * D ρ‖ := re_le_norm _
     have h2 : ‖∑' ρ, m ρ * D ρ‖ ≤ ∑' ρ, ‖m ρ * D ρ‖ := norm_tsum_le_tsum_norm hsumD'
     have h3 : ∑' ρ, ‖m ρ * D ρ‖
@@ -185,5 +180,26 @@ theorem psi1N_second_diff_ge (hRH : RiemannHypothesis) {a h : ℕ} (ha : 1 ≤ a
     nlinarith
   push_cast at hF1 hF2 hF3 hre ⊢
   nlinarith
+
+/-- **The analytic step.** Under RH, for `a, h ≥ 1` and any `σ > 3/2` with
+`4(a+2h)^{3/2} ≤ (h² a^{−1/2}) σ²`:
+`Ψ₁(a+2h) − 2Ψ₁(a+h) + Ψ₁(a) ≥ h² − 2 (h² a^{−1/2}) σ (L(1/2+σ) + 1/40) − 3`. -/
+theorem psi1N_second_diff_ge (hRH : RiemannHypothesis) {a h : ℕ} (ha : 1 ≤ a) (hh : 1 ≤ h)
+    {σ : ℝ} (hσ : 3 / 2 < σ)
+    (hB : 4 * ((a : ℝ) + 2 * h) ^ (3 / 2 : ℝ) ≤ (h : ℝ) ^ 2 * (a : ℝ) ^ (-(1 / 2 : ℝ)) * σ ^ 2) :
+    (h : ℝ) ^ 2 - 2 * ((h : ℝ) ^ 2 * (a : ℝ) ^ (-(1 / 2 : ℝ))) * σ * (Lup (1 / 2 + σ) + 1 / 40) - 3
+      ≤ psi1N (a + 2 * h) - 2 * psi1N (a + h) + psi1N a := by
+  have haR : (0 : ℝ) < a := by exact_mod_cast ha
+  have hhR : (0 : ℝ) ≤ h := h.cast_nonneg
+  have hcrit : ∀ ρ : {ρ : ℂ // xiZeta ρ = 0}, (ρ : ℂ).re = 1 / 2 :=
+    fun ρ => xiZeta_zero_re_RH hRH ρ.2
+  obtain ⟨hsumD, hD⟩ := weighted_zeroSum_le hRH (σ := σ)
+    (A := (h : ℝ) ^ 2 * (a : ℝ) ^ (-(1 / 2 : ℝ))) (B := 4 * ((a : ℝ) + 2 * h) ^ (3 / 2 : ℝ)) hσ
+    (by positivity) (by positivity) hB
+    (fun ρ => ‖gρ ρ ((a : ℝ) + 2 * h) - 2 * gρ ρ ((a : ℝ) + h) + gρ ρ a‖) (fun _ => norm_nonneg _)
+    (fun ρ => norm_second_diff_gρ_le (hcrit ρ) haR hhR)
+    (fun ρ => norm_second_diff_gρ_le' (hcrit ρ) haR hhR)
+  have := psi1N_second_diff_ge_of_zeroSum hRH ha hh hsumD hD
+  linarith
 
 end Cramer
