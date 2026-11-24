@@ -32,9 +32,22 @@ def SpeiserAbove (T₀ : ℝ) : Prop :=
 def SpeiserBelow (T₀ : ℝ) : Prop :=
   ∀ s : ℂ, 0 < s.re → s.re < 1 / 2 → |s.im| < T₀ → deriv riemannZeta s ≠ 0
 
+/-- `ζ'(s) ≠ 0` for `0 < Re s < 1/2` and `a ≤ |Im s| < b` (a band of the strip). -/
+def SpeiserBand (a b : ℝ) : Prop :=
+  ∀ s : ℂ, 0 < s.re → s.re < 1 / 2 → a ≤ |s.im| → |s.im| < b → deriv riemannZeta s ≠ 0
+
 /-- The two regions together give the target. -/
 theorem speiserStatement_of_above_of_below {T₀ : ℝ} (hA : SpeiserAbove T₀)
     (hB : SpeiserBelow T₀) : SpeiserStatement := fun s h0 h1 =>
   (le_or_gt T₀ |s.im|).elim (hA s h0 h1) (hB s h0 h1)
+
+/-- The three regions together give the target. -/
+theorem speiserStatement_of_band {a b : ℝ} (hB : SpeiserBelow a) (hM : SpeiserBand a b)
+    (hA : SpeiserAbove b) : SpeiserStatement := fun s h0 h1 => by
+  rcases lt_or_ge |s.im| a with h | h
+  · exact hB s h0 h1 h
+  rcases lt_or_ge |s.im| b with h' | h'
+  · exact hM s h0 h1 h h'
+  · exact hA s h0 h1 h'
 
 end Speiser

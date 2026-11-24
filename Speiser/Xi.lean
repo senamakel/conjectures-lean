@@ -77,9 +77,12 @@ lemma re_one_div_sub_nonpos {z ρ : ℂ} (hρ : ρ.re = 1 / 2) (hz : z.re ≤ 1 
   simp only [one_div, inv_re, sub_re, hρ]
   exact div_nonpos_of_nonpos_of_nonneg (by linarith) (normSq_nonneg _)
 
-/-- **Under RH, `Re ξ'/ξ(z) ≤ 0` for `Re z ≤ 1/2`.** -/
-theorem re_logDeriv_xiZeta_nonpos (hRH : RiemannHypothesis) {z : ℂ} (hz : xiZeta z ≠ 0)
-    (hre : z.re ≤ 1 / 2) : (deriv xiZeta z / xiZeta z).re ≤ 0 := by
+/-- **Under RH, `Re ξ'/ξ(z) = Σ_ρ m_ρ Re (1/(z-ρ))`** (with multiplicity `m_ρ`), at every `z`
+that is not a zero of `ξ`. -/
+theorem hasSum_re_logDeriv_xiZeta (hRH : RiemannHypothesis) {z : ℂ} (hz : xiZeta z ≠ 0) :
+    HasSum (fun ρ : {ρ : ℂ // xiZeta ρ = 0} =>
+        (analyticOrderNatAt xiZeta (ρ : ℂ) : ℝ) * ((1 : ℂ) / (z - ρ)).re)
+      (deriv xiZeta z / xiZeta z).re := by
   have hx0 : xiZeta 0 ≠ 0 := by rw [xiZeta_zero]; exact one_ne_zero
   obtain ⟨-, b, hb⟩ := hadamard_logDeriv differentiable_xiZeta hx0 xiZeta_growth
   obtain ⟨-, h0⟩ := hb 0 hx0
@@ -96,15 +99,21 @@ theorem re_logDeriv_xiZeta_nonpos (hRH : RiemannHypothesis) {z : ℂ} (hz : xiZe
         1 / 2 * ∑' ρ : {ρ : ℂ // xiZeta ρ = 0}, m ρ * (1 / (1 - ρ) + 1 / ρ) := by
     rw [hz']; linear_combination (-(1 : ℂ) / 2) * h1
   rw [key]
-  refine (Complex.hasSum_re H).nonpos fun ρ => ?_
+  convert Complex.hasSum_re H using 1
+  funext ρ
   have hρ := re_eq_half_of_xiZeta_eq_zero hRH ρ.2
   have h12 : ((1 : ℂ) / 2).re = 1 / 2 := by norm_num
   have h12' : ((1 : ℂ) / 2).im = 0 := by norm_num
-  have hm' : (0 : ℝ) ≤ (analyticOrderNatAt xiZeta (ρ : ℂ) : ℝ) := Nat.cast_nonneg _
-  have := re_one_div_sub_nonpos hρ hre
   simp only [sub_re, mul_re, add_re, natCast_re, natCast_im, zero_mul, sub_zero,
     re_one_div_one_sub hρ, h12, h12']
-  nlinarith [mul_nonpos_of_nonneg_of_nonpos hm' this]
+  ring
+
+/-- **Under RH, `Re ξ'/ξ(z) ≤ 0` for `Re z ≤ 1/2`.** -/
+theorem re_logDeriv_xiZeta_nonpos (hRH : RiemannHypothesis) {z : ℂ} (hz : xiZeta z ≠ 0)
+    (hre : z.re ≤ 1 / 2) : (deriv xiZeta z / xiZeta z).re ≤ 0 :=
+  (hasSum_re_logDeriv_xiZeta hRH hz).nonpos fun ρ =>
+    mul_nonpos_of_nonneg_of_nonpos (Nat.cast_nonneg _)
+      (re_one_div_sub_nonpos (re_eq_half_of_xiZeta_eq_zero hRH ρ.2) hre)
 
 /-- At a critical point `s` of `ζ` with `Re s > 0`, `s ≠ 1`, `ζ(s) ≠ 0`:
 `ξ'/ξ(s) = 1/s + 1/(s-1) - (1/2) log π + (1/2) ψ(s/2)`. -/
