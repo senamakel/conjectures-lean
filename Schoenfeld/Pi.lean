@@ -1,16 +1,16 @@
 import Schoenfeld.Theta
 
 /-!
-# `|π(x) − li(x)| < (3/5) √x log x` for `x ≥ 2657`, under RH
+# `|π(x) − li(x)| < (9/20) √x log x` for `x ≥ 2657`, under RH
 
 Partial summation (Mathlib's `Chebyshev.primeCounting_eq_theta_div_log_add_integral`) and
 `li(x) = li(2) + x/log x − 2/log 2 + ∫₂ˣ dt/log² t` (integration by parts, `logIntegral_eq`):
 
 `π(x) − li(x) = (θ(x) − x)/log x + ∫₂ˣ (θ(t) − t)/(t log² t) dt + 2/log 2 − li(2)`.
 
-* `(θ(x) − x)/log x`: `< √x log x / 8 + 2√x` (`theta_sub_lt`);
+* `(θ(x) − x)/log x`: `< √x log x / 4` (`theta_sub_lt_quarter`);
 * `∫₂^599`: `|θ(t) − t| ≤ t`, so the integrand is `≤ 1/log² t`; nine dyadic pieces give `≤ 33`;
-* `∫_599^x`: the integrand is `≤ (1/8 + 2/log t)/√t ≤ 0.44/√t`, integral `≤ 0.88 √x`;
+* `∫_599^x`: the integrand is `≤ (1/4)/√t`, integral `≤ √x/2`;
 * `0 ≤ li(2) ≤ 2` (formal-conjectures' integrand bounds), so `|2/log 2 − li(2)| ≤ 2.886`.
 -/
 
@@ -149,47 +149,37 @@ theorem integral_small : |∫ t in (2 : ℝ)..599, gfun t| ≤ 33 := by
   constructor <;> linarith [s1.1, s1.2, s2.1, s2.2, s3.1, s3.2, s4.1, s4.2, s5.1, s5.2, s6.1,
     s6.2, s7.1, s7.2, s8.1, s8.2, s9.1, s9.2]
 
-/-- `|∫_599^x g| ≤ 0.88 √x`. -/
+/-- `|∫_599^x g| ≤ √x/2`. -/
 theorem integral_large (hRH : RiemannHypothesis) {x : ℝ} (hx : 599 ≤ x) :
-    |∫ t in (599 : ℝ)..x, gfun t| ≤ 0.88 * √x := by
-  have hb : ∀ t ∈ Set.Ioc (599 : ℝ) x, ‖gfun t‖ ≤ 0.44 / √t := by
+    |∫ t in (599 : ℝ)..x, gfun t| ≤ 0.5 * √x := by
+  have hb : ∀ t ∈ Set.Ioc (599 : ℝ) x, ‖gfun t‖ ≤ 0.25 / √t := by
     intro t ht
     have ht0 : 0 < t := by linarith [ht.1]
-    have hl : 6.38 ≤ Real.log t := by
-      have := log_ge_of_pow_le 9 (show (2 : ℝ) ^ 9 ≤ t by norm_num; linarith [ht.1])
-      have : (2 : ℝ) ^ 9 / t ≤ 512 / 599 := by
-        rw [div_le_div_iff₀ ht0 (by norm_num)]; norm_num; linarith [ht.1]
-      norm_num at *; linarith
-    have hth := theta_sub_lt hRH (x := t) (by linarith [ht.1])
+    have hl : 0 < Real.log t := log_pos_of_two_le (by linarith [ht.1])
+    have hth := theta_sub_lt_quarter hRH (x := t) ht.1.le
     have hs : 0 < √t := Real.sqrt_pos.mpr ht0
     have hst : √t * √t = t := Real.mul_self_sqrt ht0.le
     rw [Real.norm_eq_abs, gfun_eq (by linarith [ht.1]), abs_div,
       abs_of_pos (by positivity : 0 < t * Real.log t ^ 2),
       div_le_div_iff₀ (by positivity) hs]
-    have hL0 : 0 < Real.log t := by linarith
-    -- `|θ − t| √t < (√t log² t / 8 + 2 √t log t) √t = t (log² t/8 + 2 log t) ≤ 0.44 t log² t`
-    have h1 : |θ t - t| * √t ≤ (1 / 8 * (√t * Real.log t ^ 2) + 2 * √t * Real.log t) * √t :=
+    have h1 : |θ t - t| * √t ≤ (1 / 4 * (√t * Real.log t ^ 2)) * √t :=
       mul_le_mul_of_nonneg_right hth.le hs.le
-    have h2 : (1 / 8 * (√t * Real.log t ^ 2) + 2 * √t * Real.log t) * √t
-        = (√t * √t) * (Real.log t ^ 2 / 8 + 2 * Real.log t) := by ring
+    have h2 : (1 / 4 * (√t * Real.log t ^ 2)) * √t = (√t * √t) * (Real.log t ^ 2 / 4) := by ring
     rw [hst] at h2
-    have h3 : 2 * Real.log t ≤ 0.315 * Real.log t ^ 2 := by nlinarith
-    have h4 : t * (Real.log t ^ 2 / 8 + 2 * Real.log t) ≤ 0.44 * (t * Real.log t ^ 2) := by
-      nlinarith
-    linarith
-  have hint : IntervalIntegrable (fun t => 0.44 / √t) volume 599 x := by
+    nlinarith
+  have hint : IntervalIntegrable (fun t => 0.25 / √t) volume 599 x := by
     refine ContinuousOn.intervalIntegrable fun t ht => ?_
     rw [Set.uIcc_of_le hx] at ht
     exact (continuousAt_const.div Real.continuous_sqrt.continuousAt
       (Real.sqrt_pos.mpr (by linarith [ht.1])).ne').continuousWithinAt
   have hle := intervalIntegral.norm_integral_le_of_norm_le hx
     (ae_of_all _ fun t ht => hb t ht) hint
-  have hval : ∫ t in (599 : ℝ)..x, 0.44 / √t = 0.88 * √x - 0.88 * √599 := by
-    refine intervalIntegral.integral_eq_sub_of_hasDerivAt (f := fun t => 0.88 * √t)
+  have hval : ∫ t in (599 : ℝ)..x, 0.25 / √t = 0.5 * √x - 0.5 * √599 := by
+    refine intervalIntegral.integral_eq_sub_of_hasDerivAt (f := fun t => 0.5 * √t)
       (fun t ht => ?_) hint
     rw [Set.uIcc_of_le hx] at ht
     have ht0 : t ≠ 0 := by linarith [ht.1]
-    have := (Real.hasDerivAt_sqrt ht0).const_mul (0.88 : ℝ)
+    have := (Real.hasDerivAt_sqrt ht0).const_mul (0.5 : ℝ)
     convert this using 1
     have : 0 < √t := Real.sqrt_pos.mpr (by linarith [ht.1])
     field_simp; norm_num
@@ -198,11 +188,11 @@ theorem integral_large (hRH : RiemannHypothesis) {x : ℝ} (hx : 599 ≤ x) :
   linarith
 
 lemma pi_fin {s L : ℝ} (hs : 51.5 ≤ s) (hL : 7.85 ≤ L) :
-    1 / 8 * (s * L) + 2 * s + (33 + 0.88 * s) + 2.886 < 3 / 5 * (s * L) := by
+    1 / 4 * (s * L) + (33 + 0.5 * s) + 2.886 < 9 / 20 * (s * L) := by
   nlinarith [mul_le_mul hs hL (by norm_num) (by linarith)]
 
-/-- **`|π(x) − li(x)| < (3/5) √x log x` for `x ≥ 2657`, under RH.** -/
-theorem piBound_of_RH (hRH : RiemannHypothesis) : PiBound (3 / 5) 2657 := by
+/-- **`|π(x) − li(x)| < (9/20) √x log x` for `x ≥ 2657`, under RH.** -/
+theorem piBound_of_RH (hRH : RiemannHypothesis) : PiBound (9 / 20) 2657 := by
   intro x hx
   have hx2 : 2 ≤ x := by linarith
   have hx0 : 0 < x := by linarith
@@ -228,7 +218,7 @@ theorem piBound_of_RH (hRH : RiemannHypothesis) : PiBound (3 / 5) 2657 := by
     rw [hpi, hli, hg, sub_div, div_eq_mul_inv]; ring
   have hS := integral_small
   have hL := integral_large hRH (x := x) (by linarith)
-  have hθ := theta_sub_lt hRH (x := x) (by linarith)
+  have hθ := theta_sub_lt_quarter hRH (x := x) (by linarith)
   have hli2 := logIntegralTwo_nonneg
   have hli2' := logIntegralTwo_le_two
   have hlog2 := Real.log_two_gt_d9
@@ -241,7 +231,7 @@ theorem piBound_of_RH (hRH : RiemannHypothesis) : PiBound (3 / 5) 2657 := by
     have : (2 : ℝ) ^ 11 / x ≤ 2048 / 2657 := by
       rw [div_le_div_iff₀ hx0 (by norm_num)]; norm_num; linarith
     norm_num at *; linarith
-  have hθ' : |(θ x - x) / Real.log x| < 1 / 8 * (√x * Real.log x) + 2 * √x := by
+  have hθ' : |(θ x - x) / Real.log x| < 1 / 4 * (√x * Real.log x) := by
     rw [abs_div, abs_of_pos hl0, div_lt_iff₀ hl0]
     calc |θ x - x| < _ := hθ
       _ = _ := by ring
@@ -255,8 +245,8 @@ theorem piBound_of_RH (hRH : RiemannHypothesis) : PiBound (3 / 5) 2657 := by
   have a3 := abs_add_le B1 B2
   have hc : |2 / Real.log 2 - logIntegralTwo| ≤ 2.886 := by
     rw [abs_le]; constructor <;> linarith
-  have hfin : 1 / 8 * (√x * Real.log x) + 2 * √x + (33 + 0.88 * √x) + 2.886
-      < 3 / 5 * (√x * Real.log x) := pi_fin hsx hlx
+  have hfin : 1 / 4 * (√x * Real.log x) + (33 + 0.5 * √x) + 2.886
+      < 9 / 20 * (√x * Real.log x) := pi_fin hsx hlx
   linarith
 
 end Schoenfeld

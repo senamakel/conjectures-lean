@@ -15,10 +15,10 @@ This repository proves all three bounds under RH, with the same thresholds and l
 
 ```lean
 theorem Schoenfeld.psiBound_of_RH (hRH : RiemannHypothesis) : PsiBound (1 / 8) 73.2
-theorem Schoenfeld.thetaBound_of_RH (hRH : RiemannHypothesis) : ThetaBound (1 / 2) 599
-theorem Schoenfeld.piBound_of_RH (hRH : RiemannHypothesis) : PiBound (3 / 5) 2657
+theorem Schoenfeld.thetaBound_of_RH (hRH : RiemannHypothesis) : ThetaBound (1 / 4) 599
+theorem Schoenfeld.piBound_of_RH (hRH : RiemannHypothesis) : PiBound (9 / 20) 2657
 theorem Schoenfeld.schoenfeld_weak_of_RH (hRH : RiemannHypothesis) :
-    PsiBound (1 / 8) 73.2 ∧ ThetaBound (1 / 2) 599 ∧ PiBound (3 / 5) 2657
+    PsiBound (1 / 8) 73.2 ∧ ThetaBound (1 / 4) 599 ∧ PiBound (9 / 20) 2657
 ```
 
 where (`Schoenfeld/Statement.lean`)
@@ -39,7 +39,7 @@ def SchoenfeldStatement : Prop :=
 
 * All three theorems are **tier C** in the main library (RH is an explicit argument) and
   **tier U** in `Unconditional/` (RH discharged by riemann-hypothesis), for the constants
-  `1/8`, `1/2`, `3/5`. Schoenfeld's exact `SchoenfeldStatement` (constant `1/(8π)`) is the
+  `1/8`, `1/4`, `9/20`. Schoenfeld's exact `SchoenfeldStatement` (constant `1/(8π)`) is the
   fixed target and is **not** proved; see "Deviations from the literature".
 * `RiemannHypothesis` is Mathlib's definition, used as is.
 * `Real.logIntegral` (principal-value `li`, `li(x) = li(2) + ∫₂ˣ dt/log t`) is copied verbatim
@@ -78,10 +78,11 @@ Full blueprint with every constant: [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
 4. **ψ** (`Psi.lean`). For `73.2 ≤ x ≤ 2^18`, `F(T) ≤ T/20` with `h ≈ 0.447 x^{3/4}` on 15
    intervals (worst ratio to `√x log² x/8`: `0.98`). For `x ≥ 2^18`, step 2 with `h = ⌈4√x⌉`
    reduces to a quadratic inequality in `log x` (ratio `0.82` at `2^18`).
-5. **θ** (`Theta.lean`). Mathlib's `0 ≤ ψ − θ ≤ 2√x log x`; `2/log x ≤ 3/8` for `x ≥ 599`.
+5. **θ** (`Theta.lean`). Costa Pereira's `ψ − θ ≤ ψ(x^{1/2}) + ψ(x^{1/3}) + ψ(x^{1/5})` and
+   `ψ(y) ≤ log 4 · y + 2√y log y` (both in Mathlib) give `ψ − θ ≤ √x log² x/8` for `x ≥ 599`.
 6. **π** (`Pi.lean`). Partial summation (Mathlib) and integration by parts for `li`:
    `π(x) − li(x) = (θ(x) − x)/log x + ∫₂ˣ (θ(t) − t)/(t log² t) dt + 2/log 2 − li(2)`, with
-   `|∫₂^599| ≤ 33`, `|∫_599^x| ≤ 0.88√x` and `0 ≤ li(2) ≤ 2`.
+   `|∫₂^599| ≤ 33`, `|∫_599^x| ≤ √x/2` and `0 ≤ li(2) ≤ 2`.
 
 ## Layout
 
@@ -94,7 +95,7 @@ Full blueprint with every constant: [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
 | `Schoenfeld/Psi1.lean` | `Ψ₁` and monotone differencing (from robin-rh) |
 | `Schoenfeld/PsiInt.lean` | Explicit formula for `Ψ₁`, `ψ` at integers and real `x` |
 | `Schoenfeld/Psi.lean` | `psiBound_of_RH` |
-| `Schoenfeld/Theta.lean` | `thetaBound_of_RH` |
+| `Schoenfeld/Theta.lean` | Costa Pereira bound for `ψ − θ`, `thetaBound_of_RH` |
 | `Schoenfeld/Pi.lean` | `li` by parts, `piBound_of_RH` |
 | `Schoenfeld/Main.lean` | `schoenfeld_weak_of_RH` |
 | `Unconditional/SchoenfeldUnconditional.lean` | RH discharged by riemann-hypothesis |
@@ -102,7 +103,7 @@ Full blueprint with every constant: [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
 ## Deviations from the literature
 
 The thresholds are Schoenfeld's; the constants are larger: `1/8 = π · 1/(8π)` for ψ,
-`1/2 = 4π · 1/(8π)` for θ, `3/5 ≈ 15 · 1/(8π)` for π − li.
+`1/4 = 2π · 1/(8π)` for θ, `9/20 ≈ 11.3 · 1/(8π)` for π − li.
 
 * **ψ.** Schoenfeld uses Rosser's explicit zero-counting formula
   `N(T) = (T/2π) log(T/2πe) + 7/8 + O(log T)` with explicit error and the numerically
@@ -113,9 +114,11 @@ The thresholds are Schoenfeld's; the constants are larger: `1/8 = π · 1/(8π)`
   versus `1/(8π) ≈ 0.0398`. Reaching `1/(8π)` from `x = 73.2` requires formalising an explicit
   `N(T)` (argument principle and Backlund's bound for `arg ζ(1/2 + iT)`) and a verified list
   of the first zeros.
-* **θ.** Mathlib's `ψ − θ ≤ 2√x log x` is crude. Costa Pereira's
-  `ψ − θ ≤ ψ(x^{1/2}) + ψ(x^{1/3}) + ψ(x^{1/5})` (also in Mathlib) would give about `1/4`.
-* **π.** Inherits θ's constant and the term `∫₂^599 dt/log² t ≈ 26`.
+* **θ.** `θ = ψ − (ψ − θ)` adds the bound `ψ − θ ≤ √x log² x/8` to ψ's `1/8`. The true
+  `ψ − θ` is about `√x`, so θ inherits ψ's constant for large `x`, but not uniformly from `599`
+  with these estimates.
+* **π.** Inherits θ's constant `1/4`, plus `2 · (1/4)/log x` from the tail integral and
+  `∫₂^599 dt/log² t ≈ 26` (bounded by 33): `0.40` at `x = 2657`, rounded up to `9/20`.
 
 ## Building
 
@@ -137,8 +140,8 @@ min, the 15-interval case split) and `Schoenfeld.Pi`.
 | Theorem | Statement | Axioms |
 |---|---|---|
 | `psi_bound` | `Schoenfeld.PsiBound (1 / 8) 73.2` | pending (see below) |
-| `theta_bound` | `Schoenfeld.ThetaBound (1 / 2) 599` | pending (see below) |
-| `pi_bound` | `Schoenfeld.PiBound (3 / 5) 2657` | pending (see below) |
+| `theta_bound` | `Schoenfeld.ThetaBound (1 / 4) 599` | pending (see below) |
+| `pi_bound` | `Schoenfeld.PiBound (9 / 20) 2657` | pending (see below) |
 
 The check has not been run yet on this branch; the axioms column will be filled in from its output.
 

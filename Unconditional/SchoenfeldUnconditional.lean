@@ -11,10 +11,10 @@ Run `scripts/check-unconditional.sh` to check it.
 theorem psi_bound : Schoenfeld.PsiBound (1 / 8) 73.2 :=
   Schoenfeld.psiBound_of_RH riemannHypothesis
 
-theorem theta_bound : Schoenfeld.ThetaBound (1 / 2) 599 :=
+theorem theta_bound : Schoenfeld.ThetaBound (1 / 4) 599 :=
   Schoenfeld.thetaBound_of_RH riemannHypothesis
 
-theorem pi_bound : Schoenfeld.PiBound (3 / 5) 2657 :=
+theorem pi_bound : Schoenfeld.PiBound (9 / 20) 2657 :=
   Schoenfeld.piBound_of_RH riemannHypothesis
 
 #print axioms psi_bound

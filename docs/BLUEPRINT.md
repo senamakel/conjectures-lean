@@ -4,8 +4,8 @@ Target (fixed, `Schoenfeld/Statement.lean`): Schoenfeld 1976, under RH,
 `|ψ(x) − x| < √x log² x/(8π)` (`x ≥ 73.2`), `|θ(x) − x| < √x log² x/(8π)` (`x ≥ 599`),
 `|π(x) − li(x)| < √x log x/(8π)` (`x ≥ 2657`).
 
-Proved (`Schoenfeld/Main.lean`): the same three bounds, same thresholds, constants `1/8`, `1/2`,
-`3/5`. Everything is under Mathlib's `RiemannHypothesis`; no `native_decide`, no hypotheses
+Proved (`Schoenfeld/Main.lean`): the same three bounds, same thresholds, constants `1/8`, `1/4`,
+`9/20`. Everything is under Mathlib's `RiemannHypothesis`; no `native_decide`, no hypotheses
 beyond RH.
 
 Notation: `ξ = xiZeta` (erdos-985), zeros `ρ = 1/2 + iγ` with multiplicity `m`;
@@ -60,14 +60,16 @@ Notation: `ξ = xiZeta` (erdos-985), zeros `ρ = 1/2 + iγ` with multiplicity `m
 
 ## Step 5. `θ` and `π` (`Schoenfeld/Theta.lean`, `Schoenfeld/Pi.lean`)
 
-15. `theta_sub_lt`: `|θ(x) − x| < √x log² x/8 + 2√x log x` (Mathlib's `psi_sub_theta_le`);
-    `thetaBound_of_RH`: `< √x log² x/2` for `x ≥ 599`.
+15. `psi_sub_theta_le_eighth`: for `x ≥ 599`, `ψ(x) − θ(x) ≤ ψ(x^{1/2}) + 2ψ(x^{1/3})` (Costa
+    Pereira, Mathlib's `psi_sub_theta_le_psi_add_psi_add_psi`) `≤ √x log² x/8`, with
+    `ψ(y) ≤ log 4 · y + 2√y log y` and `x = a¹²` (ratio `0.91` at `599`).
+    `thetaBound_of_RH`: `|θ(x) − x| < √x log² x/4` for `x ≥ 599`.
 16. `logIntegral_eq`: `li(x) = li(2) + x/log x − 2/log 2 + ∫₂ˣ dt/log² t`; with Mathlib's
     `primeCounting_eq_theta_div_log_add_integral`,
     `π(x) − li(x) = (θ(x) − x)/log x + ∫₂ˣ (θ(t) − t)/(t log² t) dt + 2/log 2 − li(2)`.
 17. `integral_small`: `|∫₂^599| ≤ 33` (`|θ(t) − t| ≤ t`, nine dyadic pieces);
-    `integral_large`: `|∫_599^x| ≤ 0.88 √x`; `0 ≤ li(2) ≤ 2`.
-    `piBound_of_RH`: `< (3/5) √x log x` for `x ≥ 2657`.
+    `integral_large`: `|∫_599^x| ≤ √x/2` (integrand `≤ (1/4)/√t`); `0 ≤ li(2) ≤ 2`.
+    `piBound_of_RH`: `< (9/20) √x log x` for `x ≥ 2657` (`0.40` at `2657`).
 
 ## Closing the gap to `1/(8π)`
 
@@ -81,7 +83,6 @@ What separates the proved constants from Schoenfeld's:
   None of these is in Mathlib or erdos-985. Proving the explicit `N(T)` (argument principle,
   Backlund's bound for `arg ζ`) is a project of its own; a verified list of the first zeros is
   another large computation.
-* **θ.** Mathlib's `ψ − θ ≤ 2√x log x` is crude; with Costa Pereira's
-  `ψ − θ ≤ ψ(x^{1/2}) + ψ(x^{1/3}) + ψ(x^{1/5})` (also in Mathlib) the constant drops to about
-  `1/4` at `x = 599`.
-* **π.** Inherits θ's constant plus `∫₂^599 dt/log² t ≈ 26` (bounded by 33).
+* **θ.** ψ's `1/8` plus `ψ − θ ≤ √x log² x/8`; the true `ψ − θ` is about `√x`, so for large
+  `x` θ inherits ψ's constant, but not uniformly from `599` with these estimates.
+* **π.** θ's `1/4` plus the tail integral (`2 · (1/4)/log x`) plus `∫₂^599 dt/log² t ≈ 26`.
