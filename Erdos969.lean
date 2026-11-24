@@ -3,3 +3,8 @@ import Erdos969.Identity
 import Erdos969.Series
 import Erdos969.Hyperbola
 import Erdos969.Main
+import Erdos969.Statement2
+import Erdos969.KFree.Identity
+import Erdos969.KFree.Series
+import Erdos969.KFree.Hyperbola
+import Erdos969.KFree.Main
