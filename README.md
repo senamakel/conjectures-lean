@@ -4,13 +4,14 @@ Nicolas (*Petites valeurs de la fonction d'Euler*, J. Number Theory 17 (1983) 37
 that the Riemann hypothesis is equivalent to `N_k/φ(N_k) > e^γ log log N_k` for every `k ≥ 1`,
 where `N_k = p_1 ⋯ p_k` is the product of the first `k` primes (see also Nicolas, Acta Arith.
 155 (2012)). Nicolas also showed that if RH fails, the inequality holds for infinitely many `k`
-and fails for infinitely many. This repository formalises the direction RH ⇒ inequality for every `k ≥ 1`
-in Lean 4 + Mathlib.
+and fails for infinitely many. This repository is a complete Lean 4 + Mathlib proof of the
+direction RH ⇒ inequality for every `k ≥ 1`, with the 9591 primes `3 ≤ p ≤ 10^5` covered by a
+proved-sound interval checker. `Unconditional/` proves the inequality for
+every primorial unconditionally in Lean, with RH supplied by the certified proof in
+leanprover-community/riemann-hypothesis.
 
 **Literature status: RH-equivalent.** The criterion is Nicolas (1983). The inequality for all `k`
-is equivalent to RH, so this says nothing beyond the RH claim; the unconditional theorem below is
-only as reliable as the Lean proof of RH in leanprover-community/riemann-hypothesis, which has not
-been independently verified.
+is equivalent to RH (Nicolas), so this theorem is RH in another form.
 
 ## Headline theorem
 
@@ -151,9 +152,7 @@ module files and needs about 19 GB of RAM. Raise the open-file limit first; on L
 `sudo prlimit --pid $$ --nofile=2000000:2000000`, on macOS
 `sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`.
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
