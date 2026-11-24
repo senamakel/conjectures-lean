@@ -5,3 +5,5 @@ import LLS.L1.Final
 import LLS.ClassNumber
 import LLS.ClassNumberAll
 import LLS.Bach2.Main2
+import LLS.Sharp.Final
+import LLS.Sharp.ClassNumber

@@ -69,6 +69,20 @@ theorem classNumberLowerBoundWith_unconditional : LLS.ClassNumberLowerBoundWith 
   LLS.classNumberLowerBoundWith_of_GRH_of_formula LFunction_ne_zero_of_half_lt_re
     classNumberFormula
 
+theorem l1UpperBound_unconditional : LLS.L1UpperBound :=
+  LLS.Sharp.l1UpperBound_of_GRH LFunction_ne_zero_of_half_lt_re
+
+theorem l1LowerBound_unconditional : LLS.L1LowerBound :=
+  LLS.Sharp.l1LowerBound_of_GRH LFunction_ne_zero_of_half_lt_re
+
+theorem classNumberUpperBound_unconditional : LLS.ClassNumberUpperBound :=
+  LLS.Sharp.classNumberUpperBound_of_GRH_of_formula LFunction_ne_zero_of_half_lt_re
+    classNumberFormula
+
+theorem classNumberLowerBound_unconditional : LLS.ClassNumberLowerBound :=
+  LLS.Sharp.classNumberLowerBound_of_GRH_of_formula LFunction_ne_zero_of_half_lt_re
+    classNumberFormula
+
 #print axioms leastNonresidueBelowLogSq_unconditional
 #print axioms bach_unconditional
 #print axioms leastNonresidue_unconditional
@@ -83,3 +97,7 @@ theorem classNumberLowerBoundWith_unconditional : LLS.ClassNumberLowerBoundWith 
 #print axioms bach2_unconditional
 #print axioms leastNonresidue2_unconditional
 #print axioms miller2_unconditional
+#print axioms l1UpperBound_unconditional
+#print axioms l1LowerBound_unconditional
+#print axioms classNumberUpperBound_unconditional
+#print axioms classNumberLowerBound_unconditional
