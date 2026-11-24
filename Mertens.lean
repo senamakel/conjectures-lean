@@ -19,3 +19,8 @@ import Mertens.FareyAlg
 import Mertens.FareyIntegral
 import Mertens.FareyDiscrete
 import Mertens.Franel
+import Mertens.Statement3
+import Mertens.SharpLower
+import Mertens.SharpSmall
+import Mertens.SharpInvZeta
+import Mertens.SharpMain

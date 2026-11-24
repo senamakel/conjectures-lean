@@ -36,6 +36,12 @@ theorem franel_bound : Mertens.FranelBound :=
 theorem franelLandau_bound : Mertens.FranelLandauBound :=
   Mertens.franelLandau_of_RH riemannHypothesis
 
+theorem mertens_sharp_bound : Mertens.MertensSharpBound :=
+  Mertens.mertensSharp_of_RH riemannHypothesis
+
+theorem invZeta_sharp_bound : Mertens.InvZetaSharpBoundWith 8 :=
+  Mertens.invZetaSharpWith_of_RH riemannHypothesis
+
 #print axioms invZeta_bound
 #print axioms mertens_bound
 #print axioms riesz_bound
@@ -45,3 +51,5 @@ theorem franelLandau_bound : Mertens.FranelLandauBound :=
 #print axioms liouville_bound
 #print axioms franel_bound
 #print axioms franelLandau_bound
+#print axioms mertens_sharp_bound
+#print axioms invZeta_sharp_bound

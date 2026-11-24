@@ -14,3 +14,7 @@ import Mertens
 #print axioms Mertens.franel_of_RH
 #print axioms Mertens.franelLandau_of_mertensBound
 #print axioms Mertens.franelLandau_of_RH
+#print axioms Mertens.norm_invZ_le_sharp
+#print axioms Mertens.invZetaSharpWith_of_RH
+#print axioms Mertens.abs_mertens_nat_le_sharp
+#print axioms Mertens.mertensSharp_of_RH
