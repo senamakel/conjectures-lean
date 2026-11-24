@@ -93,6 +93,8 @@ See [`docs/PLAN.md`](docs/PLAN.md).
 | `miller_unconditional` | `Miller.MillerStatement (21 / 5)` | standard three + ankeny-grh's 8 `native_decide` |
 | `millerTestGRH_iff_prime_unconditional` | `millerTestGRH n = true ↔ n.Prime` for odd `n > 1` | same |
 
+Checked 2026-11-24 with `scripts/check-unconditional.sh` against riemann-hypothesis `507a75d91d`: the build succeeded and `#print axioms` of both theorems printed exactly the standard three plus the 8 `native_decide` axioms (no `sorryAx`). The run took about 18 min wall, dominated by importing riemann-hypothesis.
+
 To check it:
 
 ```bash
