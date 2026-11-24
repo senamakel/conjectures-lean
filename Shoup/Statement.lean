@@ -60,4 +60,10 @@ def AnkenyTypeStatement : Prop :=
   ∃ C : ℝ, ∀ p : ℕ, p.Prime → p ≠ 2 →
     HasPrimitiveRootLE p (C * ((2 : ℝ) ^ ω (p - 1) * Real.log p) ^ 2)
 
+/-- A polynomial-in-`ω` bound `g(p) = O(ω(p-1)^A (log p)²)` with exponent `A` (added
+2026-11-24 as an intermediate target; `WangStatement` is the case `A = 6`). -/
+def PolyOmegaStatement (A : ℕ) : Prop :=
+  ∃ C : ℝ, ∀ p : ℕ, p.Prime → p ≠ 2 →
+    HasPrimitiveRootLE p (C * (ω (p - 1) : ℝ) ^ A * Real.log p ^ 2)
+
 end Shoup

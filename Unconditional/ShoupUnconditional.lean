@@ -17,5 +17,14 @@ theorem leastPrimitiveRoot_le_unconditional (p : ℕ) (hp : p.Prime) (hp2 : p �
     Shoup.HasPrimitiveRootLE p (1089 * ((2 : ℝ) ^ ω (p - 1) * Real.log p) ^ 2) :=
   Shoup.leastPrimitiveRoot_le_of_GRH LFunction_ne_zero_of_half_lt_re p hp hp2
 
+theorem polyOmega_unconditional : Shoup.PolyOmegaStatement 136 :=
+  Shoup.polyOmega_of_GRH LFunction_ne_zero_of_half_lt_re
+
+theorem leastPrimitiveRoot_le_poly_unconditional (p : ℕ) (hp : p.Prime) (hp2 : p ≠ 2) :
+    Shoup.HasPrimitiveRootLE p (Shoup.Sieve.polyC * (ω (p - 1) : ℝ) ^ 136 * Real.log p ^ 2) :=
+  Shoup.leastPrimitiveRoot_le_poly_of_GRH LFunction_ne_zero_of_half_lt_re p hp hp2
+
 #print axioms ankenyType_unconditional
 #print axioms leastPrimitiveRoot_le_unconditional
+#print axioms polyOmega_unconditional
+#print axioms leastPrimitiveRoot_le_poly_unconditional
