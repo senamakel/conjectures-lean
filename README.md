@@ -7,9 +7,11 @@ Theory* **11**, 771–778) and Carneiro–Milinovich–Soundararajan (2019, *Com
 **94**, 533–568), the latter with `p_{n+1} − p_n < (22/25) √p_n log p_n` for every `p_n > 3`.
 This is Cramér's theorem, not his 1936 conjecture `p_{n+1} − p_n = O(log² p_n)`, which is open
 even under RH. Unconditionally the best exponent is Baker–Harman–Pintz (2001):
-`p_{n+1} − p_n = O(p_n^{0.525})`. Nothing here is new mathematics.
+`p_{n+1} − p_n = O(p_n^{0.525})`. This repository proves, unconditionally in Lean with RH
+supplied by the certified proof in leanprover-community/riemann-hypothesis, that every `x ≥ 2`
+has a prime in `(x, x + 2√x log x]`, from the standard three axioms only.
 
-The main library is a Lean proof that RH implies Cramér's bound, following Cramér (1920): the
+The main library is a complete Lean proof that RH implies Cramér's bound, following Cramér (1920): the
 classical argument through a triangular (Fejér-type) weight, here the second difference of
 `ψ₁`, with the explicit constant `2` (weaker
 than `22/25`, see "Deviations"):
@@ -178,9 +180,7 @@ loading the RH cache. Output:
 The import needs about 93 GB of cache, about 19 GB of RAM and roughly 900k open files (raise the
 open-file limit first, e.g. `ulimit -n 2000000` or `nofile` in `/etc/security/limits.conf`).
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
