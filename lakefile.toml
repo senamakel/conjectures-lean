@@ -16,3 +16,8 @@ name = "Robin"
 [[lean_lib]]
 name = "RobinChecks"
 globs = ["RobinChecks.+"]
+
+[[lean_lib]]
+name = "RobinCompute"
+globs = ["RobinCompute.*"]
+precompileModules = true

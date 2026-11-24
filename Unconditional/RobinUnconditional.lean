@@ -7,8 +7,9 @@ import Robin
 Not part of the default build: it needs that project's compiled modules. Run
 `scripts/check-unconditional.sh`.
 
-Neither theorem uses `sorry`. The range `5040 < n ≤ exp(e^{30})` verified by Morrill–Platt
-(arXiv:1809.10813, Theorem 13) stays an explicit hypothesis, `Robin.RobinVerifiedRange`.
+No theorem here uses `sorry`. `robin_unconditional` and `lagarias_unconditional` use the range
+`5040 < n ≤ exp(e^{30})` proved by the verified computation (`Robin.robin_verified_range`);
+`robin_of_verified` / `lagarias_of_verified` keep it as a hypothesis.
 -/
 
 theorem robin_of_verified (hcomp : Robin.RobinVerifiedRange) : Robin.RobinStatement :=
@@ -17,5 +18,13 @@ theorem robin_of_verified (hcomp : Robin.RobinVerifiedRange) : Robin.RobinStatem
 theorem lagarias_of_verified (hcomp : Robin.RobinVerifiedRange) : Robin.LagariasStatement :=
   Robin.lagarias_of_RH_of_verified riemannHypothesis hcomp
 
+theorem robin_unconditional : Robin.RobinStatement :=
+  Robin.robin_of_RH riemannHypothesis
+
+theorem lagarias_unconditional : Robin.LagariasStatement :=
+  Robin.lagarias_of_RH riemannHypothesis
+
 #print axioms robin_of_verified
 #print axioms lagarias_of_verified
+#print axioms robin_unconditional
+#print axioms lagarias_unconditional
