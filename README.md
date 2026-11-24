@@ -52,7 +52,7 @@ theorem Robin.lagarias_of_RH_of_verified (hRH : RiemannHypothesis) (hcomp : Robi
 * `RiemannHypothesis` is Mathlib's definition, the one leanprover-community/riemann-hypothesis
   proves as `riemannHypothesis`.
 * `RobinVerifiedRange` is Robin's inequality for `5040 < n`, `log n ≤ e^{30}`. It used to be a
-  cited hypothesis (Morrill–Platt); it is now proved in Lean by the computation in
+  cited hypothesis (Morrill–Platt); here it is proved in Lean by the computation in
   `Robin/Compute/` and `RobinCompute/`.
 * `RobinStatement` and `LagariasStatement` are not in formal-conjectures.
 
@@ -199,7 +199,27 @@ and Lagarias's inequalities, given the Lean proof of RH in leanprover-community/
 which has not been independently verified. Since both are equivalent to RH, this says nothing
 beyond the RH claim.
 
-UNCOND_TABLE
+Run on 2026-11-24 against riemann-hypothesis `507a75d91d` (full output in
+[`docs/unconditional-axioms.txt`](docs/unconditional-axioms.txt)):
+
+| Theorem | Statement | Axioms |
+|---|---|---|
+| `robin_unconditional` | `RobinStatement` | standard three + 624 `native_decide` (`chunk_0` … `chunk_622`, `small_ok`) |
+| `lagarias_unconditional` | `LagariasStatement` | standard three + 625 `native_decide` (the above and `midCheck_range`) |
+| `robin_of_verified` | `RobinVerifiedRange → RobinStatement` | standard three |
+| `lagarias_of_verified` | `RobinVerifiedRange → LagariasStatement` | standard three + 1 `native_decide` |
+
+```
+'robin_of_verified' depends on axioms: [propext, Classical.choice, Quot.sound]
+'robin_unconditional' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ RobinCompute.chunk_0._native.native_decide.ax_1_1,
+ ...                                   (chunk_0 … chunk_622)
+ RobinCompute.small_ok._native.native_decide.ax_1_1]
+```
+
+The import of riemann-hypothesis took 36 min wall on the shared machine.
 
 ```bash
 scripts/check-unconditional.sh /path/to/riemann-hypothesis   # cloned there if missing
