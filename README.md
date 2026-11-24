@@ -134,18 +134,171 @@ In `Unconditional/` RH is discharged by riemann-hypothesis: the first row become
 
 ## Axioms
 
-`lake env lean` on a file with `import Schoenfeld` and `#print axioms`:
+`lake env lean scripts/Axioms.lean` (2026-11-24, at the commit of this README):
 
 ```
 'Schoenfeld.schoenfeld_weak_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
-'Schoenfeld.psiBound_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
-'Schoenfeld.thetaBound_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
-'Schoenfeld.piBound_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Schoenfeld.schoenfeld_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
-'Schoenfeld.schoenfeldPsi_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
-'Schoenfeld.schoenfeldTheta_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
-'Schoenfeld.schoenfeldPi_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Schoenfeld.Check.psiSmallRange' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psi._native.native_decide.ax_1_1]
+'Schoenfeld.Check.thetaSmallRange' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1]
+'Schoenfeld.Check.piSmallRange' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkB_pi._native.native_decide.ax_1_1]
+'Schoenfeld.psiCert' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'Schoenfeld.schoenfeld_of_RH_of_cited' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psi._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkB_pi._native.native_decide.ax_1_1]
+'Schoenfeld.schoenfeldPsi_of_RH_of_rosser' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psi._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'Schoenfeld.schoenfeldTheta_of_RH_of_rosser' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'Schoenfeld.schoenfeldPi_of_RH_of_rosser' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkB_pi._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'Schoenfeld.schoenfeld_of_RH_of_rosser' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psi._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkB_pi._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
 ```
+
+The RH-only theorems and `schoenfeld_of_RH` use the standard three axioms only. The finite
+inputs add 24 `native_decide` axioms, each the evaluation of a checker proved sound in Lean:
+
+| `native_decide` | Checks | Soundness | Time |
+|---|---|---|---|
+| `checkA_psi` | ψ on `[73.2, 1500]` against `√x log² x/(8π)` | `checkA_sound` | seconds |
+| `checkA_theta` | θ on `[599, 3·10⁴]` | `checkA_sound` | seconds |
+| `checkB_pi` | `li(2657)` enclosure, then `π − li` on `[2657, 4·10⁵]` | `liAnchor_sound`, `checkB_sound` | under a minute (whole module) |
+| `checkA_psiCert` | ψ on `[1500, 10⁶]` against `(4/5)√x` | `checkA_sound` | 71 s (whole module) |
+| `chunk00`–`chunk19` | the segmented sieve over `(1, 1.00034·10¹⁰]`, 477 segments each | `runSegs_sound` | 13.9 CPU-min in all (`chunk00` 130 s, the others 22–80 s) |
+
+The first three run in Lean's interpreter; the chunks call `SchoenfeldCompute`, compiled to
+native code (`precompileModules`). Times are single-core user CPU on a loaded machine.
 
 ## Proof outline
 
@@ -305,31 +458,43 @@ lake build
 ```
 
 Lean `v4.36.0`, Mathlib `fc4f59e5`, erdos-985 `9538edb`. On top of the Mathlib and erdos-985
-caches the library takes about 4.5 CPU-minutes; per module (user CPU): `Schoenfeld.Psi` 44 s
-(the 15-interval case split), `ThetaSharp` 34 s, `PsiSharp` 34 s, `PiSharp` 31 s, `Theta` 23 s,
-`Pi` 19 s, `Density` 15 s, `CountSum` 15 s, `PsiInt` 14 s, `ZeroSums` 10 s, the rest under 7 s
-each. The round-5 modules were timed with `lake env lean` on a loaded machine.
+caches the analytic library takes about 4.5 CPU-minutes; per module (user CPU):
+`Schoenfeld.Psi` 44 s (the 15-interval case split), `ThetaSharp` 34 s, `PsiSharp` 34 s,
+`PiSharp` 31 s, `Theta` 23 s, `Pi` 19 s, `Density` 15 s, `CountSum` 15 s, `PsiInt` 14 s,
+`ZeroSums` 10 s, the rest under 7 s each. The finite checks add about 17 CPU-minutes:
+`Schoenfeld.PsiCert.Chunks.C00`–`C19` 13.9 min (each about 20–130 s), `PsiCert.Small` 71 s,
+`Check.Pi` about 50 s, the soundness proofs (`PsiCert.Run`, `Check.Li`, …) under 20 s each.
+Build the chunks one at a time on a shared machine (`lake build Schoenfeld.PsiCert.Chunks.C00`
+and so on).
+
+The chunk states in `Schoenfeld/PsiCert/Data.lean` were produced by running
+`runSegs basePrimes 477` from `init` twenty times with the compiled code; they are data, and
+each transition is re-checked when its chunk module builds.
 
 ## Unconditional version
 
 `Unconditional/SchoenfeldUnconditional.lean` imports
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
 (commit `507a75d91d`) and closes the RH hypothesis with its `riemannHypothesis` (Alpöge's
-proof). The first three bounds are then proved unconditionally in Lean; the `1/(8π)` bounds are
-proved from the cited inputs alone.
+proof). The first three bounds are then proved unconditionally in Lean, and Schoenfeld's
+`1/(8π)` bounds are proved from Rosser's zero count alone.
 
 | Theorem | Statement | Axioms |
 |---|---|---|
 | `psi_bound` | `Schoenfeld.PsiBound (1 / 8) 73.2` | standard three |
 | `theta_bound` | `Schoenfeld.ThetaBound (1 / 4) 599` | standard three |
 | `pi_bound` | `Schoenfeld.PiBound (9 / 20) 2657` | standard three |
-| `schoenfeld_psi` | `RosserZeroCount → PsiCert → PsiSmallRange → SchoenfeldPsi` | standard three |
-| `schoenfeld_theta` | `RosserZeroCount → PsiCert → ThetaSmallRange → SchoenfeldTheta` | standard three |
-| `schoenfeld_pi` | `RosserZeroCount → PsiCert → ThetaSmallRange → PiSmallRange → SchoenfeldPi` | standard three |
+| `schoenfeld_psi_of_rosser` | `RosserZeroCount → SchoenfeldPsi` | standard three + 22 `native_decide` |
+| `schoenfeld_theta_of_rosser` | `RosserZeroCount → SchoenfeldTheta` | standard three + 22 `native_decide` |
+| `schoenfeld_pi_of_rosser` | `RosserZeroCount → SchoenfeldPi` | standard three + 23 `native_decide` |
+| `schoenfeld_statement_of_rosser` | `RosserZeroCount → SchoenfeldStatement` | standard three + 24 `native_decide` |
+| `schoenfeld_statement_of_cited` | `RosserZeroCount → PsiCert → SchoenfeldStatement` | standard three + 3 `native_decide` |
 | `schoenfeld_statement` | the five inputs `→ SchoenfeldStatement` | standard three |
 
-Checked 2026-11-24 with `scripts/check-unconditional.sh` against riemann-hypothesis
-`507a75d91d` (library at commit `6d7e828`): the build succeeded and `#print axioms` printed
+(and the parts `schoenfeld_psi`, `schoenfeld_theta`, `schoenfeld_pi`,
+`schoenfeld_*_of_cited`). Checked 2026-11-24 with `scripts/check-unconditional.sh` against
+riemann-hypothesis `507a75d91d` (library at commit `40513b3`): the build succeeded, no
+`sorryAx` appeared, and `#print axioms` printed
 
 ```
 'psi_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -339,9 +504,131 @@ Checked 2026-11-24 with `scripts/check-unconditional.sh` against riemann-hypothe
 'schoenfeld_theta' depends on axioms: [propext, Classical.choice, Quot.sound]
 'schoenfeld_pi' depends on axioms: [propext, Classical.choice, Quot.sound]
 'schoenfeld_statement' depends on axioms: [propext, Classical.choice, Quot.sound]
+'schoenfeld_psi_of_cited' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psi._native.native_decide.ax_1_1]
+'schoenfeld_theta_of_cited' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1]
+'schoenfeld_pi_of_cited' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkB_pi._native.native_decide.ax_1_1]
+'schoenfeld_statement_of_cited' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psi._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkB_pi._native.native_decide.ax_1_1]
+'schoenfeld_psi_of_rosser' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psi._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'schoenfeld_theta_of_rosser' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'schoenfeld_pi_of_rosser' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkB_pi._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'schoenfeld_statement_of_rosser' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psi._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkB_pi._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
 ```
 
-The run took 13.8 min wall (146 s user CPU), dominated by importing riemann-hypothesis.
+The run took 5.0 min wall (127 s user CPU), dominated by importing riemann-hypothesis.
 
 To check it:
 
