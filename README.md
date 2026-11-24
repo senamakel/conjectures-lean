@@ -4,9 +4,13 @@
 diviseurs et hypothèse de Riemann*, J. Math. Pures Appl. 63 (1984)) proved that the Riemann
 hypothesis is equivalent to `σ(n) < e^γ n log log n` for every `n > 5040`; Lagarias (Amer. Math.
 Monthly 109 (2002)) gave the equivalent form `σ(n) ≤ H_n + exp(H_n) log H_n`. This repository is a
-Lean 4 + Mathlib proof that RH implies Robin's inequality, following Robin (1984), and that RH
-implies Lagarias's form. Robin's inequality is equivalent to RH, so the unconditional theorem in
-`Unconditional/` says nothing beyond the RH claim. Unconditionally the inequality is known for
+complete Lean 4 + Mathlib proof that RH implies Robin's inequality, following Robin (1984), and
+that RH implies Lagarias's form. The range below the analytic threshold (`5040 < n`,
+`log n ≤ e^30`) is checked here by a proved-sound segmented sieve (624 `native_decide`
+chunks), so no hypothesis besides RH remains. `Unconditional/` proves both inequalities
+unconditionally in Lean, with RH supplied by the certified proof in
+leanprover-community/riemann-hypothesis. Robin's inequality is equivalent to RH (Robin), so this
+theorem is RH in another form. Before the 2026 proof of RH the inequality was known for
 `5040 < n ≤ 10^{10^{13.11485}}` (Morrill–Platt, Integers 21 (2021), extending Briggs, Experiment.
 Math. 15 (2006)), for odd `n > 9` and squarefree `n > 30` (Choie–Lichiardopol–Moree–Solé 2007),
 and Robin proved `σ(n) < e^γ n log log n + 0.6483 n/log log n` for `n ≥ 3`.
@@ -195,9 +199,8 @@ transition is re-checked by `native_decide`.
 `Unconditional/RobinUnconditional.lean` imports
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
 (commit `507a75d91d`) and closes the RH hypothesis with its `riemannHypothesis`. It gives Robin's
-and Lagarias's inequalities, given the Lean proof of RH in leanprover-community/riemann-hypothesis,
-which has not been independently verified. Since both are equivalent to RH, this says nothing
-beyond the RH claim.
+and Lagarias's inequalities with no hypothesis left. Both are equivalent to RH, so these
+theorems are RH in another form.
 
 Run on 2026-11-24 against riemann-hypothesis `507a75d91d` (full output in
 [`docs/unconditional-axioms.txt`](docs/unconditional-axioms.txt)):
@@ -230,9 +233,7 @@ module files and needs about 19 GB of RAM. Raise the open-file limit first; on L
 `sudo prlimit --pid $$ --nofile=2000000:2000000`, on macOS
 `sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`.
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
