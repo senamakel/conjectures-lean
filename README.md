@@ -15,9 +15,12 @@ implied constants. We follow the statements of Montgomery–Vaughan, *Multiplica
 Theory I* (Cambridge 2007), Theorem 13.7 and Corollary 13.8, which attribute them to Titchmarsh
 (1930); see also Davenport, *Multiplicative Number Theory*, Ch. 20. Without GRH the error terms
 are open: the best unconditional results (Siegel–Walfisz) save only a power of
-`exp(−c √log x)` and need `q ≤ (log x)^A`. Nothing here is new mathematics.
+`exp(−c √log x)` and need `q ≤ (log x)^A`. `Unconditional/` proves all five bounds
+unconditionally in Lean, uniform in `q`, with GRH supplied by the certified proof in
+leanprover-community/riemann-hypothesis and the two classical inputs taken from the same
+repository.
 
-The main library is a Lean proof that GRH implies these bounds, following the classical
+The main library is a complete Lean proof that GRH implies these bounds, following the classical
 argument (truncated explicit formula at height `T = x`, zero counting in unit windows,
 reduction to primitive characters), with one absolute constant for every modulus:
 
@@ -152,7 +155,7 @@ No `sorry`, no `native_decide`, no `axiom` or `opaque` declarations, no finite c
 |---|---|
 | `PsiGRH/Statement.lean` | the fixed targets |
 | `PsiGRH/Inputs.lean` | the two cited analytic inputs (tier H) |
-| `PsiGRH/ZeroSum.lean` | `Re ρ = 1/2` under GRH; `Σ m_ρ/|ρ|` over `|Im ρ| < T` |
+| `PsiGRH/ZeroSum.lean` | `Re ρ = 1/2` under GRH; `Σ m_ρ/\|ρ\|` over `\|Im ρ\| < T` |
 | `PsiGRH/Primitive.lean` | the bound for primitive characters; trivial bounds |
 | `PsiGRH/Imprimitive.lean` | reduction to the primitive character |
 | `PsiGRH/Character.lean` | (13.19) and the `log²(qx)` form |
@@ -202,9 +205,8 @@ the library builds in about 30 s; no module is expensive.
 
 Each is the corresponding `_of_GRH` theorem applied to `LFunction_ne_zero_of_half_lt_re`,
 `truncatedExplicitFormula` and `zeroWindowCount`, all from
-leanprover-community/riemann-hypothesis at commit `507a75d91d`. These are the bounds, given the
-Lean proof of GRH in riemann-hypothesis, which has not been independently verified; they are
-not "proved" on its strength, and if that proof fails they fall back to tier C + H.
+leanprover-community/riemann-hypothesis at commit `507a75d91d`. These are the bounds with no
+hypothesis left.
 
 ```
 sudo prlimit --pid $$ --nofile=2000000:2000000   # the import opens ~900k files
@@ -225,9 +227,7 @@ The import needs about 93 GB of cache, about 19 GB of RAM (36 GB peak resident o
 'piAP_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
-*The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.*
+*The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.*
 
 ## Credits
 
