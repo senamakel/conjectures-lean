@@ -15,7 +15,7 @@ with these constants: `|L(1,χ)| ≤ 2e^γ(log log q + 5)` (LLS:
 `2e^γ(log log q − log 2 + 1/2 + 1/log log q)`) and `1/|L(1,χ)| ≤ 2e^γ(log log q + 5)` (LLS:
 `(12e^γ/π²)(log log q − log 2 + 1/2 + …)`). Combined with Dirichlet's class number formula, it is
 a Lean proof that GRH implies bounds of the shape of LLS Corollary 1.3 for the class number
-`h(−q)` of an imaginary quadratic field with odd discriminant `−q`, `q ≥ 10¹⁰`:
+`h(−q)` of every imaginary quadratic field, of discriminant `−q` with `q ≥ 10¹⁰`, odd or even:
 `h(−q) ≤ (2e^γ/π)√q(log log q + 5)` and `h(−q) ≥ √q/(2πe^γ(log log q + 5))` (LLS: `(2e^γ/π)√q(log log q
 − log 2 + 1/2 + 1/log log q)` and `(π/(12e^γ))√q/(log log q − log 2 + …)`). Bounds
 `h(−q) ≪ √q log log q` and `h(−q) ≫ √q/log log q` under GRH go back to Littlewood (*On the
@@ -41,6 +41,14 @@ theorem LLS.classNumberUpperBoundOddWith_of_GRH_of_formula
 theorem LLS.classNumberLowerBoundOddWith_of_GRH_of_formula
     (hGRH : DirichletLNonvanishingRightOfHalf) (hCNF : ClassNumberFormula) :
     ClassNumberLowerBoundOddWith 5
+theorem LLS.classNumberUpperBoundWith_of_GRH_of_formula
+    (hGRH : DirichletLNonvanishingRightOfHalf) (hCNF : ClassNumberFormula) :
+    ClassNumberUpperBoundWith 5
+theorem LLS.classNumberLowerBoundWith_of_GRH_of_formula
+    (hGRH : DirichletLNonvanishingRightOfHalf) (hCNF : ClassNumberFormula) :
+    ClassNumberLowerBoundWith 5
+theorem LLS.discr_isFundamentalDiscr (K : Type*) [Field K] [NumberField K]
+    (h2 : finrank ℚ K = 2) : Int.IsFundamentalDiscr (discr K)
 ```
 
 where (`LLS/Statement.lean`, transcribed from the paper)
@@ -86,6 +94,20 @@ def LLS.ClassNumberFormula : Prop :=
         χ.LFunction 1 = (π * classNumber K / √q : ℝ)
 ```
 
+and, for every imaginary quadratic field with no condition on `q` beyond `q ≥ 10¹⁰`
+(`LLS/Statement3.lean`):
+
+```lean
+def LLS.ClassNumberUpperBoundWith (C : ℝ) : Prop :=
+  ∀ (K : Type) [Field K] [NumberField K], finrank ℚ K = 2 → ∀ q : ℕ, discr K = -q →
+    (10 : ℝ) ^ 10 ≤ q →
+      (classNumber K : ℝ) ≤ 2 * exp eulerMascheroniConstant / π * √q * (log (log q) + C)
+def LLS.ClassNumberLowerBoundWith (C : ℝ) : Prop :=
+  ∀ (K : Type) [Field K] [NumberField K], finrank ℚ K = 2 → ∀ q : ℕ, discr K = -q →
+    (10 : ℝ) ^ 10 ≤ q →
+      √q / (2 * π * exp eulerMascheroniConstant * (log (log q) + C)) ≤ classNumber K
+```
+
 ## Tier and provenance
 
 | Theorem | Tier | Hypotheses |
@@ -94,6 +116,8 @@ def LLS.ClassNumberFormula : Prop :=
 | `bach_of_GRH`, `leastNonresidue_of_GRH`, `miller_of_GRH` | C (U in `Unconditional/`) | GRH |
 | `l1UpperBoundWith_of_GRH`, `l1LowerBoundWith_of_GRH` | C (U in `Unconditional/`) | GRH |
 | `classNumberUpperBoundOddWith_of_GRH_of_formula`, `classNumberLowerBoundOddWith_of_GRH_of_formula` | C + H (U + U₀ in `Unconditional/`) | GRH, `ClassNumberFormula` |
+| `classNumberUpperBoundWith_of_GRH_of_formula`, `classNumberLowerBoundWith_of_GRH_of_formula` | C + H (U + U₀ in `Unconditional/`) | GRH, `ClassNumberFormula` |
+| `discr_isFundamentalDiscr`, `jacobiChar_isPrimitive`, `kroneckerChar_isPrimitive` | D | none |
 
 GRH is `Erdos985.DirichletLNonvanishingRightOfHalf`, copied word for word in erdos-985 from
 `src/Statements.lean` of [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
@@ -145,6 +169,15 @@ Real output of `lake env lean Axioms.lean` (2026-11-24, after a clean `lake buil
 'LLS.classNumberUpperBoundOddWith_of_GRH_of_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
 'LLS.classNumberLowerBoundOddWith_of_GRH_of_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
 'LLS.jacobiChar_isPrimitive' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
+
+Round 6 (2026-11-24, `lake build LLS.ClassNumberAll`, then `#print axioms`):
+
+```
+'LLS.classNumberUpperBoundWith_of_GRH_of_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LLS.classNumberLowerBoundWith_of_GRH_of_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LLS.discr_isFundamentalDiscr' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LLS.kroneckerChar_isPrimitive' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 Corollary 1.2 uses the standard three axioms only: its finite range `5 ≤ q < 2^12` is a list
@@ -210,6 +243,19 @@ The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.
    primitive (`jacobiChar_isPrimitive`: if it factored through `q/p`, `p ∣ q` prime, the CRT
    lift `n ≡ 1 (mod q/p)` of a non-residue mod `p` would have `J(n | q) = −1` and `χ(n) = 1`).
    Then `‖L(1,χ)‖ = π h/√q` from `ClassNumberFormula`, and step 6 gives both bounds.
+8. **Every imaginary quadratic field** (`LLS/ClassNumberAll.lean`):
+   * `discr_isFundamentalDiscr` (`LLS/FundamentalDiscr.lean`): `discr K` is a fundamental
+     discriminant. `K ≅ ℚ(√d)`, `d` squarefree (Mathlib's quadratic algebras); with `D = d` or
+     `4d`, `QuadraticAlgebra ℤ (D/4) (D%4)` is the integral closure of `ℤ`
+     (`QuadraticAlgebra.Int.algEquivIntegralClosure`), hence `≅ 𝓞 K`, and its basis `{1, ω}` has
+     discriminant `D`. So `q ≡ 3 (mod 4)` is squarefree (step 7), or `q = 4m` with `m`
+     squarefree, `m ≡ 1, 2 (mod 4)`.
+   * `kroneckerChar` (`LLS/Kronecker.lean`): for `4 ∣ q`, `n ↦ J(−q | n)` is periodic mod `q`
+     (`J(−4m | n) = J(−m | n)` and `jacobiSym.mod_right`), so a character mod `q`, and it is
+     primitive when `−q` is fundamental (`kroneckerChar_isPrimitive`): for each prime `p ∣ q`
+     some `n ≡ 1 (mod q/p)` has `J(−q | n) = −1`, namely `n = 1 + 2m` for `p = 2`
+     (`χ₄(n) = −1` or `χ₈'(n) = −1`) and a CRT lift of a non-residue mod `p` for odd `p`.
+   * The class number formula and step 6 give both bounds, exactly as in step 7.
 
 ## Layout
 
@@ -232,7 +278,11 @@ The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.
 | `LLS/L1/CesLower.lean`, `Principal.lean`, `PrinAux/*.lean` | Lemma 2.3 (lower), principal sums |
 | `LLS/L1/Assembly.lean`, `Weak.lean`, `Final.lean` | `L(1, χ)` bounds |
 | `LLS/Statement2.lean` | Target statements: LLS Cor 1.3, `ClassNumberFormula` |
-| `LLS/ClassNumber.lean` | Jacobi character, its primitivity, class-number bounds |
+| `LLS/ClassNumber.lean` | Jacobi character, its primitivity, class-number bounds (odd `q`) |
+| `LLS/Statement3.lean` | Target statements: class-number bounds for every imaginary quadratic field |
+| `LLS/FundamentalDiscr.lean` | `discr K` of a quadratic field is a fundamental discriminant |
+| `LLS/Kronecker.lean` | Kronecker character `χ_{−q}` for `4 ∣ q`, its primitivity |
+| `LLS/ClassNumberAll.lean` | Class-number bounds for every imaginary quadratic field |
 | `scripts/*.py` | Generators for the certificates and the sizing computations |
 
 ## Deviations from the literature
@@ -270,22 +320,16 @@ The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.
   `2e^γ(log log q + 5)` for every `q ≥ 10¹⁰`. LLS's own constants are within `0.004` of failing at
   `q = 10¹⁰` (`e^γ(log x + 1 + 3.1/log x)` against `2e^γ(log log q − log 2 + 1/2 + 1/log log q)`),
   so they need all of Lemmas 2.4, 2.6 and 5.1 at full precision.
-* **Corollary 1.3 (class numbers) with weaker constants, odd discriminants only.** The paper's
-  statement (`ClassNumberUpperBound`, `ClassNumberLowerBound`) is not proved: it is Theorem 1.5
-  with the paper's constants (not proved, above) plus the class number formula. We prove
-  `ClassNumberUpperBoundOddWith 5` and `ClassNumberLowerBoundOddWith 5`, which carry our
-  Theorem 1.5 constants (additive `5`; lower leading constant `1/(2πe^γ)` instead of `π/(12e^γ)`),
-  and only for odd discriminants `−q`:
-  * Theorem 1.5 is for primitive characters, so the Kronecker symbol `χ_{−q}` must be shown
-    primitive mod `q`. We do this for odd squarefree `q` (`jacobiChar_isPrimitive`). Even
-    discriminants `−4m` need the Kronecker symbol at `2` (`χ₄`, `χ₈` factors), its own
-    construction and primitivity proof, and the fact that `m ≡ 1, 2 (mod 4)` is squarefree.
-  * The hypotheses `q % 4 = 3` and `Squarefree q` hold for every field with odd discriminant
-    `−q` (Stickelberger's `discr K ≡ 0, 1 (mod 4)`, and the field discriminant is fundamental),
-    so they do not lose any odd discriminant. Neither fact is in Mathlib at this pin, so they are
-    explicit. (Mathlib's `QuadraticAlgebra.Int.algEquivIntegralClosure` identifies the ring of
-    integers when the discriminant is fundamental; what is missing is the link between
-    `NumberField.discr K` and a model `QuadraticAlgebra ℚ a b` of `K`.)
+* **Corollary 1.3 (class numbers) with weaker constants.** The paper's statement
+  (`ClassNumberUpperBound`, `ClassNumberLowerBound`) is not proved: it is Theorem 1.5 with the
+  paper's constants (not proved, above) plus the class number formula. We prove
+  `ClassNumberUpperBoundWith 5` and `ClassNumberLowerBoundWith 5` for every imaginary
+  quadratic field of discriminant `−q`, `q ≥ 10¹⁰`, with our Theorem 1.5 constants: additive
+  `5` (LLS: `−log 2 + 1/2 + 1/log log q`, and `+ 14 log log q/log q` in the lower bound) and
+  lower leading constant `1/(2πe^γ)` (LLS: `π/(12e^γ)`). The hypotheses are the paper's
+  (`−q` a fundamental discriminant, stated as `discr K = −q`). The round-5 forms
+  `ClassNumberUpperBoundOddWith 5`, `ClassNumberLowerBoundOddWith 5` (odd `q`, with explicit
+  `q % 4 = 3`, `Squarefree q`) remain, and follow from these.
 * **Theorem 1.4 (cosets) is not proved.**
 * Corollary 1.2 is proved exactly as stated (`LeastNonresidueBelowLogSq`).
 
@@ -321,12 +365,15 @@ with no hypothesis left.
 | `classNumberFormula` (U₀) | `LLS.ClassNumberFormula` | standard three |
 | `classNumberUpperBoundOddWith_unconditional` | `LLS.ClassNumberUpperBoundOddWith 5` | standard three |
 | `classNumberLowerBoundOddWith_unconditional` | `LLS.ClassNumberLowerBoundOddWith 5` | standard three |
+| `classNumberUpperBoundWith_unconditional` | `LLS.ClassNumberUpperBoundWith 5` | standard three |
+| `classNumberLowerBoundWith_unconditional` | `LLS.ClassNumberLowerBoundWith 5` | standard three |
 
 `classNumberFormula` is tier U₀: it uses no RH or GRH theorem, only riemann-hypothesis's class
 number formula `GlobalTheory.LFunction_one_and_mean_log_eta`
 (`Development/AbelianVarietyTheory/Proofs/HomogeneousIdeals/DedekindZetaEqSumRealEisenstein.lean`),
-which holds for every number field `K` of degree 2 with `discr K = −q`, `q > 4`, and every `χ`
-mod `q` with `IsKroneckerChar χ` (by definition `∀ n, Odd n → χ n = J(−q | n)`). The bridge is
+which holds for every number field `K` of degree 2 with `discr K = −q`, `q > 4`, odd or even,
+and every `χ` mod `q` with `IsKroneckerChar χ` (by definition `∀ n, Odd n → χ n = J(−q | n)`);
+so the same `ClassNumberFormula` serves even discriminants, with `χ = kroneckerChar q`. The bridge is
 four lines rather than one: that theorem also takes an embedding `σ : K →+* ℂ` (from Mathlib's
 `Nonempty (K →+* ℂ)`) and a class representative `τ c` in the upper half-plane for each ideal
 class (from the repository's `exists_isIdealClassPoint`). The class-number theorems then close
@@ -356,6 +403,14 @@ branch `round5`, 15 min wall, printed the same lines for the six theorems above 
 'classNumberFormula' depends on axioms: [propext, Classical.choice, Quot.sound]
 'classNumberUpperBoundOddWith_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
 'classNumberLowerBoundOddWith_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
+
+The rerun on branch `round6` (8 min wall) printed the same lines for all nine theorems above
+and:
+
+```
+'classNumberUpperBoundWith_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+'classNumberLowerBoundWith_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 The sixteen elided lines are `LLS.chunk114_ok_i._native.native_decide.ax_1_1` for every

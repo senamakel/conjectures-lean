@@ -16,3 +16,7 @@ import LLS
 #print axioms LLS.classNumberUpperBoundOddWith_of_GRH_of_formula
 #print axioms LLS.classNumberLowerBoundOddWith_of_GRH_of_formula
 #print axioms LLS.jacobiChar_isPrimitive
+#print axioms LLS.classNumberUpperBoundWith_of_GRH_of_formula
+#print axioms LLS.classNumberLowerBoundWith_of_GRH_of_formula
+#print axioms LLS.discr_isFundamentalDiscr
+#print axioms LLS.kroneckerChar_isPrimitive
