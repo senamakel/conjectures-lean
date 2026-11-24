@@ -11,7 +11,7 @@ Hardy–Littlewood entry), so they are fixed here.
 * `MertensBound`: `M(x) = O(x^{1/2+ε})` for every `ε > 0` (Littlewood, C. R. Acad. Sci. Paris 154
   (1912) 263–266: this follows from RH; the converse also holds but is not in scope).
 * `InvZetaBound`: `1/ζ(s) = O_{ε,δ}(|t|^ε)` uniformly on `Re s ≥ 1/2 + δ`, `|Im s| ≥ 1`
-  (Titchmarsh, *The Theory of the Riemann Zeta-Function*, §14.2, (14.2.6)).
+  (Titchmarsh, *The Theory of the Riemann Zeta-Function*, §14.2).
 * `riesz`/`RieszBound`: the Riesz function `∑_{k ≥ 1} (-1)^{k+1} x^k / ((k-1)! ζ(2k))` is
   `O(x^{1/4+ε})` (M. Riesz, Acta Math. 40 (1916)).
 * `hardyLittlewood`/`HardyLittlewoodBound`: `∑_n μ(n)/n · exp(-x/n²) = O(x^{-1/4+ε})`
