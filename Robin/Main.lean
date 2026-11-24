@@ -7,7 +7,8 @@ import Robin.Small
 /-!
 # Robin's theorem: RH implies `σ(n) < e^γ n log log n` for `n > 5040`
 
-* `5040 < n ≤ exp(e^{30})`: `RobinVerifiedRange`, the cited computation of Morrill–Platt (`robin_small_range`).
+* `5040 < n ≤ exp(e^{30})`: `RobinVerifiedRange`, the cited computation of Morrill–Platt, taken
+  as an explicit hypothesis.
 * `log n > e^{30}`: put `x = log n`, `ε = log(1+1/x)/log x`. Then
   `log(σ(n)/n) ≤ ε(x − θ(x)) + Σ_{p≤x} c_p − Σ_{p≤x} min(1/p², ε log p)` (`log_sigma_div_le`),
   and the right side is `< γ + log log x` (`main_estimate`, which uses RH through `Ψ₁`).
@@ -48,9 +49,5 @@ theorem robin_of_RH_of_verified (hRH : RiemannHypothesis) (hcomp : RobinVerified
   rw [Real.exp_log (div_pos hσpos hn0), Real.exp_add, Real.exp_log (Real.log_pos (by linarith))] at h
   rw [div_lt_iff₀ hn0] at h
   linarith [h]
-
-/-- **Robin's theorem** (1984). Uses the cited computation `robin_small_range`. -/
-theorem robin_of_RH (hRH : RiemannHypothesis) : RobinStatement :=
-  robin_of_RH_of_verified hRH robin_small_range
 
 end Robin
