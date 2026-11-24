@@ -29,8 +29,8 @@ Selberg's footnote 4, p. 161), and H. Maier's foreword to *Irregularities in the
 of Prime Numbers* (Springer, 2018), which states the asymptotic form. Unconditionally the best
 known is primes in almost all intervals `[x, x + x^{1/20+ε}]` (Jia, as quoted by
 Cully-Hugill–Dudek). The main library is a Lean proof that RH implies the existence form,
-following Selberg (1943); `Unconditional/` gives it given the Lean proof of RH in
-leanprover-community/riemann-hypothesis, which has not been independently verified. The
+following Selberg (1943); `Unconditional/` proves it unconditionally, with RH supplied by the certified proof in
+leanprover-community/riemann-hypothesis. The
 asymptotic form is **not** proved here; a smoothed version of it is (see below).
 
 ```lean
