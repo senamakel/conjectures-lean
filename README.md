@@ -6,6 +6,12 @@ root modulo infinitely many primes, indeed modulo a positive proportion of them.
 hypothesis for the Dedekind zeta functions of the Kummer fields `K_k = ℚ(ζ_k, a^{1/k})`. It is
 open unconditionally; Heath-Brown (1986) showed that at most two primes `a` fail it.
 
+**Literature status: RH-consequence (tier C stays).** The conditional theorem is Hooley (1967).
+This is a Lean formalisation of Hooley's conditional proof, with Hecke's continuation taken from
+riemann-hypothesis. Hooley's hypothesis `HooleyHypothesis a` is not implied by the RH proof in
+that repository (the Kummer fields are non-abelian), so no unconditional version exists. It is
+not new mathematics.
+
 ```lean
 -- Artin/MainContinuation.lean (main library)
 theorem conditional_artin_primitive_roots.parts.i_of_continuation (a : ℤ) (ha : ¬IsSquare a)
