@@ -6,9 +6,16 @@ Let `N(σ, T)` count the zeros `ρ = β + iγ` of `ζ(s)`, with multiplicity, in
 and Titchmarsh, *The Theory of the Riemann Zeta-Function*, 2nd ed., ch. 9 *(section unverified)*).
 It follows from RH, and from the Lindelöf hypothesis. Unconditionally the best uniform exponent is `30/13` in place of `2`
 (Ingham, Quart. J. Math. 11 (1940) for `σ ≤ 7/10`, with Guth–Maynard, arXiv:2405.20552 (2024) for
-`σ ≥ 7/10`). This project proves the formal-conjectures statement from RH, and on the way proves
+`σ ≥ 7/10`). This project proves the formal-conjectures statement from RH, and on the way formalises
 the Riemann–von Mangoldt upper bounds `N(T) ≪ T log T` and `N(T + 1) - N(T) ≪ log T`
 unconditionally, as a library for other projects.
+
+**Literature status, two labels.** (1) The zero-counting bounds `N(T) ≪ T log T` and
+`N(T + 1) - N(T) ≪ log T` are **known** (von Mangoldt 1905); no RH is used, and this is a Lean
+formalisation of them. (2) The density hypothesis is an **RH-consequence**: it is immediate from
+RH (and from Lindelöf). The Lean proof is conditional on RH, and its unconditional form is only
+as reliable as the Lean proof of RH in leanprover-community/riemann-hypothesis, which has not been
+independently verified. It is not new mathematics.
 
 ```lean
 theorem DensityHypothesis.densityHypothesis_of_RH (hRH : RiemannHypothesis) :
@@ -53,7 +60,7 @@ def DensityHypothesis.Statement : Prop :=
 
 The statement is formal-conjectures'
 [`density_hypothesis_zeta_zeros`](https://github.com/google-deepmind/formal-conjectures/blob/86a2f58a4d7a3a0637d15d5b2ce627592b54b956/FormalConjectures/Wikipedia/DensityHypothesis.lean)
-(`research open` there), and `zeroCountOn` is from
+(`research open` there; it follows from RH), and `zeroCountOn` is from
 [`FormalConjecturesForMathlib/NumberTheory/RiemannZetaZeros.lean`](https://github.com/google-deepmind/formal-conjectures/blob/86a2f58a4d7a3a0637d15d5b2ce627592b54b956/FormalConjecturesForMathlib/NumberTheory/RiemannZetaZeros.lean),
 both copied word for word at commit `86a2f58`; the only edits (dropped `module`/`public`
 markers and `@[category]` attributes, the open theorem turned into a `Prop`) are listed in the
