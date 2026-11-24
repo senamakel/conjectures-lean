@@ -13,9 +13,9 @@ Hardy–Littlewood entry), so they are fixed here.
 * `InvZetaBound`: `1/ζ(s) = O_{ε,δ}(|t|^ε)` uniformly on `Re s ≥ 1/2 + δ`, `|Im s| ≥ 1`
   (Titchmarsh, *The Theory of the Riemann Zeta-Function*, §14.2, (14.2.6)).
 * `riesz`/`RieszBound`: the Riesz function `∑_{k ≥ 1} (-1)^{k+1} x^k / ((k-1)! ζ(2k))` is
-  `O(x^{1/4+ε})` (M. Riesz, Acta Math. 40 (1916) 185–190).
+  `O(x^{1/4+ε})` (M. Riesz, Acta Math. 40 (1916)).
 * `hardyLittlewood`/`HardyLittlewoodBound`: `∑_n μ(n)/n · exp(-x/n²) = O(x^{-1/4+ε})`
-  (Hardy–Littlewood, Acta Math. 41 (1916) 119–196, §2.5).
+  (Hardy–Littlewood, Acta Math. 41 (1916) 119–196).
 * `redheffer`/`RedhefferBound`: Redheffer's matrix (`R_{ij} = 1` if `j = 1` or `i ∣ j`, else `0`),
   `det R_n = M(n)` (Redheffer 1977), hence `det R_n = O(n^{1/2+ε})`.
 
@@ -48,12 +48,20 @@ noncomputable def riesz (x : ℝ) : ℝ :=
 def RieszBound : Prop :=
   ∀ ε : ℝ, 0 < ε → riesz =O[atTop] fun x : ℝ => x ^ (1 / 4 + ε)
 
-/-- The Hardy–Littlewood sum `∑_n μ(n)/n · exp(-x/n²)`. -/
-noncomputable def hardyLittlewood (x : ℝ) : ℝ :=
-  ∑' n : ℕ, (μ n : ℝ) / n * Real.exp (-x / (n : ℝ) ^ 2)
+/-- Partial sums `∑_{n < N} μ(n)/n · exp(-x/n²)` of the Hardy–Littlewood series. -/
+noncomputable def hlPartial (x : ℝ) (N : ℕ) : ℝ :=
+  ∑ n ∈ Finset.range N, (μ n : ℝ) / n * Real.exp (-x / (n : ℝ) ^ 2)
 
-/-- **Hardy–Littlewood's bound**: `∑_n μ(n)/n · exp(-x/n²) = O(x^{-1/4+ε})` for every `ε > 0`. -/
+/-- The Hardy–Littlewood sum `∑_n μ(n)/n · exp(-x/n²)`. The series converges only
+conditionally (like `∑ μ(n)/n`), so a `tsum` would be Mathlib's junk value `0`; it is defined
+as the limit of its partial sums, and `HardyLittlewoodBound` also asserts that this limit
+exists. -/
+noncomputable def hardyLittlewood (x : ℝ) : ℝ := limUnder atTop (hlPartial x)
+
+/-- **Hardy–Littlewood's bound**: for every `x > 0` the series converges, and its sum is
+`O(x^{-1/4+ε})` for every `ε > 0`. -/
 def HardyLittlewoodBound : Prop :=
+  (∀ x : ℝ, 0 < x → ∃ L : ℝ, Tendsto (hlPartial x) atTop (nhds L)) ∧
   ∀ ε : ℝ, 0 < ε → hardyLittlewood =O[atTop] fun x : ℝ => x ^ (-1 / 4 + ε)
 
 /-- Redheffer's `n × n` matrix, 1-indexed: entry `(i, j)` is `1` if `j = 1` or `i ∣ j`, else `0`. -/
