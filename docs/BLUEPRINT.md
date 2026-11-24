@@ -44,9 +44,10 @@ Under RH, `Mertens.abs_mertens_nat_le` gives `MBound K (1/2 + 3ε')` for `ε' �
 
 ## What is not here
 
-The exponent `1/(3−α)` is the limit of this method: with `α = 1/2` it is exactly `2/5`. The
-exponents `1/3`, `9/28`, `8/25`, `7/22`, `17/54` and `11/35` need the truncated Fourier expansion
-of the sawtooth function and van der Corput exponent pairs, which Mathlib does not have.
+The exponent `1/(3−α)` is the limit of this method: with `α = 1/2` it is exactly `2/5`.
+Section 6 reaches `1/3` by a contour argument. The exponents `9/28`, `8/25`, `7/22`, `17/54` and
+`11/35` need the truncated Fourier expansion of the sawtooth function and van der Corput
+exponent pairs, which Mathlib does not have.
 
 ## 5. `k`-free numbers (`Erdos969/KFree/`)
 
@@ -69,7 +70,45 @@ The same argument with `d²` replaced by `d^k`, `k ≥ 2`, `0 ≤ α < k`:
   `Mertens.abs_mertens_nat_le` at `ε₁/3`; with `t = 2/(2k+1)`,
   `(t + ε₁)(k + 1/2 − ε₁) = 1 + ε₁(k + 1/2 − t − ε₁) ≥ 1`, so `θ ≤ t + ε` (`axerKFree_of_RH`).
 
-Montgomery–Vaughan's `1/(k+1)` (`MontgomeryVaughanBound`, stated, not proved) needs
-cancellation in the `d > Y` part on average over `m`; see the README's "Deviations from the
-literature" for the sizes and the missing Lean infrastructure (truncated Perron formula,
-mean-value theorem for Dirichlet polynomials).
+## 6. Montgomery–Vaughan's `1/(k+1)` (`Erdos969/MV/`)
+
+Why the hyperbola method stops at `2/(2k+1)`: at `Y = x^{1/(k+1)}` the `d > Y` part,
+`∑_{m ≤ X} (M((x/m)^{1/k}) − M(Y))` with `X = Y`, has `X` terms of size up to `Y^{1/2}` at the
+bottom of the range, and pointwise bounds give `x^{3/(2(k+1))}`. Montgomery–Vaughan's Theorem 1
+(as summarised by Powell 2009) handles the `d > Y` part through the Dirichlet series
+`ζ(s) ∑_{d>Y} μ(d) d^{−ks}`, so the cancellation among the `m` comes from moving the line of
+integration to `σ = 1/2 + ε`.
+
+* `MV/Perron.lean`, `norm_sum_Icc_le`. For `a : ℕ → ℂ` with `∑ ‖a n‖/n³ < ∞` and `Φ` holomorphic
+  on `σ₀ ≤ σ ≤ 3`, `Φ = L(a, ·)` on `σ = 3`, bounded there, `O((|t|+2)^{3/2})` on the strip for
+  `|t| ≥ 1`, and `‖Φ(σ₀+it)‖ ≤ A(|t|+2)^ε`: `‖∑_{n≤N} a n‖ ≤ K A (N+1)^{σ₀+2ε}`, `K = K(σ₀, ε)`.
+  Proof: `ces a N = ∑_{0<n<N} a n (N − n) = (1/2π)∫ N Φ(s) N^s/(s(s+1)) dt` (erdos-985's
+  `perron_weighted` on `σ = 3`, then `Mertens.integral_vertical_eq_of_strip`);
+  `∑_{n≤N} a n = ces a (N+1) − ces a N`; `‖(N+1)^{s+1} − N^{s+1}‖ ≤ 2(N+1)^{σ+θ}‖s+1‖^{1−θ}`
+  (interpolating the trivial and mean-value bounds), `θ = 2ε`, integrand `≪ (1+|t|)^{−1−ε}`.
+* `MV/Twisted.lean`. `twisted_mertens`: `Φ(s) = 1/ζ(s + it)`, `a n = μ(n)n^{−it}`, with
+  `‖1/ζ(w)‖ ≤ C(|Im w|+2)^ε` on `Re w ≥ 1/2 + ε` and `(|τ+t|+2)^ε ≤ (|t|+2)^ε(|τ|+2)^ε`, gives
+  `‖∑_{n≤N} μ(n)n^{−it}‖ ≤ K(|t|+2)^ε(N+1)^{1/2+3ε}`. `tail_le`: Abel summation of
+  `μ(d)d^{−it} · d^{−σ}` over `Y < d ≤ U` (weights `|(u+1)^{−σ} − u^{−σ}| ≤ σu^{−σ−1}`), then
+  `U → ∞` (`L(μ, w) = 1/ζ(w)` for `σ > 1`): `‖G_Y(σ+it)‖ ≤ K(1 + σ/(σ−β))(|t|+2)^ε Y^{β−σ}`,
+  `β = 1/2 + 3ε`. `norm_zeta_le_line`: `‖ζ(σ₀+it)‖ ≤ C(|t|+2)^ε` on `σ₀ ∈ (1/2, 1)`, from
+  lindelof-rh's `exists_log_zetaQ`, `norm_log_zetaQ_le`, `norm_le_log_rpow_of_strip`,
+  `norm_riemannZeta_le_exp` for `|t| ≥ 1` and compactness for `|t| ≤ 1`.
+* `MV/Coeff.lean`. `h(n) = μ(d)` if `n = d^k`, `d > Y` (via `iroot`), `b = h * ζ`.
+  `sum_Icc_b`: `∑_{n≤N} b n = ∑_{Y<d≤N} μ(d)⌊N/d^k⌋` (Mathlib's `sum_Ioc_mul_zeta_eq_sum`, then
+  `sum_bij_ne_zero` with `n ↦ iroot k n`). `LSeries_b`: `L(b, s) = ζ(s) G_Y(ks)` on `σ > 1`
+  (`LSeries_mul'`; `L(h, s)` by `Function.Injective.tsum_eq` along `d ↦ d^k` and
+  `natCast_cpow_natCast_mul`). `norm_b_le`: `‖b n‖ ≤ #divisors(n) ≤ n`.
+* `MV/Main.lean`. `a n = b n − g`, `g = G_Y(k)` (real: `1/ζ(k) − ∑_{d≤Y} μ(d)/d^k`).
+  `Φ(s) = ζ₁(s) · dslope (G_Y(k·)) 1 s` is holomorphic on `{Re(ks) > 1/2}` (`differentiableOn_dslope`)
+  and equals `ζ(s)(G_Y(ks) − g)` for `s ≠ 1`, which is `L(a, s)` on `σ = 3` (`LSeries_sub`,
+  `LSeries_smul`). On `σ₀ = 1/2 + ε`: `‖Φ‖ ≤ A₀ Y^{β−kσ₀}(|t|+2)^{2ε}`. So
+  `|B(N)| ≤ K A₀ Y^{β−kσ₀}(N+1)^{1/2+5ε}` and `|E_k(N)| ≤ Y + C Y^{β−kσ₀}(N+1)^{1/2+5ε}`
+  (`abs_error_le_mv`). With `θ = 1/(k+1)`, `Y = ⌈N^θ⌉`, `e = β − kσ₀ < 0`:
+  `θe + 1/2 = θ + θ(3−k)ε` and `θ(3−k) ≤ 1`, so both terms are `≤ 2(1 + C) N^{θ+6ε}`, and
+  `ε = min(ε'/6, 1/12)` gives `MontgomeryVaughanBound k` (`montgomeryVaughan_of_RH`).
+
+Numerical sanity check (Python, before the Lean proof): with `Y = ⌈N^{1/(k+1)}⌉`,
+`|B(N)|/N^{1/(k+1)}` was `0.004, 0.043, 0.042` at `N = 10^6, 10^8, 10^10` for `k = 2` and
+`0.011, 0.058, 0.001` at `N = 10^9, 10^12, 10^15` for `k = 3`, against a pointwise-method loss of
+`N^{1/(2(k+1))}` (`10` to `75` there).

@@ -8,3 +8,7 @@ import Erdos969.KFree.Identity
 import Erdos969.KFree.Series
 import Erdos969.KFree.Hyperbola
 import Erdos969.KFree.Main
+import Erdos969.MV.Perron
+import Erdos969.MV.Twisted
+import Erdos969.MV.Coeff
+import Erdos969.MV.Main
