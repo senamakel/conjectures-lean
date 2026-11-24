@@ -157,15 +157,23 @@ verified. It imports
 
 | Theorem | Statement | Axioms |
 |---|---|---|
-| `cramer_primeInShortInterval` | `Cramer.PrimeInShortInterval 2` | not yet run |
-| `cramer_primeGapExplicit` | `Cramer.PrimeGapExplicit 2` | not yet run |
-| `cramer_gapBound` | `Cramer.CramerGapBound` | not yet run |
+| `cramer_primeInShortInterval` | `Cramer.PrimeInShortInterval 2` | `propext`, `Classical.choice`, `Quot.sound` |
+| `cramer_primeGapExplicit` | `Cramer.PrimeGapExplicit 2` | `propext`, `Classical.choice`, `Quot.sound` |
+| `cramer_gapBound` | `Cramer.CramerGapBound` | `propext`, `Classical.choice`, `Quot.sound` |
 
 ```
 scripts/check-unconditional.sh [RH_DIR]
 ```
 
-Not yet run on this box: the axiom column is filled in from the script's real output once it has run.
+Run on 2026-11-24 against riemann-hypothesis `507a75d91d` (cache build, not `RH_FULL_BUILD`),
+cramer-rh commit `1f5d48e` (library unchanged since); 48 min wall, most of it waiting for and
+loading the RH cache. Output:
+
+```
+'cramer_primeInShortInterval' depends on axioms: [propext, Classical.choice, Quot.sound]
+'cramer_primeGapExplicit' depends on axioms: [propext, Classical.choice, Quot.sound]
+'cramer_gapBound' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
 
 The import needs about 93 GB of cache, about 19 GB of RAM and roughly 900k open files (raise the
 open-file limit first, e.g. `ulimit -n 2000000` or `nofile` in `/etc/security/limits.conf`).
