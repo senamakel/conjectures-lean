@@ -4,10 +4,10 @@ import Schoenfeld.SmallRange
 /-!
 # Schoenfeld's ψ and θ bounds with the constant `1/(8π)`
 
-* `schoenfeldPsi_of_RH`: `SchoenfeldPsi` from RH, Rosser's zero count, PsiCert and
+* `schoenfeldPsi_of_RH_of_inputs`: `SchoenfeldPsi` from RH, Rosser's zero count, PsiCert and
   `PsiSmallRange`: `[73.2, 1500]` by `PsiSmallRange`, `[1500, 10¹⁰]` by PsiCert
   (`0.8 < log² x/(8π)`), `x ≥ 10¹⁰` by `psi_sharp_large`.
-* `schoenfeldTheta_of_RH`: `SchoenfeldTheta` from the same inputs with `ThetaSmallRange`:
+* `schoenfeldTheta_of_RH_of_inputs`: `SchoenfeldTheta` from the same inputs with `ThetaSmallRange`:
   `[599, 3·10⁴]`, then `theta_mid` and `theta_sharp_large`.
 -/
 
@@ -36,7 +36,7 @@ theorem psi_sharp_mid (hC : PsiCert) {x : ℝ} (h1 : 1500 ≤ x) (h2 : x ≤ 10 
 
 /-- **Schoenfeld's ψ bound** (Theorem 10, (6.2)): `|ψ(x) − x| < √x log² x/(8π)` for `x ≥ 73.2`,
 from RH, Rosser's zero count, PsiCert and the range `[73.2, 1500]`. -/
-theorem schoenfeldPsi_of_RH (hRH : RiemannHypothesis) (hR : RosserZeroCount) (hC : PsiCert)
+theorem schoenfeldPsi_of_RH_of_inputs (hRH : RiemannHypothesis) (hR : RosserZeroCount) (hC : PsiCert)
     (hS : PsiSmallRange) : SchoenfeldPsi := by
   intro x hx
   rcases le_or_gt x 1500 with h | h
@@ -47,7 +47,7 @@ theorem schoenfeldPsi_of_RH (hRH : RiemannHypothesis) (hR : RosserZeroCount) (hC
 
 /-- **Schoenfeld's θ bound** (Theorem 10, (6.3)): `|θ(x) − x| < √x log² x/(8π)` for `x ≥ 599`,
 from RH, Rosser's zero count, PsiCert and the range `[599, 3·10⁴]`. -/
-theorem schoenfeldTheta_of_RH (hRH : RiemannHypothesis) (hR : RosserZeroCount) (hC : PsiCert)
+theorem schoenfeldTheta_of_RH_of_inputs (hRH : RiemannHypothesis) (hR : RosserZeroCount) (hC : PsiCert)
     (hS : ThetaSmallRange) : SchoenfeldTheta := by
   intro x hx
   rcases le_or_gt x 30000 with h | h

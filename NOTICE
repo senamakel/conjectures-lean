@@ -16,3 +16,20 @@ The Apache License 2.0 text is at https://www.apache.org/licenses/LICENSE-2.0.
 * Garald1/RSBounds, commit 82d7a55:
   the statement `PsiCert` in Schoenfeld/Inputs.lean, from
   RSBounds/Schoenfeld1976TargetsExtra.lean. Changed: namespace.
+
+This repository also vendors, under Vendor/Rosser/, the Lean proof of Rosser's zero count
+(TernaryGoldbach.RSBounds.Rosser1941.zero_count_bounds) with its import closure, 216 files:
+
+* Garald1/RSBounds, commit 82d7a55f02e52cd071cd8ed800cc889a23ad3e61, Apache License 2.0
+  (eleven files MIT, per their headers): Vendor/Rosser/RSBounds/ (82 files).
+* calr3/ternary-goldbach, commit 192ca57362fa3ee737cd83205cb9ea99526c4553, Apache License 2.0,
+  Copyright 2026 Charlie Reams: Vendor/Rosser/TernaryGoldbach/ (35 files).
+* teal-sea/zeta-lab, commit b09fa4dd2f2182cf14b248e7ffc64ff03df2c534, as adapted in
+  Garald1/RSBounds vendor/rh100/: MIT, Copyright 2026 Thomas Lince; the Zeta23 files Apache
+  License 2.0. Vendor/Rosser/{Zeta23,ZetaLean,RHHeight,RHHeight100,HardyFirstZero,
+  HardyTenZeros}/ (99 files).
+
+Each file keeps its original header and starts with a comment naming its source. The licence
+texts and the upstream NOTICE and THIRD_PARTY_NOTICES files are in Vendor/Rosser/licenses/.
+Changed: 28 files, proof repairs for Lean v4.36.0 / Mathlib fc4f59e5, listed in
+Vendor/Rosser/PORTING.md.

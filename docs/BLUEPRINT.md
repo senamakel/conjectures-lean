@@ -8,7 +8,9 @@ Proved (`Schoenfeld/Main.lean`, steps 1–5): the same three bounds, same thresh
 `1/8`, `1/4`, `9/20`, under Mathlib's `RiemannHypothesis` alone; no `native_decide`.
 
 Proved (`Schoenfeld/PiSharp.lean`, step 6): the target itself, `SchoenfeldStatement`, under RH
-and five named inputs (Rosser's zero count, PsiCert, three finite ranges).
+and five named inputs (Rosser's zero count, PsiCert, three finite ranges). All five inputs are
+proved (`Schoenfeld/Check/`, `Schoenfeld/PsiCert/`, and `Schoenfeld/Rosser.lean` with the
+vendored `Vendor/Rosser/`), so `schoenfeld_of_RH : RiemannHypothesis → SchoenfeldStatement`.
 
 Notation: `ξ = xiZeta` (erdos-985), zeros `ρ = 1/2 + iγ` with multiplicity `m`;
 `F(T) = Σ_ρ m · min(1/|ρ|, T/|ρ|²)`; `Ψ₁(t) = Σ_{n ≤ t} Λ(n)(t − n)`.
@@ -124,19 +126,20 @@ Inputs (tier H, `Schoenfeld/Inputs.lean`, `Schoenfeld/SmallRange.lean`): `Rosser
   of about `√a/256`, guards `ψ(b) − a ≤ (4/5)√a`, `b − ψ(a) ≤ (4/5)√a`. 20 chunks; about
   14 CPU-minutes compiled.
 
-## What remains for an unconditional `1/(8π)`
+## Rosser's zero count (`Schoenfeld/Rosser.lean`, `Vendor/Rosser/`)
 
-* `RosserZeroCount`: proved in Lean (`TernaryGoldbach.RSBounds.Rosser1941.zero_count_bounds`,
-  teorth/IEANTN `Solutions/Schoenfeld1976Numerics.v1`, Lean `v4.34.0-rc2`, Mathlib `71a80585`):
-  219 files, about 95,000 lines in its import closure: 113 files / 24,844 lines for `T ≥ 100`
-  (Backlund, Jensen, digamma and Stirling estimates; Mathlib only), 106 files / about 70,000
-  lines for the 29 Hardy-function zero certificates below height 100. No `sorry`, `axiom` or
-  `native_decide`; licences Apache-2.0 and MIT. Port from the Lean `v4.35.0` originals
-  (Garald1/RSBounds `82d7a55`, calr3/ternary-goldbach `192ca57`): of 14 sampled files, 8
-  compiled unchanged and 6 needed 10 small fixes (a changed Jensen API, `whnf` timeouts from
-  lemmas restated for `f / g`). Estimate: 2–3 days for `T ≥ 100`, 3–6 more for the
-  certificates.
+* `rosserZeroCount : RosserZeroCount` is `TernaryGoldbach.RSBounds.Rosser1941.zero_count_bounds`,
+  vendored from the Lean `v4.35.0` originals (Garald1/RSBounds `82d7a55`, calr3/ternary-goldbach
+  `192ca57`, and zeta-lab `b09fa4dd` through RSBounds' `vendor/rh100/`). The import closure,
+  computed from `import` lines, is 216 files and about 95,000 lines: 110 files / 24,644 lines
+  for `T ≥ 100` (Backlund, Jensen, digamma and Stirling estimates; Mathlib only), and 106 more
+  for the certificate of the 29 zeros below height 100. No `sorry`, `axiom` or `native_decide`.
+* Port to Lean `v4.36.0` / Mathlib `fc4f59e5`: 188 files unchanged, 28 with proof repairs, all
+  listed in `Vendor/Rosser/PORTING.md`. Causes: the split of set-valued `=ᶠ`/`≤ᶠ` into
+  `EventuallyEqSet`/`EventuallySubset`; set-builder membership no longer unfolded by
+  unification; `Continuous.div (by fun_prop) …` solving its metavariables by unfolding real
+  numerals to Cauchy sequences (fixed by naming `f`/`g`); the Jensen API; one heartbeat bump.
+  About 3 CPU-hours to build from cold.
 * Only the upper half of Rosser's bound is used, through the constant of `Gsum_le_Ub`. By a
   floating-point model of the budget, any `N(T) ≤ main + 7/8 + a log T + b` for all `T ≥ 4.4`
   with `2.48 a + b ≤ 3.31` suffices (Rosser: `2.33`; the binding case is π just above `10¹⁰`).
-  A bound valid only for `T ≥ 100` also needs a count below 100 (for instance `N(50) ≤ 10`).

@@ -552,7 +552,7 @@ theorem pi_large (hRH : RiemannHypothesis) (hR : RosserZeroCount) (hC : PsiCert)
 
 /-- **Schoenfeld's Corollary 1**: `|π(x) − li(x)| < √x log x/(8π)` for `x ≥ 2657`, from RH,
 Rosser's zero count, PsiCert and the ranges `ThetaSmallRange`, `PiSmallRange`. -/
-theorem schoenfeldPi_of_RH (hRH : RiemannHypothesis) (hR : RosserZeroCount) (hC : PsiCert)
+theorem schoenfeldPi_of_RH_of_inputs (hRH : RiemannHypothesis) (hR : RosserZeroCount) (hC : PsiCert)
     (hSθ : ThetaSmallRange) (hSπ : PiSmallRange) : SchoenfeldPi := by
   intro x hx
   rcases le_or_gt x 400000 with h | h
@@ -563,9 +563,9 @@ theorem schoenfeldPi_of_RH (hRH : RiemannHypothesis) (hR : RosserZeroCount) (hC 
 
 /-- **Schoenfeld's Theorem 10 and Corollary 1**, `SchoenfeldStatement`, from RH, Rosser's zero
 count (`RosserZeroCount`), PsiCert and the three finite ranges. -/
-theorem schoenfeld_of_RH (hRH : RiemannHypothesis) (hR : RosserZeroCount) (hC : PsiCert)
+theorem schoenfeld_of_RH_of_inputs (hRH : RiemannHypothesis) (hR : RosserZeroCount) (hC : PsiCert)
     (hSψ : PsiSmallRange) (hSθ : ThetaSmallRange) (hSπ : PiSmallRange) : SchoenfeldStatement :=
-  ⟨schoenfeldPsi_of_RH hRH hR hC hSψ, schoenfeldTheta_of_RH hRH hR hC hSθ,
-    schoenfeldPi_of_RH hRH hR hC hSθ hSπ⟩
+  ⟨schoenfeldPsi_of_RH_of_inputs hRH hR hC hSψ, schoenfeldTheta_of_RH_of_inputs hRH hR hC hSθ,
+    schoenfeldPi_of_RH_of_inputs hRH hR hC hSθ hSπ⟩
 
 end Schoenfeld
