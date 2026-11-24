@@ -1,4 +1,4 @@
-# Speiser's theorem above height 8 under RH in Lean
+# Speiser's theorem above height 7 under RH in Lean
 
 **Literature status: RH-equivalent.** Speiser (*Geometrisches zur Riemannschen Zetafunktion*,
 Math. Ann. **110** (1934), 514–521) proved that the Riemann hypothesis is equivalent to
@@ -11,14 +11,14 @@ number of zeros in `0 < Re s < 1/2` up to height `T`, up to `O(log T)`. Nothing 
 mathematics.
 
 The main library is a Lean proof that RH implies `ζ'(s) ≠ 0` for `0 < Re s < 1/2` and
-`|Im s| ≥ 8`, following the Re ζ'/ζ argument of Levinson–Montgomery §2. **The full target (every
-height) is not proved**: the band `|Im s| < 8` enters as an explicit hypothesis (see
+`|Im s| ≥ 7`, following the Re ζ'/ζ argument of Levinson–Montgomery §2. **The full target (every
+height) is not proved**: the band `|Im s| < 7` enters as an explicit hypothesis (see
 "Deviations from the literature").
 
 ```lean
-theorem Speiser.speiserAbove_of_RH (hRH : RiemannHypothesis) : Speiser.SpeiserAbove 8
+theorem Speiser.speiserAbove_of_RH (hRH : RiemannHypothesis) : Speiser.SpeiserAbove 7
 
-theorem Speiser.speiser_of_RH_of_below (hRH : RiemannHypothesis) (hB : Speiser.SpeiserBelow 8) :
+theorem Speiser.speiser_of_RH_of_below (hRH : RiemannHypothesis) (hB : Speiser.SpeiserBelow 7) :
     Speiser.SpeiserStatement
 ```
 
@@ -40,14 +40,14 @@ def SpeiserBelow (T₀ : ℝ) : Prop :=
 | Theorem | Tier | Hypotheses |
 |---|---|---|
 | `speiserAbove_of_RH` | C | `RiemannHypothesis` |
-| `speiser_of_RH_of_below` | C + H | `RiemannHypothesis`, `SpeiserBelow 8` |
+| `speiser_of_RH_of_below` | C + H | `RiemannHypothesis`, `SpeiserBelow 7` |
 | `speiser_above` (`Unconditional/`) | U | none |
-| `speiser_of_below` (`Unconditional/`) | U + H | `SpeiserBelow 8` |
+| `speiser_of_below` (`Unconditional/`) | U + H | `SpeiserBelow 7` |
 
 `RiemannHypothesis` is Mathlib's. formal-conjectures has no statement of Speiser's theorem
 (searched 2026-11-24 for "Speiser" and `deriv riemannZeta`), so `SpeiserStatement` and its two
-halves are this repo's own. `SpeiserBelow 8` is the target restricted to the bounded box
-`0 < σ < 1/2`, `|t| < 8`; the literature settles that box with numerical information on the low
+halves are this repo's own. `SpeiserBelow 7` is the target restricted to the bounded box
+`0 < σ < 1/2`, `|t| < 7`; the literature settles that box with numerical information on the low
 zeros of `ζ` (Levinson–Montgomery use that `β = 1/2` for `|γ| < 1000` and explicit `N(T)`
 bounds).
 
@@ -66,7 +66,7 @@ Standard three only: no `native_decide`, no `sorry`, no `axiom`.
 
 ## Proof outline
 
-Suppose `ζ'(s) = 0` with `0 < σ < 1/2`, `|t| ≥ 8`. Under RH `ζ(s) ≠ 0`, so `ξ(s) ≠ 0`, where
+Suppose `ζ'(s) = 0` with `0 < σ < 1/2`, `|t| ≥ 7`. Under RH `ζ(s) ≠ 0`, so `ξ(s) ≠ 0`, where
 `ξ(s) = s(s-1)Λ(s)` is erdos-985's `xiZeta`.
 
 1. `Speiser/Xi.lean`, `logDeriv_xiZeta_of_deriv_eq_zero`: near `s`,
@@ -79,13 +79,14 @@ Suppose `ζ'(s) = 0` with `0 < σ < 1/2`, `|t| ≥ 8`. Under RH `ζ(s) ≠ 0`, s
 3. `Speiser/Gamma.lean`, `re_archimedean_pos`: with `ψ(s/2) = ψ(1+s/2) - 2/s` the right side of
    step 1 is `1/(s-1) - (1/2) log π + (1/2) ψ(1+s/2)`. The series
    `ψ(w) - ψ(1) = Σ_k (1/(k+1) - 1/(k+w))` (erdos-985) has terms of real part `≥ 0` and
-   `≥ 1/n - (n + 1/4)/(n² + 16)`; the first 20 sum to more than `1.87`. With `γ < 2/3`,
-   `log π < 1.163` and `Re 1/(s-1) ≥ -1/64`, the real part is `> 0.005`.
+   `≥ cTerm k = 1/n - max_{u ∈ [n, n+1/4]} u/(u² + 49/4)`; the first 20 sum to more than
+   `1.799`. With `γ < 0.5851` (`H₆₄ - 6 log 2`), `log π < 1.1455` and `Re 1/(s-1) ≥ -1/50`,
+   the real part is `> 0.014`.
 4. `Speiser/Main.lean`: steps 2 and 3 contradict each other.
 
 ## Deviations from the literature
 
-The fixed target `SpeiserStatement` is **not proved**: only `|Im s| ≥ 8` is. The real-part
+The fixed target `SpeiserStatement` is **not proved**: only `|Im s| ≥ 7` is. The real-part
 argument cannot reach lower: the archimedean part `H(s) = 1/(s-1) - (1/2)log π + (1/2)ψ(1+s/2)`
 has `Re H < 0` somewhere in the strip for every `|t| < 6.52` (at `σ = 0`), and on the real
 segment `Re ζ'/ζ > 0`. Below that height the proof needs the positions of actual zeros of `ζ`:
@@ -100,8 +101,10 @@ segment `Re ζ'/ζ > 0`. Below that height the proof needs the positions of actu
   `Σ 1/γ² = 0.046`, the crude bound gives `|ξ'/ξ(s)| ≤ 0.86` against `|H(s)| ≈ 0.5`. This is
   a rigorous numerical computation of `ζ` near the critical line, which Levinson–Montgomery
   also use.
-- The threshold `8` rather than `6.52` comes from the crude bounds in step 3 (`Re 1/(s-1) ≥ -1/t²`,
-  the `+1/4` in each term, `γ < 2/3`).
+- The threshold `7` rather than `6.52` comes from bounding each series term by its worst case
+  over `σ ∈ [0, 1/2]` and from the truncation. With 40 terms `6.8` would go through (margin
+  `0.004`); `6.6` fails even with 200 terms, so below about `6.7` the bound would have to track `σ`
+  (the worst case is `σ = 0`, and `Re H(σ + it)` grows with `σ`).
 
 ## Layout
 
@@ -109,7 +112,7 @@ segment `Re ζ'/ζ > 0`. Below that height the proof needs the positions of actu
 |---|---|
 | `Speiser/Statement.lean` | Fixed targets `SpeiserStatement`, `SpeiserAbove`, `SpeiserBelow` |
 | `Speiser/Xi.lean` | `ξ(1-s) = ξ(s)`, zeros of `ξ` on the line under RH, `Re ξ'/ξ ≤ 0`, `ξ'/ξ` at a critical point of `ζ` |
-| `Speiser/Gamma.lean` | `Re` of the archimedean part `> 0` for `0 < σ ≤ 1/2`, `|t| ≥ 8` |
+| `Speiser/Gamma.lean` | `Re` of the archimedean part `> 0` for `0 < σ ≤ 1/2`, `|t| ≥ 7` |
 | `Speiser/Main.lean` | `speiserAbove_of_RH`, `speiser_of_RH_of_below` |
 | `Unconditional/SpeiserUnconditional.lean` | One-line discharges with `riemannHypothesis` |
 | `scripts/Axioms.lean` | `#print axioms` for the headline theorems |
@@ -132,8 +135,8 @@ The four `Speiser` modules take about 15 s each. The erdos-985 modules they impo
 
 | Theorem | Statement | Axioms |
 |---|---|---|
-| `speiser_above` | `Speiser.SpeiserAbove 8` | `propext`, `Classical.choice`, `Quot.sound` |
-| `speiser_of_below` | `Speiser.SpeiserBelow 8 → Speiser.SpeiserStatement` | `propext`, `Classical.choice`, `Quot.sound` |
+| `speiser_above` | `Speiser.SpeiserAbove 7` | `propext`, `Classical.choice`, `Quot.sound` |
+| `speiser_of_below` | `Speiser.SpeiserBelow 7 → Speiser.SpeiserStatement` | `propext`, `Classical.choice`, `Quot.sound` |
 
 Checked against riemann-hypothesis `507a75d91d` with
 
@@ -150,7 +153,7 @@ loaded box, mostly restoring the riemann-hypothesis cache):
 'speiser_of_below' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
-`speiser_above` is `ζ'(s) ≠ 0` for `0 < Re s < 1/2`, `|Im s| ≥ 8`, given the Lean proof of RH
+`speiser_above` is `ζ'(s) ≠ 0` for `0 < Re s < 1/2`, `|Im s| ≥ 7`, given the Lean proof of RH
 in leanprover-community/riemann-hypothesis, which has not been independently verified; since
 Speiser's statement is equivalent to RH, this says nothing beyond the RH claim.
 
