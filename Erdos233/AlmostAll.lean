@@ -16,7 +16,7 @@ The argument of `Erdos233/Gaps.lean`, read the other way round. Fix `X`, and `δ
 4. `selberg_almost_all_of_RH`: `SelbergAlmostAllStatement`, taking `H = K log² X` with `K → ∞`.
 5. `smoothed_asymptotic_of_RH`: the smoothed count `D2 δ y` is `(1 + o(1)) δ²y²` for almost all
    `y ∈ [X, 2X]`, with `δ = H(X)/X` and `H / log² → ∞` (a weaker, smoothed form of
-   `SelbergAsymptoticStatement`, which is not proved here).
+   `SelbergAsymptoticStatement`, which is proved in `Erdos233/Selberg/Asymptotic.lean`).
 6. `large_gaps_of_RH`: `Σ_{X ≤ p_n < 2X, d_n ≥ h} d_n ≪ X log² X / h` (`gap_sum`, restated).
 -/
 
@@ -282,7 +282,7 @@ theorem selberg_almost_all_of_RH (hRH : RiemannHypothesis) : SelbergAlmostAllSta
   rw [this]
   nlinarith
 
-/-- The smoothed form of Selberg's asymptotic proved here (weaker than
+/-- The smoothed form of Selberg's asymptotic (the sharp form is
 `SelbergAsymptoticStatement`). With `δ = H(X)/X`, `D2 δ y = Σ_n Λ(n) w_y(n)` where `w_y` is the
 tent of height `δy` on `(y, y(1+2δ))` (`Erdos233/Basic.lean`), whose expected value is `δ²y²`.
 For almost all `y ∈ [X, 2X]` it is `(1 + O(ε)) δ²y²`, as soon as `H / log² X → ∞`. -/

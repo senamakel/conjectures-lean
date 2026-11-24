@@ -29,9 +29,10 @@ under RH, that almost all intervals `(x, x + Φ(x) log² x]` contain a prime whe
 p. 161), and H. Maier's foreword to *Irregularities in the Distribution of Prime Numbers*
 (Springer, 2018), which states the asymptotic form. Without RH, the best known result is primes
 in almost all intervals `[x, x + x^{1/20+ε}]` (Jia, as quoted by Cully-Hugill and Dudek). The
-main library proves that RH implies the existence form, following Selberg (1943), and
-`Unconditional/` proves it unconditionally with the certified proof of RH. The asymptotic form
-(`SelbergAsymptoticStatement`) is not proved; a smoothed version of it is (see below).
+main library proves that RH implies both forms, following Selberg (1943): almost all intervals
+`(x, x + h(x)]` contain a prime, and `π(x + h) − π(x) ~ h/log x` for almost all `x`, whenever
+`h(x)/log² x → ∞` (and `h = o(x)` for the asymptotic). `Unconditional/` proves both
+unconditionally with the certified proof of RH.
 
 ```lean
 theorem Erdos233.erdos_233_upper_bound_of_RH (hRH : RiemannHypothesis) :
@@ -54,7 +55,7 @@ def Erdos233.SelbergAlmostAllStatement : Prop :=
   ∀ h : ℝ → ℝ, Tendsto (fun x => h x / Real.log x ^ 2) atTop atTop →
     Tendsto (fun X => (volume (primelessSet h X)).toReal / X) atTop (𝓝 0)
 
-def Erdos233.SelbergAsymptoticStatement : Prop :=      -- fixed target, NOT proved
+def Erdos233.SelbergAsymptoticStatement : Prop :=
   ∀ h : ℝ → ℝ, Monotone h → Tendsto (fun x => h x / Real.log x ^ 2) atTop atTop →
     Tendsto (fun x => h x / x) atTop (𝓝 0) →
     ∀ ε : ℝ, 0 < ε → Tendsto (fun X => (volume (selbergBadSet h ε X)).toReal / X) atTop (𝓝 0)
@@ -63,13 +64,16 @@ def Erdos233.SelbergAsymptoticStatement : Prop :=      -- fixed target, NOT prov
 theorem Erdos233.selberg_almost_all_of_RH (hRH : RiemannHypothesis) :
     SelbergAlmostAllStatement
 
+theorem Erdos233.selberg_asymptotic_of_RH (hRH : RiemannHypothesis) :
+    SelbergAsymptoticStatement                          -- Erdos233/Selberg/Asymptotic.lean
+
 theorem Erdos233.primeless_measure_le (hRH : RiemannHypothesis) : ∃ C X₀ : ℝ, 0 < C ∧
     ∀ X : ℝ, X₀ ≤ X → ∀ H : ℝ, 64 * (Real.log (5 * X) ^ 2 / Real.log 2) ≤ H → H ≤ X / 2 →
     volume.real {y : ℝ | y ∈ Set.Icc X (2 * X) ∧
         ¬ ∃ p : ℕ, p.Prime ∧ y < p ∧ (p : ℝ) ≤ y + H}
       ≤ C * X * Real.log X ^ 2 / H
 
-def Erdos233.SmoothedSelbergStatement : Prop :=        -- the weaker form proved
+def Erdos233.SmoothedSelbergStatement : Prop :=        -- a tent-smoothed form
   ∀ H : ℝ → ℝ, Tendsto (fun X => H X / Real.log X ^ 2) atTop atTop →
     Tendsto (fun X => H X / X) atTop (𝓝 0) → ∀ ε : ℝ, 0 < ε →
     Tendsto (fun X => (volume {y : ℝ | y ∈ Set.Icc X (2 * X) ∧
@@ -95,13 +99,14 @@ The existence form assumes only `h(x)/log² x → ∞`. Cully-Hugill and Dudek a
 monotonicity and `h = o(x)`, but existence does not need them (a larger `h` only helps), and the
 proof does not use them. The asymptotic form keeps both (`Monotone h`, `h(x)/x → 0`): without
 `h = o(x)` the main term `h/log x` is wrong (take `h = x²`), and the literature states it for
-increasing `h`.
+increasing `h`. The proof does not use `Monotone h`: `h(x) ≥ K log² x` and `h(x) ≤ ε₀x` for
+large `x` suffice, however `h` varies inside `[X, 2X]`.
 
 `SmoothedSelbergStatement` counts primes and prime powers with the tent weight of `D2`
 (`D2 δ y = Σ_n Λ(n) w(n)`, `w` the tent of height `δy` on `(y, y(1+2δ))`, see
 `Erdos233/Basic.lean`), at step `δ = H(X)/X` fixed across the block. It is an almost-all
-asymptotic for this smoothed count. The sharp count `π(x+h) − π(x)` is the subject of
-`SelbergAsymptoticStatement`.
+asymptotic for this smoothed count, proved first (round 5) and kept as a separate result. The
+sharp count `π(x+h) − π(x)` is the subject of `SelbergAsymptoticStatement`.
 
 ## Tier and provenance
 
@@ -109,10 +114,11 @@ asymptotic for this smoothed count. The sharp count `π(x+h) − π(x)` is the s
 `RiemannHypothesis`, Mathlib's own definition (as in formal-conjectures). `erdos_233_upper_bound`
 is tier U: it closes RH in one line with `riemannHypothesis` from
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
-`selberg_almost_all_of_RH`, `primeless_measure_le`, `smoothed_asymptotic_of_RH` and
-`large_gaps_of_RH` are tier C (same `RiemannHypothesis`); `selberg_almost_all`,
-`smoothed_selberg_asymptotic` and `large_gaps` in `Unconditional/` are tier U.
-`SelbergAsymptoticStatement` is a fixed target with no proof.
+`selberg_almost_all_of_RH`, `selberg_asymptotic_of_RH`, `primeless_measure_le`,
+`smoothed_asymptotic_of_RH` and `large_gaps_of_RH` are tier C (same `RiemannHypothesis`);
+`selberg_almost_all`, `selberg_asymptotic`, `smoothed_selberg_asymptotic` and `large_gaps` in
+`Unconditional/` are tier U. Both targets of `Erdos233/Statement2.lean` are proved, with the
+statement file unchanged.
 
 * `Erdos233UpperBoundStatement` and `primeGap` are copied verbatim from formal-conjectures
   [`ErdosProblems/233.lean`](https://github.com/google-deepmind/formal-conjectures/blob/d9f6ffa8dd7fc2b8b597dd1f7a824d27b12b88af/FormalConjectures/ErdosProblems/233.lean)
@@ -137,9 +143,10 @@ is tier U: it closes RH in one line with `riemannHypothesis` from
 'Erdos233.primeless_measure_le' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Erdos233.smoothed_asymptotic_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Erdos233.large_gaps_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos233.selberg_asymptotic_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
-The repository has no `sorry`, no `native_decide` and no `axiom` or `opaque` declarations.
+The last line is from round 6 (2026-11-24, branch `round6`). The repository has no `sorry`, no `native_decide` and no `axiom` or `opaque` declarations.
 
 ## Proof outline
 
@@ -177,6 +184,25 @@ Selberg's almost-all theorem reuses Steps 1 to 7 (`AlmostAll.lean`):
     `t = εH²/2` give proportion `≤ 16 C log² X / (ε² H) → 0`.
 16. `large_gaps_of_RH`: Step 8 with `h/16` in place of `h`.
 
+Selberg's asymptotic form (`Erdos233/Selberg/`):
+
+17. A trapezoid of `ψ₁`: `trap a σ D y = ψ₁(y(a+D+σ)) − ψ₁(y(a+D)) − ψ₁(y(a+σ)) + ψ₁(ya)` is
+    `Σ Λ(n) K(n)` with `0 ≤ K ≤ σy`, `K = σy` on `[y(a+σ), y(a+D)]`, `K = 0` off
+    `(ya, y(a+D+σ))`, so it brackets the sharp sum `σy(ψ(B) − ψ(A))`; through the explicit
+    formula `|trap − σD y²| ≤ 3 + y^{3/2}|Σ m_ρ t_ρ y^{iγ}|` (`Trapezoid.lean`).
+18. `|t_ρ| ≤ min(2σD, 4σ/|ρ|, 64/(1+γ²))`, so `Σ m|t|² log(|γ|+2) ≪ σ²D log²(2/D)`
+    (`TrapCoeff.lean`); the mean value and Chebyshev steps hold for any coefficient family
+    (`Waves.lean`).
+19. With `σ = κδ`, `D = δ ± σ`: outside a set of measure `≪ log² X/(κ²δ)` (the `σ` cancels),
+    `|ψ(y(1+δ)) − ψ(y) − δy| ≤ 3κδy`; through `θ` and `log p ∈ [log y, log y + δ]`,
+    `(1−6κ)δy/log y ≤ π(y(1+δ)) − π(y) ≤ (1+3κ)δy/log y` for `K₀ log² X/X ≤ δ ≤ κ/2`
+    (`Window.lean`, `Asymptotic.lean`).
+20. `selberg_asymptotic_of_RH`: a geometric grid `δ_j = δ₀(1+η)^j`, `δ₀ = K log² X/(2X)`,
+    `κ = η = min(ε,1)/8`. Each `x` has `δ_j x ≤ h(x) < δ_{j+1}x`, and monotonicity of `π`
+    sandwiches `π(x+h(x)) − π(x)` within `1 ± ε` of `h(x)/log x` unless `x` is exceptional for
+    `δ_j` or `δ_{j+1}`. The exceptional measure is `≤ Σ_j C log² X/δ_j ≤ 2C(1+η)X/(ηK)`, a
+    geometric series, and `K → ∞`.
+
 The mean square of Step 6 is as strong as Selberg's (`≪ x⁴δ³ log²(2/δ)` for the second
 difference, i.e. `δ x² log²` for the first), so the existence form reaches Selberg's exact
 threshold `h/log² x → ∞` with no extra logarithms.
@@ -200,6 +226,9 @@ threshold `h/log² x → ∞` with no extra logarithms.
 | `Erdos233/Main.lean` | Step 10, `erdos_233_upper_bound_of_RH` |
 | `Erdos233/Statement2.lean` | Selberg's almost-all statements (this repository's own) |
 | `Erdos233/AlmostAll.lean` | Steps 11 to 16 |
+| `Erdos233/Selberg/Trapezoid.lean` | Step 17 |
+| `Erdos233/Selberg/Waves.lean`, `Selberg/TrapCoeff.lean` | Step 18 |
+| `Erdos233/Selberg/Window.lean`, `Selberg/Asymptotic.lean` | Steps 19 and 20, `selberg_asymptotic_of_RH` |
 | `Unconditional/Erdos233Unconditional.lean` | `erdos_233_upper_bound` (not in the default build) |
 
 ## Deviations from the literature
@@ -210,14 +239,11 @@ threshold `h/log² x → ∞` with no extra logarithms.
   the zero-density input is the windowed sum of Step 3 rather than `N(T+1) − N(T) ≪ log T`.
   A zero-counting library now exists in density-rh; this repository keeps its own short
   Step 3 and does not depend on it.
-* `SelbergAsymptoticStatement` (the sharp `π(x + h) − π(x) ~ h/log x`) is not proved. Two
-  pieces are missing: (a) passing from the tent-weighted `Λ`-count of `D2` to the sharp count
-  of an interval of length `h(y)`, which needs a mean square for a first difference (or a
-  sandwich by many tents with an additive step; the zero coefficients `coef δ ρ` of
-  `Erdos233/Coeff/` are for the multiplicative second difference only), and (b) handling an
-  `h(y)` that varies across `[X, 2X]` (Saffari–Vaughan, Lemma 6, 1977, do this by averaging
-  over the step), plus the partial summation from `θ` to `π`. The mean square itself does not
-  need sharpening. We prove the smoothed form `SmoothedSelbergStatement` instead.
+* For the asymptotic form we do not follow Selberg's mean square of `θ(y + h) − θ(y)` with an
+  additive step. The sharp count of `(y, y(1+δ)]` is bracketed by two trapezoids of `ψ₁` with
+  multiplicative steps (Step 17), and a varying `h(x)` is handled by a geometric grid of
+  ratios `δ_j` instead of Saffari–Vaughan's averaging over the step. The threshold is
+  Selberg's (`h/log² x → ∞`).
 * `large_gaps_of_RH` is the dyadic-block form of the large-gap bound used inside Selberg's
   `Σ d_n²` argument, with explicit thresholds `256 log²(5x)/log 2 ≤ h ≤ 2x`.
 * `erdos_233` itself (`N log² N`) is not proved and is open even under RH; see the last
@@ -235,7 +261,9 @@ Clean `lake build` of this package (Mathlib and erdos-985 already built), 2026-1
 box: about 4 minutes wall, 176 CPU-seconds. No module takes more than a minute; the largest
 are `Erdos233.Explicit.Formula` (53 s), `Erdos233.Gaps` (45 s) and `Erdos233.Main` (39 s).
 No module uses `native_decide`. `Erdos233.AlmostAll` (round 5) elaborates in about 23 s
-wall, 31 CPU-seconds, on the same box under load.
+wall, 31 CPU-seconds, on the same box under load. The round-6 modules `Erdos233.Selberg.*`
+take under a minute each at load average about 80; the main theorem of `Asymptotic.lean`
+sets `maxHeartbeats 1000000`.
 
 ## Unconditional version
 
@@ -244,6 +272,7 @@ wall, 31 CPU-seconds, on the same box under load.
 | `Erdos233.erdos_233_upper_bound_of_RH` | `RiemannHypothesis → Erdos233UpperBoundStatement` | standard three |
 | `erdos_233_upper_bound` | `Erdos233UpperBoundStatement` | standard three |
 | `selberg_almost_all` | `SelbergAlmostAllStatement` | standard three |
+| `selberg_asymptotic` | `SelbergAsymptoticStatement` | standard three |
 | `smoothed_selberg_asymptotic` | `SmoothedSelbergStatement` | standard three |
 | `large_gaps` | `Σ_{X ≤ p_n < 2X, d_n ≥ h} d_n ≤ C X log² X / h` | standard three |
 
@@ -264,6 +293,17 @@ Round 5 (Selberg's almost-all theorem), checked on 2026-11-24 against riemann-hy
 ```
 'erdos_233_upper_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
 'selberg_almost_all' depends on axioms: [propext, Classical.choice, Quot.sound]
+'smoothed_selberg_asymptotic' depends on axioms: [propext, Classical.choice, Quot.sound]
+'large_gaps' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
+
+Round 6 (Selberg's asymptotic form), checked on 2026-11-24 against riemann-hypothesis
+`507a75d91d`, this repository at `651e094`, 27 minutes wall:
+
+```
+'erdos_233_upper_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'selberg_almost_all' depends on axioms: [propext, Classical.choice, Quot.sound]
+'selberg_asymptotic' depends on axioms: [propext, Classical.choice, Quot.sound]
 'smoothed_selberg_asymptotic' depends on axioms: [propext, Classical.choice, Quot.sound]
 'large_gaps' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```

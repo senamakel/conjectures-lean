@@ -21,7 +21,12 @@ theorem erdos_233_upper_bound : Erdos233.Erdos233UpperBoundStatement :=
 theorem selberg_almost_all : Erdos233.SelbergAlmostAllStatement :=
   Erdos233.selberg_almost_all_of_RH riemannHypothesis
 
-/-- The smoothed form of Selberg's asymptotic (not `SelbergAsymptoticStatement`). -/
+/-- Selberg 1943 (asymptotic form): `π(x + h) − π(x) ~ h / log x` for almost all `x ∈ [X, 2X]`,
+whenever `h(x)/log² x → ∞` and `h(x) = o(x)`, given the riemann-hypothesis repository's RH. -/
+theorem selberg_asymptotic : Erdos233.SelbergAsymptoticStatement :=
+  Erdos233.selberg_asymptotic_of_RH riemannHypothesis
+
+/-- The smoothed form of Selberg's asymptotic. -/
 theorem smoothed_selberg_asymptotic : Erdos233.SmoothedSelbergStatement :=
   Erdos233.smoothed_asymptotic_of_RH riemannHypothesis
 
@@ -33,5 +38,6 @@ theorem large_gaps : ∃ C X₀ : ℝ, 0 < C ∧ ∀ x : ℕ, X₀ ≤ x →
   Erdos233.large_gaps_of_RH riemannHypothesis
 
 #print axioms selberg_almost_all
+#print axioms selberg_asymptotic
 #print axioms smoothed_selberg_asymptotic
 #print axioms large_gaps

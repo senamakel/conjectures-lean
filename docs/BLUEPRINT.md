@@ -107,7 +107,35 @@ Steps 1–7; no new analytic input.
    `≤ 4C log²(2/δ)/(ε²H) ≤ 16 C log² X/(ε² H)`.
 6. `large_gaps_of_RH`. `gap_sum` at `h/16`.
 
-Not done: the sharp `SelbergAsymptoticStatement`. It needs the sharp count `ψ(y + h(y)) − ψ(y)`
-in mean square (a first difference with additive step: new zero coefficients
-`((1 + h/y)^{ρ} − 1)/ρ`-type bounds replacing `Coeff/`), the Saffari–Vaughan averaging over the
-step to let `h` vary with `y`, and partial summation from `θ` to `π`. Estimated several days.
+### The sharp asymptotic (round 6, `Erdos233/Selberg/`)
+
+`selberg_asymptotic_of_RH : RiemannHypothesis → SelbergAsymptoticStatement`.
+
+1. `trap_bound` (`Trapezoid.lean`). For `a > 0`, `σ, D ≥ 0`, `ya ≥ 1`:
+   `|trap a σ D y − σD y²| ≤ 3 + y^{3/2}‖TW a σ D (log y)‖`, `trap` the four-point difference
+   `ψ₁(y(a+D+σ)) − ψ₁(y(a+D)) − ψ₁(y(a+σ)) + ψ₁(ya)`. The coefficients `1,−1,−1,1` and the
+   points both sum to zero, so the affine terms cancel, and the `t(G(t) + log t)` terms
+   (each in `[t − 3/2, t]`) leave at most `3`.
+2. `psi_window_le_trap`, `trap_le_psi_window`: the kernel is a trapezoid of height `σy`, so
+   `σy(ψ(y(a+D)) − ψ(y(a+σ))) ≤ trap ≤ σy(ψ(y(a+D+σ)) − ψ(ya))`.
+3. `tcoef_sums` (`TrapCoeff.lean`): for `3/4 ≤ a ≤ 1`, `0 < σ ≤ D ≤ 1/2`,
+   `‖t_ρ‖ ≤ 2σD` (mixed second difference), `≤ 4σ/|ρ|`, `≤ 64/(1+γ²)`, so
+   `‖t_ρ‖² ≤ (4σ²/D²) w D ⌊|γ|⌋` and `Σ m‖t‖² log(|γ|+2) ≤ C σ² D log²(2/D)` (`wave_sums`).
+4. `waves_measure` (`Window.lean`): `σ = κδ`, upper trapezoid `(1−σ, σ, δ+σ)`, lower
+   `(1, σ, δ−σ)`, threshold `t = κσδX²`: measure `≤ 256 C' X⁴ σ² D L² / t² ≪ log² X/(κ²δ)`.
+5. `psi_window_of_waves`: below the threshold and with `κ²δ²X² ≥ 3`,
+   `|ψ(y(1+δ)) − ψ(y) − δy| ≤ 3κδy`.
+6. `pi_window_of_psi` (`Asymptotic.lean`): proper prime powers cost `≤ 2κδy` when
+   `log²(2y)/log 2 ≤ κ√y` and `≤ κδy`; `log y · Δπ ≤ Δθ ≤ (log y + δ)Δπ`; with `δ ≤ κ/2`,
+   `(1−6κ)δy/log y ≤ Δπ ≤ (1+3κ)δy/log y`.
+7. `pi_window_measure`: with `K₀ = 30/κ`, for `K₀ log² X/X ≤ δ ≤ κ/2` the failures have
+   measure `≤ C log² X/δ`.
+8. `selberg_asymptotic_of_RH`: `ε' = min(ε,1)`, `κ = η = ε'/8`, grid `δ_j = δ₀(1+η)^j` with
+   `δ₀ = K log² X/(2X)`, `K ≥ 2K₀`. `exists_nat_pow_near` picks `j` with
+   `δ_j ≤ h(x)/x < δ_{j+1}`; `sandwich` turns the two window bounds into
+   `|Δπ − h/log x| ≤ ε' h/log x`, since `(1+3κ)(1+η) ≤ 1+ε'` and `(1−ε')(1+η) ≤ 1−6κ`.
+   Measure `≤ (C log² X/δ₀)·Σ (1+η)^{−j} ≤ 2C(1+η)X/(ηK)`.
+
+A dead end from round 5: sandwiching the sharp count between geometric-step tents `D2 δ` leaves
+an `O(δ)` error per tent, because tents with bases `y(1+δ)^j` do not tile. The four-point
+trapezoid avoids tiling altogether.
