@@ -2,25 +2,25 @@
 
 Euler called `n` *idoneal* if it cannot be written as `ab + bc + ca` with `0 < a < b < c`
 (equivalently, every genus of forms of discriminant `−4n` is a single class), and found 65 of
-them, the largest `1848`.
+them, the largest `1848`. This repository proves in Lean that Euler's 65 numbers are the only
+idoneal numbers. `idoneal_completeness` is proved unconditionally, with GRH supplied by the
+certified proof in
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis),
+and the main library holds a complete Lean proof that GRH implies completeness.
 
-**Literature status.** Two results, with different labels:
+The implication is due to P. J. Weinberger (*Exponents of the class groups of complex quadratic
+fields*, Acta Arith. 22 (1973), 117-124), who proved that Euler's list is complete under GRH
+(label: **RH-consequence**). Unconditionally he showed that at most two more exist (sometimes
+misquoted as one); formal-conjectures lists completeness as open. The analytic step here is a
+count of small split primes in place of Weinberger's `L(1, χ)` and genus-theory argument, and
+every `n < 10^8` is covered by a proved-sound checker.
 
-- **Idoneal numbers: RH-consequence.** P. J. Weinberger (*Exponents of the class groups of
-  complex quadratic fields*, Acta Arith. 22 (1973), 117–124) proved that Euler's list is complete
-  under GRH. Unconditionally he showed that at most two more exist (sometimes misquoted as one);
-  formal-conjectures lists completeness as open. This repository is a complete Lean proof that
-  GRH implies completeness, following Weinberger's 1973 result. The analytic step is a count of
-  small split primes rather than his `L(1, χ)` and genus-theory argument, and every `n < 10^8`
-  is covered by a proved-sound checker. `Unconditional/` proves that Euler's 65 numbers are the
-  only idoneal numbers, unconditionally in Lean, with GRH supplied by the certified proof in
-  leanprover-community/riemann-hypothesis.
-- **Class number one: known, via GRH here; not a target.** The nine imaginary quadratic fields
-  of class number one were found unconditionally by Heegner (1952), Baker (1966) and Stark (1967).
-  The side result kept here assumes GRH and two cited classical inputs, so it is weaker than the
-  literature. No further work on it is planned.
+The repository also keeps a side result on class number one, which is not a target (label:
+**known, via GRH here**). The nine imaginary quadratic fields of class number one were found
+unconditionally by Heegner (1952), Baker (1966) and Stark (1967). The version here assumes GRH
+and two cited classical inputs, and no further work on it is planned.
 
-This repository proves, assuming GRH for Dirichlet L-functions:
+The headline theorems, with GRH for Dirichlet L-functions as a hypothesis:
 
 ```lean
 theorem Weinberger.idoneal_completeness_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
@@ -32,8 +32,7 @@ theorem Weinberger.isIdoneal_iff_of_GRH (hGRH : DirichletLNonvanishingRightOfHal
 theorem Weinberger.knownIdonealNumbers_are_idoneal : ∀ n ∈ knownIdonealNumbers, IsIdoneal n
 ```
 
-The headline is the idoneal-numbers statement. The repository also contains a side result that
-is **not a target**:
+The class-number-one side result:
 
 ```lean
 -- known, via GRH here; not a target (Heegner 1952, Baker 1966, Stark 1967 proved it outright)
@@ -41,9 +40,9 @@ theorem Weinberger.ClassNumber.starkHeegner_of_GRH (hGRH : DirichletLNonvanishin
     (hPS : ClassNumberOneNorms) (hH : HeegnerClassNumberOne) : StarkHeegnerStatement
 ```
 
-and, in `Unconditional/WeinbergerUnconditional.lean`,
+`Unconditional/WeinbergerUnconditional.lean` proves
 `idoneal_completeness : Idoneal.IdonealCompletenessStatement`, with GRH closed by
-leanprover-community/riemann-hypothesis. There is no `sorry`.
+leanprover-community/riemann-hypothesis. The repository has no `sorry`.
 
 ## Tier and provenance
 
@@ -74,8 +73,8 @@ leanprover-community/riemann-hypothesis. There is no `sorry`.
   `ClassNumberOneNorms` (if `ℚ(√d)` has class number one and `p ∣ N(t + ω)`, then `p = N(u + vω)`
   for some integers `u, v`) and `HeegnerClassNumberOne` (the nine fields have class number one).
   See `docs/SCOPING.md` and the end of `docs/BLUEPRINT.md` for what proving them would take.
-  So part B is not proved outright here. It is proved under GRH given these two facts, which is
-  weaker than the unconditional Heegner–Baker–Stark theorem.
+  Part B is proved under GRH given these two facts; the Heegner-Baker-Stark theorem needs
+  neither GRH nor the cited inputs.
 
 ## Axioms
 
@@ -120,20 +119,20 @@ Real output of `lake env lean AxiomsCheck.lean`, 2026-11-24, after a clean `lake
 The `native_decide` axioms:
 
 - `chunk_ok_0` … `chunk_ok_9` (10): `checkFrom (i·10^7) 10^7 = true`, which finds for every
-  `n < 10^8` outside the 65 a factorisation `n + a² = u·v` with `2a < u < v`. About 60–80 s each.
+  `n < 10^8` outside the 65 a factorisation `n + a² = u·v` with `2a < u < v`. About 60 to 80 s each.
 - `known_noRep` (1): the exhaustive search `repB` finds no representation `ab + bc + ca` of any
   of the 65 numbers. A few seconds.
 - `chunkB_ok_0` … `chunkB_ok_9` (10, part B only): `checkFromB (i·10^7) 10^7 = true`, which
   finds for every `n < 10^8` except the nine Heegner values a prime `p` with an ideal of norm
-  `p` and `4p < n` (or `n ≡ 0 mod 4`). About 25–35 s each.
+  `p` and `4p < n` (or `n ≡ 0 mod 4`). About 25 to 35 s each.
 
 The analytic theorem `not_isIdoneal_of_GRH` (no idoneal number `≥ 10^8`) uses the standard
 three axioms only.
 
 ## Proof outline
 
-Full blueprint with every Lean statement: [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md). The route
-does not go through the class number formula or genus theory, neither of which the Mathlib pin
+The full blueprint, with every Lean statement, is [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md). The
+route does not go through the class number formula or genus theory, neither of which the Mathlib pin
 has (see [`docs/SCOPING.md`](docs/SCOPING.md)).
 
 1. `Weinberger/Elementary.lean`: `n = ab + bc + ca` iff `n + a² = (a + b)(a + c)`. So if `n` is
@@ -178,13 +177,17 @@ has (see [`docs/SCOPING.md`](docs/SCOPING.md)).
 
 ## Deviations from the literature
 
-- **Threshold.** Weinberger's analytic argument goes through `L(1, χ)` and genus theory. Here
-  the analytic step is a GRH count of small split primes, with the erdos-985 constants, and
-  reaches `n ≥ 10^8` (`3·10^7` would do with the same bounds; `10^8` leaves a 17% margin). The
-  range below is checked by computation, about 10 CPU-minutes.
-- **Part B is conditional on two cited facts** (above), because the Mathlib pin has no bridge
-  from `NumberField.classNumber` of `AdjoinRoot (X² − C d)` to norms of quadratic integers. The
-  statement itself is unchanged.
+### Threshold `10^8`
+
+Weinberger's analytic argument goes through `L(1, χ)` and genus theory. Here the analytic step is a GRH count of small split primes, with the erdos-985 constants, and
+reaches `n ≥ 10^8` (`3·10^7` would do with the same bounds; `10^8` leaves a 17% margin). A
+computation of about 10 CPU-minutes checks the range below.
+
+### Part B uses two cited facts
+
+Part B assumes the two tier-H inputs described above, because the Mathlib pin has no bridge from
+`NumberField.classNumber` of `AdjoinRoot (X² − C d)` to norms of quadratic integers. The
+statement itself is unchanged.
 
 ## Building
 
@@ -197,7 +200,7 @@ lake env lean AxiomsCheck.lean
 Lean `v4.36.0`, Mathlib `fc4f59e5` (via erdos-985 `9538edb`). Measured 2026-11-24 on a 95-core
 box with the Mathlib cache and erdos-985's analytic modules already built: a clean
 `lake build` of this package took 2 min 46 s wall, about 13 CPU-minutes. The ten part-A chunks
-take 59–81 s each, the ten part-B chunks 22–35 s each. Building erdos-985's analytic modules
+take 59 to 81 s each, the ten part-B chunks 22 to 35 s each. Building erdos-985's analytic modules
 from scratch adds about 1 min 20 s wall (4 CPU-minutes).
 
 ## Unconditional version
