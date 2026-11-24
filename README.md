@@ -25,7 +25,10 @@ hypothesis with the certified proof and gives `erdos_985`.
 theorem erdos_985 : Erdos985.Erdos985Statement   -- Unconditional/Erdos985Unconditional.lean
 
 theorem Erdos985.erdos_985_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
-    ∀ p : ℕ, p.Prime → p ≠ 2 → ∃ q, q.Prime ∧ q < p ∧ orderOf (q : ZMod p) = p - 1
+    Erdos985Statement                           -- Erdos985/Main.lean
+
+def Erdos985.Erdos985Statement : Prop :=          -- Erdos985/Statement.lean
+  ∀ p : ℕ, p.Prime → p ≠ 2 → ∃ q, q.Prime ∧ q < p ∧ orderOf (q : ZMod p) = p - 1
 ```
 
 **Tiers.** `Erdos985.erdos_985_of_GRH` is tier C: GRH for Dirichlet L-functions is the explicit
@@ -58,7 +61,8 @@ The stack behind the agents:
 
 The argument needs the Generalized Riemann Hypothesis for Dirichlet L-functions. We take it
 from [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis),
-which formalizes a proof of RH and GRH and was announced on 2026-11-20.
+which formalizes L. Alpöge's proof of RH and of GRH for Dirichlet L-functions. It was announced
+on 2026-11-20 and certified by the Lean FRO and the Mathlib Initiative on 2026-11-21.
 
 `Erdos985/Statement.lean` copies the hypothesis `DirichletLNonvanishingRightOfHalf` word for
 word from that repository's `src/Statements.lean`. Both projects build on the same Lean
@@ -120,6 +124,15 @@ small primes `q` and tests `q^((p−1)/r) ≢ 1` for each prime `r | p − 1`. M
 `orderOf_eq_of_pow_and_pow_div_prime` turns that into the order. Its soundness is proved
 (`Erdos985.Compute.checkAll_sound`), and it is evaluated with `native_decide` in 20 chunks
 of 5·10⁶ that lake builds in parallel.
+
+## Deviations from the literature
+
+McGown, Treviño and Trudgian prove a prime primitive root below `√p − 2` for every prime
+`p > 2791` under GRH. This project proves the weaker conclusion `q < p` that Erdős 985 asks for.
+With the search range `[1, p)` the analytic argument closes at `p ≥ 10^8` without their sieve,
+so the threshold is `10^8` instead of `2791`, and the finite check covers every odd prime below
+`10^8`. The Bach-type estimate they cite as their Lemma 1 is proved here in full
+(`bach_nonprincipal_of_GRH`, `bach_principal_of_GRH`).
 
 ## Building
 
