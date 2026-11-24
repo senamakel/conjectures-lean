@@ -7,6 +7,11 @@ where `N_k = p_1 ⋯ p_k` is the product of the first `k` primes (see also Nicol
 and fails for infinitely many. This repository formalises the direction RH ⇒ inequality for every `k ≥ 1`
 in Lean 4 + Mathlib.
 
+**Literature status: RH-equivalent.** The criterion is Nicolas (1983). The inequality for all `k`
+is equivalent to RH, so this says nothing beyond the RH claim; the unconditional theorem below is
+only as reliable as the Lean proof of RH in leanprover-community/riemann-hypothesis, which has not
+been independently verified.
+
 ## Headline theorem
 
 ```lean
