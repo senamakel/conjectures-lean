@@ -11,7 +11,13 @@ with `li` the principal-value logarithmic integral. These are explicit forms of 
 1901 theorem `π(x) = li(x) + O(√x log x)` under RH. Unconditionally the best known error terms
 are of the form `x exp(−c (log x)^{3/5} (log log x)^{−1/5})`.
 
-This repository proves all three bounds under RH, with the same thresholds and larger constants:
+**Literature status: RH-consequence** (von Koch 1901; Schoenfeld 1976). Nothing here is new
+mathematics. This is a Lean proof that RH implies these bounds, following von Koch and
+Schoenfeld, with weaker constants. A bound `ψ(x) − x = O(√x log² x)` is in fact equivalent to
+RH, so this says nothing beyond the RH claim.
+
+The main library proves all three bounds under RH, with the same thresholds and larger
+constants:
 
 ```lean
 theorem Schoenfeld.psiBound_of_RH (hRH : RiemannHypothesis) : PsiBound (1 / 8) 73.2
@@ -127,13 +133,15 @@ lake exe cache get
 lake build
 ```
 
-Lean `v4.36.0`, Mathlib `fc4f59e5`, erdos-985 `9538edb`. The library builds in about 3 minutes
-on top of the Mathlib and erdos-985 caches; the slowest modules are `Schoenfeld.Psi` (about 1
-min, the 15-interval case split) and `Schoenfeld.Pi`.
+Lean `v4.36.0`, Mathlib `fc4f59e5`, erdos-985 `9538edb`. On top of the Mathlib and erdos-985
+caches the library takes about 2.5 CPU-minutes; per module (user CPU): `Schoenfeld.Psi` 44 s
+(the 15-interval case split), `Theta` 23 s, `Pi` 19 s, `Density` 15 s, `PsiInt` 14 s,
+`ZeroSums` 10 s, the rest under 6 s each.
 
 ## Unconditional version
 
-`Unconditional/SchoenfeldUnconditional.lean` imports
+The theorems below hold given the Lean proof of RH in leanprover-community/riemann-hypothesis,
+which has not been independently verified. `Unconditional/SchoenfeldUnconditional.lean` imports
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
 (commit `507a75d91d`) and closes the hypothesis with its `riemannHypothesis`:
 
