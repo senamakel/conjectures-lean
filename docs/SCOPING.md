@@ -70,7 +70,7 @@ Let `S(α) = Σ_{n ≤ N} Λ(n) e(nα)` (or with a smooth weight `w(n/N)`), so t
 
 **Threshold this would give.** Step 6 requires `𝔖(N) N²/2 > 3 · 2c₁(2π)^{1/3} N^{5/6} log² N ·
 N log N`, i.e. `N^{1/6} > C log³ N` with `C ≈ 9·2c₁(2π)^{1/3}/1.32`. With `c₁ ≈ 1/2` that is
-`C ≈ 13`, solved by `log N ≈ 100`, so **`N₀ ≈ 10⁴³`**. A Cesàro-weighted `S(α)` (to use
+`C ≈ 13`, which first holds near `log N ≈ 100`, so **`N₀ ≈ 10⁴³`**. A Cesàro-weighted `S(α)` (to use
 erdos-985's weighted formula directly) changes constants, not the exponent `5/6`. Zinoviev
 reaches `10²⁰` by a much more careful treatment (smoothing, separate large-`q` estimates,
 `q`-dependent Dirichlet boxes, sharp zero-sum constants). Getting a Lean circle method below

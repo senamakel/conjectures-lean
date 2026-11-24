@@ -1,18 +1,25 @@
 # Ternary Goldbach under GRH in Lean
 
-The ternary (weak) Goldbach conjecture says that every odd integer `n > 5` is a sum of three
-primes. Deshouillers, Effinger, te Riele and Zinoviev proved it under the Generalized Riemann
-Hypothesis (*A complete Vinogradov 3-primes theorem under the Riemann hypothesis*, Electron.
-Res. Announc. AMS 3 (1997) 99–104): Zinoviev's circle-method theorem (J. Number Theory 65
-(1997) 334–358) covers odd `n > 10²⁰`, and a prime-gap lemma plus a binary Goldbach computation
-cover the rest. Unconditionally, the statement is Helfgott's theorem (2013, arXiv:1312.7748 and
-arXiv:1501.05438), whose analytic part covers `n ≥ 10²⁷`; Vinogradov (1937) had it for all
-sufficiently large `n`.
+Status: wound down 2026-11-24. Ternary Goldbach was proved unconditionally by Helfgott (2013); this repo is not a current target.
 
-This repository proves the **finite half** of DETZ in Lean, with no hypothesis: every odd
-`5 < n ≤ 10²⁰` is a sum of three primes. Zinoviev's theorem for `n > 10²⁰` is **not** proved
-here; it enters as a named hypothesis. So the full statement is proved **under GRH, given
-Zinoviev's theorem**, not outright.
+**Literature status: known, via GRH here.** Ternary (weak) Goldbach, that every odd integer
+`n > 5` is a sum of three primes, was proved unconditionally by Helfgott (2013,
+arXiv:1312.7748 and arXiv:1501.05438); his analytic part covers `n ≥ 10²⁷`, and Vinogradov
+(1937) had it for all sufficiently large `n`. The proof followed here assumes GRH, so it is
+weaker than the literature. It is Deshouillers, Effinger, te Riele and Zinoviev, *A complete
+Vinogradov 3-primes theorem under the Riemann hypothesis*, Electron. Res. Announc. AMS 3 (1997)
+99–104. In that paper, Zinoviev's circle-method theorem (J. Number Theory 65 (1997) 334–358)
+covers odd `n > 10²⁰`, and a prime-gap lemma with a binary Goldbach computation covers the
+rest. Nothing here is new mathematics.
+
+This repository has two parts.
+
+* **The finite half of DETZ, with no hypothesis.** Every odd `5 < n ≤ 10²⁰` is a sum of three
+  primes. This is a Lean formalisation of a known computation (status: known).
+* **Zinoviev's theorem for `n > 10²⁰` is not proved here.** It enters as a named hypothesis,
+  `ZinovievTheorem`.
+
+So the full statement is ternary Goldbach under GRH, *given Zinoviev's theorem*, in Lean.
 
 ```lean
 theorem Goldbach.binary_goldbach_upTo : BinaryGoldbachUpTo (2 * 10 ^ 12)
@@ -178,14 +185,17 @@ chunks, which build in parallel. The proof modules are light: `Sieve` 42 s, `Lad
 ## Unconditional version
 
 `Unconditional/GoldbachUnconditional.lean` imports riemann-hypothesis and discharges GRH in one
-line. Zinoviev's theorem stays a hypothesis, so the result is tier U + H, not U.
+line. Zinoviev's theorem stays a hypothesis, so the result is tier U + H, not U. Read it as:
+ternary Goldbach given Zinoviev's theorem and the Lean proof of GRH in
+leanprover-community/riemann-hypothesis, which has not been independently verified. It is weaker
+than Helfgott's unconditional theorem.
 
 | Theorem | Statement | Axioms |
 |---|---|---|
 | `ternary_goldbach_of_zinoviev` | `ZinovievTheorem → TernaryGoldbachStatement` | not yet checked |
 
-**Not yet run on this box** (the riemann-hypothesis check is serialised across repositories and
-was queued at the time of this commit). The command is:
+**Not run.** The riemann-hypothesis check is serialised across repositories; this repository
+was wound down while still in the queue. The command is:
 
 ```
 scripts/check-unconditional.sh /path/to/riemann-hypothesis
