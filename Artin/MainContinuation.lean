@@ -6,13 +6,14 @@ import Artin.Analytic.Core.Unsmoothing
 /-!
 # Artin's conjecture under Hooley's hypothesis and Hecke's continuation
 
-`conditional_artin_primitive_roots.parts.i` (`Artin/Main.lean`) assumes only
+formal-conjectures' `conditional_artin_primitive_roots.parts.i` assumes only
 `HooleyHypothesis a`. That hypothesis says something about every function `Z` that continues
 `ζ_{K_k}` to `ℂ ∖ {1}`, but to use it one needs such a `Z`, with the functional equation, and
 neither our Mathlib pin nor upstream Mathlib has it. So the theorem here takes Hecke's
 continuation as an explicit extra hypothesis, `DedekindContinuation` (`Artin/Analytic/Continuation.lean`),
-for each Kummer field `K_k`, `k` squarefree. With Hecke's theorem formalised, a separate
-`Unconditional/` module can discharge it and recover the statement of `Artin/Main.lean`.
+for each Kummer field `K_k`, `k` squarefree. `Unconditional/ArtinUnconditional.lean`
+discharges it from the riemann-hypothesis repository's Tate thesis and recovers the
+formal-conjectures statement.
 
 The proof is the chain
 

@@ -15,6 +15,7 @@ import Artin.Analytic.Splitting
 import Artin.Analytic.Discriminant
 import Artin.Analytic.Counting
 import Artin.Analytic.Continuation
+import Artin.Analytic.ContinuationOfFEPair
 import Artin.Analytic.Core.VonMangoldt
 import Artin.Analytic.Core.GammaPart
 import Artin.Analytic.Core.Growth
@@ -24,5 +25,4 @@ import Artin.Analytic.Core.ZeroSum
 import Artin.Analytic.Core.ExplicitFormula
 import Artin.Analytic.Core.Unsmoothing
 import Artin.SieveHalf
-import Artin.Main
 import Artin.MainContinuation

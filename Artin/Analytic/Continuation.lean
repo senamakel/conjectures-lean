@@ -47,8 +47,11 @@ The riemann-hypothesis repository proves (unlicensed, so nothing is copied from 
 `tendsto_sub_one_mul_completedDedekindZeta_rootNumber` and `tendsto_mul_completedDedekindZeta_zero`
 (simple poles at `1` and `0`, hence `ξ` extends to an entire function), and
 `continuedDedekindZeta_eq`, `differentiableAt_continuedDedekindZeta` (a `Z` with
-`IsDedekindZeta K Z`). Those give every field of `ContinuationData` except the strip bound,
-which needs one more estimate on Hecke's theta integral.
+`IsDedekindZeta K Z`). Those give every field of `ContinuationData` except the strip bound.
+It builds `Λ_K` as the `Λ` of a Mathlib `WeakFEPair` (`thetaPair`), and the strip bound follows
+from that representation alone: `Artin/Analytic/ContinuationOfFEPair.lean` proves it with
+Mathlib only, and `Unconditional/ArtinUnconditional.lean` discharges `DedekindContinuation K`
+for every number field by importing the Tate-thesis modules of that repository.
 
 Things that are *not* part of the hypothesis, because they follow from it (with the Euler
 product) and are proved, or stated as separate lemmas, in `Artin/Analytic/Core/`: `ζ_K(s) ≠ 0`

@@ -7,7 +7,8 @@ import Artin.Statement
 `EffectiveKummerChebotarev a`: for squarefree `k`, the number of primes `p < x` that split
 completely in the Kummer field `K_k = ℚ(ζ_k, a^{1/k})` is `π(x)/[K_k : ℚ] + O(√x log(kx))`.
 
-* Analytic half (`effectiveKummerChebotarev_of_hooley`): RH for `ζ_{K_k}` gives that count.
+* Analytic half (`Artin.Analytic.effectiveKummerChebotarev_of_hooley_of_continuation`, in
+  `Artin/MainContinuation.lean`): RH and Hecke's continuation for `ζ_{K_k}` give that count.
 * Sieve half (`artin_of_effectiveKummerChebotarev`, in `Artin/SieveHalf.lean`): Hooley's sieve over `k` turns the counts
   into the density of primes for which `a` is a primitive root, and Kummer theory shows that
   density is positive.
@@ -37,20 +38,6 @@ def EffectiveKummerChebotarev (a : ℤ) : Prop :=
   ∃ C : ℝ, ∀ k x : ℕ, Squarefree k → 2 ≤ x →
     |(kummerCount a k x : ℝ) - (Nat.primeCounting x : ℝ) / kummerDegree a k|
       ≤ C * Real.sqrt x * Real.log (k * x)
-
-/-- Analytic half: RH for the Dedekind zeta functions of the Kummer fields gives effective
-Chebotarev for them.
-
-This is true (Hooley 1967, §3) but cannot be proved here as stated. `HooleyHypothesis` only
-speaks about functions `Z` that continue `ζ_{K_k}` to `ℂ ∖ {1}`; to use it one needs such a `Z`,
-together with the functional equation and growth in vertical strips (Hecke's theorem), and that
-is neither in our Mathlib pin nor in upstream Mathlib. The provable version takes Hecke's
-continuation as a hypothesis: `Artin.Analytic.effectiveKummerChebotarev_of_hooley_of_continuation`
-in `Artin/MainContinuation.lean`, with `DedekindContinuation` from
-`Artin/Analytic/Continuation.lean`. This `sorry` stays until Hecke's theorem is formalised. -/
-theorem effectiveKummerChebotarev_of_hooley (a : ℤ) (ha : a ≠ 0) (h : HooleyHypothesis a) :
-    EffectiveKummerChebotarev a := by
-  sorry
 
 /-! The sieve half, `artin_of_effectiveKummerChebotarev (a : ℤ) (ha : ¬IsSquare a)
 (ha' : a ≠ -1) (h : EffectiveKummerChebotarev a) : ∃ x > 0, (S a).HasDensity x {p | p.Prime}`,

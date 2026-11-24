@@ -14,9 +14,23 @@ arXiv:math/0412262, §3.
 leanprover-community/riemann-hypothesis proves RH for ζ and GRH for Dirichlet L-functions
 (`DirichletLNonvanishingRightOfHalf`). `K_k` is not abelian over ℚ for `k > 2`, so `ζ_{K_k}`
 is not a product of Dirichlet L-functions, and that repository does not discharge
-`HooleyHypothesis`. As far as we can tell it proves nothing about zeros of `ζ_K` beyond the
-functional equation and the pole at `s = 1`. The result here therefore stays conditional,
-unlike `erdos_985`. The `k = 1` instance of `HooleyHypothesis` is RH itself.
+`HooleyHypothesis`. Checked at commit `507a75d91d` (2026-11-24): its Tate-thesis
+formalisation (`src/GroundTheory/GlobalFields/TateThesis/`) gives the continuation and
+functional equation of Hecke L-functions of any number field, including `ζ_K`, and
+nonvanishing on `Re s ≥ 1`, but no statement anywhere in the repository locates zeros of `ζ_K`
+or of a Hecke L-function in the critical strip; its only zero-location results are for `ζ` and
+Dirichlet L-functions (`src/Main.lean`). The only factorisation of a Dedekind zeta function
+into Dirichlet L-functions it contains is for imaginary quadratic fields
+(`dedekindZeta_eq_mul_LFunction`, finrank 2, negative discriminant). The result here therefore
+stays conditional on `HooleyHypothesis`, unlike `erdos_985`. The `k = 1` instance of
+`HooleyHypothesis` is RH itself; for `k = 2` the field is quadratic and its RH would follow from
+RH and GRH for the Kronecker character; for every odd prime `k = q` with `a` not a `q`-th power,
+`K_q` has Galois group `ℤ/q ⋊ (ℤ/q)ˣ`, which is not abelian.
+
+What it does supply is Hecke's continuation: `Unconditional/ArtinUnconditional.lean` discharges
+`DedekindContinuation` from its Tate-thesis modules (the strip bound is proved here, from its
+`WeakFEPair` representation of `Λ_K`, in `Artin/Analytic/ContinuationOfFEPair.lean`), which
+recovers the formal-conjectures statement with `HooleyHypothesis` as its only hypothesis.
 
 ## Split
 
@@ -47,9 +61,9 @@ For `K = K_k`, `n = [K : ℚ]`, `d = |disc K|`:
    `ξ(1−s) = ξ(s)`, and `‖ξ(s)‖ ≤ M (1+‖s‖)²` for `1/2 ≤ Re s ≤ 2` (Hecke's theta integral
    bounds `Λ_K` in vertical strips away from its poles). The target becomes
    `conditional_artin_primitive_roots.parts.i_of_continuation` (`Artin/MainContinuation.lean`),
-   which additionally assumes `DedekindContinuation (K_k)` for squarefree `k`. The original
-   `effectiveKummerChebotarev_of_hooley` (`Artin/Interfaces.lean`) stays sorried: it is true but
-   unprovable here without the continuation.
+   which additionally assumes `DedekindContinuation (K_k)` for squarefree `k`.
+   `Unconditional/ArtinUnconditional.lean` discharges it from riemann-hypothesis's Tate thesis;
+   the main library has no version without it (and no `sorry`).
 1. **Completed `ζ_K`** has order 1 and a Hadamard product. Order 1 is derived from the strip
    bound, the functional equation, and Stirling plus the Euler product for `Re s ≥ 2`.
 2. **Zero counting**: `#{ρ : |γ − T| ≤ 1} ≪ log d + n log(|T| + 2)`.
@@ -112,8 +126,7 @@ analytic core has no `sorry` left:
 | `dedekindZeta_ne_zero` | `ζ_K(s) ≠ 0`, `Re s > 1` | `ζ_K = exp(Σ Λ_K(n)/log n · n^{-s})` (`dedekindZeta_eq_exp`): both sides have log-derivative `−L(Λ_K, s)` on the half-plane and tend to `1` at `+∞`; no Euler product needed |
 | `Z_ne_zero_of_re_eq_one` | `ζ_K(1+it) ≠ 0`, `t ≠ 0` | Mertens' `3 + 4 cos θ + cos 2θ ≥ 0` on the coefficients of `log ζ_K`, the simple pole at `1` (class number formula) and holomorphy of `Z` at `1 + 2it`, adapted from Mathlib's proof for Dirichlet `L`-functions (`NonvanishingOne.lean`) |
 
-`effectiveKummerChebotarev_of_hooley` (without the continuation hypothesis) stays sorried in
-`Artin/Interfaces.lean`.
+There is no main-library version without the continuation hypothesis; see step 0.
 
 ### B. Sieve half: `EffectiveKummerChebotarev a → density > 0`
 
@@ -164,7 +177,8 @@ Write `N(x)` for the number of primes `p < x`, `p ∤ a`, with `a` a primitive r
    *Done*: `Artin/Sieve/Density.lean`; the whole of part B is assembled in
    `Artin/Sieve/Assembly.lean` (from B5/B6 as hypotheses) and `Artin/SieveHalf.lean`
    (`artin_of_effectiveKummerChebotarev`, sorry-free, B5/B6 discharged by `Artin/Kummer/`).
-   The target theorem now depends only on part A (`effectiveKummerChebotarev_of_hooley`).
+   The target theorem then depends only on part A
+   (`effectiveKummerChebotarev_of_hooley_of_continuation`).
 
 ## Order of work
 
