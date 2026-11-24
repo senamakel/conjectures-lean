@@ -11,16 +11,15 @@ with `li` the principal-value logarithmic integral. These are explicit forms of 
 1901 theorem `π(x) = li(x) + O(√x log x)` under RH. Unconditionally the best known error terms
 are of the form `x exp(−c (log x)^{3/5} (log log x)^{−1/5})`.
 
-**Literature status: RH-consequence** (von Koch 1901; Schoenfeld 1976). This repository is a
-complete Lean proof that RH implies explicit bounds of this form at Schoenfeld's thresholds,
-following von Koch and Schoenfeld, with constants `1/8` for ψ, `1/4` for θ and `9/20` for
-`π − li`; Schoenfeld's constant is `1/(8π)` in all three. `Unconditional/` proves the three
-bounds unconditionally in Lean, with RH supplied by the certified proof in
-leanprover-community/riemann-hypothesis. A bound `ψ(x) − x = O(√x log² x)` is equivalent to RH,
-so these theorems are RH in another form.
+This repository proves, in Lean, that RH implies explicit bounds of this form at Schoenfeld's
+thresholds, with constants `1/8` for ψ, `1/4` for θ and `9/20` for `π − li`. `Unconditional/`
+proves the three bounds unconditionally in Lean, with RH supplied by the certified proof in
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
+Schoenfeld's constant is `1/(8π)` in all three (see "Deviations from the literature").
 
-The main library proves all three bounds under RH, with the same thresholds and larger
-constants:
+**Literature status: RH-consequence** (von Koch 1901; Schoenfeld 1976). The Lean proof follows
+von Koch and Schoenfeld. Since a bound `ψ(x) − x = O(√x log² x)` is equivalent to RH, these
+theorems are RH in another form.
 
 ```lean
 theorem Schoenfeld.psiBound_of_RH (hRH : RiemannHypothesis) : PsiBound (1 / 8) 73.2
@@ -40,23 +39,29 @@ def ThetaBound (C x₀ : ℝ) : Prop :=
 def PiBound (C x₀ : ℝ) : Prop :=
   ∀ x : ℝ, x₀ ≤ x →
     |(Nat.primeCounting ⌊x⌋₊ : ℝ) - Real.logIntegral x| < C * (√x * Real.log x)
-def SchoenfeldStatement : Prop :=
-  PsiBound (1 / (8 * π)) 73.2 ∧ ThetaBound (1 / (8 * π)) 599 ∧ PiBound (1 / (8 * π)) 2657
+def SchoenfeldPsi : Prop := PsiBound (1 / (8 * π)) 73.2
+def SchoenfeldTheta : Prop := ThetaBound (1 / (8 * π)) 599
+def SchoenfeldPi : Prop := PiBound (1 / (8 * π)) 2657
+def SchoenfeldStatement : Prop := SchoenfeldPsi ∧ SchoenfeldTheta ∧ SchoenfeldPi
 ```
 
 ## Tier and provenance
 
-* All three theorems are **tier C** in the main library (RH is an explicit argument) and
-  **tier U** in `Unconditional/` (checked, see below) (RH discharged by riemann-hypothesis), for the constants
-  `1/8`, `1/4`, `9/20`. Schoenfeld's exact `SchoenfeldStatement` (constant `1/(8π)`) is the
-  fixed target and is **not** proved; see "Deviations from the literature".
-* `RiemannHypothesis` is Mathlib's definition, used as is.
-* `Real.logIntegral` (principal-value `li`, `li(x) = li(2) + ∫₂ˣ dt/log t`) is copied verbatim
-  from formal-conjectures (`FormalConjecturesForMathlib/Analysis/SpecialFunctions/LogIntegral.lean`).
-  formal-conjectures has no statement of Schoenfeld's bounds (checked 2026-11-24), so
-  `PsiBound`, `ThetaBound`, `PiBound` are written here.
-* No cited hypotheses (tier H), no `native_decide`, no finite computation: the range above
-  each threshold is covered analytically.
+| Theorem | Tier | Hypothesis |
+|---|---|---|
+| `Schoenfeld.psiBound_of_RH`, `thetaBound_of_RH`, `piBound_of_RH`, `schoenfeld_weak_of_RH` | C | `RiemannHypothesis` (Mathlib's definition, used as is) |
+| `psi_bound`, `theta_bound`, `pi_bound` (`Unconditional/`) | U | none; RH from riemann-hypothesis |
+
+Both tiers hold for the constants `1/8`, `1/4` and `9/20`. Schoenfeld's exact
+`SchoenfeldStatement` (constant `1/(8π)`) is the fixed target and is not proved; see
+"Deviations from the literature".
+
+`Real.logIntegral` (principal-value `li`, `li(x) = li(2) + ∫₂ˣ dt/log t`) is copied verbatim
+from formal-conjectures (`FormalConjecturesForMathlib/Analysis/SpecialFunctions/LogIntegral.lean`).
+formal-conjectures has no statement of Schoenfeld's bounds (checked 2026-11-24), so
+`PsiBound`, `ThetaBound` and `PiBound` are this repository's own. There are no cited
+hypotheses (tier H), no `native_decide` and no finite computation: the range above each
+threshold is covered analytically.
 
 ## Axioms
 
@@ -73,23 +78,23 @@ def SchoenfeldStatement : Prop :=
 
 Full blueprint with every constant: [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
 
-1. **Zeros under RH** (`ZeroSums.lean`). `Σ_ρ m/|ρ|² = 2 + γ − log 4π < 1/20`, so `|ρ|² ≥ 20`.
+1. Zeros under RH (`ZeroSums.lean`): `Σ_ρ m/|ρ|² = 2 + γ − log 4π < 1/20`, so `|ρ|² ≥ 20`.
    Hadamard's product for erdos-985's `ξ` at real `s = a + 1/2` gives the Poisson-kernel sum
    `Σ_ρ m a/(a² + γ²) = Re ξ'/ξ(a + 1/2) ≤ ½ log a − ½ log 2π + (12/5)/a` for `a ≥ 2`. This is
    the zero-density input (in place of an explicit `N(T)`).
-2. **The zero sum** (`Density.lean`). `F(T) = Σ_ρ m min(1/|ρ|, T/|ρ|²)` is at most `T/20`, and
+2. The zero sum (`Density.lean`): `F(T) = Σ_ρ m min(1/|ρ|, T/|ρ|²)` is at most `T/20`, and
    at most `0.9 Jb(10T) + 2 Vb(T) + 2.75 Vb(5) ≈ 0.225 log² T` by writing `1/|γ|` as
    `0.9 ∫₂^{10T} da/(a² + γ²)` and exchanging sum and integral.
-3. **Differenced explicit formula** (`PsiInt.lean`). erdos-985's weighted explicit formula for
+3. Differenced explicit formula (`PsiInt.lean`): erdos-985's weighted explicit formula for
    `Ψ₁(x) = Σ_{n ≤ x} Λ(n)(x − n)` at integers; for `b = a + h`,
    `h ψ(a) ≤ Ψ₁(b) − Ψ₁(a) ≤ h ψ(b)` and `|b^{ρ+1} − a^{ρ+1}| ≤ min(|ρ+1| h √b, 2 b^{3/2})` give
    `|ψ(x) − x| ≤ h/2 + 3.6 + 1.5/h + √(x+h) F(2(x+h)/h)`.
-4. **ψ** (`Psi.lean`). For `73.2 ≤ x ≤ 2^18`, `F(T) ≤ T/20` with `h ≈ 0.447 x^{3/4}` on 15
+4. ψ (`Psi.lean`): for `73.2 ≤ x ≤ 2^18`, `F(T) ≤ T/20` with `h ≈ 0.447 x^{3/4}` on 15
    intervals (worst ratio to `√x log² x/8`: `0.98`). For `x ≥ 2^18`, step 2 with `h = ⌈4√x⌉`
    reduces to a quadratic inequality in `log x` (ratio `0.82` at `2^18`).
-5. **θ** (`Theta.lean`). Costa Pereira's `ψ − θ ≤ ψ(x^{1/2}) + ψ(x^{1/3}) + ψ(x^{1/5})` and
+5. θ (`Theta.lean`): Costa Pereira's `ψ − θ ≤ ψ(x^{1/2}) + ψ(x^{1/3}) + ψ(x^{1/5})` and
    `ψ(y) ≤ log 4 · y + 2√y log y` (both in Mathlib) give `ψ − θ ≤ √x log² x/8` for `x ≥ 599`.
-6. **π** (`Pi.lean`). Partial summation (Mathlib) and integration by parts for `li`:
+6. π (`Pi.lean`): partial summation (Mathlib) and integration by parts for `li`:
    `π(x) − li(x) = (θ(x) − x)/log x + ∫₂ˣ (θ(t) − t)/(t log² t) dt + 2/log 2 − li(2)`, with
    `|∫₂^599| ≤ 33`, `|∫_599^x| ≤ √x/2` and `0 ≤ li(2) ≤ 2`.
 
@@ -114,7 +119,7 @@ Full blueprint with every constant: [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
 The thresholds are Schoenfeld's; the constants are larger: `1/8 = π · 1/(8π)` for ψ,
 `1/4 = 2π · 1/(8π)` for θ, `9/20 ≈ 11.3 · 1/(8π)` for π − li.
 
-* **ψ.** Schoenfeld uses Rosser's explicit zero-counting formula
+* ψ: Schoenfeld uses Rosser's explicit zero-counting formula
   `N(T) = (T/2π) log(T/2πe) + 7/8 + O(log T)` with explicit error and the numerically
   verified low zeros. Neither is available in Mathlib or erdos-985, so zero density enters
   here through the Poisson-kernel sum of step 1, which costs a factor `≈ 1.41` in the leading
@@ -123,10 +128,10 @@ The thresholds are Schoenfeld's; the constants are larger: `1/8 = π · 1/(8π)`
   versus `1/(8π) ≈ 0.0398`. Reaching `1/(8π)` from `x = 73.2` requires formalising an explicit
   `N(T)` (argument principle and Backlund's bound for `arg ζ(1/2 + iT)`) and a verified list
   of the first zeros.
-* **θ.** `θ = ψ − (ψ − θ)` adds the bound `ψ − θ ≤ √x log² x/8` to ψ's `1/8`. The true
+* θ: `θ = ψ − (ψ − θ)` adds the bound `ψ − θ ≤ √x log² x/8` to ψ's `1/8`. The true
   `ψ − θ` is about `√x`, so θ inherits ψ's constant for large `x`, but not uniformly from `599`
   with these estimates.
-* **π.** Inherits θ's constant `1/4`, plus `2 · (1/4)/log x` from the tail integral and
+* π: inherits θ's constant `1/4`, plus `2 · (1/4)/log x` from the tail integral and
   `∫₂^599 dt/log² t ≈ 26` (bounded by 33): `0.40` at `x = 2657`, rounded up to `9/20`.
 
 ## Building
@@ -143,9 +148,9 @@ caches the library takes about 2.5 CPU-minutes; per module (user CPU): `Schoenfe
 
 ## Unconditional version
 
-The theorems below have no hypothesis. `Unconditional/SchoenfeldUnconditional.lean` imports
+`Unconditional/SchoenfeldUnconditional.lean` imports
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
-(commit `507a75d91d`) and closes the hypothesis with its `riemannHypothesis`:
+(commit `507a75d91d`) and closes the hypothesis with its `riemannHypothesis`. The theorems below have no hypothesis:
 
 | Theorem | Statement | Axioms |
 |---|---|---|
