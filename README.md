@@ -21,10 +21,14 @@ every `q`**, and the least quadratic non-residue mod an odd prime `p` is `≤ 4.
 definitions in `Ankeny/Statement.lean` are unchanged; only the numeral `2` in the two GRH theorems
 became `21 / 5` (see below). There is no `sorry`.
 
+Real output of `#print axioms` (`lake env lean`, 2026-11-24, after a clean `lake build`):
+
 ```
 #print axioms Ankeny.bach_of_GRH
 -- [propext, Classical.choice, Quot.sound,
 --  Ankeny.chunk_ok_0._native.native_decide.ax_1_1, …, Ankeny.chunk_ok_7._native.native_decide.ax_1_1]
+#print axioms Ankeny.leastNonresidue_of_GRH
+-- (the same eleven axioms)
 ```
 
 The eight `native_decide` axioms come from the finite computation for `q < 2^17` (below).
@@ -79,6 +83,10 @@ lake build
 ```
 
 Lean `v4.36.0`, Mathlib `fc4f59e5` (via erdos-985). The finite computation dominates the build.
+Measured 2026-11-24 on a 95-core box with a warm Mathlib cache (`lake exe cache get` first):
+a clean `lake build` (erdos-985 included) took 5 min wall, about 26 CPU-minutes; the eight
+`native_decide` chunks took 21, 57, 97, 135, 166, 203, 240 and 278 s (about 20 CPU-minutes in
+total, growing roughly linearly with `q`).
 
 ## Unconditional version
 
@@ -89,6 +97,8 @@ Lean `v4.36.0`, Mathlib `fc4f59e5` (via erdos-985). The finite computation domin
 |---|---|---|
 | `bach_unconditional` | `Ankeny.BachSubgroupBound (21 / 5)` | standard three + 8 `native_decide` |
 | `leastNonresidue_unconditional` | `Ankeny.LeastNonresidueBound (21 / 5)` | standard three + 8 `native_decide` |
+
+Checked 2026-11-24 with `scripts/check-unconditional.sh` against riemann-hypothesis `507a75d91d`: the build succeeded and `#print axioms` of both theorems printed exactly the standard three plus the 8 `native_decide` axioms (no `sorryAx`). The run took about 18 min wall, dominated by importing riemann-hypothesis.
 
 To check it:
 
