@@ -5,3 +5,6 @@ import Mills
 #print axioms Mills.exists_mills_lt
 #print axioms Mills.mills_bounds_of_primeBetweenCubes
 #print axioms Mills.lowerBoundOfRH_of_primeBetweenCubes
+#print axioms Mills.primeBetweenCubes_of_RH
+#print axioms Mills.lower_bound_of_RH
+#print axioms Mills.mills_bounds_of_RH
