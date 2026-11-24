@@ -11,6 +11,10 @@ bounds `g(p) ≪ p^{1/4+ε}` are known. **Status in the literature: RH-consequen
 
 This repo proves in Lean, from GRH, for every odd prime `p`:
 
+* `g(p) ≤ C · ω(p−1)^{21/5} · (log p)²` (`PolyOmegaRealStatement (21/5)`,
+  `polyOmegaReal_of_GRH`; hence `PolyOmegaStatement 5`), by Rosser's sieve over the primes
+  dividing `p − 1`, with lower and upper bounds taken from a table of 232 cells checked by the
+  kernel ([blueprint](docs/BLUEPRINT.md));
 * **Wang's bound** `g(p) ≤ C · ω(p−1)^6 · (log p)²` (`WangStatement`, `wang_of_GRH`, the same
   as `PolyOmegaStatement 6`), by a Buchstab-type lower-bound sieve over the primes dividing
   `p − 1` whose inner upper-bound sieves are Brun–Hooley designs taken from a table of 137
@@ -23,13 +27,24 @@ This repo proves in Lean, from GRH, for every odd prime `p`:
   primitive-root indicator).
 
 With the certified Lean proof of GRH (`Unconditional/`) all of these hold unconditionally;
-`wang_unconditional : WangStatement` is Wang's 1959 theorem, proved unconditionally in Lean.
-Shoup's `ω⁴(log ω + 1)⁴` (`ShoupStatement`) is not proved; the gap is in
+`wang_unconditional : WangStatement` is Wang's 1959 theorem, proved unconditionally in Lean, and
+`polyOmegaReal_unconditional` improves its exponent from `6` to `21/5`. Shoup's
+`ω⁴(log ω + 1)⁴` (`ShoupStatement`) is not proved; the gap is in
 [Deviations](#deviations-from-the-literature).
 
 ## Headline theorems
 
 ```lean
+theorem Shoup.polyOmegaReal_of_GRH (hGRH : Erdos985.DirichletLNonvanishingRightOfHalf) :
+    PolyOmegaRealStatement (21 / 5)
+
+theorem Shoup.leastPrimitiveRoot_le_real_of_GRH
+    (hGRH : Erdos985.DirichletLNonvanishingRightOfHalf) (p : ℕ) (hp : p.Prime) (hp2 : p ≠ 2) :
+    HasPrimitiveRootLE p (Creal * (ω (p - 1) : ℝ) ^ (21 / 5 : ℝ) * Real.log p ^ 2)
+
+theorem Shoup.polyOmega5_of_GRH (hGRH : Erdos985.DirichletLNonvanishingRightOfHalf) :
+    PolyOmegaStatement 5
+
 theorem Shoup.wang_of_GRH (hGRH : Erdos985.DirichletLNonvanishingRightOfHalf) : WangStatement
 
 theorem Shoup.polyOmega6_of_GRH (hGRH : Erdos985.DirichletLNonvanishingRightOfHalf) :
@@ -84,10 +99,21 @@ def AnkenyTypeStatement : Prop :=     -- proved under GRH, C = 1089
   ∃ C : ℝ, ∀ p : ℕ, p.Prime → p ≠ 2 →
     HasPrimitiveRootLE p (C * ((2 : ℝ) ^ ω (p - 1) * Real.log p) ^ 2)
 
-def PolyOmegaStatement (A : ℕ) : Prop := -- proved under GRH for A = 6, 7, 136; A = 6 is Wang
+def PolyOmegaStatement (A : ℕ) : Prop := -- proved under GRH for A = 5, 6, 7, 136; A = 6 is Wang
   ∃ C : ℝ, ∀ p : ℕ, p.Prime → p ≠ 2 →
     HasPrimitiveRootLE p (C * (ω (p - 1) : ℝ) ^ A * Real.log p ^ 2)
 ```
+
+and, from `Shoup/Statement2.lean` (added; the real-exponent version of `PolyOmegaStatement`),
+
+```lean
+def PolyOmegaRealStatement (A : ℝ) : Prop := -- proved under GRH for A = 21/5
+  ∃ C : ℝ, ∀ p : ℕ, p.Prime → p ≠ 2 →
+    HasPrimitiveRootLE p (C * (ω (p - 1) : ℝ) ^ A * Real.log p ^ 2)
+```
+
+`Creal = 1089 · Kfin²` (`Shoup/PolyReal.lean`), with `Kfin` built from `A = 2^{2^{36}}` and
+`2^{2^{2^{36}}}`; explicit and never evaluated.
 
 `WangStatement` and `PolyOmegaStatement 6` are the same proposition (`wangStatement_iff` is
 `Iff.rfl`). `C6total = C6 + polyC · M6^130` (`Shoup/Poly6.lean`) with `M6 = 2^{8000·2^{36}}`.
@@ -102,11 +128,12 @@ which the exponent-7 sieve runs, and `C7` contains the bottom-block constant
 
 | Theorem | Tier | Literature |
 |---|---|---|
+| `polyOmegaReal_of_GRH`, `leastPrimitiveRoot_le_real_of_GRH`, `polyOmega5_of_GRH` | C (GRH) | RH-consequence (exponent 21/5, between Wang 1959 and Shoup 1992) |
 | `wang_of_GRH`, `polyOmega6_of_GRH`, `leastPrimitiveRoot_le_six_of_GRH` | C (GRH) | RH-consequence (Wang 1959, as quoted by Shoup 1992) |
 | `polyOmega7_of_GRH`, `leastPrimitiveRoot_le_seven_of_GRH` | C (GRH) | RH-consequence (exponent 7) |
 | `polyOmega_of_GRH`, `leastPrimitiveRoot_le_poly_of_GRH` | C (GRH) | RH-consequence (exponent 136) |
 | `ankenyType_of_GRH`, `leastPrimitiveRoot_le_of_GRH`, `prime_primitive_root_le_of_GRH` | C (GRH) | RH-consequence (weaker than Wang 1959 / Shoup 1992) |
-| `wang_unconditional`, `polyOmega6_unconditional`, `leastPrimitiveRoot_le_six_unconditional`, `polyOmega7_unconditional`, `leastPrimitiveRoot_le_seven_unconditional`, `polyOmega_unconditional`, `leastPrimitiveRoot_le_poly_unconditional`, `ankenyType_unconditional`, `leastPrimitiveRoot_le_unconditional` | U | RH-consequence |
+| `polyOmegaReal_unconditional`, `leastPrimitiveRoot_le_real_unconditional`, `polyOmega5_unconditional`, `wang_unconditional`, `polyOmega6_unconditional`, `leastPrimitiveRoot_le_six_unconditional`, `polyOmega7_unconditional`, `leastPrimitiveRoot_le_seven_unconditional`, `polyOmega_unconditional`, `leastPrimitiveRoot_le_poly_unconditional`, `ankenyType_unconditional`, `leastPrimitiveRoot_le_unconditional` | U | RH-consequence |
 | `ShoupStatement` | not proved | RH-consequence |
 
 * `Erdos985.DirichletLNonvanishingRightOfHalf` is copied verbatim (in erdos-985) from
@@ -139,10 +166,14 @@ which the exponent-7 sieve runs, and `C7` contains the bottom-block constant
 'Shoup.polyOmega6_of_GRH' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Shoup.leastPrimitiveRoot_le_six_of_GRH' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Shoup.wang_of_GRH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Shoup.polyOmegaReal_of_GRH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Shoup.leastPrimitiveRoot_le_real_of_GRH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Shoup.polyOmega5_of_GRH' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 No `native_decide` and no `sorry`. The exponent-6 table (`Shoup/Sieve/Table6.lean`) is checked
-by two kernel `decide` proofs (`tab6_ok`, `tab6_err`, about 9 s together), which add no axioms.
+by two kernel `decide` proofs (`tab6_ok`, `tab6_err`, about 9 s together), and the Rosser table
+(`Shoup/Rosser/Table.lean`) by one (`allOK_cells`, about 60 s); they add no axioms.
 
 ## Proof outline
 
@@ -197,6 +228,35 @@ Same transfer and sieve inequality as above; four inputs are sharpened.
    2^{−n}/(9(2^{2^{20}} + 1))`. The sieve inequality gives
    `x ≤ C m² 2^{4772 n} log² p ≤ C' m^7 log² p` since `2^{1000 n} < 2^{1000} · 1000 m`.
 5. Below `m = M0` the exponent-136 bound is used (`m^{136} ≤ M0^{129} m^7`).
+
+### Exponent 21/5 (`Shoup/Rosser/`, `Shoup/PolyReal.lean`)
+
+Same transfer and sieve inequality (`le_of_no_primitive_root_lt_rep`); the sieve function is
+Rosser's. Full blueprint: [docs/BLUEPRINT.md](docs/BLUEPRINT.md).
+
+1. **Weights** (`Rosser/Defs.lean`): `L(Q,Y) = 1 − Σ_{p∈Q} y_p U(Q_{<p}, Y/p)`,
+   `U(Q,Y) = 1 − Σ_{p∈Q, p^{31}<Y^{10}} y_p L(Q_{<p}, Y/p)` (`β = 2` for the lower weights, upper
+   cut at `3.1`). On `0/1` points `L ≤ 0` unless all `y = 0` and `U ≥ 0` (`ros_sieve`); the
+   mass of `L(Q,Y)` is `≤ Y` when `q² < Y` on `Q` (distinct squarefree monomials `≤ Y`,
+   `rmass_le_cnt`, `cnt_le`).
+2. **Mertens** (`Rosser/Mertens.lean`): for primes `q > 2^{2^{36}}` with `z^{1/t} ≤ q < z`,
+   `∏(1 − 1/q)^{-1} ≤ Ω(t) = 1.001 t (1 + (t−1)/1000)`, from `sigma_block_le` chained over
+   `(2^lo, 2^{4 lo}]` (`Σ 1/q ≤ (1 + cσ/log 4) log(hi/lo) + cσ`, `cσ = 3/4096 + 10^{-5}`).
+3. **One step** (`Rosser/Layer.lean`): `L = V(1 − Σ_p (1/p) W(p) h_p)`,
+   `U = V(1 + Σ_p (1/p) W(p) h'_p)`, `Σ_{u_p ≤ t} (1/p) W(p) ≤ Ω(t) − 1` with
+   `u_p = log z/log p`, and the layer-cake bound `row_bound` for a decreasing step majorant of
+   `h` plus a dyadic tail `h ≤ C/64^k` on `u_p > t_e 2^k`.
+4. **Table** (`Rosser/Check.lean`, `Rows.lean`, `Table.lean`): 232 cells `(g, β, α)`,
+   `s = g/100 ∈ [1, 11.5]`, with `U ≤ V(1 + β)` and `L ≥ V(1 − α)` for `s ≥ g/100`, and
+   `V(1 ± s^{-6})` for `s ≥ 12`. Each row is the inequality one step needs, in fixed point
+   `2^{-48}` rounded up; `allOK_cells` checks all of them by kernel `decide`.
+5. **Induction** (`Rosser/Claims.lean`, `claims_of`): every bound holds for every admissible
+   `Q`, by induction on `|Q|`.
+6. **Assembly** (`PolyReal.lean`): `Z = A^{32} r^{1.01}` (`A = 2^{2^{36}}`), `Y = Z^{2.05}`; the
+   sieve function is `∏_{q ≤ A}(1 − y_q) · L(P ∩ (A, Z), Y) − Σ_{q ≥ Z} y_q`. The cell
+   `s = 2.05` has `α ≤ 0.98`, so `F(1/ℓ) ≥ 1/(200(A+1)t²)`, `t = log Z/log A`; the mass is
+   `≤ (2^{2^{2^{36}}} + 1) Y`; and `x ≤ 1089 (M log p/θ)² ≤ Creal · r^{4.2} log² p` since
+   `Z^{2.05}(log Z)² ≪ r^{2.0755}`.
 
 ### Exponent 6 (`Shoup/Sieve/Buchstab.lean`, `Fixed.lean`, `Factor.lean`, `Design.lean`, `DesignBound.lean`, `Table*.lean`, `Mass6.lean`, `Shoup/Poly6.lean`)
 
@@ -277,6 +337,15 @@ that exponent 6 needs; the error it achieves is `0.924`.
 | `Shoup/Sieve/Mass6.lean` | mass of the designs |
 | `Shoup/Sieve/Table6.lean` | the generated table (137 classes, 1446 rows) |
 | `Shoup/Poly6.lean` | kernel checks of the table and `polyOmega6_of_GRH`, `wang_of_GRH` |
+| `Shoup/Statement2.lean` | added target `PolyOmegaRealStatement` (real exponent) |
+| `Shoup/Rosser/Defs.lean` | Rosser's weights, the `0/1` sieve property, monomial expansion and mass |
+| `Shoup/Rosser/Mertens.lean` | Mertens' product over `(z^{1/t}, z)`, chained block bound |
+| `Shoup/Rosser/Layer.lean` | one sieve step, cumulative weights, layer-cake and dyadic-tail bounds |
+| `Shoup/Rosser/Check.lean`, `Rows.lean` | fixed-point row checker and its soundness |
+| `Shoup/Rosser/Table.lean` | the generated table (232 cells) and its kernel check |
+| `Shoup/Rosser/Claims.lean` | the induction giving all table bounds |
+| `Shoup/PolyReal.lean` | the sieve function and `polyOmegaReal_of_GRH`, `polyOmega5_of_GRH` |
+| `scripts/rosser/` | the linear program and exact checker that produce `Table.lean` |
 
 ## Deviations from the literature
 
@@ -291,12 +360,16 @@ that exponent 6 needs; the error it achieves is `0.924`.
   discretised design in `Table6.lean`, with all Mertens and rounding errors, reaches error
   `0.924 < 1` at `s = 23984/8000 = 2.998`, which with the `2^n` loss in `∏(1 − 1/ℓ)` gives
   `x ≪ m^{5.996} log² p ≤ C m^6 log² p`.
-* **Shoup's exponent is not proved.** `ShoupStatement` needs `s = 2 + o(1)` with only
-  logarithmic losses, i.e. the linear sieve lower bound `f(s) > 0` for `s > 2` (Rosser–Iwaniec
-  β-sieve with its `F`/`f` functions). The upper Brun–Hooley sieve has `F(2) ≈ 2.97` against the
-  optimal `2e^γ ≈ 1.78`, and nesting a second Buchstab step (upper bounds from Brun–Hooley lower
-  bounds) changes `F` by about `0.03`; this route stops near `s ≈ 2.8`, i.e. exponent `≈ 5.6`,
-  which `PolyOmegaStatement` (an integer exponent) cannot record below `6`.
+* **Exponent `21/5` against Shoup's `4` with `(log ω + 1)^4`.** Shoup's Theorem 1.3 (proof
+  details in G. Martin, Acta Arith. 80 (1997), Lemma 7 and Cor. 3.1, via Iwaniec's shifted
+  sieve, Demonstratio Math. 11 (1978)) runs the linear sieve at level `y ≍ z²`, i.e.
+  `s = 2 + O(1/log z)`, using two inputs not formalised here: Rosser's lower function with error
+  `O(1/log y)` at that edge, and the mass bound `Σ|λ_d| ≪ y/(log y)²`. This repo runs Rosser's
+  sieve at the fixed level exponent `s = 2.05`, with all bounds read from a checked table: the
+  table's lower function vanishes near `s ≈ 2.025` and is `≥ 0.02` at `2.05`, and the threshold
+  `Z = A^{32} r^{1.01}` and the `(log Z)²` loss bring the exponent to `2·2.0755 ≤ 4.2`. A fixed
+  table cannot give `s → 2`, so `ShoupStatement` stays open here. The earlier Buchstab +
+  Brun–Hooley route stopped near `s ≈ 2.8`.
 * **Constants are astronomically large.** `C6total` involves `M6 = 2^{8000·2^{36}}`, and
   `C7total` involves `M0 = 2^{1000·2^{23}}` and
   `(2^{2^{21}} + 1)^{2^{2^{21}+1}}`; they are explicit (`irreducible_def`) and never evaluated.
@@ -314,7 +387,8 @@ scripts/check-axioms.sh
 Requires erdos-985 at `9538edb` (HTTPS). With erdos-985's analytic modules already built, the
 whole library builds in a few minutes (`Shoup.Poly` about 45 s, `Shoup.Poly7` about 2 min,
 the exponent-6 modules about 2 min in all, `Shoup.Poly6` with its two kernel `decide` checks
-about 10 s, wall on a loaded box); building erdos-985's analytic part from scratch takes
+about 10 s, `Shoup.Rosser.Table` with its kernel check about 65 s, the other `Shoup.Rosser`
+modules and `Shoup.PolyReal` about 3 min in all, wall on a loaded box); building erdos-985's analytic part from scratch takes
 longer (its `Compute` chunks with `native_decide` are not imported here).
 
 ## Unconditional version
@@ -323,6 +397,9 @@ longer (its `Compute` chunks with `native_decide` are not imported here).
 |---|---|---|
 | `ankenyType_unconditional` | `Shoup.AnkenyTypeStatement` | see below |
 | `leastPrimitiveRoot_le_unconditional` | `g(p) ≤ 1089 (2^{ω(p−1)} log p)²` for odd prime `p` | see below |
+| `polyOmegaReal_unconditional` | `Shoup.PolyOmegaRealStatement (21 / 5)` | standard three |
+| `leastPrimitiveRoot_le_real_unconditional` | `g(p) ≤ Creal · ω(p−1)^{21/5} (log p)²` for odd prime `p` | standard three |
+| `polyOmega5_unconditional` | `Shoup.PolyOmegaStatement 5` | standard three |
 | `wang_unconditional` | `Shoup.WangStatement` | standard three |
 | `polyOmega6_unconditional` | `Shoup.PolyOmegaStatement 6` | standard three |
 | `leastPrimitiveRoot_le_six_unconditional` | `g(p) ≤ C6total · ω(p−1)^6 (log p)²` for odd prime `p` | standard three |
@@ -359,7 +436,7 @@ open-file limit first, e.g. `sudo prlimit --pid $$ --nofile=2000000:2000000`).
 Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh).
 This check links against the community build cache and does not repeat those kernel checks."*
 
-These prove Wang's bound (`WangStatement`), `PolyOmegaStatement 7`, `PolyOmegaStatement 136`
+These prove `g(p) = O(ω(p−1)^{21/5} log² p)`, Wang's bound (`WangStatement`), `PolyOmegaStatement 7`, `PolyOmegaStatement 136`
 and `AnkenyTypeStatement` unconditionally in Lean, with the proof of GRH (Alpöge) from
 riemann-hypothesis.
 
