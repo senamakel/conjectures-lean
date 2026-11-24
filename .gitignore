@@ -1,0 +1,4 @@
+.lake/
+.claude/worktrees/
+worktrees/
+__pycache__/
