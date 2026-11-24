@@ -1,30 +1,39 @@
 # The least quadratic non-residue under GRH (Lamzouri–Li–Soundararajan) in Lean
 
-**Literature status: RH-consequence.** Lamzouri, Li and Soundararajan (*Conditional bounds for
-the least quadratic non-residue and related problems*, Math. Comp. 84 (2015) 2391–2412,
+Lamzouri, Li and Soundararajan (*Conditional bounds for the least quadratic non-residue and
+related problems*, Math. Comp. 84 (2015) 2391–2412,
 [arXiv:1309.3595](https://arxiv.org/abs/1309.3595)) proved under GRH that the least quadratic
 non-residue mod a prime `q ≥ 5` is below `(log q)²` (their Corollary 1.2), and that the least
 prime `ℓ ∤ q` outside a proper subgroup of `(ℤ/q)ˣ` is at most `(log q + B(q))²` (Theorem 1.1).
-Unconditionally only Burgess-type bounds `q^{1/(4√e)+ε}` are known. This repository is a complete
-Lean proof that GRH implies LLS Corollary 1.2, following LLS, and a Lean proof that GRH implies
-Bach's subgroup bound with constant `11/4`, with every `4 ≤ q < 2^18` covered by ankeny-grh's
-proved-sound checker (Bach, Math. Comp. 55 (1990), proved `2`; the companion ankeny-grh
-repository proves `21/5`). Our constant is `11/4`; Bach's is `2`. It is also a Lean proof that
-GRH implies bounds of the shape of LLS Theorem 1.5 for `L(1, χ)`, `χ` primitive mod `q ≥ 10¹⁰`,
-with these constants: `|L(1,χ)| ≤ 2e^γ(log log q + 5)` (LLS:
-`2e^γ(log log q − log 2 + 1/2 + 1/log log q)`) and `1/|L(1,χ)| ≤ 2e^γ(log log q + 5)` (LLS:
-`(12e^γ/π²)(log log q − log 2 + 1/2 + …)`). Combined with Dirichlet's class number formula, it is
-a Lean proof that GRH implies bounds of the shape of LLS Corollary 1.3 for the class number
-`h(−q)` of every imaginary quadratic field, of discriminant `−q` with `q ≥ 10¹⁰`, odd or even:
-`h(−q) ≤ (2e^γ/π)√q(log log q + 5)` and `h(−q) ≥ √q/(2πe^γ(log log q + 5))` (LLS: `(2e^γ/π)√q(log log q
-− log 2 + 1/2 + 1/log log q)` and `(π/(12e^γ))√q/(log log q − log 2 + …)`). Bounds
-`h(−q) ≪ √q log log q` and `h(−q) ≫ √q/log log q` under GRH go back to Littlewood (*On the
-class-number of the corpus P(√−k)*, Proc. London Math. Soc. (2) 27 (1928) 358–372), in
-asymptotic form. Unconditionally the upper bound `h(−q) ≪ √q log q` is elementary, and the best
-lower bounds are Siegel's ineffective `h(−q) ≫_ε q^{1/2−ε}` and an effective bound of order
-`log q` (Goldfeld, Gross–Zagier, Oesterlé). See "Deviations". `Unconditional/` proves all of
-these unconditionally in Lean, with GRH supplied by the certified proof in
-leanprover-community/riemann-hypothesis.
+Unconditionally the best bounds are of Burgess type, `q^{1/(4√e)+ε}`.
+
+This repository proves in Lean, following LLS:
+
+- LLS Corollary 1.2 exactly as stated: for every prime `q ≥ 5` there is a quadratic non-residue
+  `≤ (log q)²`.
+- Bach's subgroup bound with constant `11/4`: every proper subgroup of `(ℤ/q)ˣ` omits a unit
+  `≤ (11/4) log² q`, with every `4 ≤ q < 2^18` covered by ankeny-grh's proved-sound checker.
+  Bach (Math. Comp. 55 (1990)) proved `2`; the companion ankeny-grh repository proves `21/5`.
+- Bounds of the shape of LLS Theorem 1.5 for `L(1, χ)`, `χ` primitive mod `q ≥ 10¹⁰`:
+  `|L(1,χ)| ≤ 2e^γ(log log q + 5)` (LLS: `2e^γ(log log q − log 2 + 1/2 + 1/log log q)`) and
+  `1/|L(1,χ)| ≤ 2e^γ(log log q + 5)` (LLS: `(12e^γ/π²)(log log q − log 2 + 1/2 + …)`).
+- With Dirichlet's class number formula, bounds of the shape of LLS Corollary 1.3 for the class
+  number `h(−q)` of every imaginary quadratic field, of discriminant `−q` with `q ≥ 10¹⁰`, odd
+  or even:
+  `h(−q) ≤ (2e^γ/π)√q(log log q + 5)` and `h(−q) ≥ √q/(2πe^γ(log log q + 5))` (LLS:
+  `(2e^γ/π)√q(log log q − log 2 + 1/2 + 1/log log q)` and
+  `(π/(12e^γ))√q/(log log q − log 2 + …)`).
+
+The main library is a complete Lean proof that GRH implies each of these. `Unconditional/`
+proves all of them unconditionally in Lean, with GRH supplied by the certified proof of
+L. Alpöge in
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
+Literature status: RH-consequence. Our constants differ from the paper's where noted above;
+"Deviations from the literature" gives both numbers. Bounds `h(−q) ≪ √q log log q` and
+`h(−q) ≫ √q/log log q` under GRH go back to Littlewood (*On the class-number of the corpus
+P(√−k)*, Proc. London Math. Soc. (2) 27 (1928) 358–372), in asymptotic form. Unconditionally the
+upper bound `h(−q) ≪ √q log q` is elementary, and the best lower bounds are Siegel's ineffective
+`h(−q) ≫_ε q^{1/2−ε}` and an effective bound of order `log q` (Goldfeld, Gross–Zagier, Oesterlé).
 
 ```lean
 theorem LLS.leastNonresidueBelowLogSq_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
@@ -193,7 +202,7 @@ cores).
 
 The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
 
-1. **Explicit formulas** (`LLS/Analytic/`), for `χ` primitive mod `N`, under GRH, with
+1. Explicit formulas (`LLS/Analytic/`), for `χ` primitive mod `N`, under GRH, with
    `Z2 = Σ_ρ m_ρ/|ρ|²`:
    * LLS Lemma 2.2, log weight (`re_logSum_le`): `Re Σ_{n≤x} Λ(n)χ(n) log(x/n) ≤ (√x+1) Z2 +
      (log N + Re D(1,χ⁻¹)) log x − ½ log π · log x + π²/6 − (γ/2) log x`. New Perron kernel
@@ -204,26 +213,26 @@ The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.
    * `psiLog_ge`: `Σ_{n≤x} Λ(n) log(x/n) ≥ x − (3/20)√x − 3 log x − 3`, by summation by
      parts from erdos-985's principal bound; `vonMangoldt_ces_ge`:
      `Σ_{n<x} Λ(n)/n (1 − n/x) ≥ log x − 2`, unconditional.
-2. **Key inequality** (`LLS/Key.lean`, LLS §3): if `χ ≠ 1` mod `q` is `1` on all `n ≤ x` prime
+2. Key inequality (`LLS/Key.lean`, LLS §3): if `χ ≠ 1` mod `q` is `1` on all `n ≤ x` prime
    to `q`, symmetrising over the inducing `ψ` and `ψ⁻¹` bounds `Z2` from Lemma 2.3 (the sum
    `Σ_{n<x} Λ(n)/n (1−n/x) ≈ log x` is now large, which is LLS's `A(q)` gain) and contradicts
    Lemma 2.2 against the principal sum `≈ x`. Prime powers `p^k ≤ x` with `p ∣ q` are the
    losses (`LLS/Losses.lean`); primes dividing `q` but not the conductor are charged to
    `log f ≤ log q − Σ log p`.
-3. **Budget** (`Numerics/Budget.lean`): the key inequality forces `Φ(x, log q) ≤ 0` for an
+3. Budget (`Numerics/Budget.lean`): the key inequality forces `Φ(x, log q) ≤ 0` for an
    explicit `Φ`; primes `p ≥ 17` dividing `q` cost at most `β log p` each,
    `β = (log x)²/(2 log 17) + K/8`, and `p < 17` are listed. For prime `q > x` the losses
    vanish and the budget is `Φ₁` (`Numerics/Prime.lean`).
-4. **Numerics**: `Φ(⌊(11/4) log² Q_a⌋, log Q_b) > 0` on 28 certified intervals covering
+4. Numerics: `Φ(⌊(11/4) log² Q_a⌋, log Q_b) > 0` on 28 certified intervals covering
    `2^18 ≤ q < 2^700` (`Numerics/Intervals114.lean`, generated by `scripts/emitfile.py`), and
    for `q ≥ 2^700` by a polynomial argument in `x^{1/8}` (`Numerics/Tail114.lean`, reusing
    `Numerics/Tail.lean`). For primes:
    `Φ₁ > 0` with `x = ⌊log² q⌋` on 153 intervals covering `2^12 ≤ q < 2^700`
    (`Numerics/IntervalsP.lean`, `scripts/emit1.py`) and `q ≥ 2^700` (`Numerics/TailP.lean`).
-5. **Finite ranges**: primes `5 ≤ q < 2^12` by Euler-criterion certificates
+5. Finite ranges: primes `5 ≤ q < 2^12` by Euler-criterion certificates
    (`LLS/NonresidueCert.lean`, `scripts/emit_small.py`); `q < 2^18` for the subgroup bound by
    ankeny-grh's checker (`LLS/Finite114.lean`, `LLS/Compute/C114_*.lean`).
-6. **`L(1, χ)`** (`LLS/L1/`), for `χ` primitive mod `q ≥ 10¹⁰`:
+6. `L(1, χ)` (`LLS/L1/`), for `χ` primitive mod `q ≥ 10¹⁰`:
    * `Shift.lean`: for real `σ > 1`, the log-kernel formula with coefficients `χ(n)Λ(n)n^{−σ}`
      gives `|S_σ + (L'/L)(σ) log x + (L'/L)'(σ)| ≤ x^{1/2−σ} Z + 2x^{−σ}` (zeros at `ρ − σ`,
      gamma poles at `−(σ + m_k)`, `(L'/L)'` by termwise differentiation of the Hadamard series);
@@ -237,13 +246,13 @@ The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.
      explicit in `x` and the zero sum `Z ≤ (log q + 2 log x)/(1 − 2/√x)`;
    * `Final.lean`: `x = 10⁵` if `log² q < 10⁵`, else `x = ⌊log² q⌋`; then `c ≤ 4.11` and
      `e^γ (l + c + c²/l) ≤ 2e^γ (log log q + 5)`.
-7. **Class numbers** (`LLS/ClassNumber.lean`), for `q ≡ 3 (mod 4)` squarefree: the Jacobi
+7. Class numbers (`LLS/ClassNumber.lean`), for `q ≡ 3 (mod 4)` squarefree: the Jacobi
    symbol `n ↦ J(n | q)` is a Dirichlet character mod `q` (`jacobiChar`), equal to the Kronecker
    symbol `J(−q | n)` at odd `n` by quadratic reciprocity (`jacobiChar_kronecker`), and
    primitive (`jacobiChar_isPrimitive`: if it factored through `q/p`, `p ∣ q` prime, the CRT
    lift `n ≡ 1 (mod q/p)` of a non-residue mod `p` would have `J(n | q) = −1` and `χ(n) = 1`).
    Then `‖L(1,χ)‖ = π h/√q` from `ClassNumberFormula`, and step 6 gives both bounds.
-8. **Every imaginary quadratic field** (`LLS/ClassNumberAll.lean`):
+8. Every imaginary quadratic field (`LLS/ClassNumberAll.lean`):
    * `discr_isFundamentalDiscr` (`LLS/FundamentalDiscr.lean`): `discr K` is a fundamental
      discriminant. `K ≅ ℚ(√d)`, `d` squarefree (Mathlib's quadratic algebras); with `D = d` or
      `4d`, `QuadraticAlgebra ℤ (D/4) (D%4)` is the integral closure of `ℤ`
@@ -287,8 +296,8 @@ The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.
 
 ## Deviations from the literature
 
-* **Subgroup bound: constant `11/4`, not LLS's `(log q + B(q))²` or Bach's `2`.** We prove the
-  LLS method with somewhat weaker constants: the principal sum is bounded by summation by parts
+* Subgroup bound: our constant is `11/4`; LLS have `(log q + B(q))²` and Bach has `2`. We prove
+  the LLS method with somewhat weaker constants: the principal sum is bounded by summation by parts
   (`x − 0.15√x − 3 log x − 3` instead of LLS Lemma 2.1's `x − 0.046√x − 1.84 log x − 1`), the
   Mertens-type sum unconditionally (`log x − 2` instead of `log x − 1.577`), and the cost of a
   prime factor `p ≥ 17` of `q` crudely (`β log p`). Moduli with many small prime factors are
@@ -297,12 +306,12 @@ The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.
   `(ℤ/q)ˣ`, about `2.3` CPU-hours up to `2^18` at `c = 11/4`, growing like `q²`. So `c = 2`
   is out of reach by this route; with the bounds formalised here `c = 5/2` needs the
   computation to about `2^20` (roughly 16 times the current one) and `c = 11/4` is what fits.
-* **Theorem 1.1 as stated is not proved.** Our constants are weaker than LLS's, so we do not
+* Theorem 1.1 as stated is not proved. Our constants are weaker than LLS's, so we do not
   get `ℓ ≤ (log q + B(q))²`. Also, as written, the proof of LLS Theorem 1.1 appears to bound
   `Σ Λ(n) χ̃(n)/n (1 − n/X)` as if `χ̃(p) = 1` for primes `p ∣ q`, `p ∤ q̃`; for such `p`
   `χ̃(p)` is unknown. Our `LLS.key` charges these primes twice and absorbs them through
   `log f ≤ log q − Σ log p`.
-* **Theorem 1.5 with weaker constants.** We prove LLS Lemma 2.5 (`LLS.log_norm_L1_le`, standard
+* Theorem 1.5 is proved with weaker constants. We prove LLS Lemma 2.5 (`LLS.log_norm_L1_le`, standard
   axioms only) and combine it with Lemma 2.3 in both directions, but the remaining inputs are
   cruder than the paper's:
   * the principal sum `Σ Λ(n)/(n log n) · log(x/n)/log x ≤ log log x + γ − 1 + 3/log x`
@@ -320,17 +329,17 @@ The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.
   `2e^γ(log log q + 5)` for every `q ≥ 10¹⁰`. LLS's own constants are within `0.004` of failing at
   `q = 10¹⁰` (`e^γ(log x + 1 + 3.1/log x)` against `2e^γ(log log q − log 2 + 1/2 + 1/log log q)`),
   so they need all of Lemmas 2.4, 2.6 and 5.1 at full precision.
-* **Corollary 1.3 (class numbers) with weaker constants.** The paper's statement
-  (`ClassNumberUpperBound`, `ClassNumberLowerBound`) is not proved: it is Theorem 1.5 with the
-  paper's constants (not proved, above) plus the class number formula. We prove
-  `ClassNumberUpperBoundWith 5` and `ClassNumberLowerBoundWith 5` for every imaginary
+* Corollary 1.3 (class numbers) is proved with weaker constants, for every imaginary quadratic
+  field. The paper's statement (`ClassNumberUpperBound`, `ClassNumberLowerBound`) is not proved:
+  it is Theorem 1.5 with the paper's constants (not proved, above) plus the class number formula.
+  We prove `ClassNumberUpperBoundWith 5` and `ClassNumberLowerBoundWith 5` for every imaginary
   quadratic field of discriminant `−q`, `q ≥ 10¹⁰`, with our Theorem 1.5 constants: additive
   `5` (LLS: `−log 2 + 1/2 + 1/log log q`, and `+ 14 log log q/log q` in the lower bound) and
-  lower leading constant `1/(2πe^γ)` (LLS: `π/(12e^γ)`). The hypotheses are the paper's
-  (`−q` a fundamental discriminant, stated as `discr K = −q`). The round-5 forms
+  lower leading constant `1/(2πe^γ)` (LLS: `π/(12e^γ)`). The hypotheses are the paper's (`−q` a
+  fundamental discriminant, stated as `discr K = −q`). The round-5 forms
   `ClassNumberUpperBoundOddWith 5`, `ClassNumberLowerBoundOddWith 5` (odd `q`, with explicit
-  `q % 4 = 3`, `Squarefree q`) remain, and follow from these.
-* **Theorem 1.4 (cosets) is not proved.**
+  `q % 4 = 3`, `Squarefree q`) remain.
+* Theorem 1.4 (cosets) is not proved.
 * Corollary 1.2 is proved exactly as stated (`LeastNonresidueBelowLogSq`).
 
 ## Building
@@ -436,4 +445,8 @@ The riemann-hypothesis proof adds no axioms of its own. It was certified by the 
   `Ankeny.exists_dirichletCharacter_trivial_on` and `Ankeny.leastNonresidue_of_bach'` likewise.
 * Mertens' third theorem under RH (`Robin.mertens_RH`, `Robin.psi_upper`, `Robin.psi_lower`,
   `Robin.psi1NatBound_of_bachBound`) is robin-rh's (`dfa8d63`), a lake dependency.
+* GRH (`LFunction_ne_zero_of_half_lt_re`) and the class number formula
+  (`GlobalTheory.LFunction_one_and_mean_log_eta`) come from
+  [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis),
+  commit `507a75d`, imported only from `Unconditional/`. That repository has no licence file.
 * No files are vendored.
