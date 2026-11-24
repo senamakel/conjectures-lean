@@ -1,5 +1,12 @@
 # Mills' constant under RH in Lean
 
+Lean proves that Mills' constant lies in `(1.3063778838, 1.3063778839)`.
+`mills_constant_bounds_unconditional` is proved unconditionally in Lean, from the standard three
+axioms, with RH supplied by the certified proof in
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
+The main library holds a complete Lean proof that RH implies the enclosure, and proves the lower
+bound `A > 1.3063778838` with no hypothesis at all.
+
 Mills (Bull. AMS 53, 1947) showed there is a real `A > 1` with `⌊A^(3^n)⌋` prime for every
 `n ≥ 1`; the least such `A` is *Mills' constant*. Caldwell and Cheng (*Determining Mills'
 constant and a note on Honaker's problem*, J. Integer Seq. 8 (2005), Art. 05.4.1) showed that
@@ -8,15 +15,16 @@ under the Riemann hypothesis it lies in `(1.3063778838, 1.3063778839)`: RH gives
 gets stuck and its limit is a Mills number.
 
 **Literature status.** The enclosure is an *RH-consequence* (Caldwell–Cheng 2005; listed as open
-in formal-conjectures; it follows from RH). The lower bound `A > 1.3063778838` is *known*
-unconditionally (Caldwell–Cheng). The main library is a complete Lean proof that RH implies the
-enclosure, following Caldwell–Cheng, with a prime between consecutive cubes from `x₀ = 10^9`
-and the primality of 2521008887 checked by a Lucas certificate. `Unconditional/` proves the
-enclosure unconditionally in Lean, with RH supplied by the certified proof in
-leanprover-community/riemann-hypothesis. Before the 2026 proof of RH only existence (Mills) and
-irrationality (Saito, Mathematika 71, 2025) were known.
+in formal-conjectures). The lower bound `A > 1.3063778838` is *known* unconditionally
+(Caldwell–Cheng). The proof follows Caldwell–Cheng, with a prime between consecutive cubes from
+`x₀ = 10^9` and the primality of 2521008887 checked by a Lucas certificate. Before the 2026 proof
+of RH, only existence (Mills) and irrationality (Saito, Mathematika 71, 2025) were known.
 
 ```lean
+-- Unconditional/MillsUnconditional.lean
+theorem mills_constant_bounds_unconditional {A : ℝ} (hA : Mills.IsMinMills A) :
+    A ∈ Set.Ioo (1.3063778838 : ℝ) 1.3063778839
+
 -- Mills/Final.lean
 theorem Mills.lower_bound_of_RH : LowerBoundOfRH   -- RiemannHypothesis → ∀ {A}, IsMinMills A → A ∈ Set.Ioo 1.3063778838 1.3063778839
 
@@ -38,11 +46,11 @@ def PrimeBetweenCubes (x₀ : ℕ) : Prop :=
 
 | Theorem | Tier | Hypothesis |
 |---|---|---|
-| `Mills.mills_lower_bound` | **D** | none |
-| `Mills.primeBetweenCubes_of_RH` | **C** | `RiemannHypothesis` (Mathlib's statement) |
-| `Mills.lower_bound_of_RH`, `Mills.mills_bounds_of_RH` | **C** | `RiemannHypothesis` |
+| `Mills.mills_lower_bound` | D | none |
+| `Mills.primeBetweenCubes_of_RH` | C | `RiemannHypothesis` (Mathlib's statement) |
+| `Mills.lower_bound_of_RH`, `Mills.mills_bounds_of_RH` | C | `RiemannHypothesis` |
 | `Mills.mills_bounds_of_primeBetweenCubes` (the reduction) | C + H | `PrimeBetweenCubes x₀`, `x₀ ≤ 2521008887` |
-| `mills_constant_bounds_unconditional` (`Unconditional/`) | **U** | none; RH from riemann-hypothesis |
+| `mills_constant_bounds_unconditional` (`Unconditional/`) | U | none; RH from riemann-hypothesis |
 
 `PrimeBetweenCubes x₀` is the analytic input "a prime lies between `x³` and `(x+1)³` for all
 `x ≥ x₀`". It is proved from RH for `x₀ = 10^9` in `Mills/Cubes.lean`, using
@@ -53,7 +61,7 @@ Schoenfeld's `1/(8π)`, which is why Caldwell–Cheng's `x₀ = 2657` is replace
 `x₀ ≤ 2521008887` is enough, see below). The argument: a prime in `(a, b]` exists when
 `θ(b) > θ(a)`; with `a = x³`, `b = x³ + 3x² + 3x = (x+1)³ − 1` the bound gives `θ(b) − θ(a) > 0`
 as soon as `3x² + 3x > ½ √b log² b`. Putting `t = (x+1)^{1/8}` (so `√b ≤ t¹²`, `log b ≤ 24 t`)
-this reduces to `3(t⁸ − 1)² > 288 t¹⁴`, true for `t ≥ 13`, i.e. `x ≥ 10^9`.
+this reduces to `3(t⁸ − 1)² > 288 t¹⁴`, true for `t ≥ 13`, that is `x ≥ 10^9`.
 
 ### No range below `x₀` needs a direct check
 
@@ -86,7 +94,8 @@ not import riemann-hypothesis.
 'Mills.mills_bounds_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
-The standard three only: no `sorry`, no `native_decide`, no `axiom` declarations. The primality of
+Every theorem uses the standard three axioms and nothing else: there is no `sorry`, no
+`native_decide` and no `axiom` declaration. The primality of
 `2521008887` is a Lucas certificate (`5` is a primitive root, `2521008886 = 2·11·23·4982231`),
 with the modular powers evaluated by `reduce_mod_char`.
 
@@ -132,8 +141,10 @@ Lean `v4.36.0`, Mathlib `fc4f59e5` (via erdos-985 `9538edb`).
 
 ```
 lake exe cache get
-lake build            # target `Mills`; the four modules take about 15 s once Mathlib and erdos-985 are built
+lake build            # target `Mills`
 ```
+
+The four modules take about 15 s once Mathlib and erdos-985 are built.
 
 `Schoenfeld` is a lake dependency (`schoenfeld-rh` rev `14df2ce`); with it a cold build adds about 2.5 minutes.
 
@@ -153,9 +164,14 @@ lake build            # target `Mills`; the four modules take about 15 s once Ma
 
 Checked against riemann-hypothesis commit `507a75d91d` with
 `scripts/check-unconditional.sh /path/to/riemann-hypothesis` (needs about 93 GB of cache, about
-19 GB of RAM and a limit of roughly 900k open files). The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
+19 GB of RAM and a limit of roughly 900k open files; on Linux run
+`sudo prlimit --pid $$ --nofile=2000000:2000000` first).
+
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
-No vendored files in this repository (the Schoenfeld bounds come from the `schoenfeld-rh` dependency). The statements are from google-deepmind/formal-conjectures (Apache-2.0,
-commit `86a2f58a`).
+No files are vendored. The Schoenfeld bounds come from the `schoenfeld-rh` lake dependency.
+`IsMills`, `IsMinMills` and the `lower_bound_of_RH` statement are copied from
+[formal-conjectures](https://github.com/google-deepmind/formal-conjectures) (Apache-2.0, commit
+`86a2f58a`).
