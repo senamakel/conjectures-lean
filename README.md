@@ -297,6 +297,17 @@ Round 5 (Selberg's almost-all theorem), checked on 2026-11-24 against riemann-hy
 'large_gaps' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
+Round 6 (Selberg's asymptotic form), checked on 2026-11-24 against riemann-hypothesis
+`507a75d91d`, this repository at `651e094`, 27 minutes wall:
+
+```
+'erdos_233_upper_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'selberg_almost_all' depends on axioms: [propext, Classical.choice, Quot.sound]
+'selberg_asymptotic' depends on axioms: [propext, Classical.choice, Quot.sound]
+'smoothed_selberg_asymptotic' depends on axioms: [propext, Classical.choice, Quot.sound]
+'large_gaps' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
+
 The riemann-hypothesis import needs its community cache (about 93 GB), about 19 GB of RAM and
 about 900,000 open files. The run above took 37 minutes wall, most of it restoring that cache.
 
