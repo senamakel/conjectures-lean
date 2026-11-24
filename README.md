@@ -5,9 +5,10 @@ hypothesis, and `Unconditional/` proves all three unconditionally with the certi
 of RH (L. Alpöge, 2026).
 
 The first is the prime-gap bound (Cramér 1920, *Arkiv för Matematik, Astronomi och Fysik* **15**,
-no. 5), with an explicit constant. Every interval `(x, x + (3/2)√x log x]` with `x ≥ 2` contains a
-prime, so `p_{n+1} − p_n ≤ (3/2)√p_n log p_n` for every `n` and
-`p_{n+1} − p_n = O(√p_n log p_n)`. (The first version, with constant `2`, is kept.)
+no. 5), with an explicit constant. Every interval `(x, x + (107/100)√x log x]` with `x ≥ 2`
+contains a prime, so `p_{n+1} − p_n ≤ 1.07 √p_n log p_n` for every `n` and
+`p_{n+1} − p_n = O(√p_n log p_n)`. The constant `1.07` is below Dudek's `4/π ≈ 1.273`. (The
+earlier versions, with constants `2` and `3/2`, are kept.)
 
 The second is the mean square of `ψ(x) − x` (Cramér 1922, *Ein Mittelwertsatz in der
 Primzahltheorie*, *Math. Z.* **12**, 147-153; Montgomery–Vaughan, *Multiplicative Number
@@ -25,8 +26,8 @@ are due to Dudek (2015, *Int. J. Number Theory* **11**, 771-778; a prime in
 Dudek–Grenié–Molteni (2016, *Int. J. Number Theory* **12**, 1391-1407, Theorem 1.1: half-width
 `(1/2 + 2/log x)√x log x` for `x ≥ 2`) and Carneiro–Milinovich–Soundararajan (2019,
 *Comment. Math. Helv.* **94**, 533-568, Theorem 5: a prime in `[x, x + (22/25)√x log x]` for
-`x ≥ 4`, so `p_{n+1} − p_n ≤ (22/25) √p_n log p_n` for `p_n > 3`). Our constant is `3/2`; see
-"Deviations".
+`x ≥ 4`, so `p_{n+1} − p_n ≤ (22/25) √p_n log p_n` for `p_n > 3`). Our constant is `107/100`;
+see "Deviations".
 Without RH the best gap exponent is Baker–Harman–Pintz (2001), `O(p_n^{0.525})`. The mean-square
 bound is Cramér's; Brent–Platt–Trudgian (2022, *J. Number Theory* **238**, 740-762) give the
 constant `0.8603` for `lim sup X^{-2} ∫_X^{2X}`. The asymptotic `∼ c₁ log X` goes back to Cramér
@@ -38,13 +39,23 @@ Cramér's 1936 conjecture
 
 The main library is a complete Lean proof that RH implies Cramér's bounds. The gap bound follows
 Cramér (1920) through a triangular (Fejér-type) weight, the second difference of `ψ₁`; the
-constant `3/2` comes from bounding each zero's contribution by its exact size
-`h²a^{−1/2} sin²x/x²` (`x = γh/2a`) and majorising that by one Lorentzian, which Hadamard's
-product sums exactly. The mean
+constant `107/100` comes from bounding each zero's contribution by its size
+`h²m^{−1/2} sin²x/x²` (`x = γh/2m`, `m` the centre of the interval) up to an `O(h/(mx))` error,
+and majorising that by 53 pairs of Lorentzians centred at `±τ`, which Hadamard's product at
+complex points sums exactly. The mean
 square goes through the explicit formula and the convergence of `Σ_ρ log|γ|/|ρ|²`, as in the
 classical proof:
 
 ```lean
+theorem Cramer.primeInShortInterval_107_of_RH (hRH : RiemannHypothesis) :
+    Cramer.PrimeInShortInterval (107 / 100)
+
+theorem Cramer.primeGapExplicit_107_of_RH (hRH : RiemannHypothesis) :
+    Cramer.PrimeGapExplicit (107 / 100)
+
+theorem Cramer.primeInClosedInterval_107_of_RH (hRH : RiemannHypothesis) :
+    Cramer.PrimeInClosedInterval 2 (107 / 100)
+
 theorem Cramer.primeInShortInterval_three_halves_of_RH (hRH : RiemannHypothesis) :
     Cramer.PrimeInShortInterval (3 / 2)
 
@@ -147,7 +158,13 @@ asserts convergence of the series, so `cramerConstant` is not `∑'`'s junk valu
 
 | Theorem | Tier | Hypothesis |
 |---|---|---|
-| `Cramer.primeInShortInterval_three_halves_of_RH` | C | `RiemannHypothesis` (Mathlib's statement) |
+| `Cramer.primeInShortInterval_107_of_RH` | C | `RiemannHypothesis` (Mathlib's statement) |
+| `Cramer.primeGapExplicit_107_of_RH` | C | `RiemannHypothesis` |
+| `Cramer.primeInClosedInterval_107_of_RH` | C | `RiemannHypothesis` |
+| `cramer_primeInShortInterval_107` (`Unconditional/`) | U | none; RH from riemann-hypothesis |
+| `cramer_primeGapExplicit_107` (`Unconditional/`) | U | none; RH from riemann-hypothesis |
+| `cramer_primeInClosedInterval_107` (`Unconditional/`) | U | none; RH from riemann-hypothesis |
+| `Cramer.primeInShortInterval_three_halves_of_RH` | C | `RiemannHypothesis` |
 | `Cramer.primeGapExplicit_three_halves_of_RH` | C | `RiemannHypothesis` |
 | `Cramer.primeInClosedInterval_three_halves_of_RH` | C | `RiemannHypothesis` |
 | `cramer_primeInShortInterval_three_halves` (`Unconditional/`) | U | none; RH from riemann-hypothesis |
@@ -256,6 +273,45 @@ Steps 1, 4 and 5 are shared; `Cramer/Identity.lean` now states Step 4 for any bo
    (`Cramer/Sharp/Small.lean`).
 7. Assembly (`Cramer/Main4.lean`).
 
+### Constant `107/100`
+
+Steps 1, 4 and 5 of the first outline are shared (`psi1N_second_diff_ge_of_zeroSum` takes any
+bound on the zero sum). Files are in `Cramer/Shift/`.
+
+1. **Centred bound** (`Center.lean`). With `m = a + h`, `ε = h/m`, write
+   `(1 ± ε)^{ρ+1} = e^{±iγε} e^{w±}`. Then `‖D_ρ‖ ≤ m^{3/2}(4 sin²(γε/2) + 2(w + w²))/γ²`,
+   `w = (3/2)ε/(1−ε) + |γ|(ε²/2 + ε³/(1−ε))`. Relative to `A = h²m^{−1/2}` the error is
+   `O(ε/x)`, not `O(εx)` as in the left-endpoint bound, so the zeros of `sin²x` can be used up to
+   `x ≈ 10`.
+2. **Three envelopes** (`PerZero.lean`). For `ε ≤ 1/800` and `y = |γh/2m|`, `‖D_ρ‖/A` is at most
+   `802/(800y²)` (trivial bound), `((1 − cos 2y) + w(y) + w(y)²)/(2y²)` with
+   `w(y) = (1200 + 801y)/639200` (Step 1), or, for `y ≤ 1`,
+   `(800/799)(T(y²)² + (799 + 3200y)/638401)` (the `3/2` bound, `T(u) = 1 − u/6 + u²/120`).
+3. **The majorant** (`Check.lean`, `Data.lean`, `Tail.lean`, `Facts.lean`).
+   `M(x) = Σ c (lor(σ, x−τ) + lor(σ, x+τ))`, `lor(σ, y) = σ²/(σ²+y²)`, 53 terms with
+   `σ ∈ {0.15, 4, 14, 30}`, `τ ∈ {0, 1/8, …, 12}`, `Σ 2cσ = 1.0671`, found by a linear program
+   (`scripts/shift_lp.py`). 4033 cells cover `[0, 150]`; on each, `cellOK` checks one envelope
+   against the smaller endpoint value of each Lorentzian, in integer arithmetic: `1 − cos 2x` is
+   bounded by writing `2x = kπ + t`, `|t| ≤ 3`, with `3.141592 < π < 3.141593` and
+   `cos ≥ T₁₀`, `cos ≤ T₈` (`Cramer/Shift/Taylor.lean`). For `x ≥ 150` the centred terms alone beat
+   `802/(800x²)`. All of it is kernel `decide`; `cellOK_sound`, `chainOK_sound`, `tail_good` prove
+   the checks sound.
+4. **Zero sums at complex points** (`ZeroSum.lean`, `MajSum.lean`). Hadamard's product at
+   `s = 1/2 + S + iT` gives `Σ_ρ m_ρ S²/(S² + (γ−T)²) ≤ S(Lc(S,T) + 1/40)` under RH, where
+   `Lc` bounds `Re ξ'/ξ(s)` with `Re ψ(σ+it) ≤ log σ + ½ log(1 + t²/(σ−1)²)` (vendored, see
+   Credits) and `Re ζ'/ζ(s) ≤ 1.52 · 2^{3/2−Re s}`. In `γ`, each `lor(σ, x ∓ τ)` is such a
+   Lorentzian with `S = 2mσ/h`, `T = ±2mτ/h`.
+5. **Two numbers** (`Bucket.lean`). Each term gets a bucket `4^{n−6}` above
+   `(σ + 1/3200)²(1 + τ²/(σ − 3/3200)²)`, so the zero term is at most
+   `4√m (SS · ½ log(m/h) + NS · ½ log 2)`, `SS = Σ cσ ≤ 0.5336`, `NS = Σ cσ(n−6) ≤ 0.207`.
+6. **Analytic range** (`Interval.lean`, `Large.lean`). For `x ≥ 10^8`, `a = ⌊x⌋ + 1`,
+   `h = ⌈(107/200)√x log x⌉ − 1`: `800h ≤ a + h`, `log(m/h) ≤ ℓ/2 − 2`, and the condition reduces
+   to `(ℓ + 0.7)(0.535ℓ + 2 + 1.26t²) + 0.18ℓ² + 3 < 1.847t³`, `x = t⁶`, `ℓ = log x`.
+7. **Finite range** (`Small.lean`). A chain of 1176 primes from 2 to 100102841 with
+   `q_{i+1} − q_i ≤ (107/100)√q_i log q_i`, `log q_i` bounded below through `2^k ≤ q_i^16`
+   (`scripts/shift_chain.py`).
+8. Assembly (`Cramer/Main5.lean`).
+
 ### Mean square
 
 `psi1 y = Σ_{n ≤ y} Λ(n)(y − n) = ∫_0^y ψ` is erdos-233's; its explicit formula for real `y`
@@ -330,6 +386,21 @@ mean square uniformly in `δ`.
 | `Cramer/Sharp/Large.lean` | Constant `3/2`, Step 5 (`x ≥ 6.4·10^7`) |
 | `Cramer/Sharp/Small.lean` | Constant `3/2`, Step 6 (the 696-prime chain) |
 | `Cramer/Main4.lean` | Headline theorems (constant `3/2`) |
+| `Cramer/Vendor/Digamma.lean` | `Re ψ(σ+it)` bound, vendored from calr3/ternary-goldbach |
+| `Cramer/Shift/Taylor.lean` | Constant `107/100`: `cos` Taylor bounds to degree 10 |
+| `Cramer/Shift/Center.lean` | Constant `107/100`, Step 1 (centred `‖D_ρ‖`) |
+| `Cramer/Shift/Check.lean` | Step 3: the integer cell check and its soundness |
+| `Cramer/Shift/PerZero.lean` | Step 2: `‖D_ρ‖ ≤ A·M(x)` from good cells |
+| `Cramer/Shift/ZeroSum.lean` | Step 4: Hadamard at complex `s`, `Lc` |
+| `Cramer/Shift/MajSum.lean` | Step 4: the zero sum of the majorant |
+| `Cramer/Shift/Tail.lean` | Step 3: the tail `x ≥ 150`, assembly of the cells |
+| `Cramer/Shift/Bucket.lean` | Step 5 |
+| `Cramer/Shift/Interval.lean` | Step 6: prime in `[a, a+2h)` |
+| `Cramer/Shift/Large.lean` | Step 6 (`x ≥ 10^8`) |
+| `Cramer/Shift/Data.lean` | Step 3: `maj107` and the 4033 cells (generated) |
+| `Cramer/Shift/Facts.lean` | Step 3, 5: the checked facts about `maj107` |
+| `Cramer/Shift/Small.lean` | Step 7: the 1176-prime chain (generated) |
+| `Cramer/Main5.lean` | Headline theorems (constant `107/100`) |
 | `Cramer/Statement2.lean` | Mean-square target definitions (fixed) |
 | `Cramer/MeanSquare/Coeff.lean` | Mean square, Step 1 |
 | `Cramer/MeanSquare/Explicit.lean` | Mean square, Step 2 |
@@ -348,47 +419,54 @@ mean square uniformly in `δ`.
 
 ## Deviations from the literature
 
-### Constant `3/2` instead of `22/25`
+### Constant `107/100` instead of `22/25`
 
-We prove `3/2`; Carneiro–Milinovich–Soundararajan prove `22/25 = 0.88` (for `x ≥ 4`, closed
-interval), Dudek–Grenié–Molteni `1 + 4/log x` and Dudek `4/π ≈ 1.273` (both as total interval
-lengths in units of `√x log x`). `22/25` is not proved here; nor are the two intermediate ones.
+We prove `107/100 = 1.07`; Carneiro–Milinovich–Soundararajan prove `22/25 = 0.88` (for `x ≥ 4`,
+closed interval), Dudek–Grenié–Molteni `1 + 4/log x` and Dudek `4/π ≈ 1.273` (both as total
+interval lengths in units of `√x log x`). `1.07` is below Dudek's constant, and below
+`1 + 4/log x` for `x < e^{57}`; for larger `x` Dudek–Grenié–Molteni's interval is shorter.
+`22/25` is not proved here.
 
-Where the constant comes from. Both versions use the triangular weight on `[a, a+2h]`, whose
-transform at a zero is `‖D_ρ‖ ≈ h²a^{−1/2} sin²x/x²`, `x = γh/2a`, and both sum over zeros through
-Hadamard's product at a real point, which sums a Lorentzian `σ/(σ² + γ²)` exactly. With zero
-density `(1/2π) log T`, a Lorentzian majorant `M(x) ≥ sin²x/x²` gives the constant `∫M/π`
-(`∫ sin²x/x² = π` would give `1`).
+Where the constant comes from. All three versions use the triangular weight on `[a, a+2h]`, whose
+transform at a zero is `‖D_ρ‖ ≈ h²m^{−1/2} sin²x/x²`, `x = γh/2m`, and sum over zeros through
+Hadamard's product, which sums a Lorentzian exactly. With zero density `(1/2π) log T`, a
+Lorentzian majorant `M(x) ≥ sin²x/x²` gives the constant `∫M/π` (`∫ sin²x/x² = π` would give
+`1`).
 
-* Constant `2` (`Cramer/ZeroSum.lean`): `‖D_ρ‖ ≤ min(A, B/γ²)`; the best Lorentzian above
-  `min(1, 1/x²)` has `∫M = 2π`, and no positive mix of centred Lorentzians does better.
-* Constant `3/2` (`Cramer/Sharp/`): the exact size `sin²x/x²` up to `x² ≤ 2`, majorised by
-  `(7/4)/(49/36 + x²)`, `∫M = (3/2)π`. The best single centred Lorentzian has `∫M ≈ 1.4492π`,
-  and a linear program shows mixtures of centred Lorentzians do no better, so this method tops
-  out at `≈ 1.4492`.
+* Constant `2` (`Cramer/ZeroSum.lean`): `‖D_ρ‖ ≤ min(A, B/γ²)`, one Lorentzian, `∫M = 2π`.
+* Constant `3/2` (`Cramer/Sharp/`): one centred Lorentzian above `sin²x/x²` for `x² ≤ 2`,
+  `∫M = (3/2)π`. Mixtures of centred Lorentzians cannot beat `≈ 1.4492`.
+* Constant `107/100` (`Cramer/Shift/`): Lorentzians centred at `±τ` (Hadamard at complex
+  points), which can follow the zeros of `sin²x`, and the centred error bound, which keeps the
+  error `O(ε/x)`. The linear program gives `∫M/π = 1.0671` with `σ ≥ 0.15`, `τ ≤ 12` and a 0.4%
+  safety margin; `107/100` leaves 0.3% for the finite range of `x`.
 
-What stands between `3/2` and `22/25`:
+Sized next steps, none proved here:
 
-1. **Zero sums beyond centred Lorentzians.** Lorentzians centred at `t ≠ 0` (Hadamard at
-   complex `s = 1/2 + σ + it`) could follow `sin²x/x²`: a linear program over such mixtures
-   gives `≈ 1.12` for this weight. That needs `Re ψ(s/2) ≤ log|s/2| + O(1)` for complex `s`
-   (erdos-985 has the digamma bounds on the real line only) and a majorant inequality over many
-   oscillations, which needs certified bounds for `sin` far beyond Taylor range.
-2. **Better weights.** Piecewise-linear weights are second differences of `Ψ₁` at several
-   points, so the explicit formula already covers them. Numerically, with one centred Lorentzian,
-   5 knots give `≈ 1.29` and 9 knots `≈ 1.23`, below Dudek's `4/π`. Each needs a certified
-   bound `|Ŵ(ξ)| ≤ α/(1 + ξ²/β²)` for an oscillating trigonometric `Ŵ` on `ξ ≲ 20`.
-3. **`22/25` itself** uses the Guinand–Weil explicit formula for a band-limited kernel
-   (`cos(2πx)/(1 − 16x²)`; their Lemma 9 is a Perron-type formula for
-   `Σ Λ(n)n^{−1/2}cos(ϑ log(a/n))`, not in erdos-985), Trudgian's explicit
-   `|N(T) − (T/2π)log(T/2πe) − 7/8| ≤ 0.112 log T + 0.278 log log T + 2.51 + 0.2/T` (their
-   Lemma 10; not in Mathlib or in these repositories: density-rh's `N(T) ≪ T log T` has an
-   existential constant), Montgomery–Vaughan's explicit Brun–Titchmarsh
-   `π(x+y) − π(x) < 2y/log y` (large sieve), and the range `x < 4·10^18` from Oliveira e Silva,
-   Herzog and Pardi's gap computation. A Lean replay of that range with a `(22/25)√x log x`
-   chain needs about `10^8` certified primes of up to 19 digits, far past this repository's
-   computing budget; with explicit error terms of their kind the analytic threshold could come
-   down, but `22/25` is within `0.3%` of their `1/J(F) = 0.8768`, so the margin is thin.
+| Route | Constant | What it needs |
+|---|---|---|
+| Narrower shifted Lorentzians (`σ ≥ 0.1`) | `≈ 1.064` | more terms and cells; same proof |
+| Piecewise-linear weight, 3 knots, shifted Lorentzians | `≈ 1.05` (LP, `σ ≤ 4`) | the explicit formula for 5-point second differences of `Ψ₁`, the centred bound for them, two-sided `sin²` enclosures |
+| Triangle weight, exact zero density | `→ 1.0` | an explicit `N(T)`: schoenfeld-rh now proves Rosser's, at the cost of about 95,000 vendored lines |
+| Piecewise-linear weights, exact zero density | `→ 0.925` | the above; `0.925` is the floor of `∫|ŵ|/(4π∫w)` over weights supported in the interval |
+| Carneiro–Milinovich–Soundararajan | `22/25` | weights negative outside the interval, paid for by an explicit Brun–Titchmarsh inequality |
+
+So `22/25` is out of reach of any weight supported in `[x, x + c√x log x]`: such weights stop at
+`≈ 0.925`. CMS go below by letting the weight extend past the interval and bounding the primes
+there with Montgomery–Vaughan's `π(x+y) − π(x) < 2y/log y`. Their proof needs (i) the
+explicit formula for their band-limited kernel (their Lemma 9, for
+`Σ Λ(n)n^{−1/2}cos(ϑ log(a/n))`; erdos-985 has the explicit formula only for `Ψ₁`-type weights),
+(ii) an explicit `N(T)` (their Lemma 10 is Trudgian's; Rosser's, now in schoenfeld-rh,
+`|N(T) − (T/2π)log(T/2πe) − 7/8| < 0.137 log T + 0.443 log log T + 1.588`, would do), (iii) the
+Brun–Titchmarsh inequality (large sieve or Selberg sieve; not in Mathlib) and (iv) a certified
+value of their extremal ratio `J(F) ≥ 25/22`. They assume `x ≥ 4·10^18` only to cover the rest
+with the gap computation of Oliveira e Silva, Herzog and Pardi. Their final inequality,
+`(cJ/2) log x ≤ ½ log x − log((c log 2/2) log x) + 1.16 + E(x)`, is contradictory as soon as
+`log(0.305 log x) > 1.16 + E(x)`, where `E(x)` collects the prime-power and discretisation terms
+they bounded using `x ≥ 4·10^18`; with those terms recomputed at finite `x` (the prime powers cost
+`≈ 2(log x + 1)³/(log 2 · √x)`) the analytic part would work from about `x ≈ 3·10^9`, and the
+range below needs a chain of about 5,700 primes, well within reach of the kernel checks used here.
+That sizing is ours, not CMS's, and is not checked in Lean.
 
 ### Mean square: `O`-constants and the asymptotic's error term
 
@@ -399,7 +477,7 @@ for `lim sup X^{-2} ∫_X^{2X} (ψ − x)²` is not proved. The asymptotic
 error: Montgomery–Vaughan's `O(1)` error term is not proved, and the numerical value
 `c₁ ≈ 0.046` is not computed in Lean.
 
-### Analytic thresholds `10^6` and `6.4·10^7`
+### Analytic thresholds `10^6`, `6.4·10^7` and `10^8`
 
 The exact form of the Step 6 inequality already holds with
 `c = 2` from about `1.9·10^3`; Step 7 uses simpler polynomial bounds that need `x ≥ 10^6`. The
@@ -408,6 +486,10 @@ range below is covered by the 99-prime chain, so no cited computation remains.
 For `3/2` the threshold comes from the error in the sharp bound: `h/a ≤ 1/400` is needed for the
 polynomial inequality of Step 3, i.e. `√x/log x ≳ 300`, and `x ≥ 6.4·10^7` (`t = x^{1/6} ≥ 20`)
 makes Step 5 clean. Below it the 696-prime chain checks every gap; no cited computation remains.
+
+For `107/100` the threshold `10^8` comes from the majorant, which is checked for `ε = h/m ≤ 1/800`;
+`ε ≈ 0.535 log x/√x` drops below `1/800` near `6·10^7`. The exact inequality of Step 6 holds with
+a wide margin from `10^6` on. Below `10^8` the 1176-prime chain checks every gap.
 
 ## Building
 
