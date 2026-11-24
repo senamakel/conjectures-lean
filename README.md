@@ -1,20 +1,25 @@
 # Speiser's theorem under RH in Lean
 
-**Literature status: RH-equivalent.** Speiser (*Geometrisches zur Riemannschen Zetafunktion*,
-Math. Ann. **110** (1934), 514–521) proved that the Riemann hypothesis is equivalent to
-`ζ'(s) ≠ 0` for `0 < Re s < 1/2`. Levinson and Montgomery (*Zeros of the derivatives of the
-Riemann zeta-function*, Acta Math. **133** (1974), 49–65, Theorem 1 and its corollary) gave an
-analytic proof and a quantitative form. The direction RH ⇒ `ζ'` zero-free was rediscovered by
-Spira (1965). Unconditionally, Levinson–Montgomery show that `ζ` and `ζ'` have the same
-number of zeros in `0 < Re s < 1/2` up to height `T`, up to `O(log T)`. `Unconditional/`
-proves `ζ'(s) ≠ 0` throughout `0 < Re s < 1/2` unconditionally in Lean, with RH supplied by the
-certified proof in leanprover-community/riemann-hypothesis. Speiser's statement is equivalent to
-RH, so this theorem is RH in another form. The band `5/2 ≤ |Im s| < 7` is covered here by a
-proved-sound checker (71,223 cells per half, 186 s of CPU) that needs no hypothesis.
+`ζ'(s) ≠ 0` throughout the strip `0 < Re s < 1/2`: `speiser` proves this unconditionally in
+Lean, with RH supplied by the certified proof in
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
+(L. Alpöge, 2026). Speiser's statement is equivalent to RH, so this theorem is RH in another
+form. The main library is a complete Lean proof that RH implies `ζ'(s) ≠ 0` throughout
+`0 < Re s < 1/2`, following Levinson–Montgomery's real-part argument for large `|Im s|`. The
+band `5/2 ≤ |Im s| < 7` is covered by a proved-sound checker (71,223 cells per half, 186 s of
+CPU) that needs no hypothesis.
 
-The main library is a complete Lean proof that RH implies `ζ'(s) ≠ 0` throughout `0 < Re s < 1/2`,
-following Levinson–Montgomery's real-part argument for large `|Im s|`. The strip is covered in
-three pieces:
+**Literature status: RH-equivalent.** Speiser (*Geometrisches zur Riemannschen Zetafunktion*,
+Math. Ann. **110** (1934), 514-521) proved that the Riemann hypothesis is equivalent to
+`ζ'(s) ≠ 0` for `0 < Re s < 1/2`. Levinson and Montgomery (*Zeros of the derivatives of the
+Riemann zeta-function*, Acta Math. **133** (1974), 49-65, Theorem 1 and its corollary) gave an
+analytic proof and a quantitative form. Spira (1965) rediscovered the direction RH ⇒ `ζ'`
+zero-free. Unconditionally, Levinson–Montgomery show that `ζ` and `ζ'` have the same number of
+zeros in `0 < Re s < 1/2` up to height `T`, up to `O(log T)`.
+
+## Headline theorems
+
+The strip is covered in three pieces:
 
 * `|Im s| ≥ 7`: the real-part argument, under RH;
 * `|Im s| < 5/2`: a size argument on the same Hadamard sum, under RH, real segment included;
@@ -57,8 +62,8 @@ def SpeiserBand (a b : ℝ) : Prop :=
 | `speiser` (`Unconditional/`) | U | none |
 | `speiser_above`, `speiser_below` (`Unconditional/`) | U | none |
 
-`speiser_of_RH_of_band` and `speiser_of_RH_of_below` (the previous milestones, which take the
-missing region as a hypothesis) are kept; `speiser_of_RH` supersedes them.
+`speiser_of_RH_of_band` and `speiser_of_RH_of_below` take the band or the low region as a
+hypothesis; `speiser_of_RH` combines them with `speiserBand` and `speiserBelow_of_RH`.
 
 `RiemannHypothesis` is Mathlib's. formal-conjectures has no statement of Speiser's theorem
 (searched 2026-11-24 for "Speiser" and `deriv riemannZeta`), so the targets are this repo's own.
@@ -104,16 +109,16 @@ of `ζ'` would give `ξ'/ξ(s) = E(s) := 1/s + 1/(s-1) - (1/2) log π + (1/2) ψ
    gives `ξ'/ξ(z) = b + Σ_ρ m_ρ (1/(z-ρ) + 1/ρ)`. At `z = 0` the sum vanishes, so `b = ξ'(0)`.
    The functional equation gives `ξ'(1) = -ξ'(0)`. Under RH, `1 - ρ = conj ρ`, so
    `Re ξ'/ξ(z) = Σ_ρ m_ρ (Re z - 1/2)/|z-ρ|²`.
-2. **`|t| ≥ 7`** (`Speiser/Gamma.lean`, `re_archimedean_pos`). `Re E(s) > 0.014`, from 20 terms of
+2. The range `|t| ≥ 7` (`Speiser/Gamma.lean`, `re_archimedean_pos`). `Re E(s) > 0.014`, from 20 terms of
    `ψ(w) - ψ(1) = Σ_k (1/(k+1) - 1/(k+w))`, each bounded by the exact maximum of
    `u/(u² + 49/4)` on `[n, n+1/4]`, together with `γ < 0.5851` (`H₆₄ - 6 log 2`),
    `log π < 1.1455` and `Re 1/(s-1) ≥ -1/50`. Step 1 gives `Re ξ'/ξ(s) ≤ 0`, a contradiction.
-3. **`|t| < 5/2`** (`Speiser/Low.lean`). `ξ'(1) = Λ₀(1) = 1 + (γ - log 4π)/2 < 0.0295`. Step 1 at
+3. The range `|t| < 5/2` (`Speiser/Low.lean`). `ξ'(1) = Λ₀(1) = 1 + (γ - log 4π)/2 < 0.0295`. Step 1 at
    `z = 1` gives `Σ_ρ m_ρ (1/2)/(1/4 + γ_ρ²) < 0.0295`, so every zero has `γ_ρ² ≥ 16`. For
    `|t| ≤ 5/2` this gives `Re ξ'/ξ(s) ≥ -(65/9)·0.0295 > -0.214`, while `Re E(s) < -0.38`
    (ten series terms, each at most the exact minimum of `u/(u² + 25/16)`, plus a
    `(15/8)(π²/6 - Σ_{n≤10} 1/n²)` tail).
-4. **`5/2 ≤ |t| < 7`** (`Speiser/Band/`, no RH):
+4. The band `5/2 ≤ |t| < 7` (`Speiser/Band/`, no RH):
    - `EulerMaclaurin.lean`: for `f(x) = x^{-s}`, one fundamental-theorem-of-calculus step with
      the positive kernel `K(u) = u²(1-u)²/24` gives
      `r_n(s) := (f(n)+f(n+1))/2 - ∫_n^{n+1} f - (f'(n+1)-f'(n))/12 = -∫₀¹ K f''''(n+u) du`, so
@@ -133,19 +138,6 @@ of `ζ'` would give `ξ'/ξ(s) = E(s) := 1/s + 1/(s-1) - (1/2) log π + (1/2) ψ
      `M1` and the Cauchy bound for `T'`.
 
 Design and sizing of the computation, and the options rejected: [`docs/BAND.md`](docs/BAND.md).
-
-## Deviations from the literature
-
-None in the statement: `SpeiserStatement` is proved in full under RH. The route differs from
-Levinson–Montgomery's in the bounded region. They use known numerical facts about the low zeros
-(`β = 1/2` for `|γ| < 1000`, explicit `N(T)`). Here the low zeros are never located: below
-`|t| = 5/2` a lower bound `γ² ≥ 16` on every zero, read off from `ξ'(1)`, is enough, and the band
-`5/2 ≤ |t| < 7` is a direct certified computation of `ζ'`.
-
-The thresholds come from the arguments:
-- The real-part argument stops at `|t| ≈ 6.52`, where `Re E` first vanishes (at `σ = 0`). `7`
-  comes from bounding each series term by its worst case over `σ`.
-- The size argument would reach about `|t| ≈ 3` with the exact `ξ'(1)`.
 
 ## Layout
 
@@ -168,6 +160,19 @@ The thresholds come from the arguments:
 | `SpeiserCompute/Core.lean` | The executable checker (Lean core only) |
 | `Unconditional/SpeiserUnconditional.lean` | One-line discharges with `riemannHypothesis` |
 | `scripts/Axioms.lean` | `#print axioms` for the headline theorems |
+
+## Deviations from the literature
+
+None in the statement: `SpeiserStatement` is proved in full under RH. The route differs from
+Levinson–Montgomery's in the bounded region. They use known numerical facts about the low zeros
+(`β = 1/2` for `|γ| < 1000`, explicit `N(T)`). Here the low zeros are never located: below
+`|t| = 5/2` a lower bound `γ² ≥ 16` on every zero, read off from `ξ'(1)`, is enough, and the band
+`5/2 ≤ |t| < 7` is a direct certified computation of `ζ'`.
+
+The thresholds come from the arguments:
+- The real-part argument stops at `|t| ≈ 6.52`, where `Re E` first vanishes (at `σ = 0`). `7`
+  comes from bounding each series term by its worst case over `σ`.
+- The size argument would reach about `|t| ≈ 3` with the exact `ξ'(1)`.
 
 ## Building
 
@@ -215,8 +220,8 @@ which needs about 93 GB of cache, about 19 GB of RAM and an open-file limit of a
 'speiser_of_band' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
-`speiser` is `ζ'(s) ≠ 0` for `0 < Re s < 1/2`, with no hypothesis left. Speiser's statement is
-equivalent to RH.
+`speiser` proves `ζ'(s) ≠ 0` for `0 < Re s < 1/2` unconditionally in Lean, with no hypothesis
+left. Speiser's statement is equivalent to RH.
 
 The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
