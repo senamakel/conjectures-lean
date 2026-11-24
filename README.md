@@ -1,16 +1,21 @@
 # Selberg's bound for Erdős Problem 233 under RH in Lean
 
+**Literature status: RH-consequence** (Cramér 1936; Selberg, *Arch. Math. Naturvid.* 47
+(1943)). Nothing here is new mathematics.
+
 [Erdős Problem 233](https://www.erdosproblems.com/233) concerns the sum of squares of prime
 gaps `d_n = p_{n+1} − p_n`. Heath-Brown conjectured `Σ_{n<N} d_n² ≍ N log² N`; the lower bound
-`≫ N log² N` follows from the prime number theorem, and the upper bound is **open, also under
-the Riemann hypothesis**. Under RH, Selberg (*Arch. Math. Naturvid.* 47 (1943)) proved
-`Σ_{p_n ≤ x} d_n² ≪ x log³ x`, which is `Σ_{n<N} d_n² ≪ N log⁴ N` in the index form because
-`p_N ≍ N log N`. (formal-conjectures attributes the `N log⁴ N` bound to Cramér; we have not
-checked that attribution. An explicit version is Cully-Hugill–Dudek,
-[arXiv:2206.00433](https://arxiv.org/abs/2206.00433).)
+`≫ N log² N` follows from the prime number theorem, and the conjectured upper bound is open,
+also under the Riemann hypothesis. Under RH, Cramér gave an earlier upper bound (formal-conjectures
+attributes the `N log⁴ N` form to him; we have not checked the exact power), and Selberg proved `Σ_{p_n ≤ x} d_n² ≪ x log³ x`, which is
+`Σ_{n<N} d_n² ≪ N log⁴ N` in index form because `p_N ≍ N log N`. formal-conjectures lists this
+bound as the variant `erdos_233.variants.upper_bound` (tagged `research solved`, i.e. known under RH). An
+explicit version is Cully-Hugill–Dudek, [arXiv:2206.00433](https://arxiv.org/abs/2206.00433).
 
-This repository proves the RH-conditional upper bound, and closes RH with the
-riemann-hypothesis formalization. **It does not prove Erdős 233 itself.**
+The main library is a Lean proof that RH implies `Σ_{n<N} d_n² ≪ N log⁴ N`, following Selberg
+(1943). `Unconditional/` gives `Σ_{n<N} d_n² ≪ N log⁴ N`, given the Lean proof of RH in
+leanprover-community/riemann-hypothesis, which has not been independently verified. Erdős 233
+itself (`≪ N log² N`) stays open; nothing here addresses it.
 
 ```lean
 theorem Erdos233.erdos_233_upper_bound_of_RH (hRH : RiemannHypothesis) :
@@ -117,7 +122,26 @@ There are no `native_decide` modules.
 
 ## Unconditional version
 
-UNCONDITIONAL_PLACEHOLDER
+| Theorem | Statement | Axioms |
+|---|---|---|
+| `Erdos233.erdos_233_upper_bound_of_RH` | `RiemannHypothesis → Erdos233UpperBoundStatement` | standard three |
+| `erdos_233_upper_bound` | `Erdos233UpperBoundStatement` | standard three |
+
+Checked on 2026-11-24 against riemann-hypothesis `507a75d91d` (this repository at `a4230f2`):
+
+```bash
+sudo prlimit --pid $$ --nofile=2000000:2000000   # Linux; the import opens ~900k files
+scripts/check-unconditional.sh /path/to/riemann-hypothesis
+```
+
+```
+'erdos_233_upper_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
+
+The riemann-hypothesis import needs its community cache (about 93 GB), about 19 GB of RAM and
+about 900,000 open files. The run above took 37 minutes wall, most of it restoring that cache.
+
+The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent verification is still pending.
 
 ## Credits
 
