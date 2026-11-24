@@ -7,13 +7,13 @@ autoImplicit = false
 
 [[require]]
 name = "Erdos985"
-git = "git@github.com:senamakel/erdos-985.git"
-rev = "63d68188f2e425e8928d7c8861abd0a1ded0b58c"
+git = "https://github.com/senamakel/erdos-985.git"
+rev = "9538edb73dc72c8fdc04b4e0df076c8930ee2fba"
 
 [[lean_lib]]
 name = "Miller"
 
 [[require]]
 name = "Ankeny"
-git = "git@github.com:senamakel/ankeny-grh.git"
-rev = "035c7aadd94a0ec5286c05083ca0396ceae63dc7"
+git = "https://github.com/senamakel/ankeny-grh.git"
+rev = "129ad575cc65def1860a32a691e106dfe1601bd7"
