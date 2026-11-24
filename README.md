@@ -342,8 +342,9 @@ scripts/check-unconditional.sh [RH_DIR]
 ```
 
 Run on 2026-11-24 against riemann-hypothesis `507a75d91d` (cache build, not `RH_FULL_BUILD`),
-library and `Unconditional/` as of cramer-rh commit `7daadad` (Round 5, mean square included);
-33 min wall, most of it restoring and loading the RH cache. Output:
+library and `Unconditional/` as of cramer-rh commit `7fbc1c7` (Round 6, asymptotic included;
+the later commits on this branch change only the README); 24 min 39 s wall, most of it
+restoring and loading the RH cache. Output:
 
 ```
 'cramer_primeInShortInterval' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -352,6 +353,7 @@ library and `Unconditional/` as of cramer-rh commit `7daadad` (Round 5, mean squ
 'cramer_dyadicMeanSquare' depends on axioms: [propext, Classical.choice, Quot.sound]
 'cramer_meanSquare' depends on axioms: [propext, Classical.choice, Quot.sound]
 'cramer_logMeanSquare' depends on axioms: [propext, Classical.choice, Quot.sound]
+'cramer_logMeanSquareAsymptotic' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 The import needs about 93 GB of cache, about 19 GB of RAM and roughly 900k open files (raise the
