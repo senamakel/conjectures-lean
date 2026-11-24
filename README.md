@@ -16,21 +16,23 @@ This repository proves in Lean, following LLS:
   `(ℤ/q)ˣ` omits a unit `≤ 2 log² q`, for every modulus `q`. Consequences: the least quadratic
   non-residue mod an odd prime `p` is `≤ 2 log² p`, and Miller's deterministic primality test
   with witnesses `a ≤ 2 log² n` is correct. The earlier form with constant `11/4` remains.
-- Bounds of the shape of LLS Theorem 1.5 for `L(1, χ)`, `χ` primitive mod `q ≥ 10¹⁰`:
-  `|L(1,χ)| ≤ 2e^γ(log log q + 5)` (LLS: `2e^γ(log log q − log 2 + 1/2 + 1/log log q)`) and
-  `1/|L(1,χ)| ≤ 2e^γ(log log q + 5)` (LLS: `(12e^γ/π²)(log log q − log 2 + 1/2 + …)`).
-- With Dirichlet's class number formula, bounds of the shape of LLS Corollary 1.3 for the class
-  number `h(−q)` of every imaginary quadratic field, of discriminant `−q` with `q ≥ 10¹⁰`, odd
-  or even:
-  `h(−q) ≤ (2e^γ/π)√q(log log q + 5)` and `h(−q) ≥ √q/(2πe^γ(log log q + 5))` (LLS:
-  `(2e^γ/π)√q(log log q − log 2 + 1/2 + 1/log log q)` and
-  `(π/(12e^γ))√q/(log log q − log 2 + …)`).
+- LLS Theorem 1.5 with the paper's constants: for `χ` primitive mod `q ≥ 10¹⁰`,
+  `|L(1,χ)| ≤ 2e^γ(log log q − log 2 + 1/2 + 1/log log q)` and
+  `1/|L(1,χ)| ≤ (12e^γ/π²)(log log q − log 2 + 1/2 + 1/log log q + 14 log log q/log q)`
+  (`LLS.L1UpperBound`, `LLS.L1LowerBound`).
+- With Dirichlet's class number formula, LLS Corollary 1.3 with the paper's constants, for the
+  class number `h(−q)` of every imaginary quadratic field of discriminant `−q`, `q ≥ 10¹⁰`:
+  `h(−q) ≤ (2e^γ/π)√q(log log q − log 2 + 1/2 + 1/log log q)` and
+  `h(−q) ≥ (π/(12e^γ))√q(log log q − log 2 + 1/2 + 1/log log q + 14 log log q/log q)⁻¹`
+  (`LLS.ClassNumberUpperBound`, `LLS.ClassNumberLowerBound`). The earlier forms with additive
+  constant `5` remain.
 
 The main library is a complete Lean proof that GRH implies each of these. `Unconditional/`
 proves all of them unconditionally in Lean, with GRH supplied by the certified proof of
 L. Alpöge in
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
-Literature status: RH-consequence. Our constants differ from the paper's where noted above;
+Literature status: RH-consequence. Corollary 1.2, Theorem 1.5 and Corollary 1.3 carry the
+paper's own constants; where other constants differ (Theorem 1.1),
 "Deviations from the literature" gives both numbers. Bounds `h(−q) ≪ √q log log q` and
 `h(−q) ≫ √q/log log q` under GRH go back to Littlewood (*On the class-number of the corpus
 P(√−k)*, Proc. London Math. Soc. (2) 27 (1928) 358–372), in asymptotic form. Unconditionally the
@@ -48,6 +50,12 @@ theorem LLS.bach2_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : Ankeny.Bac
 theorem LLS.leastNonresidue2_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
     Ankeny.LeastNonresidueBound 2
 theorem LLS.miller2_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : Miller.MillerStatement 2
+theorem LLS.Sharp.l1UpperBound_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : L1UpperBound
+theorem LLS.Sharp.l1LowerBound_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : L1LowerBound
+theorem LLS.Sharp.classNumberUpperBound_of_GRH_of_formula
+    (hGRH : DirichletLNonvanishingRightOfHalf) (hCNF : ClassNumberFormula) : ClassNumberUpperBound
+theorem LLS.Sharp.classNumberLowerBound_of_GRH_of_formula
+    (hGRH : DirichletLNonvanishingRightOfHalf) (hCNF : ClassNumberFormula) : ClassNumberLowerBound
 theorem LLS.l1UpperBoundWith_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : L1UpperBoundWith 5
 theorem LLS.l1LowerBoundWith_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : L1LowerBoundWith 5
 theorem LLS.classNumberUpperBoundOddWith_of_GRH_of_formula
@@ -77,7 +85,8 @@ def LLS.LeastNonresidueBelowLogSq : Prop :=
 and `Ankeny.BachSubgroupBound c`, `Ankeny.LeastNonresidueBound c`, `Miller.MillerStatement c`
 are the target definitions of ankeny-grh and miller-grh, used unchanged. The weaker forms of
 LLS Theorem 1.5 are stated in `LLS/L1/Weak.lean` (`LLS/Statement.lean`'s `L1UpperBound`,
-`L1LowerBound` are unchanged and not proved):
+`L1LowerBound`, the paper's statements, are proved by `LLS.Sharp.l1UpperBound_of_GRH`,
+`LLS.Sharp.l1LowerBound_of_GRH`):
 
 ```lean
 def LLS.L1UpperBoundWith (C : ℝ) : Prop :=
@@ -130,6 +139,8 @@ def LLS.ClassNumberLowerBoundWith (C : ℝ) : Prop :=
 | `leastNonresidueBelowLogSq_of_GRH` | C (U in `Unconditional/`) | GRH |
 | `bach_of_GRH`, `leastNonresidue_of_GRH`, `miller_of_GRH` | C (U in `Unconditional/`) | GRH |
 | `bach2_of_GRH`, `leastNonresidue2_of_GRH`, `miller2_of_GRH` | C (U in `Unconditional/`) | GRH |
+| `Sharp.l1UpperBound_of_GRH`, `Sharp.l1LowerBound_of_GRH` | C (U in `Unconditional/`) | GRH |
+| `Sharp.classNumberUpperBound_of_GRH_of_formula`, `Sharp.classNumberLowerBound_of_GRH_of_formula` | C + H (U + U₀ in `Unconditional/`) | GRH, `ClassNumberFormula` |
 | `l1UpperBoundWith_of_GRH`, `l1LowerBoundWith_of_GRH` | C (U in `Unconditional/`) | GRH |
 | `classNumberUpperBoundOddWith_of_GRH_of_formula`, `classNumberLowerBoundOddWith_of_GRH_of_formula` | C + H (U + U₀ in `Unconditional/`) | GRH, `ClassNumberFormula` |
 | `classNumberUpperBoundWith_of_GRH_of_formula`, `classNumberLowerBoundWith_of_GRH_of_formula` | C + H (U + U₀ in `Unconditional/`) | GRH, `ClassNumberFormula` |
@@ -145,10 +156,19 @@ Mathlib objects only, and is the conclusion of riemann-hypothesis's
 `GlobalTheory.LFunction_one_and_mean_log_eta` with that repository's `IsKroneckerChar` unfolded.
 No other hypothesis appears. `LLS/Statement.lean` also fixes, as targets not proved here,
 Theorem 1.1 (`LeastPrimeOutsideSubgroup`, with LLS's `A(q)`, `B(q)`), Theorem 1.1 (2),
-Theorem 1.4 (`LeastPrimeInCoset`) and Theorem 1.5 with the paper's constants (`L1UpperBound`,
-`L1LowerBound`).
+and Theorem 1.4 (`LeastPrimeInCoset`).
 
 ## Axioms
+
+Real output of `#print axioms` for the paper-constant Theorem 1.5 and Corollary 1.3
+(2026-11-24, after `lake build LLS`):
+
+```
+'LLS.Sharp.l1UpperBound_of_GRH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LLS.Sharp.l1LowerBound_of_GRH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LLS.Sharp.classNumberUpperBound_of_GRH_of_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LLS.Sharp.classNumberLowerBound_of_GRH_of_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
 
 Real output of `lake env lean Axioms.lean` (2026-11-24, after a clean `lake build`):
 
@@ -242,6 +262,32 @@ cores).
 ## Proof outline
 
 The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
+
+**Theorem 1.5 with the paper's constants** (`LLS/Sharp/`). Take `x = ⌊log² q/4⌋` (so `x ≥ 132`),
+`l = log x`, `y = 1/√x`, `𝔞` the parity of `χ`.
+
+1. `Assembly.lean`: LLS §5 exactly. `Re D(1,χ⁻¹) = Re D(1,χ)` (`AssemblyAux/Conj.lean`), so the
+   zero sum is `Z = log q + 2 Re D(1,χ)`, and Lemma 2.3 becomes
+   `Z(1−y)² ≤ (1−1/x) log q − 2 Re S'(χ) + 2Γ ≤ Z(1+y)²` with the gamma part `Γ` bounded per
+   parity (`AssemblyAux/Gamma.lean`). Eliminating `Z` from Lemma 2.5 gives the paper's bound in
+   terms of `l1Sum1 x`, `P2sum x` and (lower bound) `W(χ,x) = Σ Λ(n)χ(n)(1/(n log n) − 1/(x log x))`.
+2. `Principal.lean`: `P2sum x ≤ log x − 1 − γ + 1/(4√x) + 12/x` and
+   `l1Sum1 x ≤ log log x + γ − 1 + γ/log x + (0.6/√x + 29/x)/log x` (LLS Lemmas 2.4 and 2.6 in
+   the form used), from `ψ₁(t) = ∫₀ᵗ ψ` with `|ψ₁(t) − t²/2| ≤ t^{3/2}/20 + 4t` under GRH. The
+   constants come from `−ζ'/ζ(s) − 1/(s−1) → −γ` (Mathlib's `riemannZeta₁`) and a Mellin
+   transform of `ψ₁` (`Principal/Laurent.lean`, `Mellin.lean`), and from Mertens' theorem
+   (robin-rh). The representations are FTC with right derivatives (`Principal/Repr.lean`).
+3. `Lemma51.lean`: a form of LLS Lemma 5.1, prime by prime with `Re log(1 − χ(p)/p)⁻¹ ≥
+   −log(1 + 1/p)`: `Re W ≥ −(l1Sum1 + P2sum/l) + Σ_{p∈S} −log(1 − p⁻²) − (10/3)|S|/x` for any set
+   `S` of primes `p ≤ √x`, and with all of them `≥ … + log(π²/6) − 10/(3√x) − 4/(3(√x − 1))`.
+4. `NumBasic.lean`, `NumU.lean`, `NumL.lean`, `Final.lean`: both bounds reduce to
+   `u + 2u² + y·Q(u,y)` with `u = 1/l` against `log(1 + V)`, `V = u + 4u²/(1 + 2u log 2)` (upper)
+   and `log(1 + V + 7(1 + 2u log 2)y/(1 + y²/2))` (lower), using `log(1+w) ≥ 2w/(2+w)`. Upper:
+   `Q ≤ −1/2` on one box. Lower: the primes `{2,3,5,7,11}` and ten boxes in `x` for
+   `x ≤ 22100`, all primes and one box beyond. Smallest numerical margin: `0.00057`
+   (`177 ≤ x ≤ 247`).
+5. `ClassNumber.lean`: Corollary 1.3 from Theorem 1.5 and the class number formula, for every
+   imaginary quadratic field.
 
 1. Explicit formulas (`LLS/Analytic/`), for `χ` primitive mod `N`, under GRH, with
    `Z2 = Σ_ρ m_ρ/|ρ|²`:
@@ -355,6 +401,11 @@ The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.
 | `LLS/Bach2/SoundBasic.lean`, `SoundBounds.lean`, `Sound.lean` | Its soundness proof (`checkChunk_sound`) |
 | `LLS/Compute2/C2_*.lean`, `LLS/Bach2/Finite2.lean` | The 15 checked chunks, `3 ≤ q < 2^2500` |
 | `LLS/Bach2/Tail2.lean`, `Core.lean`, `Main2.lean` | `q ≥ 2^2500`; assembly of `bach2_of_GRH` |
+| `LLS/Sharp/Defs.lean`, `Assembly.lean`, `AssemblyAux/*.lean` | LLS §5 assembly, `Re D(1,χ⁻¹) = Re D(1,χ)`, gamma parts per parity |
+| `LLS/Sharp/Principal.lean`, `Principal/*.lean` | Sharp principal sums (Laurent expansion, Mellin transform of `ψ₁`) |
+| `LLS/Sharp/Lemma51.lean`, `Lemma51Aux/*.lean` | Form of LLS Lemma 5.1 |
+| `LLS/Sharp/NumBasic.lean`, `NumU.lean`, `NumL.lean` | One-variable inequalities |
+| `LLS/Sharp/Final.lean`, `ClassNumber.lean` | Theorem 1.5 and Corollary 1.3 with the paper's constants |
 | `scripts/*.py` | Generators for the certificates and the sizing computations |
 
 ## Deviations from the literature
@@ -381,34 +432,21 @@ The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.
   `Σ Λ(n) χ̃(n)/n (1 − n/X)` as if `χ̃(p) = 1` for primes `p ∣ q`, `p ∤ q̃`; for such `p`
   `χ̃(p)` is unknown. Our `LLS.key` charges these primes twice and absorbs them through
   `log f ≤ log q − Σ log p`.
-* Theorem 1.5 is proved with weaker constants. We prove LLS Lemma 2.5 (`LLS.log_norm_L1_le`, standard
-  axioms only) and combine it with Lemma 2.3 in both directions, but the remaining inputs are
-  cruder than the paper's:
-  * the principal sum `Σ Λ(n)/(n log n) · log(x/n)/log x ≤ log log x + γ − 1 + 3/log x`
-    (`LLS.l1Sum1_le`, from robin-rh's Mertens theorem under RH, for `x ≥ 10⁵`; LLS Lemma 2.6
-    gives `+ γ/log x`);
-  * `Σ_{n<x} Λ(n)/n (1 − n/x) ≤ log x − 1 + 1/x` unconditionally (LLS Lemma 2.4 under RH:
-    `log x − 1 − γ + …`);
-  * for the lower bound we use `|χ(n)| ≤ 1` instead of LLS Lemma 5.1 (the extremality of
-    `χ(p) = −1`, which needs a trigonometric computation at `p = 2`), so the leading constant
-    is `2e^γ` instead of `12e^γ/π² ≈ 1.216 e^γ`;
-  * `x ≥ 10⁵` (LLS: `x = (log q)²/4`), so for `log² q < 10⁵` we take `x = 10⁵`, which costs most
-    of the additive constant.
-
-  The result is `|L(1,χ)|^{±1} ≤ e^γ (l + c + c²/l)` with `l = log x` and `c ≤ 4.11`, which gives
-  `2e^γ(log log q + 5)` for every `q ≥ 10¹⁰`. LLS's own constants are within `0.004` of failing at
-  `q = 10¹⁰` (`e^γ(log x + 1 + 3.1/log x)` against `2e^γ(log log q − log 2 + 1/2 + 1/log log q)`),
-  so they need all of Lemmas 2.4, 2.6 and 5.1 at full precision.
-* Corollary 1.3 (class numbers) is proved with weaker constants, for every imaginary quadratic
-  field. The paper's statement (`ClassNumberUpperBound`, `ClassNumberLowerBound`) is not proved:
-  it is Theorem 1.5 with the paper's constants (not proved, above) plus the class number formula.
-  We prove `ClassNumberUpperBoundWith 5` and `ClassNumberLowerBoundWith 5` for every imaginary
-  quadratic field of discriminant `−q`, `q ≥ 10¹⁰`, with our Theorem 1.5 constants: additive
-  `5` (LLS: `−log 2 + 1/2 + 1/log log q`, and `+ 14 log log q/log q` in the lower bound) and
-  lower leading constant `1/(2πe^γ)` (LLS: `π/(12e^γ)`). The hypotheses are the paper's (`−q` a
-  fundamental discriminant, stated as `discr K = −q`). The round-5 forms
-  `ClassNumberUpperBoundOddWith 5`, `ClassNumberLowerBoundOddWith 5` (odd `q`, with explicit
-  `q % 4 = 3`, `Squarefree q`) remain.
+* Theorem 1.5 is proved with the paper's constants (`LLS.Sharp.l1UpperBound_of_GRH`,
+  `LLS.Sharp.l1LowerBound_of_GRH`). The paper's own chain of simplified inequalities leaves a
+  margin of about `0.0006` (in `log`) at `q = 10¹⁰`; we keep the exact elimination of `|Re B(χ)|`,
+  the factors `(1 ± 1/√x)^{−2}` and the gamma terms per parity, which leaves margins (in `log`,
+  before the Padé bound for `log`) of `0.127`/`0.044` (upper/lower) at `q = 10¹⁰`,
+  `0.121`/`0.087` at `10¹²`, `0.090`/`0.109` at `10²⁰`, `0.026`/`0.025` at `10¹⁰⁰`, and about
+  `1.5/l²` (`l = 2 log log q − log 4`) as `q → ∞`. Our versions of LLS Lemmas 2.4 and 2.6 have
+  error terms `1/(4√x) + 12/x` and `(0.6/√x + 29/x)/log x` (LLS: `2|B|/√x` with `|B| = 0.023…`),
+  and our Lemma 5.1 compares prime by prime with `−log(1 + 1/p)` instead of LLS's alternating
+  extremal sum (error `10/(3x)` per prime). The weaker forms `L1UpperBoundWith 5`,
+  `L1LowerBoundWith 5` remain.
+* Corollary 1.3 is proved with the paper's constants for every imaginary quadratic field of
+  discriminant `−q`, `q ≥ 10¹⁰` (`LLS.Sharp.classNumberUpperBound_of_GRH_of_formula`,
+  `…LowerBound…`), from Theorem 1.5 and Dirichlet's class number formula (tier H in the main
+  library, discharged in `Unconditional/`). The forms with additive constant `5` remain.
 * Theorem 1.4 (cosets) is not proved.
 * Corollary 1.2 is proved exactly as stated (`LeastNonresidueBelowLogSq`).
 
@@ -444,6 +482,10 @@ with no hypothesis left.
 | `bach2_unconditional` | `Ankeny.BachSubgroupBound 2` | standard three + 15 `native_decide` |
 | `leastNonresidue2_unconditional` | `Ankeny.LeastNonresidueBound 2` | standard three + 15 `native_decide` |
 | `miller2_unconditional` | `Miller.MillerStatement 2` | standard three + 15 `native_decide` |
+| `l1UpperBound_unconditional` | `LLS.L1UpperBound` | standard three |
+| `l1LowerBound_unconditional` | `LLS.L1LowerBound` | standard three |
+| `classNumberUpperBound_unconditional` | `LLS.ClassNumberUpperBound` | standard three |
+| `classNumberLowerBound_unconditional` | `LLS.ClassNumberLowerBound` | standard three |
 | `l1UpperBoundWith_unconditional` | `LLS.L1UpperBoundWith 5` | standard three |
 | `l1LowerBoundWith_unconditional` | `LLS.L1LowerBoundWith 5` | standard three |
 | `classNumberFormula` (U₀) | `LLS.ClassNumberFormula` | standard three |
