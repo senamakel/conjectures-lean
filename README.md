@@ -192,7 +192,42 @@ the library builds in about 30 s; no module is expensive.
 
 ## Unconditional version
 
-UNCONDITIONAL_SECTION
+| Theorem | Statement | Axioms |
+|---|---|---|
+| `psiChar_unconditional` | `PsiGRH.PsiCharStatement` | standard three |
+| `psiCharLogSq_unconditional` | `PsiGRH.PsiCharLogSqStatement` | standard three |
+| `psiAP_unconditional` | `PsiGRH.PsiAPStatement` | standard three |
+| `thetaAP_unconditional` | `PsiGRH.ThetaAPStatement` | standard three |
+| `piAP_unconditional` | `PsiGRH.PiAPStatement` | standard three |
+
+Each is the corresponding `_of_GRH` theorem applied to `LFunction_ne_zero_of_half_lt_re`,
+`truncatedExplicitFormula` and `zeroWindowCount`, all from
+leanprover-community/riemann-hypothesis at commit `507a75d91d`. These are the bounds, given the
+Lean proof of GRH in riemann-hypothesis, which has not been independently verified; they are
+not "proved" on its strength, and if that proof fails they fall back to tier C + H.
+
+```
+sudo prlimit --pid $$ --nofile=2000000:2000000   # the import opens ~900k files
+scripts/check-unconditional.sh /path/to/riemann-hypothesis
+```
+
+The import needs about 93 GB of cache, about 19 GB of RAM (36 GB peak resident on this run, with
+`Main` imported) and an open-file limit near 900k. Output on 2026-11-24 at this repository's
+`9a50782`:
+
+```
+'truncatedExplicitFormula' depends on axioms: [propext, Classical.choice, Quot.sound]
+'zeroWindowCount' depends on axioms: [propext, Classical.choice, Quot.sound]
+'psiChar_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+'psiCharLogSq_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+'psiAP_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+'thetaAP_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+'piAP_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
+
+*The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
+builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
+verification is still pending.*
 
 ## Credits
 
