@@ -84,14 +84,40 @@ The asymptotic margin is Robin's: gain `2√2 ≈ 2.83` against `2` from the pri
 the optimal `2 + γ − log 4π ≈ 0.046`); at `x = e^{30}` the constants are
 `2.678 > 2.38 + o(1)`.
 
-### 5. The range `5040 < n ≤ exp(e^{30})` (`Robin/Small.lean`, hypothesis `RobinVerifiedRange`)
+### 5. The range `5040 < n ≤ exp(e^{30})` (`Robin/Compute/`, `RobinCompute/`, proved)
 
-Morrill–Platt, *Robin's inequality for 20-free integers*, Integers 21 (2021), arXiv:1809.10813,
-Theorem 13: Robin's inequality holds unconditionally for `5040 < n ≤ 10^{10^{13.11485}}`
-(extending Briggs, Experiment. Math. 15 (2006), who checked all colossally abundant numbers up
-to `10^{10^{10}}`). Since `e^{30} < 1.07·10^{13}`, `log n ≤ e^{30}` gives
-`n ≤ 10^{4.64·10^{12}}`. This is a finite but enormous computation and is not replayed; it enters as the explicit
-hypothesis `RobinVerifiedRange` (no `sorry`).
+Previously the hypothesis `RobinVerifiedRange` (Morrill–Platt). Now proved by a verified
+computation; `Robin.robin_verified_range : RobinVerifiedRange`.
+
+**Sizing (2026-11-24).** The analytic threshold `x = log n ≥ e^{30} ≈ 1.0686·10^{13}` is set by
+the `x^{−1/8}`, `x^{−1/4}` error terms coming from `|ψ(s) − s| ≤ s^{3/4}` (only the integrated
+`Ψ₁` bound is available). Re-solving `3.3r + 86r² = 0.27` with the present constants only lowers
+it to `x ≈ 1.5·10^{11}` (`e^{25.7}`), and every lemma is written for `log x ≥ 30`; not worth it.
+Instead the whole range is computed:
+
+* Envelope: `log(σ(n)/n) ≤ εx + Σ_p max_k(log(σ(p^k)/p^k) − kε log p)` for all `n`, `x = log n`.
+  For `ε ≈ log(1+1/B)/log B` only primes `< B` contribute; the line `εx + C` is nearly tangent
+  to `γ + log log x` at `x ≈ θ(B)` and stays below it on an interval of width `≈ 1.2 x^{3/4}`
+  (prototype in C, CA hull up to `10^8`: normalised margin `(γ + log log x − log(σ(N)/N))·√x log x`
+  is `0.13` at `x = 10.9` (`N = 55440`), `0.76–0.9` for `10^3 ≤ x ≤ 10^8`).
+* So `≈ 4–8 X^{1/4}` checkpoints suffice (15 746 were used, spacing `2^{⌊(3/4)log₂ B⌋}`), but
+  each needs `Σ log(1+1/p)` over all primes `p < B` to absolute precision `≈ 10^{−9}` at the
+  top: the primes up to `1.07·10^{13}` (`≈ 3.6·10^{11}`) must be enumerated.
+* Cost: segmented sieve in compiled Lean, `1.2·10^8` numbers/s/core unloaded, so `≈ 25`
+  core-hours for the sieve; extras at a checkpoint near the top `≈ 4 s` (sieve to
+  `Q ≈ 4.2·10^6` plus two logs per prime). `native_decide` on a non-precompiled module runs
+  `≈ 75×` slower (interpreter), hence `RobinCompute` is a core-only, precompiled library.
+* Pass 1 (untrusted executable, same code) produced the 624 boundary states; it took
+  `≈ 109` process-hours wall on a heavily shared machine (load 120–220).
+
+**Checker** (`RobinCompute/Core.lean`): fixed point `D = 2^{96}`; segments `[B, B+h)`,
+`h = 2^{min(22, ⌊log₂B⌋−10)}`; exact per-prime logs below `2^{26}`, moments `(count, Σi, Σi²)`
+above; chunk `i` is `[i·2^{34}, (i+1)·2^{34})`, `i < 623`; `5040 < n ≤ 10^4` checked directly;
+`γ ≥ H_N − log N − 1/(2N)`, `N = 2^{20}`.
+
+**Soundness** (`Robin/Compute/`): `Log.lean` (series bounds, `γ`), `Envelope.lean`,
+`Sieve.lean` (a marked number is a proper multiple; scans are finset sums), `Step.lean`,
+`Checkpoint.lean` (`Valid` is preserved), `Run.lean`, `Range.lean` (assembly).
 
 ## Status
 

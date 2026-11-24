@@ -199,20 +199,39 @@ theorem extrasScan_spec (arr : ByteArray) (εn εd : ℕ) :
       rw [hW, if_neg hc]
       exact ⟨hall, by rw [← h, hE]⟩
 
-theorem extrasScanTR_eq (arr : ByteArray) (εn εd : ℕ) :
-    ∀ n acc, extrasScanTR arr εn εd n acc = (extrasScan arr εn εd n).map (· + acc)
-  | 0, acc => by simp [extrasScanTR, extrasScan]
-  | n + 1, acc => by
-    unfold extrasScanTR extrasScan
-    split_ifs with hc
-    · rcases he : extrasFor εn εd n with _ | e
-      · rcases hr : extrasScan arr εn εd n <;> simp
-      · rw [extrasScanTR_eq arr εn εd n]
-        rcases hr : extrasScan arr εn εd n with _ | r
-        · simp
-        · simp; ring
-    · rw [extrasScanTR_eq arr εn εd n]
-      rcases hr : extrasScan arr εn εd n with _ | r <;> simp
+theorem extrasScanTR_spec (arr : ByteArray) (εn εd : ℕ) :
+    ∀ n acc E, extrasScanTR arr εn εd n acc = some E →
+      (∀ m ∈ Wset arr n, ∃ e, extrasFor εn εd m = some e) ∧
+      E = acc + ∑ m ∈ Wset arr n, (extrasFor εn εd m).getD 0
+  | 0, acc, E, h => by
+    unfold extrasScanTR at h
+    simp only [Option.some.injEq] at h; subst h; simp [Wset]
+  | n + 1, acc, E, h => by
+    unfold extrasScanTR at h
+    have hW : Wset arr (n + 1) = if 2 ≤ n ∧ arr[n]! = 0 then insert n (Wset arr n)
+        else Wset arr n := by
+      unfold Wset; rw [Finset.range_add_one, Finset.filter_insert]
+    have hnot : n ∉ Wset arr n := by simp [Wset]
+    by_cases hc : 2 ≤ n ∧ arr[n]! = 0
+    · have hc' : (2 ≤ n ∧ (arr[n]! == 0) = true) := ⟨hc.1, by simp [hc.2]⟩
+      rw [if_pos hc'] at h
+      rcases he : extrasFor εn εd n with _ | e
+      · rw [he] at h; exact absurd h (by simp)
+      rw [he] at h
+      dsimp only at h
+      obtain ⟨hall, hE⟩ := extrasScanTR_spec arr εn εd n (acc + e) E h
+      rw [hW, if_pos hc]
+      refine ⟨?_, ?_⟩
+      · intro m hm
+        rcases Finset.mem_insert.mp hm with rfl | hm
+        · exact ⟨e, he⟩
+        · exact hall m hm
+      · rw [Finset.sum_insert hnot, he, hE, Option.getD_some]; ring
+    · have hc' : ¬ (2 ≤ n ∧ (arr[n]! == 0) = true) := by
+        intro h'; exact hc ⟨h'.1, by simpa using h'.2⟩
+      rw [if_neg hc'] at h
+      rw [hW, if_neg hc]
+      exact extrasScanTR_spec arr εn εd n acc E h
 
 /-! ### The checkpoint -/
 
@@ -311,16 +330,10 @@ theorem envelope_of_ck {x0 : ℕ} {s : St} (hv : Valid x0 s) {ck : CK} (h : ckEp
   set ε : ℝ := (ck.εn : ℝ) / ck.εd
   set arrQ := sieveSeg ((List.range (Nat.sqrt ck.Q + 2)).toArray) 0 ck.Q
   have hinvQ := sieveSeg_inv ((List.range (Nat.sqrt ck.Q + 2)).toArray) 0 ck.Q
-  have hE' : extrasScan arrQ ck.εn ck.εd ck.Q = some ck.E := by
-    have h0 : extrasScanTR arrQ ck.εn ck.εd ck.Q 0 = some ck.E := hE
-    rw [extrasScanTR_eq] at h0
-    clear_value arrQ
-    rcases h' : extrasScan arrQ ck.εn ck.εd ck.Q with _ | r
-    · rw [h'] at h0; exact absurd h0 (by simp)
-    · rw [h'] at h0
-      simp only [Option.map_some, Option.some.injEq, add_zero] at h0
-      rw [h0]
-  obtain ⟨hall, hEsum⟩ := extrasScan_spec arrQ ck.εn ck.εd ck.Q ck.E hE'
+  have hE2 : extrasScanTR arrQ ck.εn ck.εd ck.Q 0 = some ck.E := hE
+  obtain ⟨hall, hEsum0⟩ := extrasScanTR_spec arrQ ck.εn ck.εd ck.Q 0 ck.E hE2
+  have hEsum : ck.E = ∑ m ∈ Wset arrQ ck.Q, (extrasFor ck.εn ck.εd m).getD 0 := by
+    rw [hEsum0, zero_add]
   set W := Wset arrQ ck.Q
   set ex : ℕ → ℕ := fun m => (extrasFor ck.εn ck.εd m).getD 0
   have hD := D_pos
