@@ -29,9 +29,14 @@ theorem cramer_meanSquare : Cramer.CramerMeanSquare :=
 theorem cramer_logMeanSquare : Cramer.CramerLogMeanSquare :=
   Cramer.logMeanSquare_of_RH riemannHypothesis
 
+/-- Cramér (1922): `∫_1^X ((ψ(x) − x)/x)² dx ∼ (Σ_ρ m_ρ/|ρ|²) log X`. -/
+theorem cramer_logMeanSquareAsymptotic : Cramer.CramerLogMeanSquareAsymptotic :=
+  Cramer.logMeanSquareAsymptotic_of_RH riemannHypothesis
+
 #print axioms cramer_primeInShortInterval
 #print axioms cramer_primeGapExplicit
 #print axioms cramer_gapBound
 #print axioms cramer_dyadicMeanSquare
 #print axioms cramer_meanSquare
 #print axioms cramer_logMeanSquare
+#print axioms cramer_logMeanSquareAsymptotic

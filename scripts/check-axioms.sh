@@ -13,12 +13,13 @@ import Cramer
 #print axioms Cramer.dyadicMeanSquare_of_RH
 #print axioms Cramer.meanSquare_of_RH
 #print axioms Cramer.logMeanSquare_of_RH
+#print axioms Cramer.logMeanSquareAsymptotic_of_RH
 LEAN
 out="$(lake env lean "$tmp/Axioms.lean")"
 echo "$out"
 n="$(grep -c "depends on axioms: \[propext, Classical.choice, Quot.sound\]$" <<<"$out" || true)"
-if [ "$n" != 6 ]; then
-  echo "axiom check FAILED: expected 6 theorems on the standard axioms only" >&2
+if [ "$n" != 7 ]; then
+  echo "axiom check FAILED: expected 7 theorems on the standard axioms only" >&2
   exit 1
 fi
 echo "axiom check passed"
