@@ -4,9 +4,16 @@ Li (*J. Number Theory* 65 (1997) 325–333) showed that the Riemann hypothesis i
 the positivity of the numbers `λₙ = Σ_ρ (1 − (1 − 1/ρ)ⁿ)`, `n ≥ 1`, the sum running over the
 nontrivial zeros of ζ. Bombieri and Lagarias (*J. Number Theory* 77 (1999) 274–287) gave a
 general form of the criterion for any multiset of complex numbers with a mild summability
-condition. Unconditionally, `λₙ > 0` is known only for finitely many `n` (by computation); it is
-open in general, since it is equivalent to RH. This project proves the RH ⇒ positivity
-direction in Lean:
+condition. Unconditionally, `λₙ > 0` is known only for finitely many `n` (by computation); positivity
+for all `n` is equivalent to RH, so it is open exactly as RH is. This project proves the RH ⇒
+positivity direction in Lean.
+
+**Literature status: RH-equivalent.** The criterion is Li (1997) and Bombieri–Lagarias (1999).
+`λₙ > 0` for all `n` is equivalent to RH, so this says nothing beyond the RH claim; the
+unconditional theorem below is only as reliable as the Lean proof of RH in
+leanprover-community/riemann-hypothesis, which has not been independently verified.
+
+
 
 ```lean
 theorem RiemannHypothesis.li_criterion_rhs_of_RH (hRH : RiemannHypothesis) : LiCriterionRHS
@@ -27,7 +34,7 @@ theorem li_criterion_rhs {n : ℕ} (hn : 0 < n) : 0 < RiemannHypothesis.lambda n
 
 The target is formal-conjectures'
 [`RiemannHypothesis.li_criterion_rhs`](https://github.com/google-deepmind/formal-conjectures/blob/86a2f58a4d7a3a0637d15d5b2ce627592b54b956/FormalConjectures/Paper/RiemannHypothesisEquivalents.lean)
-(category `research open`). `LiCriterion/Statement.lean` copies `nontrivialPosZeros` and
+(category `research open`; it is listed as open there, and it is equivalent to RH, so this says nothing beyond the RH claim). `LiCriterion/Statement.lean` copies `nontrivialPosZeros` and
 `lambda` from it word for word, at commit `86a2f58a`, and records `li_criterion_rhs` and
 `li_criterion` as the `Prop`s `LiCriterionRHS` and `LiCriterion`. `li_criterion_rhs` above has
 exactly formal-conjectures' signature.
