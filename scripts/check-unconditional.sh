@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Link the Lindelöf proof to the riemann-hypothesis repository's RH theorem and print the axioms.
+# Link the Mills proofs to the riemann-hypothesis repository's RH theorem and print the axioms.
 #
 # Usage: scripts/check-unconditional.sh [RH_DIR]
 #   RH_DIR defaults to ../riemann-hypothesis; it is cloned there if missing.

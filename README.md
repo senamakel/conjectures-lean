@@ -1,29 +1,62 @@
 # Mills' constant under RH in Lean
 
-Lean proves that Mills' constant lies in `(1.3063778838, 1.3063778839)`.
-`mills_constant_bounds_unconditional` is proved unconditionally in Lean, from the standard three
-axioms, with RH supplied by the certified proof in
-[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
-The main library holds a complete Lean proof that RH implies the enclosure, and proves the lower
-bound `A > 1.3063778838` with no hypothesis at all.
+Lean proves that Mills' constant begins `1.30637788386308069046861449260260571291678458515671364436805375996643405376682659882150…`,
+87 correct decimals, and that a prime lies between `x³` and `(x+1)³` for every real
+`x ≥ 2^{1/3} − 1 ≈ 0.26` (Caldwell–Cheng's Lemma 5, with their threshold). Both are proved
+unconditionally in Lean, with RH supplied by the certified proof in
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis),
+and Schoenfeld's θ bound with his constant `1/(8π)` from
+[`schoenfeld-rh`](https://github.com/senamakel/schoenfeld-rh). The main library holds complete
+Lean proofs that RH implies each statement, the enclosure `(1.3063778838, 1.3063778839)` of the
+formal-conjectures statement, and the lower bound `A > 1.3063778838` with no hypothesis at all.
+The fifth and sixth Mills primes (29 and 85 digits) are certified prime in the kernel.
 
 Mills (Bull. AMS 53, 1947) showed there is a real `A > 1` with `⌊A^(3^n)⌋` prime for every
 `n ≥ 1`; the least such `A` is *Mills' constant*. Caldwell and Cheng (*Determining Mills'
 constant and a note on Honaker's problem*, J. Integer Seq. 8 (2005), Art. 05.4.1) showed that
-under the Riemann hypothesis it lies in `(1.3063778838, 1.3063778839)`: RH gives a prime between
-`x³` and `(x+1)³` for all large `x`, so the greedy sequence `2, 11, 1361, 2521008887, …` never
-gets stuck and its limit is a Mills number.
+under the Riemann hypothesis there is a prime between `x³` and `(x+1)³` for every `x ≥ 2^{1/3} − 1`
+(their Lemma 5), so the greedy sequence `2, 11, 1361, 2521008887, …` never gets stuck and its limit
+is the least Mills number; computing its terms they gave 600 decimals of the constant (their
+Theorem 1, from ten certified primes, the last one 6854 digits).
 
-**Literature status.** The enclosure is an *RH-consequence* (Caldwell–Cheng 2005; listed as open
-in formal-conjectures). The lower bound `A > 1.3063778838` is *known* unconditionally
-(Caldwell–Cheng). The proof follows Caldwell–Cheng, with a prime between consecutive cubes from
-`x₀ = 10^9` and the primality of 2521008887 checked by a Lucas certificate. Before the 2026 proof
-of RH, only existence (Mills) and irrationality (Saito, Mathematika 71, 2025) were known.
+**Literature status.** Lemma 5, the enclosure and the digits are *RH-consequences*
+(Caldwell–Cheng 2005; the enclosure is listed as open in formal-conjectures). The lower bound
+`A > 1.3063778838` is *known* unconditionally (Caldwell–Cheng). The proof follows Caldwell–Cheng,
+with Schoenfeld's θ bound in place of his `π(x)` bound and Lucas certificates for the Mills primes.
+Before the 2026 proof of RH, only existence (Mills) and irrationality (Saito, Mathematika 71, 2025)
+were known.
 
 ```lean
 -- Unconditional/MillsUnconditional.lean
 theorem mills_constant_bounds_unconditional {A : ℝ} (hA : Mills.IsMinMills A) :
     A ∈ Set.Ioo (1.3063778838 : ℝ) 1.3063778839
+
+theorem prime_between_cubes_unconditional (x : ℝ) (hx : (2 : ℝ) ^ ((1 : ℝ) / 3) - 1 ≤ x) :
+    ∃ p : ℕ, p.Prime ∧ x ^ 3 < p ∧ (p : ℝ) ≤ (x + 1) ^ 3
+
+theorem prime_strictly_between_cubes_unconditional (x : ℝ)
+    (hx : (2 : ℝ) ^ ((1 : ℝ) / 3) - 1 < x) :
+    ∃ p : ℕ, p.Prime ∧ x ^ 3 < p ∧ (p : ℝ) < (x + 1) ^ 3
+
+theorem mills_digits30_unconditional {A : ℝ} (hA : Mills.IsMinMills A) :
+    ((1306377883863080690468614492602 : ℕ) : ℝ) / 10 ^ 30 ≤ A ∧
+      A < (((1306377883863080690468614492602 : ℕ) : ℝ) + 1) / 10 ^ 30
+
+theorem mills_digits87_unconditional {A : ℝ} (hA : Mills.IsMinMills A) :
+    ((1306377883863080690468614492602605712916784585156713644368053759966434053766826598821501 : ℕ) : ℝ) / 10 ^ 87 ≤ A ∧
+      A < (((1306377883863080690468614492602605712916784585156713644368053759966434053766826598821501 : ℕ) : ℝ) + 1) / 10 ^ 87
+
+-- Mills/CubesSharp.lean, Mills/Digits.lean (targets in Mills/Statement2.lean)
+theorem Mills.caldwellChengLemma5_of_RH : CaldwellChengLemma5
+  -- RiemannHypothesis → ∀ x : ℝ, 2 ^ (1/3) - 1 ≤ x → ∃ p, p.Prime ∧ x ^ 3 < p ∧ p ≤ (x + 1) ^ 3
+theorem Mills.primeStrictlyBetweenCubes_of_RH : PrimeStrictlyBetweenCubesOfRH
+theorem Mills.millsDigits30_of_RH : MillsDigits 30 1306377883863080690468614492602
+theorem Mills.millsDigits87_of_RH : MillsDigits 87 1306377883863080690468614492602605712916784585156713644368053759966434053766826598821501
+  -- MillsDigits N D := RiemannHypothesis → ∀ {A}, IsMinMills A → D / 10^N ≤ A ∧ A < (D + 1) / 10^N
+
+-- Mills/Certificates.lean (no hypothesis)
+theorem Mills.g_four : g 4 = 16022236204009818131831320183
+theorem Mills.g_five : g 5 = 4113101149215104800030529537915953170486139623539759933135949994882770404074832568499
 
 -- Mills/Final.lean
 theorem Mills.lower_bound_of_RH : LowerBoundOfRH   -- RiemannHypothesis → ∀ {A}, IsMinMills A → A ∈ Set.Ioo 1.3063778838 1.3063778839
@@ -51,11 +84,38 @@ def PrimeBetweenCubes (x₀ : ℕ) : Prop :=
 | `Mills.lower_bound_of_RH`, `Mills.mills_bounds_of_RH` | C | `RiemannHypothesis` |
 | `Mills.mills_bounds_of_primeBetweenCubes` (the reduction) | C + H | `PrimeBetweenCubes x₀`, `x₀ ≤ 2521008887` |
 | `mills_constant_bounds_unconditional` (`Unconditional/`) | U | none; RH from riemann-hypothesis |
+| `Mills.prime_b5`, `Mills.prime_b6`, `Mills.g_four`, `Mills.g_five` | D | none |
+| `Mills.primeStrictlyBetweenCubes_small` (`1 ≤ x < 9`) | D | none |
+| `Mills.caldwellChengLemma5_of_RH`, `Mills.primeStrictlyBetweenCubes_of_RH` | C | `RiemannHypothesis` |
+| `Mills.millsDigits30_of_RH`, `Mills.millsDigits87_of_RH` | C | `RiemannHypothesis` |
+| `prime_between_cubes_unconditional`, `prime_strictly_between_cubes_unconditional`, `mills_digits30_unconditional`, `mills_digits87_unconditional` (`Unconditional/`) | U | none; RH from riemann-hypothesis |
+
+`Mills.CaldwellChengLemma5`, `Mills.PrimeStrictlyBetweenCubesOfRH`, `Mills.MillsDigits` and
+`Mills.CaldwellChengTheorem1` (`Mills/Statement2.lean`) transcribe Caldwell–Cheng's Lemma 5 and
+Theorem 1; formal-conjectures has neither. Lemma 5 reads "there is at least one prime between
+`x³` and `(x+1)³` for every `x ≥ x₀ = 2^{1/3} − 1`" with `x` real. At `x = x₀` the only candidate
+is `2 = (x₀+1)³`, so "between" includes the upper end there; `CaldwellChengLemma5` says
+`x³ < p ≤ (x+1)³`, and `PrimeStrictlyBetweenCubesOfRH` is the open-interval form for `x > x₀`.
+Both are proved.
+
+### Lemma 5 from Schoenfeld's θ bound
+
+`Mills/CubesSharp.lean` uses `Schoenfeld.schoenfeldTheta_of_RH : RiemannHypothesis →
+SchoenfeldTheta` (schoenfeld-rh `b2c3137`), Schoenfeld's 1976 bound
+`|θ(y) − y| < √y log² y / (8π)` for `y ≥ 599`.
+
+1. Real `x ≥ 9`: with `a = x³ ≥ 599`, `b = (x+1)³ − 1`, `u = x + 1`, `t = u^{1/4}`, one has
+   `√b ≤ t⁶` and `log b ≤ 12 log t ≤ 12t/e`, so `2·√b log² b/(8π) ≤ 288 t⁸/(8π e²) < 1.56 u²`,
+   which is below `b − a = 3u² − 3u` for `u ≥ 10`. So `θ(b) > θ(a)` and a prime lies in
+   `(x³, (x+1)³)` (`primeStrictlyBetweenCubes_large`).
+2. `1 ≤ x < 9`: with `k = ⌊2x⌋ ∈ [2, 17]`, one of 16 primes `5, 11, 17, …, 739` satisfies
+   `(k+1)³ < 8p < (k+2)³`, so `x³ < p < (x+1)³` (`primeStrictlyBetweenCubes_small`, no RH).
+3. `2^{1/3} − 1 ≤ x < 1`: `p = 2`.
 
 `PrimeBetweenCubes x₀` is the analytic input "a prime lies between `x³` and `(x+1)³` for all
 `x ≥ x₀`". It is proved from RH for `x₀ = 10^9` in `Mills/Cubes.lean`, using
 `Schoenfeld.thetaBound_of_RH : ThetaBound (1/4) 599` from
-[`schoenfeld-rh`](https://github.com/senamakel/schoenfeld-rh) (rev `14df2ce`):
+[`schoenfeld-rh`](https://github.com/senamakel/schoenfeld-rh) (rev `b2c3137`):
 under RH, `|θ(y) − y| < √y log² y / 4` for `y ≥ 599`. This is a weaker constant than
 Schoenfeld's `1/(8π)`, which is why Caldwell–Cheng's `x₀ = 2657` is replaced by `10^9` (any
 `x₀ ≤ 2521008887` is enough, see below). The argument: a prime in `(a, b]` exists when
@@ -80,7 +140,7 @@ not import riemann-hypothesis.
 
 ## Axioms
 
-`lake env lean scripts/axioms.lean` (2026-11-24, branch `finality`):
+`lake env lean scripts/axioms.lean` (2026-11-24, branch `round9`):
 
 ```
 'Mills.prime_2521008887' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -92,12 +152,157 @@ not import riemann-hypothesis.
 'Mills.primeBetweenCubes_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Mills.lower_bound_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Mills.mills_bounds_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mills.prime_b5' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mills.prime_b6' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mills.g_four' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mills.g_five' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mills.primeStrictlyBetweenCubes_small' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Mills.caldwellChengLemma5_of_RH' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'Mills.primeStrictlyBetweenCubes_of_RH' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'Mills.primeBetweenCubes_one_of_RH' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'Mills.millsDigits30_of_RH' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'Mills.millsDigits87_of_RH' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'Mills.millsDigits87_prefix' depends on axioms: [propext]
 ```
 
-Every theorem uses the standard three axioms and nothing else: there is no `sorry`, no
-`native_decide` and no `axiom` declaration. The primality of
-`2521008887` is a Lucas certificate (`5` is a primitive root, `2521008886 = 2·11·23·4982231`),
-with the modular powers evaluated by `reduce_mod_char`.
+There is no `sorry` and no `axiom` declaration, and nothing in this repository uses
+`native_decide`. The theorems of the original route (`Mills/Cubes.lean`, constant `1/4`), the
+certificates, the finite range of Lemma 5 and `millsDigits87_prefix` use the standard three
+axioms only. Everything built on Schoenfeld's `1/(8π)` bound (`caldwellChengLemma5_of_RH`, the
+strict form, `primeBetweenCubes_one_of_RH`, `millsDigits30_of_RH`, `millsDigits87_of_RH`) adds the
+22 `native_decide` axioms of `Schoenfeld.schoenfeldTheta_of_RH` in schoenfeld-rh: 21 for
+`PsiCert` (20 chunks of a segmented sieve checking `ψ` up to `10^10`, plus `checkA_psiCert`;
+13.9 CPU-minutes) and `checkA_theta` (θ on the small range). Each checker has a soundness proof
+in schoenfeld-rh.
+
+Primality is checked in the kernel, not by `native_decide`: `2521008887` by a Lucas certificate
+evaluated with `reduce_mod_char`, and `b₅` (29 digits, 9 links) and `b₆` (85 digits, 26 links)
+by Mathlib's `primality` tactic, whose proof term is `prime_of_lucasCheck … (Eq.refl true)`, so
+the kernel computes the modular powers with its GMP-backed `Nat` arithmetic. The two factors
+`4767859693324212149320551641267` and `158805050530653056698774265519084179` of `b₆ − 1` were
+found with GMP-ECM; the certificate only needs them, not how they were found. Minimality
+(`g 4 = b₅`, `g 5 = b₆`) checks the 80 and 12 integers below each prime with a Fermat test to
+base 2 (`fermatComposite`, proved sound by `not_prime_of_fermatComposite`), by kernel `decide`.
 
 ## Proof outline
 
@@ -113,27 +318,65 @@ with the modular powers evaluated by `reduce_mod_char`.
 4. The limit `A = sup lo n` satisfies `⌊A^(3^(n+1))⌋ = g n` (`floor_greedyLimit`), so it is a
    Mills number (`isMills_greedyLimit`), and `A^81 ≤ 2521008888 < 1.3063778839^81`.
 5. `Mills/Main.lean`: the least Mills number `A` has `A ≤` this one and `A >` the lower bound.
+6. `Mills/CubesSharp.lean`: Lemma 5 from Schoenfeld's θ bound (see above), and its integer
+   form `PrimeBetweenCubes 1`.
+7. `Mills/Certificates.lean`: `g 4 = b₅`, `g 5 = b₆` (certified primes, Fermat-tested gaps).
+8. `Mills/Digits.lean`: `g k ≤ A^{3^{k+1}} < g k + 1` for the least Mills number
+   (`minMills_pow_bounds`), so `A ∈ [b^{1/m}, (b+1)^{1/m})` with `m = 3^{k+1}`. At `k = 4`
+   (`m = 243`) this fixes 30 decimals, at `k = 5` (`m = 729`) 87; the digit comparisons
+   `D^m ≤ b·10^{Nm}` and `(b+1)·10^{Nm} ≤ (D+1)^m` are kernel `decide`s on numbers of up to
+   64,000 digits. `millsDigits87_prefix` checks that the 87 digits are the first 87 of
+   Caldwell–Cheng's table.
 
 ## Layout
 
 | File | Content |
 |---|---|
 | `Mills/Statement.lean` | `IsMills`, `IsMinMills` (verbatim), `LowerBoundOfRH` |
+| `Mills/Statement2.lean` | Caldwell–Cheng Lemma 5 (two forms), `MillsDigits`, Theorem 1 (600 digits) |
 | `Mills/Greedy.lean` | greedy sequence, the four values, primality certificate, lower bound |
 | `Mills/Upper.lean` | `PrimeBetweenCubes`, monotone enclosure, greedy limit is Mills |
 | `Mills/Main.lean` | reduction to `PrimeBetweenCubes`, lower bound |
 | `Mills/Cubes.lean` | `PrimeBetweenCubes (10^9)` from RH via Schoenfeld's θ bound |
 | `Mills/Final.lean` | `lower_bound_of_RH`, `mills_bounds_of_RH` |
+| `Mills/CubesSharp.lean` | Lemma 5 for real `x ≥ 2^{1/3} − 1` from Schoenfeld's `1/(8π)` |
+| `Mills/Certificates.lean` | Fermat composite checker, Lucas certificates for `b₅`, `b₆`, `g 4`, `g 5` |
+| `Mills/Digits.lean` | 30 and 87 decimals of Mills' constant |
 | `Unconditional/MillsUnconditional.lean` | one-line discharge of RH from riemann-hypothesis |
 | `scripts/check-unconditional.sh` | builds and checks the unconditional file |
 | `scripts/axioms.lean` | `#print axioms` for the headline theorems |
 
 ## Deviations from the literature
 
-None in the constants: the enclosure is exactly Caldwell–Cheng's. The prime-between-cubes input
-comes from the θ bound with constant `1/4` (`schoenfeld-rh`), not Schoenfeld's `1/(8π)`, so the
-threshold is `10^9` rather than `2657`. That is harmless: `PrimeBetweenCubes` is only used from
-`x = 2521008887`, so any `x₀` up to that works.
+**Lemma 5.** Caldwell–Cheng prove it for every real `x ≥ 2^{1/3} − 1`: from Schoenfeld's bound
+`|π(x) − li(x)| < √x log x/(8π)` (`x ≥ 2657`) for `x > 2657^{1/3}`, and "using a computer
+program" below that. Lean proves the same statement with the same threshold
+(`caldwellChengLemma5_of_RH`), and also the open-interval form for `x > 2^{1/3} − 1`. The
+analytic step uses Schoenfeld's θ bound (from `y = 599`, so from `x = 9`) instead of the π bound;
+the range below is 16 explicit primes and `p = 2`.
+
+**Digits.** Caldwell–Cheng's Theorem 1 states 600 decimals under RH, from the Mills primes
+`b₁, …, b₁₀` (`b₁₀` has 6854 digits; `b₇`, `b₈`, `b₉` were proved prime with Titanix, an ECPP
+program, and `b₁₀` by Morain's fastECPP in about 68 CPU-days). Lean proves 87 of them
+(`millsDigits87_of_RH`); the target `CaldwellChengTheorem1` (600 digits) is stated in
+`Mills/Statement2.lean` and is not proved. Each further Mills prime roughly triples the digits:
+`b₇` (254 digits) would give 256 decimals and `b₈` (762 digits) would reach 600. Neither has a
+Lucas or Pocklington certificate within reach: after trial division to `10^7` and GMP-ECM at
+`B1 = 10^6` (15 CPU-minutes per number), `b₇ − 1 = 2²·3³·7·C251` and
+`b₇ + 1 = 2·5²·61·601·291539·500536237·184968672986919581·P217` (`C251` an unfactored
+composite, `P217` a 217-digit probable prime). So `b₇ + 1` is fully factored, and Morrison's
+`N + 1` test (Lucas sequences, not in Mathlib) would reduce `b₇` to `P217`; but `P217 − 1` has a
+192-digit composite cofactor and `P217 + 1 = 2·2267·55320204473·P202`, so the descent goes on
+one probable prime at a time, a few digits per step. An `N − 1` (Pocklington) proof of `b₇`
+needs about 127 factored digits of `b₇ − 1`, which are not available.
+An elliptic-curve (Goldwasser–Kilian/Atkin–Morain) certificate checker would be needed, with an
+ECPP certificate for `b₇` produced elsewhere; it does not need the Hasse bound if each step asks
+`q > 2√N + 1` (the trivial bound `#E(𝔽_p) ≤ 2p + 1`), but it does need the group law of a
+Weierstrass curve reduced from `ℤ/N` to `𝔽_p`, which is not in Mathlib.
+
+**Enclosure.** `mills_bounds_of_RH` (the formal-conjectures enclosure) still goes through
+`Mills/Cubes.lean` (θ constant `1/4`, threshold `10^9`); any threshold up to `2521008887` gives
+the same enclosure, since primes between cubes are only used from `x = g 3 = 2521008887`.
 
 ## Building
 
@@ -144,9 +387,12 @@ lake exe cache get
 lake build            # target `Mills`
 ```
 
-The four modules take about 15 s once Mathlib and erdos-985 are built.
+The repository's own modules take under a minute once their dependencies are built
+(`Mills.Certificates` about 10 s, `Mills.Digits` about 10 s, both mostly kernel arithmetic).
 
-`Schoenfeld` is a lake dependency (`schoenfeld-rh` rev `14df2ce`); with it a cold build adds about 2.5 minutes.
+`Schoenfeld` is a lake dependency (`schoenfeld-rh` rev `b2c3137`). Its closure includes the
+vendored Rosser zero count (`Vendor/Rosser/`, about 95,000 lines), about 3 CPU-hours from cold;
+set `LEAN_NUM_THREADS` to the number of cores.
 
 (Building erdos-985 from its Mathlib cache takes about 2 minutes on 16 cores.)
 
@@ -154,12 +400,117 @@ The four modules take about 15 s once Mathlib and erdos-985 are built.
 
 | Theorem | Statement | Axioms |
 |---|---|---|
-| `mills_constant_bounds_unconditional` | the least Mills number lies in `(1.3063778838, 1.3063778839)` | `[propext, Classical.choice, Quot.sound]` |
+| `mills_constant_bounds_unconditional` | the least Mills number lies in `(1.3063778838, 1.3063778839)` | standard three |
+| `prime_between_cubes_unconditional` | Caldwell–Cheng Lemma 5: a prime `p` with `x³ < p ≤ (x+1)³` for every real `x ≥ 2^{1/3} − 1` | standard three + schoenfeld-rh's 22 `native_decide` |
+| `prime_strictly_between_cubes_unconditional` | a prime in `(x³, (x+1)³)` for every real `x > 2^{1/3} − 1` | standard three + the same 22 |
+| `mills_digits30_unconditional` | Mills' constant to 30 decimals | standard three + the same 22 |
+| `mills_digits87_unconditional` | Mills' constant to 87 decimals | standard three + the same 22 |
 
-`#print axioms` output (2026-11-24, from `scripts/check-unconditional.sh`):
+`#print axioms` output (2026-11-24, from `scripts/check-unconditional.sh`, 15 min wall on a loaded
+box, no `sorryAx`):
 
 ```
 'mills_constant_bounds_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+'prime_between_cubes_unconditional' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'prime_strictly_between_cubes_unconditional' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'mills_digits30_unconditional' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'mills_digits87_unconditional' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
 ```
 
 Checked against riemann-hypothesis commit `507a75d91d` with
@@ -175,3 +526,6 @@ No files are vendored. The Schoenfeld bounds come from the `schoenfeld-rh` lake 
 `IsMills`, `IsMinMills` and the `lower_bound_of_RH` statement are copied from
 [formal-conjectures](https://github.com/google-deepmind/formal-conjectures) (Apache-2.0, commit
 `86a2f58a`).
+The 600 digits in `Mills/Statement2.lean` are copied from the table of Caldwell–Cheng's
+Theorem 1. The factors of `b₆ − 1` were found with GMP-ECM 7.0.6; only the resulting
+certificate is in the repository.
