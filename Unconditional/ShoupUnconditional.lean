@@ -42,6 +42,17 @@ theorem leastPrimitiveRoot_le_six_unconditional (p : ℕ) (hp : p.Prime) (hp2 : 
 theorem wang_unconditional : Shoup.WangStatement :=
   Shoup.wang_of_GRH LFunction_ne_zero_of_half_lt_re
 
+/-- `g(p) = O(ω(p-1)^{21/5} (log p)²)`, unconditionally. -/
+theorem polyOmegaReal_unconditional : Shoup.PolyOmegaRealStatement (21 / 5) :=
+  Shoup.polyOmegaReal_of_GRH LFunction_ne_zero_of_half_lt_re
+
+theorem leastPrimitiveRoot_le_real_unconditional (p : ℕ) (hp : p.Prime) (hp2 : p ≠ 2) :
+    Shoup.HasPrimitiveRootLE p (Shoup.Creal * (ω (p - 1) : ℝ) ^ (21 / 5 : ℝ) * Real.log p ^ 2) :=
+  Shoup.leastPrimitiveRoot_le_real_of_GRH LFunction_ne_zero_of_half_lt_re p hp hp2
+
+theorem polyOmega5_unconditional : Shoup.PolyOmegaStatement 5 :=
+  Shoup.polyOmega5_of_GRH LFunction_ne_zero_of_half_lt_re
+
 #print axioms ankenyType_unconditional
 #print axioms leastPrimitiveRoot_le_unconditional
 #print axioms polyOmega_unconditional
@@ -51,3 +62,6 @@ theorem wang_unconditional : Shoup.WangStatement :=
 #print axioms polyOmega6_unconditional
 #print axioms leastPrimitiveRoot_le_six_unconditional
 #print axioms wang_unconditional
+#print axioms polyOmegaReal_unconditional
+#print axioms leastPrimitiveRoot_le_real_unconditional
+#print axioms polyOmega5_unconditional
