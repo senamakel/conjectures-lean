@@ -6,7 +6,10 @@ satisfies `g(p) < √p - 2`. McGown, Treviño and Trudgian
 proved it under the Generalized Riemann Hypothesis, building on the computation of Cohen,
 Oliveira e Silva and Trudgian for `409 < p ≤ 2.5·10^15`.
 
-This project proves in Lean:
+This project proves in Lean that GRH implies Grosswald's bound for every prime
+`p > 2.5·10^15`, following MTT, and `Unconditional/` proves that range unconditionally, with GRH
+supplied by the certified proof in leanprover-community/riemann-hypothesis. The full statement
+for `p > 409` takes the Cohen–Oliveira e Silva–Trudgian computation as a hypothesis:
 
 ```lean
 -- Grosswald/Main.lean
@@ -129,6 +132,4 @@ The script uses that project's community cache, about 93 GB. The import opens ar
 module files and needs about 19 GB of RAM. Raise the open-file limit first; on macOS:
 `sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`.
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
