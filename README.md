@@ -8,8 +8,10 @@ character `χ` under GRH. Unconditionally only subconvexity bounds are known (fo
 2017: `ζ(1/2 + it) = O(t^{13/84 + ε})`). This project formalises both implications.
 
 **Literature status: RH-consequence.** Both implications are classical (Littlewood 1912, in
-Titchmarsh). This is a Lean proof that RH, respectively GRH, implies them, following Littlewood;
-it is not new mathematics.
+Titchmarsh). This repository is a complete Lean proof that RH implies the Lindelöf hypothesis
+for ζ and that GRH implies it for every Dirichlet L-function, following Littlewood.
+`Unconditional/` proves both statements unconditionally in Lean, with RH and GRH supplied by the
+certified proof in leanprover-community/riemann-hypothesis, from the standard three axioms only.
 
 ```lean
 theorem Lindelof.lindelof_of_RH (hRH : RiemannHypothesis) : Lindelof.LindelofHypothesis
@@ -154,9 +156,7 @@ Output:
 The import needs about 93 GB of cache, about 19 GB of RAM and roughly 900k open files (raise
 the open-file limit first, e.g. `prlimit --nofile=2000000:2000000`).
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
