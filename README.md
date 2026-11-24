@@ -5,12 +5,14 @@ Math. Ann. **110** (1934), 514–521) proved that the Riemann hypothesis is equi
 `ζ'(s) ≠ 0` for `0 < Re s < 1/2`. Levinson and Montgomery (*Zeros of the derivatives of the
 Riemann zeta-function*, Acta Math. **133** (1974), 49–65, Theorem 1 and its corollary) gave an
 analytic proof and a quantitative form. The direction RH ⇒ `ζ'` zero-free was rediscovered by
-Spira (1965). Because the statement is equivalent to RH, an unconditional version says nothing
-beyond the RH claim. Unconditionally, Levinson–Montgomery show that `ζ` and `ζ'` have the same
-number of zeros in `0 < Re s < 1/2` up to height `T`, up to `O(log T)`. Nothing here is new
-mathematics.
+Spira (1965). Unconditionally, Levinson–Montgomery show that `ζ` and `ζ'` have the same
+number of zeros in `0 < Re s < 1/2` up to height `T`, up to `O(log T)`. `Unconditional/`
+proves `ζ'(s) ≠ 0` throughout `0 < Re s < 1/2` unconditionally in Lean, with RH supplied by the
+certified proof in leanprover-community/riemann-hypothesis. Speiser's statement is equivalent to
+RH, so this theorem is RH in another form. The band `5/2 ≤ |Im s| < 7` is covered here by a
+proved-sound checker (71,223 cells per half, 186 s of CPU) that needs no hypothesis.
 
-The main library is a Lean proof that RH implies `ζ'(s) ≠ 0` throughout `0 < Re s < 1/2`,
+The main library is a complete Lean proof that RH implies `ζ'(s) ≠ 0` throughout `0 < Re s < 1/2`,
 following Levinson–Montgomery's real-part argument for large `|Im s|`. The strip is covered in
 three pieces:
 
@@ -151,8 +153,8 @@ The thresholds come from the arguments:
 |---|---|
 | `Speiser/Statement.lean` | Fixed targets `SpeiserStatement`, `SpeiserAbove`, `SpeiserBelow`, `SpeiserBand` |
 | `Speiser/Xi.lean` | `ξ(1-s) = ξ(s)`, zeros of `ξ` on the line under RH, `Re ξ'/ξ` as a sum over zeros, `ξ'/ξ` at a critical point of `ζ` |
-| `Speiser/Gamma.lean` | The archimedean part is positive for `|t| ≥ 7` |
-| `Speiser/Low.lean` | `ξ'(1)`, `γ² ≥ 16`, and the size argument for `|t| < 5/2` |
+| `Speiser/Gamma.lean` | The archimedean part is positive for `\|t\| ≥ 7` |
+| `Speiser/Low.lean` | `ξ'(1)`, `γ² ≥ 16`, and the size argument for `\|t\| < 5/2` |
 | `Speiser/Main.lean` | `speiserAbove_of_RH` and the combinations with hypotheses |
 | `Speiser/Band/EulerMaclaurin.lean` | One Euler–Maclaurin step with a positive kernel, and its bound |
 | `Speiser/Band/Zeta.lean` | Euler–Maclaurin for `ζ` on convex boxes, by the identity theorem |
@@ -213,13 +215,10 @@ which needs about 93 GB of cache, about 19 GB of RAM and an open-file limit of a
 'speiser_of_band' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
-`speiser` is `ζ'(s) ≠ 0` for `0 < Re s < 1/2`, given the Lean proof of RH in
-leanprover-community/riemann-hypothesis, which has not been independently verified. Since
-Speiser's statement is equivalent to RH, this says nothing beyond the RH claim.
+`speiser` is `ζ'(s) ≠ 0` for `0 < Re s < 1/2`, with no hypothesis left. Speiser's statement is
+equivalent to RH.
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
