@@ -17,12 +17,15 @@ import Cramer
 #print axioms Cramer.primeInShortInterval_three_halves_of_RH
 #print axioms Cramer.primeGapExplicit_three_halves_of_RH
 #print axioms Cramer.primeInClosedInterval_three_halves_of_RH
+#print axioms Cramer.primeInShortInterval_107_of_RH
+#print axioms Cramer.primeGapExplicit_107_of_RH
+#print axioms Cramer.primeInClosedInterval_107_of_RH
 LEAN
 out="$(lake env lean "$tmp/Axioms.lean")"
 echo "$out"
 n="$(grep -c "depends on axioms: \[propext, Classical.choice, Quot.sound\]$" <<<"$out" || true)"
-if [ "$n" != 10 ]; then
-  echo "axiom check FAILED: expected 10 theorems on the standard axioms only" >&2
+if [ "$n" != 13 ]; then
+  echo "axiom check FAILED: expected 13 theorems on the standard axioms only" >&2
   exit 1
 fi
 echo "axiom check passed"
