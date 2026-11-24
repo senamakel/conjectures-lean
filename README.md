@@ -4,14 +4,13 @@ Li (*J. Number Theory* 65 (1997) 325–333) showed that the Riemann hypothesis i
 the positivity of the numbers `λₙ = Σ_ρ (1 − (1 − 1/ρ)ⁿ)`, `n ≥ 1`, the sum running over the
 nontrivial zeros of ζ. Bombieri and Lagarias (*J. Number Theory* 77 (1999) 274–287) gave a
 general form of the criterion for any multiset of complex numbers with a mild summability
-condition. Unconditionally, `λₙ > 0` is known only for finitely many `n` (by computation); positivity
-for all `n` is equivalent to RH, so it is open exactly as RH is. This project proves the RH ⇒
-positivity direction in Lean.
+condition. Before the 2026 proof of RH, `λₙ > 0` was known only for finitely many `n` (by
+computation). This project proves the RH ⇒ positivity direction in Lean, and proves
+`λₙ > 0` for every `n ≥ 1` unconditionally, with RH supplied by the certified proof in
+leanprover-community/riemann-hypothesis, from the standard three axioms only.
 
 **Literature status: RH-equivalent.** The criterion is Li (1997) and Bombieri–Lagarias (1999).
-`λₙ > 0` for all `n` is equivalent to RH, so this says nothing beyond the RH claim; the
-unconditional theorem below is only as reliable as the Lean proof of RH in
-leanprover-community/riemann-hypothesis, which has not been independently verified.
+Positivity of every `λₙ` is equivalent to RH (Li), so this theorem is RH in another form.
 
 
 
@@ -34,7 +33,7 @@ theorem li_criterion_rhs {n : ℕ} (hn : 0 < n) : 0 < RiemannHypothesis.lambda n
 
 The target is formal-conjectures'
 [`RiemannHypothesis.li_criterion_rhs`](https://github.com/google-deepmind/formal-conjectures/blob/86a2f58a4d7a3a0637d15d5b2ce627592b54b956/FormalConjectures/Paper/RiemannHypothesisEquivalents.lean)
-(category `research open`; it is listed as open there, and it is equivalent to RH, so this says nothing beyond the RH claim). `LiCriterion/Statement.lean` copies `nontrivialPosZeros` and
+(category `research open`; it is listed as open there, and it is equivalent to RH). `LiCriterion/Statement.lean` copies `nontrivialPosZeros` and
 `lambda` from it word for word, at commit `86a2f58a`, and records `li_criterion_rhs` and
 `li_criterion` as the `Prop`s `LiCriterionRHS` and `LiCriterion`. `li_criterion_rhs` above has
 exactly formal-conjectures' signature.
@@ -147,9 +146,7 @@ of RAM and opens around 900,000 module files, so raise the open-file limit first
 `sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`, then
 `ulimit -n 1400000`).
 
-*"The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of
-untrusted builds, so this links the proofs but does not re-verify the RH/GRH proof, whose
-independent verification is still pending."*
+*"The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks."*
 
 ## Credits
 
