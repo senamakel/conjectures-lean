@@ -10,6 +10,11 @@ theorem Erdos985.erdos_985_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
     ∀ p : ℕ, p.Prime → p ≠ 2 → ∃ q, q.Prime ∧ q < p ∧ orderOf (q : ZMod p) = p - 1
 ```
 
+**Tiers.** `Erdos985.erdos_985_of_GRH` is tier C: GRH for Dirichlet L-functions is the explicit
+hypothesis `DirichletLNonvanishingRightOfHalf`. `erdos_985` is tier U: it closes that hypothesis
+with `LFunction_ne_zero_of_half_lt_re` from riemann-hypothesis, whose build has not been
+independently re-verified (see "Axioms and unconditional version" below).
+
 The statement is the same as `erdos_985` in
 [`formal-conjectures`](https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/ErdosProblems/985.lean).
 The project has no `sorry`. A write-up of the proof in mathematical terms is in
@@ -117,3 +122,71 @@ The script uses that project's community cache, about 93 GB. The import opens ar
 module files, so raise the open-file limit first. On macOS:
 `sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`
 and then `ulimit -n 1400000`. On Linux, `sudo prlimit --pid $$ --nofile=2000000:2000000`.
+
+## Axioms and unconditional version
+
+Checked on 2026-11-24 (erdos-985 `9538edb`, riemann-hypothesis `507a75d91d`, Lean v4.36.0,
+Mathlib `fc4f59e5`). `lake build` of this repository: no `sorry` warnings, about 98 s wall
+(1395 CPU-seconds, the 20 `Compute.Chunk*` modules take about 60 s each in parallel).
+`#print axioms Erdos985.erdos_985_of_GRH` lists the three standard axioms plus the 20
+`native_decide` axioms `Erdos985.Compute.chunk_ok_{0..19}._native.native_decide.ax_1_1`. Each
+evaluates the finite checker on 5·10⁶ numbers; its soundness is `Erdos985.Compute.checkAll_sound`.
+
+| Theorem | Statement | Axioms |
+|---|---|---|
+| `Erdos985.erdos_985_of_GRH` | `DirichletLNonvanishingRightOfHalf → Erdos985Statement` | standard three + 20 `native_decide` |
+| `erdos_985` | `Erdos985Statement` | standard three + 20 `native_decide` |
+
+Output of `scripts/check-unconditional.sh /path/to/riemann-hypothesis` for `erdos_985`:
+
+```
+'erdos_985' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Erdos985.Compute.chunk_ok_0._native.native_decide.ax_1_1,
+ Erdos985.Compute.chunk_ok_1._native.native_decide.ax_1_1,
+ Erdos985.Compute.chunk_ok_10._native.native_decide.ax_1_1,
+ Erdos985.Compute.chunk_ok_11._native.native_decide.ax_1_1,
+ Erdos985.Compute.chunk_ok_12._native.native_decide.ax_1_1,
+ Erdos985.Compute.chunk_ok_13._native.native_decide.ax_1_1,
+ Erdos985.Compute.chunk_ok_14._native.native_decide.ax_1_1,
+ Erdos985.Compute.chunk_ok_15._native.native_decide.ax_1_1,
+ Erdos985.Compute.chunk_ok_16._native.native_decide.ax_1_1,
+ Erdos985.Compute.chunk_ok_17._native.native_decide.ax_1_1,
+ Erdos985.Compute.chunk_ok_18._native.native_decide.ax_1_1,
+ Erdos985.Compute.chunk_ok_19._native.native_decide.ax_1_1,
+ Erdos985.Compute.chunk_ok_2._native.native_decide.ax_1_1,
+ Erdos985.Compute.chunk_ok_3._native.native_decide.ax_1_1,
+ Erdos985.Compute.chunk_ok_4._native.native_decide.ax_1_1,
+ Erdos985.Compute.chunk_ok_5._native.native_decide.ax_1_1,
+ Erdos985.Compute.chunk_ok_6._native.native_decide.ax_1_1,
+ Erdos985.Compute.chunk_ok_7._native.native_decide.ax_1_1,
+ Erdos985.Compute.chunk_ok_8._native.native_decide.ax_1_1,
+ Erdos985.Compute.chunk_ok_9._native.native_decide.ax_1_1]
+```
+
+The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent verification is still pending.
+
+Resources: the riemann-hypothesis cache is about 93 GB, the import needs about 19 GB of RAM and
+about 900,000 open files (hard limit must be raised, see Building). With a warm cache the whole
+script took about 9.5 minutes.
+
+## Credits
+
+- **Hadamard factorization library** (`Vendor/PNT/`): vendored from
+  [PrimeNumberTheoremAnd](https://github.com/AlexKontorovich/PrimeNumberTheoremAnd), source
+  commit `a4fb6989b07e9c76b511807ae93e33e25b820e9b` (Lean v4.35.0), licence Apache-2.0
+  (`Vendor/PNT/LICENSE`). `Vendor/PNT/NOTICE.md` lists the vendored files. Each carries the
+  line "Modified for erdos-985: ported to Lean v4.36.0 / Mathlib fc4f59e5": import paths
+  rewritten to the `Vendor.PNT.` prefix plus the minimal API-drift fixes, with no statement
+  weakened.
+- **GRH statement and theorem** (`DirichletLNonvanishingRightOfHalf`,
+  `LFunction_ne_zero_of_half_lt_re`): from
+  [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis),
+  checked against commit `507a75d91d`. Only the one-line definition is copied (see
+  `Erdos985/Statement.lean`); that repository has no licence file. Its code is imported, never
+  copied, and only from `Unconditional/`.
+- **Problem statement**: [formal-conjectures](https://github.com/google-deepmind/formal-conjectures)
+  `FormalConjectures/ErdosProblems/985.lean` (Apache-2.0).
+- **Bach's bounds**: Bach, Math. Comp. 66 (1997), in the form of Lemma 1 of McGown, Treviño and
+  Trudgian, [arXiv:1508.05182](https://arxiv.org/abs/1508.05182).
