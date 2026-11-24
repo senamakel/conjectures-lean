@@ -49,8 +49,10 @@ def ThetaBound (C x₀ : ℝ) : Prop :=
 def PiBound (C x₀ : ℝ) : Prop :=
   ∀ x : ℝ, x₀ ≤ x →
     |(Nat.primeCounting ⌊x⌋₊ : ℝ) - Real.logIntegral x| < C * (√x * Real.log x)
-def SchoenfeldStatement : Prop :=
-  PsiBound (1 / (8 * π)) 73.2 ∧ ThetaBound (1 / (8 * π)) 599 ∧ PiBound (1 / (8 * π)) 2657
+def SchoenfeldPsi : Prop := PsiBound (1 / (8 * π)) 73.2
+def SchoenfeldTheta : Prop := ThetaBound (1 / (8 * π)) 599
+def SchoenfeldPi : Prop := PiBound (1 / (8 * π)) 2657
+def SchoenfeldStatement : Prop := SchoenfeldPsi ∧ SchoenfeldTheta ∧ SchoenfeldPi
 ```
 
 and the inputs (`Schoenfeld/Inputs.lean`, `Schoenfeld/SmallRange.lean`)
@@ -126,23 +128,23 @@ others U + H.
 
 Full blueprint with every constant: [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
 
-1. **Zeros under RH** (`ZeroSums.lean`). `Σ_ρ m/|ρ|² = 2 + γ − log 4π < 1/20`, so `|ρ|² ≥ 20`.
+1. Zeros under RH (`ZeroSums.lean`): `Σ_ρ m/|ρ|² = 2 + γ − log 4π < 1/20`, so `|ρ|² ≥ 20`.
    Hadamard's product for erdos-985's `ξ` at real `s = a + 1/2` gives the Poisson-kernel sum
    `Σ_ρ m a/(a² + γ²) = Re ξ'/ξ(a + 1/2) ≤ ½ log a − ½ log 2π + (12/5)/a` for `a ≥ 2`. This is
    the zero-density input (in place of an explicit `N(T)`).
-2. **The zero sum** (`Density.lean`). `F(T) = Σ_ρ m min(1/|ρ|, T/|ρ|²)` is at most `T/20`, and
+2. The zero sum (`Density.lean`): `F(T) = Σ_ρ m min(1/|ρ|, T/|ρ|²)` is at most `T/20`, and
    at most `0.9 Jb(10T) + 2 Vb(T) + 2.75 Vb(5) ≈ 0.225 log² T` by writing `1/|γ|` as
    `0.9 ∫₂^{10T} da/(a² + γ²)` and exchanging sum and integral.
-3. **Differenced explicit formula** (`PsiInt.lean`). erdos-985's weighted explicit formula for
+3. Differenced explicit formula (`PsiInt.lean`): erdos-985's weighted explicit formula for
    `Ψ₁(x) = Σ_{n ≤ x} Λ(n)(x − n)` at integers; for `b = a + h`,
    `h ψ(a) ≤ Ψ₁(b) − Ψ₁(a) ≤ h ψ(b)` and `|b^{ρ+1} − a^{ρ+1}| ≤ min(|ρ+1| h √b, 2 b^{3/2})` give
    `|ψ(x) − x| ≤ h/2 + 3.6 + 1.5/h + √(x+h) F(2(x+h)/h)`.
-4. **ψ** (`Psi.lean`). For `73.2 ≤ x ≤ 2^18`, `F(T) ≤ T/20` with `h ≈ 0.447 x^{3/4}` on 15
+4. ψ (`Psi.lean`): for `73.2 ≤ x ≤ 2^18`, `F(T) ≤ T/20` with `h ≈ 0.447 x^{3/4}` on 15
    intervals (worst ratio to `√x log² x/8`: `0.98`). For `x ≥ 2^18`, step 2 with `h = ⌈4√x⌉`
    reduces to a quadratic inequality in `log x` (ratio `0.82` at `2^18`).
-5. **θ** (`Theta.lean`). Costa Pereira's `ψ − θ ≤ ψ(x^{1/2}) + ψ(x^{1/3}) + ψ(x^{1/5})` and
+5. θ (`Theta.lean`): Costa Pereira's `ψ − θ ≤ ψ(x^{1/2}) + ψ(x^{1/3}) + ψ(x^{1/5})` and
    `ψ(y) ≤ log 4 · y + 2√y log y` (both in Mathlib) give `ψ − θ ≤ √x log² x/8` for `x ≥ 599`.
-6. **π** (`Pi.lean`). Partial summation (Mathlib) and integration by parts for `li`:
+6. π (`Pi.lean`): partial summation (Mathlib) and integration by parts for `li`:
    `π(x) − li(x) = (θ(x) − x)/log x + ∫₂ˣ (θ(t) − t)/(t log² t) dt + 2/log 2 − li(2)`, with
    `|∫₂^599| ≤ 33`, `|∫_599^x| ≤ √x/2` and `0 ≤ li(2) ≤ 2`.
 
@@ -174,7 +176,7 @@ The constant `1/(8π)` (steps 6–10):
 |---|---|
 | `Schoenfeld/LogIntegral.lean` | `Real.logIntegral`, vendored from formal-conjectures |
 | `Schoenfeld/Statement.lean` | Target statements `PsiBound`, `ThetaBound`, `PiBound`, `SchoenfeldStatement` |
-| `Schoenfeld/ZeroSums.lean` | RH for `ξ`, `Σ m/|ρ|²`, the Poisson-kernel bound |
+| `Schoenfeld/ZeroSums.lean` | RH for `ξ`, `Σ m/\|ρ\|²`, the Poisson-kernel bound |
 | `Schoenfeld/Density.lean` | The zero sum `F(T)`: trivial and log² bounds |
 | `Schoenfeld/Psi1.lean` | `Ψ₁` and monotone differencing (from robin-rh) |
 | `Schoenfeld/PsiInt.lean` | Explicit formula for `Ψ₁`, `ψ` at integers and real `x` |
