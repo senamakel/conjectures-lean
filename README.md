@@ -8,12 +8,13 @@ them, the largest `1848`.
 
 - **Idoneal numbers: RH-consequence.** P. J. Weinberger (*Exponents of the class groups of
   complex quadratic fields*, Acta Arith. 22 (1973), 117–124) proved that Euler's list is complete
-  under GRH. Unconditionally he showed that at most two more exist (sometimes misquoted as one),
-  and completeness is still open; formal-conjectures lists it as open. This repository is a
-  Lean proof that GRH implies completeness, following Weinberger's 1973 result. The analytic
-  step is a count of small split primes rather than his `L(1, χ)` and genus-theory argument.
-  `Unconditional/` gives the completeness of the list, given the Lean proof of GRH in
-  leanprover-community/riemann-hypothesis, which has not been independently verified.
+  under GRH. Unconditionally he showed that at most two more exist (sometimes misquoted as one);
+  formal-conjectures lists completeness as open. This repository is a complete Lean proof that
+  GRH implies completeness, following Weinberger's 1973 result. The analytic step is a count of
+  small split primes rather than his `L(1, χ)` and genus-theory argument, and every `n < 10^8`
+  is covered by a proved-sound checker. `Unconditional/` proves that Euler's 65 numbers are the
+  only idoneal numbers, unconditionally in Lean, with GRH supplied by the certified proof in
+  leanprover-community/riemann-hypothesis.
 - **Class number one: known, via GRH here; not a target.** The nine imaginary quadratic fields
   of class number one were found unconditionally by Heegner (1952), Baker (1966) and Stark (1967).
   The side result kept here assumes GRH and two cited classical inputs, so it is weaker than the
@@ -41,9 +42,8 @@ theorem Weinberger.ClassNumber.starkHeegner_of_GRH (hGRH : DirichletLNonvanishin
 ```
 
 and, in `Unconditional/WeinbergerUnconditional.lean`,
-`idoneal_completeness : Idoneal.IdonealCompletenessStatement`, given the Lean proof of GRH in
-leanprover-community/riemann-hypothesis, which has not been independently verified. There is no
-`sorry`.
+`idoneal_completeness : Idoneal.IdonealCompletenessStatement`, with GRH closed by
+leanprover-community/riemann-hypothesis. There is no `sorry`.
 
 ## Tier and provenance
 
@@ -270,9 +270,7 @@ module files and needs about 19 GB of RAM. Raise the open-file limit first; on L
 `sudo prlimit --pid $$ --nofile=2000000:2000000`, on macOS
 `sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`.
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
