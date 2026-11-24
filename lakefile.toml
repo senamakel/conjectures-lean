@@ -12,3 +12,8 @@ rev = "9538edb73dc72c8fdc04b4e0df076c8930ee2fba"
 
 [[lean_lib]]
 name = "Schoenfeld"
+
+[[lean_lib]]
+name = "SchoenfeldCompute"
+globs = ["SchoenfeldCompute.*"]
+precompileModules = true
