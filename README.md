@@ -55,6 +55,12 @@ Real output of `lake env lean Axioms.lean` (2026-11-24, after a clean `lake buil
  Quot.sound,
  LLS.chunk114_ok_0._native.native_decide.ax_1_1,
  LLS.chunk114_ok_1._native.native_decide.ax_1_1,
+ LLS.chunk114_ok_10._native.native_decide.ax_1_1,
+ LLS.chunk114_ok_11._native.native_decide.ax_1_1,
+ LLS.chunk114_ok_12._native.native_decide.ax_1_1,
+ LLS.chunk114_ok_13._native.native_decide.ax_1_1,
+ LLS.chunk114_ok_14._native.native_decide.ax_1_1,
+ LLS.chunk114_ok_15._native.native_decide.ax_1_1,
  LLS.chunk114_ok_2._native.native_decide.ax_1_1,
  LLS.chunk114_ok_3._native.native_decide.ax_1_1,
  LLS.chunk114_ok_4._native.native_decide.ax_1_1,
@@ -62,15 +68,9 @@ Real output of `lake env lean Axioms.lean` (2026-11-24, after a clean `lake buil
  LLS.chunk114_ok_6._native.native_decide.ax_1_1,
  LLS.chunk114_ok_7._native.native_decide.ax_1_1,
  LLS.chunk114_ok_8._native.native_decide.ax_1_1,
- LLS.chunk114_ok_9._native.native_decide.ax_1_1,
- LLS.chunk114_ok_10._native.native_decide.ax_1_1,
- LLS.chunk114_ok_11._native.native_decide.ax_1_1,
- LLS.chunk114_ok_12._native.native_decide.ax_1_1,
- LLS.chunk114_ok_13._native.native_decide.ax_1_1,
- LLS.chunk114_ok_14._native.native_decide.ax_1_1,
- LLS.chunk114_ok_15._native.native_decide.ax_1_1]
-'LLS.leastNonresidue_of_GRH' depends on axioms: (the same nineteen)
-'LLS.miller_of_GRH' depends on axioms: (the same nineteen)
+ LLS.chunk114_ok_9._native.native_decide.ax_1_1]
+'LLS.leastNonresidue_of_GRH' depends on axioms: (the same nineteen as bach_of_GRH)
+'LLS.miller_of_GRH' depends on axioms: (the same nineteen as bach_of_GRH)
 'LLS.bach_large114' depends on axioms: [propext, Classical.choice, Quot.sound]
 'LLS.re_logSum_le' depends on axioms: [propext, Classical.choice, Quot.sound]
 'LLS.re_cesShift_le' depends on axioms: [propext, Classical.choice, Quot.sound]

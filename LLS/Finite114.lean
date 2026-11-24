@@ -40,7 +40,10 @@ theorem bach_three' (H : Subgroup (ZMod 3)ˣ) (hH : H ≠ ⊤) :
     have := Real.exp_one_lt_d9
     push_cast; linarith
   have : ((a : ZMod 3).val : ℝ) ≤ 2 := by exact_mod_cast hv
-  nlinarith
+  have h2 : 1 ≤ Real.log (3 : ℕ) ^ 2 := by nlinarith
+  calc ((a : ZMod 3).val : ℝ) ≤ 2 := this
+    _ ≤ 11 / 4 * 1 := by norm_num
+    _ ≤ 11 / 4 * Real.log (3 : ℕ) ^ 2 := by gcongr
 
 theorem bach_small114 (q : ℕ) [NeZero q] (hq : q < 2 ^ 18) (H : Subgroup (ZMod q)ˣ) (hH : H ≠ ⊤) :
     ∃ a : (ZMod q)ˣ, a ∉ H ∧ ((a : ZMod q).val : ℝ) ≤ 11 / 4 * Real.log q ^ 2 := by
