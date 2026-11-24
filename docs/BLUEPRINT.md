@@ -81,10 +81,41 @@ Given `ε`, take `δ = ε` in Step 4: `‖ζ(1/2+it)‖ ≤ C t^{ε/2} ‖ζ(1/2
 `‖ζ(1/2+ε+it)‖ ≤ 3|exp M| ≤ 3 exp(C (log t)^α) = O(t^{ε/4})` by Step 7, because
 `(log t)^α = o(log t)`.
 
+## Dirichlet L-functions (`Lindelof/Dirichlet*.lean`)
+
+Target: `Lindelof.dirichletLindelof_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
+DirichletLindelofHypothesis`, i.e. for every `N`, every `χ` mod `N` and every `ε > 0`,
+`‖L(1/2 + it, χ)‖ = O_{χ,ε}(t^ε)`. The constant may depend on `χ` (the statement is in the
+`t`-aspect only), so no uniformity in the modulus is needed.
+
+Steps 2, 6 and 8 are stated generically (`re_logDeriv_one_sub_conj_le`,
+`norm_le_of_re_logDeriv_ge`, `norm_log_le_of_bounds`, and the `LogBounds` interface with
+`isBigO_rpow_of_logBounds`), so `ζ` and `L(·, χ)` share one proof of Steps 6–8.
+
+* **Reduction** (`Lindelof/Dirichlet.lean`). `χ = 1`: `L(s, 1) = ∏_{p ∣ N}(1 - p^{-s}) ζ(s)`
+  and RH follows from GRH at modulus 1 (`riemannHypothesis_of_GRH`). `χ ≠ 1`: `χ` is induced
+  by `χ' = χ.primitiveCharacter ≠ 1`, `L(s, χ) = L(s, χ') ∏_{p ∣ N}(1 - χ'(p)p^{-s})`, and each
+  Euler factor is at most `2` on `σ = 1/2`.
+* **Step 1′.** Under GRH every zero of `Λ(s, χ')` lies on `σ = 1/2` (erdos-985,
+  `completedLFunction_zero_re`); `Λ` is entire of order one with `Λ(0) ≠ 0` (erdos-985).
+* **Step 2′** (`Lindelof/DirichletCompleted.lean`). `conj Λ(s̄, χ) = Λ(s, χ⁻¹)` (identity theorem
+  from `σ > 1`) and the functional equation `Λ(1-s, χ) = N^{s-1/2} ε_χ Λ(s, χ⁻¹)` give
+  `Λ'/Λ(1 - z̄) = -log N - conj(Λ'/Λ(z))`. With the Hadamard comparison this yields
+  `2 Re Λ'/Λ ≥ -log N` on `σ > 1/2`, so `‖Λ(σ+it)‖ ≤ N^{(σ'-σ)/2} ‖Λ(σ'+it)‖`.
+* **Step 3′.** `L = Λ / Γℝ(s + κ)` with `κ ∈ {0, 1}` (parity). Odd characters need the Gamma
+  ratio for arguments up to `3/2`, so Step 3 was widened to `0 ≤ a ≤ b ≤ 1` (constant `e⁵`) and
+  extended to `0 ≤ a ≤ b ≤ 2` with `Γ(s+1) = sΓ(s)` (`norm_Gamma_le_rpow_mul_two`).
+* **Step 4′** (`Lindelof/DirichletBounds.lean`). `‖L(σ+it)‖ ≤ C |t|^{(σ'-σ)/2} ‖L(σ'+it)‖` for
+  `1/2 ≤ σ ≤ σ' ≤ 2`, `|t| ≥ 1`; with `‖L - 1‖ ≤ π²/6 - 1 < 2/3` on `σ ≥ 2` this gives
+  `‖L(s)‖ ≤ K(|t| + 2)` on `1/2 ≤ σ ≤ 5`.
+* **Step 5′.** `L` has no pole, so the logarithm is taken of `L` itself; it is normalised to the
+  principal `log L` on `σ ≥ 2`, where `1/3 ≤ ‖L‖ ≤ 2`, so `‖M‖ ≤ 2 + π` there.
+* **Steps 6–8.** The generic lemmas, instantiated by `logBounds_LFunction`.
+
 ## Status
 
 Every step's statement is fixed in its file; `Lindelof/Main.lean` already proves
-`lindelof_of_RH` from them, so the plan is checked by Lean. Remaining work is the `sorry`s.
+`lindelof_of_RH` from them, so the plan is checked by Lean. There are no `sorry`s left.
 
 | Step | File | Status |
 |---|---|---|
@@ -96,4 +127,4 @@ Every step's statement is fixed in its file; `Lindelof/Main.lean` already proves
 | 6 | `Lindelof/BorelCaratheodory.lean` | done |
 | 7 | `Lindelof/ThreeLines.lean` | done |
 | 8 | `Lindelof/Main.lean` | done |
-| stretch | `Lindelof/Dirichlet.lean` | `dirichletLindelof_of_GRH` todo |
+| Dirichlet | `Lindelof/DirichletCompleted.lean`, `Lindelof/DirichletBounds.lean`, `Lindelof/Dirichlet.lean` | done |
