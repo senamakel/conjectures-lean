@@ -10,5 +10,11 @@ name = "Erdos985"
 git = "https://github.com/senamakel/erdos-985.git"
 rev = "9538edb73dc72c8fdc04b4e0df076c8930ee2fba"
 
+
+[[require]]
+name = "Erdos233"
+git = "https://github.com/senamakel/erdos-233.git"
+rev = "1ff9f39b4b3d724fd8338fd01252c179eb302acf"
+
 [[lean_lib]]
 name = "Cramer"

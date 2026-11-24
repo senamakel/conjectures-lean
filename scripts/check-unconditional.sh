@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Link the Cramér prime-gap proof to the riemann-hypothesis repository's RH theorem and print the axioms.
+# Link the Cramér prime-gap and mean-square proofs to the riemann-hypothesis repository's RH theorem and print the axioms.
 #
 # Usage: scripts/check-unconditional.sh [RH_DIR]
 #   RH_DIR defaults to ../riemann-hypothesis; it is cloned there if missing.
@@ -47,5 +47,5 @@ fi
 (cd "$HERE" && lake build)
 
 cd "$HERE"
-LEAN_PATH="$(cd "$RH" && lake env printenv LEAN_PATH):$HERE/.lake/packages/Erdos985/.lake/build/lib/lean:$HERE/.lake/build/lib/lean" \
+LEAN_PATH="$(cd "$RH" && lake env printenv LEAN_PATH):$HERE/.lake/packages/Erdos985/.lake/build/lib/lean:$HERE/.lake/packages/Erdos233/.lake/build/lib/lean:$HERE/.lake/build/lib/lean" \
   lean Unconditional/CramerUnconditional.lean
