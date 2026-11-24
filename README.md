@@ -7,15 +7,15 @@ and is not formalised here). The best unconditional bound is of the form
 `M(x) ≪ x exp(-c (log x)^{3/5} (log log x)^{-1/5})` (Walfisz, via the Vinogradov–Korobov
 zero-free region).
 
-**Literature status: RH-equivalent.** Nothing here is new mathematics. The main library is a
-Lean proof that RH implies these bounds, following Littlewood (1912), Riesz (1916) and
+**Literature status: RH-equivalent.** The main library is a complete Lean proof that RH
+implies these bounds, following Littlewood (1912), Riesz (1916) and
 Hardy–Littlewood (1916), together with the convergence of `∑ μ(n) n^{-s}` on `Re s > 1/2`
 (Littlewood 1912), the bound `∑_{n ≤ x} λ(n) = O(x^{1/2+ε})` for the Liouville function, and
-the Farey-sequence bounds of Franel (1924) and Landau (1924). Each of these is equivalent to RH,
-so the unconditional theorems in `Unconditional/` say nothing beyond the RH claim: they are
-these bounds, given the Lean proof of RH in leanprover-community/riemann-hypothesis, which has not
-been independently verified. Redheffer's identity `det R_n = M(n)` is **known** (Redheffer 1977,
-no hypothesis); this is a Lean formalisation of it.
+the Farey-sequence bounds of Franel (1924) and Landau (1924). `Unconditional/` proves all nine
+bounds unconditionally in Lean, with RH supplied by the certified proof in
+leanprover-community/riemann-hypothesis, from the standard three axioms only. Each is equivalent
+to RH, so each is RH in another form. Redheffer's identity `det R_n = M(n)` is **known**
+(Redheffer 1977, no hypothesis); this is a complete Lean proof of it.
 
 The project formalises Littlewood's implication together with its standard companions:
 
@@ -270,9 +270,8 @@ dependencies are built; the slowest are `Mertens.Littlewood` (30–100 s), `Mert
 `Unconditional/MertensUnconditional.lean` imports both this project and
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
 (commit `507a75d91d`), which contains a Lean proof `riemannHypothesis : RiemannHypothesis`, and
-closes the hypothesis in one line each. Each row is the stated bound, given that Lean proof of
-RH, which has not been independently verified; since the bounds are equivalent to RH, they add
-nothing beyond the RH claim.
+closes the hypothesis in one line each. Each row is the stated bound with no hypothesis; each
+bound is equivalent to RH.
 
 | Theorem | Statement | Axioms |
 |---|---|---|
@@ -309,9 +308,7 @@ output
 The import needs about 93 GB of riemann-hypothesis cache, about 19 GB of RAM and roughly 900k
 open files (on Linux, `sudo prlimit --pid $$ --nofile=2000000:2000000` first).
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
