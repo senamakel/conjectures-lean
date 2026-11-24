@@ -6,10 +6,12 @@ satisfies `g(p) < √p - 2`. McGown, Treviño and Trudgian
 proved it under the Generalized Riemann Hypothesis, building on the computation of Cohen,
 Oliveira e Silva and Trudgian for `409 < p ≤ 2.5·10^15`.
 
-This project proves in Lean that GRH implies Grosswald's bound for every prime
-`p > 2.5·10^15`, following MTT, and `Unconditional/` proves that range unconditionally, with GRH
-supplied by the certified proof in leanprover-community/riemann-hypothesis. The full statement
-for `p > 409` takes the Cohen–Oliveira e Silva–Trudgian computation as a hypothesis:
+This project proves in Lean that GRH implies Grosswald's bound, with a prime primitive root, for
+every prime `p > 2.5·10^15`, following MTT (label: **RH-consequence**). `Unconditional/` proves
+that range unconditionally, with GRH supplied by the certified proof in
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
+The full statement for `p > 409` is proved given the Cohen–Oliveira e Silva–Trudgian
+computation, which enters as a hypothesis.
 
 ```lean
 -- Grosswald/Main.lean
@@ -20,14 +22,41 @@ theorem Grosswald.grosswald_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf)
     (hcomp : VerifiedUpTo 2500000000000000) : GrosswaldStatement
 ```
 
-The statements and definitions are in `Grosswald/Statement.lean`. Two inputs are hypotheses:
+The target definitions are fixed in `Grosswald/Statement.lean`:
 
-* **GRH** for Dirichlet L-functions (`DirichletLNonvanishingRightOfHalf`, copied verbatim from
-  [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)),
-* **the finite range** `409 < p ≤ 2.5·10^15` (`VerifiedUpTo 2500000000000000`), which is the
-  Cohen–Oliveira e Silva–Trudgian computation (about `7·10^13` primes) and is not redone here.
+```lean
+def HasSmallPrimitiveRoot (p : ℕ) : Prop :=
+  ∃ g : ℕ, 0 < g ∧ (g : ℝ) < Real.sqrt p - 2 ∧ orderOf (g : ZMod p) = p - 1
 
-There is no `sorry`. `#print axioms Grosswald.grosswald_of_GRH` gives
+def HasSmallPrimePrimitiveRoot (p : ℕ) : Prop :=
+  ∃ q : ℕ, q.Prime ∧ (q : ℝ) < Real.sqrt p - 2 ∧ orderOf (q : ZMod p) = p - 1
+
+def GrosswaldStatement : Prop :=
+  ∀ p : ℕ, p.Prime → 409 < p → HasSmallPrimitiveRoot p
+
+def VerifiedUpTo (B : ℕ) : Prop :=
+  ∀ p : ℕ, p.Prime → 409 < p → p ≤ B → HasSmallPrimitiveRoot p
+```
+
+## Tier and provenance
+
+| Theorem | Tier | Hypotheses |
+|---|---|---|
+| `Grosswald.prime_primitive_root_of_GRH_large` | C | GRH |
+| `Grosswald.grosswald_of_GRH` | C + H | GRH, `VerifiedUpTo 2500000000000000` |
+| `prime_primitive_root_large_unconditional` (`Unconditional/`) | U | none |
+| `grosswald_of_verified` (`Unconditional/`) | U + H | `VerifiedUpTo 2500000000000000` |
+
+GRH for Dirichlet L-functions is `DirichletLNonvanishingRightOfHalf`, which erdos-985's
+`Erdos985/Statement.lean` copies word for word from `src/Statements.lean` of
+leanprover-community/riemann-hypothesis. The tier-H input `VerifiedUpTo 2500000000000000` is
+the Cohen–Oliveira e Silva–Trudgian computation for `409 < p ≤ 2.5·10^15`, about `7·10^13`
+primes, which this repository does not redo. The statement definitions are this repository's
+own. The main library never imports riemann-hypothesis, and the project has no `sorry`.
+
+## Axioms
+
+`#print axioms Grosswald.grosswald_of_GRH` gives
 
 ```
 [propext, Classical.choice, Quot.sound,
@@ -45,30 +74,33 @@ There is no `sorry`. `#print axioms Grosswald.grosswald_of_GRH` gives
 
 The last ten are the trust assumptions of the ten `native_decide` evaluations in
 `Grosswald/Run/`. Each one says that the compiled evaluation of a Boolean checker agrees with
-its definition. The checker's soundness is proved without them.
+its definition. The checker's soundness (`checkNode_sound`, `Grosswald/Alg.lean`) is proved
+without them. Together they take about ten CPU-minutes (see Building).
 
-## How the proof goes
+## Proof outline
+
+The map from MTT to Lean is in [`docs/PLAN.md`](docs/PLAN.md).
 
 Let `p > 2.5·10^15` have no prime primitive root `q < √p - 2`, and put `x = ⌊√p⌋ - 2`, so
 no prime `q < x` is a primitive root.
 
-1. **Bach's bounds** (MTT Lemma 1), from the [erdos-985](https://github.com/senamakel/erdos-985)
+1. Bach's bounds (MTT Lemma 1), from the [erdos-985](https://github.com/senamakel/erdos-985)
    library: `|Σ_{n<x} Λ(n)(1 - n/x) - x/2| ≤ √x/20 + 3` and, for `χ ≠ 1` mod `p`,
    `|Σ_{n<x} Λ(n)χ(n)(1 - n/x)| ≤ c(p,x) √x log p`, with MTT's `c(p,x)` (`Erdos985.bachC`).
-2. **The sieve** (MTT Theorem 3, `Grosswald/Sieve.lean`): for any set `S` of prime factors of
+2. The sieve (MTT Theorem 3, `Grosswald/Sieve.lean`): for any set `S` of prime factors of
    `p - 1` with `δ = 1 - Σ_{ℓ∈S} 1/ℓ > 0`,
    `Σ_{n<x} Λ(n)(1 - n/x) ≤ (2^{ω-|S|}(2 + (|S|-1)/δ) - 1) · c(p,x) √x log p`.
    With `S = ∅` this is MTT Theorem 2. So, under GRH, the inequality
    `K · c(p,x)√x log p < x/2 - (√x/20 + 3)` must fail for every admissible `S`
    (`not_sieveIneq_of_GRH`, `Grosswald/Analytic.lean`).
-3. **Large `p`** (`Grosswald/Tail.lean`): instead of Robin's bound on `ω`, we use
+3. Large `p` (`Grosswald/Tail.lean`): instead of Robin's bound on `ω`, we use
    `256^ω · ∏_{r<256} r ≤ (p - 1) · 256^{54}`, i.e. `2^ω < 4520 · p^{1/8}`, which settles
    every `p ≥ 10^47` with `S = ∅`. Below `10^47`, `ω(p - 1) ≤ 30`.
-4. **An executable criterion** (`Grosswald/Crit.lean`): `crit K Y0` is a rational test that
+4. An executable criterion (`Grosswald/Crit.lean`): `crit K Y0` is a rational test that
    implies the inequality of step 2 for every `p ≥ (Y0² + 2)²`. It uses the tangent bound
    `log y ≤ log a + y/a - 1`, `log 2 < 0.6931471808` and the alternating series for
    `log(1 + u)` with its remainder.
-5. **Algorithm 1** (`Grosswald/Alg.lean`): a recursive checker `checkNode n fuel X Y` with a
+5. Algorithm 1 (`Grosswald/Alg.lean`): a recursive checker `checkNode n fuel X Y` with a
    soundness proof `checkNode_sound`. A node covers the primes with `ω(p - 1) = n`, all of `X`
    dividing `p - 1` and none of `Y`. Lower bound: `p ≥ 1 + ∏L`, `L` the first `n` primes
    outside `Y`. Upper bound: the sieve with `M` the `s` largest primes of `L`. The exchange
@@ -77,10 +109,12 @@ no prime `q < x` is a primitive root.
    each candidate is ruled out (a prime of `Y` divides `k`, a small odd prime divides `p`, the
    base-2 Fermat test fails, `ω(p - 1) ≠ n`, `minFac p ≠ p`) or given a prime primitive root
    `q < ⌊√p⌋ - 2` by Lucas' test. This last case is MTT's list of 68,030 exceptions.
-6. **The computation** (`Grosswald/Run/`): the roots `(n, [2], [])` for every
+6. The computation (`Grosswald/Run/`): the roots `(n, [2], [])` for every
    `n ∈ [1, 30] \ {12, 13, 14}` close at once, which is MTT Corollary 4. For `n = 12, 14` the whole
    tree, and for `n = 13` five subtrees (`covered_13` in `Main.lean` puts them back together),
    are evaluated by `native_decide`. That is about `1.5·10^7` candidates in all.
+
+## Layout
 
 | File | Content |
 |---|---|
@@ -96,23 +130,39 @@ no prime `q < x` is a primitive root.
 | `docs/PLAN.md` | map from MTT to Lean |
 | `scripts/*.py` | float prototypes used to size the computation (not part of the proof) |
 
+## Deviations from the literature
+
+### Large `p` without Robin's bound
+
+MTT bound `ω(p - 1)` with Robin's inequality. Step 3 uses
+`256^ω · ∏_{r<256} r ≤ (p - 1) · 256^{54}` instead, which settles every `p ≥ 10^47` with
+`S = ∅`; below `10^47`, `ω(p - 1) ≤ 30`, and the sieve and Algorithm 1 cover the rest.
+
+### The range `409 < p ≤ 2.5·10^15`
+
+MTT rely on the Cohen–Oliveira e Silva–Trudgian computation for this range. It covers about
+`7·10^13` primes, too many to replay as it stands, so it is the hypothesis `VerifiedUpTo` here.
+The statement for `p > 2.5·10^15` needs no such input.
+
 ## Building
 
 ```
 lake build
 ```
 
+Lean `v4.36.0`, Mathlib `fc4f59e5`, through the erdos-985 dependency at `63d6818`. The analytic
+toolkit (explicit formula for Dirichlet L-functions with weight `(1 − n/x)`, Hadamard
+factorization, Perron formula, zero-sum bounds under GRH) comes from
+[erdos-985](https://github.com/senamakel/erdos-985), required as a lake dependency.
+
 The `native_decide` files take about ten minutes of CPU in total. Measured wall times: N13A1
 162 s, N13A2 101 s, N13B 92 s, N12 90 s, N13C 57 s, N13D 32 s, N14 about 20 s, Roots about 10 s.
-
-The analytic toolkit (explicit formula for Dirichlet L-functions with weight `(1 − n/x)`,
-Hadamard factorization, Perron formula, zero-sum bounds under GRH) comes from
-[erdos-985](https://github.com/senamakel/erdos-985), required as a lake dependency.
 
 ## Unconditional version
 
 `Unconditional/GrosswaldUnconditional.lean` imports [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
-(commit `507a75d`) and closes the hypothesis with its theorem:
+(commit `507a75d`) and closes the GRH hypothesis with its theorem
+`LFunction_ne_zero_of_half_lt_re`:
 
 | Theorem | Statement | Axioms |
 |---|---|---|
@@ -129,7 +179,20 @@ scripts/check-unconditional.sh /path/to/riemann-hypothesis   # cloned there if m
 ```
 
 The script uses that project's community cache, about 93 GB. The import opens around 900,000
-module files and needs about 19 GB of RAM. Raise the open-file limit first; on macOS:
+module files and needs about 19 GB of RAM. Raise the open-file limit first. On Linux:
+`sudo prlimit --pid $$ --nofile=2000000:2000000`. On macOS:
 `sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`.
 
 The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
+
+## Credits
+
+- No files are vendored. The analytic toolkit is the [erdos-985](https://github.com/senamakel/erdos-985)
+  lake dependency, which vendors part of PrimeNumberTheoremAnd under Apache-2.0 (see its
+  `Vendor/PNT/NOTICE.md`).
+- The argument (Bach's bounds in the form of MTT Lemma 1, the sieve of MTT Theorem 3, and
+  Algorithm 1) follows McGown, Treviño and Trudgian,
+  [arXiv:1508.05182](https://arxiv.org/abs/1508.05182).
+- GRH statement and theorem (`DirichletLNonvanishingRightOfHalf`,
+  `LFunction_ne_zero_of_half_lt_re`): [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis),
+  imported only from `Unconditional/`.
