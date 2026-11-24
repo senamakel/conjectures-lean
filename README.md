@@ -7,14 +7,14 @@ Math. Comp. **58** (1992), 369–380, Theorem 1.3, improved this to
 `g(p) = O(r⁴ (log r + 1)⁴ (log p)²)` (Wang's bound is cited from Shoup's introduction; Shoup
 omits the details of the proof of Theorem 1.3, which G. Martin, Acta Arith. 80 (1997),
 Corollary 3.1, rederives for the least *prime* primitive root). Unconditionally only Burgess-type
-bounds `g(p) ≪ p^{1/4+ε}` are known. **Status in the literature: RH-consequence.** Nothing here
-is new mathematics.
+bounds `g(p) ≪ p^{1/4+ε}` are known. **Status in the literature: RH-consequence.**
 
-**What this repo proves is weaker than both targets.** Two Lean proofs from GRH, for every odd
-prime `p`:
+**What this repo proves.** Two complete Lean proofs from GRH, for every odd prime `p`, both also
+proved unconditionally in `Unconditional/` with GRH supplied by the certified proof in
+leanprover-community/riemann-hypothesis:
 
 * a polynomial-in-`ω` bound `g(p) ≤ C · ω(p−1)^136 · (log p)²` (`PolyOmegaStatement 136`), with
-  an explicit but astronomically large `C = 1089 (304 · 2^21 · 16^46)²`, from a Brun–Hooley sieve
+  the explicit constant `C = 1089 (304 · 2^21 · 16^46)²`, from a Brun–Hooley sieve
   over the primes dividing `p − 1` built in this repo;
 * the exponential-in-`ω` bound `g(p) ≤ 1089 (2^{ω(p−1)} log p)²` (the Ankeny/Linnik route: plain
   character expansion of the primitive-root indicator).
@@ -179,8 +179,7 @@ whether `n` is an `ℓ`-th power residue, and `w(n) = Λ(n)(1 − n/x)`.
   cost (number of character sums) is `≈ r^{68}`; the bound is its square. The doubly exponential
   thresholds `2^{2^i}` also double the cost of the second block (`16 r` instead of `√(16r)`
   elements).
-* **The constant is astronomically large** (`≈ 3·10^{131}`); it is explicit but not meant to be
-  used numerically.
+* **The constant is explicit and large** (`≈ 3·10^{131}`).
 * **`ShoupStatement` needs a different sieve.** Shoup's `T ≥ c₁A/(log r + 1)² − c₂ r² B` is
   Iwaniec's shifted (linear) sieve, whose lower bound needs the Rosser–Iwaniec theory
   (`F`, `f` functions); no combinatorial truncation of the kind used here gets cost `r²`.
@@ -229,13 +228,11 @@ Real output (2026-11-24, riemann-hypothesis `507a75d91d`, community cache, not r
 The import needs about 93 GB of cache, about 19 GB of RAM and roughly 900k open files (raise the
 open-file limit first, e.g. `sudo prlimit --pid $$ --nofile=2000000:2000000`).
 
-*"The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending."*
+*"The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks."*
 
-These are `PolyOmegaStatement 136`, `AnkenyTypeStatement` and their explicit forms, given the Lean proof of GRH in
-leanprover-community/riemann-hypothesis, which has not been independently verified. They are not
-Wang's or Shoup's theorem.
+These are `PolyOmegaStatement 136`, `AnkenyTypeStatement` and their explicit forms, with GRH
+closed by leanprover-community/riemann-hypothesis. Wang's exponent `6` and Shoup's
+`ω⁴(log ω + 1)⁴` stay unproved here (see Deviations).
 
 ## Credits
 
