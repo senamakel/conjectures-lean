@@ -435,9 +435,9 @@ certified proof of RH.
 scripts/check-unconditional.sh [RH_DIR]
 ```
 
-Last run 2026-11-24 on this project's commit `95be863` (branch `round5`) against
-riemann-hypothesis `507a75d91d` (linked from the community cache, not rebuilt): exit 0, 29 min
-wall time on a heavily loaded box, output
+Last run 2026-11-24 on this project's commit `4e9a6ba` (branch `round6`) against
+riemann-hypothesis `507a75d91d` (linked from the community cache, not rebuilt): exit 0, about
+40 min wall time on a heavily loaded box, output
 
 ```
 'invZeta_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -451,6 +451,8 @@ wall time on a heavily loaded box, output
 'franelLandau_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
 'mertens_sharp_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
 'invZeta_sharp_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'liouville_sharp_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'invZeta_sharp_bound_titchmarsh' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 The import needs about 93 GB of riemann-hypothesis cache, about 19 GB of RAM and roughly 900k
