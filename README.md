@@ -1,5 +1,12 @@
 # Primes in arithmetic progressions under GRH in Lean
 
+This repository proves in Lean the GRH bounds for `ψ(x, χ)`, `ϑ(x; q, a)`, `ψ(x; q, a)` and
+`π(x; q, a)`, with one absolute constant for every modulus `q ≥ 1`. The main library is a
+complete Lean proof that GRH implies them, and `Unconditional/` proves all five bounds
+unconditionally in Lean, uniform in `q`, with GRH supplied by the certified proof in
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
+(L. Alpöge, 2026) and the two classical inputs taken from the same repository.
+
 **Literature status: RH-consequence.** Titchmarsh (1930) proved that GRH for the Dirichlet
 L-functions modulo `q` implies, for every character `χ` mod `q` and every `x ≥ 2`,
 
@@ -13,16 +20,13 @@ and, for `(a, q) = 1`, `ψ(x; q, a) = x/φ(q) + O(√x log² x)`,
 `ϑ(x; q, a) = x/φ(q) + O(√x log² x)`, `π(x; q, a) = li(x)/φ(q) + O(√x log x)`, with absolute
 implied constants. We follow the statements of Montgomery–Vaughan, *Multiplicative Number
 Theory I* (Cambridge 2007), Theorem 13.7 and Corollary 13.8, which attribute them to Titchmarsh
-(1930); see also Davenport, *Multiplicative Number Theory*, Ch. 20. Without GRH the error terms
-are open: the best unconditional results (Siegel–Walfisz) save only a power of
-`exp(−c √log x)` and need `q ≤ (log x)^A`. `Unconditional/` proves all five bounds
-unconditionally in Lean, uniform in `q`, with GRH supplied by the certified proof in
-leanprover-community/riemann-hypothesis and the two classical inputs taken from the same
-repository.
+(1930); see also Davenport, *Multiplicative Number Theory*, Ch. 20. Unconditionally, the
+Siegel–Walfisz theorem saves a power of `exp(−c √log x)` and needs `q ≤ (log x)^A`.
 
-The main library is a complete Lean proof that GRH implies these bounds, following the classical
-argument (truncated explicit formula at height `T = x`, zero counting in unit windows,
-reduction to primitive characters), with one absolute constant for every modulus:
+## Headline theorems
+
+The main library follows the classical argument (truncated explicit formula at height `T = x`,
+zero counting in unit windows, reduction to primitive characters):
 
 ```lean
 theorem PsiGRH.psiChar_of_GRH (hGRH : Erdos985.DirichletLNonvanishingRightOfHalf)
@@ -83,7 +87,7 @@ def PsiCharStatement : Prop := ∃ C : ℝ, 0 < C ∧ PsiCharBound C      -- lik
   `src/Statements.lean` of
   [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
 * `TruncatedExplicitFormula` and `ZeroWindowCount` (`PsiGRH/Inputs.lean`) are two classical,
-  **unconditional** facts about primitive Dirichlet L-functions, stated in this repository's
+  unconditional facts about primitive Dirichlet L-functions, stated in this repository's
   own words in Mathlib terms: the truncated explicit formula for `ψ(u, χ)` with an error
   uniform in the modulus (Davenport Ch. 17 and 19; Montgomery–Vaughan Ch. 12), and the bound
   `≪ log(q(|t| + 2))` for the number of zeros with `|Im ρ − t| ≤ 1` (Davenport Ch. 16;
@@ -92,7 +96,7 @@ def PsiCharStatement : Prop := ∃ C : ℝ, 0 < C ∧ PsiCharBound C      -- lik
   Mathlib nor erdos-985 has (erdos-985's explicit formula is the Cesàro-weighted one, which
   gives only `x^{3/4}` after unsmoothing; see "Deviations").
 * No formal-conjectures statement exists for any of the targets; they are this repository's
-  transcription of Montgomery–Vaughan (13.19), (13.22)–(13.24).
+  transcription of Montgomery–Vaughan (13.19) and (13.22) to (13.24).
 * The main library never imports riemann-hypothesis. `Unconditional/PsiGRHUnconditional.lean`
   discharges GRH with `LFunction_ne_zero_of_half_lt_re`, `ZeroWindowCount` with
   `GlobalTheory.ZeroWindow.count_zeros_window` (a definitional match), and
@@ -100,7 +104,7 @@ def PsiCharStatement : Prop := ∃ C : ℝ, 0 < C ∧ PsiCharBound C      -- lik
   through a three-line bridge (`psi0_eq`: that repository's `psi0 χ u` is
   `ψ(u, χ) − E₀(χ) u`). Nothing is copied from riemann-hypothesis, which has no licence.
 
-**What is uniform in `q`.** Everything: each statement has one constant for all moduli `q ≥ 1`,
+Each statement has one constant for all moduli `q ≥ 1`,
 all characters (primitive or not, principal or not), all residues and all `x ≥ 2`. The
 constants are existential, because the two cited inputs are existential. They are explicit in
 terms of those: with `C₁`, `C₂` the constants of `TruncatedExplicitFormula` and
@@ -125,26 +129,26 @@ No `sorry`, no `native_decide`, no `axiom` or `opaque` declarations, no finite c
 
 ## Proof outline
 
-1. **Zeros on the line** (`PsiGRH/ZeroSum.lean`, `re_eq_half_of_GRH`). A zero of a primitive
+1. Zeros on the line (`PsiGRH/ZeroSum.lean`, `re_eq_half_of_GRH`). A zero of a primitive
    `L(s, χ)` with `0 < Re ρ < 1` is a zero of the completed L-function; GRH and the functional
    equation (erdos-985's `completedLFunction_inv_eq_zero`) force `Re ρ = 1/2`, so
    `|u^ρ/ρ| = √u/|ρ|` and `|ρ| ≥ (⌊|Im ρ|⌋ + 1)/2`.
-2. **The zero sum** (`sum_stripZeros_le`). Slice the zeros with `|Im ρ| < T` by
+2. The zero sum (`sum_stripZeros_le`). Slice the zeros with `|Im ρ| < T` by
    `k = ⌊|Im ρ|⌋`; each slice lies in the windows at `±k`, so holds `≤ 2 C₂ log(N(T + 2))`
    zeros. With the harmonic bound,
    `Σ_{|Im ρ| < T} m_ρ/|ρ| ≤ 4 C₂ log(N(T + 2)) (1 + log(T + 1))`.
-3. **Primitive characters** (`PsiGRH/Primitive.lean`). `T = u` in the explicit formula:
+3. Primitive characters (`PsiGRH/Primitive.lean`). `T = u` in the explicit formula:
    `|ψ(u, χ) − E₀(χ) u| ≤ 32 C₂ √u (log u)(log Nu) + C₁ (6 + 32 C₂) log²(Nu)`.
-4. **All characters** (`PsiGRH/Imprimitive.lean`). `χ` and its primitive character `χ*` agree
+4. All characters (`PsiGRH/Imprimitive.lean`). `χ` and its primitive character `χ*` agree
    off the `n` sharing a factor with `q`, so `|ψ(u, χ) − ψ(u, χ*)| ≤ ω(q) log u` and
    `ω(q) log 2 ≤ log q`; `E₀(χ*) = E₀(χ)`.
-5. **(13.19)** (`PsiGRH/Character.lean`). If `log qx ≤ √x log x` the term `log²(qx)` is
+5. Montgomery–Vaughan (13.19) (`PsiGRH/Character.lean`). If `log qx ≤ √x log x` the term `log²(qx)` is
    `≤ √x (log x)(log qx)`; otherwise `√x < 2 log qx` and the trivial bound
    `|ψ(x, χ) − E₀(χ) x| ≤ x log x + x ≤ 6 √x (log x)(log qx)` wins.
-6. **Progressions** (`PsiGRH/Progression.lean`). Orthogonality of characters and the triangle
+6. Progressions (`PsiGRH/Progression.lean`). Orthogonality of characters and the triangle
    inequality over the `φ(q)` characters; `0 ≤ ψ(x; q, a) − ϑ(x; q, a) ≤ ψ(x) − ϑ(x) ≤ 2√x log x`
    (Mathlib's `Chebyshev.psi_sub_theta_le`).
-7. **Prime counts** (`PsiGRH/PrimeCount.lean`). Abel summation (Mathlib's
+7. Prime counts (`PsiGRH/PrimeCount.lean`). Abel summation (Mathlib's
    `sum_mul_eq_sub_sub_integral_mul`) gives
    `π(x; q, a) − li(x)/φ(q) = E(x)/log x + ∫₂ˣ E(t)/(t log² t) dt + 2/(φ(q) log 2)` with
    `E(t) = ϑ(t; q, a) − t/φ(q)`, and `∫₂ˣ dt/√t ≤ 2√x`.
@@ -166,17 +170,16 @@ No `sorry`, no `native_decide`, no `axiom` or `opaque` declarations, no finite c
 
 ## Deviations from the literature
 
-* **Uniform forms.** Montgomery–Vaughan's (13.22)–(13.24) have error `√x log² x` and
-  `√x log x`; their proof first reduces to `q ≤ √x` using the trivial bound and a lower bound
+* Montgomery–Vaughan's (13.22) to (13.24) have error `√x log² x` and `√x log x`; their proof first reduces to `q ≤ √x` using the trivial bound and a lower bound
   for `φ(q)`. We state and prove the uniform form `√x (log x)(log qx)` (and `√x log qx` for
   `π`), which is the bound their proof gives before that reduction, and implies theirs for
   `q ≤ x` because `log qx ≤ 2 log x` there.
-* **`li`.** `li(x) = ∫₂ˣ dt/log t`; the principal-value integral differs by `li(2) ≈ 1.045`,
+* Our `li(x)` is `∫₂ˣ dt/log t`; the principal-value integral differs by `li(2) ≈ 1.045`,
   absorbed by the error term.
-* **Existential constants.** The constants depend on those of the two cited inputs, which are
+* The constants depend on those of the two cited inputs, which are
   existential in riemann-hypothesis, so no numerical constant is available. This library
   therefore serves `O(·)` targets, not targets that end in a finite check.
-* **Why not erdos-985's explicit formula.** erdos-985 has a weighted (Cesàro, `ψ₁`) explicit
+* erdos-985's explicit formula is not used here. It is a weighted (Cesàro, `ψ₁`) explicit
   formula under GRH. Unsmoothing `ψ₁` by differencing over an interval of length `h` costs
   `x^{3/2}/h + h`, i.e. `x^{3/4}` at best, so `√x` needs a truncated (sharp-cutoff) explicit
   formula, which is exactly `TruncatedExplicitFormula`.
@@ -205,8 +208,8 @@ the library builds in about 30 s; no module is expensive.
 
 Each is the corresponding `_of_GRH` theorem applied to `LFunction_ne_zero_of_half_lt_re`,
 `truncatedExplicitFormula` and `zeroWindowCount`, all from
-leanprover-community/riemann-hypothesis at commit `507a75d91d`. These are the bounds with no
-hypothesis left.
+leanprover-community/riemann-hypothesis at commit `507a75d91d`. These are the five bounds,
+proved unconditionally in Lean with no hypothesis left.
 
 ```
 sudo prlimit --pid $$ --nofile=2000000:2000000   # the import opens ~900k files
@@ -227,7 +230,7 @@ The import needs about 93 GB of cache, about 19 GB of RAM (36 GB peak resident o
 'piAP_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
-*The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.*
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
