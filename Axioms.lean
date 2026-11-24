@@ -13,3 +13,6 @@ import LLS
 #print axioms LLS.l1UpperBoundWith_of_GRH
 #print axioms LLS.l1LowerBoundWith_of_GRH
 #print axioms LLS.log_norm_L1_le
+#print axioms LLS.classNumberUpperBoundOddWith_of_GRH_of_formula
+#print axioms LLS.classNumberLowerBoundOddWith_of_GRH_of_formula
+#print axioms LLS.jacobiChar_isPrimitive
