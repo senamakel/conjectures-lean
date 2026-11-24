@@ -14,7 +14,7 @@ at commit `86a2f58a4d7a3a0637d15d5b2ce627592b54b956` (Apache-2.0, see `NOTICE.md
   [`FormalConjecturesForMathlib/NumberTheory/RiemannZetaZeros.lean`](https://github.com/google-deepmind/formal-conjectures/blob/86a2f58a4d7a3a0637d15d5b2ce627592b54b956/FormalConjecturesForMathlib/NumberTheory/RiemannZetaZeros.lean);
 * `DensityHypothesis.zetaZeroCount` and the statements of
   `DensityHypothesis.density_hypothesis_zeta_zeros` (`research open` there) and
-  `DensityHypothesis.guth_maynard_zero_density` (`research solved` there) from
+  `DensityHypothesis.guth_maynard_zero_density` (a known result, `sorry` there) from
   [`FormalConjectures/Wikipedia/DensityHypothesis.lean`](https://github.com/google-deepmind/formal-conjectures/blob/86a2f58a4d7a3a0637d15d5b2ce627592b54b956/FormalConjectures/Wikipedia/DensityHypothesis.lean).
 
 The only changes are mechanical: the `module` / `public import` / `@[expose] public section`

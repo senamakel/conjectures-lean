@@ -85,7 +85,7 @@ The statement is formal-conjectures'
 (tagged as a known result there, proof `sorry`), and `zeroCountOn` is from
 [`FormalConjecturesForMathlib/NumberTheory/RiemannZetaZeros.lean`](https://github.com/google-deepmind/formal-conjectures/blob/86a2f58a4d7a3a0637d15d5b2ce627592b54b956/FormalConjecturesForMathlib/NumberTheory/RiemannZetaZeros.lean),
 both copied word for word at commit `86a2f58`; the only edits (dropped `module`/`public`
-markers and `@[category]` attributes, the open theorem turned into a `Prop`) are listed in the
+markers and `@[category]` attributes, the two theorems turned into `Prop`s) are listed in the
 file's docstring. The implied constant depends only on `ε`, uniformly in `σ ∈ [1/2, 1]` and
 `T ≥ 2`, exactly as stated there. The main library takes RH as a hypothesis and never imports
 riemann-hypothesis.
