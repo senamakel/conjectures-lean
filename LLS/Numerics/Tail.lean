@@ -76,13 +76,13 @@ lemma tail_small (x : ℕ) (hxR : (64 : ℝ) ≤ x) (hβκ : bet x ≤ kap x) :
     _ = 6 * Real.log x ^ 2 + 16.8 * Kc x := by simp [smallP]; ring
 
 /-- A crude lower bound for `Φ`. -/
-lemma tail_Phi (x : ℕ) (L : ℝ) (hxR : (706000 : ℝ) ≤ x) (hL : 0 ≤ L) (hβκ : bet x ≤ kap x)
+lemma tail_Phi (x : ℕ) (L : ℝ) (hxR : (64 : ℝ) ≤ x) (hL : 0 ≤ L) (hβκ : bet x ≤ kap x)
     (hkap : kap x ≤ Kc x + Real.log x / 2) (hbet : bet x ≤ Real.log x ^ 2 / 5.65 + Kc x / 8)
     (hEs : Eshift x ≤ 0) (hEt : Etil x ≤ 1.645) :
     x - 0.15 * √(x : ℝ) - 3 * Real.log x - 4.645
       - (1.125 * Kc x + Real.log x / 2 + Real.log x ^ 2 / 5.65) * L - 6 * Real.log x ^ 2
       - 16.8 * Kc x ≤ Phi x L := by
-  have hx64 : (64 : ℝ) ≤ x := by linarith
+  have hx64 : (64 : ℝ) ≤ x := hxR
   have hl4 := log_ge_four hx64
   have hK0 := (Kc_pos hx64).le
   have hpi := Erdos985.Analytic.ZeroSumAux.log_pi_gt
@@ -166,7 +166,9 @@ lemma tail_z (z : ℝ) (hz : 5.38 ≤ z) : 8 * z + 2 ≤ 0.01 * z ^ 8 ∧ 64 * z
     nlinarith
   · have : 28.9 * z ^ 2 ≤ z ^ 2 * z ^ 2 := mul_le_mul_of_nonneg_right h2 (sq_nonneg z)
     have e : z ^ 4 = z ^ 2 * z ^ 2 := by ring
-    rw [e]; nlinarith
+    have hz2 : 0 ≤ z ^ 2 := sq_nonneg z
+    rw [e, div_le_iff₀ (by norm_num)]
+    nlinarith
 
 set_option maxHeartbeats 1000000 in
 theorem goodQ_tail (q : ℕ) (hq : 2 ^ 700 ≤ q) : GoodQ 3 q := by
@@ -257,11 +259,13 @@ theorem goodQ_tail (q : ℕ) (hq : 2 ^ 700 ≤ q) : GoodQ 3 q := by
     nlinarith
   have hβκ : bet x ≤ kap x := by
     rw [hz4] at hz4b
+    have h1 : l ^ 2 / 5.65 ≤ 64 * z ^ 2 / 5.65 := by gcongr
+    have h2 : K / 8 + 0.5 * K ≤ K * (1 - 1 / 706000) := by nlinarith
     linarith
-  have hEs : Eshift x ≤ 0 := tail_Es x hxbig (by rw [← hz8]; linarith)
+  have hEs : Eshift x ≤ 0 := tail_Es x hxbig (by have h := hz8b; rw [hz8] at h; linarith)
   have hEt : Etil x ≤ 1.645 := tail_Et x (by linarith)
   refine ⟨x, hx64, hx1, ?_, hβκ⟩
-  have hPhi := tail_Phi x L hxbig (by linarith) hβκ hkap hbet hEs hEt
+  have hPhi := tail_Phi x L (by linarith) (by linarith) hβκ hkap hbet hEs hEt
   rw [← hsdef, ← hldef, ← hKdef] at hPhi
   have hfin := tail_final z K l L hz538 hK0 (by linarith) (by linarith) (by rw [hz4]; exact hKhi)
     hlz (by rw [hz4]; exact hLs)
