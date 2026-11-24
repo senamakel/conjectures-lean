@@ -17,6 +17,32 @@ theorem theta_bound : Schoenfeld.ThetaBound (1 / 4) 599 :=
 theorem pi_bound : Schoenfeld.PiBound (9 / 20) 2657 :=
   Schoenfeld.piBound_of_RH riemannHypothesis
 
+/-! ### Schoenfeld's constant `1/(8π)`
+
+RH is supplied by riemann-hypothesis; the cited inputs stay hypotheses: Rosser's zero count
+(`RosserZeroCount`), PsiCert, and the finite ranges. -/
+
+theorem schoenfeld_psi (hR : Schoenfeld.RosserZeroCount) (hC : Schoenfeld.PsiCert)
+    (hS : Schoenfeld.PsiSmallRange) : Schoenfeld.SchoenfeldPsi :=
+  Schoenfeld.schoenfeldPsi_of_RH riemannHypothesis hR hC hS
+
+theorem schoenfeld_theta (hR : Schoenfeld.RosserZeroCount) (hC : Schoenfeld.PsiCert)
+    (hS : Schoenfeld.ThetaSmallRange) : Schoenfeld.SchoenfeldTheta :=
+  Schoenfeld.schoenfeldTheta_of_RH riemannHypothesis hR hC hS
+
+theorem schoenfeld_pi (hR : Schoenfeld.RosserZeroCount) (hC : Schoenfeld.PsiCert)
+    (hSθ : Schoenfeld.ThetaSmallRange) (hSπ : Schoenfeld.PiSmallRange) : Schoenfeld.SchoenfeldPi :=
+  Schoenfeld.schoenfeldPi_of_RH riemannHypothesis hR hC hSθ hSπ
+
+theorem schoenfeld_statement (hR : Schoenfeld.RosserZeroCount) (hC : Schoenfeld.PsiCert)
+    (hSψ : Schoenfeld.PsiSmallRange) (hSθ : Schoenfeld.ThetaSmallRange)
+    (hSπ : Schoenfeld.PiSmallRange) : Schoenfeld.SchoenfeldStatement :=
+  Schoenfeld.schoenfeld_of_RH riemannHypothesis hR hC hSψ hSθ hSπ
+
 #print axioms psi_bound
 #print axioms theta_bound
 #print axioms pi_bound
+#print axioms schoenfeld_psi
+#print axioms schoenfeld_theta
+#print axioms schoenfeld_pi
+#print axioms schoenfeld_statement

@@ -1,0 +1,18 @@
+schoenfeld-rh
+
+This repository contains material copied from the following Apache-2.0 licensed projects.
+The Apache License 2.0 text is at https://www.apache.org/licenses/LICENSE-2.0.
+
+* google-deepmind/formal-conjectures, commit 86a2f58a4d7a3a0637d15d5b2ce627592b54b956:
+  Schoenfeld/LogIntegral.lean (Real.logIntegral), Copyright 2026 The Formal Conjectures Authors.
+  Changed: module-system header replaced by `import Mathlib`.
+
+* teorth/IEANTN, commit cd9c2dd:
+  the definition `positiveZeroCount` and the statement of Rosser's Theorem 19
+  (`RosserZeroCount`) in Schoenfeld/Inputs.lean, from
+  Solutions/Schoenfeld1976Numerics.v1/Proof/RSBounds/RosserCountDefinition.lean and
+  Rosser1941.lean. Changed: namespace.
+
+* Garald1/RSBounds, commit 82d7a55:
+  the statement `PsiCert` in Schoenfeld/Inputs.lean, from
+  RSBounds/Schoenfeld1976TargetsExtra.lean. Changed: namespace.
