@@ -75,10 +75,11 @@ theorem norm_zetaQ_le (hRH : RiemannHypothesis) :
       _ ≤ max 1 (max B C) := le_trans (le_max_left _ _) (le_max_right _ _)
       _ ≤ _ := by nlinarith
 
-/-- Under RH, `Re M ≤ log K + log (|t| + 2)` on `1/2 < σ ≤ 5`. -/
-theorem re_le_of_exp_eq {M : ℂ → ℂ} {K : ℝ} (hK : 1 ≤ K)
-    (hKb : ∀ s : ℂ, 1 / 2 ≤ s.re → s.re ≤ 5 → ‖zetaQ s‖ ≤ K * (|s.im| + 2))
-    (hexp : ∀ s ∈ halfPlane, exp (M s) = zetaQ s) {s : ℂ} (hs : 1 / 2 < s.re) (hs5 : s.re ≤ 5) :
+/-- If `exp M = g` and `‖g‖ ≤ K (|t| + 2)`, then `Re M ≤ log K + log (|t| + 2)` on
+`1/2 < σ ≤ 5`. -/
+theorem re_le_of_exp_eq {g M : ℂ → ℂ} {K : ℝ} (hK : 1 ≤ K)
+    (hKb : ∀ s : ℂ, 1 / 2 ≤ s.re → s.re ≤ 5 → ‖g s‖ ≤ K * (|s.im| + 2))
+    (hexp : ∀ s ∈ halfPlane, exp (M s) = g s) {s : ℂ} (hs : 1 / 2 < s.re) (hs5 : s.re ≤ 5) :
     (M s).re ≤ Real.log K + Real.log (|s.im| + 2) := by
   have h := hKb s hs.le hs5
   rw [← hexp s hs, Complex.norm_exp] at h
@@ -86,13 +87,17 @@ theorem re_le_of_exp_eq {M : ℂ → ℂ} {K : ℝ} (hK : 1 ≤ K)
   rw [← Real.log_exp (M s).re]
   exact Real.log_le_log (Real.exp_pos _) h
 
-theorem norm_log_zetaQ_le (hRH : RiemannHypothesis) {M : ℂ → ℂ}
-    (hM : DifferentiableOn ℂ M halfPlane) (hexp : ∀ s ∈ halfPlane, exp (M s) = zetaQ s)
+/-- **Generic Step 6.** Let `M` be a holomorphic logarithm of `g` on `σ > 1/2` with
+`‖g‖ ≤ K (|t| + 2)` on `1/2 ≤ σ ≤ 5` and `M` bounded on `2 ≤ σ ≤ 5`. Then for each `δ > 0`,
+`‖M s‖ ≤ C_δ log (|t| + 2)` on `1/2 + δ ≤ σ ≤ 2` (Borel–Carathéodory on discs centred at
+`5/2 + it`). -/
+theorem norm_log_le_of_bounds {g M : ℂ → ℂ} {K : ℝ} (hK1 : 1 ≤ K)
+    (hKb : ∀ s : ℂ, 1 / 2 ≤ s.re → s.re ≤ 5 → ‖g s‖ ≤ K * (|s.im| + 2))
+    (hM : DifferentiableOn ℂ M halfPlane) (hexp : ∀ s ∈ halfPlane, exp (M s) = g s)
     (hbd : ∃ C : ℝ, ∀ s : ℂ, 2 ≤ s.re → s.re ≤ 5 → ‖M s‖ ≤ C) :
     ∀ δ : ℝ, 0 < δ → ∃ C : ℝ, ∀ s : ℂ, 1 / 2 + δ ≤ s.re → s.re ≤ 2 →
       ‖M s‖ ≤ C * Real.log (|s.im| + 2) := by
   intro δ hδ
-  obtain ⟨K, hK1, hKb⟩ := norm_zetaQ_le hRH
   obtain ⟨C₀, hC₀⟩ := hbd
   set d := min δ 1 with hd
   have hd0 : 0 < d := lt_min hδ one_pos
@@ -185,5 +190,13 @@ theorem norm_log_zetaQ_le (hRH : RiemannHypothesis) {M : ℂ → ℂ}
     norm_num
   rw [this]
   linarith
+
+theorem norm_log_zetaQ_le (hRH : RiemannHypothesis) {M : ℂ → ℂ}
+    (hM : DifferentiableOn ℂ M halfPlane) (hexp : ∀ s ∈ halfPlane, exp (M s) = zetaQ s)
+    (hbd : ∃ C : ℝ, ∀ s : ℂ, 2 ≤ s.re → s.re ≤ 5 → ‖M s‖ ≤ C) :
+    ∀ δ : ℝ, 0 < δ → ∃ C : ℝ, ∀ s : ℂ, 1 / 2 + δ ≤ s.re → s.re ≤ 2 →
+      ‖M s‖ ≤ C * Real.log (|s.im| + 2) := by
+  obtain ⟨K, hK1, hKb⟩ := norm_zetaQ_le hRH
+  exact norm_log_le_of_bounds hK1 hKb hM hexp hbd
 
 end Lindelof
