@@ -166,7 +166,7 @@ scripts/check-unconditional.sh [RH_DIR]
 ```
 
 Run on 2026-11-24 against riemann-hypothesis `507a75d91d` (cache build, not `RH_FULL_BUILD`),
-cramer-rh commit `1f5d48e` (library unchanged since); 48 min wall, most of it waiting for and
+library and `Unconditional/` as of cramer-rh commit `a8cbd47` (unchanged since); 48 min wall, most of it waiting for and
 loading the RH cache. Output:
 
 ```
