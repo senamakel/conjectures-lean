@@ -127,7 +127,12 @@ Checked against riemann-hypothesis commit `507a75d91d`:
 scripts/check-unconditional.sh /path/to/riemann-hypothesis   # clones it there if missing
 ```
 
-Output for `li_criterion_rhs`: not yet run on this box (pending in the shared RH-check queue).
+Output for `li_criterion_rhs` (2026-11-24, li-criterion-rh `24fbe0b`, riemann-hypothesis
+`507a75d91d131d627b380df4e32f6e9fb21dd067`):
+
+```
+'li_criterion_rhs' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
 
 The script uses that project's community cache, about 93 GB, and the import needs about 19 GB
 of RAM and opens around 900,000 module files, so raise the open-file limit first (Linux:
