@@ -21,10 +21,14 @@ every `q`**, and the least quadratic non-residue mod an odd prime `p` is `≤ 4.
 definitions in `Ankeny/Statement.lean` are unchanged; only the numeral `2` in the two GRH theorems
 became `21 / 5` (see below). There is no `sorry`.
 
+Real output of `#print axioms` (`lake env lean`, 2026-11-24, after a clean `lake build`):
+
 ```
 #print axioms Ankeny.bach_of_GRH
 -- [propext, Classical.choice, Quot.sound,
 --  Ankeny.chunk_ok_0._native.native_decide.ax_1_1, …, Ankeny.chunk_ok_7._native.native_decide.ax_1_1]
+#print axioms Ankeny.leastNonresidue_of_GRH
+-- (the same eleven axioms)
 ```
 
 The eight `native_decide` axioms come from the finite computation for `q < 2^17` (below).
@@ -79,6 +83,10 @@ lake build
 ```
 
 Lean `v4.36.0`, Mathlib `fc4f59e5` (via erdos-985). The finite computation dominates the build.
+Measured 2026-11-24 on a 95-core box with a warm Mathlib cache (`lake exe cache get` first):
+a clean `lake build` (erdos-985 included) took 5 min wall, about 26 CPU-minutes; the eight
+`native_decide` chunks took 21, 57, 97, 135, 166, 203, 240 and 278 s (about 20 CPU-minutes in
+total, growing roughly linearly with `q`).
 
 ## Unconditional version
 
