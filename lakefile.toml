@@ -17,3 +17,48 @@ name = "Schoenfeld"
 name = "SchoenfeldCompute"
 globs = ["SchoenfeldCompute.*"]
 precompileModules = true
+
+# Vendored closure of Rosser's zero count (`RSBounds.Rosser1941.zero_count_bounds`), see
+# `Vendor/Rosser/README.md`. Each library keeps the Lean options of the project it came from
+# (the upstream packages leave `autoImplicit` at Lean's default, `true`).
+[[lean_lib]]
+name = "RosserTG"
+srcDir = "Vendor/Rosser"
+roots = ["TernaryGoldbach"]
+globs = ["TernaryGoldbach.+"]
+leanOptions = { autoImplicit = true }
+
+[[lean_lib]]
+name = "RosserRSBounds"
+srcDir = "Vendor/Rosser"
+roots = ["RSBounds"]
+globs = ["RSBounds.+"]
+leanOptions = { autoImplicit = true }
+
+[[lean_lib]]
+name = "RosserZeta23"
+srcDir = "Vendor/Rosser"
+roots = ["Zeta23"]
+globs = ["Zeta23.+"]
+leanOptions = { autoImplicit = true, relaxedAutoImplicit = false }
+
+[[lean_lib]]
+name = "RosserZetaLean"
+srcDir = "Vendor/Rosser"
+roots = ["ZetaLean"]
+globs = ["ZetaLean.+"]
+leanOptions = { autoImplicit = true }
+
+[[lean_lib]]
+name = "RosserRHHeight"
+srcDir = "Vendor/Rosser"
+roots = ["RHHeight", "RHHeight100"]
+globs = ["RHHeight.+", "RHHeight100.+"]
+leanOptions = { autoImplicit = false, relaxedAutoImplicit = false }
+
+[[lean_lib]]
+name = "RosserHardy"
+srcDir = "Vendor/Rosser"
+roots = ["HardyFirstZero", "HardyTenZeros"]
+globs = ["HardyFirstZero.+", "HardyTenZeros.+"]
+leanOptions = { autoImplicit = true }
