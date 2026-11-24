@@ -106,10 +106,11 @@ theorem norm_LFunction_sub_one_le (χ : DirichletCharacter ℂ N) {s : ℂ} (hs 
   refine hF.norm_le_of_bounded hg fun n => ?_
   rcases eq_or_ne n 1 with rfl | hn1
   · simp [hf1]
-  · simp only [hn1, if_false, sub_zero]
+  · simp only [hn1, ↓reduceIte, sub_zero]
     rcases eq_or_ne n 0 with rfl | hn0
     · simp [f]
-    · rw [LSeries.norm_term_eq, if_neg hn0]
+    · rw [LSeries.norm_term_eq]
+      simp only [hn0, ↓reduceIte]
       have hn : (1 : ℝ) ≤ n := by exact_mod_cast Nat.one_le_iff_ne_zero.mpr hn0
       have h1 : ‖χ n‖ ≤ 1 := DirichletCharacter.norm_le_one χ n
       have h2 : (n : ℝ) ^ (2 : ℝ) ≤ (n : ℝ) ^ s.re := Real.rpow_le_rpow_of_exponent_le hn hs
