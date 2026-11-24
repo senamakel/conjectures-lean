@@ -15,5 +15,10 @@ name = "Schoenfeld"
 git = "https://github.com/senamakel/schoenfeld-rh.git"
 rev = "14df2ce0b613a76bc53100b1c3e2f1b946b4810c"
 
+[[require]]
+name = "Cramer"
+git = "https://github.com/senamakel/cramer-rh.git"
+rev = "1b5144f6c929e0d4109e151583a650cb159e1008"
+
 [[lean_lib]]
 name = "GoldbachAverage"
