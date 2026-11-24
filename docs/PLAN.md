@@ -87,7 +87,7 @@ Below `10^13` the tree does not terminate in reasonable time for `n ≤ 6`: the 
 arithmetic is about `0.3 µs`, and a segmented sieve plus Lucas search over all primes near
 `10^12` costs about `3 µs` per prime in C.
 
-**Verdict.** No `(T, checker)` pair fits a budget of about one CPU-day (`8.6·10^4` s):
+**First verdict (superseded below).** With interpreted checkers, no `(T, checker)` pair fits a budget of about one CPU-day (`8.6·10^4` s):
 
 * The floor alone, `6.2·10^9` primes at one `powMod` each, is `1.0·10^5` CPU-s in Lean; a
   Lucas certificate needs `ω(p-1) + 1` to `~6` of them per prime, so realistically
@@ -111,3 +111,21 @@ The cheapest real improvement is lowering `LOW` to `3·10^14` (`3.5·10^8` candi
 three CPU-hours at the current speed). That proves the GRH part for `p > 3·10^14`, but the
 hypothesis would still be `VerifiedUpTo 300000000000000` (about `9·10^12` primes), so the
 tier stays C + H. It has not been done.
+
+## The plan being run (2026-11-24, later)
+
+Two things changed the numbers above:
+
+* `native_decide` interprets the IR of definitions in Mathlib-importing modules (`powMod` ≈ 16 µs).
+  Putting the checkers in a core-only library with `precompileModules = true`
+  (`GrosswaldCompute/`) makes them compiled code, and core's `Nat.powMod` is GMP's `mpz_powm`
+  (≈ 0.25 µs at `10^12`). A full segment check now costs ≈ 0.65 µs per odd number unloaded.
+* A per-`n` split limit (`LIM n`) keeps Algorithm 1 finite at `LOW = 10^13 + 1`: about
+  `4.2·10^10` enumerated `k` (n = 7: 1.1·10^8, 8: 5.5·10^9, 9: 1.9·10^10, 10: 1.6·10^10,
+  11: 1.6·10^9, 12: 2.2·10^8, 13: 1.4·10^7, 14: 5.7·10^5). Below `10^13` the tree does not
+  terminate (`n ≤ 8` keeps splitting on `Y`), so `10^13` is the switch point.
+
+Costs: direct range `[411, 10^13 + 10^8)` ≈ `3.3·10^6` CPU-s (2502 chunks of `4·10^9`), tree
+≈ `2.3·10^5` CPU-s (447 subtrees, measured 5.6 µs per `k` on the `n = 13`, `X = [2..19]`
+subtree), node heuristics ≈ 35 ms each (interpreted). About a day of wall time on a shared
+95-core box.

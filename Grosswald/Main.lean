@@ -1,77 +1,25 @@
 import Grosswald.Tail
-import Grosswald.Alg
-import Grosswald.Run.Roots
-import Grosswald.Run.N12
-import Grosswald.Run.N14
-import Grosswald.Run.N13A1
-import Grosswald.Run.N13A2
-import Grosswald.Run.N13B
-import Grosswald.Run.N13C
-import Grosswald.Run.N13D
+import Grosswald.Covered
+import Grosswald.First31
+import Grosswald.Direct.Main
 
 /-!
-# Grosswald's conjecture under GRH (MTT Theorem 1)
+# Grosswald's conjecture under GRH
 
-For a prime `p > 2.5·10^15` with no prime primitive root below `√p - 2`, GRH gives
-`NoSieve p` (`not_sieveIneq_of_GRH`). Then:
+For a prime `p > 10^13` with no prime primitive root below `√p - 2`, GRH gives `NoSieve p`
+(`not_sieveIneq_of_GRH`). Then:
 
 * `p ≥ 10^47`: the sieve with `S = ∅` contradicts it (`sieveIneq_of_large`);
-* `p < 10^47`: `ω(p-1) ≤ 30`, and Algorithm 1 (`checkNode_sound`) covers every
-  `n = ω(p-1) ∈ [1, 30]`, either by an empty interval (all `n ∉ {12, 13, 14}`) or by recursive
-  splitting and enumeration (`n = 12, 13, 14`).
+* `p < 10^47`: `ω(p-1) ≤ 30`, and Algorithm 1 (`checkNode_sound`, assembled in
+  `Grosswald/Covered.lean`) covers every `n = ω(p-1) ∈ [1, 30]`.
 
-The range `409 < p ≤ 2.5·10^15` is the hypothesis `VerifiedUpTo 2500000000000000`.
+The range `409 < p ≤ 10^13` is checked prime by prime (`Grosswald.Direct.direct_range`).
 -/
 
 namespace Grosswald
 
 open Alg
 open Erdos985 (DirichletLNonvanishingRightOfHalf)
-
-/-- The primes of a node all have a small prime primitive root (given `NoSieve`). -/
-def Covered (n : ℕ) (X Y : List ℕ) : Prop :=
-  ∀ p, InClass n X Y p → NoSieve p → HasSmallPrimePrimitiveRoot p
-
-lemma covered_of_check {n : ℕ} {X Y : List ℕ} (h : checkNode n 40 X Y = true) : Covered n X Y :=
-  checkNode_sound n 40 X Y h
-
-lemma covered_split {n : ℕ} {X Y : List ℕ} (q : ℕ) (h1 : Covered n (q :: X) Y)
-    (h2 : Covered n X (q :: Y)) : Covered n X Y := by
-  intro p ⟨hpr, hbig, hn, hX, hY⟩ hns
-  by_cases hq : q ∣ p - 1
-  · refine h1 p ⟨hpr, hbig, hn, fun r hr => ?_, hY⟩ hns
-    rcases List.mem_cons.mp hr with h | h
-    · rw [h]; exact hq
-    · exact hX r h
-  · refine h2 p ⟨hpr, hbig, hn, hX, fun r hr => ?_⟩ hns
-    rcases List.mem_cons.mp hr with h | h
-    · rw [h]; exact hq
-    · exact hY r h
-
-lemma covered_13 : Covered 13 [2] [] := by
-  obtain ⟨h3, h5, h7⟩ := Run.n13_small
-  refine covered_split 3 ?_ (covered_of_check h3)
-  refine covered_split 5 ?_ (covered_of_check h5)
-  refine covered_split 7 ?_ (covered_of_check h7)
-  refine covered_split 11 ?_ (covered_of_check Run.n13_D)
-  refine covered_split 13 ?_ (covered_of_check Run.n13_C)
-  refine covered_split 17 ?_ (covered_of_check Run.n13_B)
-  exact covered_split 19 (covered_of_check Run.n13_A1) (covered_of_check Run.n13_A2)
-
-lemma covered_root {n : ℕ} (h1 : 1 ≤ n) (h30 : n ≤ 30) : Covered n [2] [] := by
-  by_cases h12 : n = 12
-  · subst h12; exact covered_of_check Run.n12
-  by_cases h13 : n = 13
-  · subst h13; exact covered_13
-  by_cases h14 : n = 14
-  · subst h14; exact covered_of_check Run.n14
-  apply covered_of_check
-  have h := Run.roots_ok
-  rw [List.all_eq_true] at h
-  apply h
-  simp only [List.mem_filter, List.mem_range'_1, List.mem_cons, List.not_mem_nil, or_false,
-    decide_eq_true_eq]
-  omega
 
 /-- `p < 10^47` forces `ω(p - 1) ≤ 30`. -/
 lemma card_primeFactors_le_30 {p : ℕ} (hp : p < 10 ^ 47) : (p - 1).primeFactors.card ≤ 30 := by
@@ -97,10 +45,9 @@ lemma card_primeFactors_le_30 {p : ℕ} (hp : p < 10 ^ 47) : (p - 1).primeFactor
     Nat.le_of_dvd (Nat.pos_of_ne_zero hp1) (Nat.prod_primeFactors_dvd _)
   omega
 
-/-- **MTT Theorem 1, GRH part**: every prime `p > 2.5·10^15` has a prime primitive root below
-`√p - 2`. -/
-theorem prime_primitive_root_of_GRH_large (hGRH : DirichletLNonvanishingRightOfHalf) :
-    ∀ p : ℕ, p.Prime → 2500000000000000 < p → HasSmallPrimePrimitiveRoot p := by
+/-- **GRH part**: every prime `p > 10^13` has a prime primitive root below `√p - 2`. -/
+theorem prime_primitive_root_of_GRH_above (hGRH : DirichletLNonvanishingRightOfHalf) :
+    ∀ p : ℕ, p.Prime → 10000000000000 < p → HasSmallPrimePrimitiveRoot p := by
   intro p hp hbig
   by_contra hno
   have hns : NoSieve p := fun S hS hδ => not_sieveIneq_of_GRH hGRH hp (by omega) hno hS hδ
@@ -124,14 +71,22 @@ theorem prime_primitive_root_of_GRH_large (hGRH : DirichletLNonvanishingRightOfH
     simp only [List.mem_cons, List.not_mem_nil, or_false] at hq
     rw [hq]; exact h2
 
-/-- **Grosswald's conjecture under GRH**, given the computation of Cohen, Oliveira e Silva and
-Trudgian for `409 < p ≤ 2.5·10^15`. -/
-theorem grosswald_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf)
-    (hcomp : VerifiedUpTo 2500000000000000) : GrosswaldStatement := by
+/-- MTT Theorem 1, GRH part, with MTT's threshold `2.5·10^15`. -/
+theorem prime_primitive_root_of_GRH_large (hGRH : DirichletLNonvanishingRightOfHalf) :
+    ∀ p : ℕ, p.Prime → 2500000000000000 < p → HasSmallPrimePrimitiveRoot p :=
+  fun p hp h => prime_primitive_root_of_GRH_above hGRH p hp (by omega)
+
+/-- **Grosswald's conjecture under GRH.** -/
+theorem grosswald_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : GrosswaldStatement := by
   intro p hp h409
-  by_cases hsmall : p ≤ 2500000000000000
-  · exact hcomp p hp h409 hsmall
-  · obtain ⟨q, hq, hlt, hord⟩ := prime_primitive_root_of_GRH_large hGRH p hp (by omega)
+  by_cases hsmall : p < Direct.directEnd
+  · exact Direct.direct_range p hp h409 hsmall
+  · obtain ⟨q, hq, hlt, hord⟩ :=
+      prime_primitive_root_of_GRH_above hGRH p hp (by unfold Direct.directEnd at hsmall; omega)
     exact ⟨q, hq.pos, hlt, hord⟩
+
+/-- The finite range alone, without GRH: `VerifiedUpTo 10^13`. -/
+theorem verifiedUpTo_10_13 : VerifiedUpTo 10000000000000 := fun p hp h1 h2 =>
+  Direct.direct_range p hp h1 (by unfold Direct.directEnd; omega)
 
 end Grosswald

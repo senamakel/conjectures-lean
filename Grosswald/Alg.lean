@@ -30,8 +30,8 @@ open Erdos985.Compute (powMod smallPrimes)
 /-- `10^13 + 1`. Below it, `Grosswald/Direct/` checks every prime directly. -/
 def LOW : ℕ := 10000000000001
 
-/-- Split while more than this many `k` remain. -/
-def LIM : ℕ := 100000000
+/-- Split while more than this many `k` remain (heuristic, tuned per `n = ω(p - 1)`). -/
+def LIM (n : ℕ) : ℕ := if n ≤ 8 then 100000000 else if n ≤ 10 then 10000000 else 1000000
 
 /-- The primes below `2000`. -/
 def primesList : List ℕ := (List.range 2000).filter (fun q => Nat.Prime q)
@@ -134,7 +134,7 @@ def checkNode (n : ℕ) : ℕ → List ℕ → List ℕ → Bool
     | none => false
     | some (lo, up) =>
       decide (up ≤ lo) ||
-        if LIM < (up - lo) / X.prod then
+        if LIM n < (up - lo) / X.prod then
           checkNode n f (nextPrime X Y :: X) Y && checkNode n f X (nextPrime X Y :: Y)
         else enumOk n X Y lo up
 

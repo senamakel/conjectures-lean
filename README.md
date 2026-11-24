@@ -1,92 +1,86 @@
 # Grosswald's conjecture under GRH in Lean
 
-Grosswald (1981) conjectured that the least primitive root `g(p)` of every prime `p > 409`
-satisfies `g(p) < √p - 2`. McGown, Treviño and Trudgian
-([*Resolving Grosswald's conjecture on GRH*](https://arxiv.org/abs/1508.05182), MTT below)
-proved it under the Generalized Riemann Hypothesis, building on the computation of Cohen,
-Oliveira e Silva and Trudgian for `409 < p ≤ 2.5·10^15`.
-
-This project proves in Lean:
+**Literature status: RH-consequence.** Grosswald (1981) conjectured that the least primitive
+root `g(p)` of every prime `p > 409` satisfies `g(p) < √p - 2`. McGown, Treviño and Trudgian
+([*Resolving Grosswald's conjecture on GRH*](https://arxiv.org/abs/1508.05182), 2016, MTT below)
+proved it under the Generalized Riemann Hypothesis, using the computation of Cohen, Oliveira e
+Silva and Trudgian for `409 < p ≤ 2.5·10^15`. Unconditionally it is open. The main library is a
+Lean proof that GRH implies Grosswald's conjecture, following MTT, with the finite range redone
+here (`409 < p < 10^13` prime by prime, `p > 10^13` by MTT's Algorithm 1). `Unconditional/`
+gives Grosswald's conjecture, given the Lean proof of GRH in
+leanprover-community/riemann-hypothesis, which has not been independently verified.
 
 ```lean
 -- Grosswald/Main.lean
-theorem Grosswald.prime_primitive_root_of_GRH_large (hGRH : DirichletLNonvanishingRightOfHalf) :
-    ∀ p : ℕ, p.Prime → 2500000000000000 < p → HasSmallPrimePrimitiveRoot p
+theorem Grosswald.grosswald_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
+    GrosswaldStatement
 
-theorem Grosswald.grosswald_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf)
-    (hcomp : VerifiedUpTo 2500000000000000) : GrosswaldStatement
+theorem Grosswald.prime_primitive_root_of_GRH_above (hGRH : DirichletLNonvanishingRightOfHalf) :
+    ∀ p : ℕ, p.Prime → 10000000000000 < p → HasSmallPrimePrimitiveRoot p
+
+theorem Grosswald.verifiedUpTo_10_13 : VerifiedUpTo 10000000000000
 ```
+
+> **Status (2026-11-24): computation in progress.** The checkers, their soundness proofs and
+> the assembly are written and build; the `native_decide` chunks (`Grosswald/Direct/Run/`,
+> 2501 modules, and `Grosswald/Run/`, 186 modules) are being evaluated. Until `lake build`
+> finishes and the axiom list below is pasted from real output, none of these theorems counts as
+> proved. See [Building](#building).
 
 ## Tier and provenance
 
-* `prime_primitive_root_of_GRH_large`: tier **C** (GRH is an explicit argument); tier **U** through
-  `Unconditional/` (see below).
-* `grosswald_of_GRH`: tier **C + H**. Besides GRH it takes the finite range as the cited
-  hypothesis `VerifiedUpTo 2500000000000000`. Through `Unconditional/` it becomes
-  `grosswald_of_verified`, tier **U + H**. The full `GrosswaldStatement` is therefore not proved
-  unconditionally here; see "Why the range below `2.5·10^15` stays a hypothesis".
+* `grosswald_of_GRH`: tier **C** (GRH is the only hypothesis); tier **U** through
+  `Unconditional/` (`grosswald`).
+* `prime_primitive_root_of_GRH_above`: tier **C**, and `prime_primitive_root_of_GRH_large` (MTT's
+  threshold `2.5·10^15`) is a corollary.
+* `verifiedUpTo_10_13`: tier **D**, pure computation, no GRH.
 
-The statements and definitions are in `Grosswald/Statement.lean`. Two inputs are hypotheses:
+`DirichletLNonvanishingRightOfHalf` is copied verbatim from
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
+The target definitions are in `Grosswald/Statement.lean` (fixed).
 
-* **GRH** for Dirichlet L-functions (`DirichletLNonvanishingRightOfHalf`, copied verbatim from
-  [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)),
-* **the finite range** `409 < p ≤ 2.5·10^15` (`VerifiedUpTo 2500000000000000`), which is the
-  Cohen–Oliveira e Silva–Trudgian computation (about `7·10^13` primes) and is not redone here.
+## Axioms
 
-There is no `sorry`. `#print axioms Grosswald.grosswald_of_GRH` gives
-
-```
-[propext, Classical.choice, Quot.sound,
- Grosswald.Run.first31_ok._native.native_decide.ax_1_1,
- Grosswald.Run.n12._native.native_decide.ax_1_1,
- Grosswald.Run.n13_A1._native.native_decide.ax_1_1,
- Grosswald.Run.n13_A2._native.native_decide.ax_1_1,
- Grosswald.Run.n13_B._native.native_decide.ax_1_1,
- Grosswald.Run.n13_C._native.native_decide.ax_1_1,
- Grosswald.Run.n13_D._native.native_decide.ax_1_1,
- Grosswald.Run.n13_small._native.native_decide.ax_1_1,
- Grosswald.Run.n14._native.native_decide.ax_1_1,
- Grosswald.Run.roots_ok._native.native_decide.ax_1_1]
-```
-
-The last ten are the trust assumptions of the ten `native_decide` evaluations in
-`Grosswald/Run/`. Each one says that the compiled evaluation of a Boolean checker agrees with
-its definition. The checker's soundness is proved without them.
+Pending: pasted here from `#print axioms` once the build completes. The expected shape is the
+standard three plus one `*._native.native_decide.ax_*` per chunk theorem: `first31_ok`, 2 + 2500
+direct chunks (`Grosswald.Direct.Run.a1`, `a2`, `b0000`…`b2499`) and 447 Algorithm 1 chunks
+(`Grosswald.Run.c00000`…`c00446`). Each says that the compiled evaluation of a Boolean checker
+agrees with its definition; the checkers' soundness (`Grosswald.Direct.range_sound`,
+`Grosswald.Alg.checkNode_sound`, `Grosswald.Leaf.leafOk_sound`) is proved from the standard
+three alone (checked: `#print axioms Grosswald.Direct.range_sound` gives
+`[propext, Classical.choice, Quot.sound]`).
 
 ## How the proof goes
 
-Let `p > 2.5·10^15` have no prime primitive root `q < √p - 2`, and put `x = ⌊√p⌋ - 2`, so
-no prime `q < x` is a primitive root.
+1. **Bach's bounds** (MTT Lemma 1), from [erdos-985](https://github.com/senamakel/erdos-985):
+   `|Σ_{n<x} Λ(n)(1 - n/x) - x/2| ≤ √x/20 + 3` and, for `χ ≠ 1` mod `p`,
+   `|Σ_{n<x} Λ(n)χ(n)(1 - n/x)| ≤ c(p,x) √x log p` (`Erdos985.bachC`), at `x = ⌊√p⌋ - 2`.
+2. **The sieve** (MTT Theorem 3, `Grosswald/Sieve.lean`): for a set `S` of prime factors of `p - 1`
+   with `δ = 1 - Σ_{ℓ∈S} 1/ℓ > 0`, `Σ Λ(n)(1 - n/x) ≤ (2^{ω-|S|}(2 + (|S|-1)/δ) - 1) c(p,x) √x log p`.
+   Under GRH a counterexample violates every such inequality (`not_sieveIneq_of_GRH`).
+3. **`p ≥ 10^47`** (`Grosswald/Tail.lean`): `2^ω < 4520 p^{1/8}` closes it with `S = ∅`; below,
+   `ω(p - 1) ≤ 30` (`First31.lean`).
+4. **Algorithm 1 for `p > 10^13`** (`Grosswald/Alg.lean`, `Combi.lean`, `Crit.lean`): a node
+   `(n, X, Y)` covers primes with `ω(p - 1) = n`, `X ⊆ pf(p - 1)`, `Y ∩ pf(p - 1) = ∅`; lower
+   bound `max(1 + ∏L, 10^13 + 1)`, upper bound from the sieve and the rational test `crit`.
+   Large nodes split on the next prime (split limit `LIM n`: `10^8` for `n ≤ 8`, `10^7` for
+   `n ≤ 10`, `10^6` above); leaves enumerate `p = k ∏X + 1` with the native checker
+   `GrosswaldCompute.leafOk` (`Grosswald/LeafSound.lean`): a `q ∈ Y` divides `k`, or Fermat base 2
+   fails, or a prime `g < 2000`, `g < √p - 2`, passes Lucas' test against `X`, the sieved primes
+   of `k` and the cofactor, or a trial divisor of `p` is found. `Grosswald/Covered.lean` glues the
+   447 subtrees (`scripts/treecut.c`, `scripts/gen_tree.py`; about `4.2·10^10` enumerated `k`).
+5. **`409 < p < 10^13 + 10^8`** (`Grosswald/Direct/`): `GrosswaldCompute.segOk a L` checks the odd
+   `n ∈ [a, a + 2L)`: an untrusted segmented sieve proposes a divisor of `n` or the odd primes
+   below `B = ⌊√(a + 2L)⌋ + 1` dividing `n - 1`; the checker verifies the divisor, or that every
+   prime `q < B` was offered to every `n` with `q ∣ n - 1` (`cwOk`, `progAll`), and runs Lucas'
+   test for some `g` with `g + 3 ≤ ⌊√a⌋`. Since all listed numbers are below `B` and `B² > n`,
+   the cofactor is `1` or prime, so the list holds every prime factor of `n - 1`
+   (`Grosswald/Direct/Sound.lean`). 2502 chunks, glued by `segsOk_append`
+   (`scripts/gen_direct.py`).
 
-1. **Bach's bounds** (MTT Lemma 1), from the [erdos-985](https://github.com/senamakel/erdos-985)
-   library: `|Σ_{n<x} Λ(n)(1 - n/x) - x/2| ≤ √x/20 + 3` and, for `χ ≠ 1` mod `p`,
-   `|Σ_{n<x} Λ(n)χ(n)(1 - n/x)| ≤ c(p,x) √x log p`, with MTT's `c(p,x)` (`Erdos985.bachC`).
-2. **The sieve** (MTT Theorem 3, `Grosswald/Sieve.lean`): for any set `S` of prime factors of
-   `p - 1` with `δ = 1 - Σ_{ℓ∈S} 1/ℓ > 0`,
-   `Σ_{n<x} Λ(n)(1 - n/x) ≤ (2^{ω-|S|}(2 + (|S|-1)/δ) - 1) · c(p,x) √x log p`.
-   With `S = ∅` this is MTT Theorem 2. So, under GRH, the inequality
-   `K · c(p,x)√x log p < x/2 - (√x/20 + 3)` must fail for every admissible `S`
-   (`not_sieveIneq_of_GRH`, `Grosswald/Analytic.lean`).
-3. **Large `p`** (`Grosswald/Tail.lean`): instead of Robin's bound on `ω`, we use
-   `256^ω · ∏_{r<256} r ≤ (p - 1) · 256^{54}`, i.e. `2^ω < 4520 · p^{1/8}`, which settles
-   every `p ≥ 10^47` with `S = ∅`. Below `10^47`, `ω(p - 1) ≤ 30`.
-4. **An executable criterion** (`Grosswald/Crit.lean`): `crit K Y0` is a rational test that
-   implies the inequality of step 2 for every `p ≥ (Y0² + 2)²`. It uses the tangent bound
-   `log y ≤ log a + y/a - 1`, `log 2 < 0.6931471808` and the alternating series for
-   `log(1 + u)` with its remainder.
-5. **Algorithm 1** (`Grosswald/Alg.lean`): a recursive checker `checkNode n fuel X Y` with a
-   soundness proof `checkNode_sound`. A node covers the primes with `ω(p - 1) = n`, all of `X`
-   dividing `p - 1` and none of `Y`. Lower bound: `p ≥ 1 + ∏L`, `L` the first `n` primes
-   outside `Y`. Upper bound: the sieve with `M` the `s` largest primes of `L`. The exchange
-   lemmas in `Grosswald/Combi.lean` justify both bounds without order statistics. Large
-   intervals are split on the next prime; small ones are enumerated over `p = k ∏X + 1`, and
-   each candidate is ruled out (a prime of `Y` divides `k`, a small odd prime divides `p`, the
-   base-2 Fermat test fails, `ω(p - 1) ≠ n`, `minFac p ≠ p`) or given a prime primitive root
-   `q < ⌊√p⌋ - 2` by Lucas' test. This last case is MTT's list of 68,030 exceptions.
-6. **The computation** (`Grosswald/Run/`): the roots `(n, [2], [])` for every
-   `n ∈ [1, 30] \ {12, 13, 14}` close at once, which is MTT Corollary 4. For `n = 12, 14` the whole
-   tree, and for `n = 13` five subtrees (`covered_13` in `Main.lean` puts them back together),
-   are evaluated by `native_decide`. That is about `1.5·10^7` candidates in all.
+The checkers live in `GrosswaldCompute/` (core Lean only, `precompileModules = true`), so
+`native_decide` runs them as compiled code; `Nat.powMod` is core's GMP-backed `lean_nat_powmod`.
+Map from MTT to Lean and the sizing: [`docs/PLAN.md`](docs/PLAN.md).
 
 | File | Content |
 |---|---|
@@ -94,58 +88,46 @@ no prime `q < x` is a primitive root.
 | `Grosswald/Sieve.lean` | MTT Theorem 3 |
 | `Grosswald/Analytic.lean` | GRH + Bach + sieve at `x = ⌊√p⌋ - 2` |
 | `Grosswald/Crit.lean` | rational criterion for Bach's inequality |
-| `Grosswald/Tail.lean` | `p ≥ 10^47` |
+| `Grosswald/Tail.lean`, `First31.lean` | `p ≥ 10^47`; `ω(p - 1) ≤ 30` below |
 | `Grosswald/Combi.lean` | exchange lemmas for the bounds of Algorithm 1 |
-| `Grosswald/Alg.lean` | Algorithm 1 and its soundness |
-| `Grosswald/Run/*.lean` | `native_decide` evaluations |
+| `Grosswald/Alg.lean`, `LeafSound.lean` | Algorithm 1 and its soundness |
+| `Grosswald/Covered.lean`, `Run/*.lean` | Algorithm 1 subtrees (`native_decide`) and their assembly |
+| `Grosswald/Direct/Sound.lean` | soundness of the segmented checker |
+| `Grosswald/Direct/Run/*.lean`, `Group/*.lean`, `Main.lean` | the finite range (`native_decide`) |
+| `GrosswaldCompute/Seg.lean`, `Leaf.lean` | the executable checkers (core Lean, compiled) |
 | `Grosswald/Main.lean` | assembly |
-| `docs/PLAN.md` | map from MTT to Lean |
-| `scripts/*.py`, `scripts/uncovered.c` | float prototypes used to size the computation (not part of the proof) |
+| `scripts/gen_direct.py`, `gen_tree.py`, `treecut.c`, `tree_cut.txt` | chunk generators (not part of the proof) |
+| `scripts/*.py`, `scripts/uncovered.c` | float prototypes used for sizing (not part of the proof) |
 
-## Why the range below `2.5·10^15` stays a hypothesis
+## Deviations from the literature
 
-`2.5·10^15` is where the Cohen–Oliveira e Silva–Trudgian computation ends; MTT start their GRH
-argument there, and so does this repo. Replaying the range inside Lean is out of reach:
-
-* even with the exact factorisation of every `p - 1`, the sieve inequality fails for about
-  `6.2·10^9` primes in `(409, 2.5·10^15)` (92% of primes near `10^8`, 17% near `10^11`, 0.13%
-  near `10^13`), and each of them needs an explicit Lucas certificate;
-* lowering Algorithm 1's start to `10^13` already enumerates about `1.1·10^11` candidates, and
-  every prime below the start (`π(10^12) = 3.8·10^10`) has to be visited;
-* under `native_decide`, one modular exponentiation at `p ≈ 10^12` costs about 16 µs.
-
-The best split costs an estimated 10–100 CPU-days and needs a proved segmented sieve that does
-not exist here. The numbers, the scripts that produced them, and what would have to improve
-are in [`docs/PLAN.md`](docs/PLAN.md#can-the-range-below-2510-15-be-computed-here-sized-2026-11-24).
+* The computed range is redone in Lean rather than cited: `409 < p < 10^13` prime by prime, and
+  `10^13 < p ≤ 2.5·10^15` by MTT's Algorithm 1 under GRH (MTT cite Cohen–Oliveira e
+  Silva–Trudgian up to `2.5·10^15`).
+* Leaves check every prime `p = k ∏X + 1` with Lucas' test (no `ω(p - 1) = n` filter), with
+  prime roots `g < 2000`.
 
 ## Building
 
-```
-lake build
-```
-
-Toolchain Lean `v4.36.0` (`lean-toolchain`), Mathlib `fc4f59e5` (through erdos-985, pinned at
-`9538edb`). Run `lake exe cache get` once before the first build. The `native_decide` files take
-about eight minutes of CPU in total. Measured on 2026-11-24 (95-core x86-64 box, full `lake build`
-of this repo after the Mathlib cache: 3 min 44 s wall, 787 s CPU, 7.3 GB peak RSS): N13A1 130 s,
-N13A2 83 s, N12 80 s, N13B 70 s, N13C 47 s, N13D 24 s, N14 21 s, Roots 4 s.
-
-The analytic toolkit (explicit formula for Dirichlet L-functions with weight `(1 − n/x)`,
-Hadamard factorization, Perron formula, zero-sum bounds under GRH) comes from
-[erdos-985](https://github.com/senamakel/erdos-985), required as a lake dependency.
+Toolchain Lean `v4.36.0`, Mathlib `fc4f59e5` (through erdos-985 at `9538edb`). Run
+`lake exe cache get` once, then `lake build`. That evaluates every chunk, which is a large
+computation: measured on a 95-core box under load, a direct chunk (`4·10^9` integers) takes
+about 2100 s wall (≈ 0.65 µs per odd number unloaded) and the whole direct range about
+`3.3·10^6` CPU-s; Algorithm 1 is about `4.2·10^10` enumerated `k` at ≈ 5.6 µs each
+(`2.3·10^5` CPU-s). Lake builds as many modules in parallel as there are cores; to bound the
+load, `scripts/run_direct.sh` and `scripts/run_tree.sh` build the chunk modules a few at a time
+(concurrency in `.lake/direct.jobs`, `.lake/tree.jobs`) before the final `lake build`.
 
 ## Unconditional version
 
-`Unconditional/GrosswaldUnconditional.lean` imports [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
-(commit `507a75d`) and closes the hypothesis with its theorem:
+`Unconditional/GrosswaldUnconditional.lean` imports
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
+(commit `507a75d`) and closes the hypothesis with `LFunction_ne_zero_of_half_lt_re`:
 
 | Theorem | Statement | Axioms |
 |---|---|---|
-| `prime_primitive_root_large_unconditional` | every prime `p > 2.5·10^15` has a prime primitive root `q < √p − 2` | standard three + 10 `native_decide` |
-| `grosswald_of_verified` | `VerifiedUpTo 2500000000000000 → GrosswaldStatement` | same |
-
-The range `409 < p ≤ 2.5·10^15` stays the hypothesis `VerifiedUpTo` (the Cohen–Oliveira e
-Silva–Trudgian computation).
+| `grosswald` | `GrosswaldStatement` | pending (same list as `grosswald_of_GRH`) |
+| `prime_primitive_root_large_unconditional` | every prime `p > 10^13` has a prime primitive root `q < √p − 2` | pending |
 
 To check it:
 
@@ -154,9 +136,15 @@ scripts/check-unconditional.sh /path/to/riemann-hypothesis   # cloned there if m
 ```
 
 The script uses that project's community cache, about 93 GB. The import opens around 900,000
-module files and needs about 19 GB of RAM. Raise the open-file limit first; on macOS:
-`sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`.
+module files and needs about 19 GB of RAM. Raise the open-file limit first (Linux:
+`sudo prlimit --pid $$ --nofile=2000000:2000000`; macOS:
+`sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`).
 
 The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
 builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
 verification is still pending.
+
+## Credits
+
+No vendored files. The analytic toolkit comes from [erdos-985](https://github.com/senamakel/erdos-985)
+as a lake dependency; MTT's argument and Algorithm 1 follow arXiv:1508.05182.
