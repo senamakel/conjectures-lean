@@ -9,6 +9,11 @@ Unconditionally the best bounds are of Burgess type, `q^{1/(4√e)+ε}`.
 
 This repository proves in Lean, following LLS:
 
+- LLS Theorem 1.1 exactly as stated, with the paper's `A(q)` and `B(q)`: for every `q ≥ 3000`
+  and every proper subgroup `H` of `(ℤ/q)ˣ`, some prime `ℓ ∤ q` outside `H` has
+  `ℓ ≤ (log q + B(q))²` (part 1, `LLS.LeastPrimeOutsideSubgroup`); and if no prime below
+  `(log q)²` divides `q`, some prime `ℓ ≤ (log q)²` lies outside `H` (part 2,
+  `LLS.LeastPrimeOutsideSubgroupRough`). Both use no finite computation over `q`.
 - LLS Corollary 1.2 exactly as stated: for every prime `q ≥ 5` there is a quadratic non-residue
   `≤ (log q)²`.
 - Bach's subgroup bound with Bach's own constant `2` (Bach, *Explicit bounds for primality
@@ -31,15 +36,19 @@ The main library is a complete Lean proof that GRH implies each of these. `Uncon
 proves all of them unconditionally in Lean, with GRH supplied by the certified proof of
 L. Alpöge in
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
-Literature status: RH-consequence. Corollary 1.2, Theorem 1.5 and Corollary 1.3 carry the
-paper's own constants; where other constants differ (Theorem 1.1),
-"Deviations from the literature" gives both numbers. Bounds `h(−q) ≪ √q log log q` and
+Literature status: RH-consequence. Theorem 1.1, Corollary 1.2, Theorem 1.5 and Corollary 1.3
+carry the paper's own constants; Theorem 1.4 (cosets) is not proved, see "Deviations from the
+literature". Bounds `h(−q) ≪ √q log log q` and
 `h(−q) ≫ √q/log log q` under GRH go back to Littlewood (*On the class-number of the corpus
 P(√−k)*, Proc. London Math. Soc. (2) 27 (1928) 358–372), in asymptotic form. Unconditionally the
 upper bound `h(−q) ≪ √q log q` is elementary, and the best lower bounds are Siegel's ineffective
 `h(−q) ≫_ε q^{1/2−ε}` and an effective bound of order `log q` (Goldfeld, Gross–Zagier, Oesterlé).
 
 ```lean
+theorem LLS.Thm11.leastPrimeOutsideSubgroup_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
+    LeastPrimeOutsideSubgroup
+theorem LLS.Thm11.leastPrimeOutsideSubgroupRough_of_GRH
+    (hGRH : DirichletLNonvanishingRightOfHalf) : LeastPrimeOutsideSubgroupRough
 theorem LLS.leastNonresidueBelowLogSq_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
     LeastNonresidueBelowLogSq
 theorem LLS.bach_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) : Ankeny.BachSubgroupBound (11 / 4)
@@ -77,6 +86,20 @@ theorem LLS.discr_isFundamentalDiscr (K : Type*) [Field K] [NumberField K]
 where (`LLS/Statement.lean`, transcribed from the paper)
 
 ```lean
+noncomputable def LLS.A (q : ℕ) : ℝ :=
+  max 0 (2 * log (log q) - 8 / 5 - ∑ p ∈ q.primeFactors, log p / ((p : ℝ) - 1))
+noncomputable def LLS.B (q : ℕ) : ℝ :=
+  max 0 (2 * log (log q) + 3
+    + 2 * (q.primeFactors.card : ℝ) * log (log q) ^ 2 / log q - 2 * A q)
+def LLS.LeastPrimeOutsideSubgroup : Prop :=
+  ∀ q : ℕ, 3000 ≤ q → ∀ H : Subgroup (ZMod q)ˣ, H ≠ ⊤ →
+    ∃ ℓ : ℕ, ℓ.Prime ∧ ∃ hℓ : ℓ.Coprime q,
+      ZMod.unitOfCoprime ℓ hℓ ∉ H ∧ (ℓ : ℝ) ≤ (log q + B q) ^ 2
+def LLS.LeastPrimeOutsideSubgroupRough : Prop :=
+  ∀ q : ℕ, 3000 ≤ q → (∀ p : ℕ, p.Prime → p ∣ q → log q ^ 2 ≤ p) →
+    ∀ H : Subgroup (ZMod q)ˣ, H ≠ ⊤ →
+      ∃ ℓ : ℕ, ℓ.Prime ∧ ∃ hℓ : ℓ.Coprime q,
+        ZMod.unitOfCoprime ℓ hℓ ∉ H ∧ (ℓ : ℝ) ≤ log q ^ 2
 def LLS.LeastNonresidueBelowLogSq : Prop :=
   ∀ q : ℕ, q.Prime → 5 ≤ q →
     ∃ n : ℕ, 0 < n ∧ (n : ℝ) ≤ log q ^ 2 ∧ ¬ IsSquare (n : ZMod q)
@@ -136,6 +159,7 @@ def LLS.ClassNumberLowerBoundWith (C : ℝ) : Prop :=
 
 | Theorem | Tier | Hypotheses |
 |---|---|---|
+| `Thm11.leastPrimeOutsideSubgroup_of_GRH`, `Thm11.leastPrimeOutsideSubgroupRough_of_GRH` | C (U in `Unconditional/`) | GRH |
 | `leastNonresidueBelowLogSq_of_GRH` | C (U in `Unconditional/`) | GRH |
 | `bach_of_GRH`, `leastNonresidue_of_GRH`, `miller_of_GRH` | C (U in `Unconditional/`) | GRH |
 | `bach2_of_GRH`, `leastNonresidue2_of_GRH`, `miller2_of_GRH` | C (U in `Unconditional/`) | GRH |
@@ -154,11 +178,18 @@ with the Kronecker symbol characterised by `χ(n) = J(−q | n)` at odd `n`. It 
 (Dirichlet 1839), not a conjecture; Mathlib does not have it at this pin. It is written with
 Mathlib objects only, and is the conclusion of riemann-hypothesis's
 `GlobalTheory.LFunction_one_and_mean_log_eta` with that repository's `IsKroneckerChar` unfolded.
-No other hypothesis appears. `LLS/Statement.lean` also fixes, as targets not proved here,
-Theorem 1.1 (`LeastPrimeOutsideSubgroup`, with LLS's `A(q)`, `B(q)`), Theorem 1.1 (2),
-and Theorem 1.4 (`LeastPrimeInCoset`).
+No other hypothesis appears. `LLS/Statement.lean` also fixes Theorem 1.4
+(`LeastPrimeInCoset`), which is not proved here.
 
 ## Axioms
+
+Real output of `#print axioms` for Theorem 1.1 (2026-11-24, after `lake build LLS`; no
+`native_decide`):
+
+```
+'LLS.Thm11.leastPrimeOutsideSubgroup_of_GRH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LLS.Thm11.leastPrimeOutsideSubgroupRough_of_GRH' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
 
 Real output of `#print axioms` for the paper-constant Theorem 1.5 and Corollary 1.3
 (2026-11-24, after `lake build LLS`):
@@ -262,6 +293,41 @@ cores).
 ## Proof outline
 
 The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
+
+**Theorem 1.1 with the paper's `B(q)`** (`LLS/Thm11/`). Let `q ≥ 3000`, `L = log q`,
+`ω = ω(q)`, `σ = Σ_{p ∣ q} log p/(p − 1)`, `x = ⌊(L + B(q))²⌋`, `s = √x`, `l = log x`,
+`K = (s + 1 + l/2)/(1 − 1/s)²`, `κ = K(1 − 1/x) + l/2`. If every prime `ℓ ≤ x` prime to `q` lay
+in `H`, a character `χ ≠ 1` trivial on `H` would be `1` on every `n ≤ x` prime to `q`
+(`Common.lean`).
+
+1. `Budget.lean`: the key inequality of step 2 below, with the Cesàro lower bound
+   `max(0, Pc − Σ_{p∣q} lcp) − Σ_{p∈R} lcp` (the part over `n` prime to `q` is also `≥ 0`: this
+   is the `max(0, ·)` in LLS's `A(q)`), `Pc = l − 1 − γ − 1/(4s) − 12/x` (`x ≥ 100`, from the
+   sharp principal sum of `LLS/Sharp/`) or `l − 2`. With `llp ≤ m = (l − ½ log 2)²/2` per prime
+   and the primes `p ≥ 5` outside the conductor free (side condition `R5OK`), GRH gives
+   `base0(x) + 2K max(0, Pc − σ) − κL − ω m − R(x) ≤ 0`, `R(x)` the cost of `2` and `3` outside
+   the conductor.
+2. `Elim.lean`: with `ν = s + 1/(2s) > L + B(q)` and `u = 2ω(log L)²/L`: if `σ ≤ 2 log L − 8/5`
+   then `2σ + u < ν − L − 6.2 + 2 log L` and, as `ω m ≤ K u`, the left side is at least
+   `F₁(x)`, its value at `L = ν` (it decreases in `L`); otherwise `A(q) = 0`,
+   `u < ν − L − 3 − 2 log L`, and with `μ = 2mν/l² ≥ m L/(2(log L)²)` the left side is at least
+   a function of `L` concave on `[8, ν − 3 − 2 log 8]`, so at least
+   `min(F₂(x, 8), F₂(x, ν − 3 − 2 log 8))`. `ω m ≤ μ u` uses that `t/(log t)²` increases on
+   `t ≥ 8`.
+3. `NumCore.lean`: with `δ = K − s = s(s(3 + l/2) − 1)/(s − 1)²` and
+   `ε = κ − s = (3s + 1)/(s − 1) + ls/(s − 1)`, `F₁ = s·Q + δ·W + V` with `Q`, `W`, `V` of size
+   `O(1)`, `O(l)`, `O(l²)` (`F1_eq`), so `x − κν` cancels exactly; likewise `F₂` (`F2a_eq`,
+   `F2b_eq`). On a box `X_a ≤ x ≤ X_b` every piece is bounded by monotonicity (`F1_ge`,
+   `F2a_ge`, `F2b_ge`, `R5_of`).
+4. `Boxes.lean` (59 boxes, `scripts/emit_thm11.py`) covers `64 ≤ x < 10^16`; `Tail.lean` covers
+   `x ≥ 10^16` from `log x ≤ 8x^{1/8}`, so `l² ≤ s/100`. Smallest margins: `F₁ ≥ 0.776 s`
+   (at `x = 99`), `F₂(x, 8) ≥ 0.93 s`, `F₂(x, ν − 3 − 2 log 8) ≥ 0.208 s` (at `x ≈ 15000`); on
+   the boxes the smallest certified lower bound is `0.1` (`F₂`, `401 ≤ x < 501`).
+5. Part 2 (`Rough.lean`): when every prime `p ∣ q` is `≥ (log q)² ≥ x`, all losses vanish
+   (`llp x p = lcp x p = 0` for `p ≥ x`), and the loss-free budget `Φ₁` of the prime case
+   applies. `GoodP 1 q` (some `64 ≤ x ≤ (log q)²` with `Φ₁ > 0`) holds for `3000 ≤ q < 4096`
+   by four new certified intervals (`IntervalsR.lean`, `scripts/emit_rough.py`) and beyond by
+   the existing ones.
 
 **Theorem 1.5 with the paper's constants** (`LLS/Sharp/`). Take `x = ⌊log² q/4⌋` (so `x ≥ 132`),
 `l = log x`, `y = 1/√x`, `𝔞` the parity of `χ`.
@@ -406,6 +472,9 @@ The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.
 | `LLS/Sharp/Lemma51.lean`, `Lemma51Aux/*.lean` | Form of LLS Lemma 5.1 |
 | `LLS/Sharp/NumBasic.lean`, `NumU.lean`, `NumL.lean` | One-variable inequalities |
 | `LLS/Sharp/Final.lean`, `ClassNumber.lean` | Theorem 1.5 and Corollary 1.3 with the paper's constants |
+| `LLS/Thm11/Common.lean`, `Rough.lean`, `IntervalsR.lean` | Losses at primes `p ≥ x`, the character from `H`; Theorem 1.1 (2) |
+| `LLS/Thm11/Budget.lean`, `Elim.lean` | The budget with `max(0, ·)`; eliminating `ω(q)` and `σ(q)` |
+| `LLS/Thm11/NumCore.lean`, `Boxes.lean`, `Tail.lean`, `Main.lean` | The one-variable bounds; Theorem 1.1 (1) |
 | `scripts/*.py` | Generators for the certificates and the sizing computations |
 
 ## Deviations from the literature
@@ -426,12 +495,18 @@ The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.
   The analytic part is LLS's argument with weaker constants than the paper's: the principal sum
   is bounded by summation by parts (`x − 0.15√x − 3 log x − 3` instead of LLS Lemma 2.1's
   `x − 0.046√x − 1.84 log x − 1`), and the cost of a prime factor `p ≥ 53` of `q` crudely
-  (`β log p`). The paper's own Theorem 1.1 bound `(log q + B(q))²` is not proved.
-* Theorem 1.1 as stated is not proved. Our constants are weaker than LLS's, so we do not
-  get `ℓ ≤ (log q + B(q))²`. Also, as written, the proof of LLS Theorem 1.1 appears to bound
-  `Σ Λ(n) χ̃(n)/n (1 − n/X)` as if `χ̃(p) = 1` for primes `p ∣ q`, `p ∤ q̃`; for such `p`
-  `χ̃(p)` is unknown. Our `LLS.key` charges these primes twice and absorbs them through
-  `log f ≤ log q − Σ log p`.
+  (`β log p`).
+* Theorem 1.1 is proved as stated, both parts, for every `q ≥ 3000`, with no computation over
+  `q`. The principal sum is still `x − 0.15√x − 3 log x − 3` (LLS Lemma 2.1:
+  `x − 0.046√x − 1.84 log x − 1`), and the gamma terms are bounded for both parities at once;
+  the margin left is large because the Cesàro sum is kept as `log x − 1 − γ − O(x^{−1/2})`
+  (LLS use `log X − 8/5` with `X ≥ (log q)²`, losing `2 log(√X/log q)`), the cancellation
+  `x − κν` is exact, and the primes `p ≥ 5` outside the conductor cost nothing. Over all `q`
+  the worst case found (in Python, prime sets of the first primes) leaves `0.99√x` at
+  `log q ≈ 180`. As written, the proof of LLS Theorem 1.1 bounds `Σ Λ(n) χ̃(n)/n (1 − n/X)`
+  as if `χ̃(p) = 1` for primes `p ∣ q`, `p ∤ q̃`; for such `p`, `χ̃(p)` is unknown. Here those
+  primes are charged twice and absorbed through `log f ≤ log q − Σ log p`; only `2` and `3`
+  are left with a positive cost, which the margin covers.
 * Theorem 1.5 is proved with the paper's constants (`LLS.Sharp.l1UpperBound_of_GRH`,
   `LLS.Sharp.l1LowerBound_of_GRH`). The paper's own chain of simplified inequalities leaves a
   margin of about `0.0006` (in `log`) at `q = 10¹⁰`; we keep the exact elimination of `|Re B(χ)|`,
@@ -447,10 +522,21 @@ The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.
   discriminant `−q`, `q ≥ 10¹⁰` (`LLS.Sharp.classNumberUpperBound_of_GRH_of_formula`,
   `…LowerBound…`), from Theorem 1.5 and Dirichlet's class number formula (tier H in the main
   library, discharged in `Unconditional/`). The forms with additive constant `5` remain.
-* Theorem 1.4 (cosets) is not proved.
+* Theorem 1.4 (cosets) is not proved. An estimate by hand of its proof with the constants
+  available here (principal sum `x − 0.15√x − …`, squares bounded by Chebyshev's
+  `ψ(y) ≤ y log 4`, `|D(1, χ̃)| ≤ 0.14 log q̃ + O(1)` from Lemma 2.3 at `x = 100`) leaves
+  `√X ≤ (h − 1) log q + 1.3h + 3.2 log X + O(1)` against the target
+  `(h − 1) log q + 3(h + 1) + (5/2)(log log q)²`, so the paper's constants look reachable. What is
+  missing in Lean: orthogonality over the characters trivial on `H`
+  (`Σ_χ χ̄(a)χ(n) = h·1_{n ∈ aH}`), absolute-value (not real-part) bounds for the log-weighted
+  explicit formula and for `D(1, χ̃)`, an upper bound for `Σ_{n≤y} Λ(n) log(y/n)`, the bound
+  `2^{ω(q)} ≤ q^{3/7}` for `q > 20000`, and a final inequality in `h`, `log q` and `X`.
 * Corollary 1.2 is proved exactly as stated (`LeastNonresidueBelowLogSq`).
 
 ## Building
+
+Theorem 1.1 alone: `lake build LLS.Thm11.Main` (from the warm cache: `IntervalsR` 93 s,
+`NumCore` 22 s, `Boxes` 15 s, `Tail` 22 s, the rest under 30 s each; no `native_decide`).
 
 ```
 lake exe cache get
@@ -475,6 +561,8 @@ with no hypothesis left.
 
 | Theorem | Statement | Axioms |
 |---|---|---|
+| `leastPrimeOutsideSubgroup_unconditional` | `LLS.LeastPrimeOutsideSubgroup` | standard three |
+| `leastPrimeOutsideSubgroupRough_unconditional` | `LLS.LeastPrimeOutsideSubgroupRough` | standard three |
 | `leastNonresidueBelowLogSq_unconditional` | `LLS.LeastNonresidueBelowLogSq` | standard three |
 | `bach_unconditional` | `Ankeny.BachSubgroupBound (11 / 4)` | standard three + 16 `native_decide` |
 | `leastNonresidue_unconditional` | `Ankeny.LeastNonresidueBound (11 / 4)` | standard three + 16 `native_decide` |
@@ -558,6 +646,14 @@ and:
 
 The fifteen elided `chunk2` lines are `LLS.chunk2_ok_i._native.native_decide.ax_1_1` for every
 `0 ≤ i ≤ 14`, exactly as in the main-library output above.
+
+The rerun on branch `round9` (about 4 min wall) printed the same lines for all eighteen theorems
+above and:
+
+```
+'leastPrimeOutsideSubgroup_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+'leastPrimeOutsideSubgroupRough_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
 
 ```bash
 scripts/check-unconditional.sh /path/to/riemann-hypothesis   # cloned there if missing

@@ -83,6 +83,12 @@ theorem classNumberLowerBound_unconditional : LLS.ClassNumberLowerBound :=
   LLS.Sharp.classNumberLowerBound_of_GRH_of_formula LFunction_ne_zero_of_half_lt_re
     classNumberFormula
 
+theorem leastPrimeOutsideSubgroup_unconditional : LLS.LeastPrimeOutsideSubgroup :=
+  LLS.Thm11.leastPrimeOutsideSubgroup_of_GRH LFunction_ne_zero_of_half_lt_re
+
+theorem leastPrimeOutsideSubgroupRough_unconditional : LLS.LeastPrimeOutsideSubgroupRough :=
+  LLS.Thm11.leastPrimeOutsideSubgroupRough_of_GRH LFunction_ne_zero_of_half_lt_re
+
 #print axioms leastNonresidueBelowLogSq_unconditional
 #print axioms bach_unconditional
 #print axioms leastNonresidue_unconditional
@@ -101,3 +107,5 @@ theorem classNumberLowerBound_unconditional : LLS.ClassNumberLowerBound :=
 #print axioms l1LowerBound_unconditional
 #print axioms classNumberUpperBound_unconditional
 #print axioms classNumberLowerBound_unconditional
+#print axioms leastPrimeOutsideSubgroup_unconditional
+#print axioms leastPrimeOutsideSubgroupRough_unconditional

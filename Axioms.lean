@@ -25,3 +25,5 @@ import LLS
 #print axioms LLS.miller2_of_GRH
 #print axioms LLS.Check.checkChunk_sound
 #print axioms LLS.goodQ_tail2
+#print axioms LLS.Thm11.leastPrimeOutsideSubgroup_of_GRH
+#print axioms LLS.Thm11.leastPrimeOutsideSubgroupRough_of_GRH
