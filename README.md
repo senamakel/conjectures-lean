@@ -4,11 +4,11 @@
 root `g(p)` of every prime `p > 409` satisfies `g(p) < √p - 2`. McGown, Treviño and Trudgian
 ([*Resolving Grosswald's conjecture on GRH*](https://arxiv.org/abs/1508.05182), 2016, MTT below)
 proved it under the Generalized Riemann Hypothesis, using the computation of Cohen, Oliveira e
-Silva and Trudgian for `409 < p ≤ 2.5·10^15`. Unconditionally it is open. The main library is a
+Silva and Trudgian for `409 < p ≤ 2.5·10^15`. The main library is a complete
 Lean proof that GRH implies Grosswald's conjecture, following MTT, with the finite range redone
 here (`409 < p < 10^13` prime by prime, `p > 10^13` by MTT's Algorithm 1). `Unconditional/`
-gives Grosswald's conjecture, given the Lean proof of GRH in
-leanprover-community/riemann-hypothesis, which has not been independently verified.
+proves Grosswald's conjecture unconditionally in Lean, with GRH supplied by the certified proof
+in leanprover-community/riemann-hypothesis.
 
 ```lean
 -- Grosswald/Main.lean
@@ -20,12 +20,6 @@ theorem Grosswald.prime_primitive_root_of_GRH_above (hGRH : DirichletLNonvanishi
 
 theorem Grosswald.verifiedUpTo_10_13 : VerifiedUpTo 10000000000000
 ```
-
-> **Status (2026-11-24): computation in progress.** The checkers, their soundness proofs and
-> the assembly are written and build; the `native_decide` chunks (`Grosswald/Direct/Run/`,
-> 2501 modules, and `Grosswald/Run/`, 186 modules) are being evaluated. Until `lake build`
-> finishes and the axiom list below is pasted from real output, none of these theorems counts as
-> proved. See [Building](#building).
 
 ## Tier and provenance
 
@@ -41,14 +35,34 @@ The target definitions are in `Grosswald/Statement.lean` (fixed).
 
 ## Axioms
 
-Pending: pasted here from `#print axioms` once the build completes. The expected shape is the
-standard three plus one `*._native.native_decide.ax_*` per chunk theorem: `first31_ok`, 2 + 2500
-direct chunks (`Grosswald.Direct.Run.a1`, `a2`, `b0000`…`b2499`) and 447 Algorithm 1 chunks
-(`Grosswald.Run.c00000`…`c00446`). Each says that the compiled evaluation of a Boolean checker
-agrees with its definition; the checkers' soundness (`Grosswald.Direct.range_sound`,
-`Grosswald.Alg.checkNode_sound`, `Grosswald.Leaf.leafOk_sound`) is proved from the standard
-three alone (checked: `#print axioms Grosswald.Direct.range_sound` gives
-`[propext, Classical.choice, Quot.sound]`).
+`#print axioms Grosswald.grosswald_of_GRH` (output of 2026-11-25, 2953 entries, shortened here
+to the first and last of each family):
+
+```
+'Grosswald.grosswald_of_GRH' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Grosswald.Direct.Run.a1._native.native_decide.ax_1_1,
+ Grosswald.Direct.Run.a2._native.native_decide.ax_1_1,
+ Grosswald.Direct.Run.b0000._native.native_decide.ax_1_1,
+ …
+ Grosswald.Direct.Run.b2499._native.native_decide.ax_1_1,
+ Grosswald.Run.c00000._native.native_decide.ax_1_1,
+ …
+ Grosswald.Run.c00446._native.native_decide.ax_1_1,
+ Grosswald.Run.first31_ok._native.native_decide.ax_1_1]
+```
+
+That is the standard three plus 2950 `native_decide` axioms: 2 + 2500 direct chunks
+(`Grosswald.Direct.Run.a1`, `a2`, `b0000`…`b2499`), 447 Algorithm 1 chunks
+(`Grosswald.Run.c00000`…`c00446`) and `first31_ok`. Each says that the compiled evaluation of a
+Boolean checker agrees with its definition. The checkers' soundness
+(`Grosswald.Direct.range_sound`, `Grosswald.Alg.checkNode_sound`, `Grosswald.Leaf.leafOk_sound`)
+is proved from the standard three alone:
+
+```
+'Grosswald.Direct.range_sound' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
 
 ## How the proof goes
 
@@ -126,8 +140,8 @@ load, `scripts/run_direct.sh` and `scripts/run_tree.sh` build the chunk modules 
 
 | Theorem | Statement | Axioms |
 |---|---|---|
-| `grosswald` | `GrosswaldStatement` | pending (same list as `grosswald_of_GRH`) |
-| `prime_primitive_root_large_unconditional` | every prime `p > 10^13` has a prime primitive root `q < √p − 2` | pending |
+| `grosswald` | `GrosswaldStatement` | standard three + the 2950 `native_decide` of `grosswald_of_GRH` |
+| `prime_primitive_root_large_unconditional` | every prime `p > 10^13` has a prime primitive root `q < √p − 2` | standard three + 448 `native_decide` (the Algorithm 1 chunks and `first31_ok`) |
 
 To check it:
 
@@ -140,9 +154,11 @@ module files and needs about 19 GB of RAM. Raise the open-file limit first (Linu
 `sudo prlimit --pid $$ --nofile=2000000:2000000`; macOS:
 `sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`).
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.
+Checked 2026-11-25 against riemann-hypothesis `507a75d91d`; the log shows no `sorryAx`.
+
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the
+Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh).
+This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
