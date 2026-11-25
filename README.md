@@ -1,65 +1,80 @@
-# Schoenfeld's bounds for ψ, θ and π − li under RH in Lean
+# Schoenfeld's 1/(8π) bounds for ψ, θ and π − li from RH in Lean
 
-Schoenfeld (*Sharper bounds for the Chebyshev functions θ(x) and ψ(x). II*, Math. Comp. 30
-(1976), 337–360, Theorem 10 and Corollary 1) proved that the Riemann hypothesis implies
+This repository proves Schoenfeld's explicit bounds under the Riemann hypothesis, with his
+constant `1/(8π)` and his thresholds:
 
 * `|ψ(x) − x| < √x log² x / (8π)` for `x ≥ 73.2`,
 * `|θ(x) − x| < √x log² x / (8π)` for `x ≥ 599`,
 * `|π(x) − li(x)| < √x log x / (8π)` for `x ≥ 2657`,
 
-with `li` the principal-value logarithmic integral. These are explicit forms of von Koch's
-1901 theorem `π(x) = li(x) + O(√x log x)` under RH. Unconditionally the best known error terms
-are of the form `x exp(−c (log x)^{3/5} (log log x)^{−1/5})`.
+where `li` is the principal-value logarithmic integral (L. Schoenfeld, *Sharper bounds for the
+Chebyshev functions θ(x) and ψ(x). II*, Math. Comp. 30 (1976), 337–360, Theorem 10 and
+Corollary 1). `Schoenfeld.schoenfeld_of_RH : RiemannHypothesis → SchoenfeldStatement` takes RH
+as its only hypothesis: every numerical input is proved in Lean in this repository.
+`Unconditional/` closes RH with the certified proof in
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis),
+so `schoenfeld_statement : SchoenfeldStatement` is proved unconditionally in Lean.
 
-**Literature status: RH-consequence** (von Koch 1901; Schoenfeld 1976). This repository is a
-complete Lean proof that RH implies these bounds, following von Koch and Schoenfeld; a bound
-`ψ(x) − x = O(√x log² x)` is RH in another form. With the certified Lean proof of RH (Alpöge,
-2026), `Unconditional/` proves Schoenfeld's Theorem 10 and Corollary 1 unconditionally in Lean,
-with his constant `1/(8π)` and his thresholds. It contains two results:
+**Literature status: RH-consequence** (von Koch 1901; Schoenfeld 1976). The three bounds are
+explicit forms of von Koch's 1901 theorem `π(x) = li(x) + O(√x log x)` under RH, and a bound
+`ψ(x) − x = O(√x log² x)` is RH in another form. The main library is a complete Lean proof that
+RH implies Schoenfeld's Theorem 10 and Corollary 1, following Schoenfeld. The proof of RH is
+L. Alpöge's (2026), certified by the Lean FRO and the Mathlib Initiative on 2026-11-21. Without
+RH the best known error terms have the form `x exp(−c (log x)^{3/5} (log log x)^{−1/5})`.
 
-* `schoenfeld_of_RH : RiemannHypothesis → SchoenfeldStatement`: Schoenfeld's exact statement
-  from RH alone. Its numerical inputs are all proved in this repository: Rosser's explicit zero
-  count (Rosser 1941, Theorem 19, `rosserZeroCount`, by the vendored Lean proof of
-  Garald1/RSBounds, calr3/ternary-goldbach and teal-sea/zeta-lab, see `Vendor/Rosser/`),
-  PsiCert (`|ψ(x) − x| ≤ (4/5)√x` on `[1500, 10¹⁰]`, an exact segmented sieve over every integer
-  up to `10¹⁰`) and the target itself on the three finite ranges `[73.2, 1500]`, `[599, 3·10⁴]`,
-  `[2657, 4·10⁵]`; the last two by proved-sound checkers run with `native_decide`;
-* `schoenfeld_weak_of_RH`: all three bounds with Schoenfeld's thresholds and the constants `1/8`,
-  `1/4`, `9/20`, from RH with no computation at all.
+`schoenfeld_of_RH` rests on five inputs, all proved here:
+
+* Rosser's explicit zero count (J. B. Rosser 1941, Theorem 19), `rosserZeroCount`, from the
+  vendored Lean proof of Garald1/RSBounds, calr3/ternary-goldbach and teal-sea/zeta-lab in
+  `Vendor/Rosser/`;
+* `psiCert`, the bound `|ψ(x) − x| ≤ (4/5)√x` on `[1500, 10¹⁰]`, from an exact segmented sieve
+  over every integer up to `10¹⁰`;
+* Schoenfeld's three bounds on the finite ranges `[73.2, 1500]`, `[599, 3·10⁴]` and
+  `[2657, 4·10⁵]`.
+
+`psiCert` and the three finite ranges are proved-sound checkers evaluated with `native_decide`
+(24 calls in all). A second theorem, `schoenfeld_weak_of_RH`, gives the three bounds at
+Schoenfeld's thresholds with the larger constants `1/8`, `1/4` and `9/20`, from RH with no
+computation.
 
 ```lean
+-- Schoenfeld/Rosser.lean
+theorem Schoenfeld.schoenfeld_of_RH (hRH : RiemannHypothesis) : SchoenfeldStatement
+theorem Schoenfeld.schoenfeldPsi_of_RH (hRH : RiemannHypothesis) : SchoenfeldPsi
+theorem Schoenfeld.schoenfeldTheta_of_RH (hRH : RiemannHypothesis) : SchoenfeldTheta
+theorem Schoenfeld.schoenfeldPi_of_RH (hRH : RiemannHypothesis) : SchoenfeldPi
+
+-- Unconditional/SchoenfeldUnconditional.lean
+theorem schoenfeld_statement : Schoenfeld.SchoenfeldStatement :=
+  Schoenfeld.schoenfeld_of_RH riemannHypothesis
+
+-- the inputs, each proved with no hypothesis
+theorem Schoenfeld.rosserZeroCount : RosserZeroCount
+theorem Schoenfeld.psiCert : PsiCert
+theorem Schoenfeld.Check.psiSmallRange : PsiSmallRange
+theorem Schoenfeld.Check.thetaSmallRange : ThetaSmallRange
+theorem Schoenfeld.Check.piSmallRange : PiSmallRange
+
+-- larger constants, no computation
 theorem Schoenfeld.psiBound_of_RH (hRH : RiemannHypothesis) : PsiBound (1 / 8) 73.2
 theorem Schoenfeld.thetaBound_of_RH (hRH : RiemannHypothesis) : ThetaBound (1 / 4) 599
 theorem Schoenfeld.piBound_of_RH (hRH : RiemannHypothesis) : PiBound (9 / 20) 2657
 theorem Schoenfeld.schoenfeld_weak_of_RH (hRH : RiemannHypothesis) :
     PsiBound (1 / 8) 73.2 ∧ ThetaBound (1 / 4) 599 ∧ PiBound (9 / 20) 2657
 
-theorem Schoenfeld.schoenfeldPsi_of_RH (hRH : RiemannHypothesis) : SchoenfeldPsi
-theorem Schoenfeld.schoenfeldTheta_of_RH (hRH : RiemannHypothesis) : SchoenfeldTheta
-theorem Schoenfeld.schoenfeldPi_of_RH (hRH : RiemannHypothesis) : SchoenfeldPi
-theorem Schoenfeld.schoenfeld_of_RH (hRH : RiemannHypothesis) : SchoenfeldStatement
-
-theorem Schoenfeld.rosserZeroCount : RosserZeroCount
-theorem Schoenfeld.Check.psiSmallRange : PsiSmallRange
-theorem Schoenfeld.Check.thetaSmallRange : ThetaSmallRange
-theorem Schoenfeld.Check.piSmallRange : PiSmallRange
-theorem Schoenfeld.psiCert : PsiCert
-
+-- the same statement with inputs as arguments, for reuse with other inputs
 theorem Schoenfeld.schoenfeld_of_RH_of_inputs (hRH : RiemannHypothesis) (hR : RosserZeroCount)
     (hC : PsiCert) (hSψ : PsiSmallRange) (hSθ : ThetaSmallRange) (hSπ : PiSmallRange) :
     SchoenfeldStatement
-
-theorem Schoenfeld.schoenfeldPsi_of_RH_of_rosser (hRH : RiemannHypothesis)
-    (hR : RosserZeroCount) : SchoenfeldPsi
-theorem Schoenfeld.schoenfeldTheta_of_RH_of_rosser (hRH : RiemannHypothesis)
-    (hR : RosserZeroCount) : SchoenfeldTheta
-theorem Schoenfeld.schoenfeldPi_of_RH_of_rosser (hRH : RiemannHypothesis)
-    (hR : RosserZeroCount) : SchoenfeldPi
+theorem Schoenfeld.schoenfeld_of_RH_of_cited (hRH : RiemannHypothesis) (hR : RosserZeroCount)
+    (hC : PsiCert) : SchoenfeldStatement
 theorem Schoenfeld.schoenfeld_of_RH_of_rosser (hRH : RiemannHypothesis)
     (hR : RosserZeroCount) : SchoenfeldStatement
 ```
 
-where (`Schoenfeld/Statement.lean`)
+`schoenfeld_of_RH_of_rosser` has the parts `schoenfeldPsi_of_RH_of_rosser`,
+`schoenfeldTheta_of_RH_of_rosser` and `schoenfeldPi_of_RH_of_rosser`, with the same hypotheses.
+The statements (`Schoenfeld/Statement.lean`):
 
 ```lean
 def PsiBound (C x₀ : ℝ) : Prop :=
@@ -75,7 +90,7 @@ def SchoenfeldPi : Prop := PiBound (1 / (8 * π)) 2657
 def SchoenfeldStatement : Prop := SchoenfeldPsi ∧ SchoenfeldTheta ∧ SchoenfeldPi
 ```
 
-and the inputs (`Schoenfeld/Inputs.lean`, `Schoenfeld/SmallRange.lean`)
+The inputs (`Schoenfeld/Inputs.lean`, `Schoenfeld/SmallRange.lean`):
 
 ```lean
 noncomputable def positiveZeroCount (T : ℝ) : ℝ := by
@@ -102,47 +117,47 @@ def PiSmallRange : Prop :=
 
 | Theorem | Tier | Hypotheses |
 |---|---|---|
+| `schoenfeld_statement` (`SchoenfeldStatement`, `Unconditional/`) | U | none |
+| `schoenfeld_of_RH` (`SchoenfeldStatement`) | C | RH |
 | `schoenfeldPsi_of_RH` (`1/(8π)`, `x ≥ 73.2`) | C | RH |
 | `schoenfeldTheta_of_RH` (`1/(8π)`, `x ≥ 599`) | C | RH |
 | `schoenfeldPi_of_RH` (`1/(8π)`, `x ≥ 2657`) | C | RH |
-| `schoenfeld_of_RH` (`SchoenfeldStatement`) | C | RH |
-| `psiBound_of_RH`, `thetaBound_of_RH`, `piBound_of_RH` (constants `1/8`, `1/4`, `9/20`) | C | RH |
 | `rosserZeroCount` (`RosserZeroCount`) | D | none |
-| `Check.psiSmallRange`, `Check.thetaSmallRange`, `Check.piSmallRange` | D | none |
 | `psiCert` (`PsiCert`) | D | none |
+| `Check.psiSmallRange`, `Check.thetaSmallRange`, `Check.piSmallRange` | D | none |
+| `psiBound_of_RH`, `thetaBound_of_RH`, `piBound_of_RH` (constants `1/8`, `1/4`, `9/20`) | C | RH |
 | `schoenfeld_of_RH_of_rosser` and its parts | C + H | RH, `RosserZeroCount` |
 | `schoenfeld_of_RH_of_inputs` and its parts (all five inputs as arguments) | C + H | RH and the five inputs |
 
-In `Unconditional/` RH is discharged by riemann-hypothesis, and every `_of_RH` row becomes
-tier U: `schoenfeld_statement : SchoenfeldStatement` has no hypothesis. The `_of_rosser` and
-`_of_inputs` versions are kept for downstream use with other inputs.
+In `Unconditional/` the riemann-hypothesis repository discharges RH, and every `_of_RH` row
+becomes tier U. The `_of_rosser`, `_of_cited` and `_of_inputs` versions stay available for use
+with other inputs.
 
 * `RiemannHypothesis` is Mathlib's definition, used as is.
 * `RosserZeroCount` is Rosser's explicit Riemann–von Mangoldt formula (J. B. Rosser, *Explicit
   bounds for some functions of prime numbers*, Amer. J. Math. 63 (1941), 211–232, Theorem 19).
   `positiveZeroCount` and the statement are copied verbatim from
   `TernaryGoldbach.RSBounds.Rosser1941` in [teorth/IEANTN](https://github.com/teorth/IEANTN).
-  It is proved here (`Schoenfeld.rosserZeroCount`, `Schoenfeld/Rosser.lean`) by
+  `Schoenfeld.rosserZeroCount` (`Schoenfeld/Rosser.lean`) proves it with
   `TernaryGoldbach.RSBounds.Rosser1941.zero_count_bounds`, vendored with its whole import
   closure (216 files, about 95,000 lines) from the Lean `v4.35.0` originals in
-  [Garald1/RSBounds](https://github.com/Garald1/RSBounds) `82d7a55`, whose
+  [Garald1/RSBounds](https://github.com/Garald1/RSBounds) `82d7a55`. Its
   `RosserCountDefinition.lean` has the same `positiveZeroCount`, so the two statements are the
   same term. See [`Vendor/Rosser/README.md`](Vendor/Rosser/README.md).
 * `PsiCert` is copied verbatim from `Goals.Schoenfeld1976.PsiCert` in
   [Garald1/RSBounds](https://github.com/Garald1/RSBounds), where a kernel-checked campaign also
-  proves it (Lean `v4.35.0`). It is proved here (`Schoenfeld.psiCert`) by our own checker; no
-  code is taken from RSBounds.
-* `PsiSmallRange`, `ThetaSmallRange`, `PiSmallRange` are Schoenfeld's three bounds restricted to
-  `[73.2, 1500]`, `[599, 3·10⁴]` and `[2657, 4·10⁵]` (Schoenfeld checks these ranges with
-  Gram's, the Rosser–Walker and the Appel–Rosser tables). They are proved here
-  (`Schoenfeld/Check/`).
+  proves it (Lean `v4.35.0`). `Schoenfeld.psiCert` proves it with this repository's own
+  checker; no code is taken from RSBounds.
+* `PsiSmallRange`, `ThetaSmallRange` and `PiSmallRange` are Schoenfeld's three bounds restricted
+  to `[73.2, 1500]`, `[599, 3·10⁴]` and `[2657, 4·10⁵]`. Schoenfeld checked these ranges with
+  Gram's, the Rosser–Walker and the Appel–Rosser tables; here `Schoenfeld/Check/` proves them.
 * `Real.logIntegral` (principal-value `li`, `li(x) = li(2) + ∫₂ˣ dt/log t`) is copied verbatim
   from formal-conjectures (`FormalConjecturesForMathlib/Analysis/SpecialFunctions/LogIntegral.lean`).
   formal-conjectures has no statement of Schoenfeld's bounds (checked 2026-11-24), so
-  `PsiBound`, `ThetaBound`, `PiBound` are written here.
+  `PsiBound`, `ThetaBound` and `PiBound` are written here.
 * `native_decide`: 24 calls, each evaluating a checker whose soundness is proved in Lean (see
   Axioms). `schoenfeld_weak_of_RH`, `rosserZeroCount` and `schoenfeld_of_RH_of_inputs` use
-  none; the vendored Rosser proof has no `native_decide`.
+  none, and the vendored Rosser proof has none.
 
 ## Axioms
 
@@ -412,24 +427,25 @@ evaluation of a checker proved sound in Lean:
 | `checkA_theta` | θ on `[599, 3·10⁴]` | `checkA_sound` | seconds |
 | `checkB_pi` | `li(2657)` enclosure, then `π − li` on `[2657, 4·10⁵]` | `liAnchor_sound`, `checkB_sound` | under a minute (whole module) |
 | `checkA_psiCert` | ψ on `[1500, 10⁶]` against `(4/5)√x` | `checkA_sound` | 71 s (whole module) |
-| `chunk00`–`chunk19` | the segmented sieve over `(1, 1.00034·10¹⁰]`, 477 segments each | `runSegs_sound` | 13.9 CPU-min in all (`chunk00` 130 s, the others 22–80 s) |
+| `chunk00` to `chunk19` | the segmented sieve over `(1, 1.00034·10¹⁰]`, 477 segments each | `runSegs_sound` | 13.9 CPU-min in all (`chunk00` 130 s, the others 22 to 80 s) |
 
-The first three run in Lean's interpreter; the chunks call `SchoenfeldCompute`, compiled to
+The first four run in Lean's interpreter. The chunks call `SchoenfeldCompute`, compiled to
 native code (`precompileModules`). Times are single-core user CPU on a loaded machine.
-
 ## Proof outline
 
-Full blueprint with every constant: [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
+The full blueprint, with every constant, is [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md). Steps 1
+to 6 give the bounds with the constants `1/8`, `1/4` and `9/20`. Steps 7 to 11 sharpen them to
+`1/(8π)`, steps 12 to 14 are the finite inputs, and step 15 is Rosser's zero count.
 
 1. Zeros under RH (`ZeroSums.lean`): `Σ_ρ m/|ρ|² = 2 + γ − log 4π < 1/20`, so `|ρ|² ≥ 20`.
    Hadamard's product for erdos-985's `ξ` at real `s = a + 1/2` gives the Poisson-kernel sum
    `Σ_ρ m a/(a² + γ²) = Re ξ'/ξ(a + 1/2) ≤ ½ log a − ½ log 2π + (12/5)/a` for `a ≥ 2`. This is
-   the zero-density input (in place of an explicit `N(T)`).
+   the zero-density input for the weaker constants.
 2. The zero sum (`Density.lean`): `F(T) = Σ_ρ m min(1/|ρ|, T/|ρ|²)` is at most `T/20`, and
-   at most `0.9 Jb(10T) + 2 Vb(T) + 2.75 Vb(5) ≈ 0.225 log² T` by writing `1/|γ|` as
+   at most `0.9 Jb(10T) + 2 Vb(T) + 2.75 Vb(5) ≈ 0.225 log² T`, by writing `1/|γ|` as
    `0.9 ∫₂^{10T} da/(a² + γ²)` and exchanging sum and integral.
 3. Differenced explicit formula (`PsiInt.lean`): erdos-985's weighted explicit formula for
-   `Ψ₁(x) = Σ_{n ≤ x} Λ(n)(x − n)` at integers; for `b = a + h`,
+   `Ψ₁(x) = Σ_{n ≤ x} Λ(n)(x − n)` at integers. For `b = a + h`,
    `h ψ(a) ≤ Ψ₁(b) − Ψ₁(a) ≤ h ψ(b)` and `|b^{ρ+1} − a^{ρ+1}| ≤ min(|ρ+1| h √b, 2 b^{3/2})` give
    `|ψ(x) − x| ≤ h/2 + 3.6 + 1.5/h + √(x+h) F(2(x+h)/h)`.
 4. ψ (`Psi.lean`): for `73.2 ≤ x ≤ 2^18`, `F(T) ≤ T/20` with `h ≈ 0.447 x^{3/4}` on 15
@@ -440,69 +456,66 @@ Full blueprint with every constant: [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
 6. π (`Pi.lean`): partial summation (Mathlib) and integration by parts for `li`:
    `π(x) − li(x) = (θ(x) − x)/log x + ∫₂ˣ (θ(t) − t)/(t log² t) dt + 2/log 2 − li(2)`, with
    `|∫₂^599| ≤ 33`, `|∫_599^x| ≤ √x/2` and `0 ≤ li(2) ≤ 2`.
-
-
-The constant `1/(8π)` (steps 6–10):
-
-6. **Zero count** (`ZeroCount.lean`). In `Im s > 0`, `ζ` and `ξ` have the same orders, so
-   `positiveZeroCount T` is erdos-985's `Σ_{0<γ≤T} m`. `ρ ↦ 1 − ρ` preserves orders and negates
-   `γ` under RH, so `F(T) ≤ 2 G(T)`, `G(T) = Σ_{γ>0} m min(1/γ, T/γ²)`.
-7. **`G(T)` from `N(t)`** (`CountSum.lean`). `G(T) = ∫_{4.4}^T N/t² + 2T ∫_T^∞ N/t³` (sum and
-   integral exchanged), Rosser's bound with `log log t ≤ log t/e`, and closed-form integrals:
+7. Zero count (`ZeroCount.lean`). In `Im s > 0`, `ζ` and `ξ` have the same orders, so
+   `positiveZeroCount T` is erdos-985's `Σ_{0<γ≤T} m`. The map `ρ ↦ 1 − ρ` preserves orders and
+   negates `γ` under RH, so `F(T) ≤ 2 G(T)` with `G(T) = Σ_{γ>0} m min(1/γ, T/γ²)`.
+8. `G(T)` from `N(t)` (`CountSum.lean`). `G(T) = ∫_{4.4}^T N/t² + 2T ∫_T^∞ N/t³` (sum and
+   integral exchanged). Rosser's bound with `log log t ≤ log t/e` and closed-form integrals give
    `G(T) ≤ log² T/(4π) + (1 − log 2π) log T/(2π) + 0.65`.
-8. **ψ** (`PsiSharp.lean`, `Sharp.lean`). Step 3 with `h = ⌈2√8 √x⌉`:
+9. ψ (`PsiSharp.lean`, `Sharp.lean`). Step 3 with `h = ⌈2√8 √x⌉` gives
    `|ψ(x) − x| ≤ √x (u²/(8π) − 0.2985 u + 4.62)` for `x ≥ 10¹⁰`, `u = log x` (ratio `0.90` to
-   the target at `10¹⁰`). PsiCert covers `[1500, 10¹⁰]` and `PsiSmallRange` `[73.2, 1500]`.
-9. **θ** (`ThetaSharp.lean`). `ψ − θ ≤ 1.047 √x` for `x ≥ 10¹⁰` (PsiCert and step 8 for
-   `ψ(√x)`, `ψ(x^{1/3})`), so `|θ(x) − x| ≤ √x (u²/(8π) − 0.2985 u + 5.667)`; on
-   `[3·10⁴, 10¹⁰]`, PsiCert gives `|θ(x) − x| ≤ 3.9252 √x`; `ThetaSmallRange` covers
-   `[599, 3·10⁴]`.
-10. **π** (`PiSharp.lean`). Step 6's decomposition with `|∫₂^599| ≤ 33`,
+   the target at `10¹⁰`). PsiCert covers `[1500, 10¹⁰]` and `PsiSmallRange` covers `[73.2, 1500]`.
+10. θ (`ThetaSharp.lean`). `ψ − θ ≤ 1.047 √x` for `x ≥ 10¹⁰` (PsiCert and step 9 for
+    `ψ(√x)`, `ψ(x^{1/3})`), so `|θ(x) − x| ≤ √x (u²/(8π) − 0.2985 u + 5.667)`. On
+    `[3·10⁴, 10¹⁰]`, PsiCert gives `|θ(x) − x| ≤ 3.9252 √x`, and `ThetaSmallRange` covers
+    `[599, 3·10⁴]`.
+11. π (`PiSharp.lean`). The decomposition of step 6 with `|∫₂^599| ≤ 33`,
     `|∫_599^{3·10⁴}| ≤ 14`, `|∫_{3·10⁴}^{10¹⁰}| ≤ 2448`, and for `x ≥ 10¹⁰` the antiderivative
     `2√t (1/(8π) − 0.2985/ℓ + 6.2/ℓ²)` for the tail. What is left,
     `√x ((2/(8π) − 0.2985) + 5.07/u + 12.4/u²) < 5148`, is checked on four ranges of `u`.
-    `[4·10⁵, 10¹⁰]` uses `3.9252 √x` throughout; `PiSmallRange` covers `[2657, 4·10⁵]`.
-
-The finite inputs (steps 11–13), each a checker with a soundness proof, run by `native_decide`:
-
-11. **ψ and θ on the small ranges** (`Check/Step.lean`, `Check/PsiTheta.lean`). `checkA` walks
-    the integers; between consecutive jumps `a < b` of the step function (prime powers for ψ,
+    `[4·10⁵, 10¹⁰]` uses `3.9252 √x` throughout, and `PiSmallRange` covers `[2657, 4·10⁵]`.
+12. ψ and θ on the small ranges (`Check/Step.lean`, `Check/PsiTheta.lean`). `checkA` walks
+    the integers. Between consecutive jumps `a < b` of the step function (prime powers for ψ,
     primes for θ) the value `c` is constant, and since the right-hand side `F` is increasing it
     suffices that `c − a < F(a)` and `b − c < F(a)`. `c` is carried as a rational enclosure,
-    `log p` from Mathlib's series for `log(1 − y)` (40 terms, rounded to `2^{-64}`), `√a` from
-    `Nat.sqrt`, `π < 3.141593`. Smallest margins (floating point): `0.033` (ψ, cell `[89, 97)`), `0.23` (θ).
-12. **π − li on `[2657, 4·10⁵]`** (`Check/Li.lean`, `Check/Pi.lean`). `li(2657)` is enclosed in
+    with `log p` from Mathlib's series for `log(1 − y)` (40 terms, rounded to `2^{-64}`), `√a`
+    from `Nat.sqrt` and `π < 3.141593`. Smallest margins (floating point): `0.033` for ψ (cell
+    `[89, 97)`), `0.23` for θ.
+13. π − li on `[2657, 4·10⁵]` (`Check/Li.lean`, `Check/Pi.lean`). `li(2657)` is enclosed in
     `[399.553, 399.640]` (true value 399.597): `li(2) = ∫₀¹ (1/log(1+u) + 1/log(1−u)) du`
     (the vendored definition) on a mesh of 3,327 cells, each bounded by the monotonicity of
     `1/log(1+u)` and `1/log(1/(1−u))`, and `∫₂^{2657} dt/log t` on 10,545 cells. `checkB` then
     walks the primes, advancing `li` by `(b−a)/log b ≤ ∫ₐᵇ dt/log t ≤ (b−a)/log a`. Smallest
     margin (floating point) `0.32`, at `x → 2659⁻`.
-13. **PsiCert** (`SchoenfeldCompute/Psi.lean`, `PsiCert/`). `[1500, 10⁶]`: `checkA` with
-    `F(x) = (4/5)√x` (step 11). `(10⁶, 10¹⁰]`: an exact segmented sieve over every integer up
+14. PsiCert (`SchoenfeldCompute/Psi.lean`, `PsiCert/`). On `[1500, 10⁶]`, `checkA` with
+    `F(x) = (4/5)√x` (step 12). On `(10⁶, 10¹⁰]`, an exact segmented sieve over every integer up
     to `10¹⁰ + 3.4·10⁶`, in segments of `2^{20}`, with the primes up to `131072` as sieving
     primes and a second array holding the exponent `k` of each proper prime power `p^k`. It is
     cut into blocks `(a, b]` of length `2^{⌊log₂ a⌋/2 − 8}` (about `√a/256`), on which
     `Λ(n) ∈ [log a/k, log b/k]` gives enclosures of `ψ(b)` at scale `2^{96}`, and
     `log b = log a + log(1 + (b−a)/a)` comes from the `artanh` series. For `x ∈ [a, b]`,
-    monotonicity gives `ψ(x) − x ≤ ψ(b) − a` and `x − ψ(x) ≤ b − ψ(a)`; both are checked to be
-    `≤ (4/5)√a` in integer arithmetic. Proved: the sieve is exact (`sieveSeg_spec`: an entry is
-    unmarked iff its number is prime), the exponent array is exact (`ppMark_sound`,
+    monotonicity gives `ψ(x) − x ≤ ψ(b) − a` and `x − ψ(x) ≤ b − ψ(a)`, and both are checked to
+    be `≤ (4/5)√a` in integer arithmetic. Proved: the sieve is exact (`sieveSeg_spec`: an entry
+    is unmarked iff its number is prime), the exponent array is exact (`ppMark_sound`,
     `ppMark_complete`), the logarithms are sound, and the guards imply the bound
-    (`blockStep_sound`, `runSegs_sound`). The run is split into 20 chunks of 477 segments; the
+    (`blockStep_sound`, `runSegs_sound`). The run is split into 20 chunks of 477 segments. The
     20 intermediate states (`PsiCert/Data.lean`) are untrusted data, and each transition is one
-    `native_decide`. Smallest margin (a floating-point replay in C) `67`, i.e. `0.0064 √a`, at
-    `a ≈ 1.1·10⁸`.
-
-The last input:
-
-14. **Rosser's zero count** (`Rosser.lean`, `Vendor/Rosser/`). `rosserZeroCount` is the vendored
-    `Rosser1941.zero_count_bounds`: for `T ≥ 100`, Backlund's argument
+    `native_decide`. Smallest margin (a floating-point replay in C) `67`, that is `0.0064 √a`,
+    at `a ≈ 1.1·10⁸`.
+15. Rosser's zero count (`Rosser.lean`, `Vendor/Rosser/`). `rosserZeroCount` is the vendored
+    `Rosser1941.zero_count_bounds`. For `T ≥ 100` it uses Backlund's argument
     (`RSBounds/BacklundHighCount.lean`: the argument principle on the rectangle with corners
     `1/2`, `5/4`, `5/4 + iT`, `1/2 + iT`, Jensen's formula on circles centred on `σ = 5/4` for
-    the variation of `arg ζ`, Stirling for the Gamma factor and an Euler–Maclaurin bound for `ζ`);
-    for `T ≤ 100`, zeta-lab's certificate that the 29 zeros of height at most 100 are simple and
-    lie in explicit rational brackets on the critical line (`RHHeight100/`, `HardyTenZeros/`,
-    `RSBounds/BacklundLowCount.lean`), from which `N(T)` is known exactly below 100.
+    the variation of `arg ζ`, Stirling for the Gamma factor and an Euler–Maclaurin bound for `ζ`).
+    For `T ≤ 100` it uses zeta-lab's certificate that the 29 zeros of height at most 100 are
+    simple and lie in explicit rational brackets on the critical line (`RHHeight100/`,
+    `HardyTenZeros/`, `RSBounds/BacklundLowCount.lean`), so `N(T)` is known exactly below 100.
+
+The proof uses only the upper half of Rosser's count, and only through a constant. A
+floating-point model of the error budget (not a Lean proof) indicates that any explicit count
+`N(T) ≤ (T/2π) log(T/2π) − T/2π + 7/8 + a log T + b` valid for all `T ≥ 4.4` with
+`2.48 a + b ≤ 3.31` would also do (Rosser's uses `2.33`). The binding constraint is the π bound
+just above `10¹⁰`.
 
 ## Layout
 
@@ -538,23 +551,18 @@ The last input:
 | `Schoenfeld/PsiCert/Pp.lean` | Prime-power exponents; the base primes |
 | `Schoenfeld/PsiCert/Run.lean` | Block, segment and run soundness |
 | `Schoenfeld/PsiCert/Small.lean` | PsiCert on `[1500, 10⁶]` (1 `native_decide`) |
-| `Schoenfeld/PsiCert/Data.lean`, `Chunks/C00`–`C19`, `Chain.lean` | Chunk states and the 20 transitions (20 `native_decide`) |
+| `Schoenfeld/PsiCert/Data.lean`, `Chunks/C00` to `C19`, `Chain.lean` | Chunk states and the 20 transitions (20 `native_decide`) |
 | `Schoenfeld/PsiCert/Final.lean` | `psiCert` |
 | `Schoenfeld/WithRosser.lean` | `schoenfeld_of_RH_of_rosser` and its three parts |
 | `Schoenfeld/Rosser.lean` | `rosserZeroCount`; `schoenfeld_of_RH` and its three parts |
 | `Vendor/Rosser/` | the vendored proof of Rosser's count (216 files; `README.md`, `PORTING.md`, `licenses/`) |
 | `scripts/Axioms.lean` | `#print axioms` for every headline theorem |
 | `Unconditional/SchoenfeldUnconditional.lean` | RH discharged by riemann-hypothesis |
-
 ## Deviations from the literature
 
-**From RH alone** the thresholds are Schoenfeld's and the constants larger: `1/8 = π · 1/(8π)`
-for ψ, `1/4 = 2π · 1/(8π)` for θ, `9/20 ≈ 11.3 · 1/(8π)` for π − li. Zero density enters there
-through a Poisson-kernel sum, which costs a factor `≈ 1.41` in the leading term; that method's
-asymptotic constant for ψ is about `0.056`.
-
-**With Rosser's zero count** the constant is Schoenfeld's `1/(8π)` and the thresholds are his
-(`73.2`, `599`, `2657`). The route differs from his in where the analysis takes over:
+None in the statement: `SchoenfeldStatement` has Schoenfeld's constant `1/(8π)` and his
+thresholds `73.2`, `599` and `2657`, and `schoenfeld_of_RH` assumes RH only. The route differs
+from his in where the analysis takes over:
 
 | | Schoenfeld 1976 | here |
 |---|---|---|
@@ -563,16 +571,16 @@ asymptotic constant for ψ is about `0.056`.
 | `[1500, 10¹⁰]` | Rosser–Schoenfeld 1975 Theorems 18, 19, 24 | PsiCert, proved here by a sieve to `10¹⁰` |
 | finite ranges | Gram, Rosser–Walker, Appel–Rosser, Brent tables | `PsiSmallRange`, `ThetaSmallRange`, `PiSmallRange`, proved here |
 
-The constant needs no list of zeros: Rosser's count is used from `t = 4.4` (`|ρ|² ≥ 20`), and its
-error term `0.137 log t + 0.443 log log t + 1.588`, integrated against `dt/t²`, adds a constant
-multiple of `√x`, which the `−0.2985 u √x` term absorbs from `x = 10¹⁰` on. The π bound has the
-least slack, smallest near `x ≈ e^{25}` (the four-range check in step 10).
+The constant needs no list of zeros. Rosser's count is used from `t = 4.4` (`|ρ|² ≥ 20`), and
+its error term `0.137 log t + 0.443 log log t + 1.588`, integrated against `dt/t²`, adds a
+constant multiple of `√x`, which the `−0.2985 u √x` term absorbs from `x = 10¹⁰` on. The π bound
+has the least slack, near `x ≈ e^{25}` (the four-range check in step 11).
 
-**Rosser's zero count** comes from the vendored proof (see Credits). The proof here uses only its upper half, and only through a constant. A floating-point model of
-the error budget (not a Lean proof) indicates that any explicit count
-`N(T) ≤ (T/2π) log(T/2π) − T/2π + 7/8 + a log T + b` valid for all `T ≥ 4.4` with
-`2.48 a + b ≤ 3.31` would also do (Rosser's uses `2.33`); the binding constraint is the π bound
-just above `10¹⁰`.
+The secondary theorems `psiBound_of_RH`, `thetaBound_of_RH` and `piBound_of_RH` have
+Schoenfeld's thresholds and larger constants: `1/8 = π · 1/(8π)` for ψ, `1/4 = 2π · 1/(8π)` for
+θ and `9/20 ≈ 11.3 · 1/(8π)` for π − li. They use no zero count: zero density enters through a
+Poisson-kernel sum, which costs a factor of about `1.41` in the leading term, and that method's
+asymptotic constant for ψ is about `0.056`.
 
 ## Building
 
@@ -586,8 +594,8 @@ caches the analytic library takes about 4.5 CPU-minutes; per module (user CPU):
 `Schoenfeld.Psi` 44 s (the 15-interval case split), `ThetaSharp` 34 s, `PsiSharp` 34 s,
 `PiSharp` 31 s, `Theta` 23 s, `Pi` 19 s, `Density` 15 s, `CountSum` 15 s, `PsiInt` 14 s,
 `ZeroSums` 10 s, the rest under 7 s each. The finite checks add about 17 CPU-minutes:
-`Schoenfeld.PsiCert.Chunks.C00`–`C19` 13.9 min (each about 20–130 s), `PsiCert.Small` 71 s,
-`Check.Pi` about 50 s, the soundness proofs (`PsiCert.Run`, `Check.Li`, …) under 20 s each.
+`Schoenfeld.PsiCert.Chunks.C00` to `C19` 13.9 min (each about 20 to 130 s), `PsiCert.Small` 71 s,
+`Check.Pi` about 50 s, and the soundness proofs (`PsiCert.Run`, `Check.Li` and the rest) under 20 s each.
 Build the chunks one at a time on a shared machine (`lake build Schoenfeld.PsiCert.Chunks.C00`
 and so on).
 
@@ -596,10 +604,10 @@ took about 3 CPU-hours from a cold `.lake` (10,700 s user CPU reported by `lake 
 wall with `LEAN_NUM_THREADS=12` on a loaded 95-core machine). It is dominated by zeta-lab's
 height-100 certificate: the 28 `RHHeight100` modules take about 2,800 s of elaboration in all
 (the largest `Box*` modules up to 200 s each), `HardyTenZeros` about 600 s, `HardyFirstZero` about
-250 s; the Backlund half (`RSBounds/`, `TernaryGoldbach/`) about 330 s.
+250 s, and the Backlund half (`RSBounds/`, `TernaryGoldbach/`) about 330 s.
 
 The chunk states in `Schoenfeld/PsiCert/Data.lean` were produced by running
-`runSegs basePrimes 477` from `init` twenty times with the compiled code; they are data, and
+`runSegs basePrimes 477` from `init` twenty times with the compiled code. They are data, and
 each transition is re-checked when its chunk module builds.
 
 ## Unconditional version
@@ -608,7 +616,7 @@ each transition is re-checked when its chunk module builds.
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
 (commit `507a75d91d`) and closes the RH hypothesis with its `riemannHypothesis` (Alpöge's
 proof). Every bound is then proved unconditionally in Lean, Schoenfeld's `1/(8π)` bounds
-included (`schoenfeld_statement`, no hypothesis).
+included: `schoenfeld_statement` has no hypothesis.
 
 | Theorem | Statement | Axioms |
 |---|---|---|
