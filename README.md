@@ -1,35 +1,43 @@
-# Mills' constant under RH in Lean
+# Mills' constant to 87 decimals under RH in Lean
 
-Lean proves that Mills' constant begins `1.30637788386308069046861449260260571291678458515671364436805375996643405376682659882150…`,
+This repository proves that Mills' constant begins
+`1.30637788386308069046861449260260571291678458515671364436805375996643405376682659882150…`,
 87 correct decimals, and that a prime lies between `x³` and `(x+1)³` for every real
 `x ≥ 2^{1/3} − 1 ≈ 0.26` (Caldwell–Cheng's Lemma 5, with their threshold). Both are proved
 unconditionally in Lean, with RH supplied by the certified proof in
-[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis),
-and Schoenfeld's θ bound with his constant `1/(8π)` from
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
+and Schoenfeld's θ bound with his constant `1/(8π)` taken from
 [`schoenfeld-rh`](https://github.com/senamakel/schoenfeld-rh). The main library holds complete
-Lean proofs that RH implies each statement, the enclosure `(1.3063778838, 1.3063778839)` of the
-formal-conjectures statement, and the lower bound `A > 1.3063778838` with no hypothesis at all.
-The fifth and sixth Mills primes (29 and 85 digits) are certified prime in the kernel.
+Lean proofs that RH implies each statement and the enclosure `(1.3063778838, 1.3063778839)` of
+the formal-conjectures statement, and proves the lower bound `A > 1.3063778838` with no
+hypothesis. The fifth and sixth Mills primes (29 and 85 digits) are certified prime in the
+kernel.
 
-Mills (Bull. AMS 53, 1947) showed there is a real `A > 1` with `⌊A^(3^n)⌋` prime for every
+Mills (Bull. AMS 53, 1947) showed that there is a real `A > 1` with `⌊A^(3^n)⌋` prime for every
 `n ≥ 1`; the least such `A` is *Mills' constant*. Caldwell and Cheng (*Determining Mills'
 constant and a note on Honaker's problem*, J. Integer Seq. 8 (2005), Art. 05.4.1) showed that
-under the Riemann hypothesis there is a prime between `x³` and `(x+1)³` for every `x ≥ 2^{1/3} − 1`
-(their Lemma 5), so the greedy sequence `2, 11, 1361, 2521008887, …` never gets stuck and its limit
-is the least Mills number; computing its terms they gave 600 decimals of the constant (their
-Theorem 1, from ten certified primes, the last one 6854 digits).
+under the Riemann hypothesis there is a prime between `x³` and `(x+1)³` for every
+`x ≥ 2^{1/3} − 1` (their Lemma 5). So the greedy sequence `2, 11, 1361, 2521008887, …` never gets
+stuck and its limit is the least Mills number. Computing its terms, they gave 600 decimals of the
+constant (their Theorem 1, from ten certified primes, the last with 6854 digits).
 
 **Literature status.** Lemma 5, the enclosure and the digits are *RH-consequences*
-(Caldwell–Cheng 2005; the enclosure is listed as open in formal-conjectures). The lower bound
+(Caldwell–Cheng 2005; formal-conjectures lists the enclosure as open). The lower bound
 `A > 1.3063778838` is *known* unconditionally (Caldwell–Cheng). The proof follows Caldwell–Cheng,
-with Schoenfeld's θ bound in place of his `π(x)` bound and Lucas certificates for the Mills primes.
-Before the 2026 proof of RH, only existence (Mills) and irrationality (Saito, Mathematika 71, 2025)
-were known.
+with Schoenfeld's θ bound in place of his `π(x)` bound and Lucas certificates for the Mills
+primes. The proof of RH is L. Alpöge's (2026), certified by the Lean FRO and the Mathlib
+Initiative on 2026-11-21. Before it, only existence (Mills) and irrationality (Saito,
+Mathematika 71, 2025) were known.
 
 ```lean
 -- Unconditional/MillsUnconditional.lean
-theorem mills_constant_bounds_unconditional {A : ℝ} (hA : Mills.IsMinMills A) :
-    A ∈ Set.Ioo (1.3063778838 : ℝ) 1.3063778839
+theorem mills_digits87_unconditional {A : ℝ} (hA : Mills.IsMinMills A) :
+    ((1306377883863080690468614492602605712916784585156713644368053759966434053766826598821501 : ℕ) : ℝ) / 10 ^ 87 ≤ A ∧
+      A < (((1306377883863080690468614492602605712916784585156713644368053759966434053766826598821501 : ℕ) : ℝ) + 1) / 10 ^ 87
+
+theorem mills_digits30_unconditional {A : ℝ} (hA : Mills.IsMinMills A) :
+    ((1306377883863080690468614492602 : ℕ) : ℝ) / 10 ^ 30 ≤ A ∧
+      A < (((1306377883863080690468614492602 : ℕ) : ℝ) + 1) / 10 ^ 30
 
 theorem prime_between_cubes_unconditional (x : ℝ) (hx : (2 : ℝ) ^ ((1 : ℝ) / 3) - 1 ≤ x) :
     ∃ p : ℕ, p.Prime ∧ x ^ 3 < p ∧ (p : ℝ) ≤ (x + 1) ^ 3
@@ -38,99 +46,69 @@ theorem prime_strictly_between_cubes_unconditional (x : ℝ)
     (hx : (2 : ℝ) ^ ((1 : ℝ) / 3) - 1 < x) :
     ∃ p : ℕ, p.Prime ∧ x ^ 3 < p ∧ (p : ℝ) < (x + 1) ^ 3
 
-theorem mills_digits30_unconditional {A : ℝ} (hA : Mills.IsMinMills A) :
-    ((1306377883863080690468614492602 : ℕ) : ℝ) / 10 ^ 30 ≤ A ∧
-      A < (((1306377883863080690468614492602 : ℕ) : ℝ) + 1) / 10 ^ 30
-
-theorem mills_digits87_unconditional {A : ℝ} (hA : Mills.IsMinMills A) :
-    ((1306377883863080690468614492602605712916784585156713644368053759966434053766826598821501 : ℕ) : ℝ) / 10 ^ 87 ≤ A ∧
-      A < (((1306377883863080690468614492602605712916784585156713644368053759966434053766826598821501 : ℕ) : ℝ) + 1) / 10 ^ 87
+theorem mills_constant_bounds_unconditional {A : ℝ} (hA : Mills.IsMinMills A) :
+    A ∈ Set.Ioo (1.3063778838 : ℝ) 1.3063778839
 
 -- Mills/CubesSharp.lean, Mills/Digits.lean (targets in Mills/Statement2.lean)
 theorem Mills.caldwellChengLemma5_of_RH : CaldwellChengLemma5
-  -- RiemannHypothesis → ∀ x : ℝ, 2 ^ (1/3) - 1 ≤ x → ∃ p, p.Prime ∧ x ^ 3 < p ∧ p ≤ (x + 1) ^ 3
 theorem Mills.primeStrictlyBetweenCubes_of_RH : PrimeStrictlyBetweenCubesOfRH
 theorem Mills.millsDigits30_of_RH : MillsDigits 30 1306377883863080690468614492602
 theorem Mills.millsDigits87_of_RH : MillsDigits 87 1306377883863080690468614492602605712916784585156713644368053759966434053766826598821501
-  -- MillsDigits N D := RiemannHypothesis → ∀ {A}, IsMinMills A → D / 10^N ≤ A ∧ A < (D + 1) / 10^N
+
+def CaldwellChengLemma5 : Prop :=
+  RiemannHypothesis → ∀ x : ℝ, (2 : ℝ) ^ ((1 : ℝ) / 3) - 1 ≤ x →
+    ∃ p : ℕ, p.Prime ∧ x ^ 3 < p ∧ (p : ℝ) ≤ (x + 1) ^ 3
+def PrimeStrictlyBetweenCubesOfRH : Prop :=
+  RiemannHypothesis → ∀ x : ℝ, (2 : ℝ) ^ ((1 : ℝ) / 3) - 1 < x →
+    ∃ p : ℕ, p.Prime ∧ x ^ 3 < p ∧ (p : ℝ) < (x + 1) ^ 3
+def MillsDigits (N D : ℕ) : Prop :=
+  RiemannHypothesis → ∀ {A : ℝ}, IsMinMills A →
+    (D : ℝ) / 10 ^ N ≤ A ∧ A < ((D : ℝ) + 1) / 10 ^ N
 
 -- Mills/Certificates.lean (no hypothesis)
 theorem Mills.g_four : g 4 = 16022236204009818131831320183
 theorem Mills.g_five : g 5 = 4113101149215104800030529537915953170486139623539759933135949994882770404074832568499
 
--- Mills/Final.lean
-theorem Mills.lower_bound_of_RH : LowerBoundOfRH   -- RiemannHypothesis → ∀ {A}, IsMinMills A → A ∈ Set.Ioo 1.3063778838 1.3063778839
-
+-- Mills/Final.lean (LowerBoundOfRH in Mills/Statement.lean)
+theorem Mills.lower_bound_of_RH : LowerBoundOfRH
 theorem Mills.mills_bounds_of_RH (hRH : RiemannHypothesis) {A : ℝ} (hA : IsMinMills A) :
     A ∈ Set.Ioo (1.3063778838 : ℝ) 1.3063778839
 
--- Mills/Cubes.lean
+def LowerBoundOfRH : Prop :=
+  RiemannHypothesis → ∀ {A}, IsMinMills A → A ∈ Set.Ioo (1.3063778838 : ℝ) 1.3063778839
+
+-- Mills/Cubes.lean (PrimeBetweenCubes in Mills/Upper.lean)
 theorem Mills.primeBetweenCubes_of_RH (hRH : RiemannHypothesis) : PrimeBetweenCubes (10 ^ 9)
 
--- Mills/Main.lean (no hypothesis at all)
-theorem Mills.mills_lower_bound {A : ℝ} (hA : IsMinMills A) : (1.3063778838 : ℝ) < A
-
--- Mills/Upper.lean
 def PrimeBetweenCubes (x₀ : ℕ) : Prop :=
   ∀ x : ℕ, x₀ ≤ x → ∃ p : ℕ, p.Prime ∧ x ^ 3 < p ∧ p < (x + 1) ^ 3
+
+-- Mills/Main.lean (no hypothesis)
+theorem Mills.mills_lower_bound {A : ℝ} (hA : IsMinMills A) : (1.3063778838 : ℝ) < A
 ```
 
 ## Tier and provenance
 
 | Theorem | Tier | Hypothesis |
 |---|---|---|
-| `Mills.mills_lower_bound` | D | none |
-| `Mills.primeBetweenCubes_of_RH` | C | `RiemannHypothesis` (Mathlib's statement) |
-| `Mills.lower_bound_of_RH`, `Mills.mills_bounds_of_RH` | C | `RiemannHypothesis` |
-| `Mills.mills_bounds_of_primeBetweenCubes` (the reduction) | C + H | `PrimeBetweenCubes x₀`, `x₀ ≤ 2521008887` |
+| `mills_digits30_unconditional`, `mills_digits87_unconditional`, `prime_between_cubes_unconditional`, `prime_strictly_between_cubes_unconditional` (`Unconditional/`) | U | none; RH from riemann-hypothesis |
 | `mills_constant_bounds_unconditional` (`Unconditional/`) | U | none; RH from riemann-hypothesis |
+| `Mills.millsDigits30_of_RH`, `Mills.millsDigits87_of_RH` | C | `RiemannHypothesis` |
+| `Mills.caldwellChengLemma5_of_RH`, `Mills.primeStrictlyBetweenCubes_of_RH` | C | `RiemannHypothesis` |
+| `Mills.lower_bound_of_RH`, `Mills.mills_bounds_of_RH` | C | `RiemannHypothesis` |
+| `Mills.primeBetweenCubes_of_RH` | C | `RiemannHypothesis` (Mathlib's statement) |
+| `Mills.mills_bounds_of_primeBetweenCubes` (the reduction) | C + H | `PrimeBetweenCubes x₀`, `x₀ ≤ 2521008887` |
+| `Mills.mills_lower_bound` | D | none |
 | `Mills.prime_b5`, `Mills.prime_b6`, `Mills.g_four`, `Mills.g_five` | D | none |
 | `Mills.primeStrictlyBetweenCubes_small` (`1 ≤ x < 9`) | D | none |
-| `Mills.caldwellChengLemma5_of_RH`, `Mills.primeStrictlyBetweenCubes_of_RH` | C | `RiemannHypothesis` |
-| `Mills.millsDigits30_of_RH`, `Mills.millsDigits87_of_RH` | C | `RiemannHypothesis` |
-| `prime_between_cubes_unconditional`, `prime_strictly_between_cubes_unconditional`, `mills_digits30_unconditional`, `mills_digits87_unconditional` (`Unconditional/`) | U | none; RH from riemann-hypothesis |
 
 `Mills.CaldwellChengLemma5`, `Mills.PrimeStrictlyBetweenCubesOfRH`, `Mills.MillsDigits` and
 `Mills.CaldwellChengTheorem1` (`Mills/Statement2.lean`) transcribe Caldwell–Cheng's Lemma 5 and
 Theorem 1; formal-conjectures has neither. Lemma 5 reads "there is at least one prime between
 `x³` and `(x+1)³` for every `x ≥ x₀ = 2^{1/3} − 1`" with `x` real. At `x = x₀` the only candidate
-is `2 = (x₀+1)³`, so "between" includes the upper end there; `CaldwellChengLemma5` says
+is `2 = (x₀+1)³`, so "between" includes the upper end there. `CaldwellChengLemma5` says
 `x³ < p ≤ (x+1)³`, and `PrimeStrictlyBetweenCubesOfRH` is the open-interval form for `x > x₀`.
 Both are proved.
-
-### Lemma 5 from Schoenfeld's θ bound
-
-`Mills/CubesSharp.lean` uses `Schoenfeld.schoenfeldTheta_of_RH : RiemannHypothesis →
-SchoenfeldTheta` (schoenfeld-rh `b2c3137`), Schoenfeld's 1976 bound
-`|θ(y) − y| < √y log² y / (8π)` for `y ≥ 599`.
-
-1. Real `x ≥ 9`: with `a = x³ ≥ 599`, `b = (x+1)³ − 1`, `u = x + 1`, `t = u^{1/4}`, one has
-   `√b ≤ t⁶` and `log b ≤ 12 log t ≤ 12t/e`, so `2·√b log² b/(8π) ≤ 288 t⁸/(8π e²) < 1.56 u²`,
-   which is below `b − a = 3u² − 3u` for `u ≥ 10`. So `θ(b) > θ(a)` and a prime lies in
-   `(x³, (x+1)³)` (`primeStrictlyBetweenCubes_large`).
-2. `1 ≤ x < 9`: with `k = ⌊2x⌋ ∈ [2, 17]`, one of 16 primes `5, 11, 17, …, 739` satisfies
-   `(k+1)³ < 8p < (k+2)³`, so `x³ < p < (x+1)³` (`primeStrictlyBetweenCubes_small`, no RH).
-3. `2^{1/3} − 1 ≤ x < 1`: `p = 2`.
-
-`PrimeBetweenCubes x₀` is the analytic input "a prime lies between `x³` and `(x+1)³` for all
-`x ≥ x₀`". It is proved from RH for `x₀ = 10^9` in `Mills/Cubes.lean`, using
-`Schoenfeld.thetaBound_of_RH : ThetaBound (1/4) 599` from
-[`schoenfeld-rh`](https://github.com/senamakel/schoenfeld-rh) (rev `b2c3137`):
-under RH, `|θ(y) − y| < √y log² y / 4` for `y ≥ 599`. This is a weaker constant than
-Schoenfeld's `1/(8π)`, which is why Caldwell–Cheng's `x₀ = 2657` is replaced by `10^9` (any
-`x₀ ≤ 2521008887` is enough, see below). The argument: a prime in `(a, b]` exists when
-`θ(b) > θ(a)`; with `a = x³`, `b = x³ + 3x² + 3x = (x+1)³ − 1` the bound gives `θ(b) − θ(a) > 0`
-as soon as `3x² + 3x > ½ √b log² b`. Putting `t = (x+1)^{1/8}` (so `√b ≤ t¹²`, `log b ≤ 24 t`)
-this reduces to `3(t⁸ − 1)² > 288 t¹⁴`, true for `t ≥ 13`, that is `x ≥ 10^9`.
-
-### No range below `x₀` needs a direct check
-
-`PrimeBetweenCubes` is used only at the points `x = g n` with `n ≥ 3`, that is `x ≥ 2521008887`. The
-first three steps `2 → 11 → 1361 → 2521008887` are verified directly in `Mills/Greedy.lean`
-(`g_one`, `g_two`, `g_three`: the least prime above `2³ = 8` is `11`, above `11³ = 1331` is
-`1361`, above `1361³ = 2521008881` is `2521008887`, by checking `3`, `30` and `6` integers).
-So any `x₀ ≤ 2521008887` suffices, in particular `x₀ = 10^9` (and Caldwell–Cheng's `2657`), and the cubes between `x₀³` and
-`2521008887³` are never needed.
 
 `IsMills` and `IsMinMills` are copied verbatim from
 [formal-conjectures `Wikipedia/Mills.lean`](https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Mills.lean)
@@ -286,7 +264,7 @@ not import riemann-hypothesis.
 ```
 
 There is no `sorry` and no `axiom` declaration, and nothing in this repository uses
-`native_decide`. The theorems of the original route (`Mills/Cubes.lean`, constant `1/4`), the
+`native_decide`. The theorems of the `1/4` route (`Mills/Cubes.lean`), the
 certificates, the finite range of Lemma 5 and `millsDigits87_prefix` use the standard three
 axioms only. Everything built on Schoenfeld's `1/(8π)` bound (`caldwellChengLemma5_of_RH`, the
 strict form, `primeBetweenCubes_one_of_RH`, `millsDigits30_of_RH`, `millsDigits87_of_RH`) adds the
@@ -306,24 +284,44 @@ base 2 (`fermatComposite`, proved sound by `not_prime_of_fermatComposite`), by k
 
 ## Proof outline
 
-1. `Mills/Greedy.lean`: `g 0 = 2`, `g (n+1)` = least prime `≥ (g n)³` (exists unconditionally).
-   `g_one`, `g_two`, `g_three` compute `11, 1361, 2521008887`.
+1. `Mills/Greedy.lean`: `g 0 = 2`, and `g (n+1)` is the least prime `≥ (g n)³` (it exists
+   unconditionally). `g_one`, `g_two`, `g_three` compute `11, 1361, 2521008887`: the least prime
+   above `2³ = 8` is `11`, above `11³ = 1331` is `1361`, and above `1361³ = 2521008881` is
+   `2521008887`, by checking `3`, `30` and `6` integers.
 2. Minimality, no RH (`g_le_floor`): if `⌊A^(3^n)⌋` is prime for all `n`, then
    `⌊A^(3^(n+1))⌋ ≥ ⌊A^(3^n)⌋³`, so by induction `⌊A^(3^(n+1))⌋ ≥ g n`. At `n = 3`,
    `A^81 ≥ 2521008887 > 1.3063778838^81` (`lower_bound`, a rational comparison by `norm_num`).
 3. `Mills/Upper.lean`: from `PrimeBetweenCubes`, `g (n+1) < (g n + 1)³`, and strictly
    `g (n+1) + 1 < (g n + 1)³` since `(g n+1)³ − 1 = g n·(g n² + 3 g n + 3)` is composite.
    Hence `lo n = (g n)^{1/3^{n+1}}` increases, `hi n = (g n + 1)^{1/3^{n+1}}` decreases, and
-   `lo n ≤ hi m` for all `n, m`.
+   `lo n ≤ hi m` for all `n, m`. `PrimeBetweenCubes` is used only at the points `x = g n` with
+   `n ≥ 3`, that is `x ≥ 2521008887`, so any `x₀ ≤ 2521008887` suffices and the cubes between
+   `x₀³` and `2521008887³` are never needed.
 4. The limit `A = sup lo n` satisfies `⌊A^(3^(n+1))⌋ = g n` (`floor_greedyLimit`), so it is a
    Mills number (`isMills_greedyLimit`), and `A^81 ≤ 2521008888 < 1.3063778839^81`.
-5. `Mills/Main.lean`: the least Mills number `A` has `A ≤` this one and `A >` the lower bound.
-6. `Mills/CubesSharp.lean`: Lemma 5 from Schoenfeld's θ bound (see above), and its integer
-   form `PrimeBetweenCubes 1`.
-7. `Mills/Certificates.lean`: `g 4 = b₅`, `g 5 = b₆` (certified primes, Fermat-tested gaps).
-8. `Mills/Digits.lean`: `g k ≤ A^{3^{k+1}} < g k + 1` for the least Mills number
+5. `Mills/Main.lean`: the least Mills number `A` is at most this one and exceeds the lower bound.
+6. `Mills/Cubes.lean`: `PrimeBetweenCubes (10^9)` from RH, with
+   `Schoenfeld.thetaBound_of_RH : ThetaBound (1/4) 599` from schoenfeld-rh (rev `b2c3137`), that
+   is `|θ(y) − y| < √y log² y / 4` for `y ≥ 599`. A prime lies in `(a, b]` when `θ(b) > θ(a)`.
+   With `a = x³` and `b = x³ + 3x² + 3x = (x+1)³ − 1` the bound gives `θ(b) − θ(a) > 0` as soon
+   as `3x² + 3x > ½ √b log² b`. Putting `t = (x+1)^{1/8}` (so `√b ≤ t¹²`, `log b ≤ 24 t`), this
+   reduces to `3(t⁸ − 1)² > 288 t¹⁴`, true for `t ≥ 13`, that is `x ≥ 10^9`. This route gives
+   the enclosure `(1.3063778838, 1.3063778839)`.
+7. `Mills/CubesSharp.lean`: Lemma 5 from `Schoenfeld.schoenfeldTheta_of_RH : RiemannHypothesis →
+   SchoenfeldTheta`, Schoenfeld's 1976 bound `|θ(y) − y| < √y log² y / (8π)` for `y ≥ 599`.
+   * Real `x ≥ 9`: with `a = x³ ≥ 599`, `b = (x+1)³ − 1`, `u = x + 1` and `t = u^{1/4}`,
+     `√b ≤ t⁶` and `log b ≤ 12 log t ≤ 12t/e`, so `2·√b log² b/(8π) ≤ 288 t⁸/(8π e²) < 1.56 u²`,
+     which is below `b − a = 3u² − 3u` for `u ≥ 10`. So `θ(b) > θ(a)` and a prime lies in
+     `(x³, (x+1)³)` (`primeStrictlyBetweenCubes_large`).
+   * `1 ≤ x < 9`: with `k = ⌊2x⌋ ∈ [2, 17]`, one of 16 primes `5, 11, 17, …, 739` satisfies
+     `(k+1)³ < 8p < (k+2)³`, so `x³ < p < (x+1)³` (`primeStrictlyBetweenCubes_small`, no RH).
+   * `2^{1/3} − 1 ≤ x < 1`: `p = 2`.
+
+   The integer form `PrimeBetweenCubes 1` follows.
+8. `Mills/Certificates.lean`: `g 4 = b₅` and `g 5 = b₆` (certified primes, Fermat-tested gaps).
+9. `Mills/Digits.lean`: `g k ≤ A^{3^{k+1}} < g k + 1` for the least Mills number
    (`minMills_pow_bounds`), so `A ∈ [b^{1/m}, (b+1)^{1/m})` with `m = 3^{k+1}`. At `k = 4`
-   (`m = 243`) this fixes 30 decimals, at `k = 5` (`m = 729`) 87; the digit comparisons
+   (`m = 243`) this fixes 30 decimals, and at `k = 5` (`m = 729`) 87. The digit comparisons
    `D^m ≤ b·10^{Nm}` and `(b+1)·10^{Nm} ≤ (D+1)^m` are kernel `decide`s on numbers of up to
    64,000 digits. `millsDigits87_prefix` checks that the 87 digits are the first 87 of
    Caldwell–Cheng's table.
@@ -348,35 +346,34 @@ base 2 (`fermatComposite`, proved sound by `not_prime_of_fermatComposite`), by k
 
 ## Deviations from the literature
 
-**Lemma 5.** Caldwell–Cheng prove it for every real `x ≥ 2^{1/3} − 1`: from Schoenfeld's bound
-`|π(x) − li(x)| < √x log x/(8π)` (`x ≥ 2657`) for `x > 2657^{1/3}`, and "using a computer
-program" below that. Lean proves the same statement with the same threshold
-(`caldwellChengLemma5_of_RH`), and also the open-interval form for `x > 2^{1/3} − 1`. The
-analytic step uses Schoenfeld's θ bound (from `y = 599`, so from `x = 9`) instead of the π bound;
-the range below is 16 explicit primes and `p = 2`.
-
-**Digits.** Caldwell–Cheng's Theorem 1 states 600 decimals under RH, from the Mills primes
-`b₁, …, b₁₀` (`b₁₀` has 6854 digits; `b₇`, `b₈`, `b₉` were proved prime with Titanix, an ECPP
-program, and `b₁₀` by Morain's fastECPP in about 68 CPU-days). Lean proves 87 of them
-(`millsDigits87_of_RH`); the target `CaldwellChengTheorem1` (600 digits) is stated in
-`Mills/Statement2.lean` and is not proved. Each further Mills prime roughly triples the digits:
-`b₇` (254 digits) would give 256 decimals and `b₈` (762 digits) would reach 600. Neither has a
-Lucas or Pocklington certificate within reach: after trial division to `10^7` and GMP-ECM at
+Digits: Caldwell–Cheng's Theorem 1 states 600 decimals under RH; this repository proves 87
+(`millsDigits87_of_RH`). Their digits come from the Mills primes `b₁, …, b₁₀` (`b₁₀` has 6854
+digits; `b₇`, `b₈`, `b₉` were proved prime with Titanix, an ECPP program, and `b₁₀` with Morain's
+fastECPP in about 68 CPU-days). The 600-digit target `CaldwellChengTheorem1` is stated in
+`Mills/Statement2.lean`. Each further Mills prime roughly triples the digits: `b₇` (254 digits)
+would give 256 decimals and `b₈` (762 digits) would reach 600. Neither has a Lucas or
+Pocklington certificate within reach. After trial division to `10^7` and GMP-ECM at
 `B1 = 10^6` (15 CPU-minutes per number), `b₇ − 1 = 2²·3³·7·C251` and
 `b₇ + 1 = 2·5²·61·601·291539·500536237·184968672986919581·P217` (`C251` an unfactored
 composite, `P217` a 217-digit probable prime). So `b₇ + 1` is fully factored, and Morrison's
-`N + 1` test (Lucas sequences, not in Mathlib) would reduce `b₇` to `P217`; but `P217 − 1` has a
+`N + 1` test (Lucas sequences, not in Mathlib) would reduce `b₇` to `P217`. But `P217 − 1` has a
 192-digit composite cofactor and `P217 + 1 = 2·2267·55320204473·P202`, so the descent goes on
 one probable prime at a time, a few digits per step. An `N − 1` (Pocklington) proof of `b₇`
-needs about 127 factored digits of `b₇ − 1`, which are not available.
-An elliptic-curve (Goldwasser–Kilian/Atkin–Morain) certificate checker would be needed, with an
-ECPP certificate for `b₇` produced elsewhere; it does not need the Hasse bound if each step asks
+needs about 127 factored digits of `b₇ − 1`, which are not available. The next step is an
+elliptic-curve (Goldwasser–Kilian, Atkin–Morain) certificate checker in Lean, with an ECPP
+certificate for `b₇` produced elsewhere. It does not need the Hasse bound if each step asks
 `q > 2√N + 1` (the trivial bound `#E(𝔽_p) ≤ 2p + 1`), but it does need the group law of a
 Weierstrass curve reduced from `ℤ/N` to `𝔽_p`, which is not in Mathlib.
 
-**Enclosure.** `mills_bounds_of_RH` (the formal-conjectures enclosure) still goes through
-`Mills/Cubes.lean` (θ constant `1/4`, threshold `10^9`); any threshold up to `2521008887` gives
-the same enclosure, since primes between cubes are only used from `x = g 3 = 2521008887`.
+Lemma 5 has Caldwell–Cheng's statement and threshold. They prove it from Schoenfeld's bound
+`|π(x) − li(x)| < √x log x/(8π)` (`x ≥ 2657`) for `x > 2657^{1/3}`, and "using a computer
+program" below that. Here the analytic step uses Schoenfeld's θ bound (from `y = 599`, so from
+`x = 9`) instead of the π bound, and the range below is 16 explicit primes and `p = 2`.
+
+The enclosure `mills_bounds_of_RH` (the formal-conjectures statement) goes through
+`Mills/Cubes.lean`, with θ constant `1/4` and threshold `10^9` in place of Caldwell–Cheng's
+`2657`. Any threshold up to `2521008887` gives the same enclosure, since primes between cubes
+are only used from `x = g 3 = 2521008887`.
 
 ## Building
 
