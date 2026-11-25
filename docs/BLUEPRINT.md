@@ -110,3 +110,31 @@ bound has a margin of about `0.004` at `q = 10¹⁰`.
 5. Sizing (c = 2, this checker): the uniform budget holds on every block from `2^27` on; below
    that about 7,500 moduli fail the per-modulus budget (sum `≈ 4.4·10^9`, the largest
    `≈ 3.9·10^7`) and go to the generation search.
+
+## LLS Theorem 1.1 with the paper's `B(q)` (round 9)
+
+1. `LLS.Thm11.leastPrimeOutsideSubgroup_of_GRH : GRH → LeastPrimeOutsideSubgroup`
+   (`LLS/Thm11/Main.lean`): `x = ⌊(log q + B(q))²⌋ ≥ 64`; if every prime `ℓ ≤ x` prime to `q`
+   lies in `H`, `LLS.Thm11.exists_char_of_primes_mem` gives `χ ≠ 1` equal to `1` on every
+   `n ≤ x` prime to `q`; `budget11` and `phi_pos` contradict each other.
+2. `LLS.Thm11.sum_re_ge_max`, `keyM`, `budgetM_nonpos` (`Budget.lean`): `LLS.keyP` with the
+   Cesàro lower bound `max(0, Pc − Lc_q) − Lc_R`. `budget11`:
+   `base0(x) + 2K max(0, PcF(x) − σ(q)) − κ log q − ω(q) mC(x) − RC(x) ≤ 0` given `R5OK x`, with
+   `PcF_le : PcF x ≤ cesSum x` (`Sharp.Hg_inv_bounds` for `x ≥ 100`, `vonMangoldt_ces_ge` below).
+3. `LLS.Thm11.phi_pos` (`Elim.lean`): from `log q + B(q) < √(x+1) ≤ ν(x)`, `F1 x > 0` and
+   (when `ν − 3 − 2 log 8 ≥ 8`) `F2 x 8 > 0`, `F2 x (ν − 3 − 2 log 8) > 0`, the budget is
+   positive. Case `σ ≤ 2 log L − 8/5`: multiplier `K` for `2σ` and `u = 2ω(log L)²/L`; the bound
+   decreases in `L`, evaluated at `L = ν`. Case `σ > 2 log L − 8/5`: multiplier
+   `μ = 2 mC ν/(log x)²` for `u`; concave in `L`, evaluated at the ends. `mul_log_sq_le`:
+   `a (log b)² ≤ b (log a)²` for `8 ≤ a ≤ b`.
+4. `F1_eq`, `F2a_eq`, `F2b_eq` (`NumCore.lean`): exact decompositions `s·Q + δ·W + V`;
+   `F1_ge`, `F2a_ge`, `F2b_ge`, `R5_of`: rational lower bounds on a box from `InBox`
+   (`inBox_of_data`: `2^{k_a} ≤ X_a^{64}`, `X_b^{64} ≤ 2^{k_b}`, `s_a² ≤ X_a`, `X_b ≤ s_b²`).
+5. `Boxes.lean`: `f1_range`, `f2a_range`, `f2b_range`, `r5_range` for `x < 10^16` (2 + 8, 15,
+   23 and 6 boxes); `Tail.lean`: `F1_tail`, `F2a_tail`, `F2b_tail`, `R5_tail` for
+   `x ≥ 10^16` (`tail_facts`: `l² ≤ √x/100`, `l ≤ √x/10^4`).
+6. Part 2, `LLS.Thm11.leastPrimeOutsideSubgroupRough_of_GRH` (`Rough.lean`): `Phi1_nonpos_rough`
+   (`LLS.Phi1_nonpos` for moduli whose prime factors are all `≥ x`, via `llp_eq_zero_of_le`,
+   `lcp_eq_zero_of_le`) and `goodP_ge_3000` (`IvR.goodP_rough` for `3000 ≤ q < 4096`, then the
+   existing intervals and tail).
+
