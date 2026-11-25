@@ -16,5 +16,15 @@ name = "Erdos233"
 git = "https://github.com/senamakel/erdos-233.git"
 rev = "1ff9f39b4b3d724fd8338fd01252c179eb302acf"
 
+[[require]]
+name = "Schoenfeld"
+git = "https://github.com/senamakel/schoenfeld-rh.git"
+rev = "b2c31374576f5f9e5be841b99b3011122b30361e"
+
 [[lean_lib]]
 name = "Cramer"
+
+# Lean-core-only computational checks (no Mathlib), so the kernel `decide` data modules load fast.
+[[lean_lib]]
+name = "CramerCompute"
+globs = ["CramerCompute.+"]

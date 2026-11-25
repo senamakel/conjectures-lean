@@ -47,5 +47,5 @@ fi
 (cd "$HERE" && lake build)
 
 cd "$HERE"
-LEAN_PATH="$(cd "$RH" && lake env printenv LEAN_PATH):$HERE/.lake/packages/Erdos985/.lake/build/lib/lean:$HERE/.lake/packages/Erdos233/.lake/build/lib/lean:$HERE/.lake/build/lib/lean" \
+LEAN_PATH="$(cd "$RH" && lake env printenv LEAN_PATH):$HERE/.lake/packages/Erdos985/.lake/build/lib/lean:$HERE/.lake/packages/Erdos233/.lake/build/lib/lean:$HERE/.lake/packages/Schoenfeld/.lake/build/lib/lean:$HERE/.lake/build/lib/lean" \
   lean Unconditional/CramerUnconditional.lean

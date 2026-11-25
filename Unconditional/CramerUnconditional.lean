@@ -57,6 +57,15 @@ theorem cramer_primeGapExplicit_107 : Cramer.PrimeGapExplicit (107 / 100) :=
 theorem cramer_primeInClosedInterval_107 : Cramer.PrimeInClosedInterval 2 (107 / 100) :=
   Cramer.primeInClosedInterval_107_of_RH riemannHypothesis
 
+/-- Carneiro–Milinovich–Soundararajan (2019), Theorem 5: every `[x, x + (22/25)√x log x]`,
+`x ≥ 4`, contains a prime. -/
+theorem cramer_cmsPrimeInterval : Cramer.CMSPrimeInterval :=
+  Cramer.cmsPrimeInterval_of_RH riemannHypothesis
+
+/-- `p_{n+1} − p_n ≤ (22/25)√p_n log p_n` for every prime `p_n > 3`. -/
+theorem cramer_cmsPrimeGap : Cramer.CMSPrimeGap :=
+  Cramer.cmsPrimeGap_of_RH riemannHypothesis
+
 #print axioms cramer_primeInShortInterval
 #print axioms cramer_primeGapExplicit
 #print axioms cramer_gapBound
@@ -70,3 +79,5 @@ theorem cramer_primeInClosedInterval_107 : Cramer.PrimeInClosedInterval 2 (107 /
 #print axioms cramer_primeInShortInterval_107
 #print axioms cramer_primeGapExplicit_107
 #print axioms cramer_primeInClosedInterval_107
+#print axioms cramer_cmsPrimeInterval
+#print axioms cramer_cmsPrimeGap
