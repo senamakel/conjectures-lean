@@ -10,5 +10,10 @@ name = "Ankeny"
 git = "https://github.com/senamakel/ankeny-grh.git"
 rev = "4f00a7395c7d290e5953ca9605472178a77758e6"
 
+[[require]]
+name = "LLS"
+git = "https://github.com/senamakel/lls-grh.git"
+rev = "8a2924f396d9926167818c93253f7faa3807a434"
+
 [[lean_lib]]
 name = "Erdos770"
