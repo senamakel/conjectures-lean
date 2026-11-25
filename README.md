@@ -5,10 +5,11 @@ hypothesis, and `Unconditional/` proves all three unconditionally with the certi
 of RH (L. Alpöge, 2026).
 
 The first is the prime-gap bound (Cramér 1920, *Arkiv för Matematik, Astronomi och Fysik* **15**,
-no. 5), with an explicit constant. Every interval `(x, x + (107/100)√x log x]` with `x ≥ 2`
-contains a prime, so `p_{n+1} − p_n ≤ 1.07 √p_n log p_n` for every `n` and
-`p_{n+1} − p_n = O(√p_n log p_n)`. The constant `1.07` is below Dudek's `4/π ≈ 1.273`. (The
-earlier versions, with constants `2` and `3/2`, are kept.)
+no. 5) with the best explicit constant in the literature, Carneiro–Milinovich–Soundararajan's
+`22/25` (2019, Theorem 5): every interval `[x, x + (22/25)√x log x]` with `x ≥ 4` contains a
+prime, so `p_{n+1} − p_n ≤ (22/25)√p_n log p_n` for every prime `p_n > 3` and
+`p_{n+1} − p_n = O(√p_n log p_n)`. (The earlier versions, with constants `107/100`, `3/2` and
+`2` on `(x, x + c√x log x]`, `x ≥ 2`, are kept.)
 
 The second is the mean square of `ψ(x) − x` (Cramér 1922, *Ein Mittelwertsatz in der
 Primzahltheorie*, *Math. Z.* **12**, 147-153; Montgomery–Vaughan, *Multiplicative Number
@@ -26,8 +27,9 @@ are due to Dudek (2015, *Int. J. Number Theory* **11**, 771-778; a prime in
 Dudek–Grenié–Molteni (2016, *Int. J. Number Theory* **12**, 1391-1407, Theorem 1.1: half-width
 `(1/2 + 2/log x)√x log x` for `x ≥ 2`) and Carneiro–Milinovich–Soundararajan (2019,
 *Comment. Math. Helv.* **94**, 533-568, Theorem 5: a prime in `[x, x + (22/25)√x log x]` for
-`x ≥ 4`, so `p_{n+1} − p_n ≤ (22/25) √p_n log p_n` for `p_n > 3`). Our constant is `107/100`;
-see "Deviations".
+`x ≥ 4`, so `p_{n+1} − p_n ≤ (22/25) √p_n log p_n` for `p_n > 3`). Our `22/25` theorem has
+their statement and range; the proof follows theirs, with a different weight and Brun–Titchmarsh
+from the large sieve (see "Deviations").
 Without RH the best gap exponent is Baker–Harman–Pintz (2001), `O(p_n^{0.525})`. The mean-square
 bound is Cramér's; Brent–Platt–Trudgian (2022, *J. Number Theory* **238**, 740-762) give the
 constant `0.8603` for `lim sup X^{-2} ∫_X^{2X}`. The asymptotic `∼ c₁ log X` goes back to Cramér
@@ -37,9 +39,12 @@ statement and the convention for multiplicities against Brent–Platt–Trudgian
 Cramér's 1936 conjecture
 `p_{n+1} − p_n = O(log² p_n)` is a separate, stronger statement and is not proved here.
 
-The main library is a complete Lean proof that RH implies Cramér's bounds. The gap bound follows
-Cramér (1920) through a triangular (Fejér-type) weight, the second difference of `ψ₁`; the
-constant `107/100` comes from bounding each zero's contribution by its size
+The main library is a complete Lean proof that RH implies Cramér's bounds. The `22/25` bound
+follows Carneiro–Milinovich–Soundararajan: a weight that extends past the interval and is
+negative there, the primes outside the gap bounded by Montgomery–Vaughan's large-sieve
+Brun–Titchmarsh inequality, the zero sum bounded through Rosser's `N(T)` and a step majorant
+certified on 7076 cells. The earlier gap bounds follow Cramér (1920) through a triangular
+(Fejér-type) weight, the second difference of `ψ₁`; the constant `107/100` comes from bounding each zero's contribution by its size
 `h²m^{−1/2} sin²x/x²` (`x = γh/2m`, `m` the centre of the interval) up to an `O(h/(mx))` error,
 and majorising that by 53 pairs of Lorentzians centred at `±τ`, which Hadamard's product at
 complex points sums exactly. The mean
@@ -47,6 +52,13 @@ square goes through the explicit formula and the convergence of `Σ_ρ log|γ|/|
 classical proof:
 
 ```lean
+theorem Cramer.cmsPrimeInterval_of_RH (hRH : RiemannHypothesis) : Cramer.CMSPrimeInterval
+
+theorem Cramer.cmsPrimeGap_of_RH (hRH : RiemannHypothesis) : Cramer.CMSPrimeGap
+
+theorem Cramer.primeInShortInterval_cms_of_RH (hRH : RiemannHypothesis) {x : ℝ} (hx : 5 ≤ x) :
+    ∃ p : ℕ, p.Prime ∧ x < p ∧ (p : ℝ) ≤ x + 22 / 25 * Real.sqrt x * Real.log x
+
 theorem Cramer.primeInShortInterval_107_of_RH (hRH : RiemannHypothesis) :
     Cramer.PrimeInShortInterval (107 / 100)
 
@@ -104,7 +116,8 @@ def PrimeGapExplicit (c : ℝ) : Prop :=
 The Carneiro–Milinovich–Soundararajan form, fixed in `Cramer/Statement4.lean` (Theorem 5 of
 arXiv:1708.04122, read in the arXiv source). Their interval is closed and starts at `x = 4`;
 `PrimeInShortInterval (22/25)` would be false (`(2, 2.86…]` holds no prime), so the paper's form
-has its own definition. `CMSPrimeInterval` and `CMSPrimeGap` are the targets; neither is proved:
+has its own definition. `CMSPrimeInterval` and `CMSPrimeGap` are the targets, both proved
+(`cmsPrimeInterval_of_RH`, `cmsPrimeGap_of_RH`):
 
 ```lean
 def PrimeInClosedInterval (x₀ c : ℝ) : Prop :=
@@ -158,6 +171,11 @@ asserts convergence of the series, so `cramerConstant` is not `∑'`'s junk valu
 
 | Theorem | Tier | Hypothesis |
 |---|---|---|
+| `Cramer.cmsPrimeInterval_of_RH` | C | `RiemannHypothesis` (Mathlib's statement) |
+| `Cramer.cmsPrimeGap_of_RH` | C | `RiemannHypothesis` |
+| `Cramer.primeInShortInterval_cms_of_RH` | C | `RiemannHypothesis` |
+| `cramer_cmsPrimeInterval` (`Unconditional/`) | U | none; RH from riemann-hypothesis |
+| `cramer_cmsPrimeGap` (`Unconditional/`) | U | none; RH from riemann-hypothesis |
 | `Cramer.primeInShortInterval_107_of_RH` | C | `RiemannHypothesis` (Mathlib's statement) |
 | `Cramer.primeGapExplicit_107_of_RH` | C | `RiemannHypothesis` |
 | `Cramer.primeInClosedInterval_107_of_RH` | C | `RiemannHypothesis` |
@@ -190,7 +208,9 @@ asserts convergence of the series, so `cramerConstant` is not `∑'`'s junk valu
 and `CramerGapBound` is the conclusion of `cramer_conjecture.variants.conditional_rh` in
 [`FormalConjectures/Wikipedia/CramerConjecture.lean`](https://github.com/google-deepmind/formal-conjectures/blob/86a2f58a4d7a3a0637d15d5b2ce627592b54b956/FormalConjectures/Wikipedia/CramerConjecture.lean)
 (commit `86a2f58a`), whose hypothesis is Mathlib's `RiemannHypothesis`, as here. The explicit
-forms `PrimeInShortInterval` and `PrimeGapExplicit` are this repository's own, and so are the
+forms `PrimeInShortInterval` and `PrimeGapExplicit` are this repository's own; `CMSPrimeInterval`
+and `CMSPrimeGap` transcribe Carneiro–Milinovich–Soundararajan's Theorem 5 and the sentence
+before it (formal-conjectures has no statement of either). So are the
 four mean-square statements: formal-conjectures has no mean-square statement for `ψ`
 (searched 2026-11-24 at `9097e2f9`). The main library
 takes RH as a hypothesis and never imports riemann-hypothesis. There are no tier-H inputs. The
@@ -216,13 +236,17 @@ there from Mathlib and erdos-985.
 'Cramer.primeInShortInterval_107_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Cramer.primeGapExplicit_107_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Cramer.primeInClosedInterval_107_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Cramer.cmsPrimeInterval_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Cramer.cmsPrimeGap_of_RH' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
-`scripts/check-axioms.sh` reruns this and fails unless all thirteen use only the standard axioms.
+`scripts/check-axioms.sh` reruns this and fails unless all fifteen use only the standard axioms.
 No `sorry`, no `native_decide`, no `axiom` declarations. The finite checks (`Cramer/Small.lean`,
 `Cramer/Sharp/Small.lean`, `Cramer/Shift/Small.lean`, `Cramer/Shift/Data.lean`,
-`Cramer/Shift/Facts.lean`) use kernel `decide` (`decide +kernel` for the prime chains and the
-4033 majorant cells) and `norm_num`, which add no axioms.
+`Cramer/Shift/Facts.lean`, `Cramer/CMS/Small.lean`, `Cramer/CMS/ZeroBound.lean`,
+`Cramer/CMS/PrimeSide.lean` and the 708 modules `CramerCompute/CMSData/W*.lean`) use kernel
+`decide` (`decide +kernel` for the prime chains, the 4033 majorant cells and the 7076 CMS
+cells) and `norm_num`, which add no axioms.
 
 ## Proof outline
 
@@ -248,6 +272,49 @@ product for `ξ`.
 8. For `2 ≤ x < 10^6`: a chain of 99 primes from 2 to 1005161 with checked gaps
    (`Cramer/Small.lean`).
 9. Assembly (`Cramer/Main.lean`).
+
+### Constant `22/25` (Carneiro–Milinovich–Soundararajan)
+
+Files are in `Cramer/CMS/` and `CramerCompute/`. The weight has knots `n_j = B + js`,
+`j = 0, …, 32`, `s = 8s'`; it is `w(n) = Σ_j a_j max(n_j − n, 0)`, `a_j` the second differences of
+integers `c_j` (`φ` at scale `2^20`, symmetric about `j = 16`, `Σ c_j = 11989718`,
+`Σ |a_j| = 740648`). It is positive on the gap `[n_8, n_24)` and negative outside.
+
+1. **Explicit formula** (`Weight.lean`). `Σ_n Λ(n) w(n) = Σ_j a_j Ψ₁(n_j)`, and under RH
+   `Σ_j a_j Ψ₁(n_j) ≥ s² Σ c_j − Z − (3/2) Σ |a_j|` whenever
+   `Σ_ρ m_ρ ‖Σ_j a_j g_ρ(n_j)‖ ≤ Z`, `g_ρ(t) = t^{ρ+1}/(ρ(ρ+1))` (erdos-985's explicit formula).
+2. **Per zero** (`PerZero.lean`, `Trig.lean`). With `m = n_16`, `θ = γs/m`,
+   `‖Σ_j a_j g_ρ(n_j)‖ ≤ s² m^{−1/2}(A(θ)/θ² + errors)`, `A(θ) = (2 − 2cos θ)|Q(cos θ)|`, `Q` a
+   degree-16 polynomial with integer Chebyshev coefficients; three forms (`θ ≤ 1`, decaying like
+   `θ^{−2}`, trivial).
+3. **Cells** (`Taylor.lean`, `Cells.lean`, `CramerCompute/CMSCheck.lean`). 7076 cells cover
+   `θ ∈ [0, 120]`; on each, `cos` is enclosed by Taylor polynomials of degree 13/14 after
+   reduction by `3.14159265358979323846 < π < 3.14159265358979323847`, `|Q|` by an exact Taylor
+   shift at the midpoint, all in integer arithmetic (scales `2^20`, `2^64`, `2^40`). The checks
+   run by kernel `decide` in 708 Lean-core-only modules of 11 cells each (`CramerCompute/CMSData/`),
+   glued in `Glue.lean`, `CramerCompute/CMSAll.lean`; `chk_sound` proves the check sound.
+4. **Zero sum** (`ZeroSum.lean`, `Assembly.lean`, `ZeroBound.lean`). Abel summation of the step
+   majorant against Rosser's `N(T)` (schoenfeld-rh's `rosserZeroCount`), and
+   `Σ_{γ>T} m_ρ/γ² ≤ τ(T)/T` beyond `θ = 120`:
+   `Z ≤ s² m^{−1/2} Zc(s/m)` (`zeroBound`), with `Zc` explicit in the certified sums.
+5. **Brun–Titchmarsh** (`BrunTitchmarsh.lean`). For `√(2N/3) ≤ M₀`, the primes in
+   `(M₀, M₀ + N]` number at most `N/W(√(2N/3))`, `W(R) ≥ log(R − 1) + 1/2 − log 2`: Montgomery's
+   inequality and the weighted large sieve over the Farey points (vendored, see Credits).
+6. **Prime side** (`PrimeSide.lean`). If no prime lies in the gap,
+   `Σ Λ(n) w(n) ≤ s'² log n_32 · 18838744/W + s' · 8388608 · (prime powers)`, from step 5 on each
+   of the 128 pieces of length `s'` outside the gap (16 segments, 8 pieces each).
+7. **Analytic range** (`Final.lean`, `FinalPoly.lean`, `Large.lean`). For `x ≥ 10^8`,
+   `s' = ⌊(q − 2)/128⌋`, `q = (22/25)√x log x`, `B = ⌊x⌋ + 1 − 64s'`, so the gap lies in
+   `(x, x + q]`. With `t = log x`, every term is bounded by a rational function of `t`, and the
+   contradiction is `Mb + EVb + Cb + BTb + PPt + 11 < 11989718` (`final_poly`), whose numerator
+   has positive coefficients in `t − 18`. Margin: `2.4·10^6` at `t = 18`, `1.0·10^5` (0.9%) as
+   `t → ∞`.
+8. **Finite range** (`Small.lean`). A chain of 1426 primes from 5 to 100044563 with
+   `q_{i+1} − q_i ≤ (22/25)√q_i log q_i` (`scripts/cms_chain.py`); `x ∈ [4, 5)` takes `p = 5`.
+9. Assembly (`Cramer/Main6.lean`). The prime found is `> x` for `x ≥ 5`
+   (`primeInShortInterval_cms_of_RH`), which gives the gap form.
+
+The data generators are in `scripts/cms/` (pipeline in `scripts/cms_gen.py`).
 
 ### Constant `3/2`
 
@@ -405,6 +472,26 @@ mean square uniformly in `δ`.
 | `Cramer/Shift/Facts.lean` | Step 3, 5: the checked facts about `maj107` |
 | `Cramer/Shift/Small.lean` | Step 7: the 1176-prime chain (generated) |
 | `Cramer/Main5.lean` | Headline theorems (constant `107/100`) |
+| `Cramer/CMS/Weight.lean` | Constant `22/25`, Step 1: the weight and its explicit formula |
+| `Cramer/CMS/PerZero.lean` | Step 2: the three per-zero bounds |
+| `Cramer/CMS/Trig.lean` | Step 2: `‖Σ a_j e^{ijθ}‖ = (2 − 2cos θ)|Q(cos θ)|` |
+| `Cramer/CMS/Taylor.lean` | Step 3: `cos` Taylor enclosures |
+| `Cramer/CMS/Cells.lean` | Step 3: soundness of the integer cell check |
+| `Cramer/CMS/Glue.lean` | Step 3: gluing the checked windows |
+| `CramerCompute/CMSCheck.lean` | Step 3: the cell check (Lean core only) |
+| `CramerCompute/CMSData/` | Step 3: `Q` and 708 windows of 11 cells, each checked by `decide` (generated) |
+| `CramerCompute/CMSAll.lean` | Step 3: the glued windows and their sums (generated) |
+| `Cramer/CMS/ZeroSum.lean` | Step 4: Abel summation against Rosser's `N(T)`, the tail |
+| `Cramer/CMS/Assembly.lean` | Step 4: the zero sum from the cells |
+| `Cramer/CMS/ZeroBound.lean` | Step 4: `zeroBound` with the certified constants |
+| `Cramer/CMS/BrunTitchmarsh.lean` | Step 5 |
+| `Cramer/CMS/PrimeSide.lean` | Step 6 |
+| `Cramer/CMS/Final.lean` | Step 7: each term as a function of `t = log x` |
+| `Cramer/CMS/FinalPoly.lean` | Step 7: the closing polynomial inequality |
+| `Cramer/CMS/Large.lean` | Step 7 (`x ≥ 10^8`) |
+| `Cramer/CMS/Small.lean` | Step 8: the 1426-prime chain (generated) |
+| `Cramer/Main6.lean` | Headline theorems (constant `22/25`) |
+| `Cramer/Vendor/LS/` | Montgomery's inequality and the weighted large sieve, vendored from calr3/ternary-goldbach |
 | `Cramer/Statement2.lean` | Mean-square target definitions (fixed) |
 | `Cramer/MeanSquare/Coeff.lean` | Mean square, Step 1 |
 | `Cramer/MeanSquare/Explicit.lean` | Mean square, Step 2 |
@@ -423,54 +510,31 @@ mean square uniformly in `δ`.
 
 ## Deviations from the literature
 
-### Constant `107/100` instead of `22/25`
+### Constant `22/25`: the route differs from Carneiro–Milinovich–Soundararajan's
 
-We prove `107/100 = 1.07`; Carneiro–Milinovich–Soundararajan prove `22/25 = 0.88` (for `x ≥ 4`,
-closed interval), Dudek–Grenié–Molteni `1 + 4/log x` and Dudek `4/π ≈ 1.273` (both as total
-interval lengths in units of `√x log x`). `1.07` is below Dudek's constant, and below
-`1 + 4/log x` for `x < e^{57}`; for larger `x` Dudek–Grenié–Molteni's interval is shorter.
-`22/25` is not proved here.
+`cmsPrimeInterval_of_RH` is their Theorem 5 with their constant `22/25`, their closed interval and
+their range `x ≥ 4`; `cmsPrimeGap_of_RH` is the gap form for `p_n > 3`. The proof follows their
+strategy (a weight that is negative outside the interval, Brun–Titchmarsh for the primes there,
+an explicit `N(T)` for the zeros) but not their details:
 
-Where the constant comes from. All three versions use the triangular weight on `[a, a+2h]`, whose
-transform at a zero is `‖D_ρ‖ ≈ h²m^{−1/2} sin²x/x²`, `x = γh/2m`, and sum over zeros through
-Hadamard's product, which sums a Lorentzian exactly. With zero density `(1/2π) log T`, a
-Lorentzian majorant `M(x) ≥ sin²x/x²` gives the constant `∫M/π` (`∫ sin²x/x² = π` would give
-`1`).
-
-* Constant `2` (`Cramer/ZeroSum.lean`): `‖D_ρ‖ ≤ min(A, B/γ²)`, one Lorentzian, `∫M = 2π`.
-* Constant `3/2` (`Cramer/Sharp/`): one centred Lorentzian above `sin²x/x²` for `x² ≤ 2`,
-  `∫M = (3/2)π`. Mixtures of centred Lorentzians cannot beat `≈ 1.4492`.
-* Constant `107/100` (`Cramer/Shift/`): Lorentzians centred at `±τ` (Hadamard at complex
-  points), which can follow the zeros of `sin²x`, and the centred error bound, which keeps the
-  error `O(ε/x)`. The linear program gives `∫M/π = 1.0671` with `σ ≥ 0.15`, `τ ≤ 12` and a 0.4%
-  safety margin; `107/100` leaves 0.3% for the finite range of `x`.
-
-Sized next steps, none proved here:
-
-| Route | Constant | What it needs |
+| | Carneiro–Milinovich–Soundararajan | here |
 |---|---|---|
-| Narrower shifted Lorentzians (`σ ≥ 0.1`) | `≈ 1.064` | more terms and cells; same proof |
-| Piecewise-linear weight, 3 knots, shifted Lorentzians | `≈ 1.05` (LP, `σ ≤ 4`) | the explicit formula for 5-point second differences of `Ψ₁`, the centred bound for them, two-sided `sin²` enclosures |
-| Triangle weight, exact zero density | `→ 1.0` | an explicit `N(T)`: schoenfeld-rh now proves Rosser's, at the cost of about 95,000 vendored lines |
-| Piecewise-linear weights, exact zero density | `→ 0.925` | the above; `0.925` is the floor of `∫|ŵ|/(4π∫w)` over weights supported in the interval |
-| Carneiro–Milinovich–Soundararajan | `22/25` | weights negative outside the interval, paid for by an explicit Brun–Titchmarsh inequality |
+| Weight | band-limited extremal function, explicit formula of their Lemma 9 | piecewise-linear, 33 knots, second differences of `Ψ₁` (erdos-985's explicit formula) |
+| Extremal ratio | `1/J(F) < 22/25` | LP optimum `J = 1.1569`, `1/J = 0.8644`; certified zero-sum constant `0.5%` above the exact one |
+| Brun–Titchmarsh | Montgomery–Vaughan, `π(x+y) − π(x) < 2y/log y` | the large-sieve form `N/W(√(2N/3))`, `W(R) ≥ log(R − 1) + 1/2 − log 2` |
+| `N(T)` | Trudgian's (their Lemma 10) | Rosser's (schoenfeld-rh `rosserZeroCount`) |
+| Analytic range | `x ≥ 4·10^18` | `x ≥ 10^8` |
+| Below it | the gap computation of Oliveira e Silva, Herzog and Pardi | a chain of 1426 primes checked in Lean |
 
-So `22/25` is out of reach of any weight supported in `[x, x + c√x log x]`: such weights stop at
-`≈ 0.925`. CMS go below by letting the weight extend past the interval and bounding the primes
-there with Montgomery–Vaughan's `π(x+y) − π(x) < 2y/log y`. Their proof needs (i) the
-explicit formula for their band-limited kernel (their Lemma 9, for
-`Σ Λ(n)n^{−1/2}cos(ϑ log(a/n))`; erdos-985 has the explicit formula only for `Ψ₁`-type weights),
-(ii) an explicit `N(T)` (their Lemma 10 is Trudgian's; Rosser's, now in schoenfeld-rh,
-`|N(T) − (T/2π)log(T/2πe) − 7/8| < 0.137 log T + 0.443 log log T + 1.588`, would do), (iii) the
-Brun–Titchmarsh inequality (large sieve or Selberg sieve; not in Mathlib) and (iv) a certified
-value of their extremal ratio `J(F) ≥ 25/22`. They assume `x ≥ 4·10^18` only to cover the rest
-with the gap computation of Oliveira e Silva, Herzog and Pardi. Their final inequality,
-`(cJ/2) log x ≤ ½ log x − log((c log 2/2) log x) + 1.16 + E(x)`, is contradictory as soon as
-`log(0.305 log x) > 1.16 + E(x)`, where `E(x)` collects the prime-power and discretisation terms
-they bounded using `x ≥ 4·10^18`; with those terms recomputed at finite `x` (the prime powers cost
-`≈ 2(log x + 1)³/(log 2 · √x)`) the analytic part would work from about `x ≈ 3·10^9`, and the
-range below needs a chain of about 5,700 primes, well within reach of the kernel checks used here.
-That sizing is ours, not CMS's, and is not checked in Lean.
+The weight was found by a linear program (`scripts/cms/design2.py`). Without the
+Brun–Titchmarsh term its optimum is `J ≈ 1.0835` (constant `≈ 0.923`, above `22/25`); with it,
+and 8 sub-pieces per segment, `J = 1.1569`. The final margin is `0.9%` of the main term as
+`x → ∞` and larger below.
+
+The earlier constants. `107/100` (`Cramer/Shift/`), `3/2` (`Cramer/Sharp/`) and `2` use the
+triangular weight on `[a, a+2h]`, whose transform at a zero is `‖D_ρ‖ ≈ h²m^{−1/2} sin²x/x²`,
+`x = γh/2m`, summed over zeros through Hadamard's product with a Lorentzian majorant `M`
+(constant `∫M/π`). Weights supported inside the interval cannot go below about `0.925`.
 
 ### Mean square: `O`-constants and the asymptotic's error term
 
@@ -491,6 +555,11 @@ For `3/2` the threshold comes from the error in the sharp bound: `h/a ≤ 1/400`
 polynomial inequality of Step 3, i.e. `√x/log x ≳ 300`, and `x ≥ 6.4·10^7` (`t = x^{1/6} ≥ 20`)
 makes Step 5 clean. Below it the 696-prime chain checks every gap; no cited computation remains.
 
+For `22/25` the threshold `10^8` is where the explicit terms (Rosser's error term, the
+prime powers, the discretisation of the weight) fit inside the `0.9%` margin with the simple
+bounds of `Cramer/CMS/Final.lean` (`u = √x ≥ 29(log x)²`, `x^{1/6} ≥ 3.3(log x − 12)`). Below
+it the 1426-prime chain checks every gap.
+
 For `107/100` the threshold `10^8` comes from the majorant, which is checked for `ε = h/m ≤ 1/800`;
 `ε ≈ 0.535 log x/√x` drops below `1/800` near `6·10^7`. The exact inequality of Step 6 holds with
 a wide margin from `10^6` on. Below `10^8` the 1176-prime chain checks every gap.
@@ -498,7 +567,8 @@ a wide margin from `10^6` on. Below `10^8` the 1176-prime chain checks every gap
 ## Building
 
 Lean `v4.36.0`, Mathlib `fc4f59e5` (via erdos-985 `9538edb`); erdos-233 at `1ff9f39` for the
-mean square.
+mean square; schoenfeld-rh at `b2c3137` for Rosser's `N(T)` (constant `22/25`). Building
+schoenfeld-rh's vendored Rosser proof from cold costs about 3 CPU-hours.
 
 ```
 lake exe cache get
@@ -529,15 +599,23 @@ The constant-`107/100` modules (Round 8, same box, load average about 80): `Cram
 `Cramer.Vendor.Digamma` about 10 s, the others under 40 s each; `lake build` of the whole
 library after adding them took 7 min 7 s wall.
 
+The constant-`22/25` modules (Round 9, 2026-11-25, same box under load): the 708 window modules
+`CramerCompute.CMSData.W*` took about 3260 s of summed module time (kernel `decide`, 11 cells
+each; one window per module because kernel time grows faster than linearly within a module),
+`CramerCompute.CMSAll` 7 s, `Cramer.CMS.Small` 146 s (the 1426-entry chain and its primality
+proofs).
+
 ## Unconditional version
 
-`Unconditional/CramerUnconditional.lean` proves Cramér's gap bound with constant `107/100` (and `3/2`, `2`) and his
+`Unconditional/CramerUnconditional.lean` proves Cramér's gap bound with Carneiro–Milinovich–Soundararajan's constant `22/25` (and `107/100`, `3/2`, `2`) and his
 mean-square bounds and asymptotic unconditionally in Lean, with the certified proof of RH. It imports
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
 (commit `507a75d91d`) and discharges the hypothesis with `riemannHypothesis`:
 
 | Theorem | Statement | Axioms |
 |---|---|---|
+| `cramer_cmsPrimeInterval` | `Cramer.CMSPrimeInterval` | `propext`, `Classical.choice`, `Quot.sound` |
+| `cramer_cmsPrimeGap` | `Cramer.CMSPrimeGap` | `propext`, `Classical.choice`, `Quot.sound` |
 | `cramer_primeInShortInterval_107` | `Cramer.PrimeInShortInterval (107 / 100)` | `propext`, `Classical.choice`, `Quot.sound` |
 | `cramer_primeGapExplicit_107` | `Cramer.PrimeGapExplicit (107 / 100)` | `propext`, `Classical.choice`, `Quot.sound` |
 | `cramer_primeInClosedInterval_107` | `Cramer.PrimeInClosedInterval 2 (107 / 100)` | `propext`, `Classical.choice`, `Quot.sound` |
@@ -608,4 +686,16 @@ This check links against the community build cache and does not repeat those ker
   `TernaryGoldbach/Explicit/Digamma.lean` at commit `330a61c7`, Copyright 2026 Charlie Reams,
   Apache License 2.0; the licence and NOTICE are in `Cramer/Vendor/`. Changes: namespace, the
   file stops at `re_digamma_le`, two `fun_prop` continuity steps written out for this Mathlib pin.
+* `Cramer/Vendor/LS/` (7 files): Montgomery's inequality (`montgomery_ineq`), the
+  Montgomery–Vaughan weighted large sieve (`large_sieve_weighted`, with Shan's spacing lemma and
+  the Hilbert-inequality files behind it) and `Σ_{n ≤ t} 1/n ≤ Σ_{r ≤ t squarefree} 1/φ(r)`,
+  vendored from [calr3/ternary-goldbach](https://github.com/calr3/ternary-goldbach) at commit
+  `330a61c`, Copyright 2026 Charlie Reams, Apache License 2.0 (licence and NOTICE in
+  `Cramer/Vendor/`). Namespace renamed, one proof repair; file list and changes in
+  `Cramer/Vendor/LS/PORTING.md`. `Cramer/CMS/BrunTitchmarsh.lean` copies `frac_sep` and
+  `le_dist_round_of_forall` from the same commit's `TernaryGoldbach/MinorArcs/TypeII.lean`.
+* [schoenfeld-rh](https://github.com/senamakel/schoenfeld-rh) (`b2c3137`, lake dependency,
+  constant `22/25` only): `rosserZeroCount` (Rosser's `N(T)`), the zero-sum lemmas of
+  `Schoenfeld.ZeroSums` used for the tail, and the exponential `e` of its vendored
+  `TernaryGoldbach.CircleMethod`. Same author; its vendored files carry their own licences.
 * Nothing is vendored from riemann-hypothesis; it is imported only by `Unconditional/`.
