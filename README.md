@@ -1,36 +1,31 @@
-# Montgomery–Vaughan's and Axer's bounds for squarefree and k-free numbers under RH in Lean
+# Montgomery–Vaughan's bound for squarefree and k-free numbers under RH in Lean
 
-Let `Q_k(x)` count the `k`-free integers up to `x` and `E_k(x) = Q_k(x) − x/ζ(k)`; for `k = 2`,
-`Q = Q_2` counts the squarefree integers and `E(x) = Q(x) − (6/π²)x`. This repository proves
-Montgomery and Vaughan's bound `E_k(x) = O(x^{1/(k+1)+ε})` for every `k ≥ 2` and every
-`ε > 0`, in particular `E(x) = O(x^{1/3+ε})`, together with Axer's earlier bounds
-`E(x) = O(x^{2/5+ε})` and `E_k(x) = O(x^{2/(2k+1)+ε})`. `Unconditional/` proves all of them
-unconditionally in Lean, with RH supplied by the certified proof of L. Alpöge in
-[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
-The main library holds a complete Lean proof that RH implies them.
+Let `Q_k(x)` count the `k`-free integers up to `x` and `E_k(x) = Q_k(x) − x/ζ(k)`. For `k = 2`,
+`Q = Q_2` counts the squarefree integers and `E(x) = Q(x) − (6/π²)x`. This repository proves in
+Lean that RH implies Montgomery and Vaughan's bound `E_k(x) = O(x^{1/(k+1)+ε})` for every
+`k ≥ 2` and every `ε > 0`, and in particular `E(x) = O(x^{1/3+ε})` for squarefree numbers
+(`MV.montgomeryVaughan_of_RH`, `MV.squarefreeError_mv_of_RH`). `Unconditional/` closes the
+hypothesis with the certified proof of RH in
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis),
+so `montgomeryVaughan_unconditional` and `squarefreeError_mv_unconditional` prove both bounds
+unconditionally in Lean. The library also proves Axer's earlier bounds `E(x) = O(x^{2/5+ε})`
+and `E_k(x) = O(x^{2/(2k+1)+ε})`, with RH as a hypothesis and unconditionally.
 
-The squarefree bound is Axer's theorem (1911) under RH (label **RH-consequence**). The
-attribution comes from Montgomery–Vaughan, *Multiplicative Number Theory I*, Exercise 13.2.1.14,
-read through a secondary source; Axer's paper was not read. The proof is the reduction of
-Exercise 6.2.1.8 there (`E(x)` in terms of the Mertens function) plus Littlewood's bound
-`M(x) = O(x^{1/2+ε})` under RH. Unconditionally the best known bound is `E(x) ≪ x^{1/2−o(1)}`
-(Walfisz, 1963). Published RH exponents go down to `11/35` (see "Deviations from the
-literature"). Erdős Problem 969, which asks for the true order of `E(x)` (probably `x^{1/4}`),
-is open under RH as well, and this repository does not settle it.
-
-For every `k ≥ 2` let `Q_k(x)` count the `k`-free integers up to `x` and
-`E_k(x) = Q_k(x) − x/ζ(k)`. At `k = 2` the bound `x^{2/(2k+1)+ε}` is the `2/5` above. The
-exponent is Axer's (1911, label **RH-consequence**); Montgomery and Vaughan (*The distribution
-of squarefree numbers*, Recent Progress in Analytic Number Theory, Vol. 1, Durham 1979, Academic
-Press 1981, pp. 247-256) lowered it under RH to `1/(k+1)` (label **RH-consequence**), and this
-repository proves their bound, `MontgomeryVaughanBound k` for every `k ≥ 2`. The attributions
-are as quoted by Pappalardi (*A survey on k-freeness*, 2003, §1) and Meng (arXiv:1408.0429,
-§1); the shape of the Montgomery–Vaughan argument (their Theorem 1, the Dirichlet series
-`ζ(s) ∑_{d>y} μ(d) d^{-ks}` and RH bounds for `ζ` and `1/ζ`) is taken from K. J. Powell,
-*Topics in Analytic Number Theory* (BYU thesis, 2009), §2; the paper itself was not read.
-Unconditionally,
-`E_k(x) ≪ x^{1/k} exp(−c k^{−8/5} (log x)^{3/5} (log log x)^{−1/5})` (Walfisz 1963, as quoted by
-Meng).
+**Status in the literature.** RH-consequence. The bound `1/(k+1)` is Montgomery and Vaughan's,
+*The distribution of squarefree numbers*, Recent Progress in Analytic Number Theory, Vol. 1
+(Durham 1979), Academic Press 1981, pp. 247-256, as quoted by Pappalardi (*A survey on
+k-freeness*, 2003, §1) and Meng (arXiv:1408.0429, §1). The shape of their argument (Theorem 1,
+the Dirichlet series `ζ(s) ∑_{d>y} μ(d) d^{-ks}` and RH bounds for `ζ` and `1/ζ`) is taken from
+K. J. Powell, *Topics in Analytic Number Theory* (BYU thesis, 2009), §2; the 1981 paper was not
+read. Axer's exponents (1911, also RH-consequences) are attributed through Montgomery–Vaughan,
+*Multiplicative Number Theory I*, Exercise 13.2.1.14, read through a secondary source, and
+proved by the reduction of Exercise 6.2.1.8 there plus Littlewood's bound
+`M(x) = O(x^{1/2+ε})` under RH. The proof of RH is L. Alpöge's, certified by the Lean FRO and
+the Mathlib Initiative on 2026-11-21. Unconditionally the best known bounds are
+`E(x) ≪ x^{1/2−o(1)}` and
+`E_k(x) ≪ x^{1/k} exp(−c k^{−8/5} (log x)^{3/5} (log log x)^{−1/5})` (Walfisz 1963, the second as
+quoted by Meng). Erdős Problem 969 asks for the true order of `E(x)` (probably `x^{1/4}`). It is
+open under RH as well, and these bounds do not settle it.
 
 The main library is a complete Lean proof that RH implies these bounds, following
 Montgomery–Vaughan (1981) and Axer (1911):
@@ -93,7 +88,7 @@ theorem Erdos969.KFree.kFreeError_le {k : ℕ} (hk : 2 ≤ k) {K α : ℝ} (hα0
     ∃ C : ℝ, 0 ≤ C ∧ ∀ N : ℕ, 1 ≤ N →
       |Erdos969.kFreeCountingError k N| ≤ C * (N : ℝ) ^ (1 / ((k : ℝ) + 1 - α))
 
--- consistency: at k = 2 the new target is the old one
+-- consistency: at k = 2 the k-free target is the squarefree one
 theorem Erdos969.KFree.axerKFreeBound_two_iff : Erdos969.AxerKFreeBound 2 ↔ Erdos969.AxerBound
 ```
 
@@ -166,8 +161,9 @@ own. `Powerfree` is copied word for word from formal-conjectures,
 [`FormalConjecturesForMathlib/Algebra/Powerfree.lean`](https://github.com/google-deepmind/formal-conjectures/blob/9097e2f90e66d2f6244209cb1c07f7120d17ec53/FormalConjecturesForMathlib/Algebra/Powerfree.lean)
 (commit `9097e2f9`), placed in the `Erdos969` namespace; formal-conjectures has no statement on
 the count of `k`-free numbers, so `kFreeCounting`, `kFreeCountingError`, `AxerKFreeBound` and
-`MontgomeryVaughanBound` are this repository's own. The main library takes RH as a hypothesis and never imports riemann-hypothesis. The Mertens
-bound comes from [mertens-rh](https://github.com/senamakel/mertens-rh) (`98c6eab`,
+`MontgomeryVaughanBound` are this repository's own. The main library takes RH as a hypothesis
+and never imports riemann-hypothesis. The Mertens bound comes from
+[mertens-rh](https://github.com/senamakel/mertens-rh) (`98c6eab`,
 `Mertens.abs_mertens_nat_le`), which proves it from RH. The Montgomery–Vaughan proof uses
 mertens-rh's `1/ζ ≪ |t|^ε` (`Mertens.norm_invZ_le`), its contour shift and Cesàro-difference
 lemmas, erdos-985's weighted Perron formula, and lindelof-rh's logarithm of `ζ` (for
@@ -236,6 +232,14 @@ The full plan is in [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
    `N^{1/(k+1)+6ε}` (`MV/Main.lean`). This is Montgomery–Vaughan's Theorem 1 with the sawtooth
    sum bounded trivially by `Y`.
 
+Montgomery and Vaughan apply a Perron formula to
+`ζ(s)∑_{d>y} μ(d)d^{−ks}` and compute residues (as summarised by Powell 2009). This repository
+uses a Cesàro-weighted Perron formula instead, takes the difference of the means at `N+1` and
+`N` to recover the sharp sum, removes the pole at `s = 1` by subtracting the constant
+`G_Y(k)` from the coefficients, and gets the uniform bound for the tail of `1/ζ` from a twisted
+Littlewood bound plus partial summation. The theorem proved is the same; the constants are
+existential.
+
 ## Layout
 
 | File | Content |
@@ -258,34 +262,19 @@ The full plan is in [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
 
 ## Deviations from the literature
 
-**Exponent `2/5`; the best published RH exponent is `11/35`.** Published RH exponents are `1/3`,
-`9/28` (Montgomery–Vaughan 1981), `8/25` (Graham 1981), `7/22` (Baker–Pintz 1985), `17/54` (Jia
-1993) and `11/35` (H.-Q. Liu, *J. Number Theory* **159** (2016)), the last being the best known.
-This repository proves Axer's `2/5`. The method gives `1/(3−α)` from `M(x) ≪ x^α`, which is `2/5` at
-`α = 1/2`. Every better published exponent needs exponential-sum estimates (a truncated Fourier
-expansion of the sawtooth function, van der Corput's method, exponent pairs, a Vaughan-type
-decomposition of `μ`), none of which is in Mathlib. The order `x^{1/4}` that would settle
-Erdős 969 is not known under RH by any method.
+For squarefree numbers this repository proves the exponent `1/3`, the `k = 2` case of
+Montgomery–Vaughan's general bound. In the same paper Montgomery and Vaughan reach `9/28` for
+`k = 2` by bounding the sawtooth sum `∑_{d≤Y} μ(d)ψ(x/d²)` with exponential sums. Later RH
+exponents are `8/25` (Graham 1981), `7/22` (Baker–Pintz 1985), `17/54` (Jia 1993) and `11/35`
+(H.-Q. Liu, *J. Number Theory* 159 (2016)), the best known; for `k ≥ 3`, Graham–Pintz and
+Baker–Powell improve on `1/(k+1)`. All of these work on the same sawtooth sum, which is bounded
+trivially by `Y` here. They need a truncated Fourier expansion of `ψ` and van der Corput or
+exponent-pair estimates, which Mathlib does not have at this pin. No method gives the order
+`x^{1/4}` under RH.
 
-**Squarefree numbers: exponent `1/3`; Montgomery–Vaughan's own `9/28` and later exponents are
-not proved.** For `k = 2` this repository proves `1/3`, the `k = 2` case of the general
-Montgomery–Vaughan bound. In the same paper they reach `9/28` for `k = 2` by bounding the
-sawtooth sum `∑_{d≤Y} μ(d)ψ(x/d²)` with exponential sums, and every later exponent (`8/25`,
-`7/22`, `17/54`, `11/35`) and every improvement on `1/(k+1)` for `k ≥ 3` (Graham–Pintz,
-Baker–Powell) works on that same sum. Here it is bounded trivially by `Y`. Those estimates need a
-truncated Fourier expansion of `ψ` and van der Corput or exponent-pair bounds, none of which is
-in Mathlib at this pin.
-
-**The analytic route.** Montgomery and Vaughan apply a Perron formula to
-`ζ(s)∑_{d>y} μ(d)d^{−ks}` and compute residues (as summarised by Powell 2009). This repository
-uses a Cesàro-weighted Perron formula instead, takes the difference of the means at `N+1` and
-`N` to recover the sharp sum, removes the pole at `s = 1` by subtracting the constant
-`G_Y(k)` from the coefficients, and gets the uniform bound for the tail of `1/ζ` from a twisted
-Littlewood bound plus partial summation. The theorem proved is the same; the constants are
-existential.
-
-**`x^{2/5+ε}` rather than `x^{2/5}`.** The Mertens bound `M(x) = O(x^{1/2+ε})` costs an `ε`, which
-passes to the exponent. Whether the textbook exercise has an `ε` or a logarithm was not checked.
+Every bound here carries `+ε` in the exponent, because the Mertens bound
+`M(x) = O(x^{1/2+ε})` does, and every constant is existential. For Axer's `x^{2/5+ε}`, whether
+the textbook exercise states it with an `ε` or with a power of `log x` was not checked.
 
 ## Building
 
@@ -301,7 +290,7 @@ A clean build of the four `Erdos969` modules (mertens-rh and erdos-985 already b
 75 s for `Hyperbola`, 60 s for `Main`; most of that was queueing). No module is expensive.
 The five `k`-free modules (`Statement2`, `KFree.*`) built one at a time on 2026-11-24 at load
 average about 80, each in under 40 s. The four `MV.*` modules built one at a time on
-2026-11-24 at load average about 75, each in 11–35 s; `lake build` of the whole library with
+2026-11-24 at load average about 75, each in 11 to 35 s; `lake build` of the whole library with
 everything else cached took 34 s wall.
 
 ## Unconditional version
