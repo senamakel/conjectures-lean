@@ -138,3 +138,24 @@ bound has a margin of about `0.004` at `q = 10¹⁰`.
    `lcp_eq_zero_of_le`) and `goodP_ge_3000` (`IvR.goodP_rough` for `3000 ≤ q < 4096`, then the
    existing intervals and tail).
 
+
+## LLS Theorem 1.4 with the paper's bound (round 10)
+
+1. `LLS.Thm14.leastPrimeInCoset_of_GRH : GRH → LeastPrimeInCoset` (`LLS/Thm14/Main.lean`):
+   `u = h − 1`, `B = Bf u (log q)`, `s = max 31622 ⌊B⌋₊`, `N = ⌊7072s/10000⌋ + 1` (so
+   `s² ≤ 2N²`). If no prime `p ≤ s²` lies in `aH`, `main_ineq` holds, and `reduce` with
+   `star_small` (`B < 31622`) or `star_large` (`B ≥ 31622`) contradicts it. `omega_le`:
+   `ω(q) ≤ 10 + log q/log 30`; `llp_le_two`; `card_Htil_le`.
+2. `LLS.Thm14.Htil`, `card_Htil_le`, `sum_Htil_unit`, `sum_Htil_coset`,
+   `re_sum_Htil_ne_one_ge` (`Orth.lean`), from `CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity`
+   and `CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity` on `G ⧸ H`.
+3. `LLS.Thm14.psiLog_le` (`PsiUp.lean`): `Σ_{n ≤ x} Λ(n) log(x/n) ≤ x + (3/20)√x + 4 log x + 2`.
+   `LLS.Thm14.sum_sq_pp_le` (`Squares.lean`): the prime powers `p^k ≤ s²`, `k ≥ 2`, through
+   `halfPow n = p^{⌊k/2⌋}`, injective on even and on odd exponents.
+4. `LLS.Thm14.norm_logGamma_le`, `norm_shiftGamma_le` (`Gamma.lean`); `shift_complex`,
+   `maxV_le`, `norm_logSum_le` (`Prim.lean`).
+5. `LLS.Thm14.norm_diff_le`, `prime_cost`, `bad_cost`, `norm_logSum_char` (`PerChar.lean`).
+6. `LLS.Thm14.main_ineq` (`Assembly.lean`).
+7. `LLS.Thm14.reduce`, `reduceR`, `Pc_le` (`Reduce.lean`); `Bf`, `Phi2`, `cell_of`, `lam_of`
+   (`CellCore.lean`); `Cells.box_all` (`Cells.lean`, 65 nodes, 33 leaves); `tail_u`, `tail_L`
+   (`Tails.lean`); `phi2_all`, `star_small`, `star_large` (`Elim.lean`).

@@ -14,6 +14,10 @@ This repository proves in Lean, following LLS:
   `ℓ ≤ (log q + B(q))²` (part 1, `LLS.LeastPrimeOutsideSubgroup`); and if no prime below
   `(log q)²` divides `q`, some prime `ℓ ≤ (log q)²` lies outside `H` (part 2,
   `LLS.LeastPrimeOutsideSubgroupRough`). Both use no finite computation over `q`.
+- LLS Theorem 1.4 exactly as stated: for every `q ≥ 20000`, every subgroup `H` of `(ℤ/q)ˣ` of
+  index `h > 1` and every coset `aH`, the least prime in `aH` is `≤ 10⁹` or
+  `≤ ((h − 1) log q + 3(h + 1) + (5/2)(log log q)²)²` (`LLS.LeastPrimeInCoset`). No finite
+  computation over `q` or `h`.
 - LLS Corollary 1.2 exactly as stated: for every prime `q ≥ 5` there is a quadratic non-residue
   `≤ (log q)²`.
 - Bach's subgroup bound with Bach's own constant `2` (Bach, *Explicit bounds for primality
@@ -36,15 +40,16 @@ The main library is a complete Lean proof that GRH implies each of these. `Uncon
 proves all of them unconditionally in Lean, with GRH supplied by the certified proof of
 L. Alpöge in
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
-Literature status: RH-consequence. Theorem 1.1, Corollary 1.2, Theorem 1.5 and Corollary 1.3
-carry the paper's own constants; Theorem 1.4 (cosets) is not proved, see "Deviations from the
-literature". Bounds `h(−q) ≪ √q log log q` and
+Literature status: RH-consequence. Theorems 1.1, 1.4, 1.5 and Corollaries 1.2, 1.3 carry the
+paper's own constants and thresholds, so every theorem of the paper is proved as stated. Bounds `h(−q) ≪ √q log log q` and
 `h(−q) ≫ √q/log log q` under GRH go back to Littlewood (*On the class-number of the corpus
 P(√−k)*, Proc. London Math. Soc. (2) 27 (1928) 358–372), in asymptotic form. Unconditionally the
 upper bound `h(−q) ≪ √q log q` is elementary, and the best lower bounds are Siegel's ineffective
 `h(−q) ≫_ε q^{1/2−ε}` and an effective bound of order `log q` (Goldfeld, Gross–Zagier, Oesterlé).
 
 ```lean
+theorem LLS.Thm14.leastPrimeInCoset_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
+    LeastPrimeInCoset
 theorem LLS.Thm11.leastPrimeOutsideSubgroup_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
     LeastPrimeOutsideSubgroup
 theorem LLS.Thm11.leastPrimeOutsideSubgroupRough_of_GRH
@@ -100,6 +105,12 @@ def LLS.LeastPrimeOutsideSubgroupRough : Prop :=
     ∀ H : Subgroup (ZMod q)ˣ, H ≠ ⊤ →
       ∃ ℓ : ℕ, ℓ.Prime ∧ ∃ hℓ : ℓ.Coprime q,
         ZMod.unitOfCoprime ℓ hℓ ∉ H ∧ (ℓ : ℝ) ≤ log q ^ 2
+def LLS.LeastPrimeInCoset : Prop :=
+  ∀ q : ℕ, 20000 ≤ q → ∀ H : Subgroup (ZMod q)ˣ, 1 < H.index → ∀ a : (ZMod q)ˣ,
+    ∃ p : ℕ, p.Prime ∧ ∃ hp : p.Coprime q, a⁻¹ * ZMod.unitOfCoprime p hp ∈ H ∧
+      ((p : ℝ) ≤ 10 ^ 9 ∨
+        (p : ℝ) ≤ ((H.index - 1 : ℝ) * log q + 3 * (H.index + 1 : ℝ)
+          + 5 / 2 * log (log q) ^ 2) ^ 2)
 def LLS.LeastNonresidueBelowLogSq : Prop :=
   ∀ q : ℕ, q.Prime → 5 ≤ q →
     ∃ n : ℕ, 0 < n ∧ (n : ℝ) ≤ log q ^ 2 ∧ ¬ IsSquare (n : ZMod q)
@@ -159,6 +170,7 @@ def LLS.ClassNumberLowerBoundWith (C : ℝ) : Prop :=
 
 | Theorem | Tier | Hypotheses |
 |---|---|---|
+| `Thm14.leastPrimeInCoset_of_GRH` | C (U in `Unconditional/`) | GRH |
 | `Thm11.leastPrimeOutsideSubgroup_of_GRH`, `Thm11.leastPrimeOutsideSubgroupRough_of_GRH` | C (U in `Unconditional/`) | GRH |
 | `leastNonresidueBelowLogSq_of_GRH` | C (U in `Unconditional/`) | GRH |
 | `bach_of_GRH`, `leastNonresidue_of_GRH`, `miller_of_GRH` | C (U in `Unconditional/`) | GRH |
@@ -178,10 +190,16 @@ with the Kronecker symbol characterised by `χ(n) = J(−q | n)` at odd `n`. It 
 (Dirichlet 1839), not a conjecture; Mathlib does not have it at this pin. It is written with
 Mathlib objects only, and is the conclusion of riemann-hypothesis's
 `GlobalTheory.LFunction_one_and_mean_log_eta` with that repository's `IsKroneckerChar` unfolded.
-No other hypothesis appears. `LLS/Statement.lean` also fixes Theorem 1.4
-(`LeastPrimeInCoset`), which is not proved here.
+No other hypothesis appears.
 
 ## Axioms
+
+Real output of `#print axioms` for Theorem 1.4 (2026-11-25, `lake env lean Axioms.lean` after
+`lake build`; no `native_decide`):
+
+```
+'LLS.Thm14.leastPrimeInCoset_of_GRH' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
 
 Real output of `#print axioms` for Theorem 1.1 (2026-11-24, after `lake build LLS`; no
 `native_decide`):
@@ -293,6 +311,43 @@ cores).
 ## Proof outline
 
 The full blueprint, with every step as a Lean statement, is in [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
+
+**Theorem 1.4** (`LLS/Thm14/`). Let `q ≥ 20000`, `L = log q`, `u = h − 1 ≥ 1`,
+`B = uL + 3(u + 2) + (5/2)(log L)²` (the paper's bound), `s = max(31622, ⌊B⌋)`, `X = s²`,
+`l = log X`. Since `31622² < 10⁹` and `⌊B⌋² ≤ B²`, a prime `p ≤ X` in `aH` proves the theorem;
+suppose there is none.
+
+1. `Orth.lean`: `H̃` = the characters trivial on `H`, `m = |H̃| ≤ h` (they inject into the
+   characters of `G/H`), and `Σ_{χ ∈ H̃} χ(a⁻¹)χ(n) = m·1[n ∈ aH]` (Mathlib's duality for finite
+   abelian groups). So `m Σ_{n ≤ X, n ∈ aH} Λ(n) log(X/n) = Σ_{χ ∈ H̃} χ(a⁻¹) S(X, χ)`.
+2. `Squares.lean`, `PsiUp.lean`: with no prime in `aH`, the left sum only sees `p^k`, `k ≥ 2`;
+   writing `p^k = m²` or `m²p` (`m = p^{⌊k/2⌋}`) bounds it by `2ψ₁(s) + 2ψ₁(⌈s/√2⌉)`, and
+   `ψ₁(y) = Σ_{n ≤ y} Λ(n) log(y/n) ≤ y + (3/20)√y + 4 log y + 2` under GRH (summation by parts
+   from erdos-985's principal sum). This is about `3.42 s` (LLS: `2.2 s`).
+3. `Gamma.lean`, `Prim.lean`: for `ψ` primitive mod `f`, absolute-value forms of LLS (4.4)–(4.6):
+   `|S(X, ψ)| ≤ (s + 1)Z₂ + |V'| l + ½ l max(log f − 3, l + 2) + 5/4`, where
+   `V' = ½ log f + D(1, ψ⁻¹)` (LLS's `ξ'/ξ(0, ψ)`) satisfies
+   `max(|V|, |V'|)(1 − 1/100 − 2/10) ≤ ½ log f (0.99) + P₂(100) + 1.5` from the shifted Cesàro
+   identity at `x = 100`, so `|V'| ≤ 0.627 log f + 5.93`. The gamma part is real and lies in
+   `[−l²/2 − 0.861 l, … + ½]` (even) or `[−1.554 l, … + 5/4]` (odd).
+4. `PerChar.lean`: for `χ ≠ 1` mod `q` induced by `ψ`, `|S(X, χ)| ≤ Pc − 2A Re S'(X, χ)` with
+   `A = (s + 1)/(1 − 1/s)²` and `Pc = A((1 − 1/X)L − 1.72 + log 2 + O(1/X)) + l²
+   + (0.627L + 5.93)l + ½ l max(L − 3, l + 2) + 5/4` (up to the exact `(l − ½ log p)²/2` terms). The primes `p ∣ q`, `p ∤ f` are charged at full price
+   (`|ψ(p)| ≤ 1`, nothing assumed about `ψ(p)`) and paid back by `log f ≤ log q − Σ log p`; only
+   `2` and `3` keep a positive cost.
+5. `Assembly.lean`: `Re S(X, χ₀) ≥ X − 0.15s − 3l − 3 − Σ_{p ∣ q} llp`, and
+   `Σ_{χ ∈ H̃, χ ≠ 1} Re S'(X, χ) ≥ −P₂(X)` since `Re Σ_{χ ≠ 1} χ(n) ≥ −1`. Together
+   (`main_ineq`): `X − 0.15s − 3l − 3 − Σ llp ≤ m Tup + (m − 1)Pc + 2A P₂(X)`.
+6. `Reduce.lean`: with `m ≤ h`, `ω(q) ≤ 10 + L/log 30`, `P₂(X) ≤ l − 1 − γ + 0.25/s + 12/X`,
+   this is impossible once
+   `s(s − uL) > s(3.42 + 2.391u + 3.127l) + u(1.5l² + 22.93l + 21.25) + 5l² + 9l + 3 + 0.147l²L` (★).
+7. `Elim.lean`: if `B < 31622` (`s = 31622`), (★) reduces to `31622 − uL > 68.3 + 2.43u + 0.002L`,
+   which follows from `B < 31622` after splitting at `L = 128, 1000, 4000`. If `B ≥ 31622`
+   (`B − 1 < s ≤ B`, so `s − uL > 3u + 5 + 2.5(log L)²`), (★) follows from
+   `Phi2(u, L, log B) ≤ 0.609u + 1.58 + 2.5(log L)²`: 33 boxes for `u ≤ 10⁵`, `L ≤ 10³⁰`
+   (`Cells.lean`, `scripts/emit_thm14.py`, 8 of them outside `B ≥ 31622`) and two tails
+   (`Tails.lean`). Smallest slack in (★), in units of `√X`: `68.9` (at `h ≈ 55`,
+   `log q ≈ 600`, the smallest `√X` above `31622`); smallest certified box margin: `7.0`.
 
 **Theorem 1.1 with the paper's `B(q)`** (`LLS/Thm11/`). Let `q ≥ 3000`, `L = log q`,
 `ω = ω(q)`, `σ = Σ_{p ∣ q} log p/(p − 1)`, `x = ⌊(L + B(q))²⌋`, `s = √x`, `l = log x`,
@@ -475,6 +530,12 @@ in `H`, a character `χ ≠ 1` trivial on `H` would be `1` on every `n ≤ x` pr
 | `LLS/Thm11/Common.lean`, `Rough.lean`, `IntervalsR.lean` | Losses at primes `p ≥ x`, the character from `H`; Theorem 1.1 (2) |
 | `LLS/Thm11/Budget.lean`, `Elim.lean` | The budget with `max(0, ·)`; eliminating `ω(q)` and `σ(q)` |
 | `LLS/Thm11/NumCore.lean`, `Boxes.lean`, `Tail.lean`, `Main.lean` | The one-variable bounds; Theorem 1.1 (1) |
+| `LLS/Thm14/Orth.lean` | Characters trivial on `H`: `|H̃| ≤ [G : H]`, the coset indicator |
+| `LLS/Thm14/PsiUp.lean`, `Squares.lean` | `ψ₁(y) ≤ y + (3/20)√y + 4 log y + 2`; prime powers `p^k ≤ s²`, `k ≥ 2` |
+| `LLS/Thm14/Gamma.lean`, `Prim.lean` | Absolute-value bounds for a primitive character (gamma parts, `|D(1, ψ)|`, `|S(X, ψ)|`) |
+| `LLS/Thm14/PerChar.lean`, `Assembly.lean` | One non-principal character; the main inequality |
+| `LLS/Thm14/Reduce.lean`, `CellCore.lean`, `Cells.lean`, `Tails.lean`, `Elim.lean` | Elimination in `h`, `log q`, `X` |
+| `LLS/Thm14/Main.lean` | Theorem 1.4 |
 | `scripts/*.py` | Generators for the certificates and the sizing computations |
 
 ## Deviations from the literature
@@ -522,18 +583,25 @@ in `H`, a character `χ ≠ 1` trivial on `H` would be `1` on every `n ≤ x` pr
   discriminant `−q`, `q ≥ 10¹⁰` (`LLS.Sharp.classNumberUpperBound_of_GRH_of_formula`,
   `…LowerBound…`), from Theorem 1.5 and Dirichlet's class number formula (tier H in the main
   library, discharged in `Unconditional/`). The forms with additive constant `5` remain.
-* Theorem 1.4 (cosets) is not proved. An estimate by hand of its proof with the constants
-  available here (principal sum `x − 0.15√x − …`, squares bounded by Chebyshev's
-  `ψ(y) ≤ y log 4`, `|D(1, χ̃)| ≤ 0.14 log q̃ + O(1)` from Lemma 2.3 at `x = 100`) leaves
-  `√X ≤ (h − 1) log q + 1.3h + 3.2 log X + O(1)` against the target
-  `(h − 1) log q + 3(h + 1) + (5/2)(log log q)²`, so the paper's constants look reachable. What is
-  missing in Lean: orthogonality over the characters trivial on `H`
-  (`Σ_χ χ̄(a)χ(n) = h·1_{n ∈ aH}`), absolute-value (not real-part) bounds for the log-weighted
-  explicit formula and for `D(1, χ̃)`, an upper bound for `Σ_{n≤y} Λ(n) log(y/n)`, the bound
-  `2^{ω(q)} ≤ q^{3/7}` for `q > 20000`, and a final inequality in `h`, `log q` and `X`.
+* Theorem 1.4 is proved as stated, for every `q ≥ 20000` and `h > 1`, with no computation
+  over `q` or `h`. Our intermediate constants are weaker than the paper's and the margin
+  covers it: the principal sum is `X − 0.15√X − 3 log X − 3` (LLS: `X − √X/20 − …`); the squares
+  `p^{2k}` and the odd powers `p^{2k+1}` are bounded by `2ψ₁(s) + 2ψ₁(⌈s/√2⌉) ≈ 3.42√X`
+  (LLS: `2.2√X`), using no Chebyshev-type input beyond GRH; `|ξ'/ξ(0, χ̃)| ≤ 0.627 log q̃ + 5.93`
+  (LLS (4.6): `(2/3) log(q/π) + 4`); and `ω(q) ≤ 10 + log q/log 30` replaces
+  `2^{ω(q)} ≤ q^{3/7}`. In return the cancellation of `(h − 1) log q · √X` is exact (LLS round
+  `√X + 19/6`), the gamma parts are bounded per parity, and the per-character constant is
+  `A(−1.72 + log 2)` with `A ≈ √X + 3`. As in Theorem 1.1, LLS's proof uses
+  `Re Σ Λ(n)χ̃(n)/n (1 − n/X) ≥ Re Σ Λ(n)χ(n)/n (1 − n/X) − Σ_{p ∣ q/q̃} log p/(p − 1)`, which
+  holds since it bounds the difference by absolute values; here every such step uses only
+  `|χ̃(p)| ≤ 1` at primes `p ∣ q`, `p ∤ q̃`.
 * Corollary 1.2 is proved exactly as stated (`LeastNonresidueBelowLogSq`).
 
 ## Building
+
+Theorem 1.4 alone: `lake build LLS.Thm14.Main` (from the warm cache each module of
+`LLS/Thm14/` is under a minute: `Cells` about 20 s, `Reduce` 35 s, `Tails` 30 s; no
+`native_decide`).
 
 Theorem 1.1 alone: `lake build LLS.Thm11.Main` (from the warm cache: `IntervalsR` 93 s,
 `NumCore` 22 s, `Boxes` 15 s, `Tail` 22 s, the rest under 30 s each; no `native_decide`).
@@ -561,6 +629,7 @@ with no hypothesis left.
 
 | Theorem | Statement | Axioms |
 |---|---|---|
+| `leastPrimeInCoset_unconditional` | `LLS.LeastPrimeInCoset` | standard three |
 | `leastPrimeOutsideSubgroup_unconditional` | `LLS.LeastPrimeOutsideSubgroup` | standard three |
 | `leastPrimeOutsideSubgroupRough_unconditional` | `LLS.LeastPrimeOutsideSubgroupRough` | standard three |
 | `leastNonresidueBelowLogSq_unconditional` | `LLS.LeastNonresidueBelowLogSq` | standard three |
@@ -653,6 +722,13 @@ above and:
 ```
 'leastPrimeOutsideSubgroup_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
 'leastPrimeOutsideSubgroupRough_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
+
+The rerun on branch `round10` (2026-11-25) printed the same lines for all twenty theorems above
+and:
+
+```
+'leastPrimeInCoset_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 ```bash
