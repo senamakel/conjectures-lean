@@ -642,9 +642,9 @@ the asymptotic unconditionally in Lean, with the certified proof of RH. It impor
 scripts/check-unconditional.sh [RH_DIR]
 ```
 
-Run on 2026-11-24 against riemann-hypothesis `507a75d91d` (cache build, not `RH_FULL_BUILD`),
-library and `Unconditional/` as of cramer-rh commit `3ab896d` (constant `107/100`
-included); 14 min 31 s wall, most of it restoring and loading the RH cache. Output:
+Run on 2026-11-25 against riemann-hypothesis `507a75d91d` (cache build, not `RH_FULL_BUILD`),
+library and `Unconditional/` as of cramer-rh commit `fb22f0a` (constant `22/25` included);
+about 40 min wall on a loaded box, most of it restoring and loading the RH cache. Output:
 
 ```
 'cramer_primeInShortInterval' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -660,6 +660,8 @@ included); 14 min 31 s wall, most of it restoring and loading the RH cache. Outp
 'cramer_primeInShortInterval_107' depends on axioms: [propext, Classical.choice, Quot.sound]
 'cramer_primeGapExplicit_107' depends on axioms: [propext, Classical.choice, Quot.sound]
 'cramer_primeInClosedInterval_107' depends on axioms: [propext, Classical.choice, Quot.sound]
+'cramer_cmsPrimeInterval' depends on axioms: [propext, Classical.choice, Quot.sound]
+'cramer_cmsPrimeGap' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 The import needs about 93 GB of cache, about 19 GB of RAM and roughly 900k open files (raise the
