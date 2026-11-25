@@ -89,6 +89,9 @@ theorem leastPrimeOutsideSubgroup_unconditional : LLS.LeastPrimeOutsideSubgroup 
 theorem leastPrimeOutsideSubgroupRough_unconditional : LLS.LeastPrimeOutsideSubgroupRough :=
   LLS.Thm11.leastPrimeOutsideSubgroupRough_of_GRH LFunction_ne_zero_of_half_lt_re
 
+theorem leastPrimeInCoset_unconditional : LLS.LeastPrimeInCoset :=
+  LLS.Thm14.leastPrimeInCoset_of_GRH LFunction_ne_zero_of_half_lt_re
+
 #print axioms leastNonresidueBelowLogSq_unconditional
 #print axioms bach_unconditional
 #print axioms leastNonresidue_unconditional
@@ -109,3 +112,4 @@ theorem leastPrimeOutsideSubgroupRough_unconditional : LLS.LeastPrimeOutsideSubg
 #print axioms classNumberLowerBound_unconditional
 #print axioms leastPrimeOutsideSubgroup_unconditional
 #print axioms leastPrimeOutsideSubgroupRough_unconditional
+#print axioms leastPrimeInCoset_unconditional
