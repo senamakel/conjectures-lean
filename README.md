@@ -644,7 +644,7 @@ scripts/check-unconditional.sh [RH_DIR]
 
 Run on 2026-11-25 against riemann-hypothesis `507a75d91d` (cache build, not `RH_FULL_BUILD`),
 library and `Unconditional/` as of cramer-rh commit `fb22f0a` (constant `22/25` included);
-about 40 min wall on a loaded box, most of it restoring and loading the RH cache. Output:
+about 15 min wall on a loaded box, most of it restoring and loading the RH cache. Output:
 
 ```
 'cramer_primeInShortInterval' depends on axioms: [propext, Classical.choice, Quot.sound]
