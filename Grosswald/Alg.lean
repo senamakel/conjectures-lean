@@ -2,11 +2,12 @@ import Grosswald.Analytic
 import Grosswald.Crit
 import Grosswald.Combi
 import Erdos985.Compute.Checker
+import Grosswald.LeafSound
 
 /-!
 # Algorithm 1 of MTT as a verified checker
 
-A node `(n, X, Y)` stands for the primes `p > 2.5·10^15` with `ω(p - 1) = n`, every `q ∈ X`
+A node `(n, X, Y)` stands for the primes `p > 10^13` with `ω(p - 1) = n`, every `q ∈ X`
 dividing `p - 1` and no `q ∈ Y` dividing `p - 1`. For such `p`:
 
 * *lower bound*: `p ≥ 1 + ∏ L`, `L` = the first `n` primes outside `Y` (`Combi`);
@@ -26,11 +27,11 @@ namespace Grosswald.Alg
 
 open Erdos985.Compute (powMod smallPrimes)
 
-/-- `2.5·10^15 + 1`. -/
-def LOW : ℕ := 2500000000000001
+/-- `10^13 + 1`. Below it, `Grosswald/Direct/` checks every prime directly. -/
+def LOW : ℕ := 10000000000001
 
-/-- Split while more than this many `k` remain. -/
-def LIM : ℕ := 1000000
+/-- Split while more than this many `k` remain (heuristic, tuned per `n = ω(p - 1)`). -/
+def LIM (n : ℕ) : ℕ := if n ≤ 8 then 100000000 else if n ≤ 10 then 10000000 else 1000000
 
 /-- The primes below `2000`. -/
 def primesList : List ℕ := (List.range 2000).filter (fun q => Nat.Prime q)
@@ -110,13 +111,14 @@ def checkRange (f : ℕ → Bool) : ℕ → ℕ → Bool
   | _, 0 => true
   | lo, c + 1 => f lo && checkRange f (lo + 1) c
 
-/-- Enumerate a leaf. -/
-def enumOk (n : ℕ) (X Y : List ℕ) (lo up : ℕ) : Bool :=
+/-- Enumerate a leaf: every `p = k ∏X + 1` in `[lo, up)`, checked natively by
+`GrosswaldCompute.leafOk` (soundness: `Grosswald.Leaf.leafOk_sound`). -/
+def enumOk (_n : ℕ) (X Y : List ℕ) (lo up : ℕ) : Bool :=
   let prodX := X.prod
   let k0 := (lo - 1) / prodX
   let k1 := (up - 1) / prodX
-  decide X.Nodup && X.all (fun q => decide (Nat.Prime q)) &&
-    checkRange (candOk n X Y prodX) k0 (k1 + 1 - k0)
+  decide X.Nodup && X.all (fun q => decide (Nat.Prime q)) && decide (up < 2 ^ 64) &&
+    GrosswaldCompute.leafOk X Y prodX k0 (k1 + 1 - k0)
 
 /-- The next prime not in `X ∪ Y` (heuristic). -/
 def nextPrime (X Y : List ℕ) : ℕ := (primesList.find? (fun q => q ∉ X && q ∉ Y)).getD 2
@@ -132,7 +134,7 @@ def checkNode (n : ℕ) : ℕ → List ℕ → List ℕ → Bool
     | none => false
     | some (lo, up) =>
       decide (up ≤ lo) ||
-        if LIM < (up - lo) / X.prod then
+        if LIM n < (up - lo) / X.prod then
           checkNode n f (nextPrime X Y :: X) Y && checkNode n f X (nextPrime X Y :: Y)
         else enumOk n X Y lo up
 
@@ -140,7 +142,7 @@ def checkNode (n : ℕ) : ℕ → List ℕ → List ℕ → Bool
 
 /-- The primes covered by a node. -/
 def InClass (n : ℕ) (X Y : List ℕ) (p : ℕ) : Prop :=
-  p.Prime ∧ 2500000000000000 < p ∧ (p - 1).primeFactors.card = n ∧ (∀ q ∈ X, q ∣ p - 1) ∧
+  p.Prime ∧ 10000000000000 < p ∧ (p - 1).primeFactors.card = n ∧ (∀ q ∈ X, q ∣ p - 1) ∧
     ∀ q ∈ Y, ¬ q ∣ p - 1
 
 /-- `p` violates every admissible sieve inequality (what GRH gives when `p` is a
@@ -366,7 +368,7 @@ lemma candOk_sound {n k : ℕ} {X Y : List ℕ} {p : ℕ} (h : candOk n X Y X.pr
 lemma enumOk_sound {n lo up : ℕ} {X Y : List ℕ} {p : ℕ} (h : enumOk n X Y lo up = true)
     (hp : InClass n X Y p) (hlo : lo ≤ p) (hup : p < up) : HasSmallPrimePrimitiveRoot p := by
   simp only [enumOk, Bool.and_eq_true, decide_eq_true_eq, List.all_eq_true] at h
-  obtain ⟨⟨hX, hXp⟩, hr⟩ := h
+  obtain ⟨⟨⟨hX, hXp⟩, h64⟩, hr⟩ := h
   have hXprod : X.prod = ∏ q ∈ X.toFinset, q := by rw [List.prod_toFinset _ hX, List.map_id']
   have hX0 : 0 < X.prod := by
     rw [hXprod]; exact Finset.prod_pos fun q hq => (hXp q (List.mem_toFinset.mp hq)).pos
@@ -377,11 +379,18 @@ lemma enumOk_sound {n lo up : ℕ} {X Y : List ℕ} {p : ℕ} (h : enumOk n X Y 
   obtain ⟨k, hk⟩ := hdvd
   have h2 := two_le_of_inClass hp
   have hpk : p = k * X.prod + 1 := by rw [mul_comm]; omega
-  apply candOk_sound _ hX hXp hp hpk
   have hk' : (p - 1) / X.prod = k := by rw [hk, Nat.mul_div_cancel_left _ hX0]
   have e1 : (lo - 1) / X.prod ≤ k := hk' ▸ Nat.div_le_div_right (by omega)
   have e2 : k ≤ (up - 1) / X.prod := hk' ▸ Nat.div_le_div_right (by omega)
-  exact checkRange_sound _ _ _ hr k e1 (by omega)
+  have hkp : k ≤ p := by
+    have : k ≤ k * X.prod := Nat.le_mul_of_pos_right _ hX0
+    omega
+  have := Grosswald.Leaf.leafOk_sound hr hXp rfl k e1
+    (by omega)
+  rw [hpk]
+  refine this (hpk ▸ hp.1) (by rw [← hpk]; have := hp.2.1; omega) ?_ (by omega)
+  intro q hq hqd
+  exact hp.2.2.2.2 q hq (by rw [hpk, Nat.add_sub_cancel]; exact hqd)
 
 /-- **Soundness of Algorithm 1.** -/
 theorem checkNode_sound (n : ℕ) : ∀ (fuel : ℕ) (X Y : List ℕ), checkNode n fuel X Y = true →

@@ -2,22 +2,19 @@ import Main      -- leanprover-community/riemann-hypothesis: `LFunction_ne_zero_
 import Grosswald.Main
 
 /-!
-# Grosswald's conjecture, with GRH supplied by the riemann-hypothesis repository
+# Grosswald's conjecture, given the riemann-hypothesis repository's proof of GRH
 
 Not part of the default build: it needs that project's compiled modules. Run
-`scripts/check-unconditional.sh`.
-
-The range `409 < p ≤ 2.5·10^15` remains the hypothesis `VerifiedUpTo` (the computation of
-Cohen, Oliveira e Silva and Trudgian); above it the result is unconditional.
+`scripts/check-unconditional.sh`. The proof of GRH in leanprover-community/riemann-hypothesis has
+not been independently verified.
 -/
 
+theorem grosswald : Grosswald.GrosswaldStatement :=
+  Grosswald.grosswald_of_GRH LFunction_ne_zero_of_half_lt_re
+
 theorem prime_primitive_root_large_unconditional :
-    ∀ p : ℕ, p.Prime → 2500000000000000 < p → Grosswald.HasSmallPrimePrimitiveRoot p :=
-  Grosswald.prime_primitive_root_of_GRH_large LFunction_ne_zero_of_half_lt_re
+    ∀ p : ℕ, p.Prime → 10000000000000 < p → Grosswald.HasSmallPrimePrimitiveRoot p :=
+  Grosswald.prime_primitive_root_of_GRH_above LFunction_ne_zero_of_half_lt_re
 
-theorem grosswald_of_verified (hcomp : Grosswald.VerifiedUpTo 2500000000000000) :
-    Grosswald.GrosswaldStatement :=
-  Grosswald.grosswald_of_GRH LFunction_ne_zero_of_half_lt_re hcomp
-
+#print axioms grosswald
 #print axioms prime_primitive_root_large_unconditional
-#print axioms grosswald_of_verified
