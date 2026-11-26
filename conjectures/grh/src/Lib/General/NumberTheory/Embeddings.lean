@@ -16,5 +16,7 @@ variable {E} [Field E] [IsTotallyComplex E]
   (Φ v)) := prod_fiberwise _ mk F ▸ by congr!; apply prod_eq_mul <;> grind [mk_Φ, mk_eq_iff]
 
 omit [IsTotallyComplex E] in
-lemma roots_map_conjugate (P : E[X]) σ : (P.map (conjugate σ)).roots = (P.map σ).roots.map star :=
-  (P.map_map ..).rec ((IsAlgClosed.splits _).roots_map _)
+lemma roots_map_conjugate (P : E[X]) σ : (P.map (conjugate σ)).roots = (P.map σ).roots.map star := by
+  rw [show conjugate σ = (starRingEnd ℂ).comp σ from rfl, ← P.map_map,
+    (IsAlgClosed.splits _).roots_map]
+  rfl
