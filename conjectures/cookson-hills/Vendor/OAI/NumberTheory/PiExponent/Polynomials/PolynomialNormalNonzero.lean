@@ -67,7 +67,7 @@ theorem ideal_eq_bot_of_pderiv_stable
       p.totalDegree = n → p ∈ Q → p = 0 := by
     intro n
     induction n using Nat.strong_induction_on with
-    | h n ih =>
+    | ind n ih =>
       intro p hdegree hp
       have hderiv : ∀ i, pderiv i p = 0 := by
         intro i

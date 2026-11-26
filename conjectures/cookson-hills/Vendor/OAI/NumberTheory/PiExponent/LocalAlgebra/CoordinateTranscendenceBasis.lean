@@ -165,7 +165,7 @@ theorem algebraicIndependent_of_pderiv_kernel (x : ι → E)
   apply algebraicIndependent_iff.mpr
   intro p
   induction hp : p.totalDegree using Nat.strong_induction_on generalizing p with
-  | h n ih =>
+  | ind n ih =>
     intro hz
     by_cases hn : n = 0
     · have he := totalDegree_eq_zero_iff_eq_C.mp (hp.trans hn)

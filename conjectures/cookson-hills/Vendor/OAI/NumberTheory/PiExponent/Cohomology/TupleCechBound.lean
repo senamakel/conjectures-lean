@@ -71,7 +71,7 @@ theorem fullSupport_primitives_aux (n : ℕ) :
       ∃ b : Cochain J A q, differential b = c ∧ FullSupport b := by
   classical
   induction n using Nat.strong_induction_on with
-  | h n ih =>
+  | ind n ih =>
     intro J _ hcard q hq c hc hsupport
     cases isEmpty_or_nonempty J with
     | inl hJ =>

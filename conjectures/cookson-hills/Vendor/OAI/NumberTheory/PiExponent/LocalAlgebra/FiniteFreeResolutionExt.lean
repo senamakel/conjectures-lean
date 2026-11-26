@@ -29,7 +29,7 @@ def projectiveResolutionOfExact (P : ChainComplex C ℕ) (M : C)
     cases n with
     | zero =>
       rw [ChainComplex.quasiIsoAt₀_iff,
-        ShortComplex.quasiIso_iff_of_zeros' _ (by simp; rfl) (by simp; rfl)
+        ShortComplex.quasiIso_iff_of_zeros' _ (by simp <;> rfl) (by simp <;> rfl)
           (by simp; rfl)]
       simpa [ChainComplex.toSingle₀Equiv] using! And.intro hzero hepi
     | succ n =>
