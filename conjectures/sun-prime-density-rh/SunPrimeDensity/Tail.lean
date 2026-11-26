@@ -88,7 +88,9 @@ theorem tail_core {x : ℝ} (hx : 10 ^ 10 ≤ x) :
     have h1 := log_le_div_exp_one hwpos
     have h2 : w / Real.exp 1 ≤ w / 2.7182818283 :=
       div_le_div_of_nonneg_left hw0 (by norm_num) he.le
-    rw [hLw]; nlinarith
+    have h3 : w / 2.7182818283 ≤ 0.36788 * w := by
+      rw [div_le_iff₀ (by norm_num)]; nlinarith
+    rw [hLw]; linarith
   have hL0 : 0 < Real.log x := Real.log_pos (by linarith)
   set L := Real.log x
   set Λ := 11.773 * w with hΛ
@@ -103,22 +105,17 @@ theorem tail_core {x : ℝ} (hx : 10 ^ 10 ≤ x) :
     div_le_div_of_nonneg_left (by linarith) (by positivity) (pow_le_pow_left₀ hL0.le hL 2)
   have hP := tail_poly hw2
   -- the polynomial inequality, divided by `4π Λ²`
+  rw [hws, ← hxw, ← hΛ] at hP
   have hmain : 2 * (1 / (8 * π) * (√x * Λ)) * (s + 4) < 4 * ((x - 2) / Λ ^ 2 - 2.886) := by
-    rw [← hsx, ← hws]
-    rw [← hws] at hxw
-    have hq : (x - 2) / Λ ^ 2 * Λ ^ 2 = x - 2 := by field_simp
-    set q := (x - 2) / Λ ^ 2
-    rw [hxw] at hq
-    rw [← hΛ] at hP
+    rw [← hsx]
     have hΛ2 : 0 < Λ ^ 2 := by positivity
-    have e : 2 * (1 / (8 * π) * ((w ^ 8) ^ 2 * Λ)) * (w ^ 8 + 4)
-        = (w ^ 8) ^ 2 * Λ * (w ^ 8 + 4) / (4 * π) := by field_simp; ring
-    rw [e, div_lt_iff₀ (by positivity)]
-    have key : ((w ^ 8) ^ 2 * Λ * (w ^ 8 + 4)) * Λ ^ 2 < (4 * (q - 2.886) * (4 * π)) * Λ ^ 2 := by
-      have : (4 * (q - 2.886) * (4 * π)) * Λ ^ 2 = 16 * π * (q * Λ ^ 2) - 46.18 * π * Λ ^ 2 - 0.000 * π * Λ ^ 2 := by ring
-      rw [this, hq]
-      nlinarith
-    exact lt_of_mul_lt_mul_right key hΛ2.le
+    have e1 : 2 * (1 / (8 * π) * (s ^ 2 * Λ)) * (s + 4) = s ^ 2 * Λ ^ 3 * (s + 4) / (4 * π * Λ ^ 2) := by
+      field_simp; ring
+    have e2 : 4 * ((x - 2) / Λ ^ 2 - 2.886) = (16 * π * (x - 2) - 46.176 * π * Λ ^ 2) / (4 * π * Λ ^ 2) := by
+      field_simp; ring
+    rw [e1, e2]
+    apply div_lt_div_of_pos_right _ (by positivity)
+    nlinarith [mul_pos hpi hΛ2]
   calc 2 * (1 / (8 * π) * (√x * L)) * (s + 4) ≤ _ := hlhs
     _ < _ := hmain
     _ ≤ 4 * ((x - 2) / L ^ 2 - 2.886) := by linarith
@@ -175,11 +172,17 @@ theorem tail (hS : SchoenfeldPi) {k n : ℕ} (hk : 4 ≤ k) (hn : 2 ≤ n) (hx :
   have hsy : 0 < √y := Real.sqrt_pos.mpr hy0
   -- `Ey/y ≤ Ex/x`
   have hEx : Ex / x = 1 / (8 * π) * (Real.log x / √x) := by
-    have : √x * √x = x := Real.mul_self_sqrt hx0.le
-    simp only [Ex]; field_simp; rw [← this]; ring
+    have h : √x * Real.log x / x = Real.log x / √x := by
+      rw [div_eq_div_iff hx0.ne' hsx.ne']
+      have := Real.mul_self_sqrt hx0.le
+      linear_combination Real.log x * this
+    simp only [Ex]; rw [mul_div_assoc, h]
   have hEy : Ey / y = 1 / (8 * π) * (Real.log y / √y) := by
-    have : √y * √y = y := Real.mul_self_sqrt hy0.le
-    simp only [Ey]; field_simp; rw [← this]; ring
+    have h : √y * Real.log y / y = Real.log y / √y := by
+      rw [div_eq_div_iff hy0.ne' hsy.ne']
+      have := Real.mul_self_sqrt hy0.le
+      linear_combination Real.log y * this
+    simp only [Ey]; rw [mul_div_assoc, h]
   have hmono : Ey / y ≤ Ex / x := by
     rw [hEx, hEy]
     exact mul_le_mul_of_nonneg_left (log_div_sqrt_anti hx0 hlx hxy.le) (by positivity)
@@ -209,7 +212,7 @@ theorem tail (hS : SchoenfeldPi) {k n : ℕ} (hk : 4 ≤ k) (hn : 2 ≤ n) (hx :
     have : 0 < 2 * Ex * (s + 4) := by positivity
     simp only [Dl]; nlinarith
   have hkey : Ex / x + Ey / y < (1 - x / y) * Dl / x := by
-    have h1 : 2 * Ex * (s + 4) < 4 * Dl := by simpa [mul_assoc] using hcore
+    have h1 : 2 * Ex * (s + 4) < 4 * Dl := hcore
     have h2 : 2 * (Ex / x) < 4 / (s + 4) * Dl / x := by
       rw [div_mul_eq_mul_div, div_div, lt_div_iff₀ (by positivity)]
       have e : 2 * (Ex / x) * ((s + 4) * x) = 2 * Ex * (s + 4) := by field_simp
