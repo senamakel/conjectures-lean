@@ -113,8 +113,9 @@ lemma doubling_of_parts {n : ℕ} (A B : Matrix (Fin n) (Fin n) ℝ)
       rw [ha, hb] <;> norm_num
   · rw [fromBlocks_transpose, fromBlocks_multiply, transpose_neg]
     simp only [Matrix.neg_mul, Matrix.mul_neg, neg_neg]
-    rw [hPP, add_comm ((A - B) * (A - B).transpose), hPP, hPQ, neg_add_cancel,
-      add_neg_cancel, ← fromBlocks_one, fromBlocks_smul, smul_zero]
+    rw [hPP, add_comm ((A - B) * (A - B).transpose), hPP, hPQ]
+    simp only [neg_add_cancel, add_neg_cancel]
+    rw [← fromBlocks_one, fromBlocks_smul, smul_zero]
 
 /-- **Turyn's doubling.** An `H(4, n)` matrix gives a real `2n × 2n` matrix with entries `±1`
 whose rows are orthogonal of norm `2n`. -/
@@ -144,7 +145,8 @@ lemma turyn_doubling {n : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (hM : IsButsonHa
     simp only [Matrix.conjTranspose_apply, Complex.mul_im, Complex.star_def, Complex.conj_re,
       Complex.conj_im, smul_eq_mul] at this
     simp only [Matrix.transpose_apply, Matrix.map_apply]
-    have h0 : ((n : ℂ) * (if i = j then 1 else 0)).im = 0 := by split_ifs <;> simp
+    have h0 : (n : ℂ).re * (if i = j then (1 : ℂ) else 0).im +
+        (n : ℂ).im * (if i = j then (1 : ℂ) else 0).re = 0 := by split_ifs <;> simp
     rw [h0] at this
     rw [← sub_eq_zero, ← Finset.sum_sub_distrib, ← this]
     exact Finset.sum_congr rfl (fun _ _ => by ring)
@@ -161,12 +163,13 @@ theorem hadamardConjecture_of_butsonHadamardFourthRoots
   obtain ⟨H, hpm, hHH⟩ := turyn_doubling hM
   let e : Fin (2 * k) ⊕ Fin (2 * k) ≃ Fin (4 * k) :=
     finSumFinEquiv.trans (finCongr (by ring))
-  refine ⟨reindex e e H, fun i j => ?_, ?_⟩
-  · rcases hpm (e.symm i) (e.symm j) with h1 | h1 <;> simp [reindex_apply, h1]
+  have hc : ((2 * (2 * k) : ℕ) : ℝ) = ((4 * k : ℕ) : ℝ) := by push_cast; ring
+  rw [hc] at hHH
+  refine ⟨H.submatrix e.symm e.symm, fun i j => ?_, ?_⟩
+  · rcases hpm (e.symm i) (e.symm j) with h1 | h1 <;> simp [Matrix.submatrix_apply, h1]
   · apply abs_det_of_mul_transpose
-    rw [transpose_reindex, ← reindex_mul, hHH, reindex_apply, submatrix_smul,
-      submatrix_one_equiv]
-    congr 2
-    push_cast; ring
+    rw [transpose_submatrix, submatrix_mul_equiv, hHH]
+    ext i j
+    simp [Matrix.one_apply]
 
 end Implications.Hadamard
