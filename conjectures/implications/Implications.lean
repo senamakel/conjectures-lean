@@ -5,4 +5,5 @@ import Implications.ABC.Erdos977
 import Implications.FourExponentials.TwoPowThreePow
 import Implications.Hadamard.ButsonDoubling
 import Implications.PrimeGaps.Erdos382
+import Implications.PrimeGaps.FiroozbakhtOppermann
 import Implications.Wieferich.Rotkiewicz
