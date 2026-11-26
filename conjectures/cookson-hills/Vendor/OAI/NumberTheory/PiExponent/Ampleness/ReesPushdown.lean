@@ -19,7 +19,7 @@ def piece (n : ℕ) : Submodule R (reesAlgebra I) where
     rw [coeff_add, map_add, ← hp, ← hq]
   smul_mem' a p hp := by
     change a • (p : R[X]) = monomial n ((a • (p : R[X])).coeff n)
-    rw [coeff_smul, map_smul, ← hp]
+    rw [Polynomial.coeff_smul, map_smul, ← hp]
 
 lemma mem_piece (n : ℕ) (p : reesAlgebra I) :
     p ∈ piece I n ↔ (p : R[X]) = monomial n ((p : R[X]).coeff n) := Iff.rfl
@@ -59,7 +59,7 @@ def componentsAdd : reesAlgebra I →+ ⨁ n, piece I n where
 
 lemma piece_coeff_ne {n m : ℕ} (hnm : n ≠ m) (p : piece I n) :
     ((p : reesAlgebra I) : R[X]).coeff m = 0 := by
-  rw [(mem_piece I n p.val).mp p.property, coeff_monomial, ite_eq_right hnm]
+  rw [(mem_piece I n p.val).mp p.property, coeff_monomial_of_ne _ hnm.symm]
 
 lemma components_of_piece (n : ℕ) (p : piece I n) :
     components I p.val = DirectSum.of (fun n => piece I n) n p := by
@@ -100,14 +100,14 @@ lemma recompose_components (p : reesAlgebra I) :
   have h := DFunLike.congr_fun (hc n) (components I p)
   change ((f (components I p) : reesAlgebra I) : R[X]).coeff n =
     ((component I n p : reesAlgebra I) : R[X]).coeff n at h
-  simpa only [component_val, coeff_monomial, ite_true] using h
+  simpa only [component_val, coeff_monomial_same] using h
 
 instance gradedMonoid : SetLike.GradedMonoid (piece I) where
   one_mem := by simp [mem_piece]
   mul_mem {i j} {a b} ha hb := by
     change (a : R[X]) * b = monomial (i+j) (((a : R[X]) * b).coeff (i+j))
     rw [(mem_piece I i a).mp ha, (mem_piece I j b).mp hb,
-      monomial_mul_monomial, coeff_monomial, ite_eq_left rfl]
+      monomial_mul_monomial, coeff_monomial_same]
 
 instance grading : GradedAlgebra (piece I) where
   toGradedMonoid := gradedMonoid I
