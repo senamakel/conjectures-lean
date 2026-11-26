@@ -26,6 +26,7 @@ namespace Implications.FourExponentials
 `FormalConjectures/Wikipedia/Exponentials.lean`, `Exponentials.four_exponentials_conjecture`:
 let $x_0, x_1$ and $y_0, y_1$ be $\mathbb Q$-linearly independent pairs of complex numbers,
 then some $e^{x_i y_j}$ is transcendental. -/
+set_option linter.unusedVariables false in
 def FourExponentialsConjecture : Prop :=
   ∀ (x : Fin 2 → ℂ) (y : Fin 2 → ℂ)
     (h1 : LinearIndependent ℚ x) (h2 : LinearIndependent ℚ y),
@@ -34,6 +35,7 @@ def FourExponentialsConjecture : Prop :=
 /-- Verbatim from formal-conjectures `9097e2f`, `FormalConjectures/Wikipedia/Exponentials.lean`,
 `Exponentials.two_pow_three_pow_transcendental`: for any irrational number $t$, at least one of
 the numbers $2^t$ and $3^t$ is transcendental. -/
+set_option linter.unusedVariables false in
 def TwoPowThreePowTranscendental : Prop :=
   ∀ (t : ℝ) (h : Irrational t),
     Transcendental ℚ (2 ^ t : ℝ) ∨ Transcendental ℚ (3 ^ t : ℝ)
@@ -57,8 +59,7 @@ lemma int_log_two_log_three {m n : ℤ} (h : (m : ℝ) * Real.log 2 + n * Real.l
     have e : (m : ℝ) * Real.log 2 = -((n : ℝ) * Real.log 3) := by linarith
     have := congrArg abs e
     rwa [abs_neg, abs_mul, abs_mul, abs_of_pos h2, abs_of_pos h3] at this
-  rw [← Int.cast_natAbs, ← Int.cast_natAbs] at habs
-  push_cast at habs
+  rw [← Int.cast_abs, ← Int.cast_abs, ← Nat.cast_natAbs, ← Nat.cast_natAbs] at habs
   rw [← Real.log_pow, ← Real.log_pow] at habs
   have hpow : (2 : ℝ) ^ m.natAbs = 3 ^ n.natAbs :=
     Real.log_injOn_pos (Set.mem_Ioi.mpr (by positivity)) (Set.mem_Ioi.mpr (by positivity)) habs
@@ -159,7 +160,7 @@ theorem twoPowThreePowTranscendental_of_fourExponentials (h : FourExponentialsCo
     rw [exp_mul_log_eq_rpow t 2 (by norm_num), transcendental_ofReal_iff] at hij
     exact hij
   · right
-    simp only [Fin.mk_one, Fin.isValue, Matrix.cons_val_one] at hij
+    simp only [Fin.mk_one, Fin.isValue, Matrix.cons_val_one, Matrix.cons_val_zero] at hij
     rw [exp_mul_log_eq_rpow t 3 (by norm_num), transcendental_ofReal_iff] at hij
     exact hij
 
