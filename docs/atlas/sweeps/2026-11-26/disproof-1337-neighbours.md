@@ -253,10 +253,6 @@ n = 56 base. That is a calibration failure of my pipeline, not evidence about n 
 | Benfield–Lippard 10.6, 10.18 | 11 divides every generator except those with 11 ∣ m, which reduces to a much smaller semigroup T = ⟨(m¹⁰−1)/11⟩; DP to 4·10⁸ | k = 10 | g(1,10) = 1130 with a unique extremal element; both hold (beyond 4·10⁸ by window-max heuristic only) |
 | Fiscus game, Problems 25, 29 | exhaustive minimax over 2^|V| ≤ 2³⁰ | ladders n ≤ 15; grids to 3×10, 5×6; small tori; K(6..8,2) | data, single implementation, unverified |
 
-### 4f. Real-rootedness neighbours (Alexandersson's list)
-
-See §5 (sub-agent `rr-alex`).
-
 ## 5. Real-rootedness neighbours
 
 RR_SECTION_PLACEHOLDER
