@@ -49,15 +49,11 @@ theorem two_mul_card_divisors_le (j : ℕ) (hj : 0 < j) : 2 * j.divisors.card �
   simp only [Nat.card_Icc] at this
   omega
 
-theorem card_divisors_mul_prime (j q : ℕ) (hq : q.Prime) (hqj : j < q) :
+theorem card_divisors_mul_prime (j q : ℕ) (hj : 0 < j) (hq : q.Prime) (hqj : j < q) :
     (j * q).divisors.card = 2 * j.divisors.card := by
   have hcop : j.Coprime q :=
     Nat.Coprime.symm ((Nat.Prime.coprime_iff_not_dvd hq).mpr
-      (fun h => by
-        rcases Nat.eq_zero_or_pos j with h0 | h0
-        · subst h0
-          omega
-        · exact absurd (Nat.le_of_dvd h0 h) (by omega)))
+      (fun h => absurd (Nat.le_of_dvd hj h) (by omega)))
   rw [Nat.Coprime.card_divisors_mul hcop, hq.divisors, card_pair hq.one_lt.ne, mul_comm]
 
 open Filter ArithmeticFunction.sigma in
@@ -88,7 +84,7 @@ theorem erdos_647_variants_infinite_of_dickson (hdickson : DicksonConjecture) :
     have hLj' := hLj j hj1 hjk
     have hq := ht (C ((L / j : ℕ) : ℤ) * X + C (-1)) (mem_image_of_mem _ (mem_Ico.mpr ⟨hj1, hjk⟩))
     simp only [eval_add, eval_mul, eval_C, eval_X] at hq
-    have hpos : 1 ≤ L / j * t := Nat.one_le_iff_ne_zero.mpr (by positivity)
+    have hpos : 1 ≤ L / j * t := Nat.mul_pos hLj' (by omega)
     rw [show ((L / j : ℕ) : ℤ) * (t : ℤ) + -1 = ((L / j * t - 1 : ℕ) : ℤ) by
       push_cast [Nat.cast_sub hpos]; ring, Int.natAbs_natCast] at hq
     have hqt : t ≤ L / j * t := Nat.le_mul_of_pos_left t hLj'
@@ -96,7 +92,7 @@ theorem erdos_647_variants_infinite_of_dickson (hdickson : DicksonConjecture) :
       rw [Nat.mul_sub, ← mul_assoc, Nat.mul_div_cancel' (hdvd j hj1 hjk)]
       omega
     simp only [ArithmeticFunction.sigma_zero_apply]
-    rw [hmq, card_divisors_mul_prime j _ hq (by omega)]
+    rw [hmq, card_divisors_mul_prime j _ (by omega) hq (by omega)]
     have := two_mul_card_divisors_le j (by omega)
     rw [← hmq]
     omega
