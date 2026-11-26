@@ -32,7 +32,8 @@ lemma invSq_apply (n : ℕ) : invSq n = ((n : ℝ) ^ 2)⁻¹ := rfl
 
 lemma summable_invSq : Summable (fun n : ℕ ↦ invSq n) := by
   have := hasSum_zeta_two.summable
-  simpa [invSq_apply, one_div] using this
+  simp only [one_div] at this
+  exact this
 
 lemma tsum_invSq : ∑' n : ℕ, invSq n = π ^ 2 / 6 := by
   have := hasSum_zeta_two.tsum_eq
@@ -114,6 +115,7 @@ lemma solePlanat_of_nicolas_at {N : ℕ} (hN : 3 ≤ N)
     rw [eq_div_iff hφ.ne', mul_comm, totient_mul_dedekindPsi]
   have hR : solePlanatRatio N = ((N : ℝ) / Nat.totient N) * P / L := by
     rw [solePlanatRatio, hpsi]
+    change _ / ((N : ℝ) * L) = _
     field_simp
   rw [hR, riemannZeta_two_re]
   have h1 : g / (π ^ 2 / 6) ≤ g * P := by
