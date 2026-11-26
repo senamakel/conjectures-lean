@@ -113,7 +113,7 @@ Write `P = π(X)` and `P + Δ = π(X + h)`.
    `(9, 20, 3)`, `(10, 17, 3)`, `(11, 15, 3)`; for 2.14(ii) the single region `(18, 700, 4)`
    covers every `n ≥ 700` (margin `7·10⁻⁴`).
 5. **Finite ranges** ([`SunPi/Check.lean`](SunPi/Check.lean)). What the regions leave for 2.7(i)
-   is `5 ≤ n ≤ 63` with `kn < bndA n` (at most `kn < 8192`, in fact `(k+1)n ≤ 546`), done by
+   is `5 ≤ n ≤ 63` with `kn < bndA n` (391 pairs, all with `(k+1)n ≤ 529`), done by
    `checkA_ok` in the kernel. For 2.14(ii) it is `3 ≤ n ≤ 699`, done by `checkB_ok`.
 6. **OEIS forms**. `OeisA238165_ii` chains the steps of 2.7(i) along `[1, n]`. For A038107,
    `a n = π(n²)` for `n ≥ 2` (`a_eq`, as `n²` is not prime); the limit 1 follows by squeezing
@@ -132,7 +132,7 @@ Write `P = π(X)` and `P + Δ = π(X + h)`.
 A C sieve to `4·10⁸` (run 2026-11-26, not part of the package) checked 2.7(i) for every
 `5 ≤ n ≤ 19999` and every `k ≤ n` with `(k+1)n ≤ 4·10⁸` (about `2·10⁸` pairs), and 2.14(ii) for
 every `3 ≤ n ≤ 19998`. The smallest margins `(k+1) log π(kn) − k log π((k+1)n)` are `0.5754`
-(`n = 5, k = 2`) and `0.1699` (`n = 4`; `0.1699` also at `n = 3`).
+(`n = 5, k = 2`) and `0.1699` (`n = 3` and `n = 4` agree to 14 digits).
 
 ## Deviations from the literature
 
