@@ -1,0 +1,11 @@
+SunPrimeDensity/Statement.lean contains statement bodies copied from
+
+  google-deepmind/formal-conjectures
+  FormalConjectures/OEIS/38098.lean, commit 9097e2f
+  Copyright 2026 The Formal Conjectures Authors
+  Licensed under the Apache License, Version 2.0
+  https://www.apache.org/licenses/LICENSE-2.0
+
+Changes: the namespace, and the statements of OeisA38098.conjecture1 and conjecture2 are given
+as definitions of type Prop (SunConjecture, SunConjectureSquares), with the binders of
+conjecture1 moved under a ∀.

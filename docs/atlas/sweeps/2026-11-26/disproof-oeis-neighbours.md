@@ -151,8 +151,8 @@ Dropped without a run, with the reason:
 - **Verification 2.** `scripts/verify308656.py`: pure Python with exact integers, enumerating
   every (s, c) and testing 24r+1 = z², z ≡ ±1 (mod 6). It gives 0 representations for both
   witnesses and positive counts for the other four polynomials (25, 69, 36, 41 at 235644514).
-  `src/brute2a.c` (direct per-n enumeration, a different code path) rechecks minimality over
-  [1, 235644514]: PENDING.
+  `src/brute2a.c` (direct per-n enumeration with an early exit, a different code path) rechecks
+  minimality over [1, 235644516): the only n it reports is 235644514 (about 3 CPU-h).
 - **Prior art: TAKEN.**
   - `joeyhlu/sun-representation-counterexamples` (created 2026-11-26 02:25 UTC, pushed
     09:18 UTC) lists A308656 Conj. 2 (f = x(4x+1)) → 235644514 as the smallest, from an
@@ -184,19 +184,32 @@ their start and exclusive of their end.
 | A308656 Conj. 2, f = x(5x+2), x(5x+4), x(7x+3)/2, x(7x+5)/2 | same | n < 10¹⁰ each | none | ~1 CPU-h |
 | A308656 Conj. 3 (q = 7; c(2c+1) + d(3d+r), r = 1, 2) | same | n < 4·10⁹ each | none | ~0.2 CPU-h |
 | A308656 Conj. 4 (q = 7; five g(c) + d(3d+1)/2) | same | n < 4·10⁹ each | none | ~0.5 CPU-h |
-| A308640 Conj. 2 (k = 1, 2; c ≥ 0) | same entry failed at 1.76·10⁶ | PENDING | | |
-| A308640 Conj. 3 (k = ±1; c ≥ 0) | same | PENDING | | |
-| A308641 Conj. 1, Conj. 2 (five f), Conj. 3 | sibling, no verification bound printed | PENDING | | |
-| A308644 Conj. 1 first assertion, Conj. 2 r = 1 | siblings of joeyhlu's two | PENDING | | |
-| A308662 Conj. 1, Conj. 2 (r = 1, 2) | sibling, 10⁸ verified | PENDING | | |
+| A308640 Conj. 2 (k = 1, 2; c ≥ 0) | same entry's Conj. 1 failed at 1.76·10⁶ | n ≤ 10¹⁰ each | none | ~0.5 CPU-h, `sun4.c` |
+| A308640 Conj. 3 (k = ±1; c ≥ 0) | same | n ≤ 10¹⁰ each | none | ~0.5 CPU-h |
+| A308641 Conj. 1, Conj. 2 (five f), Conj. 3 | sibling, no verification bound printed | n ≤ 10¹⁰ each (7 forms) | none | ~1.8 CPU-h |
+| A308644 Conj. 1 first assertion, Conj. 2 r = 1 | siblings of joeyhlu's two | n ≤ 10¹⁰ each | none (joeyhlu: first assertion none to 3·10⁸) | ~0.5 CPU-h |
+| A308662 Conj. 1, Conj. 2 (r = 1, 2) | sibling, 10⁸ verified | n ≤ 10¹⁰ each | none | ~0.8 CPU-h |
 | A212496 b-inequalities (pool) and the a-inequalities (same entry) | Turán-type bias 0.653 | n ≤ 10¹¹ | all hold. Closest: √n·b(n) = −1.0237 at 17593752 (exact); a(n)/√n ≥ 1.046 (block bound, ~1.2·10⁸); min (√n b + log log n) = 0.003 at n = 2009; max a/(√n log log n) = 0.995 at n = 5893 | ~1.5 CPU-h, `liou.c`, `liouex.c` |
-| A000224 (Ordowski) | Diophantine, extend Marcus's 10⁸ | n < PENDING | no composite n | ~0.3 CPU-h, `sq224.c` |
-| A245211 / A245212 (Krizek) | multiplicative Diophantine | n < PENDING | only n = 21; only powers of 2 | `kriz.c` |
+| A000224 (Ordowski) | Diophantine, extend Marcus's 10⁸ | 2 ≤ n < 10¹⁰ | no composite n satisfies it; every odd prime does | ~0.4 CPU-h, `sq224.c` |
+| A245211 / A245212 (Krizek) | multiplicative Diophantine | 2 ≤ n ≤ 10¹⁰ | only n = 21; no non-power of 2 for A245212 | ~0.3 CPU-h, `kriz.c` |
 | A321576 (Ordowski) at n = 1093², 3511² | Wieferich reduction | the two known Wieferich primes | both fail (43721, 35111) | seconds |
 
 The A212496 extremes look stationary on a log scale over 10⁵–10¹¹: max √n·b oscillates between
 −1.02 and −1.26, and min a/√n between 1.04 and 1.20. A crossing needs a rarer alignment of
 zeros, plausibly far beyond 10¹² *(heuristic)*. I stopped at the cap.
+
+## 5a. Against the owner's bar (a "real" hit)
+
+A hit counts only if the author tested the statement, reported a range, and the witness lies
+beyond that range and needed structure to find.
+
+- A308656 Conj. 2 meets that bar. Sun verified it to 10⁶; the witness is at 2.4·10⁸ and needed
+  an exhaustive bitset scan. It is **taken**.
+- The 15 sibling statements and A157237/A157218 are the same kind of real target, and all are
+  negative to the ranges in §5.
+- A212496, A000224 and A245211/2 are author-tested too, and negative.
+- Nothing in this lane was a typo-level or first-small-case failure. The Epoch P7 class
+  (edge-index defects) was not pursued.
 
 ## 6. Process lesson
 
@@ -210,11 +223,18 @@ representation conjectures (joeyhlu, Scott Moore 2026-05, Lin 2022), and Epoch O
 
 ## 7. Best unfinished lead
 
-The untouched siblings, A308641 above all, whose OEIS text prints no verification bound at all.
-They and A308640 Conj. 2–3, A308644 Conj. 2 (r = 1) and A308662 remain unreported. Their fate is
-in §5. If they all hold to 10¹⁰, what remains is joeyhlu-style targeted search (rank residue
-classes of n by local obstruction) past 10¹⁰. But joeyhlu is evidently active on this family,
-so check their repository first.
+The 15 sibling statements nobody had reported on all hold to 10¹⁰ (A308656 Conj. 3 and 4 hold
+to 4·10⁹): A308640 Conj. 2–3, A308641 Conj. 1–3, A308644 Conj. 1 (first assertion) and Conj. 2
+(r = 1), and A308662 Conj. 1–2. Counterexamples in this family have so far appeared between
+1.7·10⁶ and 10¹⁰: 1764630, 7654105, 108011768, 235644514, 2109982225 and 9974943843. Going
+further with exhaustive scans costs about 0.1 CPU-h per form per 10⁹.
+
+The better next step is joeyhlu's targeted method, ported to these forms. Rank the classes of
+n modulo a product of small primes by how many n − s are locally obstructed. For the
+d(3d+1)/2 forms, the obstruction is 48m+5 or 24m+1 having a prime q with (−6/q) = −1 to an odd
+power. Then scan only the best classes, from 10¹⁰ to 10¹⁴. Effort: M, about one day of code
+plus 5 CPU-h. joeyhlu is evidently active on this family, so look at their repository again
+before starting.
 
 ## Proposed edges
 

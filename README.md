@@ -16,7 +16,7 @@ conjectures. Those links are collected in the [implication atlas](docs/atlas/).
 
 ## Results
 
-37 projects: 22 proved in full, 12 proved in part, 1 conditional at its ceiling, 1 wound down, and 1 collection of implications between open conjectures (listed in the next section).
+40 projects: 23 proved in full, 14 proved in part, 1 conditional at its ceiling, 1 wound down, and 1 collection of implications between open conjectures (listed in the next section).
 
 | Conjecture | Folder | Lean | Literature |
 | :--- | :--- | :---: | :--- |
@@ -57,6 +57,9 @@ conjectures. Those links are collected in the [implication atlas](docs/atlas/).
 | **35.** Hajós's conjecture is false: a Lean proof of Catlin's (1979) disproof, at `k = 8` | [`hajos-catlin`](conjectures/hajos-catlin/) | ✅ | known |
 | **36.** Pólya's conjecture `L(n) ≤ 0` is false (`L(906150257) = 1`), and so is von Sterneck's `\|M(x)\| < ½√x` (`M(7725038629) = 43947`) | [`polya-liouville`](conjectures/polya-liouville/) | ✅ | known |
 | **37.** The Cookson Hills series `Σ sec²(n)/n³` converges (and the Flint Hills series `Σ csc²(n)/n³`, rebuilt here). From `μ(π) = 2`, proved in Lean by [openai/math](https://github.com/openai/math) and vendored | [`cookson-hills`](conjectures/cookson-hills/) | ✅ | consequence of `μ(π) = 2` (OpenAI 2026) |
+| **38.** Sun's conjecture (OEIS A038098): `π(n^k)/n^k` is strictly decreasing in `n`, proved for every `k ≥ 4` from RH; the run that supplies RH is pending. `k = 3` is proved outside `141 ≤ n < 10⁷` | [`sun-prime-density-rh`](conjectures/sun-prime-density-rh/) | 🟡 | RH-consequence; no proof found in the literature |
+| **39.** Every odd prime `p` has a prime primitive root `q < p` modulo `p²`, hence modulo every `p^k` (Erdős Problem 985 for prime powers): proved from GRH; the run that supplies GRH is pending | [`primitive-root-sq-grh`](conjectures/primitive-root-sq-grh/) | 🟡 | RH-consequence; the all-`p` statement was not found in the literature |
+| **40.** Two monotonicity conjectures of Sun on `π(x)` (arXiv:1402.6641): `π(kn)^{1/k} > π((k+1)n)^{1/(k+1)}` for `n > 4`, `1 ≤ k ≤ n` (Conj. 2.7(i), OEIS A238165), and `π(n²)^{1/n}` strictly decreasing for `n ≥ 3` (Conj. 2.14(ii), OEIS A038107). No RH | [`sun-pi-inequalities`](conjectures/sun-pi-inequalities/) | ✅ | no proof found in the literature |
 
 **Lean status.** ✅ the target statement is proved, end to end from Lean's three standard axioms plus
 the finite computations its README names. 🟡 part of the target, or a weaker constant, is proved

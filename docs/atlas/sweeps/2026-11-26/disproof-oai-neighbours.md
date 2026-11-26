@@ -14,8 +14,9 @@ checked out. Scripts and outputs are in the session scratchpad (`oai-work/`, wit
 named conjecture (Brannen 1996, MathWorld), it is open there by the explicit statement of Feng–Hu–Liu–Xu
 (arXiv:2610.13953, 16 Aug 2026), and nobody has claimed it. It has an exact finite-dimensional
 reduction, built from FHLX Prop. 4.1–4.2 plus one observation of mine. Under that reduction, every
-polytope with n+2 facets in dimensions 4 ≤ n ≤ 8 stays at or below the simplex value, and so do the
-n+3 and n+4 facet runs that finished. Both a global search and an exact first-order
+polytope with n+2 facets in dimensions 4 ≤ n ≤ 8 stays at or below the simplex value. So does every
+robustly evaluated n+3 and n+4 facet start, though coverage at n = 8 is thin. Three apparent
+exceedances turned out to be qhull artifacts. Both a global search and an exact first-order
 analysis say so. The search reproduces the known n = 9 violation and improves its margin. The
 second lead was an explicit small-rank counterexample to Ryser's intersecting conjecture, built from
 OpenAI's merge-and-split construction. It cannot be instantiated for q ≤ 31: the geometric data do
@@ -111,14 +112,23 @@ Times are wall-clock on a box at load 120–160 (95 cores); about 8–13 process
 | S2 | Brannen m = n+2, n = 2,3,4,9 | n = 9 must exceed 1, n = 2, 3 must not (proved) | Nelder–Mead on (a, t), 60 starts each, three start families | 60 starts | n = 2, 3, 4: max Γ = 1 − O(10⁻⁸), attained at the degenerate simplex family. **n = 9: Γ = 1.000708** at a ≈ (0, 0.472, 0.482, 0.489, 0.495, 0.5, 0.505, 0.511, 0.518, 0.528, 1), t = ½. That beats FHLX's ε-family (max about 1.0005); the improvement is ours | ~2 CPU-min |
 | S3 | Brannen m = n+2, n = 5–8 | FHLX's perturbative mechanism needs a dimension-8 cube moment; a global optimum could go lower | 300 starts per n (two seeds × 150) | 300 starts | **max Γ = 1** (to within 4·10⁻⁸) for every n = 5, 6, 7, 8; every optimum is the simplex-degenerate family | ~25 CPU-min |
 | S4 | First order at the degenerate family, n = 4–10 | Decides 2-split perturbations exactly up to sampling | LP, 4000 samples | – | gain −0.059, −0.032, −0.016, −0.0069, −0.0039 (n = 4–8); **+0.00075 (n = 9)**, +0.0037 (n = 10). The threshold is exactly between 8 and 9 | ~1 CPU-min |
-| S5 | Brannen m = n+3 (k = 2), n = 4–8 | A 3-way facet split is a first-order mechanism that m = n+2 lacks | Nelder–Mead over (A, λ), 20 min per n | 1200 s wall | K2RESULT | ~1.7 CPU-h |
-| S6 | Brannen m = n+4 (k = 3), n = 4–6 | as S5 | as S5 | 1200 s wall | K3RESULT | ~1 CPU-h |
-| S7 | 3-split first-order φ at the simplex, n = 4, 6, 8, 9, 10 | as S5, local | NM over split directions | 1100 s wall | SPLITRESULT | ~1.5 CPU-h |
+| S5 | Brannen m = n+3 (k = 2), n = 4–8, first pass | A 3-way facet split is a first-order mechanism that m = n+2 lacks | Nelder–Mead over (A, λ) with qhull section volumes centred at λ; starts: 226, 90, 29, 8, 2 for n = 4…8 | 1200 s wall | Reported best 1, **1.0000979**, 1, 1, 0.99999735. The n = 5 value is an **artifact**: recomputed with the robust evaluator it is 0.9999999999999 (a simplex in disguise; five equal columns). qhull's halfspace intersection centred at λ is off by about 10⁻⁴ relative, while the Chebyshev-centred evaluator returns 1 to 10⁻¹³ there and reproduces FHLX to 9 digits | ~1.7 CPU-h |
+| S6 | Brannen m = n+4 (k = 3), n = 4–6, first pass | as S5 | as S5; 67, 27, 8 starts | 1200 s wall | best 1, **1.00000076** (artifact: robust 0.9999999999998), 0.99777 | ~1 CPU-h |
+| S7 | 3-split first-order φ at the simplex, n = 4, 6 (8–10 never started) | as S5, local | NM over split directions, ε = 10⁻⁴ | killed | Two "positive" φ at n = 4 (0.087, 129) were qhull artifacts: λ had drifted to a simplex vertex (coordinates ~10⁻¹²). Robust recheck: Γ = 0.9999941, 0.9999651. Otherwise φ < 0 (best −0.013 at n = 4, −0.23 at n = 6). The run was stopped because its evaluator is unreliable | ~0.5 CPU-h |
+| S5′ | Brannen m = n+3 and n+4, robust evaluator | as S5; the first pass was not trustworthy above 1 − 10⁻⁴ | m points in R^k (columns of A) plus a section point t; Chebyshev-centre LP and qhull; three start families (simplex-degenerate cluster, random, FHLX-like spread). Starts: k = 2: n = 5: 35, n = 6: 25, n = 7: 26, n = 8: 11; k = 3: n = 7: 4, n = 8: 0 | 2400 s, then killed | **Every value ≤ 1.** Best: 1 (n = 5, simplex), 0.99999967 (6), 0.99984 (7), 0.99969 (8); k = 3, n = 7: 0.976. Coverage at n = 8 is thin (11 starts) | ~5 CPU-h |
 | S8 | Ryser data, strict (all §2 conditions) | Construction may already work at moderate q | q = 19, 23, 29; full tuple enumeration; 200 greedy transversal restarts | full slot fill | best partial fill 7/40, 10/48, 13/60 slots: **no data** | seconds |
 | S9 | Ryser data, relaxed (only what intersection needs) | Cover proof conditions are not needed when τ is checked by ILP | q = 11, 13, 17, 19, 23, 29, 31; 2000 restarts | full slot fill | best partial 7/24, 9/28, 11/36, 13/40, 16/48, 19/60, 20/64: **no data**; a third of the slots fills, matching the e^{−2} heuristic | ~1 CPU-min |
 
-Total compute is about 5 CPU-hours, under the 20-hour budget. The candidates stopped on their
-stop conditions, not on cost.
+Total compute is about 10 CPU-hours, under the 20-hour budget. The n = 9 improvement in S2 was
+checked exactly: with the rounded a above and t = 1/2, rational arithmetic (`fractions`) gives
+Γ = 1.0007084752541… > 1, and mpmath at 60 digits agrees. **Lesson recorded:** never trust a qhull
+`HalfspaceIntersection` volume near 1 ± 10⁻⁴ unless it is centred at the Chebyshev centre. All
+three apparent exceedances in this sweep came from that.
+
+Prior art for every target was searched before compute: web, arXiv, GitHub, clopen.solutions, Zenodo,
+fc and the 1337 snapshot. Under the owner's bar, Brannen 4 ≤ n ≤ 8 qualifies. It is a named
+conjecture, proved for n = 2, 3 (Chen–Feng–Li–Xi–Xu) and listed as open by FHLX, so any witness
+would have needed structure to find. The Ryser target qualifies too, since Tuza proved r ≤ 5.
 
 ## 5. Hits
 
@@ -134,7 +144,9 @@ of qhull section volumes, and the |det| sum computed once per F;
 (ii) gradient-based optimisation with many more restarts in n = 7, 8, where S5 and S6 managed only a
 handful of starts;
 (iii) since m = n+2 sits exactly at Γ = 1 for n ≤ 8, a second-order analysis at the simplex for
-m ≥ n+3, together with the 3-split first-order test (S7).
+m ≥ n+3, and a redo of the 3-split first-order test (S7) with the robust evaluator.
+Evaluator: `oai-work/brannen/plane.py` (robust), `gamma.py` / `gmp.py` (k = 1, B-spline, exact
+or 60 digits).
 A hit would have exact rational data: rational a or A, and rational λ. Γ is then rational for k = 1
 (B-spline divided differences), so it can be checked exactly, and in Lean by `norm_num` on a closed
 form. The second, independent check is the direct formula
