@@ -71,6 +71,32 @@ lemma poly10 (t : ℝ) (ht : 200 ≤ t) :
   nlinarith [mul_nonneg (mul_nonneg (mul_nonneg h0 h0) h0) h0, mul_nonneg (mul_nonneg h0 h0) h0,
     mul_nonneg h0 h0]
 
+/-- Abstract finish for the case `ω ≥ 10`. -/
+lemma finish_large (θ X B1 B1u B2 B2u Su S t : ℝ) (hθX : 117 ≤ θ * X) (hθ : 0 ≤ θ) (hX1 : 1 ≤ X)
+    (hXle : X ≤ 4.87 * t + 1) (ht : 0 ≤ t) (hB1 : 0 ≤ B1) (hB1u : B1 ≤ B1u) (hB2 : B2 ≤ B2u)
+    (hSu : Su ≤ 0.5001)
+    (hpoly : (4.87 * t + 1) * (0.5001 + B2u) < 117 * (S - 4.87 * t * B1u)) :
+    Su + B2 < θ * (S - (X - 1) * B1) := by
+  have hB2u : 0 ≤ B2u ∨ B2u < 0 := le_or_gt 0 B2u
+  have hD : S - 4.87 * t * B1u ≤ S - (X - 1) * B1 := by
+    have : (X - 1) * B1 ≤ 4.87 * t * B1u :=
+      mul_le_mul (by linarith) hB1u hB1 (by positivity)
+    linarith
+  rcases hB2u with hB2u | hB2u
+  · have hl : 0 ≤ (4.87 * t + 1) * (0.5001 + B2u) := by positivity
+    have hD0 : 0 < S - 4.87 * t * B1u := by linarith
+    have e1 : X * (0.5001 + B2u) ≤ (4.87 * t + 1) * (0.5001 + B2u) :=
+      mul_le_mul_of_nonneg_right hXle (by positivity)
+    have e2 : 117 * (S - 4.87 * t * B1u) ≤ (θ * X) * (S - (X - 1) * B1) :=
+      mul_le_mul hθX hD hD0.le (by positivity)
+    have e3 : (θ * X) * (S - (X - 1) * B1) = X * (θ * (S - (X - 1) * B1)) := by ring
+    have hmain : X * (0.5001 + B2u) < X * (θ * (S - (X - 1) * B1)) := by linarith
+    have := lt_of_mul_lt_mul_left hmain (by linarith)
+    linarith
+  · -- impossible case, kept for the abstract statement
+    have hB10 : 0 ≤ B1u := hB1.trans hB1u
+    nlinarith
+
 theorem numerics (p : ℕ) (hp0 : 10 ^ 8 ≤ p) (θ : ℝ)
     (hθ : (36495360 / 223092870 : ℝ) * (28 / 29) ^ (p - 1).primeFactors.card ≤ θ) :
     ((p : ℝ) / 2 + (√(p : ℝ) / 20 + 3)) / p
@@ -198,30 +224,10 @@ theorem numerics (p : ℕ) (hp0 : 10 ^ 8 ≤ p) (θ : ℝ)
     have hpoly := poly10 t htge
     simp only [one_mul] at hpoly
     rw [ht2] at hpoly
-    set B1 := (s + 2 + 3 / (p : ℝ)) * ((2 / 3) * (Real.log p + 5 / 3)) + (Real.log p + 1) + 0.6
-    set B1u := (s + 2.0001) * ((2 / 3) * (4 * (5.5451774464 + t / 256 - 1) + 5 / 3))
-      + (4 * (5.5451774464 + t / 256 - 1) + 1) + 0.6
-    set B2u := (s + 2.0001) * ((2 / 3) * (2 * (4 * (5.5451774464 + t / 256 - 1)) + 5 / 3))
-      + (4 * (5.5451774464 + t / 256 - 1) + 1) + 0.6
     rw [ht2] at hB1t hB2t
-    have hB2u0 : 0 ≤ B2u := by positivity
-    have hD : s ^ 2 / 2 - (s / 20 + 3) - 4.87 * t * B1u ≤ s ^ 2 / 2 - (s / 20 + 3) - (X - 1) * B1 := by
-      have : (X - 1) * B1 ≤ 4.87 * t * B1u :=
-        mul_le_mul (by linarith) hB1t hB10 (by positivity)
+    have hθ0 : 0 ≤ θ := by
+      have : (0 : ℝ) < 36495360 / 223092870 * (28 / 29) ^ k := by positivity
       linarith
-    have hl : 0 ≤ (4.87 * t + 1) * (0.5001 + B2u) := by positivity
-    have hD0pos : 0 < s ^ 2 / 2 - (s / 20 + 3) - 4.87 * t * B1u := by linarith
-    have hXpos : 0 < X := by linarith
-    have hmain : X * (0.5001 + B2u) < X * (θ * (s ^ 2 / 2 - (s / 20 + 3) - (X - 1) * B1)) := by
-      have e1 : X * (0.5001 + B2u) ≤ (4.87 * t + 1) * (0.5001 + B2u) :=
-        mul_le_mul_of_nonneg_right hXle (by positivity)
-      have e2 : 117 * (s ^ 2 / 2 - (s / 20 + 3) - 4.87 * t * B1u)
-          ≤ (θ * X) * (s ^ 2 / 2 - (s / 20 + 3) - (X - 1) * B1) :=
-        mul_le_mul hθX hD hD0pos.le (by positivity)
-      have e3 : (θ * X) * (s ^ 2 / 2 - (s / 20 + 3) - (X - 1) * B1)
-          = X * (θ * (s ^ 2 / 2 - (s / 20 + 3) - (X - 1) * B1)) := by ring
-      linarith
-    have hfin := lt_of_mul_lt_mul_left hmain hXpos.le
-    linarith
+    exact finish_large _ _ _ _ _ _ _ _ _ hθX hθ0 hX1 hXle htpos.le hB10 hB1t hB2t hSu hpoly
 
 end PrimitiveRootSq
