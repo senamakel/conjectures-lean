@@ -1,0 +1,5 @@
+.lake/
+.claude/worktrees/
+docs/mtt.pdf
+__pycache__/
+*.pyc

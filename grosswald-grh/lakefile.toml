@@ -1,0 +1,20 @@
+name = "Grosswald"
+defaultTargets = ["Grosswald"]
+
+[leanOptions]
+pp.unicode.fun = true
+autoImplicit = false
+
+[[require]]
+name = "Erdos985"
+git = "https://github.com/senamakel/erdos-985.git"
+rev = "9538edb73dc72c8fdc04b4e0df076c8930ee2fba"
+
+[[lean_lib]]
+name = "Grosswald"
+
+# Core-only executable checkers, compiled to native code so that `native_decide` runs them at
+# native speed. No Mathlib here; the soundness proofs live in `Grosswald/`.
+[[lean_lib]]
+name = "GrosswaldCompute"
+precompileModules = true
