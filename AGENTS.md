@@ -211,6 +211,32 @@ LivingBrain is part of the method. Ingest the proofs and lemma inventories we re
 source, repo and path, what it needs, what it gives), so a later search for "what proves a bound
 of this shape?" finds them. Check any identifier it returns against the source.
 
+## Priority: results not yet in the public record
+
+**Decided 2026-11-26 (owner).** The targets that matter most are statements nobody has publicly
+proved: not in a paper, a preprint, a problem-site comment, a Zenodo note or a public Lean
+repository. Formalising a published implication is still allowed, but it is second priority and
+no new wave of provers is started for it while a candidate of the first kind is available.
+
+What counts, strongest first:
+
+1. An open statement settled outright (proved or disproved) by connecting existing results.
+2. An open statement that becomes a theorem because RH and GRH for Dirichlet L-functions are
+   now proved in Lean, where even the conditional deduction "RH ⇒ X" was never written down, or
+   where the published conditional result leaves a finite range or a constant that we close.
+3. A result strictly stronger than the published one (a better constant, a wider range, a
+   hypothesis removed).
+4. A new implication between open conjectures that was asserted without proof, or not stated.
+
+Every candidate of this kind needs a novelty search before work starts and again before it is
+announced: arXiv, the problem's own page and comment thread, erdosproblems.com and its mirrors,
+Zenodo, formal-conjectures (statements, `formal_proof` links and open PRs),
+1337isnot1337/solved-conjectures, openai/math and a GitHub code search. Record what was
+searched and when. Easy visible corollaries of the RH proof are being posted within days, so a
+search older than a week is stale. The label *new* still needs the owner's sign-off before a
+README uses it (see "Literature status"); until then say exactly what was not found and where
+we looked.
+
 ## Agent roles
 
 Defined in `.claude/agents/`. Research roles write only to `docs/`; proving roles work in a
