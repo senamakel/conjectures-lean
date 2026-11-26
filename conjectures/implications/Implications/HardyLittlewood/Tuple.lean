@@ -10,8 +10,9 @@ all entries even. `witness` lists, for each modulus `q = 2, 3, …, 447` in turn
 `r < q` that no entry of `tuple` takes mod `q`; this is what makes the tuple admissible (for
 `q > 447` a 447-tuple cannot cover all `q` classes).
 
-The facts used later are four Boolean checks, each closed by the kernel (`decide +kernel`):
-the length, strict monotonicity, the bound `≤ 3158` together with evenness, and the witnesses.
+The facts used later are Boolean checks closed by the kernel (`decide +kernel`, no
+`native_decide`): the length, strict monotonicity, the bound `≤ 3158` together with evenness,
+the witnesses, and `π(3159) ≤ 446` through a trial-division test proved complete for primes.
 -/
 
 namespace HardyLittlewood.Richards
