@@ -21,7 +21,7 @@ is 1. **The only new fact from this lane is minimality.** All 11,716,571 connect
 vertices satisfy the inequality, so the smallest counterexample has exactly 11 vertices. Sadullo
 left order 10 open.
 
-Every other search was negative:
+The other searches found nothing of value:
 
 - **Alikhani–Peng unimodality for trees.** Every tree with at most 28 vertices has a unimodal
   domination polynomial, 2.97·10⁹ trees in all. As far as I found, no exhaustive tree range had
