@@ -14,7 +14,7 @@ complex m×n matrices has determinant |det P|^(2n)·|det Q|^(2m). -/
 lemma det_mulLeft_mulRight_real {m} [Fintype m] P Q : (mulRightLinearMap m ℝ Q ∘ₗ mulLeftLinearMap n
   ℝ P).det = ‖det P‖ ^ (2 * card n) * ‖(det Q : ℂ)‖ ^ (2 * card m) := by erw [(mulRightLinearMap m
   ℂ Q ∘ₗ mulLeftLinearMap ..).det_restrictScalars, ← det_toMatrix (stdBasis ℂ ..), congrArg det _,
-  det_kronecker' P Qᵀ] <;> simp [← ext_iff, toMatrix_apply, stdBasis, mul_apply, ite_apply,
+  det_kronecker' P Qᵀ] <;> simp [← ext_iff, toMatrix_apply, stdBasis, Matrix.mul_apply, ite_apply,
   norm_complex_eq, pow_mul, Complex.sq_norm]
 
 lemma exists_U_coe_eq : xᴴ * J * x = J → ∃ g : U J, g = x := (⟨U.of isUnit x ·, rfl⟩)
