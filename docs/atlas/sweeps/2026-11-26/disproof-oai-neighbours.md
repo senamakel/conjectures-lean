@@ -118,8 +118,16 @@ Times are wall-clock on a box at load 120–160 (95 cores); about 8–13 process
 | S8 | Ryser data, strict (all §2 conditions) | Construction may already work at moderate q | q = 19, 23, 29; full tuple enumeration; 200 greedy transversal restarts | full slot fill | best partial fill 7/40, 10/48, 13/60 slots: **no data** | seconds |
 | S9 | Ryser data, relaxed (only what intersection needs) | Cover proof conditions are not needed when τ is checked by ILP | q = 11, 13, 17, 19, 23, 29, 31; 2000 restarts | full slot fill | best partial 7/24, 9/28, 11/36, 13/40, 16/48, 19/60, 20/64: **no data**; a third of the slots fills, matching the e^{−2} heuristic | ~1 CPU-min |
 
-Total compute is about 5 CPU-hours, under the 20-hour budget. The candidates stopped on their
-stop conditions, not on cost.
+Total compute is about 10 CPU-hours, under the 20-hour budget. The n = 9 improvement in S2 was
+checked exactly: with the rounded a above and t = 1/2, rational arithmetic (`fractions`) gives
+Γ = 1.0007084752541… > 1, and mpmath at 60 digits agrees. **Lesson recorded:** never trust a qhull
+`HalfspaceIntersection` volume near 1 ± 10⁻⁴ unless it is centred at the Chebyshev centre. All
+three apparent exceedances in this sweep came from that.
+
+Prior art for every target was searched before compute: web, arXiv, GitHub, clopen.solutions, Zenodo,
+fc and the 1337 snapshot. Under the owner's bar, Brannen 4 ≤ n ≤ 8 qualifies. It is a named
+conjecture, proved for n = 2, 3 (Chen–Feng–Li–Xi–Xu) and listed as open by FHLX, so any witness
+would have needed structure to find. The Ryser target qualifies too, since Tuza proved r ≤ 5.
 
 ## 5. Hits
 
