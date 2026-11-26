@@ -35,10 +35,13 @@ lemma algebraMap_ResField_surjective : (⇑(algebraMap (𝓞 E) (ResField w))).S
     (exists_int_approx w · 0 |>.imp fun _ ↦ residue_eq_iff_valuation_sub_lt_one.2)
 
 lemma card_ResField : .card (ResField w) = w.q := card_congr
-    (RingHom.quotientKerEquivOfSurjective (algebraMap_ResField_surjective w)).1 ▸ by rcongr; simp
+    (RingHom.quotientKerEquivOfSurjective (algebraMap_ResField_surjective w)).1 ▸ by
+  rw [show RingHom.ker (algebraMap (𝓞 E) (ResField w)) = w.asIdeal from
+    Ideal.ext fun _ ↦ by simp [RingHom.mem_ker]]
+  simp [Ideal.absNorm_apply, Submodule.cardQuot_apply]
 
 instance instFiniteResField : Finite (ResField w) :=
-  finite_of_card_ne_zero (by simp [card_ResField])
+  finite_of_card_ne_zero (by simp [card_ResField, w.ne_bot])
 
 instance : ProperSpace (LocField w) :=
     properSpace_iff_completeSpace_and_isDiscreteValuationRing_integer_and_finite_residueField.2
@@ -64,10 +67,12 @@ instance : Fact (∀ w : FinPlace E, IsOpen (LocInt w).carrier) := ⟨(isOpen_in
 deriving instance T0Space, LocallyCompactSpace for 𝔸f E
 
 lemma isCompact_Ô :
-    IsCompact (Ô E : Set (𝔸f E)) := (Set.ext fun _ ↦ mem_Ô).substr ((range_structureMap ..).subst
+    IsCompact (Ô E : Set (𝔸f E)) := (show (Ô E : Set (𝔸f E)) = {f | ∀ w, f w ∈ (LocInt w : Set
+    (LocField w))} from Set.ext fun _ ↦ mem_Ô).substr ((range_structureMap ..).subst
     (isCompact_range (X := ∀ w, LocInt w) isEmbedding_structureMap.continuous))
 
-lemma isOpen_Ô : IsOpen (Ô E : Set (𝔸f E)) := (Set.ext fun _ ↦ mem_Ô).substr (isOpen_forall_mem out)
+lemma isOpen_Ô : IsOpen (Ô E : Set (𝔸f E)) := (show (Ô E : Set (𝔸f E)) = {f | ∀ w, f w ∈ (LocInt w :
+  Set (LocField w))} from Set.ext fun _ ↦ mem_Ô).substr (isOpen_forall_mem out)
 
 @[fun_prop] lemma continuous_evalAt : Continuous (evalAt w) := continuous_eval w
 

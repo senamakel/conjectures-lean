@@ -87,7 +87,8 @@ variable {k : Type*} {W ι} [Field k] [IsAlgClosed k] [AddCommGroup W] [Module k
 
 lemma exists_antitone_of_swap {α N} [LinearOrder α] (f : Fin N → α) (P : Equiv.Perm _ → _)
     (h0 : ∃ σ, P σ) (h : ∀ σ i j, i ⋖ j → f (σ i) < f (σ j) → P σ → P (σ * .swap i j)) :
-    ∃ σ, P σ ∧ Antitone (f ∘ σ) := (Set.exists_max_image P (toLex <| f ∘ ·) Subtype.finite h0).imp
+    ∃ σ, P σ ∧ Antitone (f ∘ σ) := (Set.exists_max_image P
+    (fun σ : Equiv.Perm (Fin N) ↦ toLex <| f ∘ σ) Subtype.finite h0).imp
     fun σ ⟨M, m⟩ ↦ ⟨M, (antitone_iff_forall_covBy _).2 fun i _ c ↦ not_lt.1
     (h σ _ _ c · M |> m _ |>.not_gt ⟨i, by simp_all [Equiv.swap_apply_def]; grind [CovBy]⟩)⟩
 
