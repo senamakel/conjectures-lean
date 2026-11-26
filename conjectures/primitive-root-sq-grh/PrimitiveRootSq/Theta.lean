@@ -45,7 +45,7 @@ theorem theta_ge (n : ℕ) :
   have hsmall : (36495360 / 223092870 : ℝ) ≤ ∏ ℓ ∈ Ps, f ℓ := by
     rw [← hSval, ← prod_sdiff hsub]
     have h1 : ∏ ℓ ∈ S \ Ps, f ℓ ≤ 1 := by
-      refine prod_le_one (fun ℓ hℓ => hf0 ℓ ?_) (fun ℓ _ => hf1 ℓ)
+      refine prod_le_one₀ (fun ℓ hℓ => hf0 ℓ ?_) (fun ℓ _ => hf1 ℓ)
       have := (mem_sdiff.mp hℓ).1
       simp only [hS, mem_filter] at this
       exact this.2
@@ -59,7 +59,7 @@ theorem theta_ge (n : ℕ) :
           pow_le_pow_of_le_one (by norm_num) (by norm_num) hc
       _ = ∏ _ℓ ∈ Pl, (28 / 29 : ℝ) := (prod_const _).symm
       _ ≤ ∏ ℓ ∈ Pl, f ℓ := by
-          refine prod_le_prod (fun _ _ => by norm_num) fun ℓ hℓ => ?_
+          refine prod_le_prod₀ (fun _ _ => by norm_num) fun ℓ hℓ => ?_
           simp only [hPl, mem_filter, not_lt] at hℓ
           have : (29 : ℝ) ≤ ℓ := by exact_mod_cast hℓ.2
           simp only [hf]
