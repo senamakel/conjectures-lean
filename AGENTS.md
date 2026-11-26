@@ -674,6 +674,14 @@ Rules:
 - [ ] Literature: the generator bound with constant `2` sharpens the `3` of Bach 1990 §6. Whether factoring from `φ(n)` is
       known without ERH was not checked
 
+### abundant-rh: Solé–Planat, extremely abundant numbers, extraordinary numbers · **tier C verified (Robin as an imported hypothesis), U check pending** · *RH-equivalent*
+- [x] `solePlanat_of_RH`, `extremelyAbundantInfinite_of_RH`, `fourOnlyExtraordinary_of_RH`; the last two take
+      `Robin.RobinStatement` as an argument so the main library never builds robin-rh's sieve. Rebuilt 2026-11-26 at `3b1cb54`;
+      axiom lists pinned by `#guard_msgs` in `AbundantChecks`: standard three + `Nicolas.Check.loop_ok` (+ `Abundant.Check.check_ok`
+      for the extraordinary-number theorem, one `native_decide`, 92 s, proved-sound checker over `n ≤ 5040`)
+- [ ] `Unconditional/AbundantUnconditional.lean` written; its check builds robin-rh's sieve (about 54 core-hours) first. Not run
+- [ ] The separate GA2 statement of Caveney–Nicolas–Sondow is not stated (its definition was not confirmed)
+
 ### ramanujan-rh: Ramanujan's inequality `π(x)² < (e·x/log x)·π(x/e)` · **tier C for `x ≥ e⁴⁰` verified, U check pending; full statement tier H** · *RH-consequence*
 - [x] `ramanujan_of_RH : RiemannHypothesis → RamanujanInequalityFrom (Real.exp 40)` (C), no computation. Rebuilt 2026-11-26 at
       `d2d9ea0`: standard three + 23 `native_decide` inherited from schoenfeld-rh; `ramanujan_of_schoenfeldPi` standard three only

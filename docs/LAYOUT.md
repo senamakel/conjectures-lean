@@ -25,6 +25,7 @@ against the sibling folders in this checkout. A sibling's build output lands in 
 | Project | Requires |
 | :--- | :--- |
 | `abelian-erh` | `artin-grh`, `erdos-985` |
+| `abundant-rh` | `nicolas-rh`, `robin-rh` |
 | `ankeny-grh` | `erdos-985` |
 | `artin-grh` | `erdos-985` |
 | `bach-corollaries-grh` | `ankeny-grh`, `lls-grh`, `miller-grh` |
