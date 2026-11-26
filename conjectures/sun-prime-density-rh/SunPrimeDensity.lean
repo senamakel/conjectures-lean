@@ -1,5 +1,6 @@
 import SunPrimeDensity.Statement
 import SunPrimeDensity.Analytic
 import SunPrimeDensity.Tail
+import SunPrimeDensity.Tail3
 import SunPrimeDensity.Check
 import SunPrimeDensity.Main

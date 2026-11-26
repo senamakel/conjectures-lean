@@ -6,3 +6,6 @@ import SunPrimeDensity
 #print axioms SunPrimeDensity.tail
 #print axioms SunPrimeDensity.Check.finite_range
 #print axioms SunPrimeDensity.pi_mid_explicit
+#print axioms SunPrimeDensity.sun_three_of_RH
+#print axioms SunPrimeDensity.sunConjecture_iff_of_RH
+#print axioms SunPrimeDensity.tail_three

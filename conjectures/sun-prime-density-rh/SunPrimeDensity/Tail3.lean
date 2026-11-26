@@ -52,6 +52,10 @@ theorem tail3_core {m : ℝ} (hm : 10 ^ 7 ≤ m) :
     2 * (1 / (8 * π) * (√(m ^ 3) * Real.log (m ^ 3))) * (m + 3)
       < 3 * ((m ^ 3 - 2) / Real.log (m ^ 3) ^ 2 - 2.886) := by
   have hm0 : 0 < m := by linarith
+  have hm3 : (10 : ℝ) ^ 7 ≤ m ^ 3 :=
+    calc (10 : ℝ) ^ 7 ≤ m := hm
+      _ = m ^ 1 := (pow_one m).symm
+      _ ≤ m ^ 3 := pow_le_pow_right₀ (by linarith) (by norm_num)
   set w := √(√(√(√m))) with hw
   have hw0 : 0 ≤ w := Real.sqrt_nonneg _
   have hwm : w ^ 16 = m := by
@@ -78,7 +82,7 @@ theorem tail3_core {m : ℝ} (hm : 10 ^ 7 ≤ m) :
     have h3 : w / 2.7182818283 ≤ 0.36788 * w := by
       rw [div_le_iff₀ (by norm_num)]; nlinarith
     rw [hLw]; linarith
-  have hL0 : 0 < Real.log (m ^ 3) := Real.log_pos (by nlinarith)
+  have hL0 : 0 < Real.log (m ^ 3) := Real.log_pos (by linarith)
   set L := Real.log (m ^ 3)
   set Λ := 17.659 * w with hΛ
   have hΛ0 : 0 < Λ := by positivity
@@ -89,7 +93,7 @@ theorem tail3_core {m : ℝ} (hm : 10 ^ 7 ≤ m) :
     have h8 : 0 ≤ 1 / (8 * π) := by positivity
     nlinarith [mul_le_mul_of_nonneg_left this h8]
   have hrhs : (m ^ 3 - 2) / Λ ^ 2 ≤ (m ^ 3 - 2) / L ^ 2 :=
-    div_le_div_of_nonneg_left (by nlinarith) (by positivity) (pow_le_pow_left₀ hL0.le hL 2)
+    div_le_div_of_nonneg_left (by linarith) (by positivity) (pow_le_pow_left₀ hL0.le hL 2)
   have hP := tail3_poly hw2 h16
   rw [hwm, ← hx, ← hΛ] at hP
   have hmain : 2 * (1 / (8 * π) * (√(m ^ 3) * Λ)) * (m + 3)

@@ -1,6 +1,7 @@
 import SunPrimeDensity.Statement
 import SunPrimeDensity.Tail
 import SunPrimeDensity.Check
+import SunPrimeDensity.Tail3
 
 /-!
 # Sun's conjecture for every exponent `k ≥ 4`, from RH
@@ -54,5 +55,34 @@ theorem sunConjecture_of_RH_of_three (hRH : RiemannHypothesis)
   · obtain rfl : k = 3 := by omega
     exact h3 n hn
   · exact sun_of_RH hRH k h n hn
+
+/-- **`k = 3` outside `141 ≤ n < 10⁷`, from RH**: for `2 ≤ n ≤ 140` by exact prime counts, and
+for `n ≥ 10⁷` from Schoenfeld's bound. -/
+theorem sun_three_of_RH (hRH : RiemannHypothesis) (n : ℕ) (hn : 2 ≤ n)
+    (hrange : n ≤ 140 ∨ 10 ^ 7 ≤ n) :
+    (Nat.primeCounting ((n + 1) ^ 3) : ℚ) / ((n + 1) ^ 3 : ℚ) <
+    (Nat.primeCounting (n ^ 3) : ℚ) / (n ^ 3 : ℚ) := by
+  rw [← Rat.cast_lt (K := ℝ)]
+  push_cast
+  rcases hrange with h | h
+  · exact Check.three_small hn h
+  · exact tail_three (schoenfeldPi_of_RH hRH) h
+
+/-- Under RH, Sun's conjecture (all `k > 2`) is equivalent to its case `k = 3`,
+`141 ≤ n < 10⁷`. -/
+theorem sunConjecture_iff_of_RH (hRH : RiemannHypothesis) :
+    SunConjecture ↔ ∀ n : ℕ, 141 ≤ n → n < 10 ^ 7 →
+      (Nat.primeCounting ((n + 1) ^ 3) : ℚ) / ((n + 1) ^ 3 : ℚ) <
+      (Nat.primeCounting (n ^ 3) : ℚ) / (n ^ 3 : ℚ) := by
+  constructor
+  · intro h n hn _
+    exact h 3 (by norm_num) n (by omega)
+  · intro h3
+    refine sunConjecture_of_RH_of_three hRH fun n hn => ?_
+    rcases Nat.lt_or_ge n 141 with h1 | h1
+    · exact sun_three_of_RH hRH n hn (Or.inl (by omega))
+    rcases Nat.lt_or_ge n (10 ^ 7) with h2 | h2
+    · exact h3 n h1 h2
+    · exact sun_three_of_RH hRH n hn (Or.inr h2)
 
 end SunPrimeDensity
