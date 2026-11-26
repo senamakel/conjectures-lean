@@ -144,7 +144,9 @@ of qhull section volumes, and the |det| sum computed once per F;
 (ii) gradient-based optimisation with many more restarts in n = 7, 8, where S5 and S6 managed only a
 handful of starts;
 (iii) since m = n+2 sits exactly at Γ = 1 for n ≤ 8, a second-order analysis at the simplex for
-m ≥ n+3, together with the 3-split first-order test (S7).
+m ≥ n+3, and a redo of the 3-split first-order test (S7) with the robust evaluator.
+Evaluator: `oai-work/brannen/plane.py` (robust), `gamma.py` / `gmp.py` (k = 1, B-spline, exact
+or 60 digits).
 A hit would have exact rational data: rational a or A, and rational λ. Γ is then rational for k = 1
 (B-spline divided differences), so it can be checked exactly, and in Lean by `norm_num` on a closed
 form. The second, independent check is the direct formula
