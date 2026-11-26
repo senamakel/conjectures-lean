@@ -3,5 +3,6 @@ import Implications.ABC.Erdos936
 import Implications.ABC.Erdos977
 import Implications.FourExponentials.TwoPowThreePow
 import Implications.Hadamard.ButsonDoubling
+import Implications.HardyLittlewood.Richards
 import Implications.PrimeGaps.Erdos382
 import Implications.Wieferich.Rotkiewicz

@@ -252,6 +252,8 @@ end HardyLittlewood.Richards
 
 namespace HardyLittlewood
 
+-- `hx`, `hy` are unused binder names of the copied statement.
+set_option linter.unusedVariables false in
 open Richards in
 /-- Richards [Ri74] showed that only one of the two Hardy-Littlewood conjectures can be true.
 
@@ -296,5 +298,3 @@ theorem not_first_and_secondHardyLittlewoodConjecture :
   omega
 
 end HardyLittlewood
-
-#print axioms HardyLittlewood.not_first_and_secondHardyLittlewoodConjecture
