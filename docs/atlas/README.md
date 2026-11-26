@@ -112,8 +112,8 @@ Reports: [`novel-via-rh.md`](sweeps/2026-11-26/novel-via-rh.md), [`novel-oeis-li
 | A prime primitive root `q < p` modulo `p²`, every odd prime `p` | erdos-985's argument + one character sum (GRH) | **proved**, PR #21; Martin 1997 has it for large `p` without an explicit constant |
 | Sharp generator constant `2/log² 3` for `(ℤ/m)ˣ`, every `m ≥ 3` | lls-grh's analysis (GRH) + finite check | prover running, sizing first |
 | Erdős 770 (iii) with a single-digit constant | Bach's constant 2 (GRH) | prover running |
-| Sun, arXiv:1402.6641 Conj 2.7(i): `π(kn)^{1/k} > π((k+1)n)^{1/(k+1)}` | elementary, no RH | prover running |
-| Sun, Conj 2.14(ii): `π(n²)^{1/n}` strictly decreasing, `n ≥ 3` | elementary, no RH | prover running |
+| Sun, arXiv:1402.6641 Conj 2.7(i): `π(kn)^{1/k} > π((k+1)n)^{1/(k+1)}` | elementary, no RH | **proved**, PR #23 (tier D) |
+| Sun, Conj 2.14(ii): `π(n²)^{1/n}` strictly decreasing, `n ≥ 3` | elementary, no RH | **proved**, PR #23 (tier D) |
 | Sun, Conj 3.25 / OEIS A243164: a prime `q < n` with `q·n` a primitive root mod `p_n` | erdos-985's argument with a shorter range (GRH) | feasibility study running |
 | Grosswald's conjecture modulo `p²` (Kerr–McGown–Trudgian) | grosswald-grh's sieve + one term (GRH) | not started: about 1000 CPU-hours of checks |
 | Hassani 2013: `A_n/G_n` decreasing for `n ≥ 226` | RH bound from about `3·10¹³` | not started: the range below is beyond a Lean checker |

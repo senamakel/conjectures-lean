@@ -59,5 +59,6 @@ against the sibling folders in this checkout. A sibling's build output lands in 
 | `schoenfeld-rh` | `erdos-985` |
 | `shoup-grh` | `erdos-985` |
 | `speiser-rh` | `erdos-985` |
+| `sun-pi-inequalities` | — (Mathlib only) |
 | `sun-prime-density-rh` | `schoenfeld-rh` |
 | `weinberger-grh` | `erdos-985` |
