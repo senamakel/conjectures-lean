@@ -1,0 +1,19 @@
+name = "Erdos969"
+defaultTargets = ["Erdos969"]
+
+[leanOptions]
+pp.unicode.fun = true
+autoImplicit = false
+
+[[require]]
+name = "Erdos985"
+git = "https://github.com/senamakel/erdos-985.git"
+rev = "9538edb73dc72c8fdc04b4e0df076c8930ee2fba"
+
+[[require]]
+name = "Mertens"
+git = "https://github.com/senamakel/mertens-rh.git"
+rev = "98c6eab3ff26a53f5f5efd1e8e699e3b92f737de"
+
+[[lean_lib]]
+name = "Erdos969"
