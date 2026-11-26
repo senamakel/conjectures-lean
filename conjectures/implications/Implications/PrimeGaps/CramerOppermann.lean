@@ -100,12 +100,13 @@ theorem gap_sq_lt_of_strictBound (h : CramerConjecture.StrictBound) {k : ℕ}
       rw [show (65536 : ℝ) = 256 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
     rw [← this]; exact Real.sqrt_le_sqrt ha16
   have hg : (primeGap k : ℝ) < Real.sqrt a := by
+    have hl1 : Real.log 2 ^ 2 < 1 := by nlinarith
     have : Real.log 2 ^ 2 * Real.sqrt a < Real.sqrt a := by nlinarith
     rw [← ha] at hr; linarith
   have hlt := nth_lt_nth_succ k
   have hd : ((Nat.nth Nat.Prime (k + 1) - Nat.nth Nat.Prime k : ℕ) : ℝ) = primeGap k := rfl
   have h2 := pow_lt_pow_left₀ hg (by positivity) (two_ne_zero)
-  rw [hss, ← hd] at h2
+  rw [hss, ← hd, ha] at h2
   exact_mod_cast h2
 
 /-- Under the strict Cramér bound, every `m ≥ 127` has a prime `q > m` with `(q - m)² < m`. -/
