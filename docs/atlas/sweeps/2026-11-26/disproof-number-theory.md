@@ -31,9 +31,9 @@ not an integer is not an integer, so it is not prime. Sun's Mathematica code in 
 
 | Part | Witness (least) | Further exceptions found | Certificate |
 |---|---|---|---|
-| 3.27(ii), first sentence, `3·2^{φ(k)/2+φ(m)/8}+1` | **n = 62191** | 128 exceptions with `n > 25`, all in `[62191, 129145]`; none in `(129145, 2·10⁶]` | every attainable exponent `e ∈ [1743, 31086]` gives a composite (TODO) |
-| 3.27(iv), `2^{φ(k)+φ(m)/4}−5` | **n = 167665** | 106 exceptions in `[167665, 574191]`; search stopped at `6·10⁵` | TODO |
-| OEIS A234451 only (not in the paper): `3·2^{φ(k)/2+φ(m)/12}+1` for `n > 38` | n = 83843 | 10 exceptions in `[83843, 130801]`, none to `2·10⁶` | TODO |
+| 3.27(ii), first sentence, `3·2^{φ(k)/2+φ(m)/8}+1` | **n = 62191** | 128 exceptions with `n > 25`, all in `[62191, 129145]`; none in `(129145, 2·10⁶]` | **complete**: all 17,161 attainable integer exponents `e ∈ [1743, 31086]` give a composite (15,111 with a prime factor below 2²⁰, 2,050 by a failed Fermat test base 3) |
+| 3.27(iv), `2^{φ(k)+φ(m)/4}−5` | **n = 167665** | 106 exceptions in `[167665, 574191]`; search stopped at `6·10⁵` | **checked against the list only** (program 1): no attainable exponent is in A059608. A full compositeness certificate was not run: it needs Fermat tests on numbers of up to 167,642 bits, about 60 s each at 10⁵ bits on this box, so on the order of 10² CPU-hours *(estimate)* |
+| OEIS A234451 only (not in the paper): `3·2^{φ(k)/2+φ(m)/12}+1` for `n > 38` | n = 83843 | 10 exceptions in `[83843, 130801]`, none to `2·10⁶` | **complete**: 21,452 exponents in `[1538, 41897]`, 18,843 by a small factor, 2,609 by Fermat |
 
 **Prior art.** I found none. The OEIS A234451 history has had no edit since 23 Jan 2014, and the
 entry still states the conjecture. arXiv v29 (2017, the published version) still states 3.27 as
