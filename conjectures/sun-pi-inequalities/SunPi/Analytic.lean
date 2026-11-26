@@ -59,8 +59,9 @@ theorem PlogP_ge (X j i : ℕ) (hX : 2 ^ j ≤ X) (h7 : 7 ≤ X) (hj : 0 < j) (h
       ≤ π X * Real.log (π X) := by
   have hl2 := Real.log_two_gt_d9
   have hl2pos : 0 < Real.log 2 := by linarith
-  have hX0 : (0 : ℝ) < X := by have : (0 : ℝ) < 7 := by norm_num
-                                 exact lt_of_lt_of_le this (by exact_mod_cast h7)
+  have hX0 : (0 : ℝ) < X := by
+    have : (7 : ℝ) ≤ X := by exact_mod_cast h7
+    linarith
   have hX1 : (1 : ℝ) < X := by
     have : (7 : ℝ) ≤ X := by exact_mod_cast h7
     linarith
