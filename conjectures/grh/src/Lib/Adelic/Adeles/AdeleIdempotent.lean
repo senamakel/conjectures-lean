@@ -68,8 +68,9 @@ noncomputable instance : StarRing (Ô E) := starRing ⟨_, star_mem_Ô⟩
 
 @[simp] lemma v_star_apply : v (star x w) = v (x (star w)) := by simp
 
-@[simp] lemma q_star : (star w).q = w.q :=
-  Nat.card_congr (quotientEquiv _ _ _ (comap_symm starRingAut)).1.symm
+@[simp] lemma q_star : (star w).q = w.q := by
+  rw [FinPlace.q, FinPlace.q, absNorm_eq_natCard, absNorm_eq_natCard]
+  exact Nat.card_congr (quotientEquiv _ _ _ (comap_symm starRingAut)).1.symm
 
 lemma star_idem S : star (idem S : 𝔸f E) = idem (star ⁻¹' S) := by aesop
 

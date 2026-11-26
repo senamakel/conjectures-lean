@@ -22,7 +22,7 @@ def schwartzBruhat s := Submodule.ofLinearComb {f : X → ℂ | IsLocallyConstan
 lemma schwartzBruhat.comp [T2Space X] {t : Set Y} (h : φ ∈ schwartzBruhat s) {f} g (hs :
   s.MapsTo g t) (hf : Continuous f := by fun_prop) (hg : Continuous g := by fun_prop)
   (hi : g.LeftInverse f := by intro; aesop) : φ ∘ f ∈ schwartzBruhat t := ⟨h.1.comp_continuous hf,
-  h.2.1.comp_isClosedEmbedding (hi.isClosedEmbedding hg hf), (hi · ▸ h.2.2.trans hs ·)⟩
+  h.2.1.comp_isClosedEmbedding (hi.isClosedEmbedding hg hf), fun x hx ↦ hi x ▸ hs (h.2.2 hx)⟩
 
 lemma schwartzBruhat.isLocallyConstant_curry (h : φ ∈ schwartzBruhat s) (f : Γ → Y → X) (g : Γ → X →
   Y) (hi : ∀ γ y, g γ (f γ y) = y := by
