@@ -106,7 +106,7 @@ lemma isApproximatingMonoid_of_mem_closure (hf : f ≠ 0) (h : f ∈ uniformClos
   ∀ i, T (y i) = p.2 i • y i) → p ∈ N := (Function.ne_iff.1 hf).elim fun z (o : _ ≠ 0) ↦ by
   choose s a y b using Subtype.forall'.1 (by
     simpa [mem_span_set', mem_uniformClosure, ↓← Pi.sub_apply] using smul_mem _ (f z)⁻¹ h)
-  refine ⟨s, _, .topologicalClosure ⟨⟨_, (·.rec fun T _ ↦ .imp' (· * T) (by simp_all [mul_smul]))⟩,
+  refine ⟨s, _, .topologicalClosure ⟨⟨{p | _}, (·.rec fun T _ ↦ .imp' (· * T) (by simp_all [mul_smul]))⟩,
     .intro 1 (by simp)⟩, ⟨isClosed_closure, tendstoUniformly_iff.2 (eventually_lt_atBot ⟨·, ·⟩
     |>.mono fun η e p ↦ (le_on_closure (by rintro q ⟨T, t, _, v⟩; simpa [v ⟨η, _⟩, *,
     ← dist_eq_norm, mul_comm, ← mul_assoc] using t _ _ (b η) z) ?_ ?_ p.2).trans_lt e)⟩,
