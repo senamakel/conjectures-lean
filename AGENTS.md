@@ -685,6 +685,13 @@ Rules:
       under `Implications.` before a second module copies the same definition
 - [ ] None of these is a result about the consequence by itself. Never describe one as solving its Erdős problem
 
+### polya-liouville: Pólya's and von Sterneck's conjectures are false · **tier D, complete; audit pending** · *known* (refutation lane, route c/e, owner sign-off 2026-11-26)
+- [x] Statements written here (no formal-conjectures statement): `PolyaConjecture` (`L(n) ≤ 0`, `n ≥ 2`), `VonSterneckConjecture` (real) and `VonSterneckConjectureInt` (`4M(x)² < x`), `x > 200`
+- [x] `liouvilleSum_906150257`, `polya_conjecture_false` (D): standard three + 1 `native_decide` (about 23 s)
+- [x] `mertens_7725038629`, `vonSterneck_conjecture_false`, `vonSterneck_conjecture_int_false` (D): standard three + 1 `native_decide` (about 2 min)
+- [x] Checker `Polya.Check` proved sound (`runLiouville_sound`, `runMertens_sound`, standard three): table check of `Σ_{k≤y} M(⌊y/k⌋) = 1` on `V`, `λ * ζ = 𝟙_□`; the table builders are untrusted
+- [ ] Not proved: minimality of `906150257` (Tanaka 1980) and `7725038629` (Cohen–Dress 1979). Pólya-side citations are from secondary sources
+
 ## Working here
 
 - Changes to this superproject's own files (`AGENTS.md`, `README.md`, `docs/`, `scripts/`) go
