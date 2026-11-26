@@ -55,6 +55,30 @@ The script records only what git and GitHub know. Reasoning that never reaches a
 approach dropped mid-session, a constant sized up in a scratch script) has to be written to
 LivingBrain by hand, as above.
 
+## Lemma search: lemmagraph
+
+`lemmagraph` is an MCP server (container `lemmagraph-mcp`, `http://127.0.0.1:7340/mcp`) over a
+read-only index of all 418,820 Mathlib declarations, plus the Lean core and Batteries they
+import, at exactly our pin (Lean `v4.36.0`, Mathlib `fc4f59e5`). It stores statement and proof
+dependency edges. Source and benchmarks: `~/work/personal/lemmagraph`; its CLI is `lg`.
+
+- `search`: a description or Lean statement, returns semantically close declarations.
+- `premises`: a Lean goal, returns lemmas a proof is likely to use, ranked by similarity plus
+  the proofs of similar theorems. Graph kNN over proofs is the strong signal: R@32 0.54 against
+  0.20 for vectors alone (0.59 fused; 1,000 held-out Mathlib theorems).
+- `text_search`: keywords in names, signatures and docstrings.
+- `get_declaration`: one declaration in full, with proof text and permalink; short names work.
+- `dependencies`: what a declaration uses, or what uses it.
+
+It retrieves; it does not prove. Check that a lemma applies before relying on it. Names and
+signatures are exact for our pin, so it suits Mathlib-drift fixes (e.g. the grh-compact port)
+and finding existing lemmas to connect. Corpus repos such as riemann-hypothesis are being
+ingested into a separate DB that the MCP does not serve yet.
+
+Load the tools with ToolSearch and try lemmagraph before grepping Mathlib. Whether it speeds up
+solving and discovery is being measured (A/B experiment, 2026-11-26); results will be recorded
+in docs/experiments/lemmagraph-ab.md.
+
 ## Shared facts
 
 - Toolchain: Lean `v4.36.0`, Mathlib `fc4f59e5`. `erdos-985` is the root: it holds the analytic
