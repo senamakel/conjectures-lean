@@ -33,7 +33,7 @@ theorem sum_mertens_div {x : ℕ} (hx : 1 ≤ x) :
   rw [h, Icc_one_eq_Ioc]
   refine sum_congr rfl fun n hn => ?_
   have hn0 : n ≠ 0 := by simp only [mem_Ioc] at hn; omega
-  rw [intCoe_apply, zeta_apply_ne hn0, Nat.cast_one, one_mul, mertens_eq_Ioc]
+  rw [natCoe_apply, zeta_apply_ne hn0, Nat.cast_one, one_mul, mertens_eq_Ioc]
 
 /-! ## The indicator of the squares -/
 
@@ -52,7 +52,7 @@ theorem isSquare_mul_iff_of_coprime {m n : ℕ} (hm : m ≠ 0) (hn : n ≠ 0) (h
     have key : ∀ p : ℕ, p.Prime → m.factorization p = 0 ∨ n.factorization p = 0 := by
       intro p hp
       by_contra hc
-      push_neg at hc
+      push Not at hc
       have hpm : p ∣ m := Nat.dvd_of_factorization_pos hc.1
       have hpn : p ∣ n := Nat.dvd_of_factorization_pos hc.2
       have : p ∣ Nat.gcd m n := Nat.dvd_gcd hpm hpn
@@ -94,16 +94,16 @@ theorem sum_range_neg_one_pow (i : ℕ) :
     rw [sum_range_succ, ih]
     rcases Nat.even_or_odd i with h | h
     · have h' : ¬ Even (i + 1) := by rw [Nat.even_add_one]; exact not_not.2 h
-      simp only [h, h', if_true, if_false, pow_succ, h.neg_one_pow]
+      simp only [h, h', ite_true, ite_false, pow_succ, h.neg_one_pow]
       norm_num
     · have h' : Even (i + 1) := by rw [Nat.even_add_one]; exact Nat.not_even_iff_odd.2 h
-      simp only [Nat.not_even_iff_odd.2 h, h', if_true, if_false, pow_succ, h.neg_one_pow]
+      simp only [Nat.not_even_iff_odd.2 h, h', ite_true, ite_false, pow_succ, h.neg_one_pow]
       norm_num
 
 /-- `∑_{d ∣ n} λ(d) = 1` if `n` is a nonzero square and `0` otherwise. -/
 theorem liouville_mul_zeta : liouville * (zeta : ArithmeticFunction ℤ) = sqInd := by
   refine (IsMultiplicative.eq_iff_eq_on_prime_powers _
-    (isMultiplicative_liouville.mul isMultiplicative_zeta.intCast) _ isMultiplicative_sqInd).2 ?_
+    (isMultiplicative_liouville.mul isMultiplicative_zeta.natCast) _ isMultiplicative_sqInd).2 ?_
   intro p i hp
   rw [coe_mul_zeta_apply, Nat.sum_divisors_prime_pow hp, sqInd_apply]
   have : ∀ j ∈ range (i + 1), liouville (p ^ j) = (-1 : ℤ) ^ j := by
