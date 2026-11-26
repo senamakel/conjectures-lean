@@ -155,8 +155,7 @@ theorem gap_lt_of_firoozbakht_eventually (h : Firoozbakht.FiroozbakhtConjecture)
   push_cast at hk
   rw [abs_of_pos (by positivity : 0 < a / L)] at hk
   have hπ : (1 - δ) * (a / L) ≤ (k + 1 : ℝ) := by
-    have := (neg_abs_le _).trans (le_of_eq rfl) |>.trans' (neg_le_neg hk)
-    linarith [neg_abs_le ((k + 1 : ℝ) - a / L)]
+    linarith [(abs_le.1 hk).1]
   rw [Real.norm_eq_abs, Real.norm_eq_abs, abs_of_nonneg (sq_nonneg _),
     abs_of_pos ha0] at hks
   set t : ℝ := L / (k + 1 : ℝ) with ht
