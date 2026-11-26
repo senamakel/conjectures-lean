@@ -45,7 +45,7 @@ lemma isLocallyConstant_smul x : IsLocallyConstant (· • x : Γ → Ω) :=
 
 /-- For x in Ω and any property P, the set of g in Γ such that gx has P is closed. -/
 lemma isClosed_setOf_smul x (P : Ω → _) : IsClosed {g : Γ | P (g • x)} :=
-  ⟨isLocallyConstant_smul x Pᶜ⟩
+  ⟨isLocallyConstant_smul x {y | P y}ᶜ⟩
 
 variable {Γ' L Ω'} [Group Γ'] [TopologicalSpace Γ'] [Field L] [Field Ω'] [Algebra L Ω']
   [MulSemiringAction Γ' Ω'] (j : Ω →+* Ω')
