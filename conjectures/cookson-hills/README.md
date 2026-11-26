@@ -74,7 +74,21 @@ Tiers are those of the conjectures-lean workspace (`AGENTS.md`).
 
 ## Axioms
 
-AXIOMS_PLACEHOLDER
+`#print axioms`, 2026-11-26, on Lean `v4.36.0` / Mathlib `fc4f59e5`:
+
+```
+'FlintCooksonHills.cookson_hills_series_converges' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FlintCooksonHills.flint_hills_series_converges' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FlintCooksonHills.cookson_hills_of_piEventualLowerBound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'FlintCooksonHills.cookson_hills_of_flint_hills' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OAI.PiExponent.pi_eventual_lower_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OAI.PiExponent.flint_hills_summable' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OAI.PiExponent.main' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
+
+There is no `sorry`, no `native_decide`, no `axiom` and no `opaque` declaration, here or in the
+vendored tree. OpenAI's own Comparator configuration (`ComparatorChallenges/PiExponent.json`)
+permits exactly these three axioms for `OAI.PiExponent.main`.
 
 ## Proof outline
 
@@ -113,7 +127,31 @@ OpenAI's tree targets Lean `v4.34.1` and Mathlib `d13f23b7`; this package is on 
 and Mathlib `fc4f59e5` (1486 Mathlib commits later). The vendored files are unchanged except for
 the edits that port forced, each marked with a comment where it is more than a token:
 
-PORTING_PLACEHOLDER
+- 16 files: a singleton set written over several lines inside `Ideal.span {…}` is
+  parenthesised; the newer parser reads `{f\n  (x)}` as the start of a set-builder.
+- 3 files: the case of `Nat.strong_induction_on` is now called `ind`, not `h`.
+- `Analysis/FlintSine.lean`, `Analysis/FlintConsequence.lean`: the function in
+  `summable_nat_add_iff` is given explicitly (unification hit the heartbeat limit).
+- `Analysis/PeriodAnalytic.lean`: one `congr 1` replaced by `congrArg` (heartbeat limit).
+- `Approximation/Exponent.lean`: one inequality proved with `div_le_one` (simp normal form changed).
+- `Ampleness/ReesPushdown.lean`: `Polynomial.coeff_smul` is protected and `coeff_monomial` now
+  returns `Finsupp.single`.
+- `Polynomials/PolynomialPoleBound.lean`, `Geometry/CurveLocalOrder.lean`: `AddValuation.map`
+  now takes an ordered additive hom.
+- `LocalAlgebra/FiniteFreeResolutionExt.lean`: `simp; rfl` became `simp <;> rfl`.
+- `Geometry/ProjectiveIntrinsicCoefficientLaw.lean`: the `rfl` lemmas `intrinsic_polynomial` and
+  `intrinsic_ringEquiv` are removed. On this pin the kernel times out on the first and does not
+  finish the second: its statement alone makes the kernel identify
+  `Γ(intrinsicData.scheme, intrinsicData.chartOpen z)` with `Γ(projectiveSpace, ambientOpen z)`,
+  which it does not do in under 30 minutes (the elaborator accepts it at once).
+- `Approximation/WeightedPullbackDegree.lean`: the only user of those two lemmas,
+  `pullback_supportBound`, keeps its statement; its proof now passes the ambient chart data
+  (`ambientOpen`, `ambientRingEquiv`, `coordinateChartPolynomial` and
+  `GlobalPolynomialCoefficientLaw.coordinate_law`) to `coefficient_bound` directly.
+
+Every modified file starts with a one-line `-- Modified …` notice, and `NOTICE` lists them. No
+theorem statement was changed, and the statements of `PiEventualLowerBound`,
+`pi_eventual_lower_bound` and `main` are OpenAI's.
 
 ## Building
 
