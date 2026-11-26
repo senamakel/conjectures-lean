@@ -40,11 +40,11 @@ lemma invPow_le_dom {t : ℕ} (ht : 2 ≤ t) (n : ℕ) :
   rcases Nat.lt_or_ge n 2 with h | h
   · interval_cases n
     · simp [invPow_apply, zero_pow (show t ≠ 0 by omega)]
-    · simp only [invPow_apply, Nat.cast_one, one_pow, inv_one, if_true]
+    · simp only [invPow_apply, Nat.cast_one, one_pow, inv_one, ite_true]
       have : (0 : ℝ) ≤ 4 / 2 ^ t * (1 / 1 ^ 2) := by positivity
       linarith
   · have hn1 : n ≠ 1 := by omega
-    simp only [hn1, if_false, zero_add, invPow_apply]
+    simp only [hn1, ite_false, zero_add, invPow_apply]
     have hn : (2 : ℝ) ≤ n := by exact_mod_cast h
     obtain ⟨s, rfl⟩ : ∃ s, t = s + 2 := ⟨t - 2, by omega⟩
     have h4 : (4 : ℝ) / 2 ^ (s + 2) * (1 / (n : ℝ) ^ 2) = ((2 : ℝ) ^ s * (n : ℝ) ^ 2)⁻¹ := by
