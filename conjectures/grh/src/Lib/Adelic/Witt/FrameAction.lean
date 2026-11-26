@@ -129,7 +129,7 @@ lemma witt_of_quasiReflection_mem (H : Subgroup _) (hH : ∀ v σ h,
     (hH (star u) (.mk0 (z * (u ⬝ᵥ J *ᵥ star u - star z) / ζ.unit) ?_) ?_) hg) ?_ ?_
   all_goals revert σ t; simp +contextual [← mulVec_mulVec, *, quasiReflection,
     U.form_mulVec_mulVec, vecMulVec_mulVec, ← dotProduct_mulVec, ↓op_smul_eq_smul, mulVec_sub] <;>
-    grind [add_dotProduct, star_star, IsUnit.ne_zero, star_form, star_eq_zero, dotProduct_mulVec] :
+    grind [add_dotProduct, star_star, IsUnit.ne_zero, star_form, star_eq_zero, dotProduct_mulVec, dotProduct_zero, zero_dotProduct] :
     ∃ g ∈ H, ∀ i ∈ univ, g *ᵥ Xᵀ i = Yᵀ i).imp fun _ ↦ .imp_right (by simpa using! ext_col)
 
 /-- Witt's theorem: over a field with involution having some z − z̄ ≠ 0, for invertible
