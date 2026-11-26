@@ -139,8 +139,9 @@ Rules:
    `#print axioms` shows `sorryAx` is not a result. It may exist only as a clearly labelled
    convenience wrapper, never as the headline.
 5. **`#print axioms` is the source of truth.** Every headline theorem's axiom list goes in the
-   README, pasted from real output. Allowed: `propext`, `Classical.choice`, `Quot.sound`, and
-   `*._native.native_decide.ax_*`. Each `native_decide` needs a soundness proof for its checker
+   README, pasted from real output. Allowed: `propext`, `Classical.choice`, `Quot.sound`,
+   `*._native.native_decide.ax_*` and `*._native.bv_decide.ax_*` (see "Certificate results").
+   Each `native_decide` needs a soundness proof for its checker
    and its count in the README. No `axiom` or `opaque` declarations for mathematical content.
 6. **"Done" means tier D, U or U₀ for the full target statement**, with every remaining H
    hypothesis named. A repo whose best result is C or H is not done. It is done as far as it can
