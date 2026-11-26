@@ -27,7 +27,7 @@ against the sibling folders in this checkout. A sibling's build output lands in 
 | `abelian-erh` | `artin-grh`, `erdos-985` |
 | `ankeny-grh` | `erdos-985` |
 | `artin-grh` | `erdos-985` |
-| `bach-corollaries-grh` | `ankeny-grh`, `erdos-985`, `lls-grh`, `miller-grh` |
+| `bach-corollaries-grh` | `ankeny-grh`, `lls-grh`, `miller-grh` |
 | `bach-sorenson-grh` | `ankeny-grh`, `erdos-985`, `lls-grh` |
 | `cramer-rh` | `erdos-233`, `erdos-985`, `schoenfeld-rh` |
 | `density-rh` | `erdos-985` |
