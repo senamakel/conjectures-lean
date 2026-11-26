@@ -168,7 +168,7 @@ abbrev HasFewCocycles := .card (trivialisedCocycles X I V) ∈ Set.Ioc 0 (.card 
 with u. -/
 def trivialisedCocycles.map (u : A.Hom B) :
   A.trivialisedCocycles X I →+ B.trivialisedCocycles X I := .mk' (fun p ↦
-  ⟨p.1.map (u ∘ ·) (u ∘ ·), p.2.imp (by fun_prop) (by simp_all [← u.isIntertwining])⟩) (by simp)
+  ⟨p.1.map (u ∘ ·) (u ∘ ·), p.2.imp (fun h ↦ (continuous_of_discreteTopology (f := u.toFun)).comp h) (by simp_all [← u.isIntertwining])⟩) (by simp)
 
 lemma trivialisedCocycles.card_eq_of_isShortExact (s : A.IsShortExact ι π) :
   Nat.card (B.trivialisedCocycles X I) = .card (A.trivialisedCocycles X I) * .card (map X I

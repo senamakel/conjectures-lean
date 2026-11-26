@@ -121,8 +121,9 @@ variable {K}
 /-- For an open subgroup U of the Galois group Γ of Ω/K, only finitely many primes v of K have a
 place above them whose inertia group is not contained in U. -/
 lemma finite_ramified {U} (h : U.IsOpen) : ∀ᶠ v in .cofinite, ∀ A, @IsPlaceOver K Ω _ _ _ A v →
-  inertiaGroup Γ A ≤ U := le_nhds_of_unique_clusterPt (l := .bind (.bind .cofinite (.principal ∘ _))
-  (.principal ∘ _)) (fun g ↦ ((faithful (𝓞 K)).1 fun x : 𝓞 Ω ↦ by_contra fun n ↦ ·.frequently
+  inertiaGroup Γ A ≤ U := le_nhds_of_unique_clusterPt (l := .bind (.bind .cofinite
+  (fun v : FinPlace K ↦ .principal {A : ValuationSubring Ω | IsPlaceOver A v}))
+  (fun A : ValuationSubring Ω ↦ .principal (inertiaGroup Γ A : Set Γ))) (fun g ↦ ((faithful (𝓞 K)).1 fun x : 𝓞 Ω ↦ by_contra fun n ↦ ·.frequently
   ((isLocallyConstant_smul ↑x).eventually_eq g) ((finite_factors ((span {g • x - x}).under_ne_bot _
   (by aesop))).eventually_cofinite_notMem.mono fun v k A a _ I e ↦ k (dvd_iff_le.2
   ((IsPlaceOver.centrePrime_liesOver a).1 ▸ comap_mono
@@ -134,14 +135,17 @@ include h
 
 omit [Algebra.IsAlgebraic K Ω] in
 lemma IsPlaceOver.exists_above [Algebra.IsAlgebraic L Ω] : ∃ u : FinPlace L, IsPlaceOver A u ∧
-  u.below K = v := by grind [exists_isPlaceOver_of_val_ne_one L (by simp [↓map_ne_zero])
+  u.below K = v := by grind [exists_isPlaceOver_of_val_ne_one L (by simp [↓map_ne_zero, v.ne_bot])
   ((h _).2 (absNorm_mem _)).ne, → isPlaceOver_below, unique]
 
 /-- The Galois group Γ of Ω/K acts transitively on the valuation subrings of Ω lying over a
 given prime v of K. -/
 lemma IsPlaceOver.exists_smul (h' : IsPlaceOver A' v) : ∃ g : Γ, g • A = A' :=
   let : UniformSpace (𝓞 Ω) := ⊥
-  have := continuousSMul_iff_stabilizer_isOpen.2 (Subgroup.isOpen_mono (fun _ ↦ (ext ·)) <| G.6 ·.1)
+  have : DiscreteTopology (𝓞 Ω) := ⟨rfl⟩
+  have : ContinuousSMul Γ (𝓞 Ω) := continuousSMul_iff_stabilizer_isOpen.2 fun x ↦
+    Subgroup.isOpen_mono (H₁ := MulAction.stabilizer Γ x.1) (fun g hg ↦ RingOfIntegers.ext hg)
+      (G.isOpen_stabilizer x.1)
   (IsInvariant.exists_smul_of_under_eq_of_profinite _ _
     (h'.centrePrime_liesOver.1 ▸ h.centrePrime_liesOver.1)).imp' (·⁻¹) fun g e ↦ SetLike.ext
     fun x ↦ have ⟨_, o, _⟩ := h'.exists_above (L := fixedFieldOf (id (OpenSubgroup.mk _ (G.6 x))).1)

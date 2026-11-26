@@ -228,8 +228,13 @@ lemma isDisintegration_quadricMeasure (hT : Tᴴ = T) :
   grw [← setLIntegral_eq_of_support_subset (s := (flatChart T Γ ⟨p, ·⟩) ⁻¹' tsupport f) fun _ h ↦
     subset_closure (by tauto), le_ciSup (s.isCompact_range c).bddAbove, setLIntegral_const]
   exact mul_right_mono (le_indicator_apply (fun _ ↦ skewMeasure_le_of_sub_mem h.unit (fun _ h _ k ↦
-    .intro ((_, _), _, _) ⟨⟨h, k⟩, by simp; ring⟩) ((mul_le_mul' (e _) d.le).trans (by
-    simp [← enorm_pow, mul_pow]))) fun n ↦ (skewMeasure.mono_null (by aesop) skewMeasure.empty).le)
+    (by exact ⟨((_, _), _, _), ⟨h, k⟩, by simp; ring⟩)) ((mul_le_mul' (e _) d.le).trans (by
+    have h0 : ‖√(r : ℝ)‖ₑ ^ 2 = r := by
+      rw [Real.eNorm_eq_ofReal (Real.sqrt_nonneg _), ← ENNReal.ofReal_pow (Real.sqrt_nonneg _),
+        Real.sq_sqrt (Nat.cast_nonneg _), ENNReal.ofReal_natCast]
+    rw [IsUnit.unit_spec]
+    show ‖g p.1‖ₑ ^ 2 * (r : ℝ≥0∞) ≤ ‖g p.1 * √(r : ℝ)‖ₑ ^ 2
+    rw [eNorm_mul, mul_pow, h0]))) fun n ↦ (skewMeasure.mono_null (by aesop) skewMeasure.empty).le)
   erw [lintegral_lintegral_swap, ← measurePreserving_pair_sumElim.lintegral_comp,
     lintegral_prod_symm, lintegral_congr_of_ae_imp u] <;> try fun_prop
   rintro ⟨_, w⟩ ⟨t, rfl⟩
