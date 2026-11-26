@@ -871,3 +871,1164 @@ warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/NestedPolynomialSwap.lea
 warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/RegularHilbertStep.lean: imports `Mathlib.LinearAlgebra.Isomorphisms` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
 ⚠ [18479/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.RegularHilbertStep:irArts
 warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/RegularHilbertStep.lean: imports `Mathlib.LinearAlgebra.Isomorphisms` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18480/19988] Built OAI.NumberTheory.PiExponent.Polynomials.PowerCoverExponents (25s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PowerCoverExponents.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18481/19988] Ran OAI.NumberTheory.PiExponent.Polynomials.PowerCoverExponents:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PowerCoverExponents.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18482/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.FiniteFromClosedFibers (24s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/FiniteFromClosedFibers.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18483/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.FiniteFromClosedFibers:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/FiniteFromClosedFibers.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18484/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.QuotientLocalizedLength (6.2s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/QuotientLocalizedLength.lean: imports `Mathlib.RingTheory.Length` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18485/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.QuotientLocalizedLength:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/QuotientLocalizedLength.lean: imports `Mathlib.RingTheory.Length` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18486/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.CumulativeHilbertSections (19s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CumulativeHilbertSections.lean: imports `Mathlib.Algebra.BigOperators.Fin` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18487/19988] Built OAI.NumberTheory.PiExponent.Ampleness.AmpleThresholdPolynomial (26s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Ampleness/AmpleThresholdPolynomial.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18488/19988] Ran OAI.NumberTheory.PiExponent.Ampleness.AmpleThresholdPolynomial:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Ampleness/AmpleThresholdPolynomial.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18489/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.LocalIntersectionExactStep (19s)
+⚠ [18491/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.LocalIntersectionDimensionOne (18s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/LocalIntersectionDimensionOne.lean: imports `Mathlib.RingTheory.KrullDimension.LocalRing` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18492/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.LocalIntersectionDimensionOne:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/LocalIntersectionDimensionOne.lean: imports `Mathlib.RingTheory.KrullDimension.LocalRing` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18493/19988] Built OAI.NumberTheory.PiExponent.Geometry.CurveComponentStalks (26s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveComponentStalks.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18494/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveComponentStalks:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveComponentStalks.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18495/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.PrimeResidueAlgebraEquiv (6.8s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PrimeResidueAlgebraEquiv.lean: imports `Mathlib.RingTheory.AlgebraicIndependent.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PrimeResidueAlgebraEquiv.lean: imports `Mathlib.RingTheory.LocalRing.ResidueField.Ideal` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18496/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.PrimeResidueAlgebraEquiv:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PrimeResidueAlgebraEquiv.lean: imports `Mathlib.RingTheory.AlgebraicIndependent.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PrimeResidueAlgebraEquiv.lean: imports `Mathlib.RingTheory.LocalRing.ResidueField.Ideal` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18497/19988] Built OAI.NumberTheory.PiExponent.Polynomials.PolynomialAssociatedLocalization (17s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialAssociatedLocalization.lean: imports `Mathlib.Algebra.Module.LocalizedModule.IsLocalization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialAssociatedLocalization.lean: imports `Mathlib.Algebra.Module.LocalizedModule.Submodule` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialAssociatedLocalization.lean: imports `Mathlib.RingTheory.Flat.Localization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialAssociatedLocalization.lean: imports `Mathlib.RingTheory.Ideal.AssociatedPrime.Localization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialAssociatedLocalization.lean: imports `Mathlib.RingTheory.Localization.LocalizationLocalization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialAssociatedLocalization.lean: imports `Mathlib.RingTheory.Polynomial.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialAssociatedLocalization.lean: imports `Mathlib.RingTheory.Regular.RegularSequence` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18498/19988] Ran OAI.NumberTheory.PiExponent.Polynomials.PolynomialAssociatedLocalization:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialAssociatedLocalization.lean: imports `Mathlib.Algebra.Module.LocalizedModule.IsLocalization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialAssociatedLocalization.lean: imports `Mathlib.Algebra.Module.LocalizedModule.Submodule` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialAssociatedLocalization.lean: imports `Mathlib.RingTheory.Flat.Localization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialAssociatedLocalization.lean: imports `Mathlib.RingTheory.Ideal.AssociatedPrime.Localization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialAssociatedLocalization.lean: imports `Mathlib.RingTheory.Localization.LocalizationLocalization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialAssociatedLocalization.lean: imports `Mathlib.RingTheory.Polynomial.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialAssociatedLocalization.lean: imports `Mathlib.RingTheory.Regular.RegularSequence` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18499/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.CumulativeHilbertSections:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CumulativeHilbertSections.lean: imports `Mathlib.Algebra.BigOperators.Fin` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18500/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.RamifiedLocalLength (26s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/RamifiedLocalLength.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18501/19988] Built OAI.NumberTheory.PiExponent.Geometry.CurveStalkGluing (26s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveStalkGluing.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18502/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveStalkGluing:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveStalkGluing.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18503/19988] Built OAI.NumberTheory.PiExponent.Geometry.BirationalValuationStalk (26s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/BirationalValuationStalk.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18504/19988] Ran OAI.NumberTheory.PiExponent.Geometry.BirationalValuationStalk:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/BirationalValuationStalk.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18505/19988] Built OAI.NumberTheory.PiExponent.Polynomials.ConeHomogeneousEquations (7.4s)
+⚠ [18507/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.RamifiedLocalLength:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/RamifiedLocalLength.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18508/19988] Built OAI.NumberTheory.PiExponent.Jets.DVRBranchExpansion (26s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/DVRBranchExpansion.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/DVRBranchExpansion.lean:76:39: `Module.End.mul_apply` has been deprecated: Use `mul_apply_eq_comp` instead
+
+Note: The updated constant has a different type:
+  ∀ {F : Type u_1} {α : outParam (Type u_2)} {inst : FunLike F α α} {inst_1 : Mul F} [self : IsMulApplyEqComp F]
+    (f g : F) (x : α), (f * g) x = f (g x)
+instead of
+  ∀ {R : Type u_1} {M : Type u_4} [inst : Semiring R] [inst_1 : AddCommMonoid M] [inst_2 : Module R M]
+    (f g : Module.End R M) (x : M), (f * g) x = f (g x)
+
+Note: The updated constant is in a different namespace. Dot notation may need to be changed (e.g., from `x.mul_apply` to `mul_apply_eq_comp x`).
+⚠ [18509/19988] Ran OAI.NumberTheory.PiExponent.Jets.DVRBranchExpansion:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/DVRBranchExpansion.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18510/19988] Built OAI.NumberTheory.PiExponent.Approximation.AdditiveKernelTransport (26s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/AdditiveKernelTransport.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18511/19988] Ran OAI.NumberTheory.PiExponent.Approximation.AdditiveKernelTransport:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/AdditiveKernelTransport.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18512/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.KoszulDualEndpoint (19s)
+⚠ [18514/19988] Built OAI.NumberTheory.PiExponent.Polynomials.SimplexUnweighted (27s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/SimplexUnweighted.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18515/19988] Ran OAI.NumberTheory.PiExponent.Polynomials.SimplexUnweighted:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/SimplexUnweighted.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18516/19988] Built OAI.NumberTheory.PiExponent.Jets.FormalBranchOrder (27s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/FormalBranchOrder.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18517/19988] Ran OAI.NumberTheory.PiExponent.Jets.FormalBranchOrder:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/FormalBranchOrder.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18518/19988] Built OAI.NumberTheory.PiExponent.Polynomials.SimplexRationalWeights (27s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/SimplexRationalWeights.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18519/19988] Ran OAI.NumberTheory.PiExponent.Polynomials.SimplexRationalWeights:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/SimplexRationalWeights.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18520/19988] Built OAI.NumberTheory.PiExponent.Polynomials.GradedSubring (27s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/GradedSubring.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18521/19988] Ran OAI.NumberTheory.PiExponent.Polynomials.GradedSubring:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/GradedSubring.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18522/19988] Built OAI.NumberTheory.PiExponent.Approximation.WeightedSliceDegree (27s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/WeightedSliceDegree.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18523/19988] Ran OAI.NumberTheory.PiExponent.Approximation.WeightedSliceDegree:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/WeightedSliceDegree.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18524/19988] Built OAI.NumberTheory.PiExponent.Approximation.ApproximationCenters (28s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/ApproximationCenters.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18525/19988] Ran OAI.NumberTheory.PiExponent.Approximation.ApproximationCenters:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/ApproximationCenters.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18526/19988] Built OAI.NumberTheory.PiExponent.Jets.PolynomialTangentDifferential (24s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/PolynomialTangentDifferential.lean: imports `Mathlib.Algebra.MvPolynomial.PDeriv` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/PolynomialTangentDifferential.lean: imports `Mathlib.LinearAlgebra.Dual.Lemmas` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/PolynomialTangentDifferential.lean: imports `Mathlib.RingTheory.Ideal.Quotient.Operations` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/PolynomialTangentDifferential.lean: imports `Mathlib.RingTheory.Localization.FractionRing` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18527/19988] Ran OAI.NumberTheory.PiExponent.Jets.PolynomialTangentDifferential:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/PolynomialTangentDifferential.lean: imports `Mathlib.Algebra.MvPolynomial.PDeriv` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/PolynomialTangentDifferential.lean: imports `Mathlib.LinearAlgebra.Dual.Lemmas` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/PolynomialTangentDifferential.lean: imports `Mathlib.RingTheory.Ideal.Quotient.Operations` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/PolynomialTangentDifferential.lean: imports `Mathlib.RingTheory.Localization.FractionRing` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18528/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.PrimeHilbertDegree (27s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PrimeHilbertDegree.lean: imports `Mathlib.Algebra.Group.ForwardDiff` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PrimeHilbertDegree.lean: imports `Mathlib.Analysis.Normed.Group.Rat` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PrimeHilbertDegree.lean: imports `Mathlib.Analysis.Polynomial.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PrimeHilbertDegree.lean: imports `Mathlib.RingTheory.Ideal.Prime` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PrimeHilbertDegree.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18529/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.PrimeHilbertDegree:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PrimeHilbertDegree.lean: imports `Mathlib.Algebra.Group.ForwardDiff` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PrimeHilbertDegree.lean: imports `Mathlib.Analysis.Normed.Group.Rat` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PrimeHilbertDegree.lean: imports `Mathlib.Analysis.Polynomial.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PrimeHilbertDegree.lean: imports `Mathlib.RingTheory.Ideal.Prime` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PrimeHilbertDegree.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18530/19988] Built OAI.NumberTheory.PiExponent.Polynomials.HomogeneousSubmoduleGrading (29s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/HomogeneousSubmoduleGrading.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18531/19988] Ran OAI.NumberTheory.PiExponent.Polynomials.HomogeneousSubmoduleGrading:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/HomogeneousSubmoduleGrading.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18532/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.TriangularLocalParametersAssembly (10s)
+✔ [18534/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.AffinePrimeDimensionBridge (10s)
+✔ [18536/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.SplitCoordinateClosedPoint (20s)
+⚠ [18538/19988] Built OAI.NumberTheory.PiExponent.Analysis.AnalyticCollision (29s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/AnalyticCollision.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18539/19988] Ran OAI.NumberTheory.PiExponent.Analysis.AnalyticCollision:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/AnalyticCollision.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18540/19988] Built OAI.NumberTheory.PiExponent.Polynomials.NatToIntGrading (32s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/NatToIntGrading.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18541/19988] Ran OAI.NumberTheory.PiExponent.Polynomials.NatToIntGrading:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/NatToIntGrading.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18542/19988] Built OAI.NumberTheory.PiExponent.Jets.IntrinsicLength (33s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/IntrinsicLength.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18543/19988] Ran OAI.NumberTheory.PiExponent.Jets.IntrinsicLength:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/IntrinsicLength.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18544/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.IdealFiniteGenerators (34s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/IdealFiniteGenerators.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18545/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.IdealFiniteGenerators:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/IdealFiniteGenerators.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18546/19988] Built OAI.NumberTheory.PiExponent.Analysis.HilbertSeries (9.7s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/HilbertSeries.lean: imports `Mathlib.RingTheory.PowerSeries.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/HilbertSeries.lean: imports `Mathlib.Tactic.NormNum` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18547/19988] Ran OAI.NumberTheory.PiExponent.Analysis.HilbertSeries:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/HilbertSeries.lean: imports `Mathlib.RingTheory.PowerSeries.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/HilbertSeries.lean: imports `Mathlib.Tactic.NormNum` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18548/19988] Built OAI.NumberTheory.PiExponent.Geometry.SupportedSheaf (35s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/SupportedSheaf.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18549/19988] Ran OAI.NumberTheory.PiExponent.Geometry.SupportedSheaf:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/SupportedSheaf.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18550/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.KoszulDualBottom (11s)
+⚠ [18552/19988] Built OAI.NumberTheory.PiExponent.Ampleness.NefAmple (36s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Ampleness/NefAmple.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18553/19988] Ran OAI.NumberTheory.PiExponent.Ampleness.NefAmple:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Ampleness/NefAmple.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18554/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.RegularPrefixes (11s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/RegularPrefixes.lean: imports `Mathlib.RingTheory.Regular.RegularSequence` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18555/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.RegularPrefixes:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/RegularPrefixes.lean: imports `Mathlib.RingTheory.Regular.RegularSequence` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18556/19988] Built OAI.NumberTheory.PiExponent.Approximation.AddEquivSignedSum (36s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/AddEquivSignedSum.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18557/19988] Ran OAI.NumberTheory.PiExponent.Approximation.AddEquivSignedSum:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/AddEquivSignedSum.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18558/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.KoszulBounded (13s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/KoszulBounded.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18559/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.KoszulBounded:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/KoszulBounded.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18560/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.TriangularLocalParametersTransport (7.2s)
+✔ [18562/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.ConeEquationLength (11s)
+⚠ [18564/19988] Built OAI.NumberTheory.PiExponent.Approximation.WeightErrorMargin (37s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/WeightErrorMargin.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18565/19988] Ran OAI.NumberTheory.PiExponent.Approximation.WeightErrorMargin:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/WeightErrorMargin.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18566/19988] Built OAI.NumberTheory.PiExponent.Jets.FilteredLength (38s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/FilteredLength.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18567/19988] Ran OAI.NumberTheory.PiExponent.Jets.FilteredLength:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/FilteredLength.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18568/19988] Built OAI.NumberTheory.PiExponent.Cohomology.LocalIntersectionEulerFiltration (11s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/LocalIntersectionEulerFiltration.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18569/19988] Ran OAI.NumberTheory.PiExponent.Cohomology.LocalIntersectionEulerFiltration:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/LocalIntersectionEulerFiltration.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18570/19988] Built OAI.NumberTheory.PiExponent.Geometry.ConePrimeProperties (11s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/ConePrimeProperties.lean: imports `Mathlib.RingTheory.GradedAlgebra.Radical` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/ConePrimeProperties.lean: imports `Mathlib.RingTheory.Ideal.GoingDown` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/ConePrimeProperties.lean: imports `Mathlib.RingTheory.Ideal.MinimalPrime.Localization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/ConePrimeProperties.lean: imports `Mathlib.RingTheory.KrullDimension.Polynomial` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/ConePrimeProperties.lean: imports `Mathlib.RingTheory.Localization.Submodule` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18571/19988] Ran OAI.NumberTheory.PiExponent.Geometry.ConePrimeProperties:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/ConePrimeProperties.lean: imports `Mathlib.RingTheory.GradedAlgebra.Radical` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/ConePrimeProperties.lean: imports `Mathlib.RingTheory.Ideal.GoingDown` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/ConePrimeProperties.lean: imports `Mathlib.RingTheory.Ideal.MinimalPrime.Localization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/ConePrimeProperties.lean: imports `Mathlib.RingTheory.KrullDimension.Polynomial` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/ConePrimeProperties.lean: imports `Mathlib.RingTheory.Localization.Submodule` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18572/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.RegularPrefixLocalization (12s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/RegularPrefixLocalization.lean: imports `Mathlib.RingTheory.Localization.LocalizationLocalization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18573/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.RegularPrefixLocalization:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/RegularPrefixLocalization.lean: imports `Mathlib.RingTheory.Localization.LocalizationLocalization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18574/19988] Built OAI.NumberTheory.PiExponent.Polynomials.SimplexFloor (38s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/SimplexFloor.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18575/19988] Ran OAI.NumberTheory.PiExponent.Polynomials.SimplexFloor:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/SimplexFloor.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18576/19988] Built OAI.NumberTheory.PiExponent.Geometry.CurveMorphismFinite (38s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveMorphismFinite.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18577/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveMorphismFinite:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveMorphismFinite.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18578/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.AssociatedPrimeAvoidance (38s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/AssociatedPrimeAvoidance.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18579/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.AssociatedPrimeAvoidance:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/AssociatedPrimeAvoidance.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18580/19988] Built OAI.NumberTheory.PiExponent.Cohomology.ProjectiveLaurentVertex (38s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/ProjectiveLaurentVertex.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18581/19988] Ran OAI.NumberTheory.PiExponent.Cohomology.ProjectiveLaurentVertex:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/ProjectiveLaurentVertex.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18582/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.SplitClosedPointCompatibility (9.2s)
+⚠ [18584/19988] Built OAI.NumberTheory.PiExponent.Jets.FormalJetDerivatives (39s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/FormalJetDerivatives.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/FormalJetDerivatives.lean:35:18: `Derivation.smul_apply` has been deprecated: Use `smul_apply` instead
+
+Note: The updated constant has a different type:
+  ∀ {M : Type u_1} {F : Type u_2} {α : outParam (Type u_3)} {β : outParam (Type u_4)} {inst : FunLike F α β}
+    {inst_1 : SMul M β} {inst_2 : SMul M F} [self : IsSMulApply M F] (f : F) (n : M) (x : α), (n • f) x = n • f x
+instead of
+  ∀ {R : Type u_1} {A : Type u_2} {M : Type u_4} [inst : CommSemiring R] [inst_1 : CommSemiring A]
+    [inst_2 : AddCommMonoid M] [inst_3 : Algebra R A] [inst_4 : Module A M] [inst_5 : Module R M] (a : A) {S : Type u_5}
+    [inst_6 : Monoid S] [inst_7 : DistribMulAction S M] [inst_8 : SMulCommClass R S M] [inst_9 : SMulCommClass S A M]
+    (r : S) (D : Derivation R A M), (r • D) a = r • D a
+
+Note: The updated constant is in a different namespace. Dot notation may need to be changed (e.g., from `x.smul_apply` to `smul_apply x`).
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/FormalJetDerivatives.lean:35:18: This simp argument is unused:
+  Derivation.smul_apply
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [jetFrame, smul_eq_mul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [18585/19988] Ran OAI.NumberTheory.PiExponent.Jets.FormalJetDerivatives:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/FormalJetDerivatives.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18586/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.SerreDimensionShift (38s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/SerreDimensionShift.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18587/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.SerreDimensionShift:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/SerreDimensionShift.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18588/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.HilbertGrowthComparison (10s)
+⚠ [18590/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveMonomialFinite (39s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/ProjectiveMonomialFinite.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18591/19988] Ran OAI.NumberTheory.PiExponent.Geometry.ProjectiveMonomialFinite:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/ProjectiveMonomialFinite.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✖ [18592/19988] Building OAI.NumberTheory.PiExponent.Approximation.Exponent (39s)
+trace: .> LEAN_PATH=/home/ubuntu/work/personal/conjectures-lean/.lake/packages/Cli/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/batteries/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/Qq/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/aesop/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/importGraph/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/plausible/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/mathlib/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean /home/ubuntu/.elan/toolchains/leanprover--lean4---v4.36.0/bin/lean /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/Vendor/OAI/NumberTheory/PiExponent/Approximation/Exponent.lean -o /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean/OAI/NumberTheory/PiExponent/Approximation/Exponent.olean -i /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean/OAI/NumberTheory/PiExponent/Approximation/Exponent.ilean -c /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/ir/OAI/NumberTheory/PiExponent/Approximation/Exponent.c --setup /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/ir/OAI/NumberTheory/PiExponent/Approximation/Exponent.setup.json --json
+error: Vendor/OAI/NumberTheory/PiExponent/Approximation/Exponent.lean:67:6: Type mismatch: After simplification, term
+  one_div_le_one_div_of_le
+    (Mathlib.Meta.NormNum.isNat_lt_true (Mathlib.Meta.NormNum.isNat_ofNat ℝ Nat.cast_zero)
+      (Mathlib.Meta.NormNum.isNat_ofNat ℝ Nat.cast_one) (Eq.refl false))
+    (le_of_not_gt fun a ↦
+      Mathlib.Tactic.Linarith.lt_irrefl
+        (Eq.mp
+          (congrArg (fun _a ↦ _a < 0)
+            (Mathlib.Tactic.Ring.of_eq
+              (Mathlib.Tactic.Ring.Common.add_congr
+                (Mathlib.Tactic.Ring.Common.add_congr
+                  (Mathlib.Tactic.Ring.Common.sub_congr
+                    (Mathlib.Tactic.Ring.cast_pos (Mathlib.Meta.NormNum.isNat_ofNat ℝ Nat.cast_one))
+                    (Mathlib.Tactic.Ring.Common.atom_pf (↑r.den) rfl
+                      (Eq.mpr
+                        (id
+                          (congrArg (fun _a ↦ ↑r.den ^ Nat.rawCast 1 * Nat.rawCast 1 = ↑r.den ^ Nat.rawCast 1 * _a)
+                            (Eq.symm rfl)))
+                        (Eq.refl (↑r.den ^ Nat.rawCast 1 * Nat.rawCast 1))))
+                    (Mathlib.Tactic.Ring.Common.sub_pf
+                      (Mathlib.Tactic.Ring.Common.neg_add
+                        (Mathlib.Tactic.Ring.Common.neg_mul (↑r.den) (Nat.rawCast 1)
+                          (Mathlib.Meta.NormNum.IsInt.to_raw_eq
+                            (Mathlib.Meta.NormNum.isInt_neg (Eq.refl Neg.neg)
+                              (Mathlib.Meta.NormNum.IsNat.to_isInt (Mathlib.Meta.NormNum.IsNat.of_raw ℝ 1))
+                              (Eq.refl (Int.negOfNat 1)))))
+                        Mathlib.Tactic.Ring.Common.neg_zero)
+                      (Mathlib.Tactic.Ring.Common.add_pf_add_lt (Nat.rawCast 1)
+                        (Mathlib.Tactic.Ring.Common.add_pf_zero_add
+                          (↑r.den ^ Nat.rawCast 1 * (Int.negOfNat 1).rawCast + 0)))))
+                  (Mathlib.Tactic.Ring.Common.sub_congr
+                    (Mathlib.Tactic.Ring.Common.pow_congr
+                      (Mathlib.Tactic.Ring.Common.atom_pf (↑r.den) rfl
+                        (Eq.mpr
+                          (id
+                            (congrArg (fun _a ↦ ↑r.den ^ Nat.rawCast 1 * Nat.rawCast 1 = ↑r.den ^ Nat.rawCast 1 * _a)
+                              (Eq.symm rfl)))
+                          (Eq.refl (↑r.den ^ Nat.rawCast 1 * Nat.rawCast 1))))
+                      (Mathlib.Tactic.Ring.cast_pos (Mathlib.Meta.NormNum.isNat_ofNat ℕ (Eq.refl 2)))
+                      (Mathlib.Tactic.Ring.Common.pow_add
+                        (Mathlib.Tactic.Ring.Common.single_pow
+                          (Mathlib.Tactic.Ring.Common.mul_pow_mul
+                            (Mathlib.Meta.NormNum.IsNat.to_raw_eq
+                              (Mathlib.Meta.NormNum.isNat_mul (Eq.refl HMul.hMul)
+                                (Mathlib.Meta.NormNum.IsNat.of_raw ℕ 1) (Mathlib.Meta.NormNum.IsNat.of_raw ℕ 2)
+                                (Eq.refl 2)))
+                            (Mathlib.Tactic.Ring.Common.one_pow (Nat.rawCast 2) { out := rfl })
+                            (Eq.mpr
+                              (id
+                                (congrArg
+                                  (fun _a ↦ ↑r.den ^ Nat.rawCast 2 * Nat.rawCast 1 = ↑r.den ^ Nat.rawCast 2 * _a)
+                                  (Eq.symm rfl)))
+                              (Eq.refl (↑r.den ^ Nat.rawCast 2 * Nat.rawCast 1)))
+                            (Mathlib.Tactic.Ring.Common.mul_pf_left (↑r.den) (Nat.rawCast 2)
+                              (Mathlib.Meta.NormNum.IsNat.to_raw_eq
+                                (Mathlib.Meta.NormNum.isNat_mul (Eq.refl HMul.hMul)
+                                  (Mathlib.Meta.NormNum.IsNat.of_raw ℝ 1) (Mathlib.Meta.NormNum.IsNat.of_raw ℝ 1)
+                                  (Eq.refl 1))))))
+                        (Mathlib.Tactic.Ring.Common.pow_zero (↑r.den ^ Nat.rawCast 1 * Nat.rawCast 1 + 0) rfl)
+                        (Mathlib.Tactic.Ring.Common.add_mul
+                          (Mathlib.Tactic.Ring.Common.mul_add
+                            (Mathlib.Tactic.Ring.Common.mul_pf_left (↑r.den) (Nat.rawCast 2)
+                              (Mathlib.Meta.NormNum.IsNat.to_raw_eq
+                                (Mathlib.Meta.NormNum.isNat_mul (Eq.refl HMul.hMul)
+                                  (Mathlib.Meta.NormNum.IsNat.of_raw ℝ 1) (Mathlib.Meta.NormNum.IsNat.of_raw ℝ 1)
+                                  (Eq.refl 1))))
+                            (Mathlib.Tactic.Ring.Common.mul_zero (↑r.den ^ Nat.rawCast 2 * Nat.rawCast 1))
+                            (Mathlib.Tactic.Ring.Common.add_pf_add_zero (↑r.den ^ Nat.rawCast 2 * Nat.rawCast 1 + 0)))
+                          (Mathlib.Tactic.Ring.Common.zero_mul (Nat.rawCast 1 + 0))
+                          (Mathlib.Tactic.Ring.Common.add_pf_add_zero (↑r.den ^ Nat.rawCast 2 * Nat.rawCast 1 + 0)))))
+                    (Mathlib.Tactic.Ring.cast_pos (Mathlib.Meta.NormNum.isNat_ofNat ℝ Nat.cast_one))
+                    (Mathlib.Tactic.Ring.Common.sub_pf
+                      (Mathlib.Tactic.Ring.Common.neg_add
+                        (Mathlib.Meta.NormNum.IsInt.to_raw_eq
+                          (Mathlib.Meta.NormNum.isInt_neg (Eq.refl Neg.neg)
+                            (Mathlib.Meta.NormNum.IsNat.to_isInt (Mathlib.Meta.NormNum.IsNat.of_raw ℝ 1))
+                            (Eq.refl (Int.negOfNat 1))))
+                        Mathlib.Tactic.Ring.Common.neg_zero)
+                      (Mathlib.Tactic.Ring.Common.add_pf_add_gt (Int.negOfNat 1).rawCast
+                        (Mathlib.Tactic.Ring.Common.add_pf_add_zero (↑r.den ^ Nat.rawCast 2 * Nat.rawCast 1 + 0)))))
+                  (Mathlib.Tactic.Ring.Common.add_pf_add_overlap_zero
+                    (Mathlib.Meta.NormNum.IsInt.to_isNat
+                      (Mathlib.Meta.NormNum.isInt_add (Eq.refl HAdd.hAdd)
+                        (Mathlib.Meta.NormNum.IsNat.to_isInt (Mathlib.Meta.NormNum.IsNat.of_raw ℝ 1))
+                        (Mathlib.Meta.NormNum.IsInt.of_raw ℝ (Int.negOfNat 1)) (Eq.refl (Int.ofNat 0))))
+                    (Mathlib.Tactic.Ring.Common.add_pf_add_lt (↑r.den ^ Nat.rawCast 1 * (Int.negOfNat 1).rawCast)
+                      (Mathlib.Tactic.Ring.Common.add_pf_zero_add (↑r.den ^ Nat.rawCast 2 * Nat.rawCast 1 + 0)))))
+                (Mathlib.Tactic.Ring.Common.sub_congr
+                  (Mathlib.Tactic.Ring.cast_zero (Mathlib.Meta.NormNum.isNat_ofNat ℝ Nat.cast_zero))
+                  (Mathlib.Tactic.Ring.Common.mul_congr
+                    (Mathlib.Tactic.Ring.Common.sub_congr
+                      (Mathlib.Tactic.Ring.cast_zero (Mathlib.Meta.NormNum.isNat_ofNat ℝ Nat.cast_zero))
+                      (Mathlib.Tactic.Ring.Common.atom_pf (↑r.den) rfl
+                        (Eq.mpr
+                          (id
+                            (congrArg (fun _a ↦ ↑r.den ^ Nat.rawCast 1 * Nat.rawCast 1 = ↑r.den ^ Nat.rawCast 1 * _a)
+                              (Eq.symm rfl)))
+                          (Eq.refl (↑r.den ^ Nat.rawCast 1 * Nat.rawCast 1))))
+                      (Mathlib.Tactic.Ring.Common.sub_pf
+                        (Mathlib.Tactic.Ring.Common.neg_add
+                          (Mathlib.Tactic.Ring.Common.neg_mul (↑r.den) (Nat.rawCast 1)
+                            (Mathlib.Meta.NormNum.IsInt.to_raw_eq
+                              (Mathlib.Meta.NormNum.isInt_neg (Eq.refl Neg.neg)
+                                (Mathlib.Meta.NormNum.IsNat.to_isInt (Mathlib.Meta.NormNum.IsNat.of_raw ℝ 1))
+                                (Eq.refl (Int.negOfNat 1)))))
+                          Mathlib.Tactic.Ring.Common.neg_zero)
+                        (Mathlib.Tactic.Ring.Common.add_pf_zero_add
+                          (↑r.den ^ Nat.rawCast 1 * (Int.negOfNat 1).rawCast + 0))))
+                    (Mathlib.Tactic.Ring.Common.sub_congr
+                      (Mathlib.Tactic.Ring.cast_pos (Mathlib.Meta.NormNum.isNat_ofNat ℝ Nat.cast_one))
+                      (Mathlib.Tactic.Ring.Common.atom_pf (↑r.den) rfl
+                        (Eq.mpr
+                          (id
+                            (congrArg (fun _a ↦ ↑r.den ^ Nat.rawCast 1 * Nat.rawCast 1 = ↑r.den ^ Nat.rawCast 1 * _a)
+                              (Eq.symm rfl)))
+                          (Eq.refl (↑r.den ^ Nat.rawCast 1 * Nat.rawCast 1))))
+                      (Mathlib.Tactic.Ring.Common.sub_pf
+                        (Mathlib.Tactic.Ring.Common.neg_add
+                          (Mathlib.Tactic.Ring.Common.neg_mul (↑r.den) (Nat.rawCast 1)
+                            (Mathlib.Meta.NormNum.IsInt.to_raw_eq
+                              (Mathlib.Meta.NormNum.isInt_neg (Eq.refl Neg.neg)
+                                (Mathlib.Meta.NormNum.IsNat.to_isInt (Mathlib.Meta.NormNum.IsNat.of_raw ℝ 1))
+                                (Eq.refl (Int.negOfNat 1)))))
+                          Mathlib.Tactic.Ring.Common.neg_zero)
+                        (Mathlib.Tactic.Ring.Common.add_pf_add_lt (Nat.rawCast 1)
+                          (Mathlib.Tactic.Ring.Common.add_pf_zero_add
+                            (↑r.den ^ Nat.rawCast 1 * (Int.negOfNat 1).rawCast + 0)))))
+                    (Mathlib.Tactic.Ring.Common.add_mul
+                      (Mathlib.Tactic.Ring.Common.mul_add
+                        (Mathlib.Tactic.Ring.Common.mul_pf_left (↑r.den) (Nat.rawCast 1)
+                          (Mathlib.Meta.NormNum.IsInt.to_raw_eq
+                            (Mathlib.Meta.NormNum.isInt_mul (Eq.refl HMul.hMul)
+                              (Mathlib.Meta.NormNum.IsInt.of_raw ℝ (Int.negOfNat 1))
+                              (Mathlib.Meta.NormNum.IsNat.to_isInt (Mathlib.Meta.NormNum.IsNat.of_raw ℝ 1))
+                              (Eq.refl (Int.negOfNat 1)))))
+                        (Mathlib.Tactic.Ring.Common.mul_add
+                          (Mathlib.Tactic.Ring.Common.mul_pp_pf_overlap (↑r.den)
+                            (Mathlib.Meta.NormNum.IsNat.to_raw_eq
+                              (Mathlib.Meta.NormNum.isNat_add (Eq.refl HAdd.hAdd)
+                                (Mathlib.Meta.NormNum.IsNat.of_raw ℕ 1) (Mathlib.Meta.NormNum.IsNat.of_raw ℕ 1)
+                                (Eq.refl 2)))
+                            (Mathlib.Meta.NormNum.IsNat.to_raw_eq
+                              (Mathlib.Meta.NormNum.IsInt.to_isNat
+                                (Mathlib.Meta.NormNum.isInt_mul (Eq.refl HMul.hMul)
+                                  (Mathlib.Meta.NormNum.IsInt.of_raw ℝ (Int.negOfNat 1))
+                                  (Mathlib.Meta.NormNum.IsInt.of_raw ℝ (Int.negOfNat 1)) (Eq.refl (Int.ofNat 1))))))
+                          (Mathlib.Tactic.Ring.Common.mul_zero (↑r.den ^ Nat.rawCast 1 * (Int.negOfNat 1).rawCast))
+                          (Mathlib.Tactic.Ring.Common.add_pf_add_zero (↑r.den ^ Nat.rawCast 2 * Nat.rawCast 1 + 0)))
+                        (Mathlib.Tactic.Ring.Common.add_pf_add_lt (↑r.den ^ Nat.rawCast 1 * (Int.negOfNat 1).rawCast)
+                          (Mathlib.Tactic.Ring.Common.add_pf_zero_add (↑r.den ^ Nat.rawCast 2 * Nat.rawCast 1 + 0))))
+                      (Mathlib.Tactic.Ring.Common.zero_mul
+                        (Nat.rawCast 1 + (↑r.den ^ Nat.rawCast 1 * (Int.negOfNat 1).rawCast + 0)))
+                      (Mathlib.Tactic.Ring.Common.add_pf_add_zero
+                        (↑r.den ^ Nat.rawCast 1 * (Int.negOfNat 1).rawCast +
+                          (↑r.den ^ Nat.rawCast 2 * Nat.rawCast 1 + 0)))))
+                  (Mathlib.Tactic.Ring.Common.sub_pf
+                    (Mathlib.Tactic.Ring.Common.neg_add
+                      (Mathlib.Tactic.Ring.Common.neg_mul (↑r.den) (Nat.rawCast 1)
+                        (Mathlib.Meta.NormNum.IsNat.to_raw_eq
+                          (Mathlib.Meta.NormNum.IsInt.to_isNat
+                            (Mathlib.Meta.NormNum.isInt_neg (Eq.refl Neg.neg)
+                              (Mathlib.Meta.NormNum.IsInt.of_raw ℝ (Int.negOfNat 1)) (Eq.refl (Int.ofNat 1))))))
+                      (Mathlib.Tactic.Ring.Common.neg_add
+                        (Mathlib.Tactic.Ring.Common.neg_mul (↑r.den) (Nat.rawCast 2)
+                          (Mathlib.Meta.NormNum.IsInt.to_raw_eq
+                            (Mathlib.Meta.NormNum.isInt_neg (Eq.refl Neg.neg)
+                              (Mathlib.Meta.NormNum.IsNat.to_isInt (Mathlib.Meta.NormNum.IsNat.of_raw ℝ 1))
+                              (Eq.refl (Int.negOfNat 1)))))
+                        Mathlib.Tactic.Ring.Common.neg_zero))
+                    (Mathlib.Tactic.Ring.Common.add_pf_zero_add
+                      (↑r.den ^ Nat.rawCast 1 * Nat.rawCast 1 +
+                        (↑r.den ^ Nat.rawCast 2 * (Int.negOfNat 1).rawCast + 0)))))
+                (Mathlib.Tactic.Ring.Common.add_pf_add_overlap_zero
+                  (Mathlib.Tactic.Ring.Common.add_overlap_pf_zero (↑r.den) (Nat.rawCast 1)
+                    (Mathlib.Meta.NormNum.IsInt.to_isNat
+                      (Mathlib.Meta.NormNum.isInt_add (Eq.refl HAdd.hAdd)
+                        (Mathlib.Meta.NormNum.IsInt.of_raw ℝ (Int.negOfNat 1))
+                        (Mathlib.Meta.NormNum.IsNat.to_isInt (Mathlib.Meta.NormNum.IsNat.of_raw ℝ 1))
+                        (Eq.refl (Int.ofNat 0)))))
+                  (Mathlib.Tactic.Ring.Common.add_pf_add_overlap_zero
+                    (Mathlib.Tactic.Ring.Common.add_overlap_pf_zero (↑r.den) (Nat.rawCast 2)
+                      (Mathlib.Meta.NormNum.IsInt.to_isNat
+                        (Mathlib.Meta.NormNum.isInt_add (Eq.refl HAdd.hAdd)
+                          (Mathlib.Meta.NormNum.IsNat.to_isInt (Mathlib.Meta.NormNum.IsNat.of_raw ℝ 1))
+                          (Mathlib.Meta.NormNum.IsInt.of_raw ℝ (Int.negOfNat 1)) (Eq.refl (Int.ofNat 0)))))
+                    (Mathlib.Tactic.Ring.Common.add_pf_zero_add 0))))
+              (Mathlib.Tactic.Ring.cast_zero (Mathlib.Meta.NormNum.isNat_ofNat ℝ Nat.cast_zero))))
+          (Mathlib.Tactic.Linarith.add_lt_of_neg_of_le
+            (Mathlib.Tactic.Linarith.add_lt_of_le_of_neg (Mathlib.Tactic.Linarith.sub_nonpos_of_le hrden)
+              (Mathlib.Tactic.Linarith.sub_neg_of_lt a))
+            (Mathlib.Tactic.Linarith.sub_nonpos_of_le
+              (mul_nonneg_of_nonpos_of_nonpos
+                (Mathlib.Tactic.Linarith.sub_nonpos_of_le (Mathlib.Tactic.Linarith.natCast_nonneg ℝ r.den))
+                (Mathlib.Tactic.Linarith.sub_nonpos_of_le hrden))))))
+ has type
+  @LE.le ℝ Real.partialOrder.toLE (1 / ↑r.den ^ 2) 1
+but is expected to have type
+  @LE.le ℝ Real.instPreorder.toLE { cauchy := 1 * (1 * ↑r.den * ↑r.den)⁻¹ } 1
+⚠ [18594/19988] Built OAI.NumberTheory.PiExponent.Polynomials.HilbertPolynomialBase (5.1s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/HilbertPolynomialBase.lean: imports `Mathlib.Data.Finsupp.Multiset` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/HilbertPolynomialBase.lean: imports `Mathlib.Data.Sym.Card` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/HilbertPolynomialBase.lean: imports `Mathlib.RingTheory.PowerSeries.WellKnown` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18595/19988] Ran OAI.NumberTheory.PiExponent.Polynomials.HilbertPolynomialBase:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/HilbertPolynomialBase.lean: imports `Mathlib.Data.Finsupp.Multiset` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/HilbertPolynomialBase.lean: imports `Mathlib.Data.Sym.Card` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/HilbertPolynomialBase.lean: imports `Mathlib.RingTheory.PowerSeries.WellKnown` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18596/19988] Built OAI.NumberTheory.PiExponent.Cohomology.GradedCechRecovery (39s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/GradedCechRecovery.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18597/19988] Ran OAI.NumberTheory.PiExponent.Cohomology.GradedCechRecovery:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/GradedCechRecovery.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18598/19988] Built OAI.NumberTheory.PiExponent.Cohomology.EulerDifferencePolynomial (39s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/EulerDifferencePolynomial.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18599/19988] Ran OAI.NumberTheory.PiExponent.Cohomology.EulerDifferencePolynomial:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/EulerDifferencePolynomial.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18600/19988] Built OAI.NumberTheory.PiExponent.Polynomials.ShiftedFreeGrading (39s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/ShiftedFreeGrading.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18601/19988] Ran OAI.NumberTheory.PiExponent.Polynomials.ShiftedFreeGrading:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/ShiftedFreeGrading.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18602/19988] Built OAI.NumberTheory.PiExponent.Approximation.ApproximationSelection (40s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/ApproximationSelection.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18603/19988] Ran OAI.NumberTheory.PiExponent.Approximation.ApproximationSelection:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/ApproximationSelection.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✖ [18604/19988] Building OAI.NumberTheory.PiExponent.Polynomials.PolynomialPoleBound (40s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialPoleBound.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+trace: .> LEAN_PATH=/home/ubuntu/work/personal/conjectures-lean/.lake/packages/Cli/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/batteries/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/Qq/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/aesop/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/importGraph/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/plausible/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/mathlib/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean /home/ubuntu/.elan/toolchains/leanprover--lean4---v4.36.0/bin/lean /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialPoleBound.lean -o /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean/OAI/NumberTheory/PiExponent/Polynomials/PolynomialPoleBound.olean -i /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean/OAI/NumberTheory/PiExponent/Polynomials/PolynomialPoleBound.ilean -c /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/ir/OAI/NumberTheory/PiExponent/Polynomials/PolynomialPoleBound.c --setup /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/ir/OAI/NumberTheory/PiExponent/Polynomials/PolynomialPoleBound.setup.json --json
+error: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialPoleBound.lean:14:4: Application type mismatch: The argument
+  Monotone.withTop_map
+    (have this := Int.cast_mono;
+    this)
+has type
+  Monotone (WithTop.map fun z ↦ ↑z)
+of sort `Prop` but is expected to have type
+  K
+of sort `Type u_1` in the application
+  (AddValuation.map ?m.18 ?m.21 v) ⋯
+error: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialPoleBound.lean:13:2: failed to synthesize instance of type class
+  LinearOrderedAddCommMonoidWithTop (AddValuation K (WithTop ℝ))
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+error: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialPoleBound.lean:13:38: Application type mismatch: The argument
+  rfl
+has type
+  ?m.20 = ?m.20
+but is expected to have type
+  ?m.18 ⊤ = ⊤
+in the application
+  AddValuation.map ?m.18 ⋯
+error: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialPoleBound.lean:16:0: Not a definitional equality: the left-hand side
+  (realValuation v) x
+is not definitionally equal to the right-hand side
+  WithTop.map (fun z ↦ ↑z) (v x)
+error: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialPoleBound.lean:17:68: Type mismatch
+  rfl
+has type
+  ?m.13 = ?m.13
+but is expected to have type
+  (realValuation v) x = WithTop.map (fun z ↦ ↑z) (v x)
+⚠ [18606/19988] Built OAI.NumberTheory.PiExponent.Analysis.CollisionOccupancy (40s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/CollisionOccupancy.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18607/19988] Ran OAI.NumberTheory.PiExponent.Analysis.CollisionOccupancy:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/CollisionOccupancy.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18608/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.RamifiedLocalization (40s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/RamifiedLocalization.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18609/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.RamifiedLocalization:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/RamifiedLocalization.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18610/19988] Built OAI.NumberTheory.PiExponent.Approximation.PersistentComponents (40s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/PersistentComponents.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18611/19988] Ran OAI.NumberTheory.PiExponent.Approximation.PersistentComponents:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/PersistentComponents.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18612/19988] Built OAI.NumberTheory.PiExponent.Analysis.CollisionCombinatorics (40s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/CollisionCombinatorics.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18613/19988] Ran OAI.NumberTheory.PiExponent.Analysis.CollisionCombinatorics:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/CollisionCombinatorics.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18614/19988] Built OAI.NumberTheory.PiExponent.Jets.FormalBranchOrderRational (13s)
+⚠ [18616/19988] Built OAI.NumberTheory.PiExponent.Approximation.RectangularVolume (41s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/RectangularVolume.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18617/19988] Ran OAI.NumberTheory.PiExponent.Approximation.RectangularVolume:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/RectangularVolume.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18618/19988] Built OAI.NumberTheory.PiExponent.Ampleness.BlowupSchemeExt (40s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Ampleness/BlowupSchemeExt.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18619/19988] Ran OAI.NumberTheory.PiExponent.Ampleness.BlowupSchemeExt:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Ampleness/BlowupSchemeExt.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18620/19988] Built OAI.NumberTheory.PiExponent.Polynomials.MixedSlopePolynomial (40s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/MixedSlopePolynomial.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18621/19988] Ran OAI.NumberTheory.PiExponent.Polynomials.MixedSlopePolynomial:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/MixedSlopePolynomial.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18622/19988] Built OAI.NumberTheory.PiExponent.Geometry.WeightedCurveDegree (41s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/WeightedCurveDegree.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18623/19988] Ran OAI.NumberTheory.PiExponent.Geometry.WeightedCurveDegree:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/WeightedCurveDegree.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18628/19988] Built OAI.NumberTheory.PiExponent.Polynomials.SurjectiveGradedMap (41s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/SurjectiveGradedMap.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18629/19988] Ran OAI.NumberTheory.PiExponent.Polynomials.SurjectiveGradedMap:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/SurjectiveGradedMap.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18630/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.ColonHilbertStep (6.9s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/ColonHilbertStep.lean: imports `Mathlib.LinearAlgebra.FiniteDimensional.Lemmas` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/ColonHilbertStep.lean: imports `Mathlib.RingTheory.Ideal.Colon` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18631/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.ColonHilbertStep:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/ColonHilbertStep.lean: imports `Mathlib.LinearAlgebra.FiniteDimensional.Lemmas` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/ColonHilbertStep.lean: imports `Mathlib.RingTheory.Ideal.Colon` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18632/19988] Built OAI.NumberTheory.PiExponent.Geometry.BirationalOpenIso (15s)
+⚠ [18634/19988] Built OAI.NumberTheory.PiExponent.Approximation.Sigma (42s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/Sigma.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18635/19988] Ran OAI.NumberTheory.PiExponent.Approximation.Sigma:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/Sigma.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18636/19988] Built OAI.NumberTheory.PiExponent.Approximation.GlobalSectionClearing (42s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/GlobalSectionClearing.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18637/19988] Ran OAI.NumberTheory.PiExponent.Approximation.GlobalSectionClearing:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/GlobalSectionClearing.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18638/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.KoszulTopTerm (5.5s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/KoszulTopTerm.lean: imports `Mathlib.LinearAlgebra.Dual.Defs` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/KoszulTopTerm.lean: imports `Mathlib.LinearAlgebra.Prod` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18639/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.KoszulTopTerm:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/KoszulTopTerm.lean: imports `Mathlib.LinearAlgebra.Dual.Defs` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/KoszulTopTerm.lean: imports `Mathlib.LinearAlgebra.Prod` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18640/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.KoszulDualStep (6.0s)
+⚠ [18642/19988] Built OAI.NumberTheory.PiExponent.Approximation.RowTranslation (42s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/RowTranslation.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18643/19988] Ran OAI.NumberTheory.PiExponent.Approximation.RowTranslation:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/RowTranslation.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18644/19988] Built OAI.NumberTheory.PiExponent.Polynomials.PowerCoverSubstitution (17s)
+⚠ [18646/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.SeparablePointLength (40s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/SeparablePointLength.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18647/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.SeparablePointLength:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/SeparablePointLength.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18648/19988] Built OAI.NumberTheory.PiExponent.Jets.CommutingTaylor (42s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/CommutingTaylor.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/CommutingTaylor.lean:21:6: `Module.End.mul_apply` has been deprecated: Use `mul_apply_eq_comp` instead
+
+Note: The updated constant has a different type:
+  ∀ {F : Type u_1} {α : outParam (Type u_2)} {inst : FunLike F α α} {inst_1 : Mul F} [self : IsMulApplyEqComp F]
+    (f g : F) (x : α), (f * g) x = f (g x)
+instead of
+  ∀ {R : Type u_1} {M : Type u_4} [inst : Semiring R] [inst_1 : AddCommMonoid M] [inst_2 : Module R M]
+    (f g : Module.End R M) (x : M), (f * g) x = f (g x)
+
+Note: The updated constant is in a different namespace. Dot notation may need to be changed (e.g., from `x.mul_apply` to `mul_apply_eq_comp x`).
+⚠ [18649/19988] Ran OAI.NumberTheory.PiExponent.Jets.CommutingTaylor:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/CommutingTaylor.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18650/19988] Built OAI.NumberTheory.PiExponent.Analysis.RegularSequenceSeries (3.4s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/RegularSequenceSeries.lean: imports `Mathlib.Algebra.Ring.GeomSum` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18651/19988] Ran OAI.NumberTheory.PiExponent.Analysis.RegularSequenceSeries:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/RegularSequenceSeries.lean: imports `Mathlib.Algebra.Ring.GeomSum` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18652/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveCharts (43s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/ProjectiveCharts.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18653/19988] Ran OAI.NumberTheory.PiExponent.Geometry.ProjectiveCharts:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/ProjectiveCharts.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18654/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.ConeRegularSequence (5.4s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/ConeRegularSequence.lean: imports `Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/ConeRegularSequence.lean: imports `Mathlib.RingTheory.Regular.Flat` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/ConeRegularSequence.lean:105:6: `IsLocalRing.local_hom_TFAE` has been deprecated: Use `IsLocalRing.local_hom_tfae` instead
+
+Hint: Replace the deprecated name:
+  IsLocalRing.local_hom_T̵F̵A̵E̵t̲f̲a̲e̲
+⚠ [18655/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.ConeRegularSequence:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/ConeRegularSequence.lean: imports `Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/ConeRegularSequence.lean: imports `Mathlib.RingTheory.Regular.Flat` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18656/19988] Built OAI.NumberTheory.PiExponent.Jets.NormalFrameBasis (20s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/NormalFrameBasis.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18657/19988] Ran OAI.NumberTheory.PiExponent.Jets.NormalFrameBasis:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/NormalFrameBasis.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18658/19988] Built OAI.NumberTheory.PiExponent.Jets.PrimeNormalCotangent (15s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/PrimeNormalCotangent.lean: imports `Mathlib.RingTheory.LocalRing.ResidueField.Ideal` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/PrimeNormalCotangent.lean: imports `Mathlib.RingTheory.RegularLocalRing.Polynomial` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/PrimeNormalCotangent.lean:114:5: `Derivation.coeFnAddMonoidHom` has been deprecated: Use `FunLike.coeAddMonoidHom` instead
+
+Note: The updated constant has a different type:
+  (F : Type u_1) →
+    (α : Type u_2) →
+      (β : Type u_3) →
+        [inst : FunLike F α β] →
+          [inst_1 : AddZero F] → [inst_2 : AddZeroClass β] → [IsZeroApply F] → [IsAddApply F] → F →+ α → β
+instead of
+  {R : Type u_1} →
+    {A : Type u_2} →
+      {M : Type u_4} →
+        [inst : CommSemiring R] →
+          [inst_1 : CommSemiring A] →
+            [inst_2 : AddCommMonoid M] →
+              [inst_3 : Algebra R A] → [inst_4 : Module A M] → [inst_5 : Module R M] → Derivation R A M →+ A → M
+
+Note: The updated constant is in a different namespace. Dot notation may need to be changed (e.g., from `x.coeFnAddMonoidHom` to `FunLike.coeAddMonoidHom x`).
+⚠ [18659/19988] Ran OAI.NumberTheory.PiExponent.Jets.PrimeNormalCotangent:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/PrimeNormalCotangent.lean: imports `Mathlib.RingTheory.LocalRing.ResidueField.Ideal` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/PrimeNormalCotangent.lean: imports `Mathlib.RingTheory.RegularLocalRing.Polynomial` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18660/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.RamifiedPointMap (16s)
+✔ [18662/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.HilbertZeroVariables (3.7s)
+⚠ [18664/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.CoordinateFiniteSlice (15s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateFiniteSlice.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18665/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.CoordinateFiniteSlice:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateFiniteSlice.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18666/19988] Built OAI.NumberTheory.PiExponent.Analysis.AnalyticRowSeries (13s)
+⚠ [18667/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.LocalizedAlgebraEvaluation (43s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/LocalizedAlgebraEvaluation.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18668/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.LocalizedAlgebraEvaluation:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/LocalizedAlgebraEvaluation.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18669/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.LocalPrefixCutDimension (5.4s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/LocalPrefixCutDimension.lean: imports `Mathlib.RingTheory.Ideal.KrullsHeightTheorem` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/LocalPrefixCutDimension.lean: imports `Mathlib.RingTheory.KrullDimension.Regular` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/LocalPrefixCutDimension.lean: imports `Mathlib.RingTheory.LocalRing.Quotient` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18670/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.LocalPrefixCutDimension:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/LocalPrefixCutDimension.lean: imports `Mathlib.RingTheory.Ideal.KrullsHeightTheorem` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/LocalPrefixCutDimension.lean: imports `Mathlib.RingTheory.KrullDimension.Regular` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/LocalPrefixCutDimension.lean: imports `Mathlib.RingTheory.LocalRing.Quotient` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18672/19988] Built OAI.NumberTheory.PiExponent.Cohomology.PencilCohomologyLaurent (43s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/PencilCohomologyLaurent.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18673/19988] Ran OAI.NumberTheory.PiExponent.Cohomology.PencilCohomologyLaurent:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/PencilCohomologyLaurent.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18674/19988] Built OAI.NumberTheory.PiExponent.Cohomology.LocalIntersectionRegularEuler (6.1s)
+✔ [18676/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.IteratedKoszulExactness (7.8s)
+⚠ [18678/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.RegularSequenceExt
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/RegularSequenceExt.lean: imports `Mathlib.LinearAlgebra.Dual.Defs` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/RegularSequenceExt.lean: imports `Mathlib.RingTheory.LocalRing.ResidueField.Defs` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18680/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.RegularSequenceExtObstruction
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/RegularSequenceExtObstruction.lean: imports `Mathlib.Algebra.Homology.ShortComplex.ModuleCat` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18682/19988] Built OAI.NumberTheory.PiExponent.Polynomials.PolynomialPrimeClosedPointEquiv (5.7s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialPrimeClosedPointEquiv.lean: imports `Mathlib.RingTheory.Localization.LocalizationLocalization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18683/19988] Ran OAI.NumberTheory.PiExponent.Polynomials.PolynomialPrimeClosedPointEquiv:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialPrimeClosedPointEquiv.lean: imports `Mathlib.RingTheory.Localization.LocalizationLocalization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✖ [18684/19988] Building OAI.NumberTheory.PiExponent.LocalAlgebra.CoordinateTranscendenceBasis (16s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateTranscendenceBasis.lean: imports `Mathlib.Algebra.MvPolynomial.Degrees` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+trace: .> LEAN_PATH=/home/ubuntu/work/personal/conjectures-lean/.lake/packages/Cli/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/batteries/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/Qq/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/aesop/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/importGraph/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/plausible/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/mathlib/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean /home/ubuntu/.elan/toolchains/leanprover--lean4---v4.36.0/bin/lean /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateTranscendenceBasis.lean -o /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateTranscendenceBasis.olean -i /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateTranscendenceBasis.ilean -c /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/ir/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateTranscendenceBasis.c --setup /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/ir/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateTranscendenceBasis.setup.json --json
+error: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateTranscendenceBasis.lean:168:2: Invalid alternative name `h`: Expected `ind`
+error: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateTranscendenceBasis.lean:167:2: Alternative `ind` has not been provided
+✖ [18686/19988] Building OAI.NumberTheory.PiExponent.Polynomials.PolynomialNormalNonzero (17s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialNormalNonzero.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+trace: .> LEAN_PATH=/home/ubuntu/work/personal/conjectures-lean/.lake/packages/Cli/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/batteries/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/Qq/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/aesop/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/importGraph/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/plausible/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/mathlib/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean /home/ubuntu/.elan/toolchains/leanprover--lean4---v4.36.0/bin/lean /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialNormalNonzero.lean -o /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean/OAI/NumberTheory/PiExponent/Polynomials/PolynomialNormalNonzero.olean -i /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean/OAI/NumberTheory/PiExponent/Polynomials/PolynomialNormalNonzero.ilean -c /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/ir/OAI/NumberTheory/PiExponent/Polynomials/PolynomialNormalNonzero.c --setup /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/ir/OAI/NumberTheory/PiExponent/Polynomials/PolynomialNormalNonzero.setup.json --json
+error: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialNormalNonzero.lean:70:4: Invalid alternative name `h`: Expected `ind`
+error: Vendor/OAI/NumberTheory/PiExponent/Polynomials/PolynomialNormalNonzero.lean:69:4: Alternative `ind` has not been provided
+⚠ [18696/19988] Built OAI.NumberTheory.PiExponent.Analysis.ColonSeriesTelescope (4.6s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/ColonSeriesTelescope.lean: imports `Mathlib.RingTheory.PowerSeries.WellKnown` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/ColonSeriesTelescope.lean: imports `Mathlib.Tactic.LinearCombination` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/ColonSeriesTelescope.lean: imports `Mathlib.Tactic.Ring` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18697/19988] Ran OAI.NumberTheory.PiExponent.Analysis.ColonSeriesTelescope:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/ColonSeriesTelescope.lean: imports `Mathlib.RingTheory.PowerSeries.WellKnown` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/ColonSeriesTelescope.lean: imports `Mathlib.Tactic.LinearCombination` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/ColonSeriesTelescope.lean: imports `Mathlib.Tactic.Ring` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18698/19988] Built OAI.NumberTheory.PiExponent.Approximation.OpenBaseChange (47s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/OpenBaseChange.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18699/19988] Ran OAI.NumberTheory.PiExponent.Approximation.OpenBaseChange:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/OpenBaseChange.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18700/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.CompleteIntersectionHilbert (4.4s)
+⚠ [18702/19988] Built OAI.NumberTheory.PiExponent.Geometry.CurveProperImageDimension (9.3s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveProperImageDimension.lean: imports `Mathlib.AlgebraicGeometry.Morphisms.SchemeTheoreticallyDominant` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18703/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveProperImageDimension:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveProperImageDimension.lean: imports `Mathlib.AlgebraicGeometry.Morphisms.SchemeTheoreticallyDominant` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18704/19988] Built OAI.NumberTheory.PiExponent.Jets.KoszulTopDifferential (5.6s)
+⚠ [18706/19988] Built OAI.NumberTheory.PiExponent.Approximation.Parameters (48s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/Parameters.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18707/19988] Ran OAI.NumberTheory.PiExponent.Approximation.Parameters:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/Parameters.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18708/19988] Built OAI.NumberTheory.PiExponent.Jets.FormalLogJet (9.6s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/FormalLogJet.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18709/19988] Ran OAI.NumberTheory.PiExponent.Jets.FormalLogJet:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/FormalLogJet.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18710/19988] Built OAI.NumberTheory.PiExponent.Cohomology.EulerPolynomialInterpolation (9.1s)
+⚠ [18712/19988] Built OAI.NumberTheory.PiExponent.Approximation.SuccessiveApproximations (8.9s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/SuccessiveApproximations.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18713/19988] Ran OAI.NumberTheory.PiExponent.Approximation.SuccessiveApproximations:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/SuccessiveApproximations.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18714/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.PrimeNormalKernel (5.8s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PrimeNormalKernel.lean:19:14: `Derivation.coeFnAddMonoidHom` has been deprecated: Use `FunLike.coeAddMonoidHom` instead
+
+Note: The updated constant has a different type:
+  (F : Type u_1) →
+    (α : Type u_2) →
+      (β : Type u_3) →
+        [inst : FunLike F α β] →
+          [inst_1 : AddZero F] → [inst_2 : AddZeroClass β] → [IsZeroApply F] → [IsAddApply F] → F →+ α → β
+instead of
+  {R : Type u_1} →
+    {A : Type u_2} →
+      {M : Type u_4} →
+        [inst : CommSemiring R] →
+          [inst_1 : CommSemiring A] →
+            [inst_2 : AddCommMonoid M] →
+              [inst_3 : Algebra R A] → [inst_4 : Module A M] → [inst_5 : Module R M] → Derivation R A M →+ A → M
+
+Note: The updated constant is in a different namespace. Dot notation may need to be changed (e.g., from `x.coeFnAddMonoidHom` to `FunLike.coeAddMonoidHom x`).
+✔ [18716/19988] Built OAI.NumberTheory.PiExponent.Polynomials.SimplexCounting (11s)
+✔ [18718/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.LocalIntersectionMinimalSum (5.3s)
+⚠ [18720/19988] Built OAI.NumberTheory.PiExponent.Jets.GradedGeneration (11s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/GradedGeneration.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18721/19988] Ran OAI.NumberTheory.PiExponent.Jets.GradedGeneration:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/GradedGeneration.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18722/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.HilbertDenominatorReduction (3.3s)
+⚠ [18724/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.CoordinateBasisSplitting (4.8s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateBasisSplitting.lean: imports `Mathlib.Logic.Equiv.Sum` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18725/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.CoordinateBasisSplitting:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateBasisSplitting.lean: imports `Mathlib.Logic.Equiv.Sum` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18726/19988] Built OAI.NumberTheory.PiExponent.Cohomology.ProjectiveLaurentTransitions (10s)
+✔ [18728/19988] Built OAI.NumberTheory.PiExponent.Analysis.CollisionGeometricSum (8.7s)
+⚠ [18730/19988] Built OAI.NumberTheory.PiExponent.Jets.DerivativeIdeals (9.1s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/DerivativeIdeals.lean: imports `Mathlib.RingTheory.Derivation.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/DerivativeIdeals.lean: imports `Mathlib.RingTheory.Ideal.Span` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/DerivativeIdeals.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18731/19988] Ran OAI.NumberTheory.PiExponent.Jets.DerivativeIdeals:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/DerivativeIdeals.lean: imports `Mathlib.RingTheory.Derivation.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/DerivativeIdeals.lean: imports `Mathlib.RingTheory.Ideal.Span` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/DerivativeIdeals.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18732/19988] Built OAI.NumberTheory.PiExponent.Polynomials.GradedSerre (10s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/GradedSerre.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18733/19988] Ran OAI.NumberTheory.PiExponent.Polynomials.GradedSerre:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/GradedSerre.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18734/19988] Built OAI.NumberTheory.PiExponent.Analysis.CollisionExponential (9.4s)
+⚠ [18736/19988] Built OAI.NumberTheory.PiExponent.Geometry.CurveContact (10s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveContact.lean: imports `Mathlib.RingTheory.Ideal.Span` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveContact.lean: imports `Mathlib.Tactic.Linarith` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18737/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveContact:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveContact.lean: imports `Mathlib.RingTheory.Ideal.Span` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveContact.lean: imports `Mathlib.Tactic.Linarith` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18740/19988] Built OAI.NumberTheory.PiExponent.Jets.BranchContact (9.8s)
+⚠ [18742/19988] Built OAI.NumberTheory.PiExponent.Ampleness.CoherentAffineFinite (50s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Ampleness/CoherentAffineFinite.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18743/19988] Ran OAI.NumberTheory.PiExponent.Ampleness.CoherentAffineFinite:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Ampleness/CoherentAffineFinite.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18744/19988] Built OAI.NumberTheory.PiExponent.Geometry.PolynomialProjectiveStructure (7.6s)
+✔ [18746/19988] Built OAI.NumberTheory.PiExponent.Geometry.SheafSectionGluing (8.9s)
+✔ [18748/19988] Built OAI.NumberTheory.PiExponent.Cohomology.ProjectiveMonomialCohomology (11s)
+⚠ [18750/19988] Built OAI.NumberTheory.PiExponent.Polynomials.WeightedMonomialMap (8.1s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/WeightedMonomialMap.lean: imports `Mathlib.RingTheory.GradedAlgebra.Homogeneous.Maps` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18751/19988] Ran OAI.NumberTheory.PiExponent.Polynomials.WeightedMonomialMap:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/WeightedMonomialMap.lean: imports `Mathlib.RingTheory.GradedAlgebra.Homogeneous.Maps` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✖ [18752/19988] Building OAI.NumberTheory.PiExponent.Ampleness.ReesPushdown (51s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Ampleness/ReesPushdown.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+trace: .> LEAN_PATH=/home/ubuntu/work/personal/conjectures-lean/.lake/packages/Cli/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/batteries/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/Qq/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/aesop/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/importGraph/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/plausible/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/mathlib/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean /home/ubuntu/.elan/toolchains/leanprover--lean4---v4.36.0/bin/lean /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/Vendor/OAI/NumberTheory/PiExponent/Ampleness/ReesPushdown.lean -o /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean/OAI/NumberTheory/PiExponent/Ampleness/ReesPushdown.olean -i /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean/OAI/NumberTheory/PiExponent/Ampleness/ReesPushdown.ilean -c /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/ir/OAI/NumberTheory/PiExponent/Ampleness/ReesPushdown.c --setup /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/ir/OAI/NumberTheory/PiExponent/Ampleness/ReesPushdown.setup.json --json
+error: Vendor/OAI/NumberTheory/PiExponent/Ampleness/ReesPushdown.lean:22:8: Unknown identifier `coeff_smul`
+error: Vendor/OAI/NumberTheory/PiExponent/Ampleness/ReesPushdown.lean:20:22: unsolved goals
+R : Type u
+inst✝ : CommRing R
+I : Ideal R
+n : ℕ
+a : R
+p : ↥(reesAlgebra I)
+hp : p ∈ {p | ↑p = (monomial n) ((↑p).coeff n)}
+⊢ a • ↑p = (monomial n) ((a • ↑p).coeff n)
+error: Vendor/OAI/NumberTheory/PiExponent/Ampleness/ReesPushdown.lean:62:59: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  if n = m then ?m.35 else ?m.36
+in the target expression
+  (fun₀ | n => (↑↑p).coeff n) m = 0
+
+R : Type u
+inst✝ : CommRing R
+I : Ideal R
+n m : ℕ
+hnm : n ≠ m
+p : ↥(piece I n)
+⊢ (fun₀ | n => (↑↑p).coeff n) m = 0
+error: Vendor/OAI/NumberTheory/PiExponent/Ampleness/ReesPushdown.lean:103:2: Type mismatch: After simplification, term
+  h
+ has type
+  (↑(f (components I p))).coeff n = (fun₀ | n => (↑p).coeff n) n
+but is expected to have type
+  (↑((DirectSum.coeAddMonoidHom (piece I)) (components I p))).coeff n = (↑p).coeff n
+error: Vendor/OAI/NumberTheory/PiExponent/Ampleness/ReesPushdown.lean:110:45: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  if ?m.78 = ?m.78 then ?m.80 else ?m.81
+in the target expression
+  (monomial (i + j)) ((↑a).coeff i * (↑b).coeff j) =
+    (monomial (i + j)) ((fun₀ | i + j => (↑a).coeff i * (↑b).coeff j) (i + j))
+
+R : Type u
+inst✝ : CommRing R
+I : Ideal R
+i j : ℕ
+a b : ↥(reesAlgebra I)
+ha : a ∈ piece I i
+hb : b ∈ piece I j
+⊢ (monomial (i + j)) ((↑a).coeff i * (↑b).coeff j) =
+    (monomial (i + j)) ((fun₀ | i + j => (↑a).coeff i * (↑b).coeff j) (i + j))
+⚠ [18756/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.PositiveDimensionalHilbert (3.8s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PositiveDimensionalHilbert.lean: imports `Mathlib.Algebra.Polynomial.Eval.Coeff` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PositiveDimensionalHilbert.lean: imports `Mathlib.RingTheory.Polynomial.HilbertPoly` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PositiveDimensionalHilbert.lean:127:32: `Polynomial.coeff_smul` has been deprecated: Use `AddMonoidAlgebra.coeff_smul_apply` instead
+
+Note: The updated constant has a different type:
+  ∀ {R : Type u_1} {M : Type u_4} [inst : Semiring R] {A : Type u_8} [inst_1 : SMulZeroClass A R] (a : A)
+    (x : AddMonoidAlgebra R M) (m : M), (a • x).coeff m = a • x.coeff m
+instead of
+  ∀ {R : Type u} {S : Type v} [inst : Semiring R] [inst_1 : SMulZeroClass S R] (r : S) (p : Polynomial R) (n : ℕ),
+    (r • p).coeff n = r • p.coeff n
+
+Note: The updated constant is in a different namespace. Dot notation may need to be changed (e.g., from `x.coeff_smul` to `AddMonoidAlgebra.coeff_smul_apply x`).
+⚠ [18757/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.PositiveDimensionalHilbert:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PositiveDimensionalHilbert.lean: imports `Mathlib.Algebra.Polynomial.Eval.Coeff` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/PositiveDimensionalHilbert.lean: imports `Mathlib.RingTheory.Polynomial.HilbertPoly` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18758/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.KoszulTopAugmentation (3.5s)
+⚠ [18760/19988] Ran OAI.NumberTheory.PiExponent.Jets.CompactJetIdeal
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/CompactJetIdeal.lean: imports `Mathlib.AlgebraicGeometry.IdealSheaf.Functorial` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/CompactJetIdeal.lean: imports `Mathlib.AlgebraicGeometry.Morphisms.Separated` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18762/19988] Built OAI.NumberTheory.PiExponent.Analysis.LogTailAnalytic (9.2s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/LogTailAnalytic.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18763/19988] Ran OAI.NumberTheory.PiExponent.Analysis.LogTailAnalytic:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/LogTailAnalytic.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✖ [18764/19988] Building OAI.NumberTheory.PiExponent.Geometry.CurveLocalOrder (10s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveLocalOrder.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+trace: .> LEAN_PATH=/home/ubuntu/work/personal/conjectures-lean/.lake/packages/Cli/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/batteries/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/Qq/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/aesop/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/importGraph/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/plausible/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/mathlib/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean /home/ubuntu/.elan/toolchains/leanprover--lean4---v4.36.0/bin/lean /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveLocalOrder.lean -o /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean/OAI/NumberTheory/PiExponent/Geometry/CurveLocalOrder.olean -i /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean/OAI/NumberTheory/PiExponent/Geometry/CurveLocalOrder.ilean -c /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/ir/OAI/NumberTheory/PiExponent/Geometry/CurveLocalOrder.c --setup /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/ir/OAI/NumberTheory/PiExponent/Geometry/CurveLocalOrder.setup.json --json
+error: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveLocalOrder.lean:46:27: Application type mismatch: The argument
+  enatToIntegerOrder_monotone
+has type
+  Monotone ⇑enatToIntegerOrder
+of sort `Prop` but is expected to have type
+  A
+of sort `Type u_1` in the application
+  (AddValuation.map ?m.15 ?m.16 (addVal A)) enatToIntegerOrder_monotone
+error: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveLocalOrder.lean:45:2: failed to synthesize instance of type class
+  LinearOrderedAddCommMonoidWithTop (AddValuation A (WithTop ℤ))
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+error: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveLocalOrder.lean:46:4: Application type mismatch: The argument
+  enatToIntegerOrder_top
+has type
+  Eq.{1} (enatToIntegerOrder ⊤) ⊤
+but is expected to have type
+  Eq.{u_1 + 1} (?m.15 ⊤) ⊤
+in the application
+  AddValuation.map ?m.15 enatToIntegerOrder_top
+error: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveLocalOrder.lean:48:0: Not a definitional equality: the left-hand side
+  DFunLike.coe.{u_1 + 1, u_1 + 1, 1} (localAddValuation A) a
+is not definitionally equal to the right-hand side
+  DFunLike.coe.{1, 1, 1} enatToIntegerOrder ((addVal A) a)
+error: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveLocalOrder.lean:50:87: Type mismatch
+  rfl
+has type
+  ?m.15 = ?m.15
+but is expected to have type
+  (localAddValuation A) a = enatToIntegerOrder ((addVal A) a)
+⚠ [18772/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveZeroPole
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveZeroPole.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18774/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveNormalizationModel
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationModel.lean: imports `Mathlib.Algebra.Polynomial.Laurent` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationModel.lean: imports `Mathlib.AlgebraicGeometry.FunctionField` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationModel.lean: imports `Mathlib.AlgebraicGeometry.Gluing` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationModel.lean: imports `Mathlib.AlgebraicGeometry.Limits` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationModel.lean: imports `Mathlib.AlgebraicGeometry.Normalization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18776/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveNormalizationLocalRing
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationLocalRing.lean: imports `Mathlib.AlgebraicGeometry.Morphisms.Finite` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18778/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveNormalizationDimension
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationDimension.lean: imports `Mathlib.AlgebraicGeometry.Noetherian` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18782/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.DVRValuationUnique
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/DVRValuationUnique.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18784/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveValuationCenter
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveValuationCenter.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18786/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveProductFormula
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveProductFormula.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18792/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.WeightedLocalLattice
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/WeightedLocalLattice.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18802/19988] Ran OAI.NumberTheory.PiExponent.Ampleness.AffineFunctionFieldCompatibility
+warning: Vendor/OAI/NumberTheory/PiExponent/Ampleness/AffineFunctionFieldCompatibility.lean: imports `Mathlib.RingTheory.Localization.LocalizationLocalization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18808/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveGeometricFunctionField
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveGeometricFunctionField.lean: imports `Mathlib.RingTheory.Spectrum.Prime.Topology` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18812/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveProperExtension
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveProperExtension.lean: imports `Mathlib.AlgebraicGeometry.ValuativeCriterion` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18816/19988] Built OAI.NumberTheory.PiExponent.Polynomials.PowerCoverBasis (9.6s)
+✔ [18818/19988] Built OAI.NumberTheory.PiExponent.Approximation.FrameResidueDirections (8.7s)
+⚠ [18820/19988] Built OAI.NumberTheory.PiExponent.Polynomials.HomogeneousHilbertExistence (3.1s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/HomogeneousHilbertExistence.lean: imports `Mathlib.Data.Fintype.Option` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18821/19988] Ran OAI.NumberTheory.PiExponent.Polynomials.HomogeneousHilbertExistence:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/HomogeneousHilbertExistence.lean: imports `Mathlib.Data.Fintype.Option` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18822/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.LocalIntersectionQuotientTransport (3.6s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/LocalIntersectionQuotientTransport.lean: imports `Mathlib.RingTheory.LocalRing.Quotient` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18823/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.LocalIntersectionQuotientTransport:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/LocalIntersectionQuotientTransport.lean: imports `Mathlib.RingTheory.LocalRing.Quotient` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18824/19988] Built OAI.NumberTheory.PiExponent.Polynomials.PolynomialLocalRegularParameters (3.7s)
+⚠ [18826/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.CoordinateSliceLength (8.0s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateSliceLength.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18827/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.CoordinateSliceLength:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateSliceLength.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18830/19988] Built OAI.NumberTheory.PiExponent.Approximation.ClosedPullbackUnit (6.6s)
+✔ [18832/19988] Built OAI.NumberTheory.PiExponent.Polynomials.ColonHilbertPolynomial (2.9s)
+✔ [18834/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveChartOverlaps (11s)
+⚠ [18836/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.AffineClosedPointLocalization (10s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/AffineClosedPointLocalization.lean: imports `Mathlib.RingTheory.FiniteType` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/AffineClosedPointLocalization.lean: imports `Mathlib.RingTheory.Ideal.Quotient.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/AffineClosedPointLocalization.lean: imports `Mathlib.RingTheory.Localization.Ideal` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18837/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.AffineClosedPointLocalization:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/AffineClosedPointLocalization.lean: imports `Mathlib.RingTheory.FiniteType` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/AffineClosedPointLocalization.lean: imports `Mathlib.RingTheory.Ideal.Quotient.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/AffineClosedPointLocalization.lean: imports `Mathlib.RingTheory.Localization.Ideal` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18838/19988] Built OAI.NumberTheory.PiExponent.Polynomials.SimplexRational (5.4s)
+⚠ [18840/19988] Built OAI.NumberTheory.PiExponent.Jets.CotangentGeneration (5.4s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/CotangentGeneration.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18841/19988] Ran OAI.NumberTheory.PiExponent.Jets.CotangentGeneration:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/CotangentGeneration.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18842/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.KoszulDualInitial (3.7s)
+✔ [18844/19988] Built OAI.NumberTheory.PiExponent.Approximation.WeightedGeometryScale (5.4s)
+✔ [18846/19988] Built OAI.NumberTheory.PiExponent.Polynomials.HomogeneousHilbertPolynomial (2.4s)
+⚠ [18848/19988] Built OAI.NumberTheory.PiExponent.Jets.OrdinaryDerivativeIdeals (5.7s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/OrdinaryDerivativeIdeals.lean: imports `Mathlib.Algebra.MvPolynomial.PDeriv` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/OrdinaryDerivativeIdeals.lean: imports `Mathlib.Basic.Complex.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18849/19988] Ran OAI.NumberTheory.PiExponent.Jets.OrdinaryDerivativeIdeals:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/OrdinaryDerivativeIdeals.lean: imports `Mathlib.Algebra.MvPolynomial.PDeriv` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/OrdinaryDerivativeIdeals.lean: imports `Mathlib.Basic.Complex.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18852/19988] Built OAI.NumberTheory.PiExponent.Analysis.FiniteDeterminantCollision (5.8s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/FiniteDeterminantCollision.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18853/19988] Ran OAI.NumberTheory.PiExponent.Analysis.FiniteDeterminantCollision:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/FiniteDeterminantCollision.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18854/19988] Built OAI.NumberTheory.PiExponent.Cohomology.FiniteCoverCohomology (55s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/FiniteCoverCohomology.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18855/19988] Ran OAI.NumberTheory.PiExponent.Cohomology.FiniteCoverCohomology:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/FiniteCoverCohomology.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18856/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.LocalIntersectionFormula (2.6s)
+✔ [18858/19988] Built OAI.NumberTheory.PiExponent.Approximation.InterpolationMatrix (6.4s)
+⚠ [18860/19988] Built OAI.NumberTheory.PiExponent.Approximation.AdmissibleParameters (7.2s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/AdmissibleParameters.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18861/19988] Ran OAI.NumberTheory.PiExponent.Approximation.AdmissibleParameters:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/AdmissibleParameters.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18862/19988] Built OAI.NumberTheory.PiExponent.Analysis.FormalLogTruncation (7.8s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/FormalLogTruncation.lean: imports `Mathlib.RingTheory.MvPowerSeries.Equiv` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/FormalLogTruncation.lean: imports `Mathlib.RingTheory.MvPowerSeries.Substitution` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18863/19988] Ran OAI.NumberTheory.PiExponent.Analysis.FormalLogTruncation:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/FormalLogTruncation.lean: imports `Mathlib.RingTheory.MvPowerSeries.Equiv` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/FormalLogTruncation.lean: imports `Mathlib.RingTheory.MvPowerSeries.Substitution` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18864/19988] Built OAI.NumberTheory.PiExponent.Approximation.FrameEquationFamily (5.8s)
+✔ [18866/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProperHypersurfaceHilbert (2.5s)
+⚠ [18868/19988] Built OAI.NumberTheory.PiExponent.Cohomology.GradedH0 (6.7s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/GradedH0.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18869/19988] Ran OAI.NumberTheory.PiExponent.Cohomology.GradedH0:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/GradedH0.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18870/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.PrimeDegreeExistence (2.6s)
+✔ [18872/19988] Built OAI.NumberTheory.PiExponent.Polynomials.WeightedMonomialImage (6.4s)
+✔ [18874/19988] Built OAI.NumberTheory.PiExponent.Polynomials.TranslatedPowerCover (5.0s)
+✔ [18876/19988] Built OAI.NumberTheory.PiExponent.Polynomials.PolynomialPrimeDimension (3.7s)
+✔ [18878/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.RegularSequenceDualExactness (3.7s)
+⚠ [18886/19988] Built OAI.NumberTheory.PiExponent.Geometry.LineBundleTensor (58s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/LineBundleTensor.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18887/19988] Ran OAI.NumberTheory.PiExponent.Geometry.LineBundleTensor:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/LineBundleTensor.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18888/19988] Ran OAI.NumberTheory.PiExponent.Geometry.WeightedLocalSheaf
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/WeightedLocalSheaf.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18890/19988] Built OAI.NumberTheory.PiExponent.Polynomials.GradedLocalizationExact (9.1s)
+✔ [18892/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.PrimeHilbertComparison (4.6s)
+✔ [18894/19988] Built OAI.NumberTheory.PiExponent.Approximation.ClosedImmersionModules (6.7s)
+✔ [18896/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.LocalizedOneCutPropagation (5.2s)
+⚠ [18898/19988] Built OAI.NumberTheory.PiExponent.Polynomials.HilbertPolynomial (4.5s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/HilbertPolynomial.lean: imports `Mathlib.Algebra.Polynomial.Roots` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18899/19988] Ran OAI.NumberTheory.PiExponent.Polynomials.HilbertPolynomial:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Polynomials/HilbertPolynomial.lean: imports `Mathlib.Algebra.Polynomial.Roots` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18900/19988] Built OAI.NumberTheory.PiExponent.Polynomials.SimplexLog (7.4s)
+⚠ [18902/19988] Built OAI.NumberTheory.PiExponent.Analysis.CollisionLimit (6.9s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/CollisionLimit.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18903/19988] Ran OAI.NumberTheory.PiExponent.Analysis.CollisionLimit:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/CollisionLimit.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18904/19988] Built OAI.NumberTheory.PiExponent.Jets.FormalBranchEvaluation (7.2s)
+✔ [18912/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.PrimeHypersurfaceEquidimension (5.2s)
+⚠ [18914/19988] Built OAI.NumberTheory.PiExponent.Geometry.CurvePrimeHeight (5.7s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurvePrimeHeight.lean: imports `Mathlib.FieldTheory.IntermediateField.Adjoin.Defs` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18915/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurvePrimeHeight:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurvePrimeHeight.lean: imports `Mathlib.FieldTheory.IntermediateField.Adjoin.Defs` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18916/19988] Built OAI.NumberTheory.PiExponent.Analysis.FormalLogTailOrder (8.0s)
+✔ [18918/19988] Built OAI.NumberTheory.PiExponent.Cohomology.FreeCechResolution (8.9s)
+⚠ [18920/19988] Built OAI.NumberTheory.PiExponent.Jets.TransverseMultiplicity (9.6s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/TransverseMultiplicity.lean: imports `Mathlib.Algebra.Algebra.Hom.Rat` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/TransverseMultiplicity.lean: imports `Mathlib.LinearAlgebra.Dimension.Finrank` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/TransverseMultiplicity.lean: imports `Mathlib.RingTheory.MvPowerSeries.Derivative` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/TransverseMultiplicity.lean: imports `Mathlib.RingTheory.MvPowerSeries.Inverse` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/TransverseMultiplicity.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18921/19988] Ran OAI.NumberTheory.PiExponent.Jets.TransverseMultiplicity:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/TransverseMultiplicity.lean: imports `Mathlib.Algebra.Algebra.Hom.Rat` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/TransverseMultiplicity.lean: imports `Mathlib.LinearAlgebra.Dimension.Finrank` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/TransverseMultiplicity.lean: imports `Mathlib.RingTheory.MvPowerSeries.Derivative` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/TransverseMultiplicity.lean: imports `Mathlib.RingTheory.MvPowerSeries.Inverse` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/TransverseMultiplicity.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18922/19988] Built OAI.NumberTheory.PiExponent.Cohomology.SerreVanishing (8.0s)
+✔ [18924/19988] Built OAI.NumberTheory.PiExponent.Cohomology.CechOne (9.9s)
+✔ [18926/19988] Built OAI.NumberTheory.PiExponent.Approximation.MatrixTranslation (9.0s)
+✔ [18928/19988] Built OAI.NumberTheory.PiExponent.Polynomials.AuxiliaryPolynomial (9.9s)
+✔ [18930/19988] Built OAI.NumberTheory.PiExponent.Approximation.MatrixArithmetic (10s)
+✔ [18932/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.HilbertMultiplicityFiltration (3.9s)
+✔ [18934/19988] Built OAI.NumberTheory.PiExponent.Ampleness.AmpleIso (8.2s)
+✔ [18936/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveGlobalPolynomialAlgebra (10s)
+✔ [18938/19988] Built OAI.NumberTheory.PiExponent.Approximation.LinePullback (9.2s)
+✔ [18940/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.RamifiedPowerLength (9.9s)
+✔ [18942/19988] Built OAI.NumberTheory.PiExponent.Polynomials.FrameCoefficients (9.7s)
+✔ [18944/19988] Built OAI.NumberTheory.PiExponent.Analysis.AnalyticDeterminantCollision (6.4s)
+✔ [18946/19988] Built OAI.NumberTheory.PiExponent.Analysis.TranslationCountLimit (6.5s)
+✔ [18948/19988] Built OAI.NumberTheory.PiExponent.Polynomials.GradedLocalizationFree (9.4s)
+✔ [18950/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.ComponentMultiplicityBound (3.5s)
+✔ [18952/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.ComponentMultiplicitySum (3.5s)
+✔ [18954/19988] Built OAI.NumberTheory.PiExponent.Jets.FormalBranchCoordinates (6.1s)
+✔ [18956/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveChartSections (11s)
+⚠ [18958/19988] Built OAI.NumberTheory.PiExponent.Cohomology.CurveEuler (12s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/CurveEuler.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18959/19988] Ran OAI.NumberTheory.PiExponent.Cohomology.CurveEuler:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/CurveEuler.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18960/19988] Ran OAI.NumberTheory.PiExponent.Cohomology.CurveZeroEuler
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/CurveZeroEuler.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18962/19988] Ran OAI.NumberTheory.PiExponent.Cohomology.FiniteZeroEuler
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/FiniteZeroEuler.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18964/19988] Built OAI.NumberTheory.PiExponent.Jets.TransverseWeightedMultiplicity (6.5s)
+⚠ [18966/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.LocalSectionOrder
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/LocalSectionOrder.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18970/19988] Built OAI.NumberTheory.PiExponent.Jets.RectangularCotangent (7.1s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/RectangularCotangent.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/RectangularCotangent.lean: imports `Mathlib.RingTheory.MvPowerSeries.Derivative` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [18971/19988] Ran OAI.NumberTheory.PiExponent.Jets.RectangularCotangent:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/RectangularCotangent.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/RectangularCotangent.lean: imports `Mathlib.RingTheory.MvPowerSeries.Derivative` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [18972/19988] Built OAI.NumberTheory.PiExponent.Jets.FormalAuxiliaryJet (5.7s)
+✔ [18974/19988] Built OAI.NumberTheory.PiExponent.Jets.FormalJetIndices (5.8s)
+✔ [18976/19988] Built OAI.NumberTheory.PiExponent.Approximation.MatrixCounting (5.9s)
+✔ [18978/19988] Built OAI.NumberTheory.PiExponent.Jets.AuxiliaryJetMap (6.2s)
+✔ [18980/19988] Built OAI.NumberTheory.PiExponent.Cohomology.GradedCech (12s)
+✔ [18984/19988] Built OAI.NumberTheory.PiExponent.Jets.TaylorRectangular (8.1s)
+✔ [18986/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.PrimeCutBudget (3.1s)
+✔ [18988/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.CompleteIntersectionComponentBound (3.3s)
+✔ [18990/19988] Built OAI.NumberTheory.PiExponent.Cohomology.CechHigher (7.6s)
+✔ [18992/19988] Built OAI.NumberTheory.PiExponent.Jets.OrdinaryAuxiliaryJet (7.4s)
+✔ [18994/19988] Built OAI.NumberTheory.PiExponent.Approximation.MatrixTranslationBounds (7.4s)
+✔ [18996/19988] Built OAI.NumberTheory.PiExponent.Approximation.WeightedFrameDegree (5.3s)
+✔ [18998/19988] Built OAI.NumberTheory.PiExponent.Approximation.FrameSubopens (5.5s)
+✔ [19000/19988] Built OAI.NumberTheory.PiExponent.Jets.FormalBranchContact (4.8s)
+✔ [19004/19988] Built OAI.NumberTheory.PiExponent.Approximation.TensorPure (17s)
+⚠ [19006/19988] Built OAI.NumberTheory.PiExponent.Cohomology.EulerExact (5.3s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/EulerExact.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19007/19988] Ran OAI.NumberTheory.PiExponent.Cohomology.EulerExact:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/EulerExact.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [19008/19988] Built OAI.NumberTheory.PiExponent.Cohomology.NakaiEulerGrowth (5.4s)
+✔ [19010/19988] Built OAI.NumberTheory.PiExponent.Jets.NormalBasisProducts (5.3s)
+✔ [19012/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveRepresentedCoefficient (6.3s)
+⚠ [19014/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.RetainedIntersectionCycles (3.9s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/RetainedIntersectionCycles.lean: imports `Mathlib.Algebra.BigOperators.Group.Finset.Sigma` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/RetainedIntersectionCycles.lean: imports `Mathlib.Data.Fintype.BigOperators` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19015/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.RetainedIntersectionCycles:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/RetainedIntersectionCycles.lean: imports `Mathlib.Algebra.BigOperators.Group.Finset.Sigma` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/RetainedIntersectionCycles.lean: imports `Mathlib.Data.Fintype.BigOperators` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [19016/19988] Built OAI.NumberTheory.PiExponent.Cohomology.CohomologyIso (5.6s)
+✔ [19018/19988] Built OAI.NumberTheory.PiExponent.Approximation.CoherentTwistPresentation (17s)
+✔ [19020/19988] Built OAI.NumberTheory.PiExponent.Approximation.FrameSections (8.4s)
+✔ [19022/19988] Built OAI.NumberTheory.PiExponent.Cohomology.CurveTwoAffineVanishing (5.8s)
+✔ [19024/19988] Built OAI.NumberTheory.PiExponent.Jets.PolynomialJetPackets (5.4s)
+⚠ [19026/19988] Built OAI.NumberTheory.PiExponent.Approximation.DeterminantContradiction (5.3s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/DeterminantContradiction.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19027/19988] Ran OAI.NumberTheory.PiExponent.Approximation.DeterminantContradiction:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/DeterminantContradiction.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [19028/19988] Built OAI.NumberTheory.PiExponent.Jets.OrdinaryTaylor (5.3s)
+✔ [19030/19988] Built OAI.NumberTheory.PiExponent.Jets.PrimeTaylorCotangent (6.3s)
+✔ [19032/19988] Built OAI.NumberTheory.PiExponent.Jets.FrameTransverseMultiplicity (5.3s)
+✔ [19034/19988] Built OAI.NumberTheory.PiExponent.Cohomology.GradedCechExactness (5.9s)
+✔ [19036/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveChartRingNaturalityCore (25s)
+✔ [19038/19988] Built OAI.NumberTheory.PiExponent.Cohomology.ProjectiveTwistCech (6.0s)
+✔ [19040/19988] Built OAI.NumberTheory.PiExponent.Jets.OrdinaryJetDerivatives (6.9s)
+✔ [19042/19988] Built OAI.NumberTheory.PiExponent.Cohomology.GradedPolynomialLaurent (8.1s)
+✔ [19060/19988] Built OAI.NumberTheory.PiExponent.Approximation.FormalMatrixBridge (9.2s)
+✔ [19062/19988] Built OAI.NumberTheory.PiExponent.Cohomology.FreeCechSections (9.3s)
+⚠ [19064/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.RetainedMinimalPrimeFamily (6.0s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/RetainedMinimalPrimeFamily.lean: imports `Mathlib.RingTheory.Ideal.MinimalPrime.Noetherian` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19065/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.RetainedMinimalPrimeFamily:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/RetainedMinimalPrimeFamily.lean: imports `Mathlib.RingTheory.Ideal.MinimalPrime.Noetherian` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✖ [19066/19988] Building OAI.NumberTheory.PiExponent.Analysis.PeriodAnalytic (17s)
+trace: .> LEAN_PATH=/home/ubuntu/work/personal/conjectures-lean/.lake/packages/Cli/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/batteries/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/Qq/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/aesop/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/importGraph/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/plausible/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/mathlib/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean /home/ubuntu/.elan/toolchains/leanprover--lean4---v4.36.0/bin/lean /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/Vendor/OAI/NumberTheory/PiExponent/Analysis/PeriodAnalytic.lean -o /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean/OAI/NumberTheory/PiExponent/Analysis/PeriodAnalytic.olean -i /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean/OAI/NumberTheory/PiExponent/Analysis/PeriodAnalytic.ilean -c /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/ir/OAI/NumberTheory/PiExponent/Analysis/PeriodAnalytic.c --setup /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/ir/OAI/NumberTheory/PiExponent/Analysis/PeriodAnalytic.setup.json --json
+error: Vendor/OAI/NumberTheory/PiExponent/Analysis/PeriodAnalytic.lean:83:2: (deterministic) timeout at `whnf`, maximum number of heartbeats (200000) has been reached
+
+Note: Use `set_option maxHeartbeats <num>` to set the limit.
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+✔ [19076/19988] Built OAI.NumberTheory.PiExponent.Geometry.LineBundleGluing (24s)
+✔ [19078/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveFrameNaturality (9.1s)
+✔ [19082/19988] Built OAI.NumberTheory.PiExponent.Approximation.FibreWeightSeparation (8.7s)
+✔ [19084/19988] Built OAI.NumberTheory.PiExponent.Geometry.SheafificationUnitIso (9.9s)
+✔ [19086/19988] Built OAI.NumberTheory.PiExponent.Ampleness.NumericalAmpleness (9.5s)
+✔ [19088/19988] Built OAI.NumberTheory.PiExponent.Approximation.FrameSubopensCoherence (12s)
+⚠ [19090/19988] Ran OAI.NumberTheory.PiExponent.Ampleness.CurveBlowupImageBase
+warning: Vendor/OAI/NumberTheory/PiExponent/Ampleness/CurveBlowupImageBase.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [19096/19988] Built OAI.NumberTheory.PiExponent.Approximation.SectionOpens (9.0s)
+✔ [19098/19988] Built OAI.NumberTheory.PiExponent.Cohomology.NakaiCohomology (10s)
+✔ [19100/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.EquidimensionalRetainedCut (4.5s)
+✔ [19102/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.NaturalMultiplicityPropagation (4.9s)
+✔ [19104/19988] Built OAI.NumberTheory.PiExponent.Approximation.InverseFrames (11s)
+✔ [19106/19988] Built OAI.NumberTheory.PiExponent.Jets.AlgebraicJetPackets (10s)
+⚠ [19110/19988] Ran OAI.NumberTheory.PiExponent.Jets.JetPowerIdealCoprime
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/JetPowerIdealCoprime.lean: imports `Mathlib.RingTheory.Coprime.Lemmas` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [19112/19988] Built OAI.NumberTheory.PiExponent.Approximation.PushforwardTensor (11s)
+✔ [19114/19988] Built OAI.NumberTheory.PiExponent.Jets.OrdinaryBranchEvaluation (7.7s)
+✔ [19124/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.OrdinaryMultiplicity (10s)
+✔ [19126/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.PrimeFrameMultiplicity (10s)
+⚠ [19128/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.CoordinateContactBound
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateContactBound.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [19130/19988] Built OAI.NumberTheory.PiExponent.Approximation.FormalMatrixSurjectivity (6.5s)
+✔ [19132/19988] Built OAI.NumberTheory.PiExponent.Approximation.SectionDivision (11s)
+✔ [19134/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.SectionImageIdeal (11s)
+✔ [19136/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.IdealModule (11s)
+✔ [19138/19988] Built OAI.NumberTheory.PiExponent.Approximation.FrameTensorPowers (20s)
+✔ [19140/19988] Built OAI.NumberTheory.PiExponent.Approximation.TwistSections (12s)
+✔ [19141/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.CoherentExtFiniteness (13s)
+✔ [19144/19988] Built OAI.NumberTheory.PiExponent.Polynomials.FrameCoefficientLaws (6.2s)
+✔ [19146/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveRatioCocycle (6.3s)
+✔ [19148/19988] Built OAI.NumberTheory.PiExponent.Approximation.LinePowerLaws (13s)
+✔ [19150/19988] Built OAI.NumberTheory.PiExponent.Cohomology.ProjectiveTwistAcyclicity (7.5s)
+✔ [19152/19988] Built OAI.NumberTheory.PiExponent.Approximation.GlueGlobalGenerators (13s)
+✔ [19154/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.MultiplicityCycles (2.7s)
+✔ [19156/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveChartRingNaturality (10s)
+✔ [19158/19988] Built OAI.NumberTheory.PiExponent.Geometry.LineBundleGluingTransitions (7.4s)
+⚠ [19160/19988] Built OAI.NumberTheory.PiExponent.Geometry.IntegralCurveExistence (4.4s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/IntegralCurveExistence.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19161/19988] Ran OAI.NumberTheory.PiExponent.Geometry.IntegralCurveExistence:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/IntegralCurveExistence.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [19162/19988] Built OAI.NumberTheory.PiExponent.Cohomology.GradedPolynomialCech (10s)
+✔ [19164/19988] Built OAI.NumberTheory.PiExponent.Approximation.NumericalMarginRestriction (4.6s)
+✔ [19166/19988] Built OAI.NumberTheory.PiExponent.Cohomology.CechLinear (9.0s)
+✔ [19168/19988] Built OAI.NumberTheory.PiExponent.Approximation.RegularSectionMono (4.6s)
+✔ [19170/19988] Built OAI.NumberTheory.PiExponent.Approximation.IntegralLineSections (5.0s)
