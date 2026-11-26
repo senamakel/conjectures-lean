@@ -78,7 +78,7 @@ Each `native_decide` evaluates the checker `PrimitiveRootSq.Compute.checkFrom` o
 consecutive integers; together they cover every `n < 10⁸`. The checker's soundness,
 `PrimitiveRootSq.Compute.checkAll_sound`, is proved: for each odd prime `p < 10⁸` it produces a
 prime `q < p` with `q^((p−1)/r) ≢ 1 (mod p)` for every prime `r ∣ p − 1` and
-`q^(p−1) ≢ 1 (mod p²)`. The 20 chunks take about 26 CPU-minutes in total (50–100 s each).
+`q^(p−1) ≢ 1 (mod p²)`. The 20 chunks take about 26 CPU-minutes in total (70–105 s each on a loaded shared box).
 
 ## How the proof goes
 
