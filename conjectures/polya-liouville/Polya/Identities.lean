@@ -109,8 +109,9 @@ theorem liouville_mul_zeta : liouville * (zeta : ArithmeticFunction ℤ) = sqInd
   have : ∀ j ∈ range (i + 1), liouville (p ^ j) = (-1 : ℤ) ^ j := by
     intro j _
     rw [liouville_apply (pow_ne_zero _ hp.ne_zero), cardFactors_apply_prime_pow hp]
-  rw [sum_congr rfl this, sum_range_neg_one_pow, isSquare_prime_pow_iff hp]
-  simp [hp.ne_zero]
+  rw [sum_congr rfl this, sum_range_neg_one_pow]
+  simp only [isSquare_prime_pow_iff hp, ne_eq, pow_ne_zero _ hp.ne_zero, not_false_eq_true,
+    true_and]
 
 theorem liouville_eq_sqInd_mul_moebius : liouville = sqInd * moebius := by
   rw [← liouville_mul_zeta, mul_assoc, coe_zeta_mul_moebius, mul_one]
