@@ -15,3 +15,7 @@ path = "../robin-rh"
 
 [[lean_lib]]
 name = "Abundant"
+
+[[lean_lib]]
+name = "AbundantChecks"
+globs = ["AbundantChecks.+"]
