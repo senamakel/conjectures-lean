@@ -47,7 +47,7 @@ theorem apFree_of_isAPOfLengthFree {S : Set ℕ} {k : ℕ} (hk : 2 ≤ k)
         Finset.card_range]
     · ext x
       simp only [t, f, Finset.coe_image, Finset.coe_range, Set.mem_image, Set.mem_Iio,
-        Set.mem_setOf_eq, smul_eq_mul, Nat.cast_lt, exists_prop]
+        smul_eq_mul, Nat.cast_lt, exists_prop]
   have := hS t ht hAP
   have : k ≤ 1 := by exact_mod_cast this
   omega
