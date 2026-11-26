@@ -24,7 +24,7 @@ theorem flintHills_summable_of_eventual_lower_bound (h : PiEventualLowerBound) :
 theorem flintHills_positive_summable_of_eventual_lower_bound (h : PiEventualLowerBound) :
     Summable (fun n : ℕ =>
       1 / (((n + 1 : ℕ) : ℝ) ^ 3 * Real.sin (n + 1 : ℕ) ^ 2)) :=
-  (summable_nat_add_iff 1).mpr (flintHills_summable_of_eventual_lower_bound h)
+  (summable_nat_add_iff (f := fun n : ℕ => 1 / ((n : ℝ) ^ 3 * Real.sin n ^ 2)) 1).mpr (flintHills_summable_of_eventual_lower_bound h)
 
 end PiExponent
 
