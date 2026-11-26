@@ -162,8 +162,9 @@ lake build
 Lean `v4.36.0`, Mathlib `fc4f59e5`, with the workspace's shared `.lake/packages`.
 The default target builds the 869 vendored modules and the 5 of this package. After the 29
 ported files were touched, rebuilding them and their dependents took 466 s of wall time on a
-95-core machine; a cold build was not timed separately. No single module is expensive: the
-slowest take well under a minute.
+95-core machine; a cold build was not timed separately. The slowest modules are
+`Ampleness/ReesProductFrames` (120 to 190 s wall, depending on load), `Ampleness/ReesSectionInclusion`
+(about 120 s) and `Cohomology/CartierEulerPair` (about 100 s).
 
 ## This result stays tier D
 
