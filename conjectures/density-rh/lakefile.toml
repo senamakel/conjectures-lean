@@ -7,8 +7,7 @@ autoImplicit = false
 
 [[require]]
 name = "Erdos985"
-git = "https://github.com/senamakel/erdos-985.git"
-rev = "9538edb73dc72c8fdc04b4e0df076c8930ee2fba"
+path = "../erdos-985"
 
 [[lean_lib]]
 name = "Density"

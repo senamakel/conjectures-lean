@@ -7,13 +7,11 @@ autoImplicit = false
 
 [[require]]
 name = "Erdos985"
-git = "https://github.com/senamakel/erdos-985.git"
-rev = "9538edb73dc72c8fdc04b4e0df076c8930ee2fba"
+path = "../erdos-985"
 
 [[require]]
 name = "Artin"
-git = "https://github.com/senamakel/artin-grh.git"
-rev = "5263600d910226549b32ed2146871ace6112f79b"
+path = "../artin-grh"
 
 [[lean_lib]]
 name = "AbelianERH"

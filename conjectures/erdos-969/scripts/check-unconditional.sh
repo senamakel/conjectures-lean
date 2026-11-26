@@ -47,6 +47,5 @@ fi
 (cd "$HERE" && lake build)
 
 cd "$HERE"
-PKG="$HERE/.lake/packages"
-LEAN_PATH="$(cd "$RH" && lake env printenv LEAN_PATH):$PKG/Erdos985/.lake/build/lib/lean:$PKG/Lindelof/.lake/build/lib/lean:$PKG/Mertens/.lake/build/lib/lean:$HERE/.lake/build/lib/lean" \
+LEAN_PATH="$(cd "$RH" && lake env printenv LEAN_PATH):$HERE/../erdos-985/.lake/build/lib/lean:$HERE/../lindelof-rh/.lake/build/lib/lean:$HERE/../mertens-rh/.lake/build/lib/lean:$HERE/.lake/build/lib/lean" \
   lean Unconditional/Erdos969Unconditional.lean

@@ -7,18 +7,15 @@ autoImplicit = false
 
 [[require]]
 name = "Erdos985"
-git = "https://github.com/senamakel/erdos-985.git"
-rev = "9538edb73dc72c8fdc04b4e0df076c8930ee2fba"
+path = "../erdos-985"
 
 [[require]]
 name = "Lindelof"
-git = "https://github.com/senamakel/lindelof-rh.git"
-rev = "9165bfeceeed8b3638ed4928e32e58d7d8c58b30"
+path = "../lindelof-rh"
 
 [[require]]
 name = "Littlewood"
-git = "https://github.com/senamakel/littlewood-rh.git"
-rev = "385a84e5ac75998dd7d0ad588bbe1f8d6204bbea"
+path = "../littlewood-rh"
 
 [[lean_lib]]
 name = "Mertens"

@@ -129,7 +129,7 @@ Write `ξ(s) = s(s-1)Λ(s)` for erdos-985's entire `Erdos985.Analytic.xiZeta`.
 
 ### Using the zero-counting library
 
-Import `Density.ZeroCount` (lake dependency `https://github.com/senamakel/density-rh.git`). The
+Import `Density.ZeroCount` (lake dependency `path = "../density-rh"`). The
 stable statements are `Density.zeroCountOn_le_of_jensen`,
 `Density.zeroCountOn_riemannZeta_eq_xiZeta`, `Density.zeroCountOn_xiZeta_le`,
 `Density.zeroCountOn_riemannZeta_le_of_subset_strip`,
