@@ -7,7 +7,7 @@ and 11 further projects (see the table in `README.md`). Each project is a folder
 repository `github.com/senamakel/<name>`. This file is the tracker: when a box changes, update it
 here in the same commit as the change.
 
-Status as of 2026-11-25. Every box marked **verified** below was rebuilt from source on the
+Status as of 2026-11-26 for the three newest sections, 2026-11-25 for the rest. Every box marked **verified** below was rebuilt from source on the
 build box on 2026-11-24 or 2026-11-25, its `#print axioms` output read, and (for tier U) its
 `scripts/check-unconditional.sh` run against riemann-hypothesis `507a75d91d`.
 
@@ -270,6 +270,36 @@ glue around the repo's resolution algorithm). Treat every big formalisation the 
   code search, and write down what was searched.
 - **Keep the edges.** Every implication found, kept or rejected, goes into the atlas with its
   premise, its source and the reason, so the next sweep starts from the graph and not from zero.
+
+## Disproofs: the refutation lane
+
+**Decided 2026-11-26.** Alongside proving, the workspace looks for conjectures it can refute. The
+strategy is the same: connect what exists. A disproof comes from one of five routes, and the
+README says which:
+
+| Route | Meaning | How to describe it |
+|---|---|---|
+| **a** | The negation follows from RH/GRH, a lemma of a big Lean proof, or one of our theorems | "X is false", with the tier of the premise |
+| **b** | Another open conjecture refutes it (`Y ⇒ ¬X`) | "Y implies X is false"; both stay open. Never "X is disproved" |
+| **c** | A disproof published on paper, not yet in Lean | "a Lean proof of (author, year)'s disproof of X" |
+| **d** | The formal statement is false as written (edge case, junk value, quantifier order) | "the formal-conjectures statement of X is false as written"; a misformalisation, not a disproof of X. Report it upstream |
+| **e** | A finite counterexample found by computation | "X is false: witness W", checked in Lean by `decide` or a `native_decide` with a proved-sound checker |
+
+Rules:
+
+- **Searches are educated and bounded.** Python, C and solvers (SAT, SMT, ILP, nauty) are
+  welcome and the box has the cores and RAM, but no search starts without three things written
+  down: why a witness is plausible in the range (a density or size heuristic, a structural
+  reason, a hint from a related conjecture or lemma, or a prior search limit being extended),
+  the bounded search space, and a stop condition. The default cap is about 2 CPU-hours per
+  candidate; go past it only when the estimate says a witness is close. Never redo a range
+  someone already exhausted.
+- **Negative results are recorded.** A search that finds nothing goes in the sweep report with
+  its range and its cost, so it is not repeated.
+- **Re-derive every witness from the literal Lean statement** before it is reported, and have
+  Lean check it. A witness that only a script has seen is not a result.
+- The tier, axiom, fixed-statement and audit rules apply unchanged. Sweep reports are
+  `docs/atlas/sweeps/<date>/disproof-*.md`; edges use `"lane": "disproof-…"`.
 
 ## Cross-repo issues
 
@@ -627,6 +657,33 @@ glue around the repo's resolution algorithm). Treat every big formalisation the 
 - [ ] Tier C without H: Kronecker–Weber from Mathlib once Mathlib PR #46376 lands and the pin moves
 - [ ] Washington Thm 4.3 was cited from the scoping report, not re-read
 
+
+### prime-powers-rh: a prime between `x^α` and `(x+1)^α`, real `α ≥ 3` · **tier C verified, tier U check pending** · *RH-consequence*
+- [x] `primeBetweenRealPowers_of_RH`, `primeBetweenIntegerPowers_of_RH` (C), from mills-rh's `primeStrictlyBetweenCubes_of_RH`.
+      Rebuilt 2026-11-26 at `61635fb`: standard three + 22 `native_decide` inherited from schoenfeld-rh
+- [ ] `Unconditional/PrimePowersUnconditional.lean` is written; `scripts/check-unconditional.sh` has not been run
+- [ ] Literature: the RH result for `α ≥ 9/4` is Chamberland–Straub (arXiv:2602.22502), read from the listing only.
+      Which integer exponents are open without RH was not confirmed. No prior-Lean search was done
+- [ ] Not proved: `9/4 ≤ α < 3` (needs a prime-gap computation far beyond a proved-sound checker)
+
+### bach-corollaries-grh: generators of `(ℤ/m)ˣ`, Solovay–Strassen, Miller's factoring · **tier H verified; C and U files not built** · *RH-consequence*
+- [x] `generators_of_bach`, `solovayStrassen_of_bach`, `solovayStrassenTest_iff_prime`, `millerFactoring_of_bach`,
+      `eulerLiars_ne_top`, `jacobiCalc_eq`: from `Ankeny.BachSubgroupBound c`, standard three only. Rebuilt 2026-11-26 at `23ffd52`
+- [ ] `BachCorollaries/GRH.lean` (through `LLS.bach2_of_GRH`) and `Unconditional/` are written and have never been compiled:
+      they need lls-grh's `native_decide` modules built, then the riemann-hypothesis import
+- [ ] Literature: the generator bound with constant `2` sharpens the `3` of Bach 1990 §6. Whether factoring from `φ(n)` is
+      known without ERH was not checked
+
+### implications: `X → Y` between open conjectures · **every theorem tier C or H, verified** · *premise open*
+- [x] PRs #1 to #6, each rebuilt on `main` and its axioms read (standard three): Rotkiewicz; Erdős 382 (i) from Cramér /
+      Firoozbakht; Butson ⇒ Hadamard; four exponentials ⇒ `2^t` or `3^t`; abc ⇒ Erdős 936 and 977 (factorial);
+      Dickson / Schinzel consequences (Erdős 891 Weisenberg, Erdős 647 infinite variant, twin primes and relatives);
+      Erdős 142 lower variant and all-`k` Erdős 140 from the quantitative density bound
+- [x] Statements copied word for word from formal-conjectures `9097e2f`; the table is in the root `README.md`
+- [ ] `scripts/erdos142-discharge/` (the link to openai/math's `manuscriptQuantitativeDensityTheorem`) has not been typechecked
+- [ ] Some modules define copied names in root namespaces (`Nat.Full`, `Set.IsAPOfLength…`, `ABC`, `Erdos936`); move them
+      under `Implications.` before a second module copies the same definition
+- [ ] None of these is a result about the consequence by itself. Never describe one as solving its Erdős problem
 
 ## Working here
 
