@@ -51,10 +51,12 @@ lemma robinRatio_two_neg : robinRatio 2 < 0 := by
   nlinarith
 
 lemma exp_gamma_lt_robinRatio_four : Real.exp Real.eulerMascheroniConstant < robinRatio 4 := by
-  have hγ := Nicolas.Check.exp_gamma_le_EU
-  have hEU : (Nicolas.Check.EU : ℝ) < 2 := by
-    rw [Nicolas.Check.EU]; norm_num [Robin.Lagarias.expUpper, Robin.Lagarias.taylor,
-      Robin.Lagarias.eUp, Finset.sum_range_succ, Nat.factorial]
+  have hγ := Real.eulerMascheroniConstant_lt_two_thirds
+  have hEU : Real.exp Real.eulerMascheroniConstant < 2 := by
+    have h2 : (2 : ℝ) / 3 < Real.log 2 := by have := Real.log_two_gt_d9; linarith
+    calc Real.exp Real.eulerMascheroniConstant < Real.exp (Real.log 2) :=
+          Real.exp_lt_exp.mpr (by linarith)
+      _ = 2 := Real.exp_log (by norm_num)
   have hl4 : Real.log 4 = 2 * Real.log 2 := by
     rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.log_pow]; norm_num
   have hl2 := Real.log_two_lt_d9
