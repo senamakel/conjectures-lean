@@ -38,7 +38,7 @@ lemma isAnalyticFamily_of_differentiable (hf : ∀ᶠ x in nhds p, ∀ k, Contin
   let u (w : ℂ) : C(K × sphere (e p).1 r, ℂ) := .mk (·.2) - w • 1
   have U {w} (_ : dist w (e p).1 < r) := (u w).isUnit_iff_forall_isUnit.2 (by
     simp [u]; grind [dist_eq_norm])
-  refine (i (f := fun x q ↦ u (e p).1 q * .I * f (e.symm (q.2, x)) q.1 / (2 * π * .I)) (.mono
+  refine (i (p := (e p).2) (f := fun x q ↦ u (e p).1 q * .I * f (e.symm (q.2, x)) q.1 / (2 * π * .I)) (.mono
     (ball_mem_nhds _ o) fun x h k ↦ (s (max_le k.2.2.le h.le) _).imp (by fun_prop) (by fun_prop))
     (by simp)).elim fun H ⟨a, g⟩ ↦ ⟨_, ((contractSndCLM (strongIntegral ((volume.restrict (.Icc 0
     (2 * π))).map (⟨_, circleMap_mem_sphere _ o.le ·⟩)) (evalCLM ℂ))).analyticAt _).comp (((((
