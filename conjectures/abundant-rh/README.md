@@ -253,11 +253,11 @@ From a cold nicolas-rh and robin-rh (erdos-985 and Mathlib built), building thro
 (commit `507a75d91d`) and closes the RH hypothesis with its `riemannHypothesis`, and Robin's
 inequality with `Robin.robin_of_RH riemannHypothesis`:
 
-| Theorem | Statement | Axioms (expected; the check has not been run yet) |
+| Theorem | Statement | Axioms (real output, 2026-11-26) |
 |---|---|---|
-| `solePlanat_unconditional` | `SolePlanatStatement` | standard three + `Nicolas.Check.loop_ok` |
-| `extremelyAbundantInfinite_unconditional` | `ExtremelyAbundantInfinite` | standard three + `Nicolas.Check.loop_ok` + robin-rh's 624 `native_decide`s |
-| `fourOnlyExtraordinary_unconditional` | `FourOnlyExtraordinary` | standard three + `Abundant.Check.check_ok` + `Nicolas.Check.loop_ok` + robin-rh's 624 `native_decide`s |
+| `solePlanat_unconditional` | `SolePlanatStatement` | standard three + `Nicolas.Check.loop_ok` (1 `native_decide`) |
+| `extremelyAbundantInfinite_unconditional` | `ExtremelyAbundantInfinite` | standard three + `Nicolas.Check.loop_ok` + robin-rh's 624 `native_decide`s (`RobinCompute.small_ok`, `RobinCompute.chunk_0` to `chunk_622`) |
+| `fourOnlyExtraordinary_unconditional` | `FourOnlyExtraordinary` | standard three + `Abundant.Check.check_ok` + `Nicolas.Check.loop_ok` + robin-rh's 624 `native_decide`s (same list) |
 
 ```bash
 scripts/check-unconditional.sh /path/to/riemann-hypothesis   # cloned there if missing
@@ -269,6 +269,28 @@ riemann-hypothesis's community cache, about 93 GB. The import opens around 900,0
 and needs about 19 GB of RAM. Raise the open-file limit first; on Linux
 `sudo prlimit --pid $$ --nofile=2000000:2000000`, on macOS
 `sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`.
+
+Checked 2026-11-26 at monorepo commit `8ce94d1`: robin-rh's full `Robin` library was built (its
+verified-range sieve was replayed from an existing build of byte-identical sources, so the 54
+core-hours were not repeated here), then `lean Unconditional/AbundantUnconditional.lean` ran
+against riemann-hypothesis `507a75d91d` (2430 s wall including a wait for the single RH-import
+slot). No `sorryAx`. Real output, with the 623 lines `RobinCompute.chunk_0._native.native_decide.ax_1_1`
+to `RobinCompute.chunk_622._native.native_decide.ax_1_1` (each present exactly once) folded into
+one line:
+
+```
+'solePlanat_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound,
+ Nicolas.Check.loop_ok._native.native_decide.ax_1_1]
+'extremelyAbundantInfinite_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound,
+ RobinCompute.small_ok._native.native_decide.ax_1_1,
+ Nicolas.Check.loop_ok._native.native_decide.ax_1_1,
+ RobinCompute.chunk_{0..622}._native.native_decide.ax_1_1  (623 axioms)]
+'fourOnlyExtraordinary_unconditional' depends on axioms: [propext, Classical.choice, Quot.sound,
+ RobinCompute.small_ok._native.native_decide.ax_1_1,
+ Abundant.Check.check_ok._native.native_decide.ax_1_1,
+ Nicolas.Check.loop_ok._native.native_decide.ax_1_1,
+ RobinCompute.chunk_{0..622}._native.native_decide.ax_1_1  (623 axioms)]
+```
 
 The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 

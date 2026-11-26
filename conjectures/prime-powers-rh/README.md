@@ -114,8 +114,64 @@ in total); with warm sibling builds it is seconds.
 
 `scripts/check-unconditional.sh` links against riemann-hypothesis commit `507a75d91d`; it needs
 about 93 GB of cache, 19 GB of RAM and an open-file limit of about 900k (run
-`sudo prlimit --pid $$ --nofile=2000000:2000000` first). The axiom output for the unconditional
-file has not been produced yet.
+`sudo prlimit --pid $$ --nofile=2000000:2000000` first).
+
+Checked 2026-11-26 at monorepo commit `972f715` (`lean Unconditional/PrimePowersUnconditional.lean`
+after `lake build`, 2323 s wall including a wait for the single RH-import slot). No `sorryAx`.
+Real output (3 standard axioms + 22 `native_decide`, inherited from schoenfeld-rh):
+
+```
+'prime_between_real_powers_unconditional' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+'prime_between_integer_powers_unconditional' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
+```
 
 The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the
 Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh).
