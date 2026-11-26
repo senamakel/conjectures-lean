@@ -184,14 +184,14 @@ their start and exclusive of their end.
 | A308656 Conj. 2, f = x(5x+2), x(5x+4), x(7x+3)/2, x(7x+5)/2 | same | n < 10¹⁰ each | none | ~1 CPU-h |
 | A308656 Conj. 3 (q = 7; c(2c+1) + d(3d+r), r = 1, 2) | same | n < 4·10⁹ each | none | ~0.2 CPU-h |
 | A308656 Conj. 4 (q = 7; five g(c) + d(3d+1)/2) | same | n < 4·10⁹ each | none | ~0.5 CPU-h |
-| A308640 Conj. 2 (k = 1, 2; c ≥ 0) | same entry failed at 1.76·10⁶ | PENDING | | |
-| A308640 Conj. 3 (k = ±1; c ≥ 0) | same | PENDING | | |
-| A308641 Conj. 1, Conj. 2 (five f), Conj. 3 | sibling, no verification bound printed | PENDING | | |
-| A308644 Conj. 1 first assertion, Conj. 2 r = 1 | siblings of joeyhlu's two | PENDING | | |
+| A308640 Conj. 2 (k = 1, 2; c ≥ 0) | same entry's Conj. 1 failed at 1.76·10⁶ | n ≤ 10¹⁰ each | none | ~0.5 CPU-h, `sun4.c` |
+| A308640 Conj. 3 (k = ±1; c ≥ 0) | same | n ≤ 10¹⁰ each | none | ~0.5 CPU-h |
+| A308641 Conj. 1, Conj. 2 (five f), Conj. 3 | sibling, no verification bound printed | n ≤ 10¹⁰ each (7 forms) | none | ~1.8 CPU-h |
+| A308644 Conj. 1 first assertion, Conj. 2 r = 1 | siblings of joeyhlu's two | n ≤ 10¹⁰ each | none (joeyhlu: first assertion none to 3·10⁸) | ~0.5 CPU-h |
 | A308662 Conj. 1, Conj. 2 (r = 1, 2) | sibling, 10⁸ verified | PENDING | | |
 | A212496 b-inequalities (pool) and the a-inequalities (same entry) | Turán-type bias 0.653 | n ≤ 10¹¹ | all hold. Closest: √n·b(n) = −1.0237 at 17593752 (exact); a(n)/√n ≥ 1.046 (block bound, ~1.2·10⁸); min (√n b + log log n) = 0.003 at n = 2009; max a/(√n log log n) = 0.995 at n = 5893 | ~1.5 CPU-h, `liou.c`, `liouex.c` |
-| A000224 (Ordowski) | Diophantine, extend Marcus's 10⁸ | n < PENDING | no composite n | ~0.3 CPU-h, `sq224.c` |
-| A245211 / A245212 (Krizek) | multiplicative Diophantine | n < PENDING | only n = 21; only powers of 2 | `kriz.c` |
+| A000224 (Ordowski) | Diophantine, extend Marcus's 10⁸ | 2 ≤ n < 10¹⁰ | no composite n satisfies it; every odd prime does | ~0.4 CPU-h, `sq224.c` |
+| A245211 / A245212 (Krizek) | multiplicative Diophantine | 2 ≤ n ≤ 10¹⁰ | only n = 21; no non-power of 2 for A245212 | ~0.3 CPU-h, `kriz.c` |
 | A321576 (Ordowski) at n = 1093², 3511² | Wieferich reduction | the two known Wieferich primes | both fail (43721, 35111) | seconds |
 
 The A212496 extremes look stationary on a log scale over 10⁵–10¹¹: max √n·b oscillates between
