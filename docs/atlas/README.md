@@ -78,6 +78,23 @@ axioms read before the merge (standard three only).
 Corollaries of our own theorems, each in its own project folder: prime-powers-rh (#7),
 bach-corollaries-grh (#8), legendre-exceptions-rh (#9), ramanujan-rh (#10).
 
+## Candidates not found in the literature (scouts of 2026-11-26)
+
+Reports: [`novel-via-rh.md`](sweeps/2026-11-26/novel-via-rh.md), [`novel-oeis-lists.md`](sweeps/2026-11-26/novel-oeis-lists.md), [`wave2.md`](sweeps/2026-11-26/wave2.md). Nothing here is proved until its project is merged.
+
+| Candidate | Premise | State |
+| :--- | :--- | :--- |
+| Sun, OEIS A038098: `π(n^k)/n^k` strictly decreasing, `k ≥ 4` | Schoenfeld's bound (RH) + check to about `3·10⁸` | prover running |
+| A prime primitive root `q < p` modulo `p²`, every odd prime `p` | erdos-985's argument + one character sum (GRH) | prover running |
+| Sharp generator constant `2/log² 3` for `(ℤ/m)ˣ`, every `m ≥ 3` | lls-grh's analysis (GRH) + finite check | prover running, sizing first |
+| Erdős 770 (iii) with a single-digit constant | Bach's constant 2 (GRH) | prover running |
+| Sun, arXiv:1402.6641 Conj 2.7(i): `π(kn)^{1/k} > π((k+1)n)^{1/(k+1)}` | elementary, no RH | prover running |
+| Sun, Conj 2.14(ii): `π(n²)^{1/n}` strictly decreasing, `n ≥ 3` | elementary, no RH | prover running |
+| Sun, Conj 3.25 / OEIS A243164: a prime `q < n` with `q·n` a primitive root mod `p_n` | erdos-985's argument with a shorter range (GRH) | feasibility study running |
+| Grosswald's conjecture modulo `p²` (Kerr–McGown–Trudgian) | grosswald-grh's sieve + one term (GRH) | not started: about 1000 CPU-hours of checks |
+| Hassani 2013: `A_n/G_n` decreasing for `n ≥ 226` | RH bound from about `3·10¹³` | not started: the range below is beyond a Lean checker |
+| Axler's Conjecture 3.4 (arXiv:1609.07934) | RH beyond Axler's `10¹⁹` | not started: finite range would be a cited hypothesis; a preprint of 2026-11-24 studies the same quantity |
+
 ## Novelty verdicts (audit of 2026-11-26)
 
 Is the mathematical statement in the public literature? Full report:
