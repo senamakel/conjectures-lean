@@ -19,7 +19,8 @@ theorem linear_degree_bunyakovsky {a b : ℤ} (ha : 0 < a) (hab : IsRelPrime b a
   have hd : (C a * X + C b).degree = 1 := degree_linear ha.ne'
   refine ⟨hd, hd.ge, ?_, ?_⟩
   · refine irreducible_of_degree_eq_one_of_isRelPrime_coeff hd ?_
-    simpa [coeff_add, coeff_C_mul, coeff_X, coeff_C] using hab
+    rw [coeff_add, coeff_add, coeff_C_mul_X, coeff_C_mul_X, coeff_C, coeff_C]
+    simpa using hab
   · rw [leadingCoeff_linear ha.ne']
     exact ha
 
