@@ -109,7 +109,7 @@ Details and the numbers behind each constant are in [`docs/PLAN.md`](docs/PLAN.m
 7. **Finite range** (`Compute/`). Every odd prime `p < 10⁸` is checked directly (step 1's two
    conditions). The largest witness needed is `q = 223` (at `p = 73189117`). The least prime
    primitive root modulo `p` fails modulo `p²` only at `p = 40487` (`q = 5`, `5^40486 ≡ 1 (mod
-   40487²)`) below `10⁸`; there `q = 7` works.
+   40487²)`) below `10⁸`; there `q = 13` works.
 
 | File | Content |
 |---|---|

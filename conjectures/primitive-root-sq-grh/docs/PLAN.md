@@ -20,7 +20,7 @@ lift itself).
 A C program (scratch, not kept) checked every odd prime `p < 10^8` (5,761,454 primes): each has
 a prime `q < 224` that is a primitive root modulo `p` with `q^(p−1) ≢ 1 (mod p²)`. So the
 statement has **no exceptions** below `10^8`. The least prime primitive root modulo `p` fails
-modulo `p²` for exactly one prime below `10^8`: `p = 40487`, `q = 5` (McGown–Sorenson also list
+modulo `p²` for exactly one prime below `10^8`: `p = 40487`, `q = 5` (the next prime root, `q = 13`, works there; McGown–Sorenson list
 40487 and 6692367337 as the primes below `10^16` with `g(p) ≠ h(p)`). The largest least witness
 below `10^8` is `q = 223` at `p = 73189117`.
 
@@ -101,8 +101,8 @@ copies it and adds one test per candidate, `powMod q (p − 1) (p·p) ≠ 1`; so
 and `smallPrimes` (primes below 2000, more than the 223 needed).
 
 Cost: 20 chunks of `5·10^6`, one `native_decide` each. The heaviest chunk, `[9.5·10^7, 10^8)`,
-built in 103 s (93 s CPU, 6.1 GB peak RSS) on the shared 95-core box under load ~118. Total about
-30 CPU-minutes, so under the one-hour cap. Built in batches of three to stay inside the
+built in 103 s (93 s CPU, 6.1 GB peak RSS) on the shared 95-core box under load ~118. All 20 chunks were then built: about
+26 CPU-minutes in total (1580 CPU-s), under the one-hour cap. Built in batches of three to stay inside the
 box's free RAM.
 
 ## Module plan
@@ -112,10 +112,10 @@ box's free RAM.
 | `Statement.lean` | the two targets | done |
 | `Lift.lean` | primitive root mod `p` with `q^(p−1) ≢ 1 (mod p²)` ⇒ mod every `p^k` | done |
 | `Compute/Checker.lean`, `Compute/ChunkNN.lean`, `Compute.lean` | finite range `p < 10^8` | done |
-| `Bach.lean` | `bach_primitive_of_GRH`: GRH bound for primitive `χ` at any modulus `N` | |
-| `Character.lean` | `η` modulo `p²`, primitivity of `η^j` | |
-| `Indicator.lean` | the inequality above from "no good `q`" | |
-| `Theta.lean` | `θ ≥ c₂₉ (28/29)^ω` | |
-| `Numerics.lean` | the three cases for `p ≥ 10^8` | |
-| `Main.lean` | `primitiveRootSq_of_GRH`, `primitiveRootPow_of_GRH` | |
-| `Unconditional/PrimitiveRootSqUnconditional.lean` | one-line discharge | |
+| `Bach.lean` | `bach_primitive_of_GRH`: GRH bound for primitive `χ` at any modulus `N` | done |
+| `Character.lean` | `η` modulo `p²`, primitivity of `η^j` | done |
+| `Indicator.lean` | the inequality above from "no good `q`" | done |
+| `Theta.lean` | `θ ≥ c₂₉ (28/29)^ω` | done |
+| `Numerics.lean` | the three cases for `p ≥ 10^8` | done |
+| `Main.lean` | `primitiveRootSq_of_GRH`, `primitiveRootPow_of_GRH` | done |
+| `Unconditional/PrimitiveRootSqUnconditional.lean` | one-line discharge | written, not run |
