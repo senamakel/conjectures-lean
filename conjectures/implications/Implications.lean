@@ -14,3 +14,4 @@ import Implications.PrimeGaps.FiroozbakhtOppermann
 import Implications.Wieferich.Rotkiewicz
 import Implications.Dickson.Main
 import Implications.Dickson.ConsecutiveAll
+import Implications.PrimeGaps.Granville
