@@ -38,7 +38,7 @@ def catlin : SimpleGraph (Fin 5 × Fin 3) where
     unfold catlinAdj at h
     rcases h with ⟨_, h⟩ | h | h
     · exact h rfl
-    · exact fin5_ne_succ _ h.symm
+    · exact fin5_ne_succ _ h
     · exact fin5_ne_succ _ h
 
 instance : DecidableRel catlin.Adj := inferInstanceAs (DecidableRel catlinAdj)
