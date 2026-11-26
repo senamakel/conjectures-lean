@@ -55,4 +55,24 @@ extremely abundant numbers. -/
 def ExtremelyAbundantInfinite : Prop :=
   {n : ℕ | IsExtremelyAbundant n}.Infinite
 
+/-! ## Extraordinary numbers
+
+G. Caveney, J.-L. Nicolas and J. Sondow, *Robin's theorem, primes, and a new elementary
+reformulation of the Riemann hypothesis*, Integers 11 (2011), A33 (arXiv:1110.5078, read in v2):
+with `G(n) = σ(n)/(n log log n)` (`robinRatio`), a positive integer `N` is *extraordinary* if
+`N` is composite and (i) `G(N) ≥ G(N/p)` for every prime factor `p` of `N`, and (ii)
+`G(N) ≥ G(aN)` for every multiple `aN` of `N` (Definition 1). Theorem 5: RH holds if and only if
+`4` is the only extraordinary number. No formal-conjectures entry exists. -/
+
+/-- Caveney–Nicolas–Sondow, Definition 1: extraordinary numbers. -/
+def IsExtraordinary (N : ℕ) : Prop :=
+  (1 < N ∧ ¬ N.Prime) ∧
+    (∀ p : ℕ, p.Prime → p ∣ N → robinRatio (N / p) ≤ robinRatio N) ∧
+    (∀ a : ℕ, 1 ≤ a → robinRatio (a * N) ≤ robinRatio N)
+
+/-- Caveney–Nicolas–Sondow, Theorem 5 (the RH direction): `4` is the only extraordinary
+number. -/
+def FourOnlyExtraordinary : Prop :=
+  ∀ N : ℕ, IsExtraordinary N ↔ N = 4
+
 end Abundant
