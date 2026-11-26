@@ -174,7 +174,7 @@ theorem key_inequality (p : ℕ) [hpf : Fact p.Prime] (hp2 : p ≠ 2) (B₁ B₂
         rw [Finset.prod_congr rfl hfac]
         exact Finset.prod_eq_one fun ℓ hℓ => by rw [if_neg (hall ℓ hℓ)]
       have hord : orderOf (n : ZMod p) = p - 1 := by
-        apply orderOf_eq_of_pow_and_pow_div_prime (by omega)
+        apply orderOf_eq_of_pow_and_pow_div_prime
         · exact ZMod.pow_card_sub_one_eq_one hnZ
         · intro ℓ hℓ hℓd h1
           apply hall ℓ (Nat.mem_primeFactors.mpr ⟨hℓ, hℓd, hN⟩)
@@ -190,7 +190,9 @@ theorem key_inequality (p : ℕ) [hpf : Fact p.Prime] (hp2 : p ≠ 2) (B₁ B₂
       have hη : η n = 1 := by
         have h1 : η n ^ (p - 1) = 1 := by rw [← map_pow, hW, map_one]
         have h2 := hηp _ hnU2
-        rw [show p = (p - 1) + 1 by omega, pow_succ, h1, one_mul] at h2
+        have h3 : η n ^ p = η n ^ (p - 1) * η n := by
+          rw [← pow_succ, Nat.sub_add_cancel hp.one_lt.le]
+        rw [h3, h1, one_mul] at h2
         exact h2
       rw [hF1, hJval.1 hη, mul_one]
       rw [show ((c n : ℂ) * (p : ℂ)) = ((c n * p : ℝ) : ℂ) by push_cast; ring, Complex.ofReal_re,
@@ -211,7 +213,7 @@ theorem key_inequality (p : ℕ) [hpf : Fact p.Prime] (hp2 : p ≠ 2) (B₁ B₂
   have hJsum : ∑ n ∈ range p, (c n : ℂ) * J n
       = (S₀ : ℂ) + ∑ j ∈ Ico 1 p, bachSum (η ^ j) p := by
     simp only [hJ, Finset.mul_sum]
-    rw [Finset.sum_comm, range_eq_Ico, sum_eq_sum_Ico_succ_bot (by have := hp.pos; omega)]
+    rw [Finset.sum_comm, ← Finset.sum_range_add_sum_Ico _ hp.one_lt.le, Finset.sum_range_one]
     congr 1
     · simp [hS₀]
     · refine Finset.sum_congr rfl fun j hj => ?_
