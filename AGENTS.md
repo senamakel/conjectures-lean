@@ -733,6 +733,15 @@ Rules:
 - [ ] Bazzanella (2000, Thm 2) has `O(f(N) log² N)` for Legendre under RH, one logarithm better; not proved here
 - [ ] The Oppermann, Andrica and Brocard bounds were not found in the literature (search list in the README)
 
+### cookson-hills: the Cookson Hills and Flint Hills series converge · **tier D, verified** · *consequence of `μ(π) = 2` (OpenAI 2026)*
+- [x] `cookson_hills_series_converges`, `flint_hills_series_converges`: statements verbatim from formal-conjectures (both `research open`
+      there). Replayed 2026-11-26 at `8fd961f` (19,998 jobs), standard three only, no `native_decide`
+- [x] Premise vendored: openai/math `PiExponent` tree at `3344da5` (Apache-2.0, 869 files), ported to our pin; 29 files changed, listed in
+      `NOTICE`; two `rfl` lemmas the kernel did not finish were removed and their one use re-proved
+- [x] The link Flint ⇒ Cookson (`sin² 2x ≤ 4 cos² x`) is ours, about 60 lines; not found written down, no novelty claimed
+- [ ] A cold rebuild from source in the primary checkout has not been timed
+- [ ] OpenAI's proof of `μ(π) = 2` has had no human review that we know of; our kernel accepts it
+
 ### implications: `X → Y` between open conjectures · **every theorem tier C or H, verified** · *premise open*
 - [x] PRs #1 to #6, #11, #13 and #14, each rebuilt on `main` and its axioms read (standard three): Rotkiewicz; Erdős 382 (i) from Cramér /
       Firoozbakht; Butson ⇒ Hadamard; four exponentials ⇒ `2^t` or `3^t`; abc ⇒ Erdős 936 and 977 (factorial);

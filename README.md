@@ -16,7 +16,7 @@ conjectures. Those links are collected in the [implication atlas](docs/atlas/).
 
 ## Results
 
-36 projects: 21 proved in full, 12 proved in part, 1 conditional at its ceiling, 1 wound down, and 1 collection of implications between open conjectures (listed in the next section).
+37 projects: 22 proved in full, 12 proved in part, 1 conditional at its ceiling, 1 wound down, and 1 collection of implications between open conjectures (listed in the next section).
 
 | Conjecture | Folder | Lean | Literature |
 | :--- | :--- | :---: | :--- |
@@ -56,6 +56,7 @@ conjectures. Those links are collected in the [implication atlas](docs/atlas/).
 | **34.** Solé–Planat's inequality at every primorial, infinitely many extremely abundant numbers, and `4` as the only extraordinary number: proved from RH and Robin's inequality; the run that supplies both is pending | [`abundant-rh`](conjectures/abundant-rh/) | 🟡 | RH-equivalent |
 | **35.** Hajós's conjecture is false: a Lean proof of Catlin's (1979) disproof, at `k = 8` | [`hajos-catlin`](conjectures/hajos-catlin/) | ✅ | known |
 | **36.** Pólya's conjecture `L(n) ≤ 0` is false (`L(906150257) = 1`), and so is von Sterneck's `\|M(x)\| < ½√x` (`M(7725038629) = 43947`) | [`polya-liouville`](conjectures/polya-liouville/) | ✅ | known |
+| **37.** The Cookson Hills series `Σ sec²(n)/n³` converges (and the Flint Hills series `Σ csc²(n)/n³`, rebuilt here). From `μ(π) = 2`, proved in Lean by [openai/math](https://github.com/openai/math) and vendored | [`cookson-hills`](conjectures/cookson-hills/) | ✅ | consequence of `μ(π) = 2` (OpenAI 2026) |
 
 **Lean status.** ✅ the target statement is proved, end to end from Lean's three standard axioms plus
 the finite computations its README names. 🟡 part of the target, or a weaker constant, is proved

@@ -77,3 +77,31 @@ axioms read before the merge (standard three only).
 
 Corollaries of our own theorems, each in its own project folder: prime-powers-rh (#7),
 bach-corollaries-grh (#8), legendre-exceptions-rh (#9), ramanujan-rh (#10).
+
+## Novelty verdicts (audit of 2026-11-26)
+
+Is the mathematical statement in the public literature? Full report:
+[`sweeps/2026-11-26/novelty-audit.md`](sweeps/2026-11-26/novelty-audit.md).
+
+| Result | Verdict |
+| :--- | :--- |
+| Erdős 770 (iii), explicit for every `n ≥ 2` | not found in explicit form |
+| `O(log³ N)` exceptions for Oppermann, Andrica, Brocard under RH | not found |
+| Erdős 647 "infinitely many" variant from Dickson | asserted without proof (Erdős 1979) |
+| Sun's `π(n^k)/n^k` conjecture for `k ≥ 4` (in progress) | not found |
+| A prime primitive root `q < p` modulo `p²` (in progress) | not found |
+| Cookson Hills from Flint Hills | not found written down; short |
+| Units `≤ 2 log² m` generate `(ℤ/m)ˣ` | published (Lamzouri–Li–Soundararajan; Bellotti 2026) |
+| Ramanujan's inequality under RH | published (Dudek–Platt 2015), with a lower threshold than ours |
+| Prime between `x^α` and `(x+1)^α`, `α ≥ 3` | published and stronger (Chamberland–Straub reach `9/4`) |
+| Firoozbakht ⇒ Oppermann, Andrica, Legendre, Brocard, Cramér | published (Ferreira–Mariano, arXiv:1604.03496) |
+| Dickson ⇒ Erdős 141, 218 | published (Schinzel–Sierpiński 1958); balanced primes folklore |
+| abc ⇒ Erdős 366 forms, powerful triples | published |
+| Erdős 142 lower variant, Erdős 140 for all `k` | published (erdosproblems.com/3) |
+| Solé–Planat, extremely abundant, extraordinary numbers | published RH-equivalences |
+
+Stronger statements the audit proposes, none in the literature: the sharp generator constant
+`2/log² 3 ≈ 1.657` for every `m ≥ 3` (left open by Bach in 1990); Erdős 770 (iii) with a
+single-digit constant; explicit per-block exception bounds for the four Legendre-type conjectures.
+The audit also notes that Bazzanella's Theorem 2 may give `log³ N` when summed over `[1, N]`,
+the same as ours; this needs checking against the journal version.
