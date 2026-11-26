@@ -10,6 +10,7 @@ The edges come from the [implication atlas](../../docs/atlas/).
 
 | Module | Premise | Consequence | Source | Axioms |
 | :--- | :--- | :--- | :--- | :--- |
+| [`Erdos142/FromQuantitativeDensity`](Implications/Erdos142/FromQuantitativeDensity.lean) | openai/math `OAI.Erdos3.QuantitativeDensityTheorem` (`r_k(N) ≤ C N exp(−c (log log N)^{1+η})`, `k ≥ 3`; proved there as `manuscriptQuantitativeDensityTheorem`, copied verbatim, tier H) | fc `erdos_142.variants.lower` (`r_k(N) = o(N / log N)`, `k ≥ 2`); Erdős #140 for all `k ≥ 3` (our statement; fc has no #140 file) | asymptotic comparison; Erdős–Graham's remark that the bound gives both | standard three |
 
 ## Building
 

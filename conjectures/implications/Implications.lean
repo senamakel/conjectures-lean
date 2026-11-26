@@ -1,1 +1,2 @@
 import Implications.Basic
+import Implications.Erdos142.FromQuantitativeDensity
