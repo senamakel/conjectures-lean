@@ -14,6 +14,7 @@ each deduction and, for edges we rejected, the reason.
 | :--- | :--- |
 | `edges.jsonl` | one JSON object per implication edge, kept or rejected |
 | `sweeps/2026-11-26/toolkit-reuse.md` | opens with the premise inventory: our theorems with their constants and thresholds |
+| `constructions.jsonl` | one JSON object per counterexample construction or structural lemma, with the conjectures it refutes and the neighbours not yet tested |
 | `sweeps/` | the report of each discovery sweep, by date and lane |
 
 ## Edge schema
@@ -35,6 +36,29 @@ each deduction and, for edges we rejected, the reason.
 | `novelty` | is the deduction itself in the public literature? `published` (a paper, preprint, problem page or public Lean repository proves it), `asserted-unproved` (stated somewhere without a proof), `not-found` (searched and not found; `novelty_searched` says where and when), `unknown` (not yet searched) |
 | `novelty_searched` | the places searched and the date |
 | `sweep`, `lane` | the sweep date and the lane that found the edge; the same edge can appear from two lanes |
+
+## Constructions: witnesses and where else they might apply
+
+`edges.jsonl` links statements. `constructions.jsonl` links a **witness** to statements: one
+JSON object per counterexample construction or structural lemma, with the conjecture it
+refuted and the neighbouring conjectures it has and has not been tried against. A proof is
+extrapolated by following these links: a construction that refutes `X` is evaluated on each
+untested neighbour of `X`, and a lemma that pins down where a counterexample to `X` must sit
+is reused as the search filter for the variants of `X`.
+
+| Key | Meaning |
+| :--- | :--- |
+| `construction` | the object or family, with its parameters |
+| `source` | paper, repository and path where it is defined or verified |
+| `computable` | what the construction gives in closed form (flag counts, spectrum, exact values), which decides which invariants can be evaluated on it without enumeration |
+| `refutes` | the conjectures it settles, with reference and status of the Lean proof |
+| `method` | how it was found: `transplant`, `residue-class scan`, `parametrised family`, `annealing`, `warm start`, `analytic location`, `exhaustive` |
+| `neighbours_tested` | conjecture, outcome (`holds on the family`, `refuted`, `not computable`), and the sweep report |
+| `neighbours_untested` | conjectures of the same shape the construction has not been evaluated on: the to-do list |
+| `sweep`, `lane` | as for edges |
+
+An edge whose premise is a construction uses `"premise_status": "construction"` and names the
+`constructions.jsonl` line in `premise_lean_source`.
 
 ## Priority: not yet in the public literature
 
@@ -77,6 +101,23 @@ axioms read before the merge (standard three only).
 
 Corollaries of our own theorems, each in its own project folder: prime-powers-rh (#7),
 bach-corollaries-grh (#8), legendre-exceptions-rh (#9), ramanujan-rh (#10).
+
+## Candidates not found in the literature (scouts of 2026-11-26)
+
+Reports: [`novel-via-rh.md`](sweeps/2026-11-26/novel-via-rh.md), [`novel-oeis-lists.md`](sweeps/2026-11-26/novel-oeis-lists.md), [`wave2.md`](sweeps/2026-11-26/wave2.md). Nothing here is proved until its project is merged.
+
+| Candidate | Premise | State |
+| :--- | :--- | :--- |
+| Sun, OEIS A038098: `π(n^k)/n^k` strictly decreasing, `k ≥ 4` | Schoenfeld's bound (RH) + exact counts to `2.8·10⁶` | **proved**, PR #20 (`k = 3` open for `141 ≤ n < 10⁷`) |
+| A prime primitive root `q < p` modulo `p²`, every odd prime `p` | erdos-985's argument + one character sum (GRH) | **proved**, PR #21; Martin 1997 has it for large `p` without an explicit constant |
+| Sharp generator constant `2/log² 3` for `(ℤ/m)ˣ`, every `m ≥ 3` | lls-grh's analysis (GRH) + finite check | **proved in part**, PR #24 (`m < 2^17` and `m ≥ 5·2^49`, optimality; `2^17 ≤ m < 5·2^49` open) |
+| Erdős 770 (iii) with a single-digit constant | Bach's constant 2 (GRH) | prover running |
+| Sun, arXiv:1402.6641 Conj 2.7(i): `π(kn)^{1/k} > π((k+1)n)^{1/(k+1)}` | elementary, no RH | **proved**, PR #23 (tier D) |
+| Sun, Conj 2.14(ii): `π(n²)^{1/n}` strictly decreasing, `n ≥ 3` | elementary, no RH | **proved**, PR #23 (tier D) |
+| Sun, Conj 3.25 / OEIS A243164: a prime `q < n` with `q·n` a primitive root mod `p_n` | erdos-985's argument with a shorter range (GRH) | feasibility study running |
+| Grosswald's conjecture modulo `p²` (Kerr–McGown–Trudgian) | grosswald-grh's sieve + one term (GRH) | not started: about 1000 CPU-hours of checks |
+| Hassani 2013: `A_n/G_n` decreasing for `n ≥ 226` | RH bound from about `3·10¹³` | not started: the range below is beyond a Lean checker |
+| Axler's Conjecture 3.4 (arXiv:1609.07934) | RH beyond Axler's `10¹⁹` | not started: finite range would be a cited hypothesis; a preprint of 2026-11-24 studies the same quantity |
 
 ## Novelty verdicts (audit of 2026-11-26)
 

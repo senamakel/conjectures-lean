@@ -193,7 +193,7 @@ dependencies.
 
 | Theorem | Statement | Axioms |
 |---|---|---|
-| `BachCorollaries.Unconditional.generators` | `GeneratorBound 2` | standard three + lls-grh's 15 `native_decide` (expected) |
+| `BachCorollaries.Unconditional.generators` | `GeneratorBound 2` | standard three + lls-grh's 15 `native_decide` |
 | `BachCorollaries.Unconditional.solovayStrassen` | `SolovayStrassenStatement 2` | same |
 | `BachCorollaries.Unconditional.solovayStrassenTest_iff_prime` | `solovayStrassenTest n = true ↔ n.Prime` (odd `n > 1`) | same |
 | `BachCorollaries.Unconditional.millerFactoring` | `MillerFactoringStatement 2` | same |
@@ -205,8 +205,87 @@ scripts/check-unconditional.sh [RH_DIR]
 ```
 
 which needs about 93 GB of cache, about 19 GB of RAM and an open-file limit near 900k
-(`sudo prlimit --pid $$ --nofile=2000000:2000000`). The check has not been run yet; the axiom
-column above is what the imports imply, to be replaced by the real output.
+(`sudo prlimit --pid $$ --nofile=2000000:2000000`).
+
+Checked 2026-11-26 at monorepo commit `e9aba6d`: `BachCorollaries.GRH` and the lls-grh, ankeny-grh
+and miller-grh modules it needs were built first, then
+`lean Unconditional/BachCorollariesUnconditional.lean` ran against riemann-hypothesis `507a75d91d`
+(2987 s wall including a wait for the single RH-import slot). No `sorryAx`. Real output:
+
+```
+'BachCorollaries.Unconditional.generators' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ LLS.chunk2_ok_0._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_1._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_10._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_11._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_12._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_13._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_14._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_2._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_3._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_4._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_5._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_6._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_7._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_8._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_9._native.native_decide.ax_1_1]
+'BachCorollaries.Unconditional.solovayStrassen' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ LLS.chunk2_ok_0._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_1._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_10._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_11._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_12._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_13._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_14._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_2._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_3._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_4._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_5._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_6._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_7._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_8._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_9._native.native_decide.ax_1_1]
+'BachCorollaries.Unconditional.solovayStrassenTest_iff_prime' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ LLS.chunk2_ok_0._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_1._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_10._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_11._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_12._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_13._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_14._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_2._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_3._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_4._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_5._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_6._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_7._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_8._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_9._native.native_decide.ax_1_1]
+'BachCorollaries.Unconditional.millerFactoring' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ LLS.chunk2_ok_0._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_1._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_10._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_11._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_12._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_13._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_14._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_2._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_3._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_4._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_5._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_6._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_7._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_8._native.native_decide.ax_1_1,
+ LLS.chunk2_ok_9._native.native_decide.ax_1_1]
+```
 
 The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the
 Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh).

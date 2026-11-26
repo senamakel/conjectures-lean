@@ -151,8 +151,8 @@ Dropped without a run, with the reason:
 - **Verification 2.** `scripts/verify308656.py`: pure Python with exact integers, enumerating
   every (s, c) and testing 24r+1 = z², z ≡ ±1 (mod 6). It gives 0 representations for both
   witnesses and positive counts for the other four polynomials (25, 69, 36, 41 at 235644514).
-  `src/brute2a.c` (direct per-n enumeration, a different code path) rechecks minimality over
-  [1, 235644514]: PENDING.
+  `src/brute2a.c` (direct per-n enumeration with an early exit, a different code path) rechecks
+  minimality over [1, 235644516): the only n it reports is 235644514 (about 3 CPU-h).
 - **Prior art: TAKEN.**
   - `joeyhlu/sun-representation-counterexamples` (created 2026-11-26 02:25 UTC, pushed
     09:18 UTC) lists A308656 Conj. 2 (f = x(4x+1)) → 235644514 as the smallest, from an
@@ -197,6 +197,19 @@ their start and exclusive of their end.
 The A212496 extremes look stationary on a log scale over 10⁵–10¹¹: max √n·b oscillates between
 −1.02 and −1.26, and min a/√n between 1.04 and 1.20. A crossing needs a rarer alignment of
 zeros, plausibly far beyond 10¹² *(heuristic)*. I stopped at the cap.
+
+## 5a. Against the owner's bar (a "real" hit)
+
+A hit counts only if the author tested the statement, reported a range, and the witness lies
+beyond that range and needed structure to find.
+
+- A308656 Conj. 2 meets that bar. Sun verified it to 10⁶; the witness is at 2.4·10⁸ and needed
+  an exhaustive bitset scan. It is **taken**.
+- The 15 sibling statements and A157237/A157218 are the same kind of real target, and all are
+  negative to the ranges in §5.
+- A212496, A000224 and A245211/2 are author-tested too, and negative.
+- Nothing in this lane was a typo-level or first-small-case failure. The Epoch P7 class
+  (edge-index defects) was not pursued.
 
 ## 6. Process lesson
 

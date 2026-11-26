@@ -82,6 +82,29 @@ LivingBrain by hand, as above.
               └── density-rh, grosswald-grh, li-criterion-rh, speiser-rh, weinberger-grh
   ```
 
+### A second, smaller proof of RH and GRH: lsernau/grh-lean (noted 2026-11-26)
+
+[lsernau/grh-lean](https://github.com/lsernau/grh-lean) is a shorter Lean 4 proof of RH and of GRH for
+Dirichlet L-functions, based on Alpöge's. Facts read from the repository on 2026-11-26:
+
+- **Licence:** Apache-2.0 (Copyright 2026 Anthropic, PBC), with `NOTICE` and `ATTRIBUTION.md`. Unlike
+  riemann-hypothesis it may be vendored, with credit.
+- **Size:** two editions of the same five theorems, each its own Lake project: `grh/` (about 300,000
+  lines, readable) and `grh-compact/` (about 76,000 lines). Mathlib is the only dependency.
+- **Cost:** one to two hours on 12 cores with 24 GB of memory, from source. Compare 93 GB of
+  untrusted cache and 19 GB per import for riemann-hypothesis, which has never been rebuilt here.
+- **Pin:** Lean `v4.35.0`, Mathlib `56a00585`. That is not our pin (`v4.36.0`, `fc4f59e5`), so it cannot
+  be imported as it is. A port of the compact edition to our pin is in progress on branch
+  `grh-compact-port` (`conjectures/grh/`).
+- **Axioms:** its README states `propext`, `Classical.choice`, `Quot.sound` only. Not yet checked here.
+- **Review:** its README says it has passed machine checks only and that no mathematician has read it
+  through.
+
+Once the port builds, `Unconditional/` files should take RH and GRH from it: the check then runs
+from source in an hour or two, needs no raised open-file limit, and the caveat about the untrusted
+cache no longer applies. Until then riemann-hypothesis `507a75d91d` remains the source, and the
+README rule 10 caveat stays word for word.
+
 ## Proof tiers: when a result counts as a direct proof
 
 Each headline theorem has exactly one tier, and the README must say which.
@@ -256,6 +279,7 @@ worktree on one project folder.
 | `implication-prover` | opus | proves one target in `conjectures/<name>/`, statement fixed first, real `#print axioms` at the end | once a candidate is chosen |
 | `lean-mechanic` | sonnet | scaffolds packages, writes `Unconditional/` modules and checkers, repairs builds | work that needs no new mathematical idea |
 | `proof-auditor` | opus | rebuilds, reads axioms, diffs the statement against its source, checks README claims and prior proofs | every finished target, before merge |
+| `counterexample-hunter` | opus | looks for a new witness against an open, unclaimed conjecture: transplants an existing construction to its neighbours, or searches a space first cut down by structure; prior art before compute | the refutation lane |
 
 The order for a target is scout, prover (with the mechanic for scaffolding and checkers), then
 auditor. A prover's own report is never accepted without the audit. The atlas schema is in
@@ -334,6 +358,45 @@ Rules:
 - The tier, axiom, fixed-statement and audit rules apply unchanged. Sweep reports are
   `docs/atlas/sweeps/<date>/disproof-*.md`; edges use `"lane": "disproof-…"`.
 
+### What counts, and how to hunt (learned 2026-11-26)
+
+The first day of the lane ran sixteen sweeps. Every substantive hit had already been claimed,
+one of them hours earlier; the unclaimed ones were shallow. The rules below come from that.
+
+- **The goal is a new counterexample to an open, unclaimed conjecture by a named author.** A
+  Lean proof of a disproof already in the literature (Pólya, Hajós, von Sterneck) is tooling,
+  not a result of this lane, and is not started without the owner asking.
+- **A hit is real only if the authors tested and believed the conjecture** and the witness lies
+  beyond what they checked and took structure to find. A statement false at its first small
+  case, contradicting a classical theorem, or dropped from the published version (Gawron–Miska–Ulas
+  5.6 at `36 − 4 = 32`; the `{1,8,k}` formula of arXiv:1401.7183v1) is recorded in one line.
+- **Prior art comes before compute, and again before reporting.** Search the exact wording on
+  arXiv, Zenodo, evidencepress.org, GitHub and the 1337 repo. Taken on the day: Cazenave's
+  spectral Conjecture 2, Wu–Yu–Guo, Sun's A308656 Conjecture 2, Kozma–Nitzan (proved).
+- **Transplant before you search.** The model is the Caiolo–Ferroni–Hoster disproof in
+  1337isnot1337/solved-conjectures: a matroid family built to refute one real-rootedness
+  conjecture (Bérczi–Coron–Eur–Li) was evaluated, by a closed recursion in `q`, on the
+  neighbouring invariant it had never been tried on. The witness has about `17^8` points and
+  was never enumerated; the 53-digit numbers in the announcement are discriminants. A
+  counterexample is an asset: record it in `docs/atlas/constructions.jsonl` with the neighbours
+  it has not been tested against, and test them.
+- **When there is no construction, cut the space first.** Scan only the residue classes where
+  local conditions block most representations (how Sun's conjectures fall near `10^8`–`10^10`);
+  search inside the "minimal counterexample must…" lemmas of the source paper; pass to a
+  parametrised family; let an asymptotic expansion or a zero sum locate the violation; warm-start
+  case `n` from the certificate for `n − 1`. Estimate the expected number of witnesses in reach
+  and drop a target far below 0.1.
+- **A negative result can be evidence for the conjecture.** Brannen's conjecture in dimensions
+  4 to 8: the simplex is exactly optimal among polytopes with `n + 2` facets, and the first-order
+  test changes sign between 8 and 9. Say so; it points a prover at the target instead.
+- **Exact arithmetic for every hit, and read definitions, not headlines.** Floating-point
+  volumes and grid sampling produced false hits. A Lean file that compiles proves only its own
+  definitions: stutxo/gaupenov-guyon-venier "refutes" a conjecture about the identity map, and
+  its 77-digit witness is the SHA-256 of a song lyric.
+
+The role is `counterexample-hunter` (`.claude/agents/`). Scripts of each sweep are kept under
+`docs/atlas/sweeps/<date>/disproof-scripts/`.
+
 ## Cross-repo issues
 
 - [x] **Sibling requires are local paths** (rule 7), switched 2026-11-26. Before the switch each
@@ -347,7 +410,8 @@ Rules:
       robin-rh `535c9be`, nicolas-rh `4229e63`, li-criterion-rh `f058257`,
       speiser-rh `3c73ba5`, mertens-rh `4e9a6ba`, lls-grh `2fd3311`,
       bach-sorenson-grh `bbb0184`, schoenfeld-rh `62ea23a`, cramer-rh `fb22f0a`,
-      erdos-770 `a640482`, erdos-233 `651e094`. No `sorryAx` in any log.
+      erdos-770 `a640482`, erdos-233 `651e094`; on 2026-11-26: legendre-exceptions-rh `d673d91`,
+      ramanujan-rh `24c7ca4`, prime-powers-rh `972f715`, bach-corollaries-grh `e9aba6d`, abundant-rh `8ce94d1`. No `sorryAx` in any log.
       The shell's hard open-file limit (524288) is too low for the import: run
       `sudo prlimit --pid $$ --nofile=2000000:2000000` first. Up to four checks fit in RAM at once.
 - [x] **Licence.** This repository and every project folder carry the GNU GPL v3 (`LICENSE`,
@@ -691,45 +755,54 @@ Rules:
 - [ ] Washington Thm 4.3 was cited from the scoping report, not re-read
 
 
-### prime-powers-rh: a prime between `x^α` and `(x+1)^α`, real `α ≥ 3` · **tier C verified, tier U check pending** · *RH-consequence*
+### prime-powers-rh: a prime between `x^α` and `(x+1)^α`, real `α ≥ 3` · **tier U, complete, verified** · *RH-consequence*
 - [x] `primeBetweenRealPowers_of_RH`, `primeBetweenIntegerPowers_of_RH` (C), from mills-rh's `primeStrictlyBetweenCubes_of_RH`.
       Rebuilt 2026-11-26 at `61635fb`: standard three + 22 `native_decide` inherited from schoenfeld-rh
-- [ ] `Unconditional/PrimePowersUnconditional.lean` is written; `scripts/check-unconditional.sh` has not been run
+- [x] `Unconditional/PrimePowersUnconditional.lean` (U): standard three + 22 `native_decide`, no `sorryAx`. Checked 2026-11-26 at `972f715`
+      against riemann-hypothesis `507a75d91d` (2323 s wall, including a wait for the RH-import slot)
 - [ ] Literature: the RH result for `α ≥ 9/4` is Chamberland–Straub (arXiv:2602.22502), read from the listing only.
       Which integer exponents are open without RH was not confirmed. No prior-Lean search was done
 - [ ] Not proved: `9/4 ≤ α < 3` (needs a prime-gap computation far beyond a proved-sound checker)
 
-### bach-corollaries-grh: generators of `(ℤ/m)ˣ`, Solovay–Strassen, Miller's factoring · **tier H verified; C and U files not built** · *RH-consequence*
+### bach-corollaries-grh: generators of `(ℤ/m)ˣ`, Solovay–Strassen, Miller's factoring · **tier U, complete, verified** · *RH-consequence*
 - [x] `generators_of_bach`, `solovayStrassen_of_bach`, `solovayStrassenTest_iff_prime`, `millerFactoring_of_bach`,
       `eulerLiars_ne_top`, `jacobiCalc_eq`: from `Ankeny.BachSubgroupBound c`, standard three only. Rebuilt 2026-11-26 at `23ffd52`
-- [ ] `BachCorollaries/GRH.lean` (through `LLS.bach2_of_GRH`) and `Unconditional/` are written and have never been compiled:
-      they need lls-grh's `native_decide` modules built, then the riemann-hypothesis import
+- [x] `BachCorollaries/GRH.lean` (through `LLS.bach2_of_GRH`, C) compiled with no edits, and `Unconditional/` (U): standard three +
+      lls-grh's 15 `native_decide` (`LLS.chunk2_ok_0` to `_14`), no `sorryAx`. Checked 2026-11-26 at `e9aba6d` against
+      riemann-hypothesis `507a75d91d` (2987 s wall, including a wait for the RH-import slot). lls-grh, ankeny-grh and miller-grh builds
+      were replayed from existing builds of byte-identical sources
 - [ ] Literature: the generator bound with constant `2` sharpens the `3` of Bach 1990 §6. Whether factoring from `φ(n)` is
       known without ERH was not checked
 
-### abundant-rh: Solé–Planat, extremely abundant numbers, extraordinary numbers · **tier C verified (Robin as an imported hypothesis), U check pending** · *RH-equivalent*
+### abundant-rh: Solé–Planat, extremely abundant numbers, extraordinary numbers · **tier U, complete, verified** · *RH-equivalent*
 - [x] `solePlanat_of_RH`, `extremelyAbundantInfinite_of_RH`, `fourOnlyExtraordinary_of_RH`; the last two take
       `Robin.RobinStatement` as an argument so the main library never builds robin-rh's sieve. Rebuilt 2026-11-26 at `3b1cb54`;
       axiom lists pinned by `#guard_msgs` in `AbundantChecks`: standard three + `Nicolas.Check.loop_ok` (+ `Abundant.Check.check_ok`
       for the extraordinary-number theorem, one `native_decide`, 92 s, proved-sound checker over `n ≤ 5040`)
-- [ ] `Unconditional/AbundantUnconditional.lean` written; its check builds robin-rh's sieve (about 54 core-hours) first. Not run
+- [x] `Unconditional/AbundantUnconditional.lean` (U): standard three + `Nicolas.Check.loop_ok`; the last two theorems add robin-rh's 624
+      `native_decide` (`RobinCompute.small_ok`, `chunk_0` to `chunk_622`), the extraordinary-number one also `Abundant.Check.check_ok`. No
+      `sorryAx`. Checked 2026-11-26 at `8ce94d1` against riemann-hypothesis `507a75d91d` (2430 s wall, including a wait for the RH-import
+      slot). robin-rh's sieve was replayed from an existing build of byte-identical sources (finality worktree), not recomputed
 - [ ] The separate GA2 statement of Caveney–Nicolas–Sondow is not stated (its definition was not confirmed)
 
-### ramanujan-rh: Ramanujan's inequality `π(x)² < (e·x/log x)·π(x/e)` · **tier C for `x ≥ e⁴⁰` verified, U check pending; full statement tier H** · *RH-consequence*
+### ramanujan-rh: Ramanujan's inequality `π(x)² < (e·x/log x)·π(x/e)` · **tier U for `x ≥ e⁴⁰`, verified; full statement tier H** · *RH-consequence*
 - [x] `ramanujan_of_RH : RiemannHypothesis → RamanujanInequalityFrom (Real.exp 40)` (C), no computation. Rebuilt 2026-11-26 at
       `d2d9ea0`: standard three + 23 `native_decide` inherited from schoenfeld-rh; `ramanujan_of_schoenfeldPi` standard three only
 - [x] `ramanujan_of_RH_of_verified`: the Dudek–Platt statement (`x ≥ 38,358,837,683`) with `RamanujanVerifiedRange`
       (`[38,358,837,683, e⁴⁰]`, about `6·10¹⁵` primes) as a tier-H hypothesis
-- [ ] `Unconditional/RamanujanUnconditional.lean` written; check not yet run
+- [x] `Unconditional/RamanujanUnconditional.lean` (U): `ramanujan_inequality_from_exp40` and `ramanujan_of_verified` (the latter with
+      `RamanujanVerifiedRange` as hypothesis): standard three + schoenfeld-rh's 23 `native_decide`, no `sorryAx`. Checked 2026-11-26 at
+      `24c7ca4` against riemann-hypothesis `507a75d91d` (2106 s wall, including a wait for the RH-import slot)
 - [ ] Literature not confirmed: Axler's `e^3158.442`, Platt–Trudgian's `exp(3915)`. Two unrefereed unconditional claims
       exist (arXiv:2408.02591, Zenodo 23440770), not checked
 - [ ] Lowering `e⁴⁰` to Dudek–Platt's `1.15·10¹⁶` needs `π(x) < li(x)` for `x ≤ 1.2·10¹⁷`, which we do not have in Lean
 
-### legendre-exceptions-rh: exceptional sets for Legendre, Oppermann, Andrica, Brocard · **tier C verified, U check pending** · *RH-consequence*
+### legendre-exceptions-rh: exceptional sets for Legendre, Oppermann, Andrica, Brocard · **tier U, complete, verified** · *RH-consequence*
 - [x] `legendre_exceptions_of_RH`, `oppermann_exceptions_of_RH`, `andrica_exceptions_of_RH`, `brocard_exceptions_of_RH`:
       `O(log³ N)` exceptions among the first `N` indices, from erdos-233's `large_gaps_of_RH`. Rebuilt 2026-11-26 at `f3c0776`,
       standard three only. Conjecture statements verbatim from formal-conjectures
-- [ ] `Unconditional/LegendreExceptionsUnconditional.lean` written; check not yet run
+- [x] `Unconditional/LegendreExceptionsUnconditional.lean` (U): the four `*_exceptions` theorems, standard three only, no `sorryAx`.
+      Checked 2026-11-26 at `d673d91` against riemann-hypothesis `507a75d91d` (1087 s wall)
 - [ ] Bazzanella (2000, Thm 2) has `O(f(N) log² N)` for Legendre under RH, one logarithm better; not proved here
 - [ ] The Oppermann, Andrica and Brocard bounds were not found in the literature (search list in the README)
 
@@ -741,6 +814,57 @@ Rules:
 - [x] The link Flint ⇒ Cookson (`sin² 2x ≤ 4 cos² x`) is ours, about 60 lines; not found written down, no novelty claimed
 - [ ] A cold rebuild from source in the primary checkout has not been timed
 - [ ] OpenAI's proof of `μ(π) = 2` has had no human review that we know of; our kernel accepts it
+
+### sun-prime-density-rh: Sun's conjecture, `π(n^k)/n^k` strictly decreasing (OEIS A038098) · **tier C for `k ≥ 4` verified, U check pending; `k = 3` partial** · *RH-consequence; no proof found in the literature*
+- [x] `sun_of_RH`: every `k ≥ 4`, `n ≥ 2`; statement verbatim from formal-conjectures `OeisA38098.conjecture1` (`research open`).
+      Rebuilt 2026-11-26 at `71e7505`: standard three + 23 `native_decide` from schoenfeld-rh + 2 of its own
+      (`Check.chainOK_piTable`, primes below 2,825,761, 32 s; `Check.allOK_eq_true`, 0.9 s), proved-sound checkers
+- [x] `sun_three_of_RH`: `k = 3` for `2 ≤ n ≤ 140` and `n ≥ 10⁷`; `sunConjecture_iff_of_RH` reduces the whole conjecture to the gap
+- [ ] `k = 3`, `141 ≤ n < 10⁷`: needs `π(n³)` up to about `10²¹` or a sharper explicit bound; not in Lean
+- [ ] `Unconditional/SunPrimeDensityUnconditional.lean` written; check started 2026-11-26, result not yet read
+- [ ] Novelty search of 2026-11-26 found no proof of any case (OEIS page, MathOverflow 301662, arXiv, formal-conjectures PRs,
+      GitHub, solved-conjectures). The label *new* needs the owner's sign-off before the README uses it
+- [ ] `Check` is a root namespace in this package; move it under `SunPrimeDensity` before another project copies the name
+
+### primitive-root-sq-grh: a prime primitive root `q < p` modulo `p²` and every `p^k` · **tier C verified, U check pending** · *RH-consequence; the all-`p` statement was not found in the literature*
+- [x] `primitiveRootSq_of_GRH`, `primitiveRootPow_of_GRH`: every odd prime, no exceptions. Replayed 2026-11-26 at `7f76f54`:
+      standard three + 20 `native_decide` (`PrimitiveRootSq.Compute.chunk_ok_*`, all `p < 10⁸`, about 26 CPU-minutes, proved-sound checker)
+- [x] Threshold stays at `10⁸`: one extra character of order `p` modulo `p²`; tightest margin 1.6% at `ω(p − 1) = 9`
+- [x] `Lift.lean`: a primitive root mod `p²` is one mod every `p^k` (not in Mathlib)
+- [ ] `Unconditional/PrimitiveRootSqUnconditional.lean` written; check started 2026-11-26, result not yet read
+- [ ] Literature: Martin (Acta Arith. 80, 1997, Cor. 3.1) gives it for all sufficiently large `p` under GRH with no explicit constant.
+      The label *new* needs the owner's sign-off
+- [ ] Next in the cluster, not started: Grosswald's conjecture modulo `p²` (Kerr–McGown–Trudgian), about 1000 CPU-hours of checks
+
+### sun-pi-inequalities: Sun's Conjectures 2.7(i) and 2.14(ii) on `π(x)` (arXiv:1402.6641; OEIS A238165 (ii), A038107 (i)) · **tier D, complete, audited** · *no proof found in the literature*
+- [x] `sun_2_7_i`, `oeis_A238165_ii`, `sun_2_7_i_nat`: `π(kn)^{1/k} > π((k+1)n)^{1/(k+1)}` for `n > 4`, `1 ≤ k ≤ n`. Rebuilt from source
+      2026-11-26 at `98a1b97` (merged as PR #23, `9594f71`): standard three only; finite range (391 pairs, `n ≤ 63`) by `decide +kernel`
+- [x] `sun_2_14_ii`, `oeis_A038107_i` (with limit 1), `sun_2_14_ii_nat`: `π(n²)^{1/n}` strictly decreasing for `n ≥ 3`. Standard three
+      + 1 `native_decide` (`SunPi.checkB_ok`, `n ≤ 699`, prime counting to 490000, about 10 s; proved-sound `checkB_sound`, read)
+- [x] Statements transcribed from arXiv:1402.6641 v12 and the OEIS comments, compared by the auditor 2026-11-26 (ranges, direction,
+      strictness); `a` verbatim from formal-conjectures `OeisA38107.a`, which states neither conjecture. Python check: both hold on
+      small cases and fail just outside their ranges (`n = 4, k = 1`; `n = 1, 2`)
+- [x] Novelty search 2026-11-26 (arXiv/Exa, OEIS, MathOverflow, formal-conjectures PRs, GitHub code): no proof found. The label *new*
+      needs the owner's sign-off
+- [ ] Other parts of Conjectures 2.7 and 2.14 (2.7(ii), 2.14(i), 2.14(iii)) and A238165 (i) not attempted
+
+### bach-sharp-grh: Bach's sharp generator constant `2/log² 3` for `(ℤ/m)ˣ` · **tier D + C outside `2^17 ≤ m < 5·2^49`, verified; full statement not proved; U check pending** · *RH-consequence; the sharp constant was not found in the literature*
+- [x] `SharpSubgroupBound`, `SharpGeneratorBound` are `Ankeny.BachSubgroupBound` and `BachCorollaries.GeneratorBound` at `2 / Real.log 3 ^ 2`
+      (every modulus); `SharpOptimal` (no `c < 2/log² 3` works) is proved at `m = 3`. Read by the auditor 2026-11-26; Python check
+      `3 ≤ m ≤ 3000`: worst ratio `G(m)/log² m` is 1.657071 at `m = 3`, then 1.561 (`4`), 1.557 (`6`)
+- [x] `sharpOptimal` (D), standard three only. Rebuilt 2026-11-26 at `9a18f66` (merged as PR #24, `ee15c22`), 33 s replay
+- [x] `sharp_small` (D, every `q < 2^17`, no GRH): standard three + 4 `native_decide` (`small_ok_S0..S3`, ankeny-grh's generation
+      search, 18 s to 1335 s CPU; sound by `checkSmall_sound`, read)
+- [x] `sharp_large_of_GRH` (C, every `q ≥ 5·2^49`): from `bach1657_large_of_GRH` (constant `1657/1000`) and `c1657_le_sharpConst`
+      (`1.657 < 1.6570709`); standard three + 2 `native_decide` (`chunk_ok_L0`, `chunk_ok_L1`, lls-grh's block checker at `cn/cd`,
+      sound by `checkChunkC_sound`, read) + polynomial tail `goodQ_tailS` for `q ≥ 2^7400`
+- [x] `sharp_outside_gap_of_GRH`, `generators_outside_gap_of_GRH`, `sharp_of_GRH_of_gap` (C; `SharpGap` an explicit argument),
+      `bach_sharp_of_GRH` (C, + lls-grh's 15 `chunk2_ok_*`)
+- [ ] `SharpGap` (`2^17 ≤ q < 5·2^49`) not proved: the GRH budget fails at `c = 1.657` for smooth moduli up to about `10^13.2`;
+      needs a kernel-enumerating block checker and structural generation certificates (`docs/PLAN.md`)
+- [ ] `Unconditional/BachSharpUnconditional.lean` written, not run
+- [ ] Literature: Bach 1990 §6 gives `2/log² 3` for his Theorem 2 (run of integers) and leaves the prime-to-`m` form open; read
+      through a web copy of the paper, not the journal PDF
 
 ### implications: `X → Y` between open conjectures · **every theorem tier C or H, verified** · *premise open*
 - [x] PRs #1 to #6, #11, #13 and #14, each rebuilt on `main` and its axioms read (standard three): Rotkiewicz; Erdős 382 (i) from Cramér /
@@ -780,6 +904,15 @@ Rules:
 - [x] Audited 2026-11-26 at `2106d53`, pass: rebuilt from source (3:58 wall, 2.5 GB), axioms re-read (standard three + 2 `native_decide`; both soundness theorems standard three), checker call graph read, tamper tests reject altered tables, and an independent segmented sieve in C reproduced L(906150257) = 1 and M(7725038629) = 43947 and found both are the least counterexamples (that minimality is checked in C only, not in Lean)
 - [ ] Not proved in Lean: minimality of `906150257` (Tanaka 1980) and `7725038629` (Cohen–Dress, CNRS report 1979). Pólya-side citations are from secondary sources; Jurkat (1960) is unverified
 - [x] Prior art: formal-conjectures open PR #8202 (same Pólya statement plus a least-counterexample statement, no proof; no statement exists at `9097e2f`); wappy-x/Mathematics `checks/what_counts_as_a_proof_check.lean` assumes `L(906150256) = 0` as a hypothesis, so it is not a complete proof
+
+### gmu-binary-partitions: Conjecture 5.6 of Gawron–Miska–Ulas is false · **tier D, complete, audited, awaiting owner's decision** · *new* (refutation lane, route e: a finite witness; the label needs owner sign-off)
+- [x] Statement written here (no formal-conjectures statement), transcribed from the arXiv v1 source (`GMU_MOFM_Revision_II.tex`, label `cong:powerof2-1`); `b m n` is the coefficient of `X^n` in `∏_{i≤n} (∑_j X^{2^i j})^m` in `ℤ⟦X⟧`, tied to the paper's `∏ (1 − x^{2^i})^{−m}` by `one_sub_mul_geomPow2`, `coeff_truncatedSeries`, `b_eq_coeff_of_mul_eq_one`
+- [x] `gmu_conjecture_5_6_false` (D), witness `m = 1, k = 3, n = 1` (`b₁(16) − b₁(4) = 32`, modulus `2^6`): standard three, no `native_decide`
+- [x] `…_fails_at_m1_k5`, `…_fails_at_m3`, `…_fails_at_m4`, `…_fails_at_m5` (D): standard three, values by `decide +kernel` through `bList`, proved sound (`bList_sound`); `…_fails_at_m6` adds 2 `native_decide` (same checker)
+- [x] README says: `m = 1` is a corollary of Churchhouse's congruence (Rødseth 1970, Gupta 1971); only `m ≥ 3` is new; `m = 2` holds for `4 ≤ k ≤ 24`, `2^{k+1} n < 2^26` (C, outside Lean); a minor correction
+- [ ] Audit pending: rebuild, re-read the axioms, re-transcribe the conjecture from the source, recompute the witnesses independently
+- [ ] The journal text (Monatsh. Math. 185 (2018)) was not read; Rødseth's and Gupta's exactness statement is cited through Ulas–Żmija arXiv:1904.03398
+- [ ] Owner sign-off on the *new* label
 
 ## Working here
 

@@ -29,6 +29,7 @@ against the sibling folders in this checkout. A sibling's build output lands in 
 | `ankeny-grh` | `erdos-985` |
 | `artin-grh` | `erdos-985` |
 | `bach-corollaries-grh` | `ankeny-grh`, `lls-grh`, `miller-grh` |
+| `bach-sharp-grh` | `ankeny-grh`, `bach-corollaries-grh`, `lls-grh` |
 | `bach-sorenson-grh` | `ankeny-grh`, `erdos-985`, `lls-grh` |
 | `cookson-hills` | — (vendors openai/math's `PiExponent` tree) |
 | `cramer-rh` | `erdos-233`, `erdos-985`, `schoenfeld-rh` |
@@ -52,10 +53,13 @@ against the sibling folders in this checkout. A sibling's build output lands in 
 | `mills-rh` | `erdos-985`, `schoenfeld-rh` |
 | `nicolas-rh` | `erdos-985`, `robin-rh` |
 | `prime-powers-rh` | `mills-rh` |
+| `primitive-root-sq-grh` | `erdos-985` |
 | `psi-grh` | `erdos-985` |
 | `ramanujan-rh` | `schoenfeld-rh` |
 | `robin-rh` | `erdos-985` |
 | `schoenfeld-rh` | `erdos-985` |
 | `shoup-grh` | `erdos-985` |
 | `speiser-rh` | `erdos-985` |
+| `sun-pi-inequalities` | — (Mathlib only) |
+| `sun-prime-density-rh` | `schoenfeld-rh` |
 | `weinberger-grh` | `erdos-985` |

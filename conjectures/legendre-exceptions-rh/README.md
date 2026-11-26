@@ -181,10 +181,10 @@ wall time on the build box.
 
 | Theorem | Statement | Axioms |
 |---|---|---|
-| `LegendreExceptions.Unconditional.legendre_exceptions` | `LegendreExceptionBound` | not yet run |
-| `LegendreExceptions.Unconditional.oppermann_exceptions` | `OppermannExceptionBound` | not yet run |
-| `LegendreExceptions.Unconditional.andrica_exceptions` | `AndricaExceptionBound` | not yet run |
-| `LegendreExceptions.Unconditional.brocard_exceptions` | `BrocardExceptionBound` | not yet run |
+| `LegendreExceptions.Unconditional.legendre_exceptions` | `LegendreExceptionBound` | `propext`, `Classical.choice`, `Quot.sound` |
+| `LegendreExceptions.Unconditional.oppermann_exceptions` | `OppermannExceptionBound` | `propext`, `Classical.choice`, `Quot.sound` |
+| `LegendreExceptions.Unconditional.andrica_exceptions` | `AndricaExceptionBound` | `propext`, `Classical.choice`, `Quot.sound` |
+| `LegendreExceptions.Unconditional.brocard_exceptions` | `BrocardExceptionBound` | `propext`, `Classical.choice`, `Quot.sound` |
 
 Each closes the `RiemannHypothesis` argument with `riemannHypothesis` from
 leanprover-community/riemann-hypothesis, commit `507a75d91d`:
@@ -198,6 +198,16 @@ open-file limit first, e.g. `sudo prlimit --pid $$ --nofile=2000000:2000000`). T
 riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the
 Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh).
 This check links against the community build cache and does not repeat those kernel checks.
+
+Checked 2026-11-26 at monorepo commit `d673d91`, riemann-hypothesis `507a75d91d` (`lean
+Unconditional/LegendreExceptionsUnconditional.lean` after `lake build`, 1087 s wall). Real output:
+
+```
+'LegendreExceptions.Unconditional.legendre_exceptions' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LegendreExceptions.Unconditional.oppermann_exceptions' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LegendreExceptions.Unconditional.andrica_exceptions' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LegendreExceptions.Unconditional.brocard_exceptions' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
 
 ## Credits
 
