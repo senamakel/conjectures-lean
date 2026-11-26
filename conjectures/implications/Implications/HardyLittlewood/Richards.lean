@@ -183,19 +183,18 @@ lemma tprod_factor_pos : 0 < ∏' q, factor q := by
 
 lemma integral_pos {n : ℝ} (hn : 3 ≤ n) :
     0 < ∫ t in (2 : ℝ)..n, 1 / t.log ^ (Nat.succ 446) := by
+  have hI : Set.uIcc (2 : ℝ) n = Set.Icc 2 n := Set.uIcc_of_le (by linarith)
   have hpos : ∀ t ∈ Set.uIcc (2 : ℝ) n, 0 < Real.log t := by
     intro t ht
-    rw [Set.uIcc_of_le (by linarith)] at ht
+    rw [hI] at ht
     exact Real.log_pos (by linarith [ht.1])
   apply intervalIntegral.intervalIntegral_pos_of_pos_on
   · apply ContinuousOn.intervalIntegrable
     apply continuousOn_const.div
     · apply ContinuousOn.pow
-      exact Real.continuousOn_log.mono fun t ht => by
-        simp only [Set.mem_compl_iff, Set.mem_singleton_iff]
-        exact (Real.log_pos_iff' (by linarith [(hpos t ht)])).ne' |>.elim (fun h => h) |> fun _ =>
-          ne_of_gt (lt_of_lt_of_le (by norm_num) (by
-            rw [Set.uIcc_of_le (by linarith)] at ht; exact ht.1))
+      refine Real.continuousOn_log.mono fun t ht => ?_
+      rw [hI] at ht
+      exact Set.mem_compl_singleton_iff.mpr (by linarith [ht.1] : (0 : ℝ) < t).ne'
     · intro t ht; exact pow_ne_zero _ (hpos t ht).ne'
   · intro t ht
     have : 0 < Real.log t := Real.log_pos (by linarith [ht.1])
