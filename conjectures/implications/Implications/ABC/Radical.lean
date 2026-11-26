@@ -54,18 +54,13 @@ lemma radical_factorial_le (n : ℕ) : radical n.factorial ≤ 4 ^ n :=
 
 lemma pairwise_coprime_triple {a b c : ℕ} (hab : Nat.Coprime a b) (hac : Nat.Coprime a c)
     (hbc : Nat.Coprime b c) : ({a, b, c} : Set ℕ).Pairwise Nat.Coprime := by
-  intro x hx y hy _
+  intro x hx y hy hxy
   simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx hy
   rcases hx with rfl | rfl | rfl <;> rcases hy with rfl | rfl | rfl <;>
     first
+    | exact absurd rfl hxy
     | assumption
     | exact Nat.Coprime.symm ‹_›
-    | exact (Nat.coprime_self _).2 (by
-        first
-        | exact (Nat.coprime_self _).1 hab
-        | exact (Nat.coprime_self _).1 hac
-        | exact (Nat.coprime_self _).1 hbc
-        | omega)
 
 /-- The exceptional set of `ABC.ABCConjecture` at a given `ε`. -/
 def abcSet (ε : ℝ) : Set (ℕ × ℕ × ℕ) :=
