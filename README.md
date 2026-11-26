@@ -98,6 +98,25 @@ with the [implication atlas](docs/atlas/).
 | first Hardy–Littlewood conjecture (prime `k`-tuples asymptotic, every tuple) | the second Hardy–Littlewood conjecture `π(x + y) ≤ π(x) + π(y)` is **false** (Hensley–Richards 1973, Richards 1974) | a refutation link: both conjectures stay open, and no explicit counterexample is known. One admissible 447-tuple of width 3158 (Polymath8 database; `π(3159) = 446`) and positivity of its singular series suffice. `sorry` in formal-conjectures until now; no `native_decide` |
 | infinitely many squarefree `2^n − 1` | infinitely many non-Wieferich primes (Rotkiewicz 1965) | a theorem, not a conjecture-to-conjecture link; `sorry` in formal-conjectures until now |
 
+## Disproved and refuted
+
+Conjectures shown false, or shown incompatible with another conjecture. A refutation link
+`X → ¬Y` proves that `X` and `Y` cannot both hold; it disproves neither on its own. Each theorem
+is in [`conjectures/implications`](conjectures/implications/), with statements copied word for
+word from formal-conjectures, and depends on Lean's three standard axioms only.
+
+| Refuted | Given | Lean theorem | Notes |
+| :--- | :--- | :--- | :--- |
+| Second Hardy–Littlewood conjecture, `π(x + y) ≤ π(x) + π(y)` | first Hardy–Littlewood conjecture (prime `k`-tuples) | `not_first_and_secondHardyLittlewoodConjecture` | Hensley–Richards 1973, Richards 1974. Uses one admissible 447-tuple of width 3158 against `π(3159) = 446`. No explicit counterexample is known |
+| Cramér's `limsup g_n / log² p_n = 1` | Granville's conjecture (`limsup ≥ 2e^{−γ}`) | `not_limsupEqOne_of_granville` | Granville 1995; the only arithmetic is `1 < 2e^{−γ}` |
+| Strict Cramér bound `g_n < log² p_n` for `n ≥ 4` | Granville's conjecture | `not_strictBound_of_granville` | |
+| Shanks' conjecture on maximal prime gaps | Granville's conjecture | `not_shanks_of_granville` | |
+| Granville's conjecture | Firoozbakht's conjecture, with its cited consequence `g_n < log² p_n − log p_n` as a second hypothesis | `not_granville_of_firoozbakht` | the cited consequence (Kourbatov) is not proved here |
+
+All of these are incompatibilities between open conjectures. The reports behind this lane, with
+the candidates for outright disproofs, are in [`docs/atlas/sweeps/2026-11-26/`](docs/atlas/sweeps/2026-11-26/)
+(`disproof-erdos.md`, `disproof-fc-other.md`, `disproof-literature.md`).
+
 ## How it was built
 
 The Lean proofs were built with [OpenHuman](https://github.com/tinyhumansai/openhuman) agents
