@@ -180,8 +180,9 @@ Write `x = n^k`, `y = (n+1)^k` and `D(x) = li(x) − x/log x`.
   Schoenfeld's bound first holds for all larger `n` at `n = 8441233` (crude `D`) or about
   `7.33·10⁶` (with `D ≈ x/log² x + 2x/log³ x`). The PsiCert bound reaches only `x = 10¹⁰`
   (`n ≤ 2154`) and does not separate any `k = 3` pair with `14 ≤ n ≤ 2155`. Closing the range
-  needs `π(n³)` to `x ≈ 10²¹`, or an explicit `|π(x) − li(x)|` bound of Büthe's strength
-  (`≈ √x/log x`) up to `10²¹`, which is not in Lean. Exact counts are cheap only to about
+  needs `π(n³)` to `x ≈ 10²¹`, or an explicit `|π(x) − li(x)|` bound much sharper than
+  Schoenfeld's up to `10²¹` (Büthe's bounds of size `√x/log x` stop at `10¹⁹` and are not in
+  Lean). Exact counts are cheap only to about
   `10⁹`.
 * **Conjecture (ii), `k = 2`** (`SunConjectureSquares`) is out of reach of RH: the step is
   about `1/(2n log² n)` while the RH error per term is about `log n/(4πn)`; the ratio of the
