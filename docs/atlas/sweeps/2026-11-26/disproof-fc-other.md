@@ -35,8 +35,9 @@ already claimed.**
    Tsoukalas's, not fc's. Of their 61 disproofs, 17 land on A-numbers that still have open fc
    declarations. I checked each witness against the literal fc text. Most of them refute a defect
    in Tsoukalas's wording that fc does not share: A7406, A17666, A60841, A179524, A179537,
-   A191004, A229969, A232616, A234360 and A262403. Three are genuine refutations of the fc text
-   (A189409, A238281, A261876). Two are incompatibility results (A92243, A120424). A46969 and
+   A191004, A229969, A232616, A234360 and A262403. Two are genuine refutations of the fc text (A189409, A238281). A261876 refutes the
+   characterisation that fc already marks solved as `conjecture_2`, and fc PR #8070 refutes
+   `conjecture_3` at a different `n`. Two are incompatibility results (A92243, A120424). A46969 and
    A241898 already have open fc PRs. Details are under Candidates and Rejected.
 2. **Epoch AI, fc-review audit** (`tadamcz/fc-review-results`). A language model reviewed every fc
    file against its source for misformalisations, with a "trivial proof" phase that writes Lean
