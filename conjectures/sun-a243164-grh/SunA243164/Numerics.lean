@@ -83,7 +83,9 @@ lemma core_sieve (P0 U0 s0 c3 dt0 K0 a0 a1 : ℝ) {P s L u Epp csl dt K : ℝ}
     have h3 : (3 : ℝ) ≤ s * (3 / s0) := by
       rw [mul_div_assoc', le_div_iff₀ hs0]; linarith
     have h4 : L + 2 ≤ s * ((L + 2) / s0) := by
-      rw [mul_div_assoc', le_div_iff₀ hs0]; nlinarith
+      rw [mul_div_assoc', le_div_iff₀ hs0]
+      have := mul_le_mul_of_nonneg_left hs (by linarith : (0 : ℝ) ≤ L + 2)
+      linarith
     have h5 : K0 * csl ≤ K0 * (2 / 3 * g * (L + 5 / 3) * s + s * ((L + 2) / s0)) :=
       mul_le_mul_of_nonneg_left (by linarith) hK0
     have e : s * (2 * 0.6931471808 / dt0) + s * L * (2 / (c3 * dt0)) + s / 20 + s * (3 / s0)
@@ -103,7 +105,7 @@ lemma core_sieve (P0 U0 s0 c3 dt0 K0 a0 a1 : ℝ) {P s L u Epp csl dt K : ℝ}
   have hAle : A ≤ B * exp (a1 / B * u) := by
     calc A ≤ B + a1 * u := by
           have := mul_le_mul_of_nonneg_left hLU ha1pos.le
-          rw [hA, hBdef]; nlinarith
+          rw [hA, hBdef]; linarith
       _ ≤ _ := lin_le_exp hBpos
   have hLle : L ≤ U0 * exp (1 / U0 * u) := by
     have := lin_le_exp (c := 1) (u := u) hU0
@@ -123,11 +125,16 @@ lemma core_sieve (P0 U0 s0 c3 dt0 K0 a0 a1 : ℝ) {P s L u Epp csl dt K : ℝ}
       _ < P0 * 0.6931471803 * exp u := mul_lt_mul_of_pos_right hB (Real.exp_pos u)
       _ = P * 0.6931471803 := by rw [hPe]; ring
   have hsq : (2 * A) ^ 2 < s ^ 2 := by
-    have h1 : 4 * A ^ 2 * L < s ^ 2 * L := by nlinarith
-    have := lt_of_mul_lt_mul_right h1 hLpos.le
-    nlinarith
+    have h1 : 4 * A ^ 2 * L < s ^ 2 * L := by
+      have e : 4 * A ^ 2 * L = 4 * L * A ^ 2 := by ring
+      rw [e]; exact lt_of_lt_of_le hpoly hπ
+    have h2 := lt_of_mul_lt_mul_right h1 hLpos.le
+    calc (2 * A) ^ 2 = 4 * A ^ 2 := by ring
+      _ < s ^ 2 := h2
   have h2A : 2 * A < s := lt_of_pow_lt_pow_left₀ 2 hspos.le hsq
-  have hsA : s * A < s ^ 2 / 2 := by nlinarith
+  have hsA : s * A < s ^ 2 / 2 := by
+    have := mul_lt_mul_of_pos_left h2A hspos
+    linarith
   -- (c) conclusion
   have hX : Epp / dt0 < s ^ 2 / 2 - (s / 20 + 3) - K * csl := by
     have : K * csl ≤ K0 * csl := mul_le_mul_of_nonneg_right hK hc0
@@ -166,7 +173,9 @@ lemma core_nosieve (P0 U0 s0 c3 Cq b0 b1 η : ℝ) {P s L u Epp csl θ T : ℝ}
   have hQpos : 0 < Q := by positivity
   have hsum : Epp + csl ≤ s * Q := by
     have h4 : L + 2 ≤ s * ((L + 2) / s0) := by
-      rw [mul_div_assoc', le_div_iff₀ hs0]; nlinarith
+      rw [mul_div_assoc', le_div_iff₀ hs0]
+      have := mul_le_mul_of_nonneg_left hs (by linarith : (0 : ℝ) ≤ L + 2)
+      linarith
     have e : 2 * 0.6931471808 * s + 2 * L * s / c3 + (2 / 3 * g * (L + 5 / 3) * s
         + s * ((L + 2) / s0))
         = s * ((2 * 0.6931471808 + 10 / 9 * g + 2 / s0) + (2 / c3 + 2 / 3 * g + 1 / s0) * L) := by
@@ -182,7 +191,7 @@ lemma core_nosieve (P0 U0 s0 c3 Cq b0 b1 η : ℝ) {P s L u Epp csl θ T : ℝ}
   have hQle : Q ≤ Bq * exp (b1 / Bq * u) := by
     calc Q ≤ Bq + b1 * u := by
           have := mul_le_mul_of_nonneg_left hLU hb1pos.le
-          rw [hQdef, hBqdef]; nlinarith
+          rw [hQdef, hBqdef]; linarith
       _ ≤ _ := lin_le_exp hBq
   have hLle : L ≤ U0 * exp (1 / U0 * u) := by
     have := lin_le_exp (c := 1) (u := u) hU0
@@ -210,7 +219,9 @@ lemma core_nosieve (P0 U0 s0 c3 Cq b0 b1 η : ℝ) {P s L u Epp csl θ T : ℝ}
       exact mul_le_mul_of_nonneg_right this hL2.le
     have h2 : Cq * P * Q ^ 4 * L ^ 2 < η ^ 4 * (P * 0.6931471803) ^ 2 := by
       have := mul_lt_mul_of_pos_left hpoly hPpos
-      nlinarith
+      calc Cq * P * Q ^ 4 * L ^ 2 = P * (Cq * Q ^ 4 * L ^ 2) := by ring
+        _ < P * (η ^ 4 * 0.6931471803 ^ 2 * P) := this
+        _ = η ^ 4 * (P * 0.6931471803) ^ 2 := by ring
     have h3 : η ^ 4 * (P * 0.6931471803) ^ 2 ≤ (η * s) ^ 4 * L ^ 2 := by
       have hP' : 0 ≤ P * 0.6931471803 := by positivity
       have : (P * 0.6931471803) ^ 2 ≤ (s ^ 2 * L) ^ 2 := pow_le_pow_left₀ hP' hπ 2
@@ -227,11 +238,11 @@ lemma core_nosieve (P0 U0 s0 c3 Cq b0 b1 η : ℝ) {P s L u Epp csl θ T : ℝ}
     have hκ : 0 ≤ 1 / 20 + 3 / s0 := by positivity
     have h3 : s * (η * s) ≤ s ^ 2 / 2 - (1 / 20 + 3 / s0) / s0 * s ^ 2 := by
       have := mul_le_mul_of_nonneg_left hη' (sq_nonneg s)
-      nlinarith
+      linarith
     have h5 : (1 / 20 + 3 / s0) * s ≤ (1 / 20 + 3 / s0) / s0 * s ^ 2 := by
       rw [div_mul_eq_mul_div, le_div_iff₀ hs0]
       have := mul_le_mul_of_nonneg_left hs (mul_nonneg hκ hspos.le)
-      nlinarith
+      linarith
     have h6 : s / 20 + 3 ≤ (1 / 20 + 3 / s0) * s := by
       have : (3 : ℝ) ≤ 3 / s0 * s := by
         rw [div_mul_eq_mul_div, le_div_iff₀ hs0]; linarith
@@ -242,7 +253,7 @@ lemma core_nosieve (P0 U0 s0 c3 Cq b0 b1 η : ℝ) {P s L u Epp csl θ T : ℝ}
       rw [div_eq_mul_one_div, mul_comm]
       exact mul_le_mul_of_nonneg_right hDθ hE0
     have h2 : (T - 1) * csl ≤ D * csl := mul_le_mul_of_nonneg_right (by linarith) hc0
-    nlinarith
+    linarith
   rw [div_lt_iff₀ hθ0] at hX
   linarith
 
@@ -289,7 +300,7 @@ lemma Epp_bound {P x : ℕ} (hx2 : 2 ≤ x) (hxP : x ≤ P) {s0 c3 : ℝ} (hc3 :
   have hxP' : (x : ℝ) ≤ P := by exact_mod_cast hxP
   have hspos : 0 < s := Real.sqrt_pos.2 (by linarith)
   have hs2 : s ^ 2 = x := Real.sq_sqrt (by linarith)
-  have hl2p := Real.log_two_pos
+  have hl2p : 0 < Real.log 2 := Real.log_pos one_lt_two
   have hfl : (⌊Real.log x / Real.log 2⌋₊ : ℝ) ≤ Real.log P / Real.log 2 := by
     refine (Nat.floor_le (div_nonneg (Real.log_nonneg (by linarith)) hl2p.le)).trans ?_
     gcongr
@@ -336,7 +347,6 @@ lemma csl_bound {P x : ℕ} (hx2 : 2 ≤ x) (hxP : x ≤ P) {s0 : ℝ} (hs0 : 0 
   have hx32 : (x : ℝ) ^ (3 / 2 : ℝ) = s ^ 3 := by
     rw [hs2, show (3 / 2 : ℝ) = 1 + 1 / 2 by norm_num, Real.rpow_add (by positivity),
       Real.rpow_one, ← Real.sqrt_eq_rpow, Real.sqrt_sq hspos.le]
-    ring
   have hLpos : 0 < Real.log P := Real.log_pos (by linarith)
   have hlx0 : 0 ≤ Real.log x := Real.log_nonneg (by linarith)
   have hlx : Real.log x ≤ Real.log P := Real.log_le_log (by linarith) hxP'
@@ -427,8 +437,8 @@ theorem sieveIneq_of (P0 : ℕ) (U0 s0 c3 dt0 K0 a0 a1 : ℝ) (hP08 : 8 ≤ P0)
   have key := core_sieve (P0 : ℝ) U0 s0 c3 dt0 K0 a0 a1 hs0 hc3 hdt0 hU0pos hK0 ha0n ha1 ha0 hB hB'
     hs (by rw [← hs2]; exact hπ) hLpos (by linarith) (by linarith) hPe hE (Epp_nonneg x) hc0 hc
     hdt hK
+  rw [← hs2] at key
   simp only [SieveIneq]
-  rw [← hxdef, hs2]
   exact key
 
 /-- **Case without sieve** (`S = ∅`). -/
@@ -468,7 +478,7 @@ theorem sieveIneq_empty_of (P0 : ℕ) (U0 s0 c3 Cq b0 b1 η : ℝ) (hP08 : 8 ≤
   have hθ0 : 0 < θ F :=
     Finset.prod_pos fun ℓ hℓ => aR_pos (Nat.prime_of_mem_primeFactors hℓ).two_le
   have hθ1 : θ F ≤ 1 := by
-    refine Finset.prod_le_one (fun ℓ hℓ => (aR_pos (Nat.prime_of_mem_primeFactors hℓ).two_le).le)
+    refine Finset.prod_le_one₀ (fun ℓ hℓ => (aR_pos (Nat.prime_of_mem_primeFactors hℓ).two_le).le)
       fun ℓ _ => ?_
     unfold aR
     have : (0 : ℝ) ≤ 1 / (ℓ : ℝ) := by positivity
@@ -480,8 +490,9 @@ theorem sieveIneq_empty_of (P0 : ℕ) (U0 s0 c3 Cq b0 b1 η : ℝ) (hP08 : 8 ≤
   have hδ : deltaOf ∅ = 1 := by simp [deltaOf]
   have hK : sieveK P ∅ = 2 ^ F.card - 1 := by
     simp only [sieveK, hδ, Finset.card_empty, Nat.sub_zero, Nat.cast_zero]; ring
+  rw [← hs2] at key
   simp only [SieveIneq]
-  rw [hK, hδ, Finset.sdiff_empty, one_mul, ← hxdef, hs2]
+  rw [hK, hδ, Finset.sdiff_empty, one_mul]
   exact key
 
 /-! ## Combinatorics of the prime factors of `P - 1` -/
@@ -656,7 +667,7 @@ lemma D_pow4_le (n : ℕ) (hn : n ≠ 0) :
   have hrF : ∏ ℓ ∈ F, r ℓ ≤ smallC := by
     rw [← Finset.prod_filter_mul_prod_filter_not F (fun ℓ => ℓ < 23)]
     have hbig : ∏ ℓ ∈ F.filter (fun ℓ => ¬ ℓ < 23), r ℓ ≤ 1 := by
-      refine Finset.prod_le_one (fun ℓ hℓ => hr0 ℓ (Finset.filter_subset _ _ hℓ)) fun ℓ hℓ => ?_
+      refine Finset.prod_le_one₀ (fun ℓ hℓ => hr0 ℓ (Finset.filter_subset _ _ hℓ)) fun ℓ hℓ => ?_
       have h23 : (23 : ℝ) ≤ ℓ := by
         have := (Finset.mem_filter.mp hℓ).2
         exact_mod_cast (by omega : 23 ≤ ℓ)
@@ -685,7 +696,7 @@ lemma D_pow4_le (n : ℕ) (hn : n ≠ 0) :
       have hC : smallC = ∏ ℓ ∈ small, r ℓ := rfl
       rw [hC, ← Finset.prod_sdiff hsub]
       have h1 : 1 ≤ ∏ ℓ ∈ small \ F.filter (fun ℓ => ℓ < 23), r ℓ := by
-        have := Finset.prod_le_prod (s := small \ F.filter (fun ℓ => ℓ < 23)) (f := fun _ => (1 : ℝ))
+        have := Finset.prod_le_prod₀ (s := small \ F.filter (fun ℓ => ℓ < 23)) (f := fun _ => (1 : ℝ))
           (g := r) (fun _ _ => zero_le_one) (fun ℓ hℓ => hone ℓ (Finset.sdiff_subset hℓ))
         simpa using this
       have h0 : 0 ≤ ∏ ℓ ∈ F.filter (fun ℓ => ℓ < 23), r ℓ :=
