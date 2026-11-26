@@ -25,27 +25,21 @@ open Finset
 
 /-! ## Block sums -/
 
-theorem le_div_div (x n : ℕ) : n ≤ x / (x / n) := by
+theorem le_div_div {x n : ℕ} (h : n ≤ x) : n ≤ x / (x / n) := by
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · exact Nat.zero_le _
-  rcases Nat.lt_or_ge x n with h | h
-  · rw [Nat.div_eq_of_lt h, Nat.div_zero]
-    -- `x / 0 = 0`, and `n ≤ 0` fails; handle via `x < n` impossible below
-    exact absurd h (by
-      intro _
-      exact absurd (Nat.zero_le _) (by omega)) |>.elim
-  · have hq : 0 < x / n := Nat.div_pos h hn
-    rw [Nat.le_div_iff_mul_le hq]
-    rw [Nat.mul_comm]; exact Nat.mul_div_le x n
+  have hq : 0 < x / n := Nat.div_pos h hn
+  rw [Nat.le_div_iff_mul_le hq, Nat.mul_comm]
+  exact Nat.mul_div_le x n
 
 /-- `blockSum f x n = ∑_{k=n}^{x} f ⌊x/k⌋`, summed over the blocks `[n, ⌊x/⌊x/n⌋⌋]` on which
 `⌊x/k⌋` is constant. -/
 def blockSum (f : ℕ → ℤ) (x n : ℕ) : ℤ :=
-  if x < n then 0 else
+  if h : x < n then 0 else
     ((x / (x / n) + 1 - n : ℕ) : ℤ) * f (x / n) + blockSum f x (x / (x / n) + 1)
 termination_by x + 1 - n
 decreasing_by
-  have := le_div_div x n
+  have := le_div_div (Nat.le_of_not_lt h)
   omega
 
 end Polya.Check
