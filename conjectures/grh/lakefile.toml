@@ -1,6 +1,6 @@
 name = "GRH"
 srcDir = "src"
-defaultTargets = ["Lib", "New", "Main"]
+defaultTargets = ["Lib", "New", "Main", "GRH"]
 moreLeanArgs = ["--tstack=400000"]
 
 [leanOptions]
@@ -30,3 +30,9 @@ roots = ["Statements", "Main"]
 [[lean_lib]]
 name = "Challenge"
 srcDir = ".."
+
+# Not in the source: the bridge module of our port, outside the vendored `src/` tree.
+[[lean_lib]]
+name = "GRH"
+srcDir = "."
+roots = ["GRH.Bridge"]
