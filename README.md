@@ -71,7 +71,9 @@ Lean statements, `#print axioms` output and build instructions.
 Each row is a Lean theorem `premise → consequence`, in [`conjectures/implications`](conjectures/implications/).
 Where formal-conjectures has the statements, both sides are copied from it word for word. Every
 theorem depends on Lean's three standard axioms only. A row does not settle its consequence: it
-becomes an unconditional theorem the day its premise is proved in Lean. The links were found
+becomes an unconditional theorem the day its premise is proved in Lean. A row may also be a
+refutation, `premise → ¬ consequence` (the [refutation lane](AGENTS.md#disproofs-the-refutation-lane)): then the two
+conjectures cannot both hold, and neither is settled. The links were found
 with the [implication atlas](docs/atlas/).
 
 | Premise | Consequence | Notes |
@@ -93,6 +95,7 @@ with the [implication atlas](docs/atlas/).
 | Butson-type Hadamard matrices `H(4, 2m)` exist for every `m` | Hadamard conjecture | Turyn's doubling |
 | Four exponentials conjecture | `2^t` or `3^t` is transcendental for every irrational `t` | |
 | `r_k(N) ≤ C·N·exp(−c (log log N)^{1+η})` for every `k ≥ 3` | Erdős Problem 142, lower variant `r_k(N) = o(N/log N)`; Erdős Problem 140 for every `k` | the premise is a Lean theorem of [openai/math](https://github.com/openai/math) (Erdős #3); it is a hypothesis here because that library is on another Lean version, and the link has not been typechecked |
+| first Hardy–Littlewood conjecture (prime `k`-tuples asymptotic, every tuple) | the second Hardy–Littlewood conjecture `π(x + y) ≤ π(x) + π(y)` is **false** (Hensley–Richards 1973, Richards 1974) | a refutation link: both conjectures stay open, and no explicit counterexample is known. One admissible 447-tuple of width 3158 (Polymath8 database; `π(3159) = 446`) and positivity of its singular series suffice. `sorry` in formal-conjectures until now; no `native_decide` |
 | infinitely many squarefree `2^n − 1` | infinitely many non-Wieferich primes (Rotkiewicz 1965) | a theorem, not a conjecture-to-conjecture link; `sorry` in formal-conjectures until now |
 
 ## How it was built

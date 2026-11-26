@@ -707,6 +707,14 @@ Rules:
       Erdős 142 lower variant and all-`k` Erdős 140 from the quantitative density bound; abc ⇒ non-Wieferich primes
       (Silverman), powerful triples, Brocard, Erdős 366 forms; Dickson ⇒ admissible patterns at consecutive primes
       (Erdős 141, 218 variant, balanced primes); Firoozbakht ⇒ Oppermann, Andrica, Legendre, Brocard
+- [x] PR #12 (merged 2026-11-26, `42c8652`), refutation lane route b: Richards' incompatibility,
+      `HardyLittlewood.not_first_and_secondHardyLittlewoodConjecture` verbatim from formal-conjectures
+      (first Hardy–Littlewood conjecture ⇒ the second is false). Standard three axioms, no `native_decide`:
+      the 447-tuple's admissibility and `π(3159) ≤ 446` are kernel checks. Both conjectures stay open
+- [ ] PR #12: the independent `proof-auditor` pass was started after the merge and has not reported
+- [ ] Erdős 855 (the form eventual in both `x` and `y`) does not follow from one tuple: it needs dense
+      admissible tuples of every large width (the Hensley–Richards sieve). Sized L in
+      `docs/atlas/sweeps/2026-11-26/disproof-erdos.md`; not started
 - [x] Statements copied word for word from formal-conjectures `9097e2f`; the table is in the root `README.md`
 - [ ] `scripts/erdos142-discharge/` (the link to openai/math's `manuscriptQuantitativeDensityTheorem`) has not been typechecked
 - [ ] Some modules define copied names in root namespaces (`Nat.Full`, `Set.IsAPOfLength…`, `ABC`, `Erdos936`); move them
