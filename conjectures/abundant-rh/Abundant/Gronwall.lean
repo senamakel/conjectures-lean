@@ -171,7 +171,7 @@ lemma kthPrimorial_eq_prod (k : ℕ) : Nicolas.kthPrimorial k = ∏ p ∈ primes
   rw [primesOf, Finset.prod_image]
   · rfl
   · intro i _ j _ h
-    exact Nat.nth_injective Nat.infinite_setOf_prime h
+    exact Nat.nth_injective Nat.infinite_setOfPred_prime h
 
 /-- `σ(N_k^e)/N_k^e = (N_k/φ(N_k)) ∏_{p ≤ p_k}(1 − p^{−(e+1)})`. -/
 lemma sigma_kthPrimorial_pow_div (k e : ℕ) :
