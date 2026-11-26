@@ -1,0 +1,4 @@
+import PrimePowers
+#print axioms PrimePowers.primeBetweenPowers_of_RH
+#print axioms PrimePowers.primeBetweenRealPowers_of_RH
+#print axioms PrimePowers.primeBetweenIntegerPowers_of_RH
