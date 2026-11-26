@@ -14,8 +14,9 @@ checked out. Scripts and outputs are in the session scratchpad (`oai-work/`, wit
 named conjecture (Brannen 1996, MathWorld), it is open there by the explicit statement of Feng–Hu–Liu–Xu
 (arXiv:2610.13953, 16 Aug 2026), and nobody has claimed it. It has an exact finite-dimensional
 reduction, built from FHLX Prop. 4.1–4.2 plus one observation of mine. Under that reduction, every
-polytope with n+2 facets in dimensions 4 ≤ n ≤ 8 stays at or below the simplex value, and so do the
-n+3 and n+4 facet runs that finished. Both a global search and an exact first-order
+polytope with n+2 facets in dimensions 4 ≤ n ≤ 8 stays at or below the simplex value. So does every
+robustly evaluated n+3 and n+4 facet start, though coverage at n = 8 is thin. Three apparent
+exceedances turned out to be qhull artifacts. Both a global search and an exact first-order
 analysis say so. The search reproduces the known n = 9 violation and improves its margin. The
 second lead was an explicit small-rank counterexample to Ryser's intersecting conjecture, built from
 OpenAI's merge-and-split construction. It cannot be instantiated for q ≤ 31: the geometric data do
