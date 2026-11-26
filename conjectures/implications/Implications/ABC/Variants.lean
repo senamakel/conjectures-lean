@@ -61,10 +61,10 @@ lemma radical_pow {m k : ℕ} (hk : k ≠ 0) : radical (m ^ k) = radical m := by
 
 lemma radical_mul_le {a b : ℕ} (ha : a ≠ 0) (hb : b ≠ 0) :
     radical (a * b) ≤ radical a * radical b := by
+  refine Nat.le_of_dvd (Nat.mul_pos (radical_pos a) (radical_pos b)) ?_
   unfold radical
   rw [Nat.primeFactors_mul ha hb]
-  refine Nat.le_of_dvd (Finset.prod_pos fun p hp => ?_) (Dvd.intro _ Finset.prod_union_inter)
-  rcases Finset.mem_union.1 hp with h | h <;> exact (Nat.prime_of_mem_primeFactors h).pos
+  exact Dvd.intro _ Finset.prod_union_inter
 
 lemma two_le_radical {n : ℕ} (hn : 2 ≤ n) : 2 ≤ radical n := by
   obtain ⟨p, hp⟩ := Nat.nonempty_primeFactors.2 (by omega : 1 < n)
@@ -84,7 +84,7 @@ lemma radical_pow_le_of_full {n k : ℕ} (hn : n ≠ 0) (h : (k).Full n) : radic
   Nat.le_of_dvd (Nat.pos_of_ne_zero hn) (radical_pow_dvd_of_full hn h)
 
 /-- A nonzero square is powerful. -/
-lemma powerful_sq {m : ℕ} (hm : m ≠ 0) : (m ^ 2).Powerful := by
+lemma powerful_sq (m : ℕ) : (m ^ 2).Powerful := by
   intro p hp
   have hpm : p ∣ m := (Nat.prime_of_mem_primeFactors hp).dvd_of_dvd_pow
     (Nat.dvd_of_mem_primeFactors hp)
@@ -137,12 +137,12 @@ theorem abcConstantMul_of_abc (habc : ABCConjecture) : ABCConstantMul := by
   · have hcM : c ≤ M := hM ⟨(a, b, c), ⟨ha, hb, hc, hcop, hsum, hmem⟩, rfl⟩
     have hM0 : (0 : ℝ) ≤ M := Nat.cast_nonneg M
     calc (c : ℝ) ≤ M := by exact_mod_cast hcM
-      _ < M + 1 := by linarith
-      _ ≤ (M + 1) * r := le_mul_of_one_le_right (by linarith) hr
-  · push_neg at hmem
+      _ < (M : ℝ) + 1 := by linarith
+      _ ≤ ((M : ℝ) + 1) * r := le_mul_of_one_le_right (by linarith) hr
+  · push Not at hmem
     have hM0 : (0 : ℝ) ≤ M := Nat.cast_nonneg M
     calc (c : ℝ) ≤ r := hmem
-      _ < (M + 1) * r := by nlinarith
+      _ < ((M : ℝ) + 1) * r := by nlinarith
 
 /-- The constant form `ABC.abc.variants.lt_constant_mul` implies abc. -/
 theorem abc_of_abcConstantMul (hK : ABCConstantMul) : ABCConjecture := by
