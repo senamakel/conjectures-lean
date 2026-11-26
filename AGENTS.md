@@ -742,6 +742,17 @@ Rules:
 - [ ] A cold rebuild from source in the primary checkout has not been timed
 - [ ] OpenAI's proof of `μ(π) = 2` has had no human review that we know of; our kernel accepts it
 
+### sun-prime-density-rh: Sun's conjecture, `π(n^k)/n^k` strictly decreasing (OEIS A038098) · **tier C for `k ≥ 4` verified, U check pending; `k = 3` partial** · *RH-consequence; no proof found in the literature*
+- [x] `sun_of_RH`: every `k ≥ 4`, `n ≥ 2`; statement verbatim from formal-conjectures `OeisA38098.conjecture1` (`research open`).
+      Rebuilt 2026-11-26 at `71e7505`: standard three + 23 `native_decide` from schoenfeld-rh + 2 of its own
+      (`Check.chainOK_piTable`, primes below 2,825,761, 32 s; `Check.allOK_eq_true`, 0.9 s), proved-sound checkers
+- [x] `sun_three_of_RH`: `k = 3` for `2 ≤ n ≤ 140` and `n ≥ 10⁷`; `sunConjecture_iff_of_RH` reduces the whole conjecture to the gap
+- [ ] `k = 3`, `141 ≤ n < 10⁷`: needs `π(n³)` up to about `10²¹` or a sharper explicit bound; not in Lean
+- [ ] `Unconditional/SunPrimeDensityUnconditional.lean` written; check started 2026-11-26, result not yet read
+- [ ] Novelty search of 2026-11-26 found no proof of any case (OEIS page, MathOverflow 301662, arXiv, formal-conjectures PRs,
+      GitHub, solved-conjectures). The label *new* needs the owner's sign-off before the README uses it
+- [ ] `Check` is a root namespace in this package; move it under `SunPrimeDensity` before another project copies the name
+
 ### implications: `X → Y` between open conjectures · **every theorem tier C or H, verified** · *premise open*
 - [x] PRs #1 to #6, #11, #13 and #14, each rebuilt on `main` and its axioms read (standard three): Rotkiewicz; Erdős 382 (i) from Cramér /
       Firoozbakht; Butson ⇒ Hadamard; four exponentials ⇒ `2^t` or `3^t`; abc ⇒ Erdős 936 and 977 (factorial);
