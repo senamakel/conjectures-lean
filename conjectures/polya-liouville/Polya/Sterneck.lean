@@ -38,11 +38,10 @@ theorem vonSterneck_conjecture_false : ¬ VonSterneckConjecture := by
   intro h
   have h1 := h 7725038629 (by norm_num)
   rw [mertens_7725038629] at h1
-  have h2 : Real.sqrt (7725038629 : ℕ) ≤ 87894 := by
+  have h2 : Real.sqrt (7725038629 : ℝ) ≤ 87894 := by
     rw [show (87894 : ℝ) = Real.sqrt (87894 ^ 2) by rw [Real.sqrt_sq (by norm_num)]]
     exact Real.sqrt_le_sqrt (by norm_num)
-  have h3 : |((43947 : ℤ) : ℝ)| = 43947 := by norm_num
-  rw [h3] at h1
+  norm_num at h1
   linarith
 
 end Polya
