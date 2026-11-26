@@ -190,7 +190,7 @@ theorem erdos_945_of_cramer (h : CramerConjecture.CramerConjecture) : Erdos945.E
     have : 1 ≤ Real.log x ^ 2 := one_le_pow₀ hlx1
     nlinarith
   -- every admissible `k` is at most `2 A (log x)² + 2`
-  suffices hk : ∀ k ∈ {k | ∃ (n : ℕ), n + k ≤ x ∧ (Set.Ioc n (n + k)).InjOn Erdos945.τ},
+  suffices hk : ∀ k ∈ {k : ℕ | ∃ (n : ℕ), n + k ≤ x ∧ (Set.Ioc n (n + k)).InjOn Erdos945.τ},
       (k : ℝ) ≤ 2 * A * Real.log x ^ 2 + 2 by
     have hF : (Erdos945.F x : ℝ) ≤ 2 * A * Real.log x ^ 2 + 2 := by
       have hne : (2 * A * Real.log x ^ 2 + 2) ≥ 0 := by positivity
@@ -213,7 +213,8 @@ theorem erdos_945_of_cramer (h : CramerConjecture.CramerConjecture) : Erdos945.E
     push Not at hc
     have hk3 : 3 ≤ k := by
       have : (2 : ℝ) < k := by linarith
-      exact_mod_cast this
+      have : 2 < k := by exact_mod_cast this
+      omega
     exact two 2 3 Nat.prime_two Nat.prime_three (by norm_num) (by omega) (by omega)
       (by omega) (by omega)
   · have hnR : (n : ℝ) ≤ x := by
