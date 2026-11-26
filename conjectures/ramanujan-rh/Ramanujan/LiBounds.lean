@@ -35,7 +35,6 @@ lemma A_nonneg {ℓ : ℝ} (h : 0 < ℓ) : 0 ≤ A ℓ :=
 lemma A_fifteen_le : A 15 ≤ 1 := by
   unfold A
   simp [Finset.sum_range_succ, Nat.factorial]
-  norm_num
 
 lemma A_eq {u : ℝ} (hu : u ≠ 0) :
     A u = (u ^ 8 + u ^ 7 + 2 * u ^ 6 + 6 * u ^ 5 + 24 * u ^ 4 + 120 * u ^ 3 + 720 * u ^ 2 +
