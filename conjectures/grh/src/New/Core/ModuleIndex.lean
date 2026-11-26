@@ -70,4 +70,4 @@ lemma IndexDvd.of_det_dvd [IsDomain O] [ValuationRing O] [Fintype ι] {A : Matri
   (isValuationPair_top.hermite (.refl _) (fromBlocks 1 (-of Φ) 0 Aᵀ) (1 ⊕ᵥ 0)).elim fun _ ⟨_, D, t,
   a, b⟩ ↦ ⟨_, .trans ⟨_, by simpa [mul_left_comm, (ext (by tauto) : D.toBlocks₁₂ = 0)] using
   (D.fromBlocks_toBlocks ▸ congr(($a).det) :)⟩ h, fun i ↦ e ⟨_ ∘ _, ⟨⟩, funext (by simpa [← b,
-  toBlocks₁₁, mul_apply, mulVec_eq_sum, neg_add_eq_sub] using (@t (.inl i) <| .inr ·))⟩⟩
+  toBlocks₁₁, Matrix.mul_apply, mulVec_eq_sum, neg_add_eq_sub] using (@t (.inl i) <| .inr ·))⟩⟩

@@ -71,7 +71,8 @@ omit h
 
 omit [Finite G] in
 lemma comp_mem_virtualChars [Finite H] (p : H →* G) : f ∘ p ∈ virtualChars S H :=
-  mapsTo_span (f := funLeft ..) (fun _ ↦ (·.comp p)) v
+  mapsTo_span (f := funLeft ..) (s := {f | IsChar f}) (t := {f | IsChar f})
+    (fun _ h ↦ Set.mem_setOf.2 (Set.mem_setOf.1 h |>.comp p)) v
 
 omit [Finite G] in
 lemma isClassFunction_of_mem_virtualChars : IsClassFunction f := by induction v using
