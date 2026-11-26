@@ -29,6 +29,7 @@ against the sibling folders in this checkout. A sibling's build output lands in 
 | `ankeny-grh` | `erdos-985` |
 | `artin-grh` | `erdos-985` |
 | `bach-corollaries-grh` | `ankeny-grh`, `lls-grh`, `miller-grh` |
+| `bach-sharp-grh` | `ankeny-grh`, `bach-corollaries-grh`, `lls-grh` |
 | `bach-sorenson-grh` | `ankeny-grh`, `erdos-985`, `lls-grh` |
 | `cookson-hills` | — (vendors openai/math's `PiExponent` tree) |
 | `cramer-rh` | `erdos-233`, `erdos-985`, `schoenfeld-rh` |

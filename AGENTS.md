@@ -838,6 +838,24 @@ The role is `counterexample-hunter` (`.claude/agents/`). Scripts of each sweep a
       needs the owner's sign-off
 - [ ] Other parts of Conjectures 2.7 and 2.14 (2.7(ii), 2.14(i), 2.14(iii)) and A238165 (i) not attempted
 
+### bach-sharp-grh: Bach's sharp generator constant `2/log² 3` for `(ℤ/m)ˣ` · **tier D + C outside `2^17 ≤ m < 5·2^49`, verified; full statement not proved; U check pending** · *RH-consequence; the sharp constant was not found in the literature*
+- [x] `SharpSubgroupBound`, `SharpGeneratorBound` are `Ankeny.BachSubgroupBound` and `BachCorollaries.GeneratorBound` at `2 / Real.log 3 ^ 2`
+      (every modulus); `SharpOptimal` (no `c < 2/log² 3` works) is proved at `m = 3`. Read by the auditor 2026-11-26; Python check
+      `3 ≤ m ≤ 3000`: worst ratio `G(m)/log² m` is 1.657071 at `m = 3`, then 1.561 (`4`), 1.557 (`6`)
+- [x] `sharpOptimal` (D), standard three only. Rebuilt 2026-11-26 at `9a18f66` (merged as PR #24, `ee15c22`), 33 s replay
+- [x] `sharp_small` (D, every `q < 2^17`, no GRH): standard three + 4 `native_decide` (`small_ok_S0..S3`, ankeny-grh's generation
+      search, 18 s to 1335 s CPU; sound by `checkSmall_sound`, read)
+- [x] `sharp_large_of_GRH` (C, every `q ≥ 5·2^49`): from `bach1657_large_of_GRH` (constant `1657/1000`) and `c1657_le_sharpConst`
+      (`1.657 < 1.6570709`); standard three + 2 `native_decide` (`chunk_ok_L0`, `chunk_ok_L1`, lls-grh's block checker at `cn/cd`,
+      sound by `checkChunkC_sound`, read) + polynomial tail `goodQ_tailS` for `q ≥ 2^7400`
+- [x] `sharp_outside_gap_of_GRH`, `generators_outside_gap_of_GRH`, `sharp_of_GRH_of_gap` (C; `SharpGap` an explicit argument),
+      `bach_sharp_of_GRH` (C, + lls-grh's 15 `chunk2_ok_*`)
+- [ ] `SharpGap` (`2^17 ≤ q < 5·2^49`) not proved: the GRH budget fails at `c = 1.657` for smooth moduli up to about `10^13.2`;
+      needs a kernel-enumerating block checker and structural generation certificates (`docs/PLAN.md`)
+- [ ] `Unconditional/BachSharpUnconditional.lean` written, not run
+- [ ] Literature: Bach 1990 §6 gives `2/log² 3` for his Theorem 2 (run of integers) and leaves the prime-to-`m` form open; read
+      through a web copy of the paper, not the journal PDF
+
 ### implications: `X → Y` between open conjectures · **every theorem tier C or H, verified** · *premise open*
 - [x] PRs #1 to #6, #11, #13 and #14, each rebuilt on `main` and its axioms read (standard three): Rotkiewicz; Erdős 382 (i) from Cramér /
       Firoozbakht; Butson ⇒ Hadamard; four exponentials ⇒ `2^t` or `3^t`; abc ⇒ Erdős 936 and 977 (factorial);
