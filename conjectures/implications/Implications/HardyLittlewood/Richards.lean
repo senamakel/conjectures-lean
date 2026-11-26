@@ -207,7 +207,8 @@ lemma integral_pos (k : ℕ) {n : ℝ} (hn : 3 ≤ n) :
       ((Real.continuousOn_log.mono fun t ht => ?_).pow k.succ) fun t ht => ?_
     · rw [hI] at ht
       exact Set.mem_compl_singleton_iff.mpr (by linarith [ht.1] : (0 : ℝ) < t).ne'
-    · exact pow_ne_zero _ (hpos t ht).ne'
+    · show Real.log t ^ k.succ ≠ 0
+      exact pow_ne_zero _ (hpos t ht).ne'
   · intro t ht
     have : 0 < Real.log t := Real.log_pos (by linarith [ht.1])
     positivity
@@ -295,3 +296,5 @@ theorem not_first_and_secondHardyLittlewoodConjecture :
   omega
 
 end HardyLittlewood
+
+#print axioms HardyLittlewood.not_first_and_secondHardyLittlewoodConjecture
