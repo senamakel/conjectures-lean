@@ -42,7 +42,7 @@ theorem schinzelCondition_X_sq_add_one : SchinzelCondition {(X ^ 2 + 1 : ℤ[X])
   subst hf
   simp only [eval_add, eval_pow, eval_X, eval_one, Nat.cast_zero]
   norm_num
-  exact_mod_cast hp.one_lt.ne'
+  exact_mod_cast hp.not_dvd_one
 
 /-- **Bunyakovsky's conjecture implies Landau's fourth problem** (formal-conjectures
 `PrimesAndPerfectSquares.infinite_prime_sq_add_one`, conclusion verbatim). -/
@@ -52,7 +52,7 @@ theorem infinite_prime_sq_add_one_of_bunyakovsky (h : BunyakovskyConjecture) :
   rw [Set.infinite_coe_iff] at H
   convert H using 1
   ext n
-  simp only [Set.mem_setOf_eq, eval_add, eval_pow, eval_X, eval_one]
+  simp only [Set.mem_ofPred_eq, eval_add, eval_pow, eval_X, eval_one]
   rw [show ((n : ℤ) ^ 2 + 1) = ((n ^ 2 + 1 : ℕ) : ℤ) by push_cast; ring, Int.natAbs_natCast,
     Nat.prime_iff]
 
