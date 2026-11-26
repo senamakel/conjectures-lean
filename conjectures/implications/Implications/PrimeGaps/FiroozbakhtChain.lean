@@ -167,10 +167,9 @@ theorem oppChain11_prime : ∀ q ∈ oppChain11, q.Prime := by
   exact ⟨by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num⟩
 
 theorem oppChain_prime : ∀ q ∈ oppChain, q.Prime := by
-  intro q hq
-  simp only [oppChain, List.mem_append] at hq
-  rcases hq with h | h | h | h | h | h | h | h | h | h | h | h
-  all_goals first | exact oppChain0_prime q h | exact oppChain1_prime q h | exact oppChain2_prime q h | exact oppChain3_prime q h | exact oppChain4_prime q h | exact oppChain5_prime q h | exact oppChain6_prime q h | exact oppChain7_prime q h | exact oppChain8_prime q h | exact oppChain9_prime q h | exact oppChain10_prime q h | exact oppChain11_prime q h
+  unfold oppChain
+  simp only [List.forall_mem_append]
+  exact ⟨oppChain0_prime, oppChain1_prime, oppChain2_prime, oppChain3_prime, oppChain4_prime, oppChain5_prime, oppChain6_prime, oppChain7_prime, oppChain8_prime, oppChain9_prime, oppChain10_prime, oppChain11_prime⟩
 
 /-- Walking a checked chain. -/
 theorem exists_prime_sq_lt_of_chain : ∀ (L : List ℕ) (p : ℕ), oppChainOK p L = true →
