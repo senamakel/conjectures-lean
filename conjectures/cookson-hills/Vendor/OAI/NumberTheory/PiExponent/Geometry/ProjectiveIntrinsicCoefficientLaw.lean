@@ -1,3 +1,4 @@
+-- Modified from openai/math@3344da5 for Lean v4.36.0 / Mathlib fc4f59e5 (Apache-2.0 §4(b)): the `rfl` lemmas `intrinsic_polynomial` and `intrinsic_ringEquiv` are removed (kernel timeout / non-termination on this pin); see the comment at their old place.
 import OAI.NumberTheory.PiExponent.LocalAlgebra.WeightedChartRingEvaluation
 import OAI.NumberTheory.PiExponent.Polynomials.GlobalPolynomialCoefficientLaw
 

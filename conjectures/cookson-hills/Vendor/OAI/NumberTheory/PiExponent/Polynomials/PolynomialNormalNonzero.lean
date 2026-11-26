@@ -1,3 +1,4 @@
+-- Modified from openai/math@3344da5 for Lean v4.36.0 / Mathlib fc4f59e5 (Apache-2.0 §4(b)): the `Nat.strong_induction_on` case is now named `ind`, not `h`.
 import Mathlib
 import OAI.NumberTheory.PiExponent.Jets.PolynomialTangentDifferential
 

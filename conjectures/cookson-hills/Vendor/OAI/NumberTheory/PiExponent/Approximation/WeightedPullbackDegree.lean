@@ -1,3 +1,4 @@
+-- Modified from openai/math@3344da5 for Lean v4.36.0 / Mathlib fc4f59e5 (Apache-2.0 §4(b)): the proof of `pullback_supportBound` uses the ambient chart data directly instead of the removed `intrinsic_*` lemmas; the statement is unchanged.
 import OAI.NumberTheory.PiExponent.Approximation.WeightedFrameDegree
 import OAI.NumberTheory.PiExponent.Geometry.ProjectiveIntrinsicCoefficientLaw
 import OAI.NumberTheory.PiExponent.Geometry.ProjectiveSectionInterface

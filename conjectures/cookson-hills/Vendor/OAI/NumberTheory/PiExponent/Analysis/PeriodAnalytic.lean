@@ -1,3 +1,4 @@
+-- Modified from openai/math@3344da5 for Lean v4.36.0 / Mathlib fc4f59e5 (Apache-2.0 §4(b)): `congr 1` in `rowTest_congr_sphere` replaced by an explicit `congrArg` (it timed out).
 import OAI.NumberTheory.PiExponent.Analysis.LogTailAnalytic
 import OAI.NumberTheory.PiExponent.Approximation.MatrixTranslation
 

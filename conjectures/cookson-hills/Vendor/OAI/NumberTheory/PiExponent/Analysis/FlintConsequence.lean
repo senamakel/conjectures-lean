@@ -1,3 +1,4 @@
+-- Modified from openai/math@3344da5 for Lean v4.36.0 / Mathlib fc4f59e5 (Apache-2.0 §4(b)): `summable_nat_add_iff` gets its function explicitly in `flintHills_positive_summable_of_eventual_lower_bound` (unification timed out).
 import OAI.NumberTheory.PiExponent.Analysis.DyadicSpacing
 import OAI.NumberTheory.PiExponent.Analysis.FlintSine
 import OAI.NumberTheory.PiExponent.Statement

@@ -1,3 +1,4 @@
+-- Modified from openai/math@3344da5 for Lean v4.36.0 / Mathlib fc4f59e5 (Apache-2.0 §4(b)): `(by simp; rfl)` became `(by simp <;> rfl)` (simp now closes one goal).
 import Mathlib.Algebra.Category.ModuleCat.Ext.HasExt
 import Mathlib.Algebra.Homology.ShortComplex.ModuleCat
 import Mathlib.CategoryTheory.Abelian.Projective.Ext

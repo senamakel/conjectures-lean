@@ -1,3 +1,4 @@
+-- Modified from openai/math@3344da5 for Lean v4.36.0 / Mathlib fc4f59e5 (Apache-2.0 §4(b)): `summable_nat_add_iff` gets its function explicitly in `flintHills_positive_summable_of_distance_summable` (unification timed out).
 import Mathlib.Analysis.Real.Pi.Bounds
 import Mathlib.Analysis.Real.Pi.Irrational
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds

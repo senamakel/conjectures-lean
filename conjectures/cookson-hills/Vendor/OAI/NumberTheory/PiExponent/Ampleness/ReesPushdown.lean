@@ -1,3 +1,4 @@
+-- Modified from openai/math@3344da5 for Lean v4.36.0 / Mathlib fc4f59e5 (Apache-2.0 §4(b)): `Polynomial.coeff_smul` is protected and `coeff_monomial` now returns `Finsupp.single`; uses `coeff_monomial_same` / `coeff_monomial_of_ne`.
 import Mathlib
 
 namespace OAI

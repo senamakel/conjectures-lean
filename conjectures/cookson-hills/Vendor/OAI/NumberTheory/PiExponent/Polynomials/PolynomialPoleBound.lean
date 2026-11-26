@@ -1,3 +1,4 @@
+-- Modified from openai/math@3344da5 for Lean v4.36.0 / Mathlib fc4f59e5 (Apache-2.0 §4(b)): `AddValuation.map` now takes an ordered additive hom (`→+o`) instead of a hom and a monotonicity proof.
 import Mathlib
 import OAI.NumberTheory.PiExponent.Polynomials.PolynomialFrameDegree
 

@@ -1,3 +1,4 @@
+-- Modified from openai/math@3344da5 for Lean v4.36.0 / Mathlib fc4f59e5 (Apache-2.0 §4(b)): a multi-line singleton set inside `Ideal.span {…}` is parenthesised, which the newer parser needs.
 import OAI.NumberTheory.PiExponent.Geometry.LineBundleProduct
 import OAI.NumberTheory.PiExponent.Geometry.SectionCartierRegular
 

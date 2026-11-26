@@ -1,3 +1,4 @@
+-- Modified from openai/math@3344da5 for Lean v4.36.0 / Mathlib fc4f59e5 (Apache-2.0 §4(b)): one inequality in `two_mem_approximationExponents` proved with `div_le_one` (simp normal form changed).
 import OAI.NumberTheory.PiExponent.Statement
 
 namespace OAI
