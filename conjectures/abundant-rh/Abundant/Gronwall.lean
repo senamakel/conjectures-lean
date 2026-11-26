@@ -1,4 +1,4 @@
-import Abundant.Statement
+import Abundant.SolePlanat
 
 /-!
 # Gronwall's lower bound along multiples, from Nicolas' inequality
@@ -146,7 +146,7 @@ lemma sigma_prod_pow_div (s : Finset ℕ) (hs : ∀ p ∈ s, p.Prime) (e : ℕ) 
 /-- `N/φ(N) = ∏_{p ∈ s} p/(p−1)` for `N = ∏_{p ∈ s} p`, `s` a set of primes. -/
 lemma prod_div_totient (s : Finset ℕ) (hs : ∀ p ∈ s, p.Prime) :
     ((∏ p ∈ s, p : ℕ) : ℝ) / (Nat.totient (∏ p ∈ s, p) : ℝ) = ∏ p ∈ s, (p : ℝ) / (p - 1) := by
-  have hφ := totient_eq_mul_prod_real' (∏ p ∈ s, p)
+  have hφ := totient_eq_mul_prod_real (∏ p ∈ s, p)
   rw [Nat.primeFactors_prod hs] at hφ
   have hN : ((∏ p ∈ s, p : ℕ) : ℝ) ≠ 0 := by
     have : 0 < ∏ p ∈ s, p := Finset.prod_pos fun p hp ↦ (hs p hp).pos
