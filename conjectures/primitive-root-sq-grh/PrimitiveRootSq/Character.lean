@@ -3,7 +3,7 @@ import Mathlib
 /-!
 # A character of order `p` modulo `p²`
 
-For an odd prime `p` we take a Dirichlet character `η` modulo `p²` with `η(a)^p = 1` on units and
+For a prime `p` we take a Dirichlet character `η` modulo `p²` with `η(a)^p = 1` on units and
 `η(1 + p)` a primitive `p`-th root of unity. Its kernel contains every unit `a` with
 `a ^ (p - 1) = 1`, and each power `η^j` with `0 < j < p` is primitive modulo `p²` (it does not
 factor through level `p`, since it is non-trivial on `1 + p`, which is `1` modulo `p`).
@@ -30,6 +30,7 @@ lemma one_add_pow_eq (n : ℕ) : (1 + p : ZMod (p ^ 2)) ^ n = 1 + n * p := by
     push_cast
     linear_combination (n : ZMod (p ^ 2)) * natCast_mul_self_eq_zero
 
+omit hp in
 lemma one_add_pow_self : (1 + p : ZMod (p ^ 2)) ^ p = 1 := by
   rw [one_add_pow_eq, natCast_mul_self_eq_zero, add_zero]
 
@@ -65,7 +66,7 @@ theorem isPrimitive_of_apply_one_add_ne_one {χ : DirichletCharacter ℂ (p ^ 2)
   exact e
 
 /-- The character `η`. -/
-theorem exists_eta (hp2 : p ≠ 2) :
+theorem exists_eta :
     ∃ η : DirichletCharacter ℂ (p ^ 2), (∀ a : ZMod (p ^ 2), IsUnit a → η a ^ p = 1) ∧
       ∀ j, 0 < j → j < p → η (1 + (p : ZMod (p ^ 2))) ^ j ≠ 1 := by
   have hp1 : p - 1 ≠ 0 := by have := hp.out.two_le; omega
