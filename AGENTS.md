@@ -211,12 +211,19 @@ LivingBrain is part of the method. Ingest the proofs and lemma inventories we re
 source, repo and path, what it needs, what it gives), so a later search for "what proves a bound
 of this shape?" finds them. Check any identifier it returns against the source.
 
-## Priority: results not yet in the public record
+## Priority: results not yet in the public literature
 
-**Decided 2026-11-26 (owner).** The targets that matter most are statements nobody has publicly
-proved: not in a paper, a preprint, a problem-site comment, a Zenodo note or a public Lean
-repository. Formalising a published implication is still allowed, but it is second priority and
-no new wave of provers is started for it while a candidate of the first kind is available.
+**Decided 2026-11-26 (owner).** We work on conjectures whose solution is not yet known in the
+public literature: not proved in a paper, a preprint, a problem-site comment, a Zenodo note or a
+public Lean repository. **Do not start a prover on a deduction that is already published**, and
+stop one that is running on it. A Lean version of a known proof is a formalisation; it is not what
+this workspace is for. On 2026-11-26 four provers were stopped for this reason (further Cramér,
+Schinzel, abc and Berge–Fulkerson consequences); their partial branches (`impl-cramer-2`,
+`impl-schinzel-2`, `impl-abc-3`, `impl-combinatorics`) are unmerged and stay that way unless the
+owner asks. The implications already merged stay; the table in `README.md` marks nothing as new.
+
+Every edge in the atlas carries a `novelty` verdict (`docs/atlas/README.md`), and a prover is
+started only on an edge whose verdict is `not-found` or `asserted-unproved`.
 
 What counts, strongest first:
 

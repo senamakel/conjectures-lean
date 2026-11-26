@@ -32,7 +32,19 @@ each deduction and, for edges we rejected, the reason.
 | `in_1337` | whether 1337isnot1337/solved-conjectures lists `Y` as settled |
 | `class` | `1`: `X` is proved in Lean, so `Y` can be unconditional. `2`: `X` is open |
 | `notes` | the catch, the finite range, the reason for a rejection |
+| `novelty` | is the deduction itself in the public literature? `published` (a paper, preprint, problem page or public Lean repository proves it), `asserted-unproved` (stated somewhere without a proof), `not-found` (searched and not found; `novelty_searched` says where and when), `unknown` (not yet searched) |
+| `novelty_searched` | the places searched and the date |
 | `sweep`, `lane` | the sweep date and the lane that found the edge; the same edge can appear from two lanes |
+
+## Priority: not yet in the public literature
+
+Since 2026-11-26 a prover is started only on an edge whose `novelty` is `not-found` or
+`asserted-unproved`: a statement that is open in the literature and that we can settle, a
+statement that becomes a theorem through the Lean proof of RH and GRH by a deduction nobody
+wrote down, a result stronger than the published one, or an implication that was only asserted.
+Edges whose deduction is `published` are kept for the record and are not worked on. Edges from
+the first sweep were collected before this rule and have `novelty: unknown` unless a later
+audit set it; the lanes `novel-via-rh` and `novelty-audit` are filling that in.
 
 ## Sweeps
 
