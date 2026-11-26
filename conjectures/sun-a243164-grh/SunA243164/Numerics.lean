@@ -554,14 +554,13 @@ lemma small_eq {P : ℕ} (hP : P.Prime) (h3 : 3 ≤ P) :
     constructor
     · rintro ⟨hm, hl⟩
       have hpr := Nat.prime_of_mem_primeFactors hm
-      interval_cases ℓ <;> norm_num at hpr ⊢
+      interval_cases ℓ <;> first | (norm_num at hpr; done) | simp_all
     · rintro (rfl | rfl) <;> simp_all
   · simp only [Finset.mem_singleton]
     constructor
     · rintro ⟨hm, hl⟩
       have hpr := Nat.prime_of_mem_primeFactors hm
-      interval_cases ℓ <;> norm_num at hpr ⊢
-      exact absurd hm h3F
+      interval_cases ℓ <;> first | (norm_num at hpr; done) | simp_all
     · rintro rfl; simp_all
 
 /-- `δ_S`, `θ_{F∖S}` and `K` for `S = {ℓ ∈ F : ℓ ≥ 5}`. -/
@@ -612,10 +611,10 @@ lemma sieve_data {P : ℕ} (hP : P.Prime) (h3 : 3 ≤ P) (B M e : ℕ) (dM th : 
     linarith
 
 lemma theta_23 : θ ({2, 3} : Finset ℕ) = 1 / 3 := by
-  simp [θ, aR]
+  simp [θ, aR]; norm_num
 
 lemma theta_2 : θ ({2} : Finset ℕ) = 1 / 2 := by
-  simp [θ, aR]
+  simp [θ, aR]; norm_num
 
 /-- `B · ∏_{r < B prime} r ≤ n` once `ω(n) > π(B - 1)`. -/
 lemma mul_prod_le (B n k Q : ℕ) (hn : n ≠ 0) (hB : 0 < B) (hk : k ≤ n.primeFactors.card)
@@ -785,18 +784,18 @@ theorem sieveNumerics_10_8 : SieveNumerics 100000000 := by
       have hth : (1 / 3 : ℝ) ≤ θ (F.filter (fun ℓ => ¬ 5 ≤ ℓ)) := by rw [hEe, theta_23]
       rcases (show F.card ≤ 8 ∨ F.card = 9 ∨ 10 ≤ F.card by omega) with h8 | h9 | h10
       · obtain ⟨hδ, hdt, hK⟩ := hdata 19 6 2 0.377855 (1 / 3) G19.1 G19.2 (by norm_num)
-          (by norm_num) he hth (by norm_num) (by omega)
+          (by norm_num) he hth (by norm_num) (show S.card ≤ 6 by omega)
         refine ⟨hδ, sieveIneq_of 100000000 (27 * 0.6931471808 + 100000000 / 2 ^ 27 - 1) 1937 12
           0.125951 59.931 77.779 41.35 (by norm_num) (log_le_U _ _ (by norm_num)) (by norm_num)
           (by norm_num) (by norm_num) (by norm_num) (by norm_num) (by norm_num) (by norm_num)
           (by norm_num) (by norm_num) (by norm_num) (by norm_num) hP8 S
           (le_trans (by norm_num) hdt) (hK.trans (by norm_num))⟩
       · have hPlow : 223092871 ≤ P := by
-          have := mul_prod_le 23 (P - 1) 9 9699690 hn (by norm_num) (by omega) (by decide)
+          have := mul_prod_le 23 (P - 1) 9 9699690 hn (by norm_num) (show 9 ≤ F.card by omega) (by decide)
             (by decide)
           omega
         obtain ⟨hδ, hdt, hK⟩ := hdata 23 7 2 0.334377 (1 / 3) G23.1 G23.2 (by norm_num)
-          (by norm_num) he hth (by norm_num) (by omega)
+          (by norm_num) he hth (by norm_num) (show S.card ≤ 7 by omega)
         refine ⟨hδ, sieveIneq_of 223092871 (28 * 0.6931471808 + 223092871 / 2 ^ 28 - 1) 2835 14
           0.111459 78.776 100.135 53.864 (by norm_num) (log_le_U _ _ (by norm_num)) (by norm_num)
           (by norm_num) (by norm_num) (by norm_num) (by norm_num) (by norm_num) (by norm_num)
@@ -807,7 +806,7 @@ theorem sieveNumerics_10_8 : SieveNumerics 100000000 := by
             (by decide)
           omega
         obtain ⟨hδ, hdt, hK⟩ := hdata 43 12 2 0.192963 (1 / 3) G43.1 G43.2 (by norm_num)
-          (by norm_num) he hth (by norm_num) (by omega)
+          (by norm_num) he hth (by norm_num) (show S.card ≤ 12 by omega)
         refine ⟨hδ, sieveIneq_of 6469693231 (33 * 0.6931471808 + 6469693231 / 2 ^ 33 - 1) 14077 24
           0.064321 235.023 282.811 158.017 (by norm_num) (log_le_U _ _ (by norm_num))
           (by norm_num) (by norm_num) (by norm_num) (by norm_num) (by norm_num) (by norm_num)
@@ -819,18 +818,18 @@ theorem sieveNumerics_10_8 : SieveNumerics 100000000 := by
       have hth : (1 / 2 : ℝ) ≤ θ (F.filter (fun ℓ => ¬ 5 ≤ ℓ)) := by rw [hEe, theta_2]
       rcases (show F.card ≤ 8 ∨ F.card = 9 ∨ 10 ≤ F.card by omega) with h8 | h9 | h10
       · obtain ⟨hδ, hdt, hK⟩ := hdata 23 7 1 0.334377 (1 / 2) G23.1 G23.2 (by norm_num)
-          (by norm_num) he hth (by norm_num) (by omega)
+          (by norm_num) he hth (by norm_num) (show S.card ≤ 7 by omega)
         refine ⟨hδ, sieveIneq_of 100000000 (27 * 0.6931471808 + 100000000 / 2 ^ 27 - 1) 1937 12
           0.167188 38.888 51.638 26.97 (by norm_num) (log_le_U _ _ (by norm_num)) (by norm_num)
           (by norm_num) (by norm_num) (by norm_num) (by norm_num) (by norm_num) (by norm_num)
           (by norm_num) (by norm_num) (by norm_num) (by norm_num) hP8 S
           (le_trans (by norm_num) hdt) (hK.trans (by norm_num))⟩
       · have hPlow : 223092871 ≤ P := by
-          have := mul_prod_le 23 (P - 1) 9 9699690 hn (by norm_num) (by omega) (by decide)
+          have := mul_prod_le 23 (P - 1) 9 9699690 hn (by norm_num) (show 9 ≤ F.card by omega) (by decide)
             (by decide)
           omega
         obtain ⟨hδ, hdt, hK⟩ := hdata 29 8 1 0.299894 (1 / 2) G29.1 G29.2 (by norm_num)
-          (by norm_num) he hth (by norm_num) (by omega)
+          (by norm_num) he hth (by norm_num) (show S.card ≤ 8 by omega)
         refine ⟨hδ, sieveIneq_of 223092871 (28 * 0.6931471808 + 223092871 / 2 ^ 28 - 1) 2835 14
           0.149947 49.684 64.575 34.117 (by norm_num) (log_le_U _ _ (by norm_num)) (by norm_num)
           (by norm_num) (by norm_num) (by norm_num) (by norm_num) (by norm_num) (by norm_num)
@@ -841,7 +840,7 @@ theorem sieveNumerics_10_8 : SieveNumerics 100000000 := by
             (by decide)
           omega
         obtain ⟨hδ, hdt, hK⟩ := hdata 47 13 1 0.171686 (1 / 2) G47.1 G47.2 (by norm_num)
-          (by norm_num) he hth (by norm_num) (by omega)
+          (by norm_num) he hth (by norm_num) (show S.card ≤ 13 by omega)
         refine ⟨hδ, sieveIneq_of 6469693231 (33 * 0.6931471808 + 6469693231 / 2 ^ 33 - 1) 14077 24
           0.085843 142.791 174.899 96.189 (by norm_num) (log_le_U _ _ (by norm_num))
           (by norm_num) (by norm_num) (by norm_num) (by norm_num) (by norm_num) (by norm_num)
