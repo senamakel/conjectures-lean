@@ -84,8 +84,9 @@ theorem sun_2_14_ii_nat (n : ℕ) (hn : 3 ≤ n) :
   rw [sq, sq]
   by_cases hfin : n < 700
   · have h9 : π (3 * 3) = 4 := by decide
-    rw [← h9] at checkB_ok
-    exact checkB_sound 697 3 checkB_ok n hn (by omega)
+    have hB := checkB_ok
+    rw [← h9] at hB
+    exact checkB_sound 697 3 hB n hn (by omega)
   · have hsq : 700 * 700 ≤ n * n := Nat.mul_le_mul (by omega) (by omega)
     exact sunB_region n 18 700 4 (by norm_num; omega) (by norm_num) (by omega) (by norm_num)
       (by norm_num) regionB_18
@@ -94,11 +95,12 @@ theorem sun_2_14_ii_nat (n : ℕ) (hn : 3 ≤ n) :
 theorem rpow_lt_of_pow_lt {a b : ℝ} (ha : 0 ≤ a) (hb : 0 ≤ b) {k : ℕ} (hk : 1 ≤ k)
     (h : b ^ k < a ^ (k + 1)) : b ^ ((1 : ℝ) / (k + 1)) < a ^ ((1 : ℝ) / k) := by
   by_contra hc
-  push_neg at hc
+  push Not at hc
   have hN : 0 < k * (k + 1) := by positivity
   have := pow_le_pow_left₀ (by positivity) hc (k * (k + 1))
-  have hk0 : (k : ℝ) ≠ 0 := by have : (1 : ℝ) ≤ k := by exact_mod_cast hk
-                                linarith
+  have hk0 : (k : ℝ) ≠ 0 := by
+    have : (1 : ℝ) ≤ k := by exact_mod_cast hk
+    linarith
   have e1 : (a ^ ((1 : ℝ) / k)) ^ (k * (k + 1)) = a ^ (k + 1) := by
     rw [← Real.rpow_natCast, ← Real.rpow_mul ha, ← Real.rpow_natCast a (k + 1)]
     congr 1; push_cast; field_simp
@@ -152,9 +154,10 @@ theorem a_eq (n : ℕ) (hn : 2 ≤ n) : a n = π (n ^ 2) := by
   have h1 : 1 ≤ n ^ 2 := Nat.one_le_pow _ _ (by omega)
   have : π (n ^ 2) = π (n ^ 2 - 1) := by
     obtain ⟨m, hm⟩ : ∃ m, n ^ 2 = m + 1 := ⟨n ^ 2 - 1, by omega⟩
-    rw [hm, Nat.add_sub_cancel, Nat.primeCounting, Nat.primeCounting, Nat.primeCounting',
-      Nat.primeCounting', Nat.count_succ]
+    rw [hm, Nat.add_sub_cancel]
     rw [hm] at hnp
+    show Nat.count Nat.Prime (m + 1 + 1) = Nat.count Nat.Prime (m + 1)
+    rw [Nat.count_succ]
     simp [hnp]
   rw [this, ← Nat.primeCounting_sub_one]
 
