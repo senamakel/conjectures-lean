@@ -65,12 +65,10 @@ theorem goodB_sound {P n : ℕ} (h : goodB P n = true) (hP : P.Prime) :
   obtain ⟨q, hq, ⟨hqn, h0⟩, hfs⟩ := h
   refine ⟨q, prime_of_mem_smallPrimes hq, hqn, ?_⟩
   apply orderOf_eq_of_pow_and_pow_div_prime
-  · have : 0 < P := by omega
-    · apply ZMod.pow_card_sub_one_eq_one
-      intro hz
-      rw [ZMod.natCast_eq_zero_iff] at hz
-      exact h0 (Nat.eq_zero_of_dvd_of_lt hz (Nat.mod_lt _ this) |>.symm ▸
-        (Nat.mod_eq_zero_of_dvd hz))
+  · apply ZMod.pow_card_sub_one_eq_one
+    intro hz
+    rw [ZMod.natCast_eq_zero_iff] at hz
+    exact h0 (Nat.mod_eq_zero_of_dvd hz)
   · intro r hr hrd
     rw [ne_eq, zmod_pow_eq_one_iff hP2]
     apply hfs r
@@ -99,7 +97,7 @@ theorem countFrom_sound : ∀ (k lo c c' : ℕ), countFrom lo k c = some c' →
   | k + 1, lo, c, c', h, hc => by
     simp only [countFrom] at h
     by_cases hp : isPrimeB lo = true
-    · rw [if_pos hp] at h
+    · simp only [hp, ↓reduceIte] at h
       have hlo : lo.Prime := (isPrimeB_iff lo).mp hp
       split_ifs at h with hg
       have hc1 : c + 1 = Nat.count Nat.Prime (lo + 1) := by
@@ -107,14 +105,15 @@ theorem countFrom_sound : ∀ (k lo c c' : ℕ), countFrom lo k c = some c' →
       obtain ⟨ih1, ih2⟩ := countFrom_sound k (lo + 1) (c + 1) c' h hc1
       refine ⟨by rw [ih1]; ring_nf, fun P h1 h2 hP h6 => ?_⟩
       rcases Nat.eq_or_lt_of_le h1 with rfl | h1
-      · have hπ : Nat.primeCounting P = c + 1 := by rw [primeCounting_of_prime hP, hc]
+      · have hπ : Nat.primeCounting lo = c + 1 := by rw [primeCounting_of_prime hP, hc]
         simp only [Bool.or_eq_true, decide_eq_true_eq] at hg
         rcases hg with hg | hg
         · omega
         · obtain ⟨q, hq, hqn, hord⟩ := goodB_sound hg hP
           exact ⟨q, hq, hπ ▸ hqn, hπ ▸ hord⟩
       · exact ih2 P h1 (by omega) hP h6
-    · rw [if_neg hp] at h
+    · have hp' : isPrimeB lo = false := by simpa using hp
+      simp only [hp', Bool.false_eq_true, ↓reduceIte] at h
       have hlo : ¬ lo.Prime := fun h' => hp ((isPrimeB_iff lo).mpr h')
       have hc1 : c = Nat.count Nat.Prime (lo + 1) := by
         rw [Nat.count_succ, ← hc]; simp [hlo]
