@@ -156,7 +156,9 @@ theorem checkA_sound (bound : ℕ) : ∀ (f n : ℕ), checkA bound n f = true �
     simp only [checkA, Bool.and_eq_true] at h
     rcases Nat.eq_or_lt_of_le h1 with rfl | hlt
     · have h0 : cnt 0 n = π (1 * n) := by
-        rw [one_mul, ← zero_add n, primeCounting_add_cnt]; simp
+        have := primeCounting_add_cnt 0 n
+        simp only [zero_add, Nat.primeCounting_zero] at this
+        rw [one_mul, this]
       rw [h0] at h
       exact checkAk_sound n bound n 1 h.1 j hj1 (by omega) hj2 hj3
     · exact ih (n + 1) h.2 m hlt (by omega) j hj1 hj2 hj3
