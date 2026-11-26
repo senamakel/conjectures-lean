@@ -123,8 +123,44 @@ lemma linearIndependent_one_irrational {t : ℝ} (ht : Irrational t) :
   simpa using hR
 
 /-- A natural number, viewed in `ℂ`, is not transcendental over `ℚ`. -/
-lemma not_transcendental_natCast (k : ℕ) : ¬ Transcendental ℚ (k : ℂ) := by
-  intro h
-  exact h (isAlgebraic_algebraMap (R := ℚ) (A := ℂ) (k : ℚ) |>.of_eq? )
+lemma not_transcendental_natCast (k : ℕ) : ¬ Transcendental ℚ (k : ℂ) :=
+  fun h => h (isAlgebraic_natCast k)
+
+/-- For a real `r`, transcendence of `(r : ℂ)` over `ℚ` is transcendence of `r`. -/
+lemma transcendental_ofReal_iff (r : ℝ) : Transcendental ℚ (r : ℂ) ↔ Transcendental ℚ r :=
+  transcendental_algebraMap_iff (S := ℝ) (A := ℂ) Complex.ofReal_injective
+
+/-- `exp (s * log b) = b ^ s` for real `s` and `b > 0`, as complex numbers. -/
+lemma exp_mul_log_eq_rpow (s b : ℝ) (hb : 0 < b) :
+    exp ((s : ℂ) * (Real.log b : ℂ)) = ((b ^ s : ℝ) : ℂ) := by
+  rw [Real.rpow_def_of_pos hb, ← Complex.ofReal_mul, ← Complex.ofReal_exp, mul_comm]
+
+/-- **Four exponentials ⇒ `2^t` or `3^t` is transcendental** (the formal-conjectures
+statement `Exponentials.two_pow_three_pow_transcendental`, from
+`Exponentials.four_exponentials_conjecture`). -/
+theorem twoPowThreePowTranscendental_of_fourExponentials (h : FourExponentialsConjecture) :
+    TwoPowThreePowTranscendental := by
+  intro t ht
+  obtain ⟨i, j, hij⟩ := h ![(1 : ℂ), (t : ℂ)] ![(Real.log 2 : ℂ), (Real.log 3 : ℂ)]
+    (linearIndependent_one_irrational ht) linearIndependent_log_two_log_three
+  have h2 : exp ((Real.log 2 : ℝ) : ℂ) = ((2 : ℕ) : ℂ) := by
+    rw [← Complex.ofReal_exp, Real.exp_log (by norm_num)]; norm_num
+  have h3 : exp ((Real.log 3 : ℝ) : ℂ) = ((3 : ℕ) : ℂ) := by
+    rw [← Complex.ofReal_exp, Real.exp_log (by norm_num)]; norm_num
+  fin_cases i <;> fin_cases j
+  · simp only [Fin.zero_eta, Fin.isValue, Matrix.cons_val_zero, one_mul] at hij
+    rw [h2] at hij; exact absurd hij (not_transcendental_natCast 2)
+  · simp only [Fin.zero_eta, Fin.isValue, Matrix.cons_val_zero, Fin.mk_one,
+      Matrix.cons_val_one, one_mul] at hij
+    rw [h3] at hij; exact absurd hij (not_transcendental_natCast 3)
+  · left
+    simp only [Fin.mk_one, Fin.isValue, Matrix.cons_val_one, Fin.zero_eta,
+      Matrix.cons_val_zero] at hij
+    rw [exp_mul_log_eq_rpow t 2 (by norm_num), transcendental_ofReal_iff] at hij
+    exact hij
+  · right
+    simp only [Fin.mk_one, Fin.isValue, Matrix.cons_val_one] at hij
+    rw [exp_mul_log_eq_rpow t 3 (by norm_num), transcendental_ofReal_iff] at hij
+    exact hij
 
 end Implications.FourExponentials
