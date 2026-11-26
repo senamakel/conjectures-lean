@@ -1,0 +1,17 @@
+name = "Ramanujan"
+defaultTargets = ["Ramanujan"]
+
+[leanOptions]
+pp.unicode.fun = true
+autoImplicit = false
+
+[[require]]
+name = "Erdos985"
+path = "../erdos-985"
+
+[[require]]
+name = "Schoenfeld"
+path = "../schoenfeld-rh"
+
+[[lean_lib]]
+name = "Ramanujan"

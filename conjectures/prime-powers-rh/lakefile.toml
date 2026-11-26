@@ -1,0 +1,13 @@
+name = "PrimePowers"
+defaultTargets = ["PrimePowers"]
+
+[leanOptions]
+pp.unicode.fun = true
+autoImplicit = false
+
+[[require]]
+name = "Mills"
+path = "../mills-rh"
+
+[[lean_lib]]
+name = "PrimePowers"
