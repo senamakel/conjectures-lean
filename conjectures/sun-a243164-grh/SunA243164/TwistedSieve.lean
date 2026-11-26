@@ -131,15 +131,6 @@ lemma norm_W_le (ψ : DirichletCharacter ℂ p) (hψ : orderOf ψ = p - 1) (a : 
     rw [← Finset.prod_coe_sort, Finset.prod_univ_sum]
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [Finset.prod_pow_eq_pow_sum]
-  have hB0 : 0 ≤ B := by
-    have := hB _ (fun h => by
-      have h1 : orderOf ψ ∣ 1 := by rw [h]; exact (orderOf_one (G := DirichletCharacter ℂ p)).le
-        |> fun _ => by rw [h, orderOf_one]
-      rw [hψ] at h1
-      have := (Fact.out : p.Prime).two_le
-      have := Nat.le_of_dvd one_pos h1
-      omega)
-    exact (norm_nonneg _).trans this
   have hW : W p ψ a x T = ∑ c ∈ Fintype.piFinset (fun ℓ : T => Ico 1 (ℓ : ℕ)),
       (ψ ^ m c) a * bachSum (ψ ^ m c) x := by
     unfold W bachSum
@@ -250,7 +241,7 @@ lemma pointwise (ψ : DirichletCharacter ℂ p) (a : ZMod p) (ha : a ≠ 0) (x :
   set E := P \ S
   set IE := ∏ ℓ ∈ E, ind p ψ a ℓ n
   have hIE0 : 0 ≤ IE := Finset.prod_nonneg fun ℓ _ => ind_nonneg p ψ a ℓ n
-  have hIE1 : IE ≤ 1 := Finset.prod_le_one (fun ℓ _ => ind_nonneg p ψ a ℓ n)
+  have hIE1 : IE ≤ 1 := Finset.prod_le_one₀ (fun ℓ _ => ind_nonneg p ψ a ℓ n)
     (fun ℓ _ => ind_le_one p ψ a ℓ n)
   have hins : ∀ i ∈ S, ∏ ℓ ∈ insert i E, ind p ψ a ℓ n = ind p ψ a i n * IE := by
     intro i hi
@@ -452,7 +443,7 @@ theorem principal_le_sieve_twisted (hp2 : p ≠ 2) (a : ZMod p) (ha : a ≠ 0) (
   have h1 : ∑ i ∈ S, (aR i * vE - aR i * θ E * (2 : ℝ) ^ k * B) ≤ ∑ i ∈ S, v i :=
     Finset.sum_le_sum hv_ge
   rw [Finset.sum_sub_distrib, ← Finset.sum_mul, ← Finset.sum_mul, ← Finset.sum_mul,
-    hsumA] at h1
+    ← Finset.sum_mul, hsumA] at h1
   have e : δ * θ E * (S₀ - ((2 : ℝ) ^ k * (2 + ((S.card : ℝ) - 1) / δ) - 1) * B)
       = δ * (θ E * S₀ - θ E * ((2 : ℝ) ^ k - 1) * B)
         - (((S.card : ℝ) - 1) + δ) * θ E * (2 : ℝ) ^ k * B := by
