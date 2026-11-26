@@ -38,7 +38,7 @@ lemma degree_rowExpansion_mem_interlacing (hf : f ∈ nabla R c l) :
   simp [Ψ, aevalTower, eval₂_eq, b, -pow_ite, -Prod.mk.injEq, prod_pow_eq_pow_sum, -map_aeval,
     ↓if_mem_support, coeff_sum, Polynomial.coeff_X_pow_mul', ← Polynomial.comp_eq_aeval]
   rw [sum_eq_ite γ] <;> simp_all [X_pow_eq_monomial, Polynomial.coeff_mul_X_pow',
-    Finsupp.ext_iff, apply_ite Polynomial.coeff, DFunLike.ite_apply] <;> grind [coeff_eq_zero_of_lt,
+    Finsupp.ext_iff, apply_ite AddMonoidAlgebra.coeff, DFunLike.ite_apply] <;> grind [coeff_eq_zero_of_lt,
     degree_zero, coeff_degree_eq_zero_iff, columnOrder_lt_of_eq_above]
 
 lemma HasLeadingTerm.leadingCoeff_mem_nabla (hf :
