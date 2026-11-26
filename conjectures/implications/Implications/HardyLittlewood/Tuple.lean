@@ -116,7 +116,8 @@ theorem count_isPrimeB : Nat.count (fun n => isPrimeB n = true) 3160 = 446 := by
 
 /-- `π(3159) ≤ 446` (in fact `= 446`). -/
 theorem primeCounting_3159_le : Nat.primeCounting 3159 ≤ 446 := by
+  show Nat.count Nat.Prime 3160 ≤ 446
   rw [← count_isPrimeB]
-  exact Nat.count_monotone_left' fun n hn => isPrimeB_of_prime hn
+  exact Nat.count_mono_left fun k _ hk => isPrimeB_of_prime hk
 
 end HardyLittlewood.Richards

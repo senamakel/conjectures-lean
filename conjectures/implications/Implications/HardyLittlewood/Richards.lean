@@ -223,8 +223,6 @@ lemma exists_constellation
   obtain ⟨p, hp⟩ := hcount
   exact ⟨p, (Finset.mem_filter.mp hp).2.1.2.2⟩
 
-lemma primeCounting_3159 : π 3159 = 446 := by decide +kernel
-
 end HardyLittlewood.Richards
 
 namespace HardyLittlewood
@@ -252,7 +250,7 @@ theorem not_first_and_secondHardyLittlewoodConjecture :
     exact absurd h1 (by decide)
   have h2 := hHL2 (x := p - 1) (y := 3159) (by omega) (by norm_num)
   unfold SecondHardyLittlewoodConjectureFor at h2
-  rw [primeCounting_3159] at h2
+  have h3 := primeCounting_3159_le
   simp only [Nat.primeCounting, Nat.primeCounting'] at h2
   have e1 : p - 1 + 3159 + 1 = p + 3159 := by omega
   have e2 : p - 1 + 1 = p := by omega
