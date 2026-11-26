@@ -304,7 +304,6 @@ lemma Epp_bound {P x : ℕ} (hx2 : 2 ≤ x) (hxP : x ≤ P) {s0 c3 : ℝ} (hc3 :
   have hfl : (⌊Real.log x / Real.log 2⌋₊ : ℝ) ≤ Real.log P / Real.log 2 := by
     refine (Nat.floor_le (div_nonneg (Real.log_nonneg (by linarith)) hl2p.le)).trans ?_
     gcongr
-    exact Real.log_le_log (by linarith) hxP'
   have hcube : (x : ℝ) ^ ((1 : ℝ) / 3) ≤ s / c3 := by
     set r := (x : ℝ) ^ ((1 : ℝ) / 3) with hr
     have hr0 : 0 ≤ r := by positivity
@@ -347,6 +346,7 @@ lemma csl_bound {P x : ℕ} (hx2 : 2 ≤ x) (hxP : x ≤ P) {s0 : ℝ} (hs0 : 0 
   have hx32 : (x : ℝ) ^ (3 / 2 : ℝ) = s ^ 3 := by
     rw [hs2, show (3 / 2 : ℝ) = 1 + 1 / 2 by norm_num, Real.rpow_add (by positivity),
       Real.rpow_one, ← Real.sqrt_eq_rpow, Real.sqrt_sq hspos.le]
+    ring
   have hLpos : 0 < Real.log P := Real.log_pos (by linarith)
   have hlx0 : 0 ≤ Real.log x := Real.log_nonneg (by linarith)
   have hlx : Real.log x ≤ Real.log P := Real.log_le_log (by linarith) hxP'
@@ -355,7 +355,6 @@ lemma csl_bound {P x : ℕ} (hx2 : 2 ≤ x) (hxP : x ≤ P) {s0 : ℝ} (hs0 : 0 
     unfold Erdos985.bachC
     rw [← hsdef, hx32]
     field_simp
-    ring
   rw [hexp]
   have hG : 1 + 2 / s + 3 / s ^ 3 ≤ 1 + 2 / s0 + 3 / s0 ^ 3 := by
     have : 2 / s ≤ 2 / s0 := by gcongr
@@ -502,7 +501,7 @@ element of `G`, has reciprocal sum at most that of `G`. -/
 lemma sum_inv_le (S G : Finset ℕ) (B : ℕ) (hG : ∀ g ∈ G, 0 < g ∧ g ≤ B)
     (hSG : ∀ ℓ ∈ S, ℓ ∉ G → B < ℓ) (hc : S.card ≤ G.card) :
     ∑ ℓ ∈ S, 1 / (ℓ : ℝ) ≤ ∑ ℓ ∈ G, 1 / (ℓ : ℝ) := by
-  rw [← Finset.sum_inter_add_sum_diff S G, ← Finset.sum_inter_add_sum_diff G S,
+  rw [← Finset.sum_inter_add_sum_sdiff S G, ← Finset.sum_inter_add_sum_sdiff G S,
     Finset.inter_comm G S]
   have hcard : (S \ G).card ≤ (G \ S).card := by
     have h1 := Finset.card_sdiff_add_card_inter S G
@@ -598,7 +597,7 @@ lemma sieve_data {P : ℕ} (hP : P.Prime) (h3 : 3 ≤ P) (B M e : ℕ) (dM th : 
     rw [hsd] at hθpos
     exact mul_le_mul hδ hth hth0 hδpos.le
   · have hcardF : S.card + e = F.card := by
-      rw [← he]; exact Finset.filter_card_add_filter_neg_card_eq_card _
+      rw [← he]; exact Finset.card_filter_add_card_filter_not _
     have hexp : F.card - S.card = e := by omega
     unfold sieveK
     rw [hexp]
@@ -613,10 +612,10 @@ lemma sieve_data {P : ℕ} (hP : P.Prime) (h3 : 3 ≤ P) (B M e : ℕ) (dM th : 
     linarith
 
 lemma theta_23 : θ ({2, 3} : Finset ℕ) = 1 / 3 := by
-  simp [θ, aR]; norm_num
+  simp [θ, aR]
 
 lemma theta_2 : θ ({2} : Finset ℕ) = 1 / 2 := by
-  simp [θ, aR]; norm_num
+  simp [θ, aR]
 
 /-- `B · ∏_{r < B prime} r ≤ n` once `ω(n) > π(B - 1)`. -/
 lemma mul_prod_le (B n k Q : ℕ) (hn : n ≠ 0) (hB : 0 < B) (hk : k ≤ n.primeFactors.card)
@@ -658,7 +657,8 @@ lemma D_pow4_le (n : ℕ) (hn : n ≠ 0) :
   rw [e1]
   have hprod : (∏ ℓ ∈ F, (ℓ : ℝ)) ≤ n := by
     have := Nat.le_of_dvd (Nat.pos_of_ne_zero hn) (Nat.prod_primeFactors_dvd n)
-    exact_mod_cast this
+    have h' : ((∏ p ∈ F, p : ℕ) : ℝ) ≤ n := by exact_mod_cast this
+    simpa [Nat.cast_prod] using h'
   have hr0 : ∀ ℓ ∈ F, 0 ≤ r ℓ := fun ℓ hℓ => by
     have h2 : (2 : ℝ) ≤ ℓ := by exact_mod_cast hF2 ℓ hℓ
     simp only [hr]
@@ -672,6 +672,7 @@ lemma D_pow4_le (n : ℕ) (hn : n ≠ 0) :
         have := (Finset.mem_filter.mp hℓ).2
         exact_mod_cast (by omega : 23 ≤ ℓ)
       simp only [hr]
+      have hl1 : (0 : ℝ) < (ℓ : ℝ) - 1 := by linarith
       rw [div_le_one (by positivity)]
       set t := (ℓ : ℝ) - 1 with ht
       have ht22 : 22 ≤ t := by linarith
@@ -753,7 +754,7 @@ theorem sieveNumerics_10_8 : SieveNumerics 100000000 := by
   set S := F.filter (fun ℓ => 5 ≤ ℓ) with hS
   have hSF : S ⊆ F := Finset.filter_subset _ _
   have hcardFS : S.card + (F.filter (fun ℓ => ¬ 5 ≤ ℓ)).card = F.card :=
-    Finset.filter_card_add_filter_neg_card_eq_card _
+    Finset.card_filter_add_card_filter_not _
   have hE := small_eq hP h3
   by_cases hω : 15 ≤ F.card
   · -- no sieve
