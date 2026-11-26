@@ -140,8 +140,8 @@ Heuristic used to rank: **how the expected number of representations grows with 
 | 6 | 3.27(ii) second `3·2^{φ(k)/2+φ(m)/12}−1`, n > 15 (paper; OEIS n > 14) | 50,000 | medium | holds for n ≤ 469,000 (list as fetched ends at 234760) |
 | 7 | 3.27(iii) `2·3^{…}+1`, n > 27 | 50,000 | medium | holds for n ≤ 2·10⁶ |
 | 8 | 3.27(iii) `2·3^{…}−1`, n > 37 | 50,000 | medium | holds for n ≤ 2·10⁶ (list to 1,360,104) |
-| 9 | 3.26(i) `2^{φ(k)}+2^{φ(m)}−1`, k, m ≥ 3, n > 5 | b-file to 8000 (no range in paper) | O(1) count, λ ≈ 6 | TODO |
-| 10 | 3.26(ii) `a^{φ(k)}+a^{φ(m)/2}−1`, N(a) = 5 (a = 2..6, 8), N(7) = 17 | b-file to 2500 for a = 5 | O(1) count | TODO |
+| 9 | 3.26(i) `2^{φ(k)}+2^{φ(m)}−1`, k, m ≥ 3, n > 5 | b-file to 8000 (no range in paper) | O(1) count, λ ≈ 6 (Poisson model; the observed minimum is higher, about 6 distinct prime values at n ≈ 5000) | holds for 5 < n ≤ 12,000 |
+| 10 | 3.26(ii) `a^{φ(k)}+a^{φ(m)/2}−1`, N(a) = 5 (a = 2..6, 8), N(7) = 17 | b-file to 2500 for a = 5 | O(1) count | holds for N(a) < n ≤ 10⁴ (a = 2, 3, 5) and ≤ 7000 (a = 7; failures exactly at 6, 7, 10, 17, as Sun states). a = 4, 6, 8 were stopped to free cores, with no covered range recorded |
 
 ## Searches (range, cost)
 
@@ -154,11 +154,22 @@ Heuristic used to rank: **how the expected number of representations grows with 
 | `phirep`, form 2 | 2·10⁵ < n ≤ 6·10⁵ | 104 more exceptions (largest 574191) | ~2 CPU-min |
 | `verify.py`, certificates | n = 62191, 83843 | all composite (see Verification) | ~35 + ~60 CPU-min (10 workers); a first serial run, about 1 CPU-h, was abandoned |
 | sizing the certificate for n = 167665 | 61,838 exponents | 9,145 need Fermat tests | ~15 CPU-min; the certificate itself was not run (~50–120 CPU-h) |
-| `c326.py`, 3.26(i) | TODO | TODO | TODO |
-| `c326.py`, 3.26(ii), a = 2..8 | 6 ≤ n ≤ 10⁴ | TODO (a = 7: zeros exactly at 6, 7, 10, 17, matching N(7) = 17) | TODO |
+| `c326.py`, 3.26(i) | 6 ≤ n ≤ 12,000 (segment 12,001–18,000 stopped at the 12:40 cap) | none | ~2 CPU-h incl. an earlier unsegmented run that was discarded |
+| `c326.py`, 3.26(ii) | a = 2, 3, 5: 6 ≤ n ≤ 10⁴; a = 7: 6 ≤ n ≤ 7000 | none beyond N(a) (a = 7: zeros exactly at 6, 7, 10, 17, matching N(7) = 17) | ~2.5 CPU-h |
+
+Total compute for the lane: about 6 CPU-hours, against a budget of 20.
+
+Stop conditions, written before each run: `phirep` stops at the bound to which the prime-exponent
+list is believed complete (or 2·10⁶). `c326` stops at n = 24,000 / 10⁴ or at 12:40, whichever
+comes first (the time cap was hit). Certificates were run only for witnesses whose cost was
+estimated under 2 CPU-hours.
 
 ## Not done / leads
 
+- **Best unfinished item: certify 3.27(iv) at n = 167665.** It needs 9,145 Fermat tests on
+  numbers of 9k–168k bits, about 50–120 CPU-hours, or a faster primality backend (a natively
+  built GMP, PFGW or LLR) that would cut this by a large factor. Until then the witness rests on
+  the A059608 list.
 - Part (iv) beyond 6·10⁵: A059608 is a PRP list whose completeness I did not check above 595122.
 - Sun's OEIS-only siblings from Dec 2013–Jan 2014 (A234503 `3^{…}+2`, A234337, A234344,
   A234346, A234361) have the same O(1) structure and are probably false too. They count as OEIS
