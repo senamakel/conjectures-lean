@@ -674,6 +674,14 @@ Rules:
 - [ ] Literature: the generator bound with constant `2` sharpens the `3` of Bach 1990 §6. Whether factoring from `φ(n)` is
       known without ERH was not checked
 
+### abundant-rh: Solé–Planat, extremely abundant numbers, extraordinary numbers · **tier C verified (Robin as an imported hypothesis), U check pending** · *RH-equivalent*
+- [x] `solePlanat_of_RH`, `extremelyAbundantInfinite_of_RH`, `fourOnlyExtraordinary_of_RH`; the last two take
+      `Robin.RobinStatement` as an argument so the main library never builds robin-rh's sieve. Rebuilt 2026-11-26 at `3b1cb54`;
+      axiom lists pinned by `#guard_msgs` in `AbundantChecks`: standard three + `Nicolas.Check.loop_ok` (+ `Abundant.Check.check_ok`
+      for the extraordinary-number theorem, one `native_decide`, 92 s, proved-sound checker over `n ≤ 5040`)
+- [ ] `Unconditional/AbundantUnconditional.lean` written; its check builds robin-rh's sieve (about 54 core-hours) first. Not run
+- [ ] The separate GA2 statement of Caveney–Nicolas–Sondow is not stated (its definition was not confirmed)
+
 ### ramanujan-rh: Ramanujan's inequality `π(x)² < (e·x/log x)·π(x/e)` · **tier C for `x ≥ e⁴⁰` verified, U check pending; full statement tier H** · *RH-consequence*
 - [x] `ramanujan_of_RH : RiemannHypothesis → RamanujanInequalityFrom (Real.exp 40)` (C), no computation. Rebuilt 2026-11-26 at
       `d2d9ea0`: standard three + 23 `native_decide` inherited from schoenfeld-rh; `ramanujan_of_schoenfeldPi` standard three only
@@ -699,6 +707,17 @@ Rules:
       Erdős 142 lower variant and all-`k` Erdős 140 from the quantitative density bound; abc ⇒ non-Wieferich primes
       (Silverman), powerful triples, Brocard, Erdős 366 forms; Dickson ⇒ admissible patterns at consecutive primes
       (Erdős 141, 218 variant, balanced primes); Firoozbakht ⇒ Oppermann, Andrica, Legendre, Brocard
+- [x] PR #12 (merged 2026-11-26, `42c8652`), refutation lane route b: Richards' incompatibility,
+      `HardyLittlewood.not_first_and_secondHardyLittlewoodConjecture` verbatim from formal-conjectures
+      (first Hardy–Littlewood conjecture ⇒ the second is false). Standard three axioms, no `native_decide`:
+      the 447-tuple's admissibility and `π(3159) ≤ 446` are kernel checks. Both conjectures stay open
+- [x] PR #12 audited 2026-11-26 at `768fd21`: pass. The three modules were rebuilt from source, the axioms
+      re-read (standard three), the statement re-elaborated against a fresh copy of the formal-conjectures
+      text, and no earlier Lean proof was found (GitHub code search, formal-conjectures PRs, 1337). Not
+      checked: the proof at formal-conjectures' own pin (Lean v4.33.1, Mathlib `0df444a`)
+- [ ] Erdős 855 (the form eventual in both `x` and `y`) does not follow from one tuple: it needs dense
+      admissible tuples of every large width (the Hensley–Richards sieve). Sized L in
+      `docs/atlas/sweeps/2026-11-26/disproof-erdos.md`; not started
 - [x] Statements copied word for word from formal-conjectures `9097e2f`; the table is in the root `README.md`
 - [ ] `scripts/erdos142-discharge/` (the link to openai/math's `manuscriptQuantitativeDensityTheorem`) has not been typechecked
 - [ ] Some modules define copied names in root namespaces (`Nat.Full`, `Set.IsAPOfLength…`, `ABC`, `Erdos936`); move them

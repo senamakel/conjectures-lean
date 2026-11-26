@@ -9,8 +9,9 @@ with binders becomes a `Prop` whose binders are `∀`. `primeGap`, `CramerConjec
 `CramerConjecture.StrictBound` and `Firoozbakht.FiroozbakhtConjecture` are the copies already in
 `Implications.PrimeGaps.Erdos382`.
 
-All four conjectures are `research open` in formal-conjectures. Nothing here proves or disproves
-any of them.
+Granville, `limsup_eq_one`, `strict_bound` and Shanks are `research open` in formal-conjectures;
+`firoozbakht_conjecture_consequence` is `research solved` there (cited, with no Lean proof here).
+Nothing here proves or disproves any of the open ones.
 -/
 
 open Filter
@@ -78,6 +79,8 @@ verbatim as a `Prop` (its binders become `∀`; `type_of% firoozbakht_conjecture
 
 The inequality $p_{n+1}-p_n < (\log p_n)^2-\log p_n$ holds for all $n>4$.
 A consequence of Firuzbakht's conjecture. -/
+-- Note: the docstring's "n > 4" counts primes from 1, while the code's `3 < n` indexes from 0
+-- (`Nat.nth`); they agree.
 def FiroozbakhtConsequence : Prop :=
     ∀ (n : ℕ) (_hn : 3 < n) (_P : FiroozbakhtConjecture),
       (n+1).nth Prime - n.nth Prime < (log (n.nth Prime))^2 - log (n.nth Prime)

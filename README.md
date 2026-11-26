@@ -16,7 +16,7 @@ conjectures. Those links are collected in the [implication atlas](docs/atlas/).
 
 ## Results
 
-33 projects: 19 proved in full, 11 proved in part, 1 conditional at its ceiling, 1 wound down, and 1 collection of implications between open conjectures (listed in the next section).
+34 projects: 19 proved in full, 12 proved in part, 1 conditional at its ceiling, 1 wound down, and 1 collection of implications between open conjectures (listed in the next section).
 
 | Conjecture | Folder | Lean | Literature |
 | :--- | :--- | :---: | :--- |
@@ -53,6 +53,7 @@ conjectures. Those links are collected in the [implication atlas](docs/atlas/).
 | **31.** Implications between open conjectures (table below) | [`implications`](conjectures/implications/) | 🔗 | see below |
 | **32.** Ramanujan's inequality `π(x)² < (e·x/log x)·π(x/e)` for every `x ≥ e⁴⁰`: proved from RH; the run that supplies RH is pending. The range below `e⁴⁰` is a cited hypothesis | [`ramanujan-rh`](conjectures/ramanujan-rh/) | 🟡 | RH-consequence |
 | **33.** Legendre, Oppermann, Andrica and Brocard each fail for at most `O(log³ N)` of the first `N` indices: proved from RH; the run that supplies RH is pending. These bound the exceptions and prove none of the four | [`legendre-exceptions-rh`](conjectures/legendre-exceptions-rh/) | 🟡 | RH-consequence |
+| **34.** Solé–Planat's inequality at every primorial, infinitely many extremely abundant numbers, and `4` as the only extraordinary number: proved from RH and Robin's inequality; the run that supplies both is pending | [`abundant-rh`](conjectures/abundant-rh/) | 🟡 | RH-equivalent |
 
 **Lean status.** ✅ the target statement is proved, end to end from Lean's three standard axioms plus
 the finite computations its README names. 🟡 part of the target, or a weaker constant, is proved
@@ -70,7 +71,9 @@ Lean statements, `#print axioms` output and build instructions.
 Each row is a Lean theorem `premise → consequence`, in [`conjectures/implications`](conjectures/implications/).
 Where formal-conjectures has the statements, both sides are copied from it word for word. Every
 theorem depends on Lean's three standard axioms only. A row does not settle its consequence: it
-becomes an unconditional theorem the day its premise is proved in Lean. The links were found
+becomes an unconditional theorem the day its premise is proved in Lean. A row may also be a
+refutation, `premise → ¬ consequence` (the [refutation lane](AGENTS.md#disproofs-the-refutation-lane)): then the two
+conjectures cannot both hold, and neither is settled. The links were found
 with the [implication atlas](docs/atlas/).
 
 | Premise | Consequence | Notes |
@@ -92,6 +95,7 @@ with the [implication atlas](docs/atlas/).
 | Butson-type Hadamard matrices `H(4, 2m)` exist for every `m` | Hadamard conjecture | Turyn's doubling |
 | Four exponentials conjecture | `2^t` or `3^t` is transcendental for every irrational `t` | |
 | `r_k(N) ≤ C·N·exp(−c (log log N)^{1+η})` for every `k ≥ 3` | Erdős Problem 142, lower variant `r_k(N) = o(N/log N)`; Erdős Problem 140 for every `k` | the premise is a Lean theorem of [openai/math](https://github.com/openai/math) (Erdős #3); it is a hypothesis here because that library is on another Lean version, and the link has not been typechecked |
+| first Hardy–Littlewood conjecture (prime `k`-tuples asymptotic, every tuple) | the second Hardy–Littlewood conjecture `π(x + y) ≤ π(x) + π(y)` is **false** (Hensley–Richards 1973, Richards 1974) | a refutation link: both conjectures stay open, and no explicit counterexample is known. One admissible 447-tuple of width 3158 (Polymath8 database; `π(3159) = 446`) and positivity of its singular series suffice. `sorry` in formal-conjectures until now; no `native_decide` |
 | infinitely many squarefree `2^n − 1` | infinitely many non-Wieferich primes (Rotkiewicz 1965) | a theorem, not a conjecture-to-conjecture link; `sorry` in formal-conjectures until now |
 
 ## How it was built

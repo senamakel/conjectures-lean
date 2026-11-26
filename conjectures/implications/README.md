@@ -20,6 +20,7 @@ The edges come from the [implication atlas](../../docs/atlas/).
 | `ABC/Silverman` | abc (`ABC.abc`) | `{p : ℕ \| p.Prime ∧ ¬ IsWieferichPrime p}.Infinite` (conclusion of fc `Mersenne.rotkiewicz_...`; definitions from `Wieferich/Rotkiewicz`) | Silverman 1988, elementary form: primes dividing `2^n − 1` once are non-Wieferich, and abc on `(1, 2^n − 1, 2^n)` bounds `rad(2^n−1)² ≤ Q²(2^n−1)` away | standard three |
 | `Implications.FourExponentials.TwoPowThreePow` | `Exponentials.four_exponentials_conjecture` | `Exponentials.two_pow_three_pow_transcendental` | folklore (four exponentials applied to `(1, t)`, `(log 2, log 3)`) | standard three |
 | `Implications.Hadamard.ButsonDoubling` | `ButsonHadamardMatrix.butson_hadamard_fourth_roots_conjecture` | `Hadamard.HadamardConjecture` | Turyn 1970, doubling | standard three |
+| [`HardyLittlewood.Richards`](Implications/HardyLittlewood/Richards.lean) | first Hardy–Littlewood conjecture, all tuples (`∀ m, FirstHardyLittlewoodConjectureFor m`) | the second fails: `¬ ∀ x y ≥ 2, π(x + y) ≤ π x + π y` (`HardyLittlewood.not_first_and_secondHardyLittlewoodConjecture`) | Hensley–Richards 1973; Richards 1974 | standard three |
 | [`PrimeGaps.Erdos382`](Implications/PrimeGaps/Erdos382.lean) | Cramér's conjecture `CramerConjecture.cramer_conjecture`, its strict form `cramer_conjecture.variants.strict_bound`, or Firoozbakht's conjecture `Firoozbakht.firoozbakht_conjecture` (each via `SubpowerGaps`: gaps `≤ p_n^ε` eventually) | Erdős 382 (i) `erdos_382.parts.i` | Cambie, quoted at erdosproblems.com/382; Firoozbakht ⇒ Cramér via Chebyshev's `π(x) log x ≥ x log 2` | standard three |
 | [`PrimeGaps.FiroozbakhtOppermann`](Implications/PrimeGaps/FiroozbakhtOppermann.lean), [`PrimeGaps.Andrica`](Implications/PrimeGaps/Andrica.lean) | Firoozbakht's conjecture `Firoozbakht.firoozbakht_conjecture`; Oppermann's `Oppermann.oppermann_conjecture`; Andrica's `Andrica.andrica_conjecture` | Oppermann (`oppermann_of_firoozbakht`), hence Andrica, Legendre `LegendreConjecture.legendre_conjecture` and Brocard `Brocard.brocard_conjecture`; Oppermann ⇒ Andrica ⇒ Legendre; Oppermann ⇒ Brocard (fc's own proof, ported) | Firoozbakht ⇒ Oppermann/Andrica/Legendre/Brocard attributed to Ferreira–Mariano (not consulted; our proof: Chebyshev's `π(x) log x ≥ x log 2` gives `p_{k+1} - p_k < √p_k` for `p_k ≥ 2^16`, plus a kernel-`decide` chain of 535 primes for `127 ≤ m < 65731`); Oppermann ⇒ Andrica as on Wikipedia | standard three |
 | `Wieferich/Rotkiewicz` | `{n : ℕ \| Squarefree (mersenne n)}.Infinite` | `{p : ℕ \| p.Prime ∧ ¬ IsWieferichPrime p}.Infinite`; also `sq_dvd_mersenne_iff_isWieferichPrime` (no premise) | Rotkiewicz 1965 | standard three |
@@ -27,9 +28,60 @@ The edges come from the [implication atlas](../../docs/atlas/).
 | `Dickson/` (`Consecutive`, `Erdos141`, `Erdos218`, `BalancedPrimes`) | Dickson's conjecture | every admissible pattern occurs infinitely often as consecutive primes; Erdős 141 (`erdos_141`, `variants.eleven`, `.infinite_three`, `.infinite_general_case`); Erdős 218 `variants.infinite_equal_prime_gap`; `BalancedPrimes.balanced_primes`, `.balanced_primes_order` | standard: CRT puts a distinct prime `q_j > H` into each unwanted position, then Dickson on the forms `M t + a + h`; the patterns used are `0, k!, …, (k−1)·k!` | standard three |
 | [`PrimeGaps.Granville`](Implications/PrimeGaps/Granville.lean) (refutations, route b) | Granville's conjecture `CramerConjecture.cramer_conjecture.variants.granville` (`limsup g_n/(log p_n)² ≥ 2e^{−γ}`); Firoozbakht `Firoozbakht.firoozbakht_conjecture` with fc's cited `firoozbakht_conjecture_consequence` (tier H) | the negations of `cramer_conjecture.variants.limsup_eq_one`, `cramer_conjecture.variants.strict_bound` and Shanks's `MaximalPrimeGap.shanks_maximal_prime_gap_conjecture`; Firoozbakht + its consequence ⇒ ¬ Granville | Granville 1995, Scand. Actuar. J. (remark recorded in the fc docstrings; primary source not read); only input `1 < 2e^{−γ}` from `γ < 2/3 < log 2` | standard three |
 
-## Building
+## Richards: the two Hardy–Littlewood conjectures are incompatible
 
-Lean `v4.36.0`, Mathlib `fc4f59e5`. `lake build Implications`, or one module at a time.
+[`Implications/HardyLittlewood/Richards.lean`](Implications/HardyLittlewood/Richards.lean) is a
+Lean proof of Richards' theorem (Hensley–Richards, *Acta Arith.* 25 (1973/74), 375–391;
+Richards, *Bull. Amer. Math. Soc.* 80 (1974), 419–438): the first Hardy–Littlewood conjecture
+implies that the second is false (refutation lane, route b: both conjectures stay open). The statement is formal-conjectures'
+`HardyLittlewood.not_first_and_secondHardyLittlewoodConjecture` (`FormalConjectures/Wikipedia/HardyLittlewood.lean`,
+commit `9097e2f`, marked `research solved` with body `sorry`), copied unchanged:
+
+```lean
+theorem not_first_and_secondHardyLittlewoodConjecture :
+    (∀ {k : ℕ} (m : Fin k.succ → ℕ), FirstHardyLittlewoodConjectureFor m) →
+      ¬(∀ {x y : ℕ} (hx : 2 ≤ x) (hy : 2 ≤ y), SecondHardyLittlewoodConjectureFor x y)
+```
+
+The definitions `IsPrimeConstellation`, `IsAdmissiblePrimeConstellation`, `Nat.numResidues`,
+`Nat.primeTupleCounting`, `FirstHardyLittlewoodConjectureFor` and
+`SecondHardyLittlewoodConjectureFor` are copied word for word into
+[`Statement.lean`](Implications/HardyLittlewood/Statement.lean) (Apache-2.0, © 2025 The Formal
+Conjectures Authors). Both conjectures remain open; the theorem is tier C, conditional on the
+first conjecture, and says that at most one of the two is true.
+
+Proof:
+
+1. [`Tuple.lean`](Implications/HardyLittlewood/Tuple.lean) holds an admissible 447-tuple
+   `0 = m₀ < m₁ = 2 < ⋯ < m₄₄₆ = 3158` of even numbers, `admissible_447_3158.txt` from the
+   Polymath8 database of narrow admissible tuples (math.mit.edu/~primegaps); Engelsma first
+   found a 447-tuple of this width (largest offset 3158, so it sits in a window of 3159
+   consecutive integers). For each `q = 2, …, 447` a residue class missed by the tuple
+   is listed and checked. Also there: `π(3159) ≤ 446`, by trial division with a checker proved
+   complete for primes. All checks are kernel `decide`; there is no `native_decide`.
+2. The Hardy–Littlewood constant of the tuple is positive (`tprod_pos`). Every factor is
+   positive because the tuple misses a class mod every prime, and for `q > 3158` the factor
+   `(1 − 447/q)/(1 − 1/q)^447` is within `2·447²/q²` of `1`, so the logs are summable and the
+   product equals the exponential of their sum.
+3. The integral `∫ t in 2..n, 1/log t ^ 447` is positive for `n ≥ 3`, so the asymptotic of the
+   first conjecture makes the counting function nonzero for some `n`: there is a `p` with all 447
+   numbers `p + mᵢ` prime, and `p ≥ 3` since `p + 2` is prime.
+4. These are 447 primes in `[p, p + 3158]`, so `π(p − 1 + 3159) ≥ π(p − 1) + 447`. The second
+   conjecture at `x = p − 1`, `y = 3159` gives `≤ π(p − 1) + π(3159) ≤ π(p − 1) + 446`.
+
+Axioms (`#print axioms HardyLittlewood.not_first_and_secondHardyLittlewoodConjecture`):
+
+```
+'HardyLittlewood.not_first_and_secondHardyLittlewoodConjecture' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+```
+
+`lake build Implications.HardyLittlewood.Richards`: `Tuple` (the kernel checks) took 100 s wall
+on a heavily loaded build box, `Richards` 9 s.
+
+The Lean proof was built with [OpenHuman](https://github.com/tinyhumansai/openhuman) agents
+running in an [RSI Ralph](https://github.com/tinyhumansai/rsi-ralph) loop.
 
 ## Refutations between open prime-gap conjectures (`PrimeGaps.Granville`)
 
@@ -50,13 +102,18 @@ theorem not_granville_of_firoozbakht (hF : Firoozbakht.FiroozbakhtConjecture)
     (hK : Firoozbakht.FiroozbakhtConsequence) : ¬ CramerConjecture.Granville
 ```
 
-All five statements in [`Granville/Statement.lean`](Implications/PrimeGaps/Granville/Statement.lean)
-(`Granville`, `LimsupEqOne`, `sup_primeGap`, `ShanksConjecture`, `FiroozbakhtConsequence`) are
-copied word for word from formal-conjectures `9097e2f` (Apache-2.0); `cramerRatio`, `StrictBound`
+The four statements `Granville`, `LimsupEqOne`, `ShanksConjecture` and `FiroozbakhtConsequence`, and the
+definition `sup_primeGap` that Shanks's statement uses, are in
+[`Granville/Statement.lean`](Implications/PrimeGaps/Granville/Statement.lean), copied word for word
+from formal-conjectures `9097e2f` (Apache-2.0); `cramerRatio`, `StrictBound`
 and `FiroozbakhtConjecture` are the copies in `Erdos382.lean`. formal-conjectures states
 Granville's conjecture without a real `limsup` (for each `c < 2e^{−γ}`, infinitely many `n` have
 `c ≤ g_n / (log p_n)²`), and `limsup_eq_one` as two `ε`-statements, so no junk value of an
 unbounded `limsup` enters any of them.
+
+Small cases (a Python sieve of all primes below 2·10^8, from the audit): the strict bound fails only at
+`p = 2, 3, 7`, which `4 ≤ n` excludes, and the largest ratio `g_n/(log p_n)²` for `n ≥ 4` in that range
+is 0.7395, at `p = 20831323`, so none of the refuted statements is false at small cases as written.
 
 - Granville ⇒ ¬ `limsup_eq_one`: take `c = (1 + 2e^{−γ})/2 > 1` and `ε = (c − 1)/2`.
 - Granville ⇒ ¬ `strict_bound`: take `c = 1`.
@@ -82,3 +139,11 @@ the formal-conjectures docstrings and was not checked against the paper.
 'Implications.PrimeGaps.strictBound_of_firoozbakht' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Implications.PrimeGaps.not_granville_of_firoozbakht' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
+
+## Building
+
+Lean `v4.36.0`, Mathlib `fc4f59e5`. `lake build Implications`, or one module at a time.
+
+formal-conjectures `9097e2f` is on Lean v4.33.1 and Mathlib `0df444a`; this package is on v4.36.0 and
+`fc4f59e5`. The Hardy–Littlewood statement text is identical, but the proof has been checked at this
+package's pin only.
