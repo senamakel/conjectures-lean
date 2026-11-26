@@ -124,14 +124,12 @@ lemma sqrt_sub_sqrt_lt_one {a b : ℕ} (hab : a < b) (h : (b - a - 1) ^ 2 < 4 * 
   have hsa0 := Real.sqrt_nonneg (a : ℝ)
   -- `b - a - 1 < 2 √a`
   have hlt : (b : ℝ) - a - 1 < 2 * Real.sqrt a := by
-    have h4 : (4 : ℝ) * a = (2 * Real.sqrt a) ^ 2 := by rw [mul_pow, hsa]; norm_num
-    rw [h4] at h'
-    exact lt_of_pow_lt_pow_left₀ 2 (by positivity) (by
-      calc ((b : ℝ) - a - 1) ^ 2 ≤ ((b : ℝ) - a - 1) ^ 2 := le_rfl
-        _ < _ := h') |>.trans_le' (le_abs_self _) |> fun h => by
-          rcases le_or_gt 0 ((b : ℝ) - a - 1) with h0 | h0
-          · exact lt_of_pow_lt_pow_left₀ 2 (by positivity) h'
-          · linarith
+    by_contra hc
+    push_neg at hc
+    have h2 : (2 * Real.sqrt a) ^ 2 ≤ ((b : ℝ) - a - 1) ^ 2 :=
+      pow_le_pow_left₀ (by positivity) hc 2
+    rw [mul_pow, hsa] at h2
+    linarith
   have hb : (b : ℝ) < (Real.sqrt a + 1) ^ 2 := by nlinarith
   have := Real.sqrt_lt_sqrt (by positivity) hb
   rw [Real.sqrt_sq (by positivity)] at this
