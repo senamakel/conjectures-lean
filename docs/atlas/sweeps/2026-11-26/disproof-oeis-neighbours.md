@@ -188,7 +188,7 @@ their start and exclusive of their end.
 | A308640 Conj. 3 (k = ±1; c ≥ 0) | same | n ≤ 10¹⁰ each | none | ~0.5 CPU-h |
 | A308641 Conj. 1, Conj. 2 (five f), Conj. 3 | sibling, no verification bound printed | n ≤ 10¹⁰ each (7 forms) | none | ~1.8 CPU-h |
 | A308644 Conj. 1 first assertion, Conj. 2 r = 1 | siblings of joeyhlu's two | n ≤ 10¹⁰ each | none (joeyhlu: first assertion none to 3·10⁸) | ~0.5 CPU-h |
-| A308662 Conj. 1, Conj. 2 (r = 1, 2) | sibling, 10⁸ verified | PENDING | | |
+| A308662 Conj. 1, Conj. 2 (r = 1, 2) | sibling, 10⁸ verified | n ≤ 10¹⁰ each | none | ~0.8 CPU-h |
 | A212496 b-inequalities (pool) and the a-inequalities (same entry) | Turán-type bias 0.653 | n ≤ 10¹¹ | all hold. Closest: √n·b(n) = −1.0237 at 17593752 (exact); a(n)/√n ≥ 1.046 (block bound, ~1.2·10⁸); min (√n b + log log n) = 0.003 at n = 2009; max a/(√n log log n) = 0.995 at n = 5893 | ~1.5 CPU-h, `liou.c`, `liouex.c` |
 | A000224 (Ordowski) | Diophantine, extend Marcus's 10⁸ | 2 ≤ n < 10¹⁰ | no composite n satisfies it; every odd prime does | ~0.4 CPU-h, `sq224.c` |
 | A245211 / A245212 (Krizek) | multiplicative Diophantine | 2 ≤ n ≤ 10¹⁰ | only n = 21; no non-power of 2 for A245212 | ~0.3 CPU-h, `kriz.c` |
@@ -210,11 +210,18 @@ representation conjectures (joeyhlu, Scott Moore 2026-05, Lin 2022), and Epoch O
 
 ## 7. Best unfinished lead
 
-The untouched siblings, A308641 above all, whose OEIS text prints no verification bound at all.
-They and A308640 Conj. 2–3, A308644 Conj. 2 (r = 1) and A308662 remain unreported. Their fate is
-in §5. If they all hold to 10¹⁰, what remains is joeyhlu-style targeted search (rank residue
-classes of n by local obstruction) past 10¹⁰. But joeyhlu is evidently active on this family,
-so check their repository first.
+The 15 sibling statements nobody had reported on all hold to 10¹⁰ (A308656 Conj. 3 and 4 hold
+to 4·10⁹): A308640 Conj. 2–3, A308641 Conj. 1–3, A308644 Conj. 1 (first assertion) and Conj. 2
+(r = 1), and A308662 Conj. 1–2. Counterexamples in this family have so far appeared between
+1.7·10⁶ and 10¹⁰: 1764630, 7654105, 108011768, 235644514, 2109982225 and 9974943843. Going
+further with exhaustive scans costs about 0.1 CPU-h per form per 10⁹.
+
+The better next step is joeyhlu's targeted method, ported to these forms. Rank the classes of
+n modulo a product of small primes by how many n − s are locally obstructed. For the
+d(3d+1)/2 forms, the obstruction is 48m+5 or 24m+1 having a prime q with (−6/q) = −1 to an odd
+power. Then scan only the best classes, from 10¹⁰ to 10¹⁴. Effort: M, about one day of code
+plus 5 CPU-h. joeyhlu is evidently active on this family, so look at their repository again
+before starting.
 
 ## Proposed edges
 
