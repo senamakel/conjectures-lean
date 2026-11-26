@@ -2,6 +2,16 @@
 
 Every repo was built the same way, and most of what went wrong went wrong in the same few places.
 
+**Targets come from connecting results that exist.** Since 2026-11-26 a target can be an open
+conjecture in any area, and it is chosen because the pieces of its proof are already somewhere:
+a lemma inside a large Lean proof, a theorem of one of our own projects, a conjecture solved last
+month, a published implication between two conjectures. Scouts record every such link as an
+edge in the [implication atlas](atlas/README.md), and we prove the easiest edges first. Four
+earlier projects were found this way before it was the rule (artin-grh, abelian-erh, mertens-rh,
+hironaka-fc): each needed one input, and riemann-hypothesis happened to prove it on the way to
+its headline. An implication whose premise is still open is proved as `Y_of_X`, with the premise
+as an argument.
+
 **The statement comes first.** Before any proof, the target goes into `<Pkg>/Statement.lean` and
 is not edited again. Where formal-conjectures has the statement, we copy it word for word. Where
 it doesn't, we transcribe it from the paper and say so. This rule exists because the easiest way

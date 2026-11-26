@@ -211,6 +211,23 @@ LivingBrain is part of the method. Ingest the proofs and lemma inventories we re
 source, repo and path, what it needs, what it gives), so a later search for "what proves a bound
 of this shape?" finds them. Check any identifier it returns against the source.
 
+## Agent roles
+
+Defined in `.claude/agents/`. Research roles write only to `docs/`; proving roles work in a
+worktree on one project folder.
+
+| Agent | Model | Does | Use it |
+|---|---|---|---|
+| `conjecture-scout` | opus | finds open statements that follow from existing results; records edges in `docs/atlas` | discovery sweeps; before any new target |
+| `lemma-miner` | opus | inventories the intermediate lemmas of a big Lean proof and matches them to open problems | when a large formalisation lands; when a target lacks one input |
+| `implication-prover` | opus | proves one target in `conjectures/<name>/`, statement fixed first, real `#print axioms` at the end | once a candidate is chosen |
+| `lean-mechanic` | sonnet | scaffolds packages, writes `Unconditional/` modules and checkers, repairs builds | work that needs no new mathematical idea |
+| `proof-auditor` | opus | rebuilds, reads axioms, diffs the statement against its source, checks README claims and prior proofs | every finished target, before merge |
+
+The order for a target is scout, prover (with the mechanic for scaffolding and checkers), then
+auditor. A prover's own report is never accepted without the audit. The atlas schema is in
+[`docs/atlas/README.md`](docs/atlas/README.md).
+
 ## Mine the lemmas of big proofs
 
 A large Lean proof is worth more for its intermediate lemmas than for its last line. The headline

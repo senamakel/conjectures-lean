@@ -1,13 +1,18 @@
 # Conjectures in Lean
 
-Machine-checked Lean 4 proofs of conjectures and theorems in number theory, each project in its own
+Machine-checked Lean 4 proofs of mathematical conjectures and theorems, each project in its own
 folder under [`conjectures/`](conjectures/). The table lists every project, finished or not,
 together with the attempts that never became a project. RH and GRH for Dirichlet L-functions come from
 Levent Alpöge's Lean proof ([riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)),
 which the Lean FRO and the Mathlib Initiative
 [certified](https://leanprover-community.github.io/blog/posts/riemann-hypothesis/) on 21 November 2026.
 
-[Docs](docs/) · [Further projects](docs/FURTHER_PROJECTS.md) · [Attempts](docs/ATTEMPTS.md) · [Method](docs/METHOD.md) · [Status tracker and rules](AGENTS.md) · [Literature status](docs/LITERATURE_STATUS.md) · [Next targets](docs/NEXT_TARGETS.md) · [Paper](paper/)
+The first 28 projects are consequences of RH and GRH. From 26 November 2026 the scope is any
+open conjecture that can be settled by connecting results that already exist: lemmas inside big
+Lean proofs, the theorems below, recently solved conjectures, and published implications between
+conjectures. Those links are collected in the [implication atlas](docs/atlas/).
+
+[Docs](docs/) · [Atlas](docs/atlas/) · [Further projects](docs/FURTHER_PROJECTS.md) · [Attempts](docs/ATTEMPTS.md) · [Method](docs/METHOD.md) · [Status tracker and rules](AGENTS.md) · [Literature status](docs/LITERATURE_STATUS.md) · [Next targets](docs/NEXT_TARGETS.md) · [Paper](paper/)
 
 ## Results
 
@@ -70,6 +75,11 @@ The stack behind the agents:
 | Loop | [RSI Ralph](https://github.com/tinyhumansai/rsi-ralph) |
 | Memory | [LivingBrain](https://livingbrain.com) |
 | Search | [Exa](https://exa.ai) ([@ExaAILabs](https://x.com/ExaAILabs)) |
+
+Agent roles are defined in [`.claude/agents/`](.claude/agents/): a scout that finds implications
+and records them in the atlas, a lemma miner that inventories big proofs, a prover, a mechanic
+for scaffolding and checkers, and an auditor that rebuilds every result and reads its axioms
+before it is merged.
 
 ## Licence
 
