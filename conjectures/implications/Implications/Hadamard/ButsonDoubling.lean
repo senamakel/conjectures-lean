@@ -82,64 +82,72 @@ lemma abs_det_of_mul_transpose {N : ℕ} (H : Matrix (Fin N) (Fin N) ℝ)
   congr 1
   push_cast; ring
 
+/-- The real block construction: from `A`, `B` with `(A, B)` entrywise one of `(±1, 0)`,
+`(0, ±1)`, `A Aᵀ + B Bᵀ = n I` and `B Aᵀ = A Bᵀ`, the matrix
+`[[A + B, A - B], [-(A - B), A + B]]` has entries `±1` and orthogonal rows of norm `2n`. -/
+lemma doubling_of_parts {n : ℕ} (A B : Matrix (Fin n) (Fin n) ℝ)
+    (hentry : ∀ i j, (A i j = 1 ∧ B i j = 0) ∨ (A i j = -1 ∧ B i j = 0) ∨
+      (A i j = 0 ∧ B i j = 1) ∨ (A i j = 0 ∧ B i j = -1))
+    (hre : A * A.transpose + B * B.transpose = (n : ℝ) • 1)
+    (him : B * A.transpose = A * B.transpose) :
+    ∃ H : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) ℝ,
+      (∀ i j, H i j = 1 ∨ H i j = -1) ∧ H * H.transpose = ((2 * n : ℕ) : ℝ) • 1 := by
+  have hPP : (A + B) * (A + B).transpose + (A - B) * (A - B).transpose =
+      ((2 * n : ℕ) : ℝ) • 1 := by
+    simp only [transpose_add, transpose_sub, add_mul, mul_add, sub_mul, mul_sub]
+    have : A * A.transpose + A * B.transpose + (B * A.transpose + B * B.transpose) +
+        (A * A.transpose - A * B.transpose - (B * A.transpose - B * B.transpose)) =
+        (2 : ℝ) • (A * A.transpose + B * B.transpose) := by
+      rw [two_smul]; abel
+    rw [this, hre, smul_smul]
+    push_cast; ring_nf
+  have hPQ : (A - B) * (A + B).transpose = (A + B) * (A - B).transpose := by
+    simp only [transpose_add, transpose_sub, add_mul, mul_add, sub_mul, mul_sub]
+    rw [him]; abel
+  refine ⟨fromBlocks (A + B) (A - B) (-(A - B)) (A + B), ?_, ?_⟩
+  · intro i j
+    rcases i with i | i <;> rcases j with j | j <;>
+      simp only [fromBlocks_apply₁₁, fromBlocks_apply₁₂, fromBlocks_apply₂₁,
+        fromBlocks_apply₂₂, neg_apply, add_apply, sub_apply] <;>
+      rcases hentry i j with ⟨ha, hb⟩ | ⟨ha, hb⟩ | ⟨ha, hb⟩ | ⟨ha, hb⟩ <;>
+      rw [ha, hb] <;> norm_num
+  · rw [fromBlocks_transpose, fromBlocks_multiply, transpose_neg]
+    simp only [Matrix.neg_mul, Matrix.mul_neg, neg_neg]
+    rw [hPP, add_comm ((A - B) * (A - B).transpose), hPP, hPQ, neg_add_cancel,
+      add_neg_cancel, ← fromBlocks_one, fromBlocks_smul, smul_zero]
+
 /-- **Turyn's doubling.** An `H(4, n)` matrix gives a real `2n × 2n` matrix with entries `±1`
 whose rows are orthogonal of norm `2n`. -/
 lemma turyn_doubling {n : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (hM : IsButsonHadamard 4 M) :
     ∃ H : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) ℝ,
       (∀ i j, H i j = 1 ∨ H i j = -1) ∧ H * H.transpose = ((2 * n : ℕ) : ℝ) • 1 := by
   obtain ⟨-, hroot, hmul⟩ := hM
-  set A : Matrix (Fin n) (Fin n) ℝ := M.map Complex.re
-  set B : Matrix (Fin n) (Fin n) ℝ := M.map Complex.im
-  have hentry : ∀ i j, (A i j = 1 ∧ B i j = 0) ∨ (A i j = -1 ∧ B i j = 0) ∨
-      (A i j = 0 ∧ B i j = 1) ∨ (A i j = 0 ∧ B i j = -1) := fun i j => fourth_root_cases (hroot i j)
-  -- real and imaginary parts of `M M* = n I`
-  have hre : A * A.transpose + B * B.transpose = (n : ℝ) • 1 := by
+  refine doubling_of_parts (M.map Complex.re) (M.map Complex.im)
+    (fun i j => fourth_root_cases (hroot i j)) ?_ ?_
+  · -- real part of `M M* = n I`
     ext i j
     have := congrArg Complex.re (congrFun (congrFun hmul i) j)
-    simp only [mul_apply, conjTranspose_apply, Complex.re_sum, Complex.mul_re, Complex.star_def,
-      Complex.conj_re, Complex.conj_im, smul_apply, one_apply, smul_eq_mul] at this
-    simp only [add_apply, mul_apply, transpose_apply, smul_apply, one_apply, smul_eq_mul,
-      ← Finset.sum_add_distrib, A, B, map_apply]
-    rw [this]
+    rw [add_apply, mul_apply, mul_apply, smul_apply, one_apply]
+    rw [mul_apply, smul_apply, one_apply, Complex.re_sum] at this
+    simp only [conjTranspose_apply, Complex.mul_re, Complex.star_def, Complex.conj_re,
+      Complex.conj_im, smul_eq_mul] at this
+    simp only [transpose_apply, map_apply, smul_eq_mul, ← Finset.sum_add_distrib]
+    rw [show (∑ x, ((M i x).re * (M j x).re + (M i x).im * (M j x).im)) =
+      ∑ x, ((M i x).re * (M j x).re - (M i x).im * -(M j x).im) from
+        Finset.sum_congr rfl (fun _ _ => by ring), this]
     split_ifs <;> simp
-  have him : B * A.transpose = A * B.transpose := by
+  · -- imaginary part of `M M* = n I`
     ext i j
     have := congrArg Complex.im (congrFun (congrFun hmul i) j)
-    simp only [mul_apply, conjTranspose_apply, Complex.im_sum, Complex.mul_im, Complex.star_def,
-      Complex.conj_re, Complex.conj_im, smul_apply, one_apply, smul_eq_mul] at this
-    simp only [mul_apply, transpose_apply, A, B, map_apply]
-    have h0 : (n : ℂ) * (if i = j then 1 else 0) = ((n * (if i = j then 1 else 0) : ℝ) : ℂ) := by
-      split_ifs <;> simp
-    rw [h0, Complex.ofReal_im] at this
-    rw [← sub_eq_zero, ← Finset.sum_sub_distrib]
-    rw [← this]
-    apply Finset.sum_congr rfl
-    intro l _
-    ring
-  set P := A + B
-  set Q := A - B
-  have hPP : P * P.transpose + Q * Q.transpose = ((2 * n : ℕ) : ℝ) • 1 := by
-    simp only [P, Q, transpose_add, transpose_sub, add_mul, mul_add, sub_mul, mul_sub]
-    have : A * A.transpose + B * A.transpose + (A * B.transpose + B * B.transpose) +
-        (A * A.transpose - B * A.transpose - (A * B.transpose - B * B.transpose)) =
-        (2 : ℝ) • (A * A.transpose + B * B.transpose) := by
-      rw [two_smul]; abel
-    rw [this, hre, smul_smul]
-    push_cast; ring_nf
-  have hPQ : Q * P.transpose = P * Q.transpose := by
-    simp only [P, Q, transpose_add, transpose_sub, add_mul, mul_add, sub_mul, mul_sub]
-    rw [him]; abel
-  refine ⟨fromBlocks P Q (-Q) P, ?_, ?_⟩
-  · intro i j
-    rcases i with i | i <;> rcases j with j | j <;>
-      simp only [fromBlocks_apply₁₁, fromBlocks_apply₁₂, fromBlocks_apply₂₁,
-        fromBlocks_apply₂₂, neg_apply, P, Q, add_apply, sub_apply] <;>
-      rcases hentry i j with ⟨ha, hb⟩ | ⟨ha, hb⟩ | ⟨ha, hb⟩ | ⟨ha, hb⟩ <;>
-      rw [ha, hb] <;> norm_num
-  · rw [fromBlocks_transpose, fromBlocks_multiply, transpose_neg]
-    simp only [Matrix.neg_mul, Matrix.mul_neg, neg_neg]
-    rw [hPP, add_comm (Q * Q.transpose), hPP, hPQ, neg_add_cancel, add_neg_cancel,
-      ← fromBlocks_one, fromBlocks_smul, smul_zero]
+    rw [mul_apply, mul_apply]
+    rw [mul_apply, smul_apply, one_apply, Complex.im_sum] at this
+    simp only [conjTranspose_apply, Complex.mul_im, Complex.star_def, Complex.conj_re,
+      Complex.conj_im, smul_eq_mul] at this
+    simp only [transpose_apply, map_apply]
+    have h0 : ((n : ℂ) * (if i = j then 1 else 0)).im = 0 := by split_ifs <;> simp
+    rw [h0] at this
+    rw [← sub_eq_zero, ← Finset.sum_sub_distrib, ← this]
+    exact Finset.sum_congr rfl (fun _ _ => by ring)
 
 /-- **Quaternary complex Hadamard conjecture ⇒ Hadamard conjecture** (Turyn 1970): the
 formal-conjectures statement `Hadamard.HadamardConjecture`, from
