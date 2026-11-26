@@ -1,0 +1,169 @@
+- Quantitative permanent-graph decision lower bound [Major theorem consequences (not separately solved conjectures)] - see entry: Written corollary of the pinned Anthropic Theorem 1.4 and co - `https://github.com/1337isnot1337/solved-conjectures/tree/research/research/bss-permanent-graph/` - Written corollary of the pinned Anthropic Theorem 1.4 and corrected Bürgisser Remark 1.4(1), with three intern
+- Wild-number conjecture for complete graphs. [partial result on open problem] - written only
+- Seven upper-half circular chromatic index certificates [partial result on open problem] - Lean partial
+- Upper-half circular chromatic index for degrees congruent to 1 or 2 modulo 4 [partial result on open problem] - Lean partial
+- Upper-half circular chromatic index for degrees congruent to 3 modulo 4 [partial result on open problem] - Lean partial
+- Shifted Lonely Runner. [partial result on open problem] - Lean partial
+- Steinke–Zakynthinou’s agnostic VC learning conjecture. [partial result on open problem] - Lean partial
+- Erdős essential-component conjecture. [partial result on open problem] - written only
+- Erdős–Sauer conjecture. [partial result on open problem] - written only
+- Bollobás–Erdős–Tuza conjecture. [partial result on open problem] - written only
+- Erdős–Oler conjecture. [partial result on open problem] - written only
+- Erdős–Granville–Pomerance–Spiro conjecture. [partial result on open problem] - written only
+- Frankl’s conjecture (partial). [partial result on open problem] - Lean partial
+- Lonely Runner (partial). [partial result on open problem] - Lean partial
+- Erdős–Gyárfás (partial). [partial result on open problem] - Lean partial
+- Hadamard existence conjecture, order 2396 (open). [partial result on open problem] - Lean partial
+- Kovalev’s linear Lipschitz clustering questions [Finite-subset Lipschitz retractions] - written only - `results/kovalev-lipschitz-clustering/` - Not formalized
+- Steinke–Zakynthinou agnostic threshold problem [Information complexity of learning] - Lean (complete per repo) - `results/steinke-zakynthinou-thresholds/` - Complete for the proper threshold prize statement. Lean proves empirical excess at most $`512/\sqrt n`$ and or
+- Tom–Vailaya’s weighted trace conjecture [Weighted chromatic quasisymmetric traces] - Lean partial - `results/tom-vailaya-weighted-trace/` - Partial Lean. The literal finite-color closure trace, endpoint gluing product, weighted path tests, symbolic c
+- Ekhad–Zeilberger’s most unfair bet conjecture [Word-count games] - Lean partial - `results/ekhad-zeilberger-unfair-bet/` - Partial: exact unrestricted overlap-score maximum
+- Hartke–Stolee–West–Yancey matching-excess conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/hartke-stolee-west-yancey-matching-excess/` - Complete: actual simple-graph matching and edge counts, all-input witnesses, all-order extrema and stabilizati
+- Chappelon–Ramírez Alfonsín–Stamate’s leaf-type conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/chappelon-ramirez-stamate-leaf-type/` - Complete: original Conjecture 4.4 refuted
+- Feldheim–Feldheim’s weighted tail conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/feldheim-weighted-tail/` - Complete original Conjecture 1 for all positive weights and arbitrary distinct laws, including atoms; norm and
+- Hajdu–Sárközy’s shifted-power perturbation conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/hajdu-sarkozy-shifted-power-perturbations/` - Complete for the original conjecture and general-shift symmetric-difference theorem; stronger retained-limsup 
+- Hajdu–Sárközy’s shifted-product total primitivity conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/hajdu-sarkozy-shifted-products/` - Complete original conjecture, summable-family theorem and two-variable perturbations; more-than-two-variable s
+- Dougherty-Bliss–Galván–Polley–Shuster’s separable derangement conjecture [Matching excess and plane-partition polynomials] - Lean partial - `results/separable-derangements-limit/` - Partial Lean
+- Dougherty-Bliss–Galván–Polley–Shuster’s separable derangement asymptotic conjecture [Matching excess and plane-partition polynomials] - written only - `results/separable-derangements-asymptotic/` - Not formalized
+- Fan’s interval Riesz capacity-ratio conjecture [Matching excess and plane-partition polynomials] - written only - `results/fan-interval-riesz-capacity/` - Not formalized
+- Kovalev’s square-root Taylor-section zero-free conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/kovalev-zero-free/` - Complete original square-root conjecture for all lengths and degrees; fractional-exponent and segment suppleme
+- Dilcher–Kidwai–Tomkins’s Stern-polynomial conjecture [Matching excess and plane-partition polynomials] - Lean partial - `results/stern-half-plane/` - Partial: exact recurrence, conditional continuant criterion and positive real axis
+- Chern–Fu–Lin’s joint Eulerian equidistribution conjecture [Matching excess and plane-partition polynomials] - written only - `results/chern-fu-lin-joint-eulerian/` - Not formalized
+- Dukes’s revstack interlacing conjecture [Matching excess and plane-partition polynomials] - written only - `results/dukes-revstack/` - Not formalized
+- González D’León–Wachs’s complete-graph specialization question [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/gonzalez-dleon-wachs-complete-graphs/` - Complete Lean
+- Almirón–Moyano-Fernández’s Wilf-module questions [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/almiron-moyano-wilf-module-questions/` - Complete Lean
+- Defant–Engen–Miller’s Lassalle refinement conjecture [Matching excess and plane-partition polynomials] - Lean partial - `results/defant-engen-miller-lassalle/` - Partial: all rows conditional on two source bridges
+- Sagan–Wilson’s plactic centralizer conjecture [Matching excess and plane-partition polynomials] - written only - `results/sagan-wilson-plactic/` - Not formalized
+- Sagan–Wilson’s plactic coefficient-mode conjecture [Matching excess and plane-partition polynomials] - written only - `results/sagan-wilson-plactic-mode/` - Not formalized
+- Juhnke’s arbitrary-step lattice-path log-concavity conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/juhnke-lattice-paths/` - Complete Lean proof for all dimensions and step counts
+- Athanasiadis–Chapoton’s polar preorder duality conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/athanasiadis-chapoton-polar-duality/` - Complete for Conjecture 6.2
+- Athanasiadis–Chapoton’s q-zeta reciprocity conjecture [Matching excess and plane-partition polynomials] - written only - `results/athanasiadis-chapoton-q-zeta/` - Not formalized
+- Athanasiadis–Chapoton’s transmuted M-triangle duality conjecture [Matching excess and plane-partition polynomials] - written only - `results/athanasiadis-chapoton-transmuted-m/` - Not formalized
+- Gawron–Miska–Ulas’s Thue–Morse valuation conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/gawron-miska-ulas-thue-morse-valuation/` - Complete
+- Sobolewski–Ulas’s binary-partition exception regularity conjecture [Matching excess and plane-partition polynomials] - Lean partial - `results/sobolewski-ulas-exception-regularity/` - Partial: power-of-two obstruction and exact binary-partition congruences
+- Gawron–Ulas’s partition-sign nonperiodicity conjecture [Matching excess and plane-partition polynomials] - written only - `results/gawron-ulas-partition-signs/` - Not formalized
+- Steinerberger’s greedy-energy Fourier conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/steinerberger-greedy-fourier/` - Complete: original conjecture; stronger supplements remain unformalized
+- Ćurgus–Mascioni’s Fréchet root-matching extremizer question [Matching excess and plane-partition polynomials] - Lean partial - `results/curgus-mascioni-frechet/` - Partial: nonuniqueness counterexample
+- Chern–Fu–Lin’s three-statistic equidistribution conjecture [Matching excess and plane-partition polynomials] - written only - `results/chern-fu-lin-three-statistic/` - Not formalized
+- Gawron–Miska–Ulas’s Thue–Morse sign-density conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/gawron-miska-ulas-thue-morse-sign-density/` - Complete disproof of Conjecture 5.8 for the original infinite-product coefficients, including both finite-pref
+- Fan–Tringali’s power-monoid length-set conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/fan-tringali-power-monoid-lengths/` - Complete for the original 2018 conjecture and reduced natural-number system. Survey irreducibles, multipliciti
+- Sokal’s Apéry moment threshold [Matching excess and plane-partition polynomials] - Lean partial - `results/sokal-apery-moment-threshold/` - Partial
+- Gessel–Zhuang’s pinnacle-set gamma-positivity conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/gessel-zhuang-pinnacle-gamma/` - Complete: literal permutation sums for every positive size and pinnacle set, with the stated inverse-descent w
+- Burstein’s descent-top shape-Wilf conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/burstein-descent-top-shape-wilf/` - Complete disproof of Conjectures 16 and 17; every-suffix family is written only
+- Burstein’s A218225 enumeration conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/burstein-a218225-enumeration/` - Complete for both outstanding avoidance classes
+- Steinerberger’s quantitative Feldheim-tail conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/steinerberger-feldheim-tail/` - Complete for both original conjectures: the actual law, product events, expectation, median, and failure at ev
+- Benfield–Lippard’s stable Waring-gap symmetry conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/benfield-lippard-waring-gap-symmetry/` - Complete for original Conjecture 10.1 and intended finite-domain 10.2. Strict compilation, all-owned axiom aud
+- Benfield–Lippard’s stable Waring-gap parity conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/benfield-lippard-waring-gap-parity/` - Complete for Conjecture 10.4; stronger congruences are written only
+- Heim–Neuhauser–Tröger’s plane-partition polynomial Turán conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/heim-neuhauser-troeger-plane-partition-turan/` - Complete
+- Heim–Neuhauser’s plane-partition polynomization conjecture [Matching excess and plane-partition polynomials] - Lean (complete per repo) - `results/heim-neuhauser-plane-partition-polynomization/` - Complete
+- Heim–Neuhauser’s ordinary D’Arcais root conjecture [Matching excess and plane-partition polynomials] - Lean partial - `results/heim-neuhauser-ordinary-darcais-root/` - Partial
+- Charlton et al.’s distinct D’Arcais zeros question [Matching excess and plane-partition polynomials] - written only - `results/darcais-distinct-right-half-plane-zeros/` - Not formalized
+- Bétermin’s FCC/BCC cold-spot conjecture [Gaussian lattice sums] - written only - `results/betermin-fcc-bcc-cold-spots/` - Not formalized
+- Meylender–Thalmaier’s truncated-square conjecture [Gaussian lattice sums] - Lean partial - `results/meylender-thalmaier-truncated-square/` - Partial
+- Rossi’s permutohedron characteristic-polynomial conjecture [Gaussian lattice sums] - Lean (complete per repo) - `results/rossi-permutohedron-roots/` - Complete for Conjecture 6.16
+- Ferroni–Higashitani’s first-three interior Ehrhart question [Gaussian lattice sums] - Lean (complete per repo) - `results/ferroni-higashitani-early-interior-ehrhart/` - Complete for Question 5.12(a)
+- Ferroni–Morales–Panova’s cylindric Ehrhart-positivity conjecture [Gaussian lattice sums] - Lean partial - `results/fmp-cylindric/` - Partial: both counterexample conventions
+- Braun–Bruegge’s bicyclic facet conjectures [Gaussian lattice sums] - Lean (complete per repo) - `results/braun-bruegge-bicyclic-facets/` - Complete Lean verification of both maxima and the theta equality cases
+- Braun–Bruegge’s minimum facet conjecture [Gaussian lattice sums] - Lean (complete per repo) - `results/braun-bruegge-minimum-facets/` - Complete for both global minimum clauses
+- Cyrusian–Kaplan’s ordinarization quasipolynomial question [Gaussian lattice sums] - Lean (complete per repo) - `results/cyrusian-kaplan-ordinarization/` - Complete for both written conclusions
+- Coulangeon–Lazzarini’s two-shell conjecture [Lattice designs] - Lean (complete per repo) - `results/coulangeon-lazzarini-two-shells/` - Complete Lean for Conjecture 21 and the elementary arbitrary-delay family
+- Alexandersson’s parking-function excedance conjecture [Parking-function statistics] - Lean (complete per repo) - `results/alexandersson-parking-excedance/` - Complete
+- Pantone–Bóna’s asymptotic conjecture [Long monotone subsequences] - written only - `results/pantone-bona-asymptotic/` - Not formalized
+- Pantone–Bóna’s second-largest-terminal asymptotic conjecture [Long monotone subsequences] - Lean partial - `results/pantone-bona-second-largest-terminal/` - Partial
+- Pantone–Bóna’s third-largest-terminal asymptotic conjecture [Long monotone subsequences] - written only - `results/pantone-bona-third-largest-terminal/` - Not formalized
+- Pantone–Bóna’s second-smallest-terminal asymptotic conjecture [Long monotone subsequences] - written only - `results/pantone-bona-second-smallest-terminal/` - Not formalized
+- Shumyatsky’s conjugate prime-spectrum conjecture [Finite group generation] - Lean partial - `results/shumyatsky-conjugate-prime-spectrum/` - Partial Lean
+- McNamara–Steingrímsson’s interval rank-unimodality conjecture [Restricted permutations] - Lean (complete per repo) - `results/mcnamara-steingrimsson-rank-unimodality/` - Complete: exact literal rank dip and disproof
+- Kauers–Koutschan recurrence conjecture [Restricted permutations] - Lean (complete per repo) - `results/kauers-koutschan-recurrence/` - Complete Lean for both operators
+- Johnson's conjecture [Pfaffian matching bounds] - Lean (complete per repo) - `results/johnson-pfaffian/` - Complete Lean proof of the full all-order, every-matching conjecture and the general circular interval-product
+- Brown–Mol's conjecture [Subtree roots] - Lean (complete per repo) - `results/brown-mol/` - Complete: Lean verifies both the explicit 1001-vertex counterexample and the all-sufficiently-large diameter-f
+- Kovalev's conjecture [Matrix Hardy norms] - written only - `results/kovalev-hardy-duality/` - Not formalized. Analytic proof with supplementary exact arithmetic.
+- Roos–Seiringer's conjecture [Radial kernels in BCS theory] - written only - `results/roos-seiringer-kernel/` - Not formalized. Essential computer-assisted proof.
+- Dospolova–Germanskov–Zaporozhets's conjecture [Intrinsic-volume sequence realizability] - Lean partial - `results/dospolova-germanskov-zaporozhets/` - Partial: factorial sequence equalities and abstract Gaussian strict-mean obstruction checked; intrinsic-volume
+- Chen–Khare–Sahi's conjecture [Macdonald polynomial semirings] - Lean partial - `results/chen-khare-sahi-macdonald/` - Partial: the fixed q=1/10, t=9/10 stable Hall family, literal specialization and full semiring witness passed 
+- Ferreira–Simon's conjecture [Beta-prime self-convolution] - written only - `results/ferreira-simon-beta-prime/` - Not formalized
+- Lyon's conjecture [Gamma medians] - written only - `results/lyon-gamma-median/` - Not formalized
+- Han–Sabag–Kostina–Hassibi's conjecture [Lyapunov matrix optimization] - Lean (complete per repo) - `results/han-sabag-kostina-hassibi/` - Complete source formalization; merged-package gate pending
+- Ferroni–Pagaria–Vecchi’s type B real-rootedness conjecture [Moduli-space Poincaré polynomials] - written only - `results/ferroni-pagaria-vecchi-type-b/` - Not formalized
+- Nuttall's conjecture [Zeros of polynomial transforms] - Lean (complete per repo) - `results/nuttall-cumulants/` - Complete for Conjecture 1, including the least cumulant order
+- Coffey–Smith conjecture [Zeros of polynomial transforms] - written only - `results/coffey-smith/` - Not formalized
+- Chaudhary–Khmiri–Mazhouda conjecture [Zeros of polynomial transforms] - written only - `results/chaudhary-khmiri-mazhouda/` - Not formalized
+- Merlini–Sala–Sala conjecture [Zeros of polynomial transforms] - written only - `results/merlini-sala-sala/` - Not formalized
+- Wang–Yang's conjecture [Zeros of polynomial transforms] - written only - `results/wang-yang/` - Not formalized
+- Csordas–Vishnyakova conjecture [Zeros of polynomial transforms] - Lean (complete per repo) - `results/csordas-vishnyakova/` - Complete for Conjecture 3.6: actual all-order test coefficients and exclusion from the Laguerre–Pólya class
+- Cardon–Forgács–Piotrowski–Sorensen–White conjecture [Zeros of polynomial transforms] - Lean (complete per repo) - `results/cardon-zero-sector/` - Complete for Question 6.1 and the uniform small-damping obstruction
+- Wagner's Laguerre-operator conjecture [Zeros of polynomial transforms] - Lean (complete per repo) - `results/wagner-laguerre-operator/` - Complete for original Conjecture 4.3 using the actual positive shifted class
+- Vishnyakova's conjecture [Zeros of polynomial transforms] - Lean (complete per repo) - `results/vishnyakova-root-radius/` - Complete: Lean proves the original sampled-sequence theorem and the weighted transform-class theorem for every
+- López Pouso–Segura's node conjecture [Gauss–Legendre quadrature] - Lean partial - `results/lopez-pouso-segura-quadrature/` - Partial: Lean checks the exact two-node counterexample; the eventual-even-degree strengthening and combined ga
+- López Pouso–Segura's conjectures [Bessel zeros and weights] - Lean partial - `results/lopez-pouso-segura-bessel/` - Partial: Lean proves the signs and strict monotonicity of all three sequences from explicit convexity, antider
+- Simon's stable-infimum conjecture [Mittag–Leffler functions and stochastic ordering] - written only - `results/simon-stable-infimum/` - Not formalized
+- Ferreira–Simon's stochastic-order conjecture [Mittag–Leffler functions and stochastic ordering] - written only - `results/ferreira-simon-stochastic/` - Not formalized
+- Ferreira–Simon's diagonal Mittag–Leffler conjecture [Mittag–Leffler functions and stochastic ordering] - Lean partial - `results/ferreira-simon-diagonal/` - Partial
+- McCrea's conjecture [Partition statistics] - written only - `results/mccrea-single-crossover/` - Not formalized
+- Pula–Song–Wanless conjecture [Permanent minima] - written only - `results/pula-song-wanless/` - Not formalized
+- Malek's conjecture [Subpermanent transform inequalities] - written only - `results/malek-subpermanent/` - Not formalized
+- Perron root of permanental compounds [Permanental compounds] - written only - `results/perron-root-permanental-compounds/` - Not formalized
+- Rowland–Sistos Barrón conjecture [Polynomial identities and positivity] - Lean (complete per repo) - `results/rowland-sistos-barron/` - Complete: actual minimum tail-recurrence ranks, the formula for every M≥49, and failure of every eventual quas
+- Caiolo–Ferroni–Hoster conjecture [Polynomial identities and positivity] - Lean (complete per repo) - `results/caiolo-ferroni-hoster/` - Complete Lean
+- Higashitani–Kummer–Michałek conjecture [Polynomial identities and positivity] - Lean (complete per repo) - `results/hkm-ehrhart/` - Complete for Conjecture 4.10 via the off-line root; independent interlacing certificates remain written
+- Novelli–Thibon's conjecture [Polynomial identities and positivity] - Lean partial - `results/novelli-thibon/` - Partial: source monomial product and exact hook coefficients from the stable ordinary expansion
+- Chen–Kitaev–Zhang's record conjectures [Polynomial identities and positivity] - Lean (complete per repo) - `results/chen-kitaev-zhang-records/` - Complete Lean: actual permutation classes, all record statistics, the credited all-index tail and singleton ca
+- Zhu's generalized Jacobi–Stirling conjecture [Polynomial identities and positivity] - Lean (complete per repo) - `results/zhu-jacobi-stirling/` - Complete source formalization; merged-package gate pending
+- Baricz–Pogány's asymptotic-coefficient positivity conjecture [Polynomial identities and positivity] - Lean (complete per repo) - `results/baricz-pogany-coefficients/` - Complete: full coefficient theorem, explicit lower bound, and uniqueness/positivity for the source recurrence;
+- Ferreira–Simon's Wright log-concavity conjecture [Polynomial identities and positivity] - written only - `results/ferreira-simon-wright/` - Complete original-conjecture disproof; the additional interior families are not formalized
+- Karp–Vishnyakova–Zhang's gamma-quotient conjecture [Polynomial identities and positivity] - Lean (complete per repo) - `results/kvz-gamma-quotient/` - Complete
+- Alexandersson's Fuss–Catalan conjecture [Polynomial identities and positivity] - Lean (complete per repo) - `results/alexandersson-fuss-catalan/` - Complete: Lean verifies the literal path enumerator, closed form, real-rootedness, exact simple-root count and
+- Sagan–Swanson conjecture [Polynomial identities and positivity] - written only - `results/sagan-swanson-normality/` - Not formalized
+- Bernardi–Morales's delta-process conjecture [Polynomial identities and positivity] - Lean (complete per repo) - `results/bernardi-morales-delta/` - Complete: literal cyclic delta map, all-parameter tree counts, full-subset interval-event matrices and the sou
+- Gilmore's crossing–nesting conjecture [Polynomial identities and positivity] - Lean (complete per repo) - `results/gilmore-crossing-nesting/` - Complete: literal stabilized matrix product, exhaustive perfect-matching bijection, and crossing/nesting/align
+- Chow's conjecture [Polynomial identities and positivity] - Lean (complete per repo) - `results/chow-conjecture/` - Complete: Lean proves consecutive interlacing for every rank at least two and strict interlacing from rank thr
+- Generalized Bulgarian solitaire limit shapes [Solitaire and combinatorial games] - Lean (complete per repo) - `results/l-solitaire-limit-shapes/` - ☑
+- Pham's Bulgarian solitaire denominator degree [Solitaire and combinatorial games] - Lean (complete per repo) - `results/pham-denominator-degree/` - ☑
+- Spivey's three-player War [Solitaire and combinatorial games] - Lean (complete per repo) - `results/spivey-multiplayer-war/PROOF.md` - ☑
+- CUT Family B: nim-sequence threshold [Solitaire and combinatorial games] - Lean (complete per repo) - `results/cut-family-b/PROOF.md` - ☑
+- CUT arithmetic periodicity with a preperiod [Solitaire and combinatorial games] - Lean (complete per repo) - `results/cut-arithmetic-periodicity/PROOF.md` - ☑
+- Mazák–Zrubák conjecture on complete graphs minus an edge [Graph theory and discrete geometry] - Lean partial - `results/circular-index-complete-minus-edge/` - Partial (actual Steps 1–4 and all assertions of Lemma 5)
+- Circular chromatic index of complete graphs minus a few edges [Graph theory and discrete geometry] - Lean partial - `results/circular-index-complete-minus-edges/` - Partial
+- Németh–Seberry–Shu conjecture [Graph theory and discrete geometry] - Lean partial - `results/nemeth-seberry-shu/` - Partial: Fourier support, spectral identities, congruence and conditional counting
+- Sonntag–Teichert conjecture [Graph theory and discrete geometry] - Lean (complete per repo) - `results/sonntag-teichert/` - Complete source formalization; merged-package gate pending.
+- Horňák–Woźniak conjecture [Graph theory and discrete geometry] - Lean partial - `results/hornak-wozniak/` - Partial Lean: tripods with short arm at most two under source tests, and general large-part and short-arm-subs
+- Graffiti.pc Conjecture 318 [Graph theory and discrete geometry] - Lean (complete per repo) - `results/graffiti-pc-318/` - ☑
+- Li's chromatic symmetric function signs [Graph theory and discrete geometry] - Lean (complete per repo) - `results/li-coefficient-sign/` - ☑
+- Circulants with circular chromatic index in the upper half [Graph theory and discrete geometry] - Lean (complete per repo) - `results/circular-index-upper-half-circulants/` - Partial overall: Theorems 1–2 and the C31/C33 regular examples have complete Lean proofs of regularity, vertex
+- Gyárfás’s planar degree-repetition problem [Graph theory and discrete geometry] - written only - `results/gyarfas-planar-degree-repetition/` - Not formalized
+- Erdős Problem 607: line-size sets [Graph theory and discrete geometry] - Lean (complete per repo) - `results/erdos-607-line-sizes/PROOF.md` - Complete
+- Distance graphs with three missing differences [Graph theory and discrete geometry] - Lean (complete per repo) - `results/distance-graph-densities/PROOF.md` - ☑
+- Oravcová–Soták conjecture for five to eight distances [Graph theory and discrete geometry] - Lean (complete per repo) - `results/oravcova-sotak/` - Partial: actual integer distance graphs, all literal certificates and infinite coloring families, and Theorem 
+- Johnson–Kaya–Matzke conjecture on Babai spectra of paths [Graph theory and discrete geometry] - Lean (complete per repo) - `results/babai-spectrum-paths/` - Complete: actual finite-graph chromatic number, both bounds, and construction of every spectrum value; strict 
+- Currie's conjecture on complexity 2n+1 and critical exponent [Combinatorics on words] - written only - `results/currie-conjecture-19/` - Not formalized
+- Batista's Egyptian fractions [Number theory, packing and partitions] - Lean (complete per repo) - `results/batista-egyptian-fractions/PROOF.md` - ☑
+- Rectangle partition asymptotics [Number theory, packing and partitions] - Lean (complete per repo) - `results/rectangle-partition-asymptotics/PROOF.md` - ☑
+- Two-difference Motzkin density [Number theory, packing and partitions] - Lean (complete per repo) - `results/two-difference-motzkin/PROOF.md` - Complete
+- Liu–Zhu packing and Natalchenko–Sagdeev covering [Number theory, packing and partitions] - Lean (complete per repo) - `results/symmetric-four-point-density/PROOF.md` - ☑
+- Natalchenko–Sagdeev nonmixed-gap packing [Number theory, packing and partitions] - Lean (complete per repo) - `results/nonmixed-gap-packing/PROOF.md` - ☑
+- Haralambis’s three-difference conjecture [Number theory, packing and partitions] - Lean (complete per repo) - `results/haralambis-three-differences/PROOF.md` - ☑
+- Hegyvári’s conjecture [Number theory, packing and partitions] - written only - `results/hegyvari-floor-doubling/` - Not formalized
+- Ma–Tang’s random subset-sum threshold conjecture [Number theory, packing and partitions] - written only - `results/ma-tang-random-subset-sums/` - Complete for original real-log limsup, third-log bound and mixed-order convergence; separate bounded-error sup
+- Féray’s conjugate-power word-measure conjectures [Number theory, packing and partitions] - written only - `results/feray-conjugate-power-word/` - Not formalized
+- Xu–Zhou’s diameter–Laplacian conjecture [Number theory, packing and partitions] - Lean (complete per repo) - `results/xu-zhou-laplacian-diameter/` - Complete for Conjecture 1.1 and unbounded sharpness
+- Han’s simultaneous spherical-harmonic saturation question [Number theory, packing and partitions] - written only - `results/han-spherical-harmonic-saturation/` - Not formalized
+- Steinerberger’s small-average eigenfunction norm question [Number theory, packing and partitions] - written only - `results/steinerberger-small-average-eigenfunction-norms/` - Not formalized
+- Pomerance–Sárközy’s fluctuation conjecture [Number theory, packing and partitions] - Lean partial - `results/pomerance-sarkozy-fluctuations/` - Partial: exact count, prime tails, finite-window total variation, distribution comparisons, the joint arithmet
+- Ulas’s disjoint-block square-product conjecture [Number theory, packing and partitions] - Lean (complete per repo) - `results/ulas-disjoint-square-blocks/` - Complete for the common-length theorem at every positive length
+- Revised Tan–Zhou conjecture [Number theory, packing and partitions] - Lean (complete per repo) - `results/revised-tan-zhou-luroth/` - Complete for every positive nonincreasing approximation function bounded by one
+- Simmons–Weiss’s Hausdorff-measure question [Number theory, packing and partitions] - written only - `results/simmons-weiss-hausdorff/` - Not formalized
+- Gravgaard–Lee’s mixed Lüroth sumset conjecture [Number theory, packing and partitions] - Lean (complete per repo) - `results/gravgaard-lee-mixed-luroth/` - Complete Lean: the ordinary interval and all real residues modulo one
+- Gravgaard–Lee’s large-digit Lüroth sumset conjecture [Number theory, packing and partitions] - Lean (complete per repo) - `results/gravgaard-lee-large-luroth/` - Complete Lean: the all-threshold interval and strictly increasing interleaved expansions
+- Gravgaard–Lee’s Lüroth diameter question [Number theory, packing and partitions] - Lean (complete per repo) - `results/gravgaard-lee-diameter-condition/` - Complete for the exact positive sum hull and modulo-one threshold
+- Gravgaard–Lee’s mixed upper/lower Lüroth conjecture [Number theory, packing and partitions] - Lean (complete per repo) - `results/gravgaard-lee-upper-lower-luroth/` - Complete: exact interval and original modulo-one theorem for every k≥2, with actual infinite expansions; all 1
+- Loneliness on a fixed relation hyperplane [Lonely runners] - Lean (complete per repo) - `results/loneliness-on-a-hyperplane/` - Complete
+- Zhang's Question 8.4: deletion values of the lonely runner [Lonely runners] - Lean (complete per repo) - `results/zhang-deletion-values/` - Complete: Lean checks the strict inequality and the full exact-value formula; seven-module kernel replay passe
+- Five-speed Loneliness Spectrum Conjecture [Lonely runners] - Lean partial - `results/five-speed-spectrum/PROOF.md` - Partial
+- Eight-speed Loneliness Spectrum Conjecture [Lonely runners] - Lean partial - `results/eight-speed-spectrum/` - ◐
+- Seven-speed Amended Loneliness Spectrum Conjecture [Lonely runners] - Lean partial - `results/seven-speed-spectrum/` - ◐
+- Six-speed Loneliness Spectrum Conjecture [Lonely runners] - Lean partial - `results/six-speed-spectrum/PROOF.md` - Partial
+- Tight six-speed sets and seven-coordinate critical subtori [Lonely runners] - Lean partial - `results/tight-six-speeds/PROOF.md` - ◐
+- Eight lonely runners, all equality cases [Lonely runners] - Lean partial - `results/tight-seven-speeds/PROOF.md` - ◐
+- Nine lonely runners, unique equality case [Lonely runners] - Lean partial - `results/tight-eight-speeds/PROOF.md` - ◐
+- Eleven through fourteen lonely runners, all equality cases [Lonely runners] - Lean partial - `results/tight-eleven-to-fourteen/` - Partial; conditional norm reduction checked
+- Ten lonely runners, unique equality case [Lonely runners] - Lean partial - `results/tight-nine-speeds/PROOF.md` - Partial; conditional norm reduction checked
