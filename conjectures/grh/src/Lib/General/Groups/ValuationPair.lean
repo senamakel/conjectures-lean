@@ -151,7 +151,7 @@ lemma mem_intGL {g} : g ∈ intGL n O ↔ (∀ i j, g i j ∈ O) ∧ ∀ i j, g�
 /-- For a ring homomorphism f: O → S, the homomorphism GL_n(O) → GL_n(S) applying f to each
 entry. -/
 def intGL.map (f : O →+* S) : intGL n O →* GL n S := (GeneralLinearGroup.map f).comp (.toHomUnits
-  (by use! fun k ↦ of (⟨_, (mem_intGL.1 k.2).1 · ·⟩) <;> aesop (add simp mul_apply)))
+  (by use! fun k ↦ of (⟨_, (mem_intGL.1 k.2).1 · ·⟩) <;> aesop (add simp Matrix.mul_apply)))
 
 variable {f : O →+* S} {k : intGL n O}
 
