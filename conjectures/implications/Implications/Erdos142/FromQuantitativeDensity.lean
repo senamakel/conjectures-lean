@@ -48,11 +48,6 @@ theorem apFree_of_isAPOfLengthFree {S : Set ℕ} {k : ℕ} (hk : 2 ≤ k)
     · ext x
       simp only [t, f, Finset.coe_image, Finset.coe_range, Set.mem_image, Set.mem_Iio,
         Set.mem_setOf_eq, smul_eq_mul, Nat.cast_lt, exists_prop]
-      constructor
-      · rintro ⟨i, hi, rfl⟩
-        exact ⟨i, hi, by ring⟩
-      · rintro ⟨i, hi, rfl⟩
-        exact ⟨i, hi, by ring⟩
   have := hS t ht hAP
   have : k ≤ 1 := by exact_mod_cast this
   omega
@@ -70,9 +65,11 @@ theorem maxCard_le_extremalNumber {k l : ℕ} (hk : 2 ≤ k) (hkl : k ≤ l) (N 
   apply csSup_le'
   rintro _ ⟨S, hSN, hS, rfl⟩
   unfold OAI.extremalNumber
-  convert Finset.le_sup (f := Finset.card)
-    (Finset.mem_filter.mpr ⟨Finset.mem_powerset.mpr hSN,
-      apFree_of_le (apFree_of_isAPOfLengthFree hk hS) hkl⟩)
+  have hmem : S ∈ ((Finset.Icc 1 N).powerset).filter
+      (fun S : Finset ℕ ↦ OAI.APFree (S : Set ℕ) l) :=
+    Finset.mem_filter.mpr ⟨Finset.mem_powerset.mpr hSN,
+      apFree_of_le (apFree_of_isAPOfLengthFree hk hS) hkl⟩
+  convert Finset.le_sup (f := Finset.card) hmem
 
 /-- `log log N → ∞` along the naturals. -/
 theorem tendsto_loglog : Tendsto (fun N : ℕ => Real.log (Real.log N)) atTop atTop :=
