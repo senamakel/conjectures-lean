@@ -77,7 +77,7 @@ theorem PlogP_ge (X j i : ℕ) (hX : 2 ^ j ≤ X) (h7 : 7 ≤ X) (hj : 0 < j) (h
     have h2 : π 2 = 1 := by decide
     omega
   set P : ℝ := (π X : ℝ) with hPdef
-  have hP1' : (1 : ℝ) ≤ P := by exact_mod_cast hP1
+  have hP1' : (1 : ℝ) ≤ P := by rw [hPdef]; exact_mod_cast hP1
   have hPpos : 0 < P := by linarith
   have hlogP : 0 ≤ Real.log P := Real.log_nonneg hP1'
   -- Q = X log 2 / L ≤ P
@@ -124,7 +124,7 @@ theorem PlogP_ge (X j i : ℕ) (hX : 2 ^ j ≤ X) (h7 : 7 ≤ X) (hj : 0 < j) (h
 
 /-- Conjecture 2.7(i) for `kn ≥ 2^j` and `n ≥ s`, given the numerical condition of region
 `(j, s, i)`. The count of integers prime to 6 gives `kΔ ≤ kn/3 + 2k`. -/
-theorem sunA_region (n k j s i : ℕ) (hk1 : 1 ≤ k) (hkn : k ≤ n) (hX : 2 ^ j ≤ k * n)
+theorem sunA_region (n k j s i : ℕ) (hk1 : 1 ≤ k) (hX : 2 ^ j ≤ k * n)
     (hj : 3 ≤ j) (hs : s ≤ n) (hs0 : 0 < s) (hi : 1 ≤ i)
     (hnum : (1 : ℝ) / 3 + 2 / s
       < Real.log 2 * (1 - (1 / 2 : ℝ) ^ i) - (i * Real.log 2 - 1 + 4428 / 10000) / j) :
