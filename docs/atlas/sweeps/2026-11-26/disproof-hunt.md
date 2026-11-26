@@ -223,7 +223,7 @@ Edge lists are in the session file `hunt/runs/hits.jsonl`.
 | Cazenave Conj. 6(i), 6(iii), 6(iv) a and b | 6(iii) tight on paths | as above, plus exhaustive n = 10 for 6(iii) (−0.50) | best −3.2·10⁻², −2.6·10⁻³, −6.8·10⁻³, −3.2·10⁻³ | — |
 | Cazenave Conj. 7 `R ≥ rad + √2 − 3/2` | the literature's hard one (Caporossi–Hansen) | annealing as above | equality on even paths only | — |
 | Cazenave Conj. 4, 5, 6(ii) | — | annealing negative | proved since by others: C4 and C5 in `trureturing` (`CazenaveRandicSpectralBound`, `CazenaveLaplacianRankBound`), C6(ii) by Kramer (Hexagon 2611.00232) *(not audited)* | — |
-| Corpus open and conditional items | see §5 | see §5 | see §5 | see §5 |
+| Corpus `ouverte` and `conditionnelle` rows (17,948) | no optimisation in the authors' testing | pool of 10,589 graphs with n ≤ 40, then 2 × 1,200-step anneal per row | 6 violated (§5); the other 17,942 found nothing at this depth | 3.2 h |
 
 ## 7. What I would try next with more budget
 
