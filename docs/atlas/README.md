@@ -39,6 +39,7 @@ each deduction and, for edges we rejected, the reason.
 | Date | Lanes | Status |
 | :--- | :--- | :--- |
 | 2026-11-26 | [formal-conjectures conditional scan](sweeps/2026-11-26/fc-scan.md); [solved-conjectures newsfeed](sweeps/2026-11-26/newsfeed.md) (with an [inventory of 1337isnot1337/solved-conjectures](sweeps/2026-11-26/newsfeed-1337-inventory.md)); [Conjecture Atlas](sweeps/2026-11-26/atlas.md); [reuse of our theorems](sweeps/2026-11-26/toolkit-reuse.md); [implications between open conjectures](sweeps/2026-11-26/implications.md); [Erdős status feed](sweeps/2026-11-26/erdos-feed.md); [lemma mining of big proofs](sweeps/2026-11-26/lemma-mining.md) (inventories: [external](sweeps/2026-11-26/lemma-mining-external-inventory.md), [local](sweeps/2026-11-26/lemma-mining-local-inventory.md)) | 268 edges |
+| 2026-11-26 | refutation lane: [literature](sweeps/2026-11-26/disproof-literature.md); [Erdős formal-conjectures](sweeps/2026-11-26/disproof-erdos.md); [other formal-conjectures directories](sweeps/2026-11-26/disproof-fc-other.md). The two formal-conjectures lanes found no unclaimed cheap disproof (Erdős: 850 open declarations read; other directories: 1,102), and the literature lane's candidates are tracked in AGENTS.md. | 37 edges |
 
 The sweep reports are research notes: nothing in them was built, and claims marked
 *(unverified)* were not checked against a primary source. An edge is confirmed only when its
