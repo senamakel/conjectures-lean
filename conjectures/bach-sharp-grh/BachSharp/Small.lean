@@ -34,8 +34,13 @@ theorem checkSmall_sound {lo n : ℕ} (h : checkSmall lo n = true) (q : ℕ) [Ne
   push_cast at hc
   nlinarith
 
-lemma closure_three : Subgroup.closure (Ankeny.Checker.smallUnits 3 2) = ⊤ :=
-  Ankeny.Checker.closure_eq_top_of_checkGen 3 2 (by decide +kernel)
+lemma closure_three : Subgroup.closure (Ankeny.Checker.smallUnits 3 2) = ⊤ := by
+  rw [eq_top_iff]
+  intro u _
+  apply Subgroup.subset_closure
+  show (u : ZMod 3).val ≤ 2
+  have := ZMod.val_lt (u : ZMod 3)
+  omega
 
 /-- **The sharp bound for every modulus `q < 2^17`** (tier D, no GRH). -/
 theorem sharp_small (q : ℕ) [NeZero q] (hq : q < 2 ^ 17) (H : Subgroup (ZMod q)ˣ)
