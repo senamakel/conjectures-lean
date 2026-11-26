@@ -219,18 +219,21 @@ theorem oppermann_of_firoozbakht (h : Firoozbakht.FiroozbakhtConjecture) :
         w _ _ 101 (by norm_num) (by norm_num) (by norm_num)⟩
     · exact ⟨w _ _ 113 (by norm_num) (by norm_num) (by norm_num),
         w _ _ 127 (by norm_num) (by norm_num) (by norm_num)⟩
-  · have hxx : 144 ≤ x * x := Nat.mul_le_mul hbig hbig
-    have e1 : x * (x - 1) + x = x * x := by
+  · obtain ⟨A, hA⟩ : ∃ A, A = x * x := ⟨_, rfl⟩
+    have hxA : 12 * x ≤ A := hA ▸ Nat.mul_le_mul_right x hbig
+    have e1 : x * (x - 1) + x = A := by
       obtain ⟨y, rfl⟩ : ∃ y, x = y + 1 := ⟨x - 1, by omega⟩
-      rw [Nat.add_sub_cancel]; ring
-    have e2 : x ^ 2 = x * x := sq x
-    have e3 : x * (x + 1) = x * x + x := by ring
+      rw [hA, Nat.add_sub_cancel]; ring
+    have e2 : x ^ 2 = A := by rw [hA, sq]
+    have e3 : x * (x + 1) = A + x := by rw [hA]; ring
+    rw [e2, e3]
+    generalize hB : x * (x - 1) = B at e1 ⊢
     constructor
-    · obtain ⟨q, hq, h1, h2⟩ := exists_prime_sq_lt_of_firoozbakht h (m := x * (x - 1)) (by omega)
-      have := lt_add_of_sq_lt h1 h2 (by omega)
+    · obtain ⟨q, hq, h1, h2⟩ := exists_prime_sq_lt_of_firoozbakht h (m := B) (by omega)
+      have := lt_add_of_sq_lt (x := x) h1 h2 (by rw [← hA]; omega)
       exact ⟨q, Finset.mem_Ioo.2 ⟨h1, by omega⟩, hq⟩
-    · obtain ⟨q, hq, h1, h2⟩ := exists_prime_sq_lt_of_firoozbakht h (m := x ^ 2) (by omega)
-      have := lt_add_of_sq_lt h1 h2 (by omega)
+    · obtain ⟨q, hq, h1, h2⟩ := exists_prime_sq_lt_of_firoozbakht h (m := A) (by omega)
+      have := lt_add_of_sq_lt (x := x) h1 h2 (by rw [← hA])
       exact ⟨q, Finset.mem_Ioo.2 ⟨h1, by omega⟩, hq⟩
 
 /-- **Firoozbakht's conjecture implies Andrica's conjecture** (through Oppermann's). -/
