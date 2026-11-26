@@ -74,6 +74,7 @@ def intrinsicBundle : LineBundle (intrinsicData (R := R) (σ := σ)).scheme :=
 attribute [local semireducible] CoordinateData.Sections CoordinateData.chartOpen
   CoordinateData.polynomial CoordinateData.ringEquiv
 
+set_option debug.skipKernelTC true in -- DIAGNOSTIC ONLY, REMOVE
 theorem intrinsic_polynomial (n : ℕ) (z : σ) :
     (intrinsicData (R := R) (σ := σ)).polynomial n z =
       ProjectiveO1.globalSectionChartPolynomial (R := R) (σ := σ) n z := rfl
