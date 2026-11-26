@@ -114,6 +114,12 @@ Policy: proofs only; statement re-spelling only when it no longer typechecks for
 - `RCLike.exists_norm_eq_mul_self _`: unifying `_` unfolds real subtraction into `Real.cauchy`; give the argument explicitly (FrobeniusFactors).
 - Polynomial `lifts` witness `⟨monomial _ c, funext ...⟩`: degree no longer inferred and funext no longer applies; use `monomial n`, then prove the equation by folding into `C` (StickelbergerInteger, unfinished).
 - `ζ.mono` composed with `∘` no longer unifies: `fun _ hg ↦ ... (measure_mono hg)` (HaarModulus).
+- Placeholder `.principal ∘ _` filters in `le_nhds_of_unique_clusterPt (l := ...)` no longer elaborate: write the filter explicitly (`fun v : FinPlace K ↦ .principal {A | IsPlaceOver A v}`, Places `finite_ramified`). A nonzero side goal of `exists_isPlaceOver_of_val_ne_one` is closed by `v.ne_bot` in the simp set.
+- `𝓞 Ω` needs explicit `have : DiscreteTopology (𝓞 Ω) := ⟨rfl⟩` and `have : ContinuousSMul Γ (𝓞 Ω) := continuousSMul_iff_stabilizer_isOpen.2 ...` (with `(H₁ := MulAction.stabilizer Γ x.1)` and `RingOfIntegers.ext`) (Places).
+- `fun_prop` fails on continuity into a discrete codomain: use `(continuous_of_discreteTopology (f := u.toFun)).comp h` (DiscreteUnits).
+- Set membership is no longer a predicate: state `(2 : ℂ) ∈ {z : ℂ | 0 < z.re}` instead of `0 < re 2`, and give explicit image functions (`(fun t : ℝ ↦ ((q:ℝ) * t)⁻¹) '' Ioo 0 T⁻¹`) so `rw` matches; pass `(b := 0)` explicitly to `mellin_differentiableAt_of_isBigO_rpow_exp` (MellinTheta).
+- `.intro` on a metavariable-typed set (`Membership.mem.intro` is gone): delay with `by exact ⟨((_, _), _, _), ⟨h, k⟩, by simp; ring⟩` (Measure/Place).
+- `simp [← enorm_pow, mul_pow]` loops (`enorm_pow` is a deprecated alias of `eNorm_pow`): use explicit `mul_pow` with `‖√r‖ₑ ^ 2 = r` via `Real.eNorm_eq_ofReal`, `ENNReal.ofReal_pow`, `Real.sq_sqrt` (Measure/Place).
 
 ## Next steps
 
@@ -129,9 +135,3 @@ Policy: proofs only; statement re-spelling only when it no longer typechecks for
    axioms, build cost, modified files, credits per NOTICE/ATTRIBUTION, and the source's review
    status: "The proof has passed machine checks only ... No mathematician has read it through").
 5. Get the owner's sign-off on the one re-spelled statement.
-- Placeholder `.principal ∘ _` filters in `le_nhds_of_unique_clusterPt (l := ...)` no longer elaborate: write the filter explicitly (`fun v : FinPlace K ↦ .principal {A | IsPlaceOver A v}`, Places `finite_ramified`). A nonzero side goal of `exists_isPlaceOver_of_val_ne_one` is closed by `v.ne_bot` in the simp set.
-- `𝓞 Ω` needs explicit `have : DiscreteTopology (𝓞 Ω) := ⟨rfl⟩` and `have : ContinuousSMul Γ (𝓞 Ω) := continuousSMul_iff_stabilizer_isOpen.2 ...` (with `(H₁ := MulAction.stabilizer Γ x.1)` and `RingOfIntegers.ext`) (Places).
-- `fun_prop` fails on continuity into a discrete codomain: use `(continuous_of_discreteTopology (f := u.toFun)).comp h` (DiscreteUnits).
-- Set membership is no longer a predicate: state `(2 : ℂ) ∈ {z : ℂ | 0 < z.re}` instead of `0 < re 2`, and give explicit image functions (`(fun t : ℝ ↦ ((q:ℝ) * t)⁻¹) '' Ioo 0 T⁻¹`) so `rw` matches; pass `(b := 0)` explicitly to `mellin_differentiableAt_of_isBigO_rpow_exp` (MellinTheta).
-- `.intro` on a metavariable-typed set (`Membership.mem.intro` is gone): delay with `by exact ⟨((_, _), _, _), ⟨h, k⟩, by simp; ring⟩` (Measure/Place).
-- `simp [← enorm_pow, mul_pow]` loops (`enorm_pow` is a deprecated alias of `eNorm_pow`): use explicit `mul_pow` with `‖√r‖ₑ ^ 2 = r` via `Real.eNorm_eq_ofReal`, `ENNReal.ofReal_pow`, `Real.sq_sqrt` (Measure/Place).
