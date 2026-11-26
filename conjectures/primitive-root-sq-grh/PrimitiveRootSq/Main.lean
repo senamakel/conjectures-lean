@@ -47,7 +47,7 @@ theorem exists_good_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) (p : ℕ) 
     intro χ hprim hχ
     have h := bach_primitive_of_GRH hGRH hprim hχ p hp1
     rwa [Nat.cast_pow, Real.log_pow, Nat.cast_ofNat] at h
-  have key := key_inequality p hp2 B₁ B₂ hb₁ hb₂ hno
+  have key := key_inequality p B₁ B₂ hb₁ hb₂ hno
   set θ := ∏ ℓ ∈ (p - 1).primeFactors, (1 - 1 / (ℓ : ℝ)) with hθ
   have hθ0 := theta_ge (p - 1)
   have hnum := numerics p (not_lt.mp hlt) θ hθ0

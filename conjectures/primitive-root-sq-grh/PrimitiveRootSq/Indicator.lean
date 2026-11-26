@@ -49,7 +49,7 @@ lemma factor_val (ℓ : ℕ) (hℓ : 2 ≤ ℓ) (ζ : ℂ) (hζ : ζ ^ ℓ = 1) 
     field_simp
     ring
 
-theorem key_inequality (p : ℕ) [hpf : Fact p.Prime] (hp2 : p ≠ 2) (B₁ B₂ : ℝ)
+theorem key_inequality (p : ℕ) [hpf : Fact p.Prime] (B₁ B₂ : ℝ)
     (hB₁ : ∀ χ : DirichletCharacter ℂ p, χ ≠ 1 → ‖bachSum χ p‖ ≤ B₁)
     (hB₂ : ∀ χ : DirichletCharacter ℂ (p ^ 2), χ.IsPrimitive → χ ≠ 1 → ‖bachSum χ p‖ ≤ B₂)
     (hno : ∀ q, q.Prime → q < p → orderOf (q : ZMod p) = p - 1 →
@@ -172,7 +172,7 @@ theorem key_inequality (p : ℕ) [hpf : Fact p.Prime] (hp2 : p ≠ 2) (B₁ B₂
       have hF1 : F n = 1 := by
         simp only [hF]
         rw [Finset.prod_congr rfl hfac]
-        exact Finset.prod_eq_one fun ℓ hℓ => by rw [if_neg (hall ℓ hℓ)]
+        exact Finset.prod_eq_one fun ℓ hℓ => by simp [hall ℓ hℓ]
       have hord : orderOf (n : ZMod p) = p - 1 := by
         apply orderOf_eq_of_pow_and_pow_div_prime
         · exact ZMod.pow_card_sub_one_eq_one hnZ
@@ -198,11 +198,11 @@ theorem key_inequality (p : ℕ) [hpf : Fact p.Prime] (hp2 : p ≠ 2) (B₁ B₂
       rw [show ((c n : ℂ) * (p : ℂ)) = ((c n * p : ℝ) : ℂ) by push_cast; ring, Complex.ofReal_re,
         Complex.ofReal_re, mul_div_assoc, div_self hpR.ne', mul_one]
     · -- `F n = 0`
-      push_neg at hall
+      simp only [not_forall, not_not] at hall
       obtain ⟨ℓ, hℓ, h1⟩ := hall
       have hF0 : F n = 0 := by
         simp only [hF]
-        exact Finset.prod_eq_zero hℓ (by rw [hfac ℓ hℓ, if_pos h1])
+        exact Finset.prod_eq_zero hℓ (by simp [hfac ℓ hℓ, h1])
       rw [hF0, mul_zero, Complex.zero_re]
       by_cases hη : η n = 1
       · rw [hJval.1 hη, show ((c n : ℂ) * (p : ℂ)) = ((c n * p : ℝ) : ℂ) by push_cast; ring,
