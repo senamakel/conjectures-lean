@@ -75,6 +75,7 @@ theorem erdos_977_factorial_of_abc (habc : ABCConjecture) : Erdos977.Factorial :
 `Erdos977.fcMaxPrimeFac`). -/
 theorem erdos_977_factorial_of_abc' (habc : ABCConjecture) :
     Tendsto (fun n : ℕ ↦ (fcMaxPrimeFac (n.factorial + 1) : ℝ) / n) atTop atTop := by
-  simpa only [fcMaxPrimeFac_eq] using erdos_977_factorial_of_abc habc
+  simp only [fcMaxPrimeFac_eq]
+  exact erdos_977_factorial_of_abc habc
 
 end Implications.Abc
