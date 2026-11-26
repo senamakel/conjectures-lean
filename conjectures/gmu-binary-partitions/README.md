@@ -199,7 +199,10 @@ lake build GMUBinaryPartitions
 lake env lean scripts/Axioms.lean
 ```
 
-BUILD_TIMES
+A clean build of the package on top of the Mathlib cache took 3 min 50 s wall (59 s user, 76 s
+system CPU) on a box with load average about 120, with a peak resident set of 9.1 GB.
+`GMUBinaryPartitions.Values` (the kernel evaluations, `b₃₁(256)` the largest) took 128 s and
+dominates; every other module takes under 30 s, `Native` 12 s.
 
 ## This result needs no RH
 
