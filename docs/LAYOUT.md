@@ -18,8 +18,9 @@ under GRH). RH and GRH come from
 [riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis), which only the
 `Unconditional/` files import.
 
-The lakefiles still require their siblings by git URL (`github.com/senamakel/<name>`) at a pinned
-rev, not by `path = "../<name>"`. The table below is read from those lakefiles.
+Projects require their siblings by local path (`path = "../<name>"`), so each project builds
+against the sibling folders in this checkout. A sibling's build output lands in its own
+`.lake/build`, and every dependent reuses it. The table below is read from the lakefiles.
 
 | Project | Requires |
 | :--- | :--- |

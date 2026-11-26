@@ -560,8 +560,9 @@ Each README follows the shape already used across these repos:
   through one PR to this repository, however many folders it touches.
 - Adding a conjecture: create `conjectures/<name>/` as its own Lean package (`lakefile`, `lean-toolchain`,
   `README.md`), then give it a row in `README.md` and a section in the checklist below.
-- The lakefiles still require their siblings by git URL (`github.com/senamakel/<name>`) at a
-  pinned rev. Switching them to `path = "../<name>"` requires is still to do.
+- Projects require their siblings by local path (`path = "../<name>"` in `lakefile.toml`), so a
+  change to one folder is seen by every project that depends on it at the next build, with no pin
+  to bump. Run `lake update <Pkg>` in a dependent after adding or removing a sibling require.
 - Lean projects with no `.lake` here yet: run `lake exe cache get` first in erdos-985. The
   siblings will build only after the pins are fixed.
 - Build one module at a time when iterating (`lake build LLS.ClassNumber`). The `native_decide`
