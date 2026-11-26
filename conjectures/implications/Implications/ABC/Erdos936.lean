@@ -91,14 +91,14 @@ theorem erdos_936_factorial_add_one_of_abc (habc : ABCConjecture) : FactorialAdd
 theorem erdos_936_factorial_sub_one_of_abc (habc : ABCConjecture) : FactorialSubOne := by
   obtain ⟨N, hN⟩ := exists_four_pow_six_lt_factorial
   refine eventually_of_abcSet_finite (abcSet_finite habc (by norm_num : (0 : ℝ) < 1 / 2)) _
-    (fun n => (1, n ! - 1, n !)) N (fun n hn hP => ?_) (fun n => Nat.self_le_factorial n)
+    (fun n => (1, (n !) - 1, n !)) N (fun n hn hP => ?_) (fun n => Nat.self_le_factorial n)
   have hbig := hN n hn
   have h1 : 1 ≤ (4 ^ n) ^ 6 := Nat.one_le_pow _ _ (by positivity)
   have hpos : 0 < n ! := Nat.factorial_pos n
-  have hb0 : n ! - 1 ≠ 0 := by omega
+  have hb0 : (n !) - 1 ≠ 0 := by omega
   refine mem_abcSet_of_le Nat.one_pos (by omega) (Nat.coprime_one_left _)
     (Nat.coprime_one_left _) (coprime_pred_self hpos) (by omega)
-    (X := 4 ^ n * radical (n ! - 1)) ?_
+    (X := 4 ^ n * radical ((n !) - 1)) ?_
     (four_pow_mul_cube_lt_sq ((radical_sq_le_of_powerful hb0 hP).trans (by omega)) hbig)
   rw [one_mul, radical_mul (coprime_pred_self hpos), mul_comm]
   exact Nat.mul_le_mul_right _ (radical_factorial_le n)
