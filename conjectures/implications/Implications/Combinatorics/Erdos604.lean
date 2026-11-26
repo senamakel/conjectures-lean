@@ -67,7 +67,7 @@ theorem erdos604SqrtLog_of_average (h : Erdos604Average) : Erdos604SqrtLog := by
   filter_upwards [hev, eventually_ge_atTop 1] with n hn hn1
   obtain ⟨A, hA, hsup⟩ := exists_sup_eq_pinnedDistinctDistances n
   have hsum : (∑ x ∈ A, distinctDistancesFrom A x : ℕ) ≤ n * pinnedDistinctDistances n := by
-    rw [← hA, ← hsup]
+    rw [← hsup, ← hA]
     exact Finset.sum_le_card_nsmul _ _ _ fun x hx => Finset.le_sup (f := distinctDistancesFrom A) hx
   have hsumR : ((∑ x ∈ A, distinctDistancesFrom A x : ℕ) : ℝ) ≤
       (n : ℝ) * (pinnedDistinctDistances n : ℝ) := by exact_mod_cast hsum
