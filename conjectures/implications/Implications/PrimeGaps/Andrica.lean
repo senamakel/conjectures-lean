@@ -18,6 +18,8 @@ at commit `9097e2f`, each as a `def … : Prop` (the binders of the source theor
 Everything here is elementary; no computation is involved.
 -/
 
+set_option linter.dupNamespace false
+
 namespace Implications.PrimeGaps
 
 open Finset
@@ -96,7 +98,7 @@ lemma exists_nth_le_lt {m : ℕ} (hm : 2 ≤ m) :
   · have := Nat.nth_lt_of_lt_count (p := Nat.Prime) (n := m + 1)
       (k := Nat.count Nat.Prime (m + 1) - 1) (by omega)
     omega
-  · have := Nat.le_nth_count hinf (m + 1)
+  · have := Nat.le_nth_count (p := Nat.Prime) hinf (m + 1)
     rw [Nat.sub_add_cancel hc]
     omega
 
@@ -125,7 +127,7 @@ lemma sqrt_sub_sqrt_lt_one {a b : ℕ} (hab : a < b) (h : (b - a - 1) ^ 2 < 4 * 
   -- `b - a - 1 < 2 √a`
   have hlt : (b : ℝ) - a - 1 < 2 * Real.sqrt a := by
     by_contra hc
-    push_neg at hc
+    push Not at hc
     have h2 : (2 * Real.sqrt a) ^ 2 ≤ ((b : ℝ) - a - 1) ^ 2 :=
       pow_le_pow_left₀ (by positivity) hc 2
     rw [mul_pow, hsa] at h2
@@ -147,21 +149,22 @@ theorem andrica_of_oppermann (h : Oppermann.OppermannConjecture) : Andrica.Andri
   have hp2 : 2 ≤ p := hpP.two_le
   suffices hs : (q - p - 1) ^ 2 < 4 * p by
     exact_mod_cast sqrt_sub_sqrt_lt_one hpq hs
-  set x := Nat.sqrt p with hx
-  have hx1 : x * x ≤ p := Nat.sqrt_le p
-  have hx2 : p < (x + 1) * (x + 1) := Nat.lt_succ_sqrt p
+  obtain ⟨x, hx⟩ : ∃ x, x = Nat.sqrt p := ⟨_, rfl⟩
+  have hx1 : x * x ≤ p := hx ▸ Nat.sqrt_le p
+  have hx2 : p < (x + 1) * (x + 1) := hx ▸ Nat.lt_succ_sqrt p
   have hx0 : 1 ≤ x := by
     rw [hx, Nat.le_sqrt]; omega
+  have e1 : (x + 1) * (x + 1) = x * x + 2 * x + 1 := by ring
+  have e2 : (x + 1) * (x + 1 - 1) = x * x + x := by rw [Nat.add_sub_cancel]; ring
+  have e3 : (x + 1) ^ 2 = x * x + 2 * x + 1 := by ring
+  have e4 : (x + 1) * (x + 1 + 1) = x * x + 3 * x + 2 := by ring
   rcases lt_or_ge p (x * x + x) with hcase | hcase
   · -- `p < x² + x = (x+1)x`: Oppermann (i) at `x + 1` gives a prime in `((x+1)x, (x+1)²)`.
     obtain ⟨r, hr, hrP⟩ := (h (x + 1) (by omega)).1
     rw [Finset.mem_Ioo] at hr
-    have hr1 : p < r := by
-      have : (x + 1) * (x + 1 - 1) = x * x + x := by
-        rw [Nat.add_sub_cancel]; ring
-      omega
+    have hr1 : p < r := by omega
     have hqr : q ≤ r := nth_succ_le_of_prime hrP hr1
-    have hr2 : r < (x + 1) * (x + 1) := by rw [← pow_two]; exact hr.2
+    have hr2 : r < (x + 1) ^ 2 := hr.2
     have : q - p - 1 ≤ 2 * x - 1 := by omega
     calc (q - p - 1) ^ 2 ≤ (2 * x - 1) ^ 2 := Nat.pow_le_pow_left this 2
       _ < 4 * p := by
@@ -187,12 +190,10 @@ theorem andrica_of_oppermann (h : Oppermann.OppermannConjecture) : Andrica.Andri
     · -- Oppermann (ii) at `x + 1` gives a prime in `((x+1)², (x+1)(x+2))`.
       obtain ⟨r, hr, hrP⟩ := (h (x + 1) (by omega)).2
       rw [Finset.mem_Ioo] at hr
-      have hr1 : p < r := by
-        have : (x + 1) ^ 2 = (x + 1) * (x + 1) := pow_two _
-        omega
+      have hr1 : p < r := by omega
       have hqr : q ≤ r := nth_succ_le_of_prime hrP hr1
       have hr2 : r < (x + 1) * (x + 1 + 1) := hr.2
-      have hr3 : r ≤ x * x + 3 * x + 1 := by nlinarith
+      have hr3 : r ≤ x * x + 3 * x + 1 := by omega
       have : q - p - 1 ≤ 2 * x - 1 := by omega
       calc (q - p - 1) ^ 2 ≤ (2 * x - 1) ^ 2 := Nat.pow_le_pow_left this 2
         _ < 4 * p := by
@@ -232,7 +233,6 @@ theorem legendre_of_oppermann (P : Oppermann.OppermannConjecture) :
   have h := Finset.mem_Ioo.1 ph.1
   refine ⟨lt_of_le_of_lt ?_ h.1, h.2⟩
   push_cast [sq, add_one_mul, le_self_add]
-  simp
 
 /-- formal-conjectures `Oppermann.oppermann_implies_brocard` (`textbook`), ported (the proof is
 the source's), stated as `OppermannConjecture → BrocardConjecture`. -/
