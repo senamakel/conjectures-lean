@@ -1,0 +1,7 @@
+import LegendreExceptions
+#print axioms LegendreExceptions.legendre_exceptions_of_RH
+#print axioms LegendreExceptions.oppermann_exceptions_of_RH
+#print axioms LegendreExceptions.andrica_exceptions_of_RH
+#print axioms LegendreExceptions.brocard_exceptions_of_RH
+#print axioms LegendreExceptions.count_le_of_RH
+#print axioms LegendreExceptions.nth_prime_le_cube

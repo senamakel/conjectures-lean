@@ -1,0 +1,14 @@
+LegendreExceptions/Statement.lean contains statement bodies copied from
+
+  google-deepmind/formal-conjectures, commit 9097e2f
+  FormalConjectures/Wikipedia/LegendreConjecture.lean
+  FormalConjectures/Wikipedia/Oppermann.lean
+  FormalConjectures/Wikipedia/Andrica.lean
+  FormalConjectures/Wikipedia/BrocardConjecture.lean
+  Copyright 2025 The Formal Conjectures Authors
+  Licensed under the Apache License, Version 2.0
+  https://www.apache.org/licenses/LICENSE-2.0
+
+Changes: the namespace; each `theorem … := by sorry` is given as a definition of type Prop
+(LegendreConjecture, OppermannConjecture, AndricaConjecture, BrocardConjecture), and its body
+for a single index as LegendreAt, OppermannAt, AndricaAt, BrocardAt.
