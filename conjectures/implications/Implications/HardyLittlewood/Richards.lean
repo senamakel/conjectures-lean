@@ -251,6 +251,7 @@ theorem not_first_and_secondHardyLittlewoodConjecture :
   have h2 := hHL2 (x := p - 1) (y := 3159) (by omega) (by norm_num)
   unfold SecondHardyLittlewoodConjectureFor at h2
   have h3 := primeCounting_3159_le
+  generalize π 3159 = c at h2 h3
   simp only [Nat.primeCounting, Nat.primeCounting'] at h2
   have e1 : p - 1 + 3159 + 1 = p + 3159 := by omega
   have e2 : p - 1 + 1 = p := by omega
