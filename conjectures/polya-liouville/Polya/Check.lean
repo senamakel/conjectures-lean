@@ -214,8 +214,14 @@ on whatever they return. -/
 def buildSmall (T : ℕ) : Array ℤ := Id.run do
   let mut s : Array ℤ := Array.replicate (T + 1) 0
   for y in [1:T + 1] do
-    let v := 1 - blockSum (fun q => s.getD q 0) y 2
-    s := s.set! y v
+    let mut acc : ℤ := 0
+    let mut n := 2
+    while n ≤ y do
+      let q := y / n
+      let n2 := y / q
+      acc := acc + ((n2 + 1 - n : ℕ) : ℤ) * s.getD q 0
+      n := n2 + 1
+    s := s.set! y (1 - acc)
   return s
 
 def buildBig (X T : ℕ) (small : Array ℤ) : Array ℤ := Id.run do
@@ -223,8 +229,16 @@ def buildBig (X T : ℕ) (small : Array ℤ) : Array ℤ := Id.run do
   let mut b : Array ℤ := Array.replicate (A + 1) 0
   for i in [0:A] do
     let a := A - i
-    let v := 1 - blockSum (tableFn X T small b) (X / a) 2
-    b := b.set! a v
+    let y := X / a
+    let mut acc : ℤ := 0
+    let mut n := 2
+    while n ≤ y do
+      let q := y / n
+      let n2 := y / q
+      let fq := if q ≤ T then small.getD q 0 else b.getD (X / q) 0
+      acc := acc + ((n2 + 1 - n : ℕ) : ℤ) * fq
+      n := n2 + 1
+    b := b.set! a (1 - acc)
   return b
 
 /-- Fill the tables with `T = ⌊√X⌋` and check `M(X) = target`. -/
