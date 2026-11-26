@@ -2137,3 +2137,25 @@ error: Vendor/OAI/NumberTheory/PiExponent/Geometry/CartierSequence.lean:57:83: u
 warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CartierDegreeLength.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
 ✔ [19406/19988] Built OAI.NumberTheory.PiExponent.Geometry.LineBundleInverse (5.8s)
 ✔ [19408/19988] Built OAI.NumberTheory.PiExponent.Geometry.LineBundleProduct (8.2s)
+✔ [19416/19988] Built OAI.NumberTheory.PiExponent.Approximation.PushforwardSectionComparison (6.8s)
+✔ [19418/19988] Built OAI.NumberTheory.PiExponent.Approximation.SectionImageSupport (9.1s)
+✔ [19420/19988] Built OAI.NumberTheory.PiExponent.Approximation.WeightedCompactificationImmersion (26s)
+✔ [19422/19988] Built OAI.NumberTheory.PiExponent.Approximation.AffineClosedAnnihilatedDescent (7.0s)
+⚠ [19424/19988] Built OAI.NumberTheory.PiExponent.Ampleness.ClosedAmpleBaseChange (5.4s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Ampleness/ClosedAmpleBaseChange.lean: imports `Mathlib.AlgebraicGeometry.IdealSheaf.Functorial` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19425/19988] Ran OAI.NumberTheory.PiExponent.Ampleness.ClosedAmpleBaseChange:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Ampleness/ClosedAmpleBaseChange.lean: imports `Mathlib.AlgebraicGeometry.IdealSheaf.Functorial` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [19426/19988] Built OAI.NumberTheory.PiExponent.Ampleness.AmpleGlobalGeneration (12s)
+✔ [19428/19988] Built OAI.NumberTheory.PiExponent.Approximation.CompositePullbackFrame (5.8s)
+✔ [19430/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.GlobalInvertibleIdeal (6.1s)
+✔ [19434/19988] Built OAI.NumberTheory.PiExponent.Ampleness.FiniteAffineFrames (4.0s)
+✔ [19436/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveCoordinateSections (12s)
+✔ [19438/19988] Built OAI.NumberTheory.PiExponent.Approximation.ClosedPushforwardCoherent (7.2s)
+✔ [19440/19988] Built OAI.NumberTheory.PiExponent.Approximation.InverseDualRestriction (6.0s)
+⚠ [19450/19988] Ran OAI.NumberTheory.PiExponent.Jets.AffineJetPackets
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/AffineJetPackets.lean: imports `Mathlib.RingTheory.Ideal.Quotient.Operations` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [19452/19988] Built OAI.NumberTheory.PiExponent.Cohomology.PencilCohomologySections (13s)
+✔ [19454/19988] Built OAI.NumberTheory.PiExponent.Approximation.RegularSectionChoice (6.2s)
+✔ [19456/19988] Built OAI.NumberTheory.PiExponent.Approximation.TensorSectionOpen (7.7s)
+✔ [19458/19988] Built OAI.NumberTheory.PiExponent.Approximation.NegativeTwistPresentations (12s)
+✔ [19460/19988] Built OAI.NumberTheory.PiExponent.Geometry.WeightedProjectiveStructure (8.2s)
