@@ -1,0 +1,21 @@
+name = "BachSharp"
+defaultTargets = ["BachSharp"]
+
+[leanOptions]
+pp.unicode.fun = true
+autoImplicit = false
+
+[[require]]
+name = "Ankeny"
+path = "../ankeny-grh"
+
+[[require]]
+name = "LLS"
+path = "../lls-grh"
+
+[[require]]
+name = "BachCorollaries"
+path = "../bach-corollaries-grh"
+
+[[lean_lib]]
+name = "BachSharp"
