@@ -151,8 +151,8 @@ Dropped without a run, with the reason:
 - **Verification 2.** `scripts/verify308656.py`: pure Python with exact integers, enumerating
   every (s, c) and testing 24r+1 = z², z ≡ ±1 (mod 6). It gives 0 representations for both
   witnesses and positive counts for the other four polynomials (25, 69, 36, 41 at 235644514).
-  `src/brute2a.c` (direct per-n enumeration, a different code path) rechecks minimality over
-  [1, 235644514]: PENDING.
+  `src/brute2a.c` (direct per-n enumeration with an early exit, a different code path) rechecks
+  minimality over [1, 235644516): the only n it reports is 235644514 (about 3 CPU-h).
 - **Prior art: TAKEN.**
   - `joeyhlu/sun-representation-counterexamples` (created 2026-11-26 02:25 UTC, pushed
     09:18 UTC) lists A308656 Conj. 2 (f = x(4x+1)) → 235644514 as the smallest, from an

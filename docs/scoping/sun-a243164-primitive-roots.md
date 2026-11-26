@@ -146,8 +146,9 @@ erdos-985's own `ω = 9` case (about 4%).
 
 - Every `n ≥ 7` with `p_n < 10^8` (5,761,449 values): no counterexample; least `q ≤ 211`.
   Segmented sieve plus trial-division factorisation, C, 7 s.
-- Every `n ≥ 7` with `p_n < 10^10`: see the addendum at the end (run finished after this
-  section was written).
+- Every `n ≥ 7` with `p_n < 10^10` (455,052,505 values): no counterexample. Least `q ≤ 331`
+  (at `P = 6893217871`). By `ω(P−1)`: 2: 29,344,976 primes, 3: 109,741,416, 4: 158,596,236,
+  5: 111,401,782, 6: 39,196,571, 7: 6,376,718, 8: 389,375, 9: 5,425, 10: 3. C, 1,203 CPU-s.
 - Large `ω` beyond the sieve range (exact `n = π(P)` by the Lucy–Hedgehog method): every prime
   `P ≡ 1 (mod 2·3·…·23)` below `10^11` (110 primes, `ω ≥ 9`, least `q ≤ 139`), every prime
   `P ≡ 1 (mod 2·3·…·29)` below `10^12` (41 primes, `ω ≥ 10`, least `q ≤ 163`), every prime
@@ -184,8 +185,11 @@ New mathematics: none beyond the twist and the prime-power term; new Lean is rou
    lines) rather than imported.
 3. Grosswald's `pointwise` lemma is stated for its own `hno`. The twisted version with the
    prime-power term is new, but it is elementary.
-4. Exact primality in the checker: `Nat.minFac` in compiled code on 5.76·10⁶ primes. Time one
-   chunk first.
+4. Exact primality in the checker. A first version ran `Nat.minFac` on every prime and was
+   far too slow under `native_decide` (stopped after 6 CPU-minutes on one chunk). The checker
+   now uses the search for `q` as a Lucas certificate (Mathlib's `lucas_primality`), so
+   `minFac` runs only on base-2 pseudoprimes. **Measured:** 57–96 s CPU and 6.5 GB per chunk of
+   `5·10^6`, about 30 CPU-minutes for all 20 (Phase 1, below).
 
 ## 6. Novelty search (2026-11-26)
 
@@ -205,3 +209,13 @@ Scripts (scratch, not kept in the repository): `thr.py` (thresholds, the formula
 verbatim: `bachC`, `E(x)`, `x = P log 2/log P` or the RH variant, worst-case `θ_E`, `δ`, `K`),
 `ver.c` (segmented sieve to `LIM`, running index `n`, least `q`), `big.c` (Lucy–Hedgehog
 `π(P)` and the check for `P ≡ 1 (mod primorial)`).
+
+## 8. Phase 1 (started 2026-11-26)
+
+Branch `sun-a243164-grh`, folder `conjectures/sun-a243164-grh/`. Built and compiling, no
+`sorry`: `Statement`, `Assembly`, `PrimePowers`, `TwistedSieve`
+(`SunA243164.Sieve.principal_le_sieve_twisted`), `Analytic`
+(`SunA243164.not_sieveIneq_of_GRH`), `Compute` (`SunA243164.Compute.verifiedBelow_10_8`,
+20 `native_decide`), `Main` (`SunA243164.sunA243164_of_GRH_of_numerics`, with GRH and the
+numerical inequality `SieveNumerics 100000000` as hypotheses). Remaining: prove
+`SieveNumerics 100000000` (`docs/PLAN.md` in the project folder).
