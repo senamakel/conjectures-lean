@@ -130,8 +130,9 @@ lemma IsOpenSub.whisker_restrictAlg {E} [CommRing E] [Algebra k E] (h : IsOpenSu
 lemma isOpenSub_offPoints [IsSepFunctor X] {s : Set _} [Finite s] :
   @IsOpenSub _ _ X (offPoints s) := isOpenSub_fieldLocus fun _ x ↦ by
   choose J _ using (IsSepFunctor.exists_ideal _ x <| X.map structureMap ·)
-  use s.toFinite.toFinset.inf J, by simp_all [ComesFromPoints, IsField.isDomain,
-    (ker_isPrime _).inf_le', map_eq_bot_iff_le_ker]
+  use s.toFinite.toFinset.inf J, by
+    simp_all [ComesFromPoints, IsField.isDomain, map_eq_bot_iff_le_ker]
+    intro K φ hK; have := hK.isDomain; simp [(ker_isPrime φ.hom).inf_le']
 
 lemma isOpenSub_offDiagonal [IsSepFunctor X] : IsOpenSub (offDiagonal X) :=
   isOpenSub_fieldLocus fun _ ⟨x, y⟩ ↦ by peel IsSepFunctor.exists_ideal _ x y; tauto
