@@ -7,7 +7,7 @@ and 11 further projects (see the table in `README.md`). Each project is a folder
 repository `github.com/senamakel/<name>`. This file is the tracker: when a box changes, update it
 here in the same commit as the change.
 
-Status as of 2026-11-25. Every box marked **verified** below was rebuilt from source on the
+Status as of 2026-11-26 for the three newest sections, 2026-11-25 for the rest. Every box marked **verified** below was rebuilt from source on the
 build box on 2026-11-24 or 2026-11-25, its `#print axioms` output read, and (for tier U) its
 `scripts/check-unconditional.sh` run against riemann-hypothesis `507a75d91d`.
 
@@ -657,6 +657,53 @@ Rules:
 - [ ] Tier C without H: Kronecker–Weber from Mathlib once Mathlib PR #46376 lands and the pin moves
 - [ ] Washington Thm 4.3 was cited from the scoping report, not re-read
 
+
+### prime-powers-rh: a prime between `x^α` and `(x+1)^α`, real `α ≥ 3` · **tier C verified, tier U check pending** · *RH-consequence*
+- [x] `primeBetweenRealPowers_of_RH`, `primeBetweenIntegerPowers_of_RH` (C), from mills-rh's `primeStrictlyBetweenCubes_of_RH`.
+      Rebuilt 2026-11-26 at `61635fb`: standard three + 22 `native_decide` inherited from schoenfeld-rh
+- [ ] `Unconditional/PrimePowersUnconditional.lean` is written; `scripts/check-unconditional.sh` has not been run
+- [ ] Literature: the RH result for `α ≥ 9/4` is Chamberland–Straub (arXiv:2602.22502), read from the listing only.
+      Which integer exponents are open without RH was not confirmed. No prior-Lean search was done
+- [ ] Not proved: `9/4 ≤ α < 3` (needs a prime-gap computation far beyond a proved-sound checker)
+
+### bach-corollaries-grh: generators of `(ℤ/m)ˣ`, Solovay–Strassen, Miller's factoring · **tier H verified; C and U files not built** · *RH-consequence*
+- [x] `generators_of_bach`, `solovayStrassen_of_bach`, `solovayStrassenTest_iff_prime`, `millerFactoring_of_bach`,
+      `eulerLiars_ne_top`, `jacobiCalc_eq`: from `Ankeny.BachSubgroupBound c`, standard three only. Rebuilt 2026-11-26 at `23ffd52`
+- [ ] `BachCorollaries/GRH.lean` (through `LLS.bach2_of_GRH`) and `Unconditional/` are written and have never been compiled:
+      they need lls-grh's `native_decide` modules built, then the riemann-hypothesis import
+- [ ] Literature: the generator bound with constant `2` sharpens the `3` of Bach 1990 §6. Whether factoring from `φ(n)` is
+      known without ERH was not checked
+
+### ramanujan-rh: Ramanujan's inequality `π(x)² < (e·x/log x)·π(x/e)` · **tier C for `x ≥ e⁴⁰` verified, U check pending; full statement tier H** · *RH-consequence*
+- [x] `ramanujan_of_RH : RiemannHypothesis → RamanujanInequalityFrom (Real.exp 40)` (C), no computation. Rebuilt 2026-11-26 at
+      `d2d9ea0`: standard three + 23 `native_decide` inherited from schoenfeld-rh; `ramanujan_of_schoenfeldPi` standard three only
+- [x] `ramanujan_of_RH_of_verified`: the Dudek–Platt statement (`x ≥ 38,358,837,683`) with `RamanujanVerifiedRange`
+      (`[38,358,837,683, e⁴⁰]`, about `6·10¹⁵` primes) as a tier-H hypothesis
+- [ ] `Unconditional/RamanujanUnconditional.lean` written; check not yet run
+- [ ] Literature not confirmed: Axler's `e^3158.442`, Platt–Trudgian's `exp(3915)`. Two unrefereed unconditional claims
+      exist (arXiv:2408.02591, Zenodo 23440770), not checked
+- [ ] Lowering `e⁴⁰` to Dudek–Platt's `1.15·10¹⁶` needs `π(x) < li(x)` for `x ≤ 1.2·10¹⁷`, which we do not have in Lean
+
+### legendre-exceptions-rh: exceptional sets for Legendre, Oppermann, Andrica, Brocard · **tier C verified, U check pending** · *RH-consequence*
+- [x] `legendre_exceptions_of_RH`, `oppermann_exceptions_of_RH`, `andrica_exceptions_of_RH`, `brocard_exceptions_of_RH`:
+      `O(log³ N)` exceptions among the first `N` indices, from erdos-233's `large_gaps_of_RH`. Rebuilt 2026-11-26 at `f3c0776`,
+      standard three only. Conjecture statements verbatim from formal-conjectures
+- [ ] `Unconditional/LegendreExceptionsUnconditional.lean` written; check not yet run
+- [ ] Bazzanella (2000, Thm 2) has `O(f(N) log² N)` for Legendre under RH, one logarithm better; not proved here
+- [ ] The Oppermann, Andrica and Brocard bounds were not found in the literature (search list in the README)
+
+### implications: `X → Y` between open conjectures · **every theorem tier C or H, verified** · *premise open*
+- [x] PRs #1 to #6, #11, #13 and #14, each rebuilt on `main` and its axioms read (standard three): Rotkiewicz; Erdős 382 (i) from Cramér /
+      Firoozbakht; Butson ⇒ Hadamard; four exponentials ⇒ `2^t` or `3^t`; abc ⇒ Erdős 936 and 977 (factorial);
+      Dickson / Schinzel consequences (Erdős 891 Weisenberg, Erdős 647 infinite variant, twin primes and relatives);
+      Erdős 142 lower variant and all-`k` Erdős 140 from the quantitative density bound; abc ⇒ non-Wieferich primes
+      (Silverman), powerful triples, Brocard, Erdős 366 forms; Dickson ⇒ admissible patterns at consecutive primes
+      (Erdős 141, 218 variant, balanced primes); Firoozbakht ⇒ Oppermann, Andrica, Legendre, Brocard
+- [x] Statements copied word for word from formal-conjectures `9097e2f`; the table is in the root `README.md`
+- [ ] `scripts/erdos142-discharge/` (the link to openai/math's `manuscriptQuantitativeDensityTheorem`) has not been typechecked
+- [ ] Some modules define copied names in root namespaces (`Nat.Full`, `Set.IsAPOfLength…`, `ABC`, `Erdos936`); move them
+      under `Implications.` before a second module copies the same definition
+- [ ] None of these is a result about the consequence by itself. Never describe one as solving its Erdős problem
 
 ## Working here
 
