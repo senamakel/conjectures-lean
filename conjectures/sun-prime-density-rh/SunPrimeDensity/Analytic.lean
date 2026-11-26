@@ -131,10 +131,8 @@ theorem pi_mid_explicit (hC : PsiCert) (hS : ThetaSmallRange) {x : ℝ} (h1 : 40
   linarith
 
 /-- `log t/√t` decreases on `[e², ∞)`: `log y/√y ≤ log x/√x` for `x ≤ y`, `log x ≥ 2`. -/
-theorem log_div_sqrt_anti {x y : ℝ} (hx : 2 ≤ Real.log x) (hxy : x ≤ y) :
+theorem log_div_sqrt_anti {x y : ℝ} (hx0 : 0 < x) (hx : 2 ≤ Real.log x) (hxy : x ≤ y) :
     Real.log y / √y ≤ Real.log x / √x := by
-  have hx0 : 0 < x := by
-    by_contra h; push_neg at h; rw [Real.log_of_nonpos h] at hx; linarith
   have hy0 : 0 < y := hx0.trans_le hxy
   set r := y / x with hr
   have hr1 : 1 ≤ r := by rw [hr, le_div_iff₀ hx0]; linarith
