@@ -1,0 +1,13 @@
+name = "SunA243164"
+defaultTargets = ["SunA243164"]
+
+[leanOptions]
+pp.unicode.fun = true
+autoImplicit = false
+
+[[require]]
+name = "Erdos985"
+path = "../erdos-985"
+
+[[lean_lib]]
+name = "SunA243164"
