@@ -118,9 +118,12 @@ theorem Abundant.le_5040_of_forall_mul_le (hR : Robin.RobinStatement)
   `Nicolas.kthPrimorial n`, copied there from formal-conjectures' `Nat.kthPrimorial`.
 * formal-conjectures has none of the three (searched at commit `9097e2f` for Dedekind, Solé,
   Planat, extremely abundant, extraordinary, Caveney). Prior formalisations searched:
-  formal-conjectures, 1337isnot1337/solved-conjectures, Mathlib (no Dedekind Ψ); GitHub
-  facebookresearch/atlas-lean has definitions of the Dedekind Ψ function and of extremely
-  abundant numbers and no theorem about either.
+  formal-conjectures, 1337isnot1337/solved-conjectures, Mathlib (no Dedekind Ψ), and a GitHub
+  code search of Lean files (2026-11-26) for `dedekindPsi`, `IsExtremelyAbundant`,
+  "extraordinary number" and "Caveney". facebookresearch/atlas-lean (mirrored in
+  math-proof/lemma) has definitions of the Dedekind Ψ function and of extremely abundant
+  numbers with small `example`s, and no theorem relating either to RH; nothing was found for
+  extraordinary numbers.
 
 ## Axioms
 
