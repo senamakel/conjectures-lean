@@ -170,8 +170,10 @@ theorem numerics (p : ℕ) (hp0 : 10 ^ 8 ≤ p) (θ : ℝ)
     exact finish_small _ _ _ _ _ _ _ _ _ _ hθ9 (by norm_num) (by linarith) hXe hB10 hB1 hB2
       hB2u0 hSu hpoly
   · -- ω ≥ 10
-    set k := (p - 1).primeFactors.card with hk
-    set X : ℝ := 2 ^ k with hX
+    obtain ⟨k, hk⟩ : ∃ k, k = (p - 1).primeFactors.card := ⟨_, rfl⟩
+    rw [← hk] at hθ h10 hX1 ⊢
+    obtain ⟨X, hX⟩ : ∃ X : ℝ, X = 2 ^ k := ⟨_, rfl⟩
+    rw [← hX] at hX1 ⊢
     have hnat := Erdos985.pow_card_primeFactors_mul_le 16 (p - 1) hpnz
     rw [← hk, show ∏ r ∈ (Finset.range 16).filter Nat.Prime, r = 30030 by decide,
       show ((Finset.range 16).filter Nat.Prime).card = 6 by decide] at hnat
