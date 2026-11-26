@@ -11,7 +11,7 @@ variable {k m : ℕ} {T : Type} [Add T] [One T] (v : T → Bool) (P : ℝ) (k' :
 
 /-- For permutations σ_j, the linear map ν ↦ β with β(b,j) = ±(P·ν(b,j+1) − ν(σ_j b, j)), the
 sign being + if v j is true and − otherwise. -/
-@[simps!] def permStep (σ : T → Perm (Fin k)) : Module.End ℝ (Fin k × T → ℝ) := .pi fun x ↦
+@[simps! apply] def permStep (σ : T → Perm (Fin k)) : Module.End ℝ (Fin k × T → ℝ) := .pi fun x ↦
   ite (v x.2) (1 : ℝ) (-1) • (P • .proj (x.1, x.2 + 1) - .proj (σ x.2 x.1, x.2))
 
 /-- The set Σ of real vectors β ≥ 0 with ∑_b β(b,j) in [D_j − 1, D_j] for every j. -/
