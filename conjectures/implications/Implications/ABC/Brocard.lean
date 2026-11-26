@@ -38,11 +38,8 @@ open _root_.ABC Erdos398 Nat
 /-- abc implies Brocard's equation `n! + 1 = m²` has only finitely many solutions. -/
 theorem brocardFinite_of_abc (habc : ABCConjecture) : BrocardFinite := by
   have hev := erdos_936_factorial_add_one_of_abc habc
-  apply ((Nat.frequently_atTop_iff_infinite (p := fun n => ∃ m, n ! + 1 = m ^ 2)).not.1 ?_).of_not_not
-  intro hfreq
-  apply hfreq
-  filter_upwards [hev] with n hn hsol
-  obtain ⟨m, hm⟩ := hsol
+  by_contra hinf
+  obtain ⟨n, ⟨m, hm⟩, hn⟩ := ((Nat.frequently_atTop_iff_infinite.2 hinf).and_eventually hev).exists
   exact hn (hm ▸ powerful_sq m)
 
 end Implications.Abc
