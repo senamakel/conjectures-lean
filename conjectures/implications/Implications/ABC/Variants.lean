@@ -9,7 +9,7 @@ formal-conjectures (`FormalConjectures/Wikipedia/ABC.lean`, commit
 `ABC.abc.variants.lt_constant_mul` and `ABC.abc.variants.quality`. All three are open there and
 no implication between them is proved. This module proves that the three are equivalent.
 
-* `abcConstantMul_of_abc`: take `K = 1 + max c` over the finite exceptional set.
+* `abcConstantMul_of_abc`: take `K = 2 + max c` over the finite exceptional set.
 * `abc_of_abcConstantMul`: use the constant form at `ε/2`. An exceptional triple has
   `rad^(1+ε) < c < K rad^(1+ε/2)`, so `rad^(ε/2) < K`; this bounds `rad`, then `c`, then `a, b`.
 * `abcQuality_iff_abc`: the two exceptional sets are equal for every `ε`, because
@@ -129,7 +129,7 @@ lemma finite_of_abc (habc : ABCConjecture) {ε : ℝ} (hε : 0 < ε) (P : ℕ �
 theorem abcConstantMul_of_abc (habc : ABCConjecture) : ABCConstantMul := by
   intro ε hε
   obtain ⟨M, hM⟩ := ((habc ε hε).image fun x => x.2.2).bddAbove
-  refine ⟨(M : ℝ) + 1, fun a b c ha hb hc hcop hsum => ?_⟩
+  refine ⟨(M : ℝ) + 2, fun a b c ha hb hc hcop hsum => ?_⟩
   set r : ℝ := (radical (a * b * c) : ℝ) ^ (1 + ε)
   have hr : (1 : ℝ) ≤ r :=
     Real.one_le_rpow (by exact_mod_cast one_le_radical _) (by linarith)
@@ -137,12 +137,12 @@ theorem abcConstantMul_of_abc (habc : ABCConjecture) : ABCConstantMul := by
   · have hcM : c ≤ M := hM ⟨(a, b, c), ⟨ha, hb, hc, hcop, hsum, hmem⟩, rfl⟩
     have hM0 : (0 : ℝ) ≤ M := Nat.cast_nonneg M
     calc (c : ℝ) ≤ M := by exact_mod_cast hcM
-      _ < (M : ℝ) + 1 := by linarith
-      _ ≤ ((M : ℝ) + 1) * r := le_mul_of_one_le_right (by linarith) hr
+      _ < (M : ℝ) + 2 := by linarith
+      _ ≤ ((M : ℝ) + 2) * r := le_mul_of_one_le_right (by linarith) hr
   · push Not at hmem
     have hM0 : (0 : ℝ) ≤ M := Nat.cast_nonneg M
     calc (c : ℝ) ≤ r := hmem
-      _ < ((M : ℝ) + 1) * r := by nlinarith
+      _ < ((M : ℝ) + 2) * r := by nlinarith
 
 /-- The constant form `ABC.abc.variants.lt_constant_mul` implies abc. -/
 theorem abc_of_abcConstantMul (hK : ABCConstantMul) : ABCConjecture := by
@@ -155,8 +155,8 @@ theorem abc_of_abcConstantMul (hK : ABCConstantMul) : ABCConjecture := by
     (Set.finite_Iic ⌈B⌉₊) |>.image fun x : (ℕ × ℕ) × ℕ => (x.1.1, x.1.2, x.2)).subset ?_
   rintro ⟨a, b, c⟩ ⟨ha, hb, hc, hcop, hsum, hlt⟩
   have hup := hK a b c ha hb hc hcop hsum
+  have hr1 : (1 : ℝ) ≤ (radical (a * b * c) : ℝ) := by exact_mod_cast one_le_radical _
   set r : ℝ := (radical (a * b * c) : ℝ)
-  have hr1 : (1 : ℝ) ≤ r := by exact_mod_cast one_le_radical _
   have hr0 : (0 : ℝ) < r := by linarith
   have hsplit : r ^ (1 + ε) = r ^ (1 + ε / 2) * r ^ (ε / 2) := by
     rw [← Real.rpow_add hr0]; ring_nf
@@ -193,10 +193,9 @@ lemma quality_gt_iff {a b c : ℕ} {ε : ℝ} (ha : 0 < a) (hb : 0 < b) (hsum : 
     calc 2 ≤ c := by omega
       _ = 1 * c := (one_mul c).symm
       _ ≤ a * b * c := Nat.mul_le_mul_right _ this)
+  have hr' : (2 : ℝ) ≤ (radical (a * b * c) : ℝ) := by exact_mod_cast hr2
   set r : ℝ := (radical (a * b * c) : ℝ)
-  have hr : (1 : ℝ) < r := by
-    have : (2 : ℝ) ≤ r := by exact_mod_cast hr2
-    linarith
+  have hr : (1 : ℝ) < r := by linarith
   have hlogr : 0 < Real.log r := Real.log_pos hr
   have hc0 : (0 : ℝ) < c := by exact_mod_cast (show 0 < c by omega)
   unfold quality
@@ -213,7 +212,7 @@ theorem abcQuality_iff_abc : ABCQuality ↔ ABCConjecture := by
         a + b = c ∧ (radical <| a * b * c : ℝ)^(1 + ε) < c} := by
     intro ε
     ext ⟨a, b, c⟩
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     constructor
     · rintro ⟨ha, hb, hc, hcop, hsum, hq⟩
       exact ⟨ha, hb, hc, hcop, hsum, (quality_gt_iff ha hb hsum).1 hq⟩
