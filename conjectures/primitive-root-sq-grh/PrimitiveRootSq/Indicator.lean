@@ -66,7 +66,6 @@ theorem key_inequality (p : ℕ) [hpf : Fact p.Prime] (hp2 : p ≠ 2) (B₁ B₂
     MulChar.exists_mulChar_orderOf (ZMod p) (by rw [ZMod.card])
       (Complex.isPrimitiveRoot_exp (p - 1) hN)
   obtain ⟨η, hηp, hη1⟩ := exists_eta (p := p)
-  set x : ℕ := p with hx
   set P := (p - 1).primeFactors with hP
   have hP2 : ∀ ℓ ∈ P, 2 ≤ ℓ := fun ℓ hℓ => (Nat.mem_primeFactors.mp hℓ).1.two_le
   set a : ℕ → ℝ := fun ℓ => 1 - 1 / (ℓ : ℝ) with ha
@@ -74,17 +73,17 @@ theorem key_inequality (p : ℕ) [hpf : Fact p.Prime] (hp2 : p ≠ 2) (B₁ B₂
   set A : ℕ → ℕ → ℂ := fun ℓ n => ∑ i ∈ Ico 1 ℓ, ψ n ^ (i * ((p - 1) / ℓ)) with hA
   set F : ℕ → ℂ := fun n => ∏ ℓ ∈ P, ((b ℓ : ℂ) * A ℓ n + (a ℓ : ℂ)) with hF
   set J : ℕ → ℂ := fun n => ∑ j ∈ range p, η n ^ j with hJ
-  set c : ℕ → ℝ := fun n => (Λ n : ℝ) * (1 - (n : ℝ) / x) with hc
-  set S₀ : ℝ := ∑ n ∈ range x, c n with hS₀
-  have hc0 : ∀ n ∈ range x, 0 ≤ c n := by
+  set c : ℕ → ℝ := fun n => (Λ n : ℝ) * (1 - (n : ℝ) / p) with hc
+  set S₀ : ℝ := ∑ n ∈ range p, c n with hS₀
+  have hc0 : ∀ n ∈ range p, 0 ≤ c n := by
     intro n hn
-    have : (n : ℝ) / x ≤ 1 := by
+    have : (n : ℝ) / p ≤ 1 := by
       rw [div_le_one (by exact_mod_cast hp.pos)]; exact_mod_cast (mem_range.mp hn).le
     exact mul_nonneg vonMangoldt_nonneg (by linarith)
   -- Step 1: expansion of `F` over subsets of `P`.
   have hsum : ∑ t ∈ P.powerset,
-      (((∏ ℓ ∈ t, b ℓ) * ∏ ℓ ∈ P \ t, a ℓ : ℝ) : ℂ) * W p ψ x t
-        = ∑ n ∈ range x, (Λ n : ℂ) * (1 - (n : ℂ) / x) * F n := by
+      (((∏ ℓ ∈ t, b ℓ) * ∏ ℓ ∈ P \ t, a ℓ : ℝ) : ℂ) * W p ψ p t
+        = ∑ n ∈ range p, (Λ n : ℂ) * (1 - (n : ℂ) / p) * F n := by
     simp only [hF]
     simp_rw [Finset.prod_add, Finset.mul_sum, W, Finset.mul_sum]
     rw [Finset.sum_comm]
@@ -101,7 +100,7 @@ theorem key_inequality (p : ℕ) [hpf : Fact p.Prime] (hp2 : p ≠ 2) (B₁ B₂
     simp only [ha]
     rw [sub_pos, div_lt_one (by linarith)]
     linarith
-  have hW0 : W p ψ x ∅ = (S₀ : ℂ) := by simp [W, hS₀, hc]
+  have hW0 : W p ψ p ∅ = (S₀ : ℂ) := by simp [W, hS₀, hc]
   rw [hW0] at hsum
   have hcoef : ∀ t ∈ P.powerset.erase ∅,
       |(∏ ℓ ∈ t, b ℓ) * ∏ ℓ ∈ P \ t, a ℓ| * (∏ ℓ ∈ t, ((ℓ : ℝ) - 1)) = θ := by
@@ -117,7 +116,7 @@ theorem key_inequality (p : ℕ) [hpf : Fact p.Prime] (hp2 : p ≠ 2) (B₁ B₂
     rw [abs_of_pos (by positivity)]
     field_simp
   set R : ℂ := ∑ t ∈ P.powerset.erase ∅,
-      (((∏ ℓ ∈ t, b ℓ) * ∏ ℓ ∈ P \ t, a ℓ : ℝ) : ℂ) * W p ψ x t with hR
+      (((∏ ℓ ∈ t, b ℓ) * ∏ ℓ ∈ P \ t, a ℓ : ℝ) : ℂ) * W p ψ p t with hR
   have hRle : ‖R‖ ≤ ((2 : ℝ) ^ P.card - 1) * (θ * B₁) := by
     have hcard : ((P.powerset.erase ∅).card : ℝ) = (2 : ℝ) ^ P.card - 1 := by
       rw [Finset.card_erase_of_mem (Finset.empty_mem_powerset P), Finset.card_powerset,
@@ -131,9 +130,9 @@ theorem key_inequality (p : ℕ) [hpf : Fact p.Prime] (hp2 : p ≠ 2) (B₁ B₂
     have htP : t ⊆ P := Finset.mem_powerset.mp (Finset.mem_of_mem_erase ht)
     have htne : t.Nonempty := Finset.nonempty_iff_ne_empty.mpr (Finset.ne_of_mem_erase ht)
     rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, ← hcoef t ht, mul_assoc]
-    exact mul_le_mul_of_nonneg_left (norm_W_le p ψ hψ x B₁ hB₁ t htP htne) (abs_nonneg _)
+    exact mul_le_mul_of_nonneg_left (norm_W_le p ψ hψ p B₁ hB₁ t htP htne) (abs_nonneg _)
   -- Step 2: termwise comparison of `F` with `J / p`.
-  have hpoint : ∀ n ∈ range x, ((c n : ℂ) * F n).re ≤ ((c n : ℂ) * J n).re / p := by
+  have hpoint : ∀ n ∈ range p, ((c n : ℂ) * F n).re ≤ ((c n : ℂ) * J n).re / p := by
     intro n hn
     have hnp : n < p := mem_range.mp hn
     by_cases hΛ : Λ n = 0
@@ -209,8 +208,8 @@ theorem key_inequality (p : ℕ) [hpf : Fact p.Prime] (hp2 : p ≠ 2) (B₁ B₂
         positivity
       · rw [hJval.2 hη, mul_zero, Complex.zero_re, zero_div]
   -- Step 3: `Σ c J = S₀ + Σ_{0<j<p} bachSum (η^j)`.
-  have hJsum : ∑ n ∈ range x, (c n : ℂ) * J n
-      = (S₀ : ℂ) + ∑ j ∈ Ico 1 p, bachSum (η ^ j) x := by
+  have hJsum : ∑ n ∈ range p, (c n : ℂ) * J n
+      = (S₀ : ℂ) + ∑ j ∈ Ico 1 p, bachSum (η ^ j) p := by
     simp only [hJ, Finset.mul_sum]
     rw [Finset.sum_comm, range_eq_Ico, sum_eq_sum_Ico_succ_bot (by have := hp.pos; omega)]
     congr 1
@@ -222,9 +221,9 @@ theorem key_inequality (p : ℕ) [hpf : Fact p.Prime] (hp2 : p ≠ 2) (B₁ B₂
       rw [MulChar.pow_apply' _ hj0]
       push_cast
       ring
-  have hJre : (∑ n ∈ range x, (c n : ℂ) * J n).re ≤ S₀ + (p - 1) * B₂ := by
+  have hJre : (∑ n ∈ range p, (c n : ℂ) * J n).re ≤ S₀ + (p - 1) * B₂ := by
     rw [hJsum, Complex.add_re, Complex.ofReal_re]
-    have : (∑ j ∈ Ico 1 p, bachSum (η ^ j) x).re ≤ (p - 1) * B₂ := by
+    have : (∑ j ∈ Ico 1 p, bachSum (η ^ j) p).re ≤ (p - 1) * B₂ := by
       refine (Complex.re_le_norm _).trans ((norm_sum_le _ _).trans ?_)
       have hcard : ((Ico 1 p).card : ℝ) = p - 1 := by
         rw [Nat.card_Ico, Nat.cast_sub hp.one_lt.le, Nat.cast_one]
@@ -242,18 +241,18 @@ theorem key_inequality (p : ℕ) [hpf : Fact p.Prime] (hp2 : p ≠ 2) (B₁ B₂
     linarith
   -- Step 4: combine.
   have hFre : θ * S₀ - ((2 : ℝ) ^ P.card - 1) * (θ * B₁)
-      ≤ (∑ n ∈ range x, (Λ n : ℂ) * (1 - (n : ℂ) / x) * F n).re := by
+      ≤ (∑ n ∈ range p, (Λ n : ℂ) * (1 - (n : ℂ) / p) * F n).re := by
     rw [← hsum, Complex.add_re, ← Complex.ofReal_mul, Complex.ofReal_re]
     have := (Complex.abs_re_le_norm R).trans hRle
     have := neg_abs_le R.re
     linarith
-  have hFc : ∑ n ∈ range x, (Λ n : ℂ) * (1 - (n : ℂ) / x) * F n
-      = ∑ n ∈ range x, (c n : ℂ) * F n := by
+  have hFc : ∑ n ∈ range p, (Λ n : ℂ) * (1 - (n : ℂ) / p) * F n
+      = ∑ n ∈ range p, (c n : ℂ) * F n := by
     refine Finset.sum_congr rfl fun n _ => ?_
     simp only [hc]; push_cast; ring
   rw [hFc, Complex.re_sum] at hFre
-  have hsumle : ∑ n ∈ range x, ((c n : ℂ) * F n).re
-      ≤ (∑ n ∈ range x, (c n : ℂ) * J n).re / p := by
+  have hsumle : ∑ n ∈ range p, ((c n : ℂ) * F n).re
+      ≤ (∑ n ∈ range p, (c n : ℂ) * J n).re / p := by
     rw [Complex.re_sum, Finset.sum_div]
     exact Finset.sum_le_sum hpoint
   have hfin : θ * S₀ - ((2 : ℝ) ^ P.card - 1) * (θ * B₁) ≤ (S₀ + (p - 1) * B₂) / p :=
