@@ -14,9 +14,9 @@ Proof.
 
 1. `tuple` (`Implications.HardyLittlewood.Tuple`) is an admissible 447-tuple
    `0 = m₀ < ⋯ < m₄₄₆ = 3158` of even numbers, while `π(3159) = 446`.
-2. Its Hardy–Littlewood constant is positive (`constant_pos`): every factor is positive because
+2. Its Hardy–Littlewood constant is positive (`tprod_pos`): every factor is positive because
    the tuple misses a class mod every prime, and for `q > 3158` the factor
-   `(1 - 447/q)/(1 - 1/q)^447` is within `2·447²/q²` of `1` (`factor_sub_one_le`), so the logs of
+   `(1 - 447/q)/(1 - 1/q)^447` is within `2·447²/q²` of `1` (`factor_sub_one_le'`), so the logs of
    the factors are summable and the product is the exponential of their sum.
 3. The integral `∫ t in 2..n, 1/log t ^ 447` is positive for `n ≥ 3`, so the first conjecture
    makes the counting function of the constellation eventually nonzero: some `p` has all 447
