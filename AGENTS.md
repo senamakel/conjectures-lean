@@ -722,6 +722,16 @@ The role is `counterexample-hunter` (`.claude/agents/`). Scripts of each sweep a
       at `8a2924f`. Checked 2026-11-25 at `a640482`
 - [ ] The splitting exponent `10` is not optimised; any exponent above 2 works
       asymptotically, so the constant could approach `4c = 8`
+- [x] Constant `5`: `Sharp.explicitBound5_of_lls : LLS.LeastPrimeOutsideSubgroup → ExplicitBound5`
+      and `Sharp.erdos_770_iii_of_lls` (H; input LLS Theorem 1.1 (1), imported from lls-grh's
+      `LLS/Statement.lean`), with `ExplicitBound5 := ExplicitBound 5 2` (`Erdos770/Sharp/`).
+      Standard three only; the finite checks (`n < 216`, primes `r < 3000`, 1019 block
+      certificates up to `n < 2⁷⁰⁹`) are kernel `decide`. Audited 2026-11-26 at `7c03eda`
+      (every `Sharp/*.lean` but `GRH.lean` re-elaborated from source, 86 s wall), PR #26
+- [ ] `Sharp/GRH.lean` (`explicitBound5_of_GRH`, C) not built: needs lls-grh's `LLS.Thm11`
+      modules rebuilt in the shared build
+- [ ] `Unconditional/` `explicitBound5` (U) not run
+- [ ] The constant-`5` method's limit is `C → 4`; the data (`n ≤ 10⁵`) allow any `C > 2/log² 3 ≈ 1.657`
 
 ### speiser-rh: RH ⇒ `ζ'(s) ≠ 0` in `0 < Re s < 1/2` · **tier U, complete, verified** · *RH-equivalent*
 - [x] `SpeiserStatement` (the fixed target), `SpeiserAbove T₀`, `SpeiserBelow T₀`, and

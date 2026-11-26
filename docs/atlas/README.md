@@ -111,7 +111,7 @@ Reports: [`novel-via-rh.md`](sweeps/2026-11-26/novel-via-rh.md), [`novel-oeis-li
 | Sun, OEIS A038098: `π(n^k)/n^k` strictly decreasing, `k ≥ 4` | Schoenfeld's bound (RH) + exact counts to `2.8·10⁶` | **proved**, PR #20 (`k = 3` open for `141 ≤ n < 10⁷`) |
 | A prime primitive root `q < p` modulo `p²`, every odd prime `p` | erdos-985's argument + one character sum (GRH) | **proved**, PR #21; Martin 1997 has it for large `p` without an explicit constant |
 | Sharp generator constant `2/log² 3` for `(ℤ/m)ˣ`, every `m ≥ 3` | lls-grh's analysis (GRH) + finite check | **proved in part**, PR #24 (`m < 2^17` and `m ≥ 5·2^49`, optimality; `2^17 ≤ m < 5·2^49` open) |
-| Erdős 770 (iii) with a single-digit constant | Bach's constant 2 (GRH) | prover running |
+| Erdős 770 (iii) with a single-digit constant | LLS Theorem 1.1 (GRH) | **proved** (tier H; constant 5), PR #26 |
 | Sun, arXiv:1402.6641 Conj 2.7(i): `π(kn)^{1/k} > π((k+1)n)^{1/(k+1)}` | elementary, no RH | **proved**, PR #23 (tier D) |
 | Sun, Conj 2.14(ii): `π(n²)^{1/n}` strictly decreasing, `n ≥ 3` | elementary, no RH | **proved**, PR #23 (tier D) |
 | Sun, Conj 3.25 / OEIS A243164: a prime `q < n` with `q·n` a primitive root mod `p_n` | erdos-985's argument with a shorter range (GRH) | feasibility study running |
@@ -126,7 +126,7 @@ Is the mathematical statement in the public literature? Full report:
 
 | Result | Verdict |
 | :--- | :--- |
-| Erdős 770 (iii), explicit for every `n ≥ 2` | not found in explicit form |
+| Erdős 770 (iii), explicit for every `n ≥ 2` | not found in explicit form; **proved** (tier H; constant 5), PR #26 |
 | `O(log³ N)` exceptions for Oppermann, Andrica, Brocard under RH | not found |
 | Erdős 647 "infinitely many" variant from Dickson | asserted without proof (Erdős 1979) |
 | Sun's `π(n^k)/n^k` conjecture for `k ≥ 4` (in progress) | not found |

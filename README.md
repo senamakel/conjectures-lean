@@ -39,7 +39,7 @@ conjectures. Those links are collected in the [implication atlas](docs/atlas/).
 | **17.** `ψ(x,χ)` and primes in arithmetic progressions, uniform in `q` | [`psi-grh`](conjectures/psi-grh/) | ✅ | RH-consequence |
 | **18.** Fujii's average Goldbach bound `Σ G(n) = x²/2 + O(x^{3/2})` | [`goldbach-average-rh`](conjectures/goldbach-average-rh/) | ✅ | RH-equivalent |
 | **19.** Hironaka's resolution of singularities in characteristic 0 | [`hironaka-fc`](conjectures/hironaka-fc/) | ✅ | known |
-| **20.** Erdős Problem 770, part (iii); parts (i) and (ii) open | [`erdos-770`](conjectures/erdos-770/) | 🟡 | RH-consequence |
+| **20.** Erdős Problem 770, part (iii), explicit bound `h(n) ≤ max(P(n), ⌈5 log² n⌉)` from LLS Theorem 1.1 as a hypothesis (GRH and unconditional forms await a build); parts (i) and (ii) open | [`erdos-770`](conjectures/erdos-770/) | 🟡 | RH-consequence |
 | **21.** Erdős Problem 233: the RH bound `O(N log⁴ N)`; `N log² N` open | [`erdos-233`](conjectures/erdos-233/) | 🟡 | RH-consequence |
 | **22.** Erdős Problem 969: Montgomery–Vaughan's `E_k(x) = O(x^{1/(k+1)+ε})` | [`erdos-969`](conjectures/erdos-969/) | 🟡 | RH-consequence |
 | **23.** Bach's explicit Ankeny bound, constant `21/5` here (`2` in lls-grh) | [`ankeny-grh`](conjectures/ankeny-grh/) | 🟡 | RH-consequence |
