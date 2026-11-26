@@ -275,9 +275,4 @@ theorem brocard_of_oppermann (P : Oppermann.OppermannConjecture) :
       linarith [hp1mem.1, hp1mem.2, hp2mem.1, hp2mem.2, hp3mem.1, hp3mem.2,
         hp4mem.1, hp4mem.2, hb0, hb1, hsq, hsq1]
 
-/-- **Andrica's conjecture implies Legendre's conjecture**, and Oppermann's implies both. -/
-theorem legendre_of_oppermann' (P : Oppermann.OppermannConjecture) :
-    LegendreConjecture.LegendreConjecture :=
-  legendre_of_andrica (andrica_of_oppermann P)
-
 end Implications.PrimeGaps
