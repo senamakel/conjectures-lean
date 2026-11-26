@@ -101,7 +101,7 @@ lemma map_eq_top_iff_fields : I.map φ.hom = ⊤ ↔ ∀ K (ψ : B ⟶ K), IsFie
   ker (φ ≫ ψ).hom := by simpa using ⟨by aesop, (ne_top_iff_exists_maximal.not_right.2
   fun ⟨m, _, l⟩ ↦ · _ (ofHom (mkₐ ..)) (Quotient.field m).toIsField (map_mk_eq_bot_of_le l))⟩
 
-lemma IsOpenSub.fieldLocus_le : IsOpenSub V → fieldLocus V.obj ≤ V := (· · · |>.elim fun _ h e ↦ by
+lemma IsOpenSub.fieldLocus_le : IsOpenSub V → fieldLocus V ≤ V := (· · · |>.elim fun _ h e ↦ by
   simpa +contextual [↓map_eq_top_iff_fields, (h ..).1 (e ..)] using h _ (𝟙 _))
 
 lemma IsOpenSub.exists_basicOpen (h : IsOpenSub V) x (k : IsField B) (e : X.map φ x ∈ V B) : ∃ f,
@@ -131,7 +131,7 @@ lemma isOpenSub_offPoints [IsSepFunctor X] {s : Set _} [Finite s] :
   @IsOpenSub _ _ X (offPoints s) := isOpenSub_fieldLocus fun _ x ↦ by
   choose J _ using (IsSepFunctor.exists_ideal _ x <| X.map structureMap ·)
   use s.toFinite.toFinset.inf J, by simp_all [ComesFromPoints, IsField.isDomain,
-    (ker_isPrime _).inf_le']
+    (ker_isPrime _).inf_le', map_eq_bot_iff_le_ker]
 
 lemma isOpenSub_offDiagonal [IsSepFunctor X] : IsOpenSub (offDiagonal X) :=
   isOpenSub_fieldLocus fun _ ⟨x, y⟩ ↦ by peel IsSepFunctor.exists_ideal _ x y; tauto
