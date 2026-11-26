@@ -1,4 +1,5 @@
 import Implications.Basic
+import Implications.Erdos142.FromQuantitativeDensity
 import Implications.ABC.Erdos936
 import Implications.ABC.Erdos977
 import Implications.FourExponentials.TwoPowThreePow
