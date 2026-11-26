@@ -59,8 +59,8 @@ theorem cookson_hills_of_flint_hills (h : FlintHillsStatement) : CooksonHillsSta
   have key := cookson_term_le ((n : ℝ) + 1) hx hs
   simp only [Function.comp_apply]
   push_cast
-  convert key using 4
-  all_goals trace_state
-  all_goals sorry
+  have e : (2 * (n : ℝ) + 1 + 1) = 2 * ((n : ℝ) + 1) := by ring
+  rw [e]
+  exact key
 
 end FlintCooksonHills
