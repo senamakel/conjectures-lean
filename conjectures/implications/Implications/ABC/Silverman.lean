@@ -62,7 +62,7 @@ lemma two_mul_radical_cube_lt {r Q m : ℕ} (hr : r ^ 2 ≤ Q ^ 2 * m) (hm : 64 
   have h6 : ((2 * r) ^ 3) ^ 2 < ((m + 1) ^ 2) ^ 2 := by
     have e1 : ((2 * r) ^ 3) ^ 2 = 64 * (r ^ 2) ^ 3 := by ring
     rw [e1]
-    have hm3 : 0 < m ^ 3 := by positivity
+    have hm3 : 0 < m ^ 3 := Nat.pos_pow_of_pos 3 (by omega)
     calc 64 * (r ^ 2) ^ 3 ≤ 64 * (Q ^ 2 * m) ^ 3 := Nat.mul_le_mul_left _ (Nat.pow_le_pow_left hr 3)
       _ = (64 * Q ^ 6) * m ^ 3 := by ring
       _ < m * m ^ 3 := Nat.mul_lt_mul_of_pos_right hm hm3
