@@ -75,6 +75,32 @@ conjectures are actively mined (Zenodo 10.5281/zenodo.24380486 refutes a differe
 **Lean.** Prove the alternating-sum congruence for Euler numbers once. Then each prime is a
 `decide`/`native_decide` over at most 10^5 terms.
 
+## 4. Subagent scans (stopped early; leads only, nothing computed to a witness)
+
+- **Erdős #203** (Erdős–Graham 1980): m coprime to 6 with every 2^k3^l·m + 1 composite. It has
+  the same 2D-coset covering core as #2. The same Σ1/g figures (0.89 / 1.02 / 1.16) apply, and so
+  does the 34% greedy residue. One covering would settle both #203 and A308950.
+- Dujella's list (version of 14 Nov 2026), reported but not checked by me:
+  - Problem 4.9 (integer points on y² = ((k−1)x+1)((k+1)x+1)(4kx+1)): no new point for x ≲ 16000
+    in the k-fibration.
+  - Problem 1.5: Sadowski's 5-point family, t ≤ 2.1·10^8, no 6th x.
+  - Problem 5.18: Pell classes for ab = r² − 1, r < 6·10^5, c ≤ 10^80, nothing found.
+  - Not tested: 4.1, 1.4, 5.14/5.15.
+  - Problem 4.2: only known points up to v < 3·10^6.
+- **A364383** (Eldar): six consecutive greedy Jacobsthal–Niven numbers. This is a question, not a
+  conjecture. Thirteen digit-sum patterns pass CRT, so any witness is L + a sparse high part.
+  The search was killed unfinished.
+- **A229927** (Cami): no Riesel number of the form 4^n − 1. The best partial cover hit 4190 of 5040
+  residues. Not built.
+- Shown true or out of reach by the subagents:
+  - A178612: rank-0 curve of conductor 35.
+  - A014945: only a Wieferich prime could break it, and both known ones are excluded.
+  - A038867: impossible mod 3.
+  - A241855: settled by Ljunggren's theorem.
+  - Pell-, Lucas-, tribonacci- and Catalan-Niven runs: no CRT-admissible pattern among n < 3·10^5.
+- The subagents' scripts were left in the scratchpad (`hunt-large/agentA`, `agentB`), not copied.
+  The OEIS clone was deleted. The shared IP was briefly rate-limited by OEIS.
+
 ## Proposed lines (do not apply without a verified witness)
 
 ```jsonl
