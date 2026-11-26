@@ -30,14 +30,6 @@ lemma mem_abcSet_of_le {a b c X : ℕ} (ha : 0 < a) (hb : 0 < b)
   mem_abcSet_of_cube_lt_sq ha hb hab hac hbc hsum
     (lt_of_le_of_lt (Nat.pow_le_pow_left hX 3) h)
 
-lemma coprime_pred_self {m : ℕ} (hm : 0 < m) : Nat.Coprime (m - 1) m := by
-  have : m = (m - 1) + 1 := by omega
-  conv_rhs => rw [this]
-  exact Nat.coprime_self_add_right.2 (Nat.coprime_one_right _)
-
-lemma coprime_self_succ (m : ℕ) : Nat.Coprime m (m + 1) :=
-  Nat.coprime_self_add_right.2 (Nat.coprime_one_right _)
-
 /-- abc implies `erdos_936.variants.two_pow_add_one`. -/
 theorem erdos_936_two_pow_add_one_of_abc (habc : ABCConjecture) : TwoPowAddOne := by
   refine eventually_of_abcSet_finite (abcSet_finite habc (by norm_num : (0 : ℝ) < 1 / 2)) _

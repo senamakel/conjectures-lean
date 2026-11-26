@@ -21,7 +21,7 @@ open _root_.ABC Erdos977 Nat Filter
 
 /-- `rad(m) ≤ 4^{P(m)}` for `m ≠ 0`. -/
 lemma radical_le_four_pow_maxPrimeFac {m : ℕ} (hm : m ≠ 0) : radical m ≤ 4 ^ m.maxPrimeFac :=
-  radical_le_four_pow fun p hp =>
+  radical_le_four_pow fun _ hp =>
     Nat.le_maxPrimeFac hm (Nat.prime_of_mem_primeFactors hp) (Nat.dvd_of_mem_primeFactors hp)
 
 /-- Under abc, `n! + 1 ≤ 16^(n + P(n! + 1))` for all large `n`. -/
@@ -55,7 +55,7 @@ lemma eventually_mul_le_maxPrimeFac (habc : ABCConjecture) (K : ℕ) :
   filter_upwards [eventually_factorial_succ_le habc, eventually_pow_lt_factorial (16 ^ (K + 1))]
     with n h1 h2
   by_contra hlt
-  push_neg at hlt
+  push Not at hlt
   have : 16 ^ (n + (n ! + 1).maxPrimeFac) ≤ (16 ^ (K + 1)) ^ n := by
     rw [← pow_mul]
     exact Nat.pow_le_pow_right (by norm_num) (by nlinarith)
@@ -70,5 +70,11 @@ theorem erdos_977_factorial_of_abc (habc : ABCConjecture) : Erdos977.Factorial :
   rw [le_div_iff₀ hn']
   calc b * n ≤ (⌈b⌉₊ : ℝ) * n := by gcongr; exact Nat.le_ceil b
     _ ≤ _ := by exact_mod_cast h
+
+/-- The same, stated with formal-conjectures' own `Nat.maxPrimeFac` (copied as
+`Erdos977.fcMaxPrimeFac`). -/
+theorem erdos_977_factorial_of_abc' (habc : ABCConjecture) :
+    Tendsto (fun n : ℕ ↦ (fcMaxPrimeFac (n.factorial + 1) : ℝ) / n) atTop atTop := by
+  simpa only [fcMaxPrimeFac_eq] using erdos_977_factorial_of_abc habc
 
 end Implications.Abc

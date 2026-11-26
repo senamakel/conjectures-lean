@@ -18,7 +18,7 @@ namespace Implications.Abc
 open _root_.ABC Finset
 
 lemma radical_pos (n : ℕ) : 0 < radical n :=
-  Finset.prod_pos fun p hp => (Nat.prime_of_mem_primeFactors hp).pos
+  Finset.prod_pos fun _ hp => (Nat.prime_of_mem_primeFactors hp).pos
 
 lemma radical_one : radical 1 = 1 := by simp [radical]
 
@@ -44,12 +44,12 @@ lemma radical_le_four_pow {n B : ℕ} (h : ∀ p ∈ n.primeFactors, p ≤ B) : 
   refine le_trans ?_ (primorial_le_four_pow B)
   rw [primorial_eq_prod_primesLE]
   unfold radical
-  refine Nat.le_of_dvd (Finset.prod_pos fun p hp => (Nat.prime_of_mem_primesLE hp).pos)
+  refine Nat.le_of_dvd (Finset.prod_pos fun _ hp => (Nat.prime_of_mem_primesLE hp).pos)
     (Finset.prod_dvd_prod_of_subset _ _ _ fun p hp => ?_)
   exact Nat.mem_primesLE.2 ⟨h p hp, Nat.prime_of_mem_primeFactors hp⟩
 
 lemma radical_factorial_le (n : ℕ) : radical n.factorial ≤ 4 ^ n :=
-  radical_le_four_pow fun p hp =>
+  radical_le_four_pow fun _ hp =>
     (Nat.Prime.dvd_factorial (Nat.prime_of_mem_primeFactors hp)).1 (Nat.dvd_of_mem_primeFactors hp)
 
 lemma pairwise_coprime_triple {a b c : ℕ} (hab : Nat.Coprime a b) (hac : Nat.Coprime a c)
@@ -61,6 +61,14 @@ lemma pairwise_coprime_triple {a b c : ℕ} (hab : Nat.Coprime a b) (hac : Nat.C
     | exact absurd rfl hxy
     | assumption
     | exact Nat.Coprime.symm ‹_›
+
+lemma coprime_pred_self {m : ℕ} (hm : 0 < m) : Nat.Coprime (m - 1) m := by
+  have : m = (m - 1) + 1 := by omega
+  conv_rhs => rw [this]
+  exact Nat.coprime_self_add_right.2 (Nat.coprime_one_right _)
+
+lemma coprime_self_succ (m : ℕ) : Nat.Coprime m (m + 1) :=
+  Nat.coprime_self_add_right.2 (Nat.coprime_one_right _)
 
 /-- The exceptional set of `ABC.ABCConjecture` at a given `ε`. -/
 def abcSet (ε : ℝ) : Set (ℕ × ℕ × ℕ) :=
