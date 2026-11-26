@@ -10,6 +10,8 @@ The edges come from the [implication atlas](../../docs/atlas/).
 
 | Module | Premise | Consequence | Source | Axioms |
 | :--- | :--- | :--- | :--- | :--- |
+| `Implications.FourExponentials.TwoPowThreePow` | `Exponentials.four_exponentials_conjecture` | `Exponentials.two_pow_three_pow_transcendental` | folklore (four exponentials applied to `(1, t)`, `(log 2, log 3)`) | standard three |
+| `Implications.Hadamard.ButsonDoubling` | `ButsonHadamardMatrix.butson_hadamard_fourth_roots_conjecture` | `Hadamard.HadamardConjecture` | Turyn 1970, doubling | standard three |
 
 ## Building
 
