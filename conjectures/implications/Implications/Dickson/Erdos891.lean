@@ -68,12 +68,12 @@ theorem omega_mul_prime_le (i q : ℕ) (hi : i ≠ 0) (hq : q.Prime) : ω (i * q
   rw [Nat.primeFactors_mul hi hq.ne_zero, hq.primeFactors]
   exact (card_union_le _ _).trans (by simp)
 
+set_option linter.unusedVariables false in
+open Nat Filter Finset in
 /-- Source: `FormalConjectures/ErdosProblems/891.lean`, `Erdos891.erdos_891.variants.weisenberg`,
 formal-conjectures `9097e2f`; binders and conclusion verbatim, with
 `hdickson : type_of% Dickson.dickson_conjecture` written as `hdickson : DicksonConjecture`.
 The hypothesis `hk : k ≥ 2` is not needed by the proof. -/
-set_option linter.unusedVariables false in
-open Nat Filter Finset in
 theorem erdos_891_variants_weisenberg (k : ℕ) (hk : k ≥ 2)
     (hdickson : DicksonConjecture) :
     ∃ᶠ n in atTop,

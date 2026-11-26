@@ -54,10 +54,10 @@ theorem twin_primes_of_dickson (h : DicksonConjecture) :
     {p : ℕ | Prime p ∧ Prime (p + 2)}.Infinite := by
   simpa [← Nat.prime_iff] using infinite_prime_add_even_of_dickson h 2 even_two
 
+set_option linter.unusedVariables false in
 /-- Source: `FormalConjectures/Wikipedia/Dickson.lean`, `Dickson.generalized_twin_primes`,
 formal-conjectures `9097e2f`; binders and conclusion verbatim. The hypothesis `hk` is not
 needed: for `k = 0` the set is the set of primes. -/
-set_option linter.unusedVariables false in
 theorem generalized_twin_primes_of_dickson (h : DicksonConjecture) (k : ℕ) (hk : 0 < k) :
     Infinite {p : ℕ | p.Prime ∧ (p + 2 * k).Prime} :=
   Set.infinite_coe_iff.mpr (infinite_prime_add_even_of_dickson h (2 * k) (even_two_mul k))
