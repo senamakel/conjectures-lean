@@ -10,8 +10,8 @@ namespace PiExponent.PolynomialPoleBound
 variable {K C σ : Type*} [Field K] [CommRing C] [Algebra C K]
 
 def realValuation (v : AddValuation K (WithTop ℤ)) : AddValuation K (WithTop ℝ) :=
-  v.map { toAddMonoidHom := (Int.castAddHom ℝ).withTopMap,
-      monotone' := (show Monotone (fun z : ℤ => (z : ℝ)) from Int.cast_mono).withTop_map } rfl
+  v.map ⟨(Int.castAddHom ℝ).withTopMap,
+      (show Monotone (fun z : ℤ => (z : ℝ)) from Int.cast_mono).withTop_map⟩ rfl
 
 @[simp] theorem realValuation_apply (v : AddValuation K (WithTop ℤ)) (x : K) :
     realValuation v x = WithTop.map (fun z : ℤ => (z : ℝ)) (v x) := rfl

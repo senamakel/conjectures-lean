@@ -2278,3 +2278,5 @@ warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/IntegralAffineOpenDimen
 ✔ [19884/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveSpaceFinite (12s)
 ✔ [19894/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveSectionPullback (8.8s)
 ✔ [19900/19988] Built OAI.NumberTheory.PiExponent.Ampleness.NilpotentAmpleDescent (9.0s)
+✔ [19904/19988] Built OAI.NumberTheory.PiExponent.Cohomology.AmpleCohomologyFinite (4.4s)
+✔ [19968/19988] Built OAI.NumberTheory.PiExponent.Ampleness.AmpleFiniteProjectiveEmbedding (3.7s)
