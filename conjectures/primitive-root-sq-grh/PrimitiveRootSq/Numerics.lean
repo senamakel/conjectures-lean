@@ -28,6 +28,10 @@ lemma bach_mono (A A' L L' c : ℝ) (hA0 : 0 ≤ A) (hA : A ≤ A') (hL0 : 0 ≤
   have h2 : 0 ≤ (2 / 3) * (c * L + 5 / 3) := by positivity
   nlinarith [mul_le_mul hA h1 h2 (hA0.trans hA)]
 
+lemma bach_mono1 (A A' L L' : ℝ) (hA0 : 0 ≤ A) (hA : A ≤ A') (hL0 : 0 ≤ L) (hL : L ≤ L') :
+    A * ((2 / 3) * (L + 5 / 3)) + (L + 1) + 0.6 ≤ A' * ((2 / 3) * (L' + 5 / 3)) + (L' + 1) + 0.6 := by
+  simpa using bach_mono A A' L L' 1 hA0 hA hL0 hL (by norm_num)
+
 /-- Abstract finish for the cases `ω ≤ 9`. -/
 lemma finish_small (θ θ₀ X B1 B1u B2 B2u Su M S : ℝ) (hθ : θ₀ ≤ θ) (hθ₀ : 0 < θ₀)
     (hX : 0 ≤ X - 1) (hXM : X - 1 ≤ M) (hB1 : 0 ≤ B1) (hB1u : B1 ≤ B1u) (hB2 : B2 ≤ B2u)
@@ -46,7 +50,7 @@ lemma poly8 (s : ℝ) (hs : 10000 ≤ s) :
     0.5001 + ((s + 2.0001) * ((2 / 3) * (2 * (2 * (14 * 0.6931471808 + s / 16384 - 1)) + 5 / 3))
         + (2 * (14 * 0.6931471808 + s / 16384 - 1) + 1) + 0.6)
       < 0.1235 * (s ^ 2 / 2 - (s / 20 + 3) - 255 * ((s + 2.0001) * ((2 / 3) *
-        (1 * (2 * (14 * 0.6931471808 + s / 16384 - 1)) + 5 / 3))
+        (2 * (14 * 0.6931471808 + s / 16384 - 1) + 5 / 3))
         + (2 * (14 * 0.6931471808 + s / 16384 - 1) + 1) + 0.6)) := by
   nlinarith [mul_nonneg (sub_nonneg.2 hs) (sub_nonneg.2 hs)]
 
@@ -55,7 +59,7 @@ lemma poly9 (s : ℝ) (hs : 14936 ≤ s) :
     0.5001 + ((s + 2.0001) * ((2 / 3) * (2 * (2 * (14 * 0.6931471808 + s / 16384 - 1)) + 5 / 3))
         + (2 * (14 * 0.6931471808 + s / 16384 - 1) + 1) + 0.6)
       < 0.1192 * (s ^ 2 / 2 - (s / 20 + 3) - 511 * ((s + 2.0001) * ((2 / 3) *
-        (1 * (2 * (14 * 0.6931471808 + s / 16384 - 1)) + 5 / 3))
+        (2 * (14 * 0.6931471808 + s / 16384 - 1) + 5 / 3))
         + (2 * (14 * 0.6931471808 + s / 16384 - 1) + 1) + 0.6)) := by
   nlinarith [mul_nonneg (sub_nonneg.2 hs) (sub_nonneg.2 hs)]
 
@@ -65,7 +69,7 @@ lemma poly10 (t : ℝ) (ht : 200 ≤ t) :
         (2 * (4 * (5.5451774464 + t / 256 - 1)) + 5 / 3)) + (4 * (5.5451774464 + t / 256 - 1) + 1)
         + 0.6))
       < 117 * ((t ^ 2) ^ 2 / 2 - (t ^ 2 / 20 + 3) - 4.87 * t * ((t ^ 2 + 2.0001) * ((2 / 3) *
-        (1 * (4 * (5.5451774464 + t / 256 - 1)) + 5 / 3)) + (4 * (5.5451774464 + t / 256 - 1) + 1)
+        (4 * (5.5451774464 + t / 256 - 1) + 5 / 3)) + (4 * (5.5451774464 + t / 256 - 1) + 1)
         + 0.6)) := by
   have h0 := sub_nonneg.2 ht
   nlinarith [mul_nonneg (mul_nonneg (mul_nonneg h0 h0) h0) h0, mul_nonneg (mul_nonneg h0 h0) h0,
@@ -130,9 +134,8 @@ theorem numerics (p : ℕ) (hp0 : 10 ^ 8 ≤ p) (θ : ℝ)
   have hU0 : (0 : ℝ) ≤ 2 * (14 * 0.6931471808 + √(p : ℝ) / 16384 - 1) := by
     have : (0 : ℝ) ≤ √(p : ℝ) / 16384 := by positivity
     linarith
-  have hB1 := bach_mono _ _ _ _ 1 hA0 hA hL0 hU14 (by norm_num)
+  have hB1 := bach_mono1 _ _ _ _ hA0 hA hL0 hU14
   have hB2 := bach_mono _ _ _ _ 2 hA0 hA hL0 hU14 (by norm_num)
-  simp only [one_mul] at hB1
   have hB2u0 : (0 : ℝ) ≤ (√(p : ℝ) + 2.0001) * ((2 / 3) *
       (2 * (2 * (14 * 0.6931471808 + √(p : ℝ) / 16384 - 1)) + 5 / 3))
       + (2 * (14 * 0.6931471808 + √(p : ℝ) / 16384 - 1) + 1) + 0.6 := by positivity
@@ -148,7 +151,6 @@ theorem numerics (p : ℕ) (hp0 : 10 ^ 8 ≤ p) (θ : ℝ)
       have h' : (0.1235 : ℝ) ≤ 36495360 / 223092870 * (28 / 29) ^ 8 := by norm_num
       nlinarith
     have hpoly := poly8 _ hsge
-    simp only [one_mul] at hpoly
     exact finish_small _ _ _ _ _ _ _ _ _ _ hθ8 (by norm_num) (by linarith) hXle hB10 hB1 hB2
       hB2u0 hSu hpoly
   · -- ω = 9
@@ -165,7 +167,6 @@ theorem numerics (p : ℕ) (hp0 : 10 ^ 8 ≤ p) (θ : ℝ)
       have h' : (0.1192 : ℝ) ≤ 36495360 / 223092870 * (28 / 29) ^ 9 := by norm_num
       linarith
     have hpoly := poly9 _ hsge'
-    simp only [one_mul] at hpoly
     exact finish_small _ _ _ _ _ _ _ _ _ _ hθ9 (by norm_num) (by linarith) hXe hB10 hB1 hB2
       hB2u0 hSu hpoly
   · -- ω ≥ 10
@@ -205,7 +206,7 @@ theorem numerics (p : ℕ) (hp0 : 10 ^ 8 ≤ p) (θ : ℝ)
         rw [show (256 : ℝ) = 2 ^ 8 by norm_num, Real.log_pow]; norm_num
       rw [ht4, Real.log_pow]; push_cast; linarith
     have hA' : √(p : ℝ) + 2 + 3 / p ≤ t ^ 2 + 2.0001 := by rw [ht2]; exact hA
-    have hB1t := bach_mono _ _ _ _ 1 hA0 hA' hL0 hU (by norm_num)
+    have hB1t := bach_mono1 _ _ _ _ hA0 hA' hL0 hU
     have hB2t := bach_mono _ _ _ _ 2 hA0 hA' hL0 hU (by norm_num)
     have hθX : (117 : ℝ) ≤ θ * X := by
       have e : (36495360 / 223092870 : ℝ) * (28 / 29) ^ k * X
@@ -219,7 +220,8 @@ theorem numerics (p : ℕ) (hp0 : 10 ^ 8 ≤ p) (θ : ℝ)
     rw [ht2] at hpoly
     rw [ht2] at hB1t hB2t
     have hθ0 : 0 ≤ θ := by
-      have : (0 : ℝ) < 36495360 / 223092870 * (28 / 29) ^ k := by positivity
+      have : (0 : ℝ) < 36495360 / 223092870 * (28 / 29) ^ k :=
+        mul_pos (by norm_num) (pow_pos (by norm_num) _)
       linarith
     have hU0' : (0 : ℝ) ≤ (2 / 3) * (2 * (4 * (5.5451774464 + t / 256 - 1)) + 5 / 3) := by
       have : (0 : ℝ) ≤ t / 256 := by positivity
