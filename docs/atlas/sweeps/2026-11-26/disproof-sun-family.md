@@ -301,7 +301,7 @@ All counterexamples below 10¹¹, all prime and ≡ 7 (mod 12), each with 0 repr
 
 ### 6.4 Prior art at the moment of the hit
 
-Checked at 12:28 UTC and again at 12:28 (no later re-check: the lane was wound down) UTC, 2026-11-26:
+Checked at 12:28 UTC, 2026-11-26. There was no later re-check, because the lane was wound down; re-check before any claim is made:
 - the OEIS entry, re-fetched: still #22 of 16 April 2018, with no comment after Sun's;
 - an OEIS full-text search for 28662666283: no results;
 - joeyhlu's repository at `22d8e9e`, re-fetched: no mention of A301534 or the number;

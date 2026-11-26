@@ -96,7 +96,8 @@ the `n = 5` row has one implementation only, and the diagonal is verified for `j
 
 - **Two infinite families.**
   - At fixed `k = 284`, the table gives `v_37(s(37^n, 37^n − 284)) = n + 2` for
-    `n = 2, 3, 4, 5`, against the conjectured `n + 1`.
+    `n = 2, 3, 4, 5`, against the conjectured `n + 1`. `n = 2, 3` were checked exactly, `n = 4`
+    by two modular implementations, and `n = 5` by one.
   - On the diagonal, `v_37(s(37^j, 37^j − k_j)) = 2j` for `j = 2, 3, 4`, against `j + 1`. The
     excess `j − 1` is unbounded if the pattern continues.
 - **The odd companions** `k_j + 1` behave the same way. This is forced by the paper's own
