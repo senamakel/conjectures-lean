@@ -15,7 +15,7 @@ open MulSemiringAction Polynomial PreTilt IsOfFinOrder nonZeroDivisors WittVecto
 
 lemma mk_complex_eq_mk_padicAlgCl {p} [Fact p.Prime] : #ℂ = #(PadicAlgCl p) := mk_complex ▸
   (continuum_le_cardinal_of_module ℚ_[p] _).antisymm ((Algebra.IsAlgebraic.cardinalMk_le_max ℚ_[p]
-  _).trans (by simpa using! mk_quotient_le.trans (@mk_set_le (ℕ → ℚ) _)))
+  _).trans (by simpa using! mk_quotient_le.trans (@mk_subtype_le (ℕ → ℚ) _)))
 
 variable {p} [ThePrime p]
 
