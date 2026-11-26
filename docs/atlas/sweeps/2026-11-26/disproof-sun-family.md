@@ -331,7 +331,7 @@ Proof shape:
   the decidable instance over `Finset.range` together with `Nat.sqrt_eq'`/`Nat.exists_mul_self`.
 - Kernel-only alternative (no `native_decide`): use the certificate in §6.3. Each z needs the
   lemma "q prime, q ≡ 2 (mod 3), q ∣ x² + 3y² ⇒ q ∣ x ∧ q ∣ y", from −3 being a non-residue
-  (quadratic reciprocity in Mathlib), applied with q ∥ m. Alternatively, for q ≤ 23 (6 of the
+  (quadratic reciprocity in Mathlib), applied with q ∥ m. Alternatively, for q ≤ 23 (9 of the
   31 z), a residue check of x² + 3y² mod q² by `decide`.
 - The rest are kernel-checkable divisions.
 
