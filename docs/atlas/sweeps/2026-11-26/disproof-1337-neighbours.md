@@ -97,7 +97,7 @@ Patterns that transfer, in order of how often they produced a finite witness:
 | Fiscus et al. remaining problems | arXiv:2504.03448v2 | no open conjecture besides 24; only "determine the winner" problems | data only |
 | McNamara–Steingrímsson Q. 9.1, 9.5, Conj. 9.2 | JCTA 2015 | 9.5 answered; 9.2 (shellability) not computable; 9.1 too costly | dropped |
 | Wild-number conjecture, 13 ≤ n ≤ 154 | arXiv:2610.22142 Conj. 6.1 | open, but proved for n ≥ 155 by 1337 and for n ≤ 12 by the source, so it is probably true | dropped: no plausibility for a counterexample |
-| Alexandersson's real-rootedness list (other entries) | symmetricfunctions.com | see §5 | sub-agent |
+| Alexandersson's real-rootedness list (26 open entries) | symmetricfunctions.com | page stamped 2026-11-26; short searches found no later resolution of the tested rows | yes; 9 families searched, no hit (§5) |
 | Mazák–Zrubák problems 6, 7; 1337 "Conjecture H′" | arXiv:2603.08822 | H′ is the 1337 repo's own conjecture, not a published one | dropped (ad hoc) |
 | Hadamard order 2396 | — | an existence witness would prove, not refute | dropped |
 | Fujii threshold 20.40443 | rh-transfer | analytic, no finite witness | dropped |
@@ -233,7 +233,7 @@ contains it entirely, so a grid cover implies a true cover. `hb.c` is a heat-bat
 | `sa3` conservative | n=56 + 1 → 57 | 2¹⁸ | 6M × 2 | 0.3 h | best 16, 28 cells |
 | `sa3` conservative | **n=57 + 1 → 58** | 2¹⁸ | 6M × 8 | 1.2 h | best 46–104 cells; no cover |
 
-Total for this target: about 15 CPU-hours. **Stop condition reached** (CPU budget). The most
+Total for this target: about 15 CPU-hours. The whole lane used about 17 CPU-hours (this target, plus 0.5 h `nb-comb` and 1.2 h `rr-alex`). **Stop condition reached** (CPU budget). The most
 useful negative: a centre-sampled grid at 2¹⁸ cells is **not** a reliable cover test at
 n ≈ 57. Pairs with v_i + v_j ≳ 200 leave holes narrower than a cell, so a grid "cover" was
 exactly checked at E between −0.74 and 0 in every case. The conservative grid fixes this, but
@@ -255,7 +255,34 @@ n = 56 base. That is a calibration failure of my pipeline, not evidence about n 
 
 ## 5. Real-rootedness neighbours
 
-RR_SECTION_PLACEHOLDER
+Sub-agent `rr-alex`, about 1.2 CPU-hours on at most 4 cores. Source: Alexandersson's open-problem
+page (https://www.symmetricfunctions.com/realRootedOpenProblems.htm, stamped 2026-11-26), with
+26 open entries listed. Plausibility for each family: a sibling of the parking-excedance family,
+which failed at n = 17; ranges barely tested; lopsided top coefficients.
+
+Every family had two coefficient implementations that agree. Real-rootedness was certified by
+python-flint/arb root isolation and, independently, by an integer Sturm sequence for degree
+≤ 70 (≤ 40 for Jacobi–Stirling). As a validation, both methods report 14 real roots out of 16
+for 1337's P₁₇, and the search finds the Laguerre witness −1/5.
+
+| Conjecture | Source | Checked before | Checked here | CPU | Outcome | Min Newton margin |
+|---|---|---|---|---|---|---|
+| E_{n,k} real-rooted + interlacing | Alexandersson 2026 | k ≤ 6, n ≤ 22 | k = 3..6 to n = 150; k = 7..20 to n = 120 | 23 min | holds | ≈ 6.7/n |
+| D_{n,k} real-rooted | Alexandersson 2026 | k ≤ 6, n ≤ 22 | k = 3..6 to n = 100; k = 7..12 to n = 60 | 4 min | holds | ≈ 8/n |
+| B_n(t;132) | Elizalde–Rivera–Zhuang 2026 | n ≤ 40 | n ≤ 250 | 2 min | holds | ≈ 8/n |
+| Rows of A² | Mao–Wang arXiv:2607.01572 Conj. 4.1 | n ≤ 30 | n ≤ 150 | 3 min | holds | ≈ 9/n |
+| Rows of D² | same | unstated | n ≤ 200 | 19 min | holds | ≈ 0.5/n (smallest, smooth) |
+| P_{n,j}, j ≥ 4 | Alexandersson 2026 | j ≤ 6, n ≤ 40 | j = 4..20, n ≤ 200 | 2 min | holds | 0.036–0.42 |
+| O_{n,j} | Alexandersson 2026 | j ≤ 5, n ≤ 30 | j = 2..20, n ≤ 150 | 4 min | holds | ≈ 1.8/n (j = 2) |
+| Jacobi–Stirling A_{k,i}, 4 ≤ i ≤ k−3 | Gessel–Lin–Zeng 2012 Conj. 15 | unstated | k ≤ 100 | 16 min | holds | ≈ 2.8/k |
+| Natural-descent N_λ | Alexandersson 2026 | \|λ\| ≤ 35 | exhaustive \|λ\| ≤ 20, eight families to size 175 | < 1 min | holds | converges to 0.10–0.30 |
+
+No hit. Every margin decays smoothly like c/n, with no sign of the small-coefficient tail that
+came before the P₁₇ failure. A positive margin is weak evidence either way: P₁₇ itself has
+margin +0.21. Not tried, because they need heavier code: balanced arrays, nested-matroid
+Z-polynomials, Lascoux numerators, transportation polytopes, Hurwitz numbers, Gessel–Zhuang 7.1.
+Side note: the page still lists as open four entries that 1337 claims to have settled
+(parking excedances, CFH 7.3, FPV 4.13, Chow). This is unverified here.
 
 ## 6. Best lead not finished
 
