@@ -27,14 +27,14 @@ private lemma fin5_ne_succ : ∀ i : Fin 5, i ≠ i + 1 := by decide
 def catlin : SimpleGraph (Fin 5 × Fin 3) where
   Adj := catlinAdj
   symm := by
-    intro x y h
+    refine ⟨fun x y h => ?_⟩
     unfold catlinAdj at *
     rcases h with ⟨h1, h2⟩ | h | h
     · exact Or.inl ⟨h1.symm, Ne.symm h2⟩
     · exact Or.inr (Or.inr h)
     · exact Or.inr (Or.inl h)
   loopless := by
-    intro x h
+    refine ⟨fun x h => ?_⟩
     unfold catlinAdj at h
     rcases h with ⟨_, h⟩ | h | h
     · exact h rfl
@@ -51,7 +51,7 @@ theorem catlin_indep_three : ∀ x y z : Fin 5 × Fin 3, x ≠ y → x ≠ z →
 /-- `χ(C₅[K₃]) ≥ 8`. -/
 theorem eight_le_chromaticNumber : (8 : ℕ∞) ≤ catlin.chromaticNumber := by
   by_contra hlt
-  push_neg at hlt
+  push Not at hlt
   have h7 : catlin.chromaticNumber ≤ (7 : ℕ) := by
     have : catlin.chromaticNumber < (7 : ℕ∞) + 1 := hlt
     exact Order.le_of_lt_add_one this
