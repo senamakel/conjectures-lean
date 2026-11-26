@@ -31,4 +31,28 @@ def SolePlanatStatement : Prop :=
     Real.exp Real.eulerMascheroniConstant / (riemannZeta 2).re
       < solePlanatRatio (Nicolas.kthPrimorial n)
 
+/-! ## Extremely abundant numbers
+
+S. Nazardonyavi and S. Yakubovich, *Extremely abundant numbers and the Riemann hypothesis*,
+J. Integer Seq. 17 (2014), Article 14.2.8 (arXiv:1211.2147, read in v3: Definition 2.1 and
+Theorem 2.4; Definition 3 and Theorem 7 in the journal numbering, not checked against the
+journal PDF). With `f(n) = σ(n)/(n log log n)`, `n` is *extremely abundant* if `n = 10080`, or
+`n > 10080` and `f(m) < f(n)` for every `10080 ≤ m < n`. They prove that RH holds if and only if
+there are infinitely many extremely abundant numbers. No formal-conjectures entry exists. -/
+
+open ArithmeticFunction in
+open scoped ArithmeticFunction.sigma in
+/-- Robin's ratio `f(n) = σ(n)/(n log log n)` (Caveney–Nicolas–Sondow's `G(n)`). -/
+noncomputable def robinRatio (n : ℕ) : ℝ :=
+  (σ 1 n : ℝ) / (n * Real.log (Real.log n))
+
+/-- Nazardonyavi–Yakubovich, Definition 2.1: extremely abundant numbers. -/
+def IsExtremelyAbundant (n : ℕ) : Prop :=
+  n = 10080 ∨ (10080 < n ∧ ∀ m : ℕ, 10080 ≤ m → m < n → robinRatio m < robinRatio n)
+
+/-- Nazardonyavi–Yakubovich, Theorem 2.4 (the RH direction): there are infinitely many
+extremely abundant numbers. -/
+def ExtremelyAbundantInfinite : Prop :=
+  {n : ℕ | IsExtremelyAbundant n}.Infinite
+
 end Abundant
