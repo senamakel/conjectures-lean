@@ -353,4 +353,21 @@ theorem cramer_of_firoozbakht (h : Firoozbakht.FiroozbakhtConjecture) :
   rw [Real.norm_eq_abs, Real.norm_eq_abs, abs_of_nonneg hpg, abs_of_nonneg (sq_nonneg _)]
   exact hmain
 
+/-! ## Headline theorems -/
+
+/-- **Cramér's conjecture implies Erdős 382 (i)** (Cambie's observation). -/
+theorem erdos_382_i_of_cramer (h : CramerConjecture.CramerConjecture) :
+    Erdos382.Erdos382PartI :=
+  erdos_382_i_of_subpowerGaps (subpowerGaps_of_cramer h)
+
+/-- **The strict numerical Cramér inequality implies Erdős 382 (i).** -/
+theorem erdos_382_i_of_strictBound (h : CramerConjecture.StrictBound) :
+    Erdos382.Erdos382PartI :=
+  erdos_382_i_of_cramer (cramer_of_strictBound h)
+
+/-- **Firoozbakht's conjecture implies Erdős 382 (i).** -/
+theorem erdos_382_i_of_firoozbakht (h : Firoozbakht.FiroozbakhtConjecture) :
+    Erdos382.Erdos382PartI :=
+  erdos_382_i_of_cramer (cramer_of_firoozbakht h)
+
 end Implications.PrimeGaps
