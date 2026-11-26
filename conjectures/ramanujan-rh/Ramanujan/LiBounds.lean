@@ -35,6 +35,7 @@ lemma A_nonneg {ℓ : ℝ} (h : 0 < ℓ) : 0 ≤ A ℓ :=
 lemma A_fifteen_le : A 15 ≤ 1 := by
   unfold A
   simp [Finset.sum_range_succ, Nat.factorial]
+  norm_num
 
 lemma A_eq {u : ℝ} (hu : u ≠ 0) :
     A u = (u ^ 8 + u ^ 7 + 2 * u ^ 6 + 6 * u ^ 5 + 24 * u ^ 4 + 120 * u ^ 3 + 720 * u ^ 2 +
@@ -42,7 +43,6 @@ lemma A_eq {u : ℝ} (hu : u ≠ 0) :
   unfold A
   simp [Finset.sum_range_succ, Nat.factorial]
   field_simp
-  ring
 
 lemma two_le_exp_fifteen : 2 ≤ Real.exp 15 := by
   have := Real.add_one_le_exp 15
