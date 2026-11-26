@@ -63,10 +63,8 @@ theorem two_mem_approximationExponents {x : ℝ} (hx : Irrational x) :
   intro r hr
   have hrden : 1 ≤ (r.den : ℝ) := by exact_mod_cast r.pos
   have hrone : |x - (r : ℝ)| < 1 :=
-    hr.1.trans_le (by
-      simpa only [div_one] using
-        one_div_le_one_div_of_le (by norm_num : (0 : ℝ) < 1)
-          (by nlinarith : (1 : ℝ) ≤ (r.den : ℝ)^2))
+    hr.1.trans_le ((div_le_one (by positivity)).mpr
+      (by nlinarith : (1 : ℝ) ≤ (r.den : ℝ)^2))
   have hr2 : 2 ≤ r.den := by
     by_contra h
     exact hr.2 ⟨by omega, hrone⟩
