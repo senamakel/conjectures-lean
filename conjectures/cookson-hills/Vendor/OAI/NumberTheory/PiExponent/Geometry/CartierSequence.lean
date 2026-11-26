@@ -53,8 +53,8 @@ theorem exact (p : X ⟶ Spec (CommRingCat.of ℂ))
     (heq : ∀ x : X, ∃ U : X.affineOpens, x ∈ U.1 ∧
       ∃ e : M.sheaf.restrict U.1.ι ≅ O U.1.toScheme,
       ∃ d : N.sheaf.restrict U.1.ι ≅ O U.1.toScheme,
-        I.ideal U = Ideal.span {U.1.topIso.hom
-          (endValue (e.inv ≫ (Scheme.Modules.restrictFunctor U.1.ι).map φ ≫ d.hom))}) :
+        I.ideal U = Ideal.span {(U.1.topIso.hom
+          (endValue (e.inv ≫ (Scheme.Modules.restrictFunctor U.1.ι).map φ ≫ d.hom)))}) :
     ∃ hz : φ ≫ LineClosedUnit.map I.subschemeι N = 0,
       (ShortComplex.mk φ (LineClosedUnit.map I.subschemeι N) hz).ShortExact := by
   have local_exact (U : X.affineOpens)

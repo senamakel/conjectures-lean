@@ -46,8 +46,8 @@ theorem zero_stalk_kernel (L : LineBundle X) (s : GlobalSections X L.sheaf)
     (y : (SectionZeroIdeal.zeroIdeal L s).subscheme)
     (hy : (SectionZeroIdeal.zeroIdeal L s).subschemeι y ∈ U.1) :
     RingHom.ker ((SectionZeroIdeal.zeroIdeal L s).subschemeι.stalkMap y).hom =
-      Ideal.span {(X.presheaf.germ U.1 _ hy)
-        (U.1.topIso.hom (coefficient e (restrictSection U.1.ι s)))} := by
+      Ideal.span {((X.presheaf.germ U.1 _ hy)
+        (U.1.topIso.hom (coefficient e (restrictSection U.1.ι s))))} := by
   rw [stalkMap_ker_eq_map_affine_ker _ U.1 U.2 y hy,
     (SectionZeroIdeal.zeroIdeal L s).ker_subschemeι_app U,
     SectionZeroIdeal.zeroIdeal_on_frame L s U e,

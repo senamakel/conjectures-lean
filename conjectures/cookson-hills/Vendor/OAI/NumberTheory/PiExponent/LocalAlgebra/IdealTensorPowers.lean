@@ -54,8 +54,8 @@ private lemma affineMapCoefficient_id {M : X.Modules} (U : X.affineOpens)
 
 lemma idealPowerInclusion_ideal (J : LineBundle X) (ι : J.sheaf ⟶ O X)
     (U : X.affineOpens) (e : J.sheaf.restrict U.1.ι ≅ O U.1.toScheme) (n : ℕ) :
-    Ideal.span {affineMapCoefficient U (idealPowerFrame J U.1 e n)
-      (Scheme.Modules.restrictUnitIso U.1.ι) (idealPowerInclusion J ι n)} =
+    Ideal.span {(affineMapCoefficient U (idealPowerFrame J U.1 e n)
+      (Scheme.Modules.restrictUnitIso U.1.ι) (idealPowerInclusion J ι n))} =
       (Ideal.span {affineMapCoefficient U e (Scheme.Modules.restrictUnitIso U.1.ι) ι})^n := by
   induction n with
   | zero =>
