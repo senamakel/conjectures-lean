@@ -131,7 +131,7 @@ theorem not_shanks_of_granville (hG : CramerConjecture.Granville) :
   have hK1 : 1 ≤ L := le_trans (le_max_left _ _) hLn
   have hK2 : 3 * (1 + ε) / ε ≤ L := le_trans (le_max_right _ _) hLn
   have hK2' : 3 * (1 + ε) ≤ ε * L := by
-    rwa [div_le_iff₀ hε, mul_comm] at hK2
+    rw [div_le_iff₀ hε] at hK2; linarith
   push_cast at hbn
   rw [← hp] at hbn
   set l := Real.log (p + 1) with hldef
