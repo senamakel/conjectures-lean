@@ -1,5 +1,6 @@
 import Abundant.SolePlanat
 import Abundant.Extremely
+import Abundant.Extraordinary
 import Nicolas.Main
 
 /-!
@@ -23,5 +24,11 @@ a consequence of RH), there are infinitely many extremely abundant numbers. -/
 theorem extremelyAbundantInfinite_of_RH (hRH : RiemannHypothesis) (hR : Robin.RobinStatement) :
     ExtremelyAbundantInfinite :=
   extremelyAbundantInfinite_of_robin_of_nicolas hR (Nicolas.nicolas_of_RH hRH)
+
+/-- **Caveney–Nicolas–Sondow** (2011, Theorem 5): under RH (with Robin's inequality, itself a
+consequence of RH), `4` is the only extraordinary number. -/
+theorem fourOnlyExtraordinary_of_RH (hRH : RiemannHypothesis) (hR : Robin.RobinStatement) :
+    FourOnlyExtraordinary :=
+  fourOnlyExtraordinary_of_robin_of_nicolas hR (Nicolas.nicolas_of_RH hRH)
 
 end Abundant
