@@ -29,7 +29,7 @@ theorem le_div_div {x n : ℕ} (h : n ≤ x) : n ≤ x / (x / n) := by
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · exact Nat.zero_le _
   have hq : 0 < x / n := Nat.div_pos h hn
-  rw [Nat.le_div_iff_mul_le hq, Nat.mul_comm]
+  rw [Nat.le_div_iff_mul_le hq]
   exact Nat.mul_div_le x n
 
 /-- `blockSum f x n = ∑_{k=n}^{x} f ⌊x/k⌋`, summed over the blocks `[n, ⌊x/⌊x/n⌋⌋]` on which
@@ -98,7 +98,7 @@ theorem allBelow_iff (p : ℕ → Bool) (n : ℕ) : allBelow p n = true ↔ ∀ 
         · exact h
       · intro H k hk
         exact H k (Nat.lt_succ_of_lt hk)
-    · simp only [Bool.false_eq_true, false_iff, not_forall]
+    · simp only [false_iff, not_forall]
       exact ⟨n, Nat.lt_succ_self n, h⟩
 
 /-- `sqSum f X D = ∑_{d=1}^{D} f ⌊X/d²⌋`. -/
