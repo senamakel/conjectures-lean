@@ -57,7 +57,7 @@ theorem omega_lt_of_lt_prod (k i : ℕ) (hi : 0 < i) (h : i < ∏ j ∈ range k,
   push Not at hk
   rw [ArithmeticFunction.cardDistinctFactors_eq_card_primeFactors] at hk
   have h1 : ∏ j ∈ range k, j.nth Nat.Prime ≤ ∏ j ∈ range i.primeFactors.card, j.nth Nat.Prime :=
-    prod_le_prod_of_subset_of_one_le' (range_subset_range.mpr hk)
+    prod_le_prod_of_subset_of_one_le (range_subset_range.mpr hk)
       (fun j _ _ => (Nat.prime_nth_prime j).one_lt.le)
   have h2 := prod_range_nth_prime_le i.primeFactors (fun p hp => Nat.prime_of_mem_primeFactors hp)
   have h3 : ∏ p ∈ i.primeFactors, p ≤ i := Nat.le_of_dvd hi (Nat.prod_primeFactors_dvd i)
@@ -70,10 +70,13 @@ theorem omega_mul_prime_le (i q : ℕ) (hi : i ≠ 0) (hq : q.Prime) : ω (i * q
 
 /-- Source: `FormalConjectures/ErdosProblems/891.lean`, `Erdos891.erdos_891.variants.weisenberg`,
 formal-conjectures `9097e2f`; binders and conclusion verbatim, with
-`hdickson : type_of% Dickson.dickson_conjecture` written as `hdickson : DicksonConjecture`. -/
+`hdickson : type_of% Dickson.dickson_conjecture` written as `hdickson : DicksonConjecture`.
+The hypothesis `hk : k ≥ 2` is not needed by the proof. -/
+set_option linter.unusedVariables false in
+open Nat Filter Finset in
 theorem erdos_891_variants_weisenberg (k : ℕ) (hk : k ≥ 2)
     (hdickson : DicksonConjecture) :
-    ∃ᶠ n in Filter.atTop,
+    ∃ᶠ n in atTop,
       ∀ m ∈ Ico n (n + (∏ i ∈ range k, i.nth Nat.Prime) - 1),
       ω m ≤ k := by
   set P := ∏ i ∈ range k, i.nth Nat.Prime with hP
