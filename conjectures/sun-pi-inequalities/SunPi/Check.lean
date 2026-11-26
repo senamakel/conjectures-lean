@@ -13,6 +13,7 @@ theorems `checkA_sound` and `checkB_sound` say what a `true` result means.
 namespace SunPi.Check
 
 open Nat
+open scoped Nat.Prime
 
 /-- `true` iff no `e` with `d ≤ e < d + fuel` and `e² ≤ m` divides `m`. -/
 def noDivFrom (m : ℕ) : ℕ → ℕ → Bool
@@ -28,15 +29,15 @@ theorem noDivFrom_iff (m : ℕ) : ∀ (f d : ℕ),
     intro d
     simp only [noDivFrom]
     by_cases h : m < d * d
-    · simp only [h, if_true, true_iff]
+    · simp only [h, ite_true, true_iff]
       intro e hde _ hee
       have : d * d ≤ e * e := Nat.mul_le_mul hde hde
       omega
-    · simp only [h, if_false]
+    · simp only [h, ite_false]
       by_cases hm : m % d = 0
-      · simp only [hm, if_true, Bool.false_eq_true, false_iff, not_forall]
+      · simp only [hm, ite_true, Bool.false_eq_true, false_iff, not_forall]
         exact ⟨d, le_refl d, by omega, by omega, fun hn => hn (Nat.dvd_of_mod_eq_zero hm)⟩
-      · simp only [hm, if_false, ih]
+      · simp only [hm, ite_false, ih]
         constructor
         · intro H e hde hlt hee
           rcases Nat.eq_or_lt_of_le hde with rfl | hlt'
@@ -132,7 +133,7 @@ theorem checkAk_sound (n bound : ℕ) : ∀ (f k : ℕ), checkAk n bound k (π (
       intro H; rcases H with H | H
       · omega
       · have : k * n ≤ j * n := Nat.mul_le_mul_right n h1; omega
-    simp only [hkn, if_false, Bool.and_eq_true, decide_eq_true_eq] at h
+    simp only [hkn, ite_false, Bool.and_eq_true, decide_eq_true_eq] at h
     have hd : π (k * n) + cnt (k * n) n = π ((k + 1) * n) := by
       rw [← primeCounting_add_cnt]; congr 1; ring
     rw [hd] at h
