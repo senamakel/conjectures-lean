@@ -21,12 +21,12 @@ What this lane adds:
    - Each pendant branch shifts the mass ratio by a factor of at most 2.
    - A Cauchy–Schwarz bound then shows a hub cannot produce a second peak unless one of its branches
      is already "lumpy".
-   - Lumpiness, measured as `ρ`, is at most 0.475 over all 52,577 rooted trees with up to 14 vertices.
+   - Lumpiness, measured as `ρ`, is at most 0.475 over all 53,271 rooted trees with up to 14 vertices.
      It falls roughly like 3/n: annealing reached at most 0.014 at 60–200 vertices.
    - So a hub cannot amplify lumpiness (§2).
 2. **A new exhaustive fact (D, computational).** Every free tree with `n ≤ 28` vertices has a domination
    polynomial that is **log-concave from its first strict descent onward**. That property implies
-   unimodality. It covers 3,252,141,005 trees with 20 ≤ n ≤ 28; smaller n were checked in Python.
+   unimodality. It covers 3,221,658,129 trees with 20 ≤ n ≤ 28; smaller n were checked in Python.
    The normalised post-descent curvature stays at or below −0.83, against −1 for a Gaussian.
    All known non-log-concave trees fail only before the mode: Hong's `U` (n = 27) and the three at
    n = 28, which this run recounted as 1 and 3. So the smallest counterexample to the
@@ -130,7 +130,7 @@ Write `f_c = A+B+C` for the factor when v ∈ S and `g_c = A+B` for the factor w
    ρ ≤ 1/2, the requirement becomes 0.72 L > 2L − ln√1.5. That forces L < 0.16, which in turn gives
    S < 0.35σ. Two components that close cannot form two peaks.
 4. **Branches are never lumpy (computed).** `src/lumpy.py` computes ρ for every rooted tree with
-   n ≤ 14 (52,577 rooted trees). The maximum is **0.475**, at n = 5, root of `P_4` plus a pendant;
+   n ≤ 14 (53,271 rooted trees). The maximum is **0.475**, at n = 5 (root–a–b with two leaves on b);
    the maxima for n = 5, 10 and 14 are 0.475, 0.291 and 0.213. The shift stays near −1.33 while
    var(g) grows, so ρ_max ≈ 3/n. Annealing on rooted trees (`src/anneal_rho.py`, 18 chains) reached
    only 0.19 at n = 15, 0.014 at 60–200 vertices and 0.005 at 200–500. **The state of a vertex
@@ -169,7 +169,7 @@ range §3 checks exhaustively.
 
 Cross-checks:
 - DP-1 rooted at vertex 0 equals DP-1 rerooted at a random vertex, and equals brute force, for
-  **every tree with n ≤ 14** (5,478 trees).
+  **every tree with n ≤ 14** (5,446 trees).
 - The multiset of DP-1 polynomials equals the multiset from DP-2 for every n ≤ 20 (1.34·10⁶ trees).
 - DP-3's maximum curvature agrees with DP-1's at n = 10, 15 and 19.
 - DP-3 recounts the non-log-concave trees as 1 at n = 27 and 3 at n = 28, as Hong and the sibling
@@ -190,7 +190,7 @@ Cross-checks:
 
 | # | Family | Range | Trees | Valleys | Best K (n ≥ 40) | Best J_core (n ≥ 40) | CPU |
 |---|---|---|---|---|---|---|---|
-| E | all free trees: post-descent log-concavity (new property) | 20 ≤ n ≤ 28 exhaustive (smaller n in Python) | 3.25·10⁹ | 0 | −0.8309 (n = 28; −0.810 to −0.831 for n = 20 to 28) | — | ≤ 5.3 h |
+| E | all free trees: post-descent log-concavity (new property) | 20 ≤ n ≤ 28 exhaustive (smaller n in Python) | 3.22·10⁹ | 0 | −0.8309 (n = 28; −0.810 to −0.831 for n = 20 to 28) | — | ≤ 5.3 h |
 | F1 | hub + k₁·G₁ + k₂·G₂ + ℓ leaves; G₁, G₂ any rooted trees with ≤ 7 vertices (85); k ∈ {1,2,3,4,6,8,12,16,24,32,48,64,96}, ℓ ∈ {0,1,4} | n ≤ 1,349 | 1,813,305 | 0 | −0.847 | 0.10 | 0.9 h |
 | F2 | hub of hubs: k_a·U_a + k_b·U_b, U = root + k·g (g ≤ 5 vertices, k ≤ 32), k_a, k_b ≤ 16 | n ≤ 2,977 | 128,437 | 0 | −0.852 | 0.13 | 0.3 h |
 | F3 | Hong–Beaton–Schoonhoven T(k₁..k_r) + m pendant P₂ (r = 3, 4; k ≤ 5; m ≤ 2; ≤ 60 vertices; 139 of the 305 are non-log-concave) as seeds: hubs of k ≤ 32 seeds under three rootings; pairs joined by paths of 0–5 inner vertices; products of 2–3 non-log-concave seeds (forests) | n ≤ 1,924 | 521,987 | 0 | −0.878 (hub), −0.877 (path), −0.907 (products) | −0.33 | 0.5 h |
@@ -229,7 +229,7 @@ processes at a time, on a box at load ~110 on 95 cores. It is under the 20 CPU-h
 ## Proposed edges
 
 ```jsonl
-{"premise": "Exhaustive computation: every free tree on n <= 28 vertices has a domination polynomial that is log-concave from its first strict descent onward (3,252,141,005 trees for 20 <= n <= 28 by a 128-bit C DP; n <= 19 in exact Python); normalised post-descent curvature <= -0.8309", "premise_status": "theorem", "premise_lean_source": "", "consequence": "no counterexample to Alikhani-Peng unimodality for trees below 29 vertices (independent re-check of disproof-hunt), and none to the stronger post-descent log-concavity property", "consequence_ref": "Alikhani-Peng, arXiv:0905.2251 / Ars Combin. 114 (2014), restricted to trees (open: Du-Heilman-Panova arXiv:2605.02193; Hong 2026, github.com/ARTHONG1/domination-polynomial-verification)", "consequence_status": "open", "implication_source": "this sweep (src/postlc.c; cross-checked against brute force for n <= 14, against the sibling's subtraction DP for n <= 20, and against the non-log-concave counts 1 at n = 27 and 3 at n = 28)", "effort": "S", "lean_exists": "", "in_1337": false, "class": 2, "notes": "negative; post-descent log-concavity implies unimodality and is a candidate strengthening for trees; at most 5.3 CPU-h", "novelty": "not-found", "novelty_searched": "Exa and web search; gh search repos/code 'domination polynomial'; Hong, Beaton-Schoonhoven, Du-Heilman-Panova, Omar; 2026-11-26", "sweep": "2026-11-26", "lane": "disproof-domtree"}
+{"premise": "Exhaustive computation: every free tree on n <= 28 vertices has a domination polynomial that is log-concave from its first strict descent onward (3,221,658,129 trees for 20 <= n <= 28 by a 128-bit C DP; n <= 19 in exact Python); normalised post-descent curvature <= -0.8309", "premise_status": "theorem", "premise_lean_source": "", "consequence": "no counterexample to Alikhani-Peng unimodality for trees below 29 vertices (independent re-check of disproof-hunt), and none to the stronger post-descent log-concavity property", "consequence_ref": "Alikhani-Peng, arXiv:0905.2251 / Ars Combin. 114 (2014), restricted to trees (open: Du-Heilman-Panova arXiv:2605.02193; Hong 2026, github.com/ARTHONG1/domination-polynomial-verification)", "consequence_status": "open", "implication_source": "this sweep (src/postlc.c; cross-checked against brute force for n <= 14, against the sibling's subtraction DP for n <= 20, and against the non-log-concave counts 1 at n = 27 and 3 at n = 28)", "effort": "S", "lean_exists": "", "in_1337": false, "class": 2, "notes": "negative; post-descent log-concavity implies unimodality and is a candidate strengthening for trees; at most 5.3 CPU-h", "novelty": "not-found", "novelty_searched": "Exa and web search; gh search repos/code 'domination polynomial'; Hong, Beaton-Schoonhoven, Du-Heilman-Panova, Omar; 2026-11-26", "sweep": "2026-11-26", "lane": "disproof-domtree"}
 {"premise": "Parametrised scans (hub + two rooted gadgets <= 7 vertices; hubs of hubs; T(k1..kr) seeds as hubs, paths and products; clause trees from subdivided H) and simulated annealing, 40 <= n <= 3000, exact flint DP", "premise_status": "theorem", "premise_lean_source": "", "consequence": "no tree with a non-unimodal domination polynomial among about 2.6e6 structured trees with n <= 3000 and about 3e6 annealing evaluations; every margin in the Gaussian regime (best K -0.85, best Hong jump 0.13 against a needed 2)", "consequence_ref": "Alikhani-Peng conjecture restricted to trees", "consequence_status": "open", "implication_source": "this sweep (src/scan_hub.py, src/scan_misc.py, src/anneal.py)", "effort": "S", "lean_exists": "", "in_1337": false, "class": 2, "notes": "negative search, about 3.5 CPU-h", "novelty": "unknown", "novelty_searched": "", "sweep": "2026-11-26", "lane": "disproof-domtree"}
-{"premise": "Heuristic: in a tree, mass(v in S) >= mass(v not in S) (injection); each pendant branch changes the hub mass ratio by a factor in [1,2] (injection C -> A); Cauchy-Schwarz gives shift^2 <= (sum w_c) * mixing variance; computed unit lumpiness rho <= 0.475 for all 52,577 rooted trees with <= 14 vertices, decaying like 3/n", "premise_status": "conjecture", "premise_lean_source": "", "consequence": "the two-phase mass-matched mechanism behind the July-October 2026 refutations (cliques, z-vertices on cycles, expander clauses) cannot be realised in trees; a tree counterexample would need a lumpy rooted branch, which none of the computed ones is", "consequence_ref": "Silverman Zenodo 10.5281/zenodo.21587251; Heilman Substack 10 Aug 2026; Chalmers 10.13140/rg.2.2.34268.76163; Wang Zenodo 10.5281/zenodo.21701336", "consequence_status": "open", "implication_source": "this sweep, section 1 (heuristic, not a proof: Gaussian tails, and rho <= 1/2 unproved)", "effort": "L", "lean_exists": "", "in_1337": false, "class": 3, "notes": "a proof of rho <= 1/2 plus a local CLT would be a route to proving the tree case; research, not a bounded search", "novelty": "unknown", "novelty_searched": "", "sweep": "2026-11-26", "lane": "disproof-domtree"}
+{"premise": "Heuristic: in a tree, mass(v in S) >= mass(v not in S) (injection); each pendant branch changes the hub mass ratio by a factor in [1,2] (injection C -> A); Cauchy-Schwarz gives shift^2 <= (sum w_c) * mixing variance; computed unit lumpiness rho <= 0.475 for all 53,271 rooted trees with <= 14 vertices, decaying like 3/n", "premise_status": "conjecture", "premise_lean_source": "", "consequence": "the two-phase mass-matched mechanism behind the July-October 2026 refutations (cliques, z-vertices on cycles, expander clauses) cannot be realised in trees; a tree counterexample would need a lumpy rooted branch, which none of the computed ones is", "consequence_ref": "Silverman Zenodo 10.5281/zenodo.21587251; Heilman Substack 10 Aug 2026; Chalmers 10.13140/rg.2.2.34268.76163; Wang Zenodo 10.5281/zenodo.21701336", "consequence_status": "open", "implication_source": "this sweep, section 1 (heuristic, not a proof: Gaussian tails, and rho <= 1/2 unproved)", "effort": "L", "lean_exists": "", "in_1337": false, "class": 3, "notes": "a proof of rho <= 1/2 plus a local CLT would be a route to proving the tree case; research, not a bounded search", "novelty": "unknown", "novelty_searched": "", "sweep": "2026-11-26", "lane": "disproof-domtree"}
 ```
