@@ -64,7 +64,7 @@ unbounded `limsup` enters any of them.
   `G(p_n + 1) ≤ (1 + ε)(log(p_n + 1))² ≤ (1 + ε)(log p_n + 1)²`, which is below `c (log p_n)²`
   once `log p_n ≥ 3(1 + ε)/ε`.
 - Firoozbakht ⇒ ¬ Granville is proved only with fc's `firoozbakht_conjecture_consequence`
-  (`g_n < (log p_n)² − log p_n` for `n > 3`, Kourbatov's consequence, `research solved` in fc
+  (`g_n < (log p_n)² − log p_n` for `n > 3`, attributed on Wikipedia to Kourbatov 2015 and not checked; `research solved` in fc
   but not proved in Lean) as an explicit tier-H hypothesis. The module's own Firoozbakht bound
   (`cramer_of_firoozbakht` in `Erdos382.lean`, via Chebyshev) has constant `2/log 2 ≈ 2.885`,
   above `2e^{−γ} ≈ 1.1229`; getting below it without the cited consequence needs an explicit
