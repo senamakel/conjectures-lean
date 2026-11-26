@@ -71,7 +71,7 @@ theorem bach_primitive_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) {N : �
     _ ≤ _ := by linarith
 
 /-- A non-trivial character modulo a prime is primitive. -/
-theorem isPrimitive_of_prime {p : ℕ} (hp : p.Prime) {χ : DirichletCharacter ℂ p} (hχ : χ ≠ 1) :
+theorem isPrimitive_of_prime {p : ℕ} [NeZero p] (hp : p.Prime) {χ : DirichletCharacter ℂ p} (hχ : χ ≠ 1) :
     χ.IsPrimitive := by
   rw [DirichletCharacter.isPrimitive_def]
   rcases (Nat.dvd_prime hp).1 (DirichletCharacter.conductor_dvd_level χ) with h | h
