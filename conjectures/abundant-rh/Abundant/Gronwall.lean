@@ -132,7 +132,7 @@ lemma sigma_prime_pow_div {p : ℕ} (hp : p.Prime) (e : ℕ) :
 lemma sigma_prod_pow_div (s : Finset ℕ) (hs : ∀ p ∈ s, p.Prime) (e : ℕ) :
     (σ 1 (∏ p ∈ s, p ^ e) : ℝ) / ((∏ p ∈ s, p ^ e : ℕ) : ℝ)
       = (∏ p ∈ s, (p : ℝ) / (p - 1)) * ∏ p ∈ s, (1 - invPow (e + 1) p) := by
-  have hcop : (s : Set ℕ).Pairwise (Nat.Coprime on fun p ↦ p ^ e) := by
+  have hcop : (s : Set ℕ).Pairwise (Function.onFun Nat.Coprime fun p ↦ p ^ e) := by
     intro p hp q hq hpq
     exact Nat.Coprime.pow _ _ ((Nat.coprime_primes (hs p hp) (hs q hq)).mpr hpq)
   rw [IsMultiplicative.map_prod (fun p ↦ p ^ e) isMultiplicative_sigma s hcop]
