@@ -2032,3 +2032,51 @@ warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/IntegralCurveExistence.lean
 ✔ [19166/19988] Built OAI.NumberTheory.PiExponent.Cohomology.CechLinear (9.0s)
 ✔ [19168/19988] Built OAI.NumberTheory.PiExponent.Approximation.RegularSectionMono (4.6s)
 ✔ [19170/19988] Built OAI.NumberTheory.PiExponent.Approximation.IntegralLineSections (5.0s)
+✔ [19172/19988] Built OAI.NumberTheory.PiExponent.Approximation.SectionPullback (4.9s)
+✔ [19174/19988] Built OAI.NumberTheory.PiExponent.Approximation.ClosedThickeningSections (4.2s)
+✔ [19176/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.FiniteSupportLocalIso (6.2s)
+✔ [19178/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.RegularCutHistory (2.9s)
+✔ [19180/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.TwistLocalSections (4.2s)
+✔ [19182/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveCoordinates (6.8s)
+✔ [19184/19988] Built OAI.NumberTheory.PiExponent.Approximation.InverseFrameRestriction (6.1s)
+✔ [19186/19988] Built OAI.NumberTheory.PiExponent.Ampleness.BlowupIdeal (5.0s)
+✔ [19198/19988] Built OAI.NumberTheory.PiExponent.Geometry.FiniteOfNoContractedCurves (4.7s)
+⚠ [19200/19988] Built OAI.NumberTheory.PiExponent.Geometry.CurveComponentMultiplicity (5.0s)
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveComponentMultiplicity.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19201/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveComponentMultiplicity:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveComponentMultiplicity.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [19202/19988] Built OAI.NumberTheory.PiExponent.Geometry.PrincipalCartierSequence (5.3s)
+✔ [19204/19988] Built OAI.NumberTheory.PiExponent.Cohomology.CechZero (6.1s)
+✔ [19206/19988] Built OAI.NumberTheory.PiExponent.Polynomials.HomogeneousListHistory (4.6s)
+✔ [19208/19988] Built OAI.NumberTheory.PiExponent.Cohomology.LaurentCechFinite (6.6s)
+✔ [19210/19988] Built OAI.NumberTheory.PiExponent.Ampleness.NakaiCartier (7.2s)
+✔ [19212/19988] Built OAI.NumberTheory.PiExponent.Approximation.ModuleLinePowerLaws (9.3s)
+✔ [19214/19988] Built OAI.NumberTheory.PiExponent.Approximation.ConstantPullbackDegree (6.6s)
+✔ [19216/19988] Built OAI.NumberTheory.PiExponent.Approximation.FramedPullback (6.9s)
+✔ [19218/19988] Built OAI.NumberTheory.PiExponent.Geometry.LineBundleFrameCocycle (10s)
+✔ [19220/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveFramedAtlas (7.8s)
+✔ [19222/19988] Built OAI.NumberTheory.PiExponent.Cohomology.GradedFreeCech (10s)
+✔ [19224/19988] Built OAI.NumberTheory.PiExponent.Geometry.LineBundleGluingSections (11s)
+✔ [19226/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveCoordinateValues (8.7s)
+✔ [19228/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveEmbeddingCharts (9.1s)
+✔ [19230/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveLineCharts (9.7s)
+✔ [19232/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.AffineIdealSections (9.7s)
+✔ [19234/19988] Built OAI.NumberTheory.PiExponent.Approximation.TwistSectionScalars (15s)
+✔ [19236/19988] Built OAI.NumberTheory.PiExponent.Geometry.IdealSheafPowers (10s)
+⚠ [19238/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.AffineLocalRegularBezout (7.0s)
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/AffineLocalRegularBezout.lean: imports `Mathlib.RingTheory.Ideal.KrullsHeightTheorem` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19239/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.AffineLocalRegularBezout:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/AffineLocalRegularBezout.lean: imports `Mathlib.RingTheory.Ideal.KrullsHeightTheorem` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [19266/19988] Built OAI.NumberTheory.PiExponent.Geometry.ReducedComponentStalk (10s)
+✔ [19268/19988] Built OAI.NumberTheory.PiExponent.Approximation.TensorPowerRestriction (19s)
+✔ [19270/19988] Built OAI.NumberTheory.PiExponent.Cohomology.CechZeroAdditive (10s)
+✔ [19272/19988] Built OAI.NumberTheory.PiExponent.Cohomology.CechOneConverse (11s)
+✔ [19274/19988] Built OAI.NumberTheory.PiExponent.Polynomials.PullbackFrameCoefficient (10s)
+✔ [19276/19988] Built OAI.NumberTheory.PiExponent.Approximation.CoordinateFrameIdentification (10s)
+✔ [19278/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveO1Sections (9.5s)
+✔ [19280/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveLineReciprocal (8.4s)
+⚠ [19284/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveModelGenericPoint
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveModelGenericPoint.lean: imports `Mathlib.AlgebraicGeometry.Stalk` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19292/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveNormalizationNonaffine
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationNonaffine.lean: imports `Mathlib.AlgebraicGeometry.Artinian` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [19294/19988] Built OAI.NumberTheory.PiExponent.Approximation.WeightedCompactification (18s)
