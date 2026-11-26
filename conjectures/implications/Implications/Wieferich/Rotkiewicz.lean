@@ -53,7 +53,7 @@ abbrev IsWieferichPrime (p : ℕ) : Prop := IsWieferichPrimeBase 2 p
 
 /-- `p ^ k ∣ 2 ^ n - 1` in `ℕ` iff `2 ^ n = 1` in `ZMod (p ^ k)`. -/
 lemma dvd_two_pow_sub_one_iff (m n : ℕ) : m ∣ 2 ^ n - 1 ↔ (2 : ZMod m) ^ n = 1 := by
-  rw [← ZMod.natCast_eq_zero_iff_dvd, Nat.cast_sub Nat.one_le_two_pow, sub_eq_zero]
+  rw [← ZMod.natCast_eq_zero_iff, Nat.cast_sub Nat.one_le_two_pow, sub_eq_zero]
   push_cast
   rfl
 
@@ -61,11 +61,11 @@ lemma dvd_two_pow_sub_one_iff (m n : ℕ) : m ∣ 2 ^ n - 1 ↔ (2 : ZMod m) ^ n
 in `ZMod p` divides `p - 1`. -/
 lemma two_pow_sub_one_eq_one {p : ℕ} (hp : p.Prime) (h2 : p ≠ 2) :
     (2 : ZMod p) ^ (p - 1) = 1 := by
-  haveI := Fact.mk hp
+  have := Fact.mk hp
   apply ZMod.pow_card_sub_one_eq_one
   intro h
   have : ((2 : ℕ) : ZMod p) = 0 := by exact_mod_cast h
-  rw [ZMod.natCast_eq_zero_iff_dvd] at this
+  rw [ZMod.natCast_eq_zero_iff] at this
   exact h2 ((Nat.prime_dvd_prime_iff_eq hp Nat.prime_two).1 this)
 
 /-- For `n > 0`, a number dividing `2 ^ n - 1` is not `2`. -/
@@ -102,10 +102,8 @@ theorem sq_dvd_two_pow_sub_one_of_isWieferichPrime {p n : ℕ} (hW : IsWieferich
   have ho1 : orderOf (2 : ZMod (p ^ 2)) ∣ p - 1 := orderOf_dvd_of_pow_eq_one hW'
   have ho2 : orderOf (2 : ZMod (p ^ 2)) ∣ n * p := orderOf_dvd_of_pow_eq_one hnp
   have hcop : Nat.Coprime (orderOf (2 : ZMod (p ^ 2))) p := by
-    have : Nat.Coprime (p - 1) p := by
-      have h := hp.one_lt
-      rw [Nat.coprime_comm, Nat.Coprime, ← Nat.gcd_sub_self_right (by omega : 1 ≤ p)]
-      · simp
+    have : Nat.Coprime (p - 1) p :=
+      (Nat.coprime_self_sub_left hp.one_le).2 (Nat.coprime_one_left p)
     exact Nat.Coprime.coprime_dvd_left ho1 this
   exact orderOf_dvd_iff_pow_eq_one.1 (hcop.dvd_of_dvd_mul_right ho2)
 
@@ -156,7 +154,7 @@ theorem rotkiewicz_infinite_non_wieferich_of_squarefree_mersenne :
   apply hinf
   apply (Set.finite_Iic P).subset
   intro n hn
-  simp only [Set.mem_setOf_eq] at hn
+  simp only [Set.mem_ofPred_eq] at hn
   simp only [Set.mem_Iic]
   -- every prime factor of the squarefree `mersenne n` is non-Wieferich
   have hsub : (mersenne n).primeFactors ⊆ hfin.toFinset := by
