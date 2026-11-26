@@ -20,7 +20,7 @@ def virtualChars := (span S {f | @IsChar G _ f}).toSubalgebra (subset_span (isCh
   (BilinMap.apply_apply_mem_of_mem_span _ _ _ (.mul ..) fun _ a _ b ↦ subset_span (a.mul b))
 
 /-- A function on a group G in the ℕ-span of the characters of G is itself a character. -/
-lemma isChar_of_mem_virtualChars (h : f ∈ virtualChars ℕ G) : IsChar f := (span_nat_eq ⟨⟨IsChar,
+lemma isChar_of_mem_virtualChars (h : f ∈ virtualChars ℕ G) : IsChar f := (span_nat_eq ⟨⟨{f | IsChar f},
   fun ⟨ρ, a⟩ ⟨σ, b⟩ ↦ ⟨.of (.prod ρ.ρ σ.ρ), a ▸ b ▸ by ext; apply trace_prodMap'⟩⟩,
   ⟨default, 1⟩, by ext; apply map_zero⟩).le h
 

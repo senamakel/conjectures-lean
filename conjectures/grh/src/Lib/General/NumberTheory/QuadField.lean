@@ -74,7 +74,7 @@ lemma minpoly_sqrtNegD : X ^ 2 - C (-d : ℚ) = minpoly ℚ (I * √d) :=
   (sq_nonneg · |>.not_gt <| by simp [·])) (by simp) (by monicity!)
 
 lemma finrank_K : finrank ℚ (QuadField d) = 2 :=
-  adjoin.finrank (isIntegral_sqrtNegD d) ▸ minpoly_sqrtNegD d ▸ natDegree_X_pow_sub_C
+  adjoin.finrank (isIntegral_sqrtNegD d) ▸ minpoly_sqrtNegD d ▸ natDegree_X_pow_sub_C _
 
 instance : IsTotallyComplex (QuadField d) := ⟨fun _ ↦ not_isReal_iff_isComplex.1
   (by simpa [← map_pow] using sq_nonneg <| embedding_of_isReal · (sqrtNegD d))⟩
