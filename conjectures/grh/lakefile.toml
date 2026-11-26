@@ -1,0 +1,38 @@
+name = "GRH"
+srcDir = "src"
+defaultTargets = ["Lib", "New", "Main", "GRH"]
+moreLeanArgs = ["--tstack=400000"]
+
+[leanOptions]
+autoImplicit = false
+relaxedAutoImplicit = false
+maxSynthPendingDepth = 3
+pp.unicode.fun = true
+maxHeartbeats = 4000000
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4"
+rev = "fc4f59e577feb1a4956671bc04ac18aaaf8cd842"
+
+[[lean_lib]]
+name = "Lib"
+globs = ["Lib.+"]
+
+[[lean_lib]]
+name = "New"
+globs = ["New.+"]
+
+[[lean_lib]]
+name = "Main"
+roots = ["Statements", "Main"]
+
+[[lean_lib]]
+name = "Challenge"
+srcDir = ".."
+
+# Not in the source: the bridge module of our port, outside the vendored `src/` tree.
+[[lean_lib]]
+name = "GRH"
+srcDir = ".."
+roots = ["GRH.Bridge"]
