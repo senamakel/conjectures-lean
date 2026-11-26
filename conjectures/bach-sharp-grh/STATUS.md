@@ -38,16 +38,19 @@ Nothing new on the proof side. `SharpGap` is still open, and the README title an
 
 ## Next steps (the order planned)
 1. `BachSharp/Frattini.lean`:
-   - Frattini lemma: `H ⊔ (powMonoidHom ℓ).range = ⊤` for every prime ℓ implies `H = ⊤`. Proof
-     via G/H: a prime ℓ divides the index, Cauchy gives an element of order ℓ, so the ℓ-power map
-     is not injective, hence not surjective.
-   - Echelon lemma: kernels `K_i ⊇ G^ℓ`, words `h_i ∉ K_i` with `h_i ∈ K_k` for `k < i`, and
+   - DONE: Frattini lemma `BachSharp.frattini_top` (`H ⊔ (powMonoidHom ℓ).range = ⊤` for every
+     prime ℓ implies `H = ⊤`; standard three axioms only).
+   - OPEN: echelon lemma: kernels `K_i ⊇ G^ℓ`, words `h_i ∉ K_i` with `h_i ∈ K_k` for `k < i`, and
      `|G[ℓ]| ≤ ℓ^r`. The map `(Fin r → Fin ℓ) → G ⧸ G^ℓ` is injective (prime-order Bezout step),
      so it is bijective. Use `Subgroup.index_ker`, `card_mul_index` and `Subgroup.mem_sup`.
-2. Torsion count. CRT injectivity (`ZMod.chineseRemainder`) gives
-   `|(ℤ/mn)ˣ[ℓ]| ≤ |(ℤ/m)ˣ[ℓ]|·|(ℤ/n)ˣ[ℓ]|`. The odd-p^e case uses
-   `IsCyclic.card_pow_eq_one_le` with `isCyclic_units_of_prime_pow`. For 2^e the bounds are
-   1, 2 and 4: the e ≥ 3 case is elementary, since `2^{e-1} | a ∓ 1`.
+2. Torsion count (`BachSharp/Frattini.lean` and `BachSharp/Torsion.lean`, standard three axioms
+   only, all DONE):
+   - CRT injectivity: `BachSharp.card_torsion_units_mul_le`,
+     `|(ℤ/mn)ˣ[ℓ]| ≤ |(ℤ/m)ˣ[ℓ]|·|(ℤ/n)ˣ[ℓ]|` for coprime `m n`.
+   - Odd `p^e`: `BachSharp.card_torsion_units_odd_prime_pow_le` (at most `ℓ`, via
+     `IsCyclic.card_pow_eq_one_le`; helper `torsion_card_cyclic_le`).
+   - `2^e`: `BachSharp.card_torsion_units_two_pow_le` (the bounds 1, 2, 4; helper
+     `torsion_card_sq_le_four`) and `BachSharp.card_torsion_units_two_pow_odd` (exactly 1 for odd ℓ).
 3. Soundness of `powMod`, `isPrimeS`, `factOK`, `evalW` and `psiW`, giving
    `closure_eq_top_of_genCert : genCert q x = true → closure (smallUnits q x) = ⊤`.
 4. `dfs_sound` with these invariants: rest primes are coprime to P, `rhoOK` gives sorted lists
