@@ -117,23 +117,19 @@ hypotheses; it is applied to `m` (with `k = 446`) only at the end. -/
 
 /-- The elementary estimate behind the convergence of the singular series:
 `|(1 - n x)/(1 - x)^n - 1| ≤ 2 n² x²` when `0 < x` and `n x ≤ 1/2`. -/
-lemma factor_sub_one_le (n : ℕ) (x : ℝ) (hx0 : 0 < x) (hx1 : (n : ℝ) * x ≤ 1 / 2) :
+lemma factor_sub_one_le (n : ℕ) (x : ℝ) (hx0 : 0 < x) (hx1' : x ≤ 1)
+    (hx1 : (n : ℝ) * x ≤ 1 / 2) :
     |(1 - n * x) / (1 - x) ^ n - 1| ≤ 2 * (n : ℝ) ^ 2 * x ^ 2 := by
   have hnx : 0 ≤ (n : ℝ) * x := mul_nonneg (Nat.cast_nonneg n) hx0.le
   obtain ⟨P, hP⟩ : ∃ P : ℝ, P = (1 - x) ^ n := ⟨_, rfl⟩
   rw [← hP]
   have hlow : 1 - n * x ≤ P := by
-    have h := one_add_mul_le_pow (a := -x) (by nlinarith) n
+    have h := one_add_mul_le_pow (a := -x) (by linarith) n
     rw [← sub_eq_add_neg, ← hP] at h
     linarith
   have hup : P ≤ 1 - n * x + (n * x) ^ 2 := by
     have h1 : P ≤ Real.exp (-x) ^ n := by
       rw [hP]
-      have hx1' : x ≤ 1 := by
-        rcases Nat.eq_zero_or_pos n with hn | hn
-        · subst hn; simp at hP; nlinarith [Real.one_sub_le_exp_neg x, hP]
-        · have : (1 : ℝ) ≤ n := by exact_mod_cast hn
-          nlinarith
       exact pow_le_pow_left₀ (by linarith) (Real.one_sub_le_exp_neg x) n
     have h2 : Real.exp (-x) ^ n = Real.exp (-(n * x)) := by
       rw [← Real.exp_nat_mul]; congr 1; ring
@@ -152,7 +148,7 @@ lemma factor_sub_one_le (n : ℕ) (x : ℝ) (hx0 : 0 < x) (hx1 : (n : ℝ) * x �
 lemma factor_sub_one_le' (n : ℕ) (q : ℝ) (hq : 2 * (n : ℝ) ≤ q) (hq1 : 1 ≤ q) :
     |(1 - (n : ℝ) / q) / (1 - 1 / q) ^ n - 1| ≤ 2 * (n : ℝ) ^ 2 * (1 / q ^ 2) := by
   have hq0 : 0 < q := by linarith
-  have h := factor_sub_one_le n (1 / q) (by positivity)
+  have h := factor_sub_one_le n (1 / q) (by positivity) (by rw [div_le_one hq0]; exact hq1)
     (by rw [mul_one_div, div_le_iff₀ hq0]; linarith)
   rwa [mul_one_div, one_div_pow] at h
 
@@ -207,12 +203,11 @@ lemma integral_pos (k : ℕ) {n : ℝ} (hn : 3 ≤ n) :
     exact Real.log_pos (by linarith [ht.1])
   apply intervalIntegral.intervalIntegral_pos_of_pos_on
   · apply ContinuousOn.intervalIntegrable
-    apply continuousOn_const.div
-    · apply ContinuousOn.pow
-      refine Real.continuousOn_log.mono fun t ht => ?_
-      rw [hI] at ht
+    refine ContinuousOn.div continuousOn_const
+      ((Real.continuousOn_log.mono fun t ht => ?_).pow k.succ) fun t ht => ?_
+    · rw [hI] at ht
       exact Set.mem_compl_singleton_iff.mpr (by linarith [ht.1] : (0 : ℝ) < t).ne'
-    · intro t ht; exact pow_ne_zero _ (hpos t ht).ne'
+    · exact pow_ne_zero _ (hpos t ht).ne'
   · intro t ht
     have : 0 < Real.log t := Real.log_pos (by linarith [ht.1])
     positivity
@@ -250,7 +245,7 @@ lemma exists_constellation
     (hHL : ∀ {k : ℕ} (m : Fin k.succ → ℕ), FirstHardyLittlewoodConjectureFor m) :
     ∃ p, ∀ i, (p + m i).Prime :=
   exists_constellation_of m 3158 m_zero (fun i _ => m_even i) m_injective numResidues_lt
-    numResidues_eq hHL
+    numResidues_eq (hHL (k := 446) m)
 
 end HardyLittlewood.Richards
 
