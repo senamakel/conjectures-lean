@@ -31,7 +31,9 @@ Every other search was negative:
   non-log-concave tree polynomials on at most 28 vertices is unimodal.
 - **The other curated conjectures of arXiv:2611.03879** (C1, its two strengthenings, C3, C6(i),
   C6(iii), C6(iv) and C7): annealing at 4 ≤ n ≤ 60 found nothing.
-- **The 14,150 open and 3,798 conditional items of the same corpus:** see §5.
+- **The 14,150 open and 3,798 conditional items of the same corpus:** annealing broke 6 open
+  rows, each certified exactly or by interval arithmetic. None is in gap-is-one's list of 125.
+  They are size-window failures of ad hoc expressions, so their value is low (§5).
 
 **Main lesson.** In late 2026 even a three-week-old machine-generated list is being mined within
 days, by `gap-is-one`, by the Omega Institute's `trureturing` (which proves C4 and C5) and by
