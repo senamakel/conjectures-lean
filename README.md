@@ -16,7 +16,7 @@ conjectures. Those links are collected in the [implication atlas](docs/atlas/).
 
 ## Results
 
-35 projects: 20 proved in full, 12 proved in part, 1 conditional at its ceiling, 1 wound down, and 1 collection of implications between open conjectures (listed in the next section).
+36 projects: 21 proved in full, 12 proved in part, 1 conditional at its ceiling, 1 wound down, and 1 collection of implications between open conjectures (listed in the next section).
 
 | Conjecture | Folder | Lean | Literature |
 | :--- | :--- | :---: | :--- |
@@ -55,6 +55,7 @@ conjectures. Those links are collected in the [implication atlas](docs/atlas/).
 | **33.** Legendre, Oppermann, Andrica and Brocard each fail for at most `O(log³ N)` of the first `N` indices: proved from RH; the run that supplies RH is pending. These bound the exceptions and prove none of the four | [`legendre-exceptions-rh`](conjectures/legendre-exceptions-rh/) | 🟡 | RH-consequence |
 | **34.** Solé–Planat's inequality at every primorial, infinitely many extremely abundant numbers, and `4` as the only extraordinary number: proved from RH and Robin's inequality; the run that supplies both is pending | [`abundant-rh`](conjectures/abundant-rh/) | 🟡 | RH-equivalent |
 | **35.** Hajós's conjecture is false: a Lean proof of Catlin's (1979) disproof, at `k = 8` | [`hajos-catlin`](conjectures/hajos-catlin/) | ✅ | known |
+| **36.** Pólya's conjecture `L(n) ≤ 0` is false (`L(906150257) = 1`), and so is von Sterneck's `\|M(x)\| < ½√x` (`M(7725038629) = 43947`) | [`polya-liouville`](conjectures/polya-liouville/) | ✅ | known |
 
 **Lean status.** ✅ the target statement is proved, end to end from Lean's three standard axioms plus
 the finite computations its README names. 🟡 part of the target, or a weaker constant, is proved
@@ -104,7 +105,7 @@ with the [implication atlas](docs/atlas/).
 Conjectures shown false, or shown incompatible with another conjecture. A refutation link
 `X → ¬Y` proves that `X` and `Y` cannot both hold; it disproves neither on its own. Each theorem
 is in [`conjectures/implications`](conjectures/implications/), with statements copied word for
-word from formal-conjectures, and depends on Lean's three standard axioms only.
+word from formal-conjectures. The incompatibility links in the first table depend on Lean's three standard axioms only; the two outright disproofs below it use one `native_decide` each.
 
 | Refuted | Given | Lean theorem | Notes |
 | :--- | :--- | :--- | :--- |
@@ -114,7 +115,14 @@ word from formal-conjectures, and depends on Lean's three standard axioms only.
 | Shanks' conjecture on maximal prime gaps | Granville's conjecture | `not_shanks_of_granville` | |
 | Granville's conjecture | Firoozbakht's conjecture, with its cited consequence `g_n < log² p_n − log p_n` as a second hypothesis | `not_granville_of_firoozbakht` | the cited consequence (Kourbatov) is not proved here |
 
-All of these are incompatibilities between open conjectures. The reports behind this lane, with
+Outright disproofs, in [`conjectures/polya-liouville`](conjectures/polya-liouville/) (tier D, no hypotheses). Each uses the standard three axioms plus one `native_decide` with a proved-sound checker.
+
+| Disproved | Lean theorem | Notes |
+| :--- | :--- | :--- |
+| Pólya's conjecture `L(n) ≤ 0` for `n ≥ 2` | `polya_conjecture_false` | `L(906150257) = 1`; Haselgrove 1958, Tanaka 1980 |
+| von Sterneck's conjecture `\|M(x)\| < ½√x` for `x > 200` | `vonSterneck_conjecture_false` | `M(7725038629) = 43947`; Neubauer 1963, Cohen–Dress 1979 |
+
+All of the incompatibility links above are between open conjectures. The reports behind this lane, with
 the candidates for outright disproofs, are in [`docs/atlas/sweeps/2026-11-26/`](docs/atlas/sweeps/2026-11-26/)
 (`disproof-erdos.md`, `disproof-fc-other.md`, `disproof-literature.md`).
 

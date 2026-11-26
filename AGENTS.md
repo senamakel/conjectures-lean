@@ -763,6 +763,15 @@ Rules:
 - [x] Audited 2026-11-26 at `8841eaf`, pass: rebuilt from source, axioms re-read (standard three, no `native_decide`), statement re-elaborated against a fresh paste of formal-conjectures `9097e2f`, an independent exhaustive search over all 6,435 branch sets confirmed no `K₈` subdivision and χ = 8, no earlier unconditional Lean disproof found. The owner signed off on this *known*-label target on 2026-11-26
 - [ ] `variants.catlin` for the other `k ≥ 7` (Catlin's other graphs, `k = 7` included) not done
 
+### polya-liouville: Pólya's and von Sterneck's conjectures are false · **tier D, complete, audited** · *known* (refutation lane, route e: a witness checked by `native_decide`, owner sign-off 2026-11-26)
+- [x] Statements written here (no formal-conjectures statement): `PolyaConjecture` (`L(n) ≤ 0`, `n ≥ 2`), `VonSterneckConjecture` (real) and `VonSterneckConjectureInt` (`4M(x)² < x`), `x > 200`
+- [x] `liouvilleSum_906150257`, `polya_conjecture_false` (D): standard three + 1 `native_decide` (23–37 s)
+- [x] `mertens_7725038629`, `vonSterneck_conjecture_false`, `vonSterneck_conjecture_int_false` (D): standard three + 1 `native_decide` (110–170 s; full build 2.5–4 min on a loaded box)
+- [x] Checker `Polya.Check` proved sound (`runLiouville_sound`, `runMertens_sound`, standard three): table check of `Σ_{k≤y} M(⌊y/k⌋) = 1` on `V`, `λ * ζ = 𝟙_□`; the table builders are untrusted
+- [x] Audited 2026-11-26 at `2106d53`, pass: rebuilt from source (3:58 wall, 2.5 GB), axioms re-read (standard three + 2 `native_decide`; both soundness theorems standard three), checker call graph read, tamper tests reject altered tables, and an independent segmented sieve in C reproduced L(906150257) = 1 and M(7725038629) = 43947 and found both are the least counterexamples (that minimality is checked in C only, not in Lean)
+- [ ] Not proved in Lean: minimality of `906150257` (Tanaka 1980) and `7725038629` (Cohen–Dress, CNRS report 1979). Pólya-side citations are from secondary sources; Jurkat (1960) is unverified
+- [x] Prior art: formal-conjectures open PR #8202 (same Pólya statement plus a least-counterexample statement, no proof; no statement exists at `9097e2f`); wappy-x/Mathematics `checks/what_counts_as_a_proof_check.lean` assumes `L(906150256) = 0` as a hypothesis, so it is not a complete proof
+
 ## Working here
 
 - Changes to this superproject's own files (`AGENTS.md`, `README.md`, `docs/`, `scripts/`) go
