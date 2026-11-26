@@ -131,7 +131,8 @@ lemma tsum_le_of_separated {c : ℝ} (hm : 0 < m) (hR : 0 ≤ R) (hf : Pairwise 
     I → _} (h1 : ∀ i, 1 ≤ u i) (hu : ∀ i, ‖f i‖ ≤ R * u i) (hA : finrank ℝ V < A) (hc : A ≤ c * (A -
     finrank ℝ V)) : Summable (u · ^ (-A)) ∧ ∑' i, u i ^ (-A) ≤ (1 + 2 * R / m) ^ finrank ℝ V * c :=
     .elim (by simp [count, integral_sum_measure ‹_›, integrable_count_iff.1 · |>.of_norm]; tauto)
-    (integral_rpow_neg_le_of_layers A (e := 1) (ν := @count I ⊤) (V := 1) h1 (by
+    (integral_rpow_neg_le_of_layers A (K := 1 + 2 * R / m) (e := 1) (d := finrank ℝ V)
+    (ν := @count I ⊤) (V := 1) h1 (by
     simp_intro .. [count_apply]; grw [encard_le_of_separated hm _ (hf.set_pairwise _) (by grw [hu]; bound)]
     gcongr; grind; bound) c nofun)
 
