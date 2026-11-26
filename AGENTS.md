@@ -2,7 +2,7 @@
 
 This repository (`github.com/senamakel/conjectures-lean`) holds 28 Lean 4 projects that formalise
 number-theory conjectures and theorems: the 17 headline results, each a consequence of RH or GRH,
-and 11 further projects (see `README.md`, "Further projects"). Each project is a folder under
+and 11 further projects (see the table in `README.md`). Each project is a folder under
 `conjectures/` and a Lean package of its own, imported with its full history from the former standalone
 repository `github.com/senamakel/<name>`. This file is the tracker: when a box changes, update it
 here in the same commit as the change.
