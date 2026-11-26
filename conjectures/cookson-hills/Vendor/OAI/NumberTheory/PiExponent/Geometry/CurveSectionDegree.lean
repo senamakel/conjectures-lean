@@ -73,8 +73,8 @@ theorem euler_difference_eq_sum_zero_orders [IsIntegral X]
   have heq : ∀ x : X, ∃ U : X.affineOpens, x ∈ U.1 ∧
       ∃ e : (L.pow 0).sheaf.restrict U.1.ι ≅ O U.1.toScheme,
       ∃ d : L.sheaf.restrict U.1.ι ≅ O U.1.toScheme,
-        I.ideal U = Ideal.span {U.1.topIso.hom
-          (endValue (e.inv ≫ (Scheme.Modules.restrictFunctor U.1.ι).map s ≫ d.hom))} := by
+        I.ideal U = Ideal.span {(U.1.topIso.hom
+          (endValue (e.inv ≫ (Scheme.Modules.restrictFunctor U.1.ι).map s ≫ d.hom)))} := by
     intro x
     let F := affineFrameAt L x
     refine ⟨F.openSet, F.mem, Scheme.Modules.restrictUnitIso F.openSet.1.ι, F.frame, ?_⟩

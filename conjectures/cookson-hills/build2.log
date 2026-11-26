@@ -1823,3 +1823,8 @@ warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateContactBound.
 ✔ [19934/19988] Built OAI.NumberTheory.PiExponent.Polynomials.WeightedMonomialFamilyLattice (4.4s)
 ✔ [19940/19988] Built OAI.NumberTheory.PiExponent.Geometry.AdmissibleCurveInequality (4.7s)
 ✔ [19944/19988] Built OAI.NumberTheory.PiExponent.Ampleness.AdmissibleBlowupGeometry (3.6s)
+✔ [19954/19988] Built OAI.NumberTheory.PiExponent.Approximation.AdmissibleMatrixInterpolation (7.7s)
+✔ [19956/19988] Built OAI.NumberTheory.PiExponent.Geometry.AdmissibleCurveImage (7.8s)
+✔ [19958/19988] Built OAI.NumberTheory.PiExponent.Ampleness.WeightedAffineFrame (7.9s)
+✔ [19962/19988] Built OAI.NumberTheory.PiExponent.Polynomials.WeightedHomogeneousSubstitution (8.2s)
+✔ [19964/19988] Built OAI.NumberTheory.PiExponent.Geometry.AdmissibleCurveCoordinates (6.8s)

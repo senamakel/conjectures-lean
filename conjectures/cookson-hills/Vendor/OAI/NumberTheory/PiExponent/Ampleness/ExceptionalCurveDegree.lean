@@ -43,8 +43,8 @@ theorem inverseSection_zeroIdeal (J : LineBundle Y) (ι : J.sheaf ⟶ O Y)
     let b := tensorFrame J J.inverse V.1 (e' y) (f' y)
     rw [zeroIdeal_on_frame J.inverse (inverseSection J ι) V (f' y),
       imageIdealSheaf_on_frame ι V (e' y)]
-    change Ideal.span {affineMapCoefficient V a (f' y)
-      ((lineTensorInverseIso J).inv ≫ tensorInclusion J J.inverse ι)} = _
+    change Ideal.span {(affineMapCoefficient V a (f' y)
+      ((lineTensorInverseIso J).inv ≫ tensorInclusion J J.inverse ι))} = _
     erw [affineMapCoefficient_comp V a b (f' y),
       ← Ideal.span_singleton_mul_span_singleton]
     have hu : IsUnit (affineMapCoefficient V a b (lineTensorInverseIso J).inv) := by
@@ -138,8 +138,8 @@ theorem zeroIdeal_spec_top {A : Type} [CommRing A]
   change (imageIdeal (L.dualSection s) ⊤).map _ = _
   rw [imageIdeal_top_of_frame (L.dualSection s)
     (InverseFrames.pairingFrame (lineTensorInverseIso L) e)]
-  change (Ideal.span {endValue ((InverseFrames.pairingFrame (lineTensorInverseIso L) e).inv ≫
-    InverseFrames.dualMap (lineTensorInverseIso L) s)}).map _ = _
+  change (Ideal.span {(endValue ((InverseFrames.pairingFrame (lineTensorInverseIso L) e).inv ≫
+    InverseFrames.dualMap (lineTensorInverseIso L) s))}).map _ = _
   erw [InverseFrames.dualMap_coefficient]
   rw [Ideal.map_span, Set.image_singleton]
   rfl

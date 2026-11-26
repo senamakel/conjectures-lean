@@ -38,8 +38,8 @@ theorem section_tensor_euler_add [IsIntegral X]
   have heqTensor : ∀ x : X, ∃ U : X.affineOpens, x ∈ U.1 ∧
       ∃ f : M.sheaf.restrict U.1.ι ≅ O U.1.toScheme,
       ∃ e : (L.tensor M).sheaf.restrict U.1.ι ≅ O U.1.toScheme,
-        I.ideal U = Ideal.span {U.1.topIso.hom
-          (endValue (f.inv ≫ (Scheme.Modules.restrictFunctor U.1.ι).map φ ≫ e.hom))} := by
+        I.ideal U = Ideal.span {(U.1.topIso.hom
+          (endValue (f.inv ≫ (Scheme.Modules.restrictFunctor U.1.ι).map φ ≫ e.hom)))} := by
     intro x
     obtain ⟨U, hx, ⟨e⟩, ⟨f⟩⟩ := common_affine_frames L M x
     refine ⟨U, hx, f, tensorFrame L.sheaf M.sheaf U.1 e f, ?_⟩
@@ -48,8 +48,8 @@ theorem section_tensor_euler_add [IsIntegral X]
   have heqSection : ∀ x : X, ∃ U : X.affineOpens, x ∈ U.1 ∧
       ∃ f : (L.pow 0).sheaf.restrict U.1.ι ≅ O U.1.toScheme,
       ∃ e : L.sheaf.restrict U.1.ι ≅ O U.1.toScheme,
-        I.ideal U = Ideal.span {U.1.topIso.hom
-          (endValue (f.inv ≫ (Scheme.Modules.restrictFunctor U.1.ι).map s ≫ e.hom))} := by
+        I.ideal U = Ideal.span {(U.1.topIso.hom
+          (endValue (f.inv ≫ (Scheme.Modules.restrictFunctor U.1.ι).map s ≫ e.hom)))} := by
     intro x
     obtain ⟨U, hx, ⟨e⟩, ⟨f⟩⟩ := common_affine_frames L M x
     refine ⟨U, hx, Scheme.Modules.restrictUnitIso U.1.ι, e, ?_⟩

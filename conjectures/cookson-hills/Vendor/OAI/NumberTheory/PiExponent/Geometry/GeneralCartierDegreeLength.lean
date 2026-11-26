@@ -25,8 +25,8 @@ theorem cartier_euler_difference_eq_sum_local_lengths
     (heq : ∀ x : X, ∃ U : X.affineOpens, x ∈ U.1 ∧
       ∃ e : M.sheaf.restrict U.1.ι ≅ O U.1.toScheme,
       ∃ d : N.sheaf.restrict U.1.ι ≅ O U.1.toScheme,
-        I.ideal U = Ideal.span {U.1.topIso.hom
-          (endValue (e.inv ≫ (Scheme.Modules.restrictFunctor U.1.ι).map φ ≫ d.hom))})
+        I.ideal U = Ideal.span {(U.1.topIso.hom
+          (endValue (e.inv ≫ (Scheme.Modules.restrictFunctor U.1.ι).map φ ≫ d.hom)))})
     (hfiniteM : ∀ n ≤ 1, letI := Module.compHom (cohomology M.sheaf n) (baseScalars p)
       FiniteDimensional ℂ (cohomology M.sheaf n))
     (hfiniteN : ∀ n ≤ 1, letI := Module.compHom (cohomology N.sheaf n) (baseScalars p)

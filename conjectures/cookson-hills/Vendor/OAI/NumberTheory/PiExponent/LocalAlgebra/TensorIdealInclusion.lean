@@ -113,11 +113,11 @@ theorem tensorInclusion_mono (J M : LineBundle X) (ι : J.sheaf ⟶ O X) [Mono �
 lemma tensor_inclusion_ideal (J M : LineBundle X) (ι : J.sheaf ⟶ O X)
     (U : X.affineOpens) (e : J.sheaf.restrict U.1.ι ≅ O U.1.toScheme)
     (f : M.sheaf.restrict U.1.ι ≅ O U.1.toScheme) :
-    Ideal.span {U.1.topIso.hom (endValue ((tensorFrame J M U.1 e f).inv ≫
-      (Scheme.Modules.restrictFunctor U.1.ι).map (tensorInclusion J M ι) ≫ f.hom))} =
-    Ideal.span {U.1.topIso.hom (endValue (e.inv ≫
+    Ideal.span {(U.1.topIso.hom (endValue ((tensorFrame J M U.1 e f).inv ≫
+      (Scheme.Modules.restrictFunctor U.1.ι).map (tensorInclusion J M ι) ≫ f.hom)))} =
+    Ideal.span {(U.1.topIso.hom (endValue (e.inv ≫
       (Scheme.Modules.restrictFunctor U.1.ι).map ι ≫
-        (Scheme.Modules.restrictUnitIso U.1.ι).hom))} := by
+        (Scheme.Modules.restrictUnitIso U.1.ι).hom)))} := by
   erw [tensor_inclusion_framed,endValue_comp,map_mul,
     ← Ideal.span_singleton_mul_span_singleton]
   have hu : IsUnit (endValue (tensorUnitTwist M U.1 f).inv) :=

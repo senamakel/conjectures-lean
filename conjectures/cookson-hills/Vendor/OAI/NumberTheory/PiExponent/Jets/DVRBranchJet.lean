@@ -132,8 +132,8 @@ theorem frameWord_colength_lower {m : ℕ}
     (word : List (Fin (m+1)))
     (hne : MvPolynomial.aeval (Fin.cases y x) (polynomialFrameWord m word p) ≠ 0) :
     contact v c y x hnc * (H - (word.map v).sum) ≤
-      ((Module.length A (A ⧸ Ideal.span {
-        MvPolynomial.aeval (Fin.cases y x) (polynomialFrameWord m word p)})).toNat : ℚ) := by
+      ((Module.length A (A ⧸ Ideal.span {(
+        MvPolynomial.aeval (Fin.cases y x) (polynomialFrameWord m word p))})).toNat : ℚ) := by
   rw [CurveLocalOrder.length_quotient_span_eq_addVal hne]
   exact frameWord_addVal_lower v hv H c y x hy hx hnc p hp word hne
 

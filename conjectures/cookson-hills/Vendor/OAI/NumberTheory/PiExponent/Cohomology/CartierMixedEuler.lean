@@ -74,9 +74,9 @@ theorem mixedCartierPower_zeroIdeal_frames (L M : LineBundle X)
     ∀ x : X, ∃ U : X.affineOpens, x ∈ U.1 ∧
       ∃ e : ((L.pow n).tensor M).sheaf.restrict U.1.ι ≅ O U.1.toScheme,
       ∃ e' : ((L.pow (n+1)).tensor M).sheaf.restrict U.1.ι ≅ O U.1.toScheme,
-        (zeroIdeal L s).ideal U = Ideal.span {U.1.topIso.hom
+        (zeroIdeal L s).ideal U = Ideal.span {(U.1.topIso.hom
           (endValue (e.inv ≫ (Scheme.Modules.restrictFunctor U.1.ι).map
-            (mixedCartierPowerMultiply L M s n) ≫ e'.hom))} := by
+            (mixedCartierPowerMultiply L M s n) ≫ e'.hom)))} := by
   intro x
   obtain ⟨U, hx, ⟨e⟩, ⟨f⟩⟩ := common_affine_frames L M x
   refine ⟨U, hx,

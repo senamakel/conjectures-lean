@@ -84,9 +84,9 @@ lemma tensor_multiply_framed (L M : X.Modules) (s : O X ⟶ L) (U : X.Opens)
 lemma tensor_multiply_ideal (L M : X.Modules) (s : O X ⟶ L)
     (U : X.affineOpens) (e : L.restrict U.1.ι ≅ O U.1.toScheme)
     (f : M.restrict U.1.ι ≅ O U.1.toScheme) :
-    Ideal.span {U.1.topIso.hom (endValue (f.inv ≫
+    Ideal.span {(U.1.topIso.hom (endValue (f.inv ≫
       (Scheme.Modules.restrictFunctor U.1.ι).map (sectionMultiplyLeft L M s) ≫
-        (tensorFrame L M U.1 e f).hom))} =
+        (tensorFrame L M U.1 e f).hom)))} =
     Ideal.span {U.1.topIso.hom (coefficient e (restrictSection U.1.ι s))} := by
   rw [tensor_multiply_framed,endValue_comp,map_mul,← Ideal.span_singleton_mul_span_singleton]
   have hu : IsUnit (endValue (tensorUnitTwist M U.1 f).hom) :=
@@ -97,10 +97,10 @@ lemma tensor_multiply_ideal (L M : X.Modules) (s : O X ⟶ L)
 theorem cartierPowerMultiply_ideal (L : LineBundle X) (s : GlobalSections X L.sheaf)
     (n : ℕ) (U : X.affineOpens)
     (e : L.sheaf.restrict U.1.ι ≅ structureSheaf U.1.toScheme) :
-    Ideal.span {U.1.topIso.hom (endValue ((modulePowFrame U.1 e n).inv ≫
+    Ideal.span {(U.1.topIso.hom (endValue ((modulePowFrame U.1 e n).inv ≫
       (Scheme.Modules.restrictFunctor U.1.ι).map
         (PiExponent.NumericalAmpleness.cartierPowerMultiply L s n) ≫
-      (modulePowFrame U.1 e (n+1)).hom))} =
+      (modulePowFrame U.1 e (n+1)).hom)))} =
     Ideal.span {U.1.topIso.hom (coefficient e (restrictSection U.1.ι s))} :=
   tensor_multiply_ideal L.sheaf (modulePow X L.sheaf n) s U e (modulePowFrame U.1 e n)
 end

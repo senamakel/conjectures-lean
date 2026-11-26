@@ -23,9 +23,9 @@ theorem cartierPower_zeroIdeal_frames (L : LineBundle X) (s : GlobalSections X L
     (n : ℕ) : ∀ x : X, ∃ U : X.affineOpens, x ∈ U.1 ∧
       ∃ e : (L.pow n).sheaf.restrict U.1.ι ≅ O U.1.toScheme,
       ∃ e' : (L.pow (n+1)).sheaf.restrict U.1.ι ≅ O U.1.toScheme,
-        (zeroIdeal L s).ideal U = Ideal.span {U.1.topIso.hom
+        (zeroIdeal L s).ideal U = Ideal.span {(U.1.topIso.hom
           (endValue (e.inv ≫ (Scheme.Modules.restrictFunctor U.1.ι).map
-            (cartierPowerMultiply L s n) ≫ e'.hom))} := by
+            (cartierPowerMultiply L s n) ≫ e'.hom)))} := by
   intro x
   obtain ⟨V,hxV,⟨eV⟩⟩ := L.locallyRankOne x
   obtain ⟨U,hU,hxU,hUV⟩ := exists_isAffineOpen_mem_and_subset hxV

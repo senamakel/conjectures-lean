@@ -34,8 +34,8 @@ theorem cartier_euler_difference
     (heq : ∀ x : X, ∃ U : X.affineOpens, x ∈ U.1 ∧
       ∃ e : M.sheaf.restrict U.1.ι ≅ O U.1.toScheme,
       ∃ e' : N.sheaf.restrict U.1.ι ≅ O U.1.toScheme,
-        I.ideal U = Ideal.span {U.1.topIso.hom
-          (endValue (e.inv ≫ (Scheme.Modules.restrictFunctor U.1.ι).map φ ≫ e'.hom))})
+        I.ideal U = Ideal.span {(U.1.topIso.hom
+          (endValue (e.inv ≫ (Scheme.Modules.restrictFunctor U.1.ι).map φ ≫ e'.hom)))})
     (d : ℕ)
     (hfiniteM : ∀ q ≤ d, letI := Module.compHom (cohomology M.sheaf q) (baseScalars p)
       FiniteDimensional ℂ (cohomology M.sheaf q))

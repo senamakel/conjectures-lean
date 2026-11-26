@@ -101,8 +101,8 @@ theorem ordinaryWord_colength_lower {n : ℕ}
     (word : List (Fin n))
     (hne : MvPolynomial.aeval x (OrdinaryDerivatives.word n word p) ≠ 0) :
     contact v c x hnc * (H - (word.map v).sum) ≤
-      ((Module.length A (A ⧸ Ideal.span {
-        MvPolynomial.aeval x (OrdinaryDerivatives.word n word p)})).toNat : ℚ) := by
+      ((Module.length A (A ⧸ Ideal.span {(
+        MvPolynomial.aeval x (OrdinaryDerivatives.word n word p))})).toNat : ℚ) := by
   rw [CurveLocalOrder.length_quotient_span_eq_addVal hne]
   exact ordinaryWord_addVal_toNat_lower v hv H c x hx hnc p hp word hne
 

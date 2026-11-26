@@ -60,8 +60,8 @@ theorem exact (p : X ⟶ Spec (CommRingCat.of ℂ))
   have local_exact (U : X.affineOpens)
       (e : M.sheaf.restrict U.1.ι ≅ O U.1.toScheme)
       (d : N.sheaf.restrict U.1.ι ≅ O U.1.toScheme)
-      (hI : I.ideal U = Ideal.span {U.1.topIso.hom
-        (endValue (e.inv ≫ (Scheme.Modules.restrictFunctor U.1.ι).map φ ≫ d.hom))}) :=
+      (hI : I.ideal U = Ideal.span {(U.1.topIso.hom
+        (endValue (e.inv ≫ (Scheme.Modules.restrictFunctor U.1.ι).map φ ≫ d.hom)))}) :=
     PrincipalSequence.exact (I.subschemeι ∣_ U.1)
       (e.inv ≫ (Scheme.Modules.restrictFunctor U.1.ι).map φ ≫ d.hom)
       (restriction_principal p I U _ hI)

@@ -63,12 +63,12 @@ lemma idealPowerInclusion_ideal (J : LineBundle X) (ι : J.sheaf ⟶ O X)
     exact (congrArg (fun r : Γ(X,U.1) => Ideal.span {r})
       (affineMapCoefficient_id U (Scheme.Modules.restrictUnitIso U.1.ι))).trans (by simp)
   | succ n ih =>
-    change Ideal.span {affineMapCoefficient U (tensorFrame J (J.pow n) U.1 e (idealPowerFrame J U.1 e n))
-      (Scheme.Modules.restrictUnitIso U.1.ι) (tensorInclusion J (J.pow n) ι ≫ idealPowerInclusion J ι n)} = _
+    change Ideal.span {(affineMapCoefficient U (tensorFrame J (J.pow n) U.1 e (idealPowerFrame J U.1 e n))
+      (Scheme.Modules.restrictUnitIso U.1.ι) (tensorInclusion J (J.pow n) ι ≫ idealPowerInclusion J ι n))} = _
     erw [affineMapCoefficient_comp U _ (idealPowerFrame J U.1 e n),
       ← Ideal.span_singleton_mul_span_singleton,ih]
-    rw [show Ideal.span {affineMapCoefficient U (tensorFrame J (J.pow n) U.1 e (idealPowerFrame J U.1 e n))
-      (idealPowerFrame J U.1 e n) (tensorInclusion J (J.pow n) ι)} =
+    rw [show Ideal.span {(affineMapCoefficient U (tensorFrame J (J.pow n) U.1 e (idealPowerFrame J U.1 e n))
+      (idealPowerFrame J U.1 e n) (tensorInclusion J (J.pow n) ι))} =
       Ideal.span {affineMapCoefficient U e (Scheme.Modules.restrictUnitIso U.1.ι) ι} from
         tensor_inclusion_ideal J (J.pow n) ι U e (idealPowerFrame J U.1 e n)]
     rw [pow_succ']
