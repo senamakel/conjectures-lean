@@ -71,7 +71,23 @@ Two programs, written separately, one of them straight from the paper's definiti
    GMP (gmpy2 2.3.2), which proves N composite. The script stops with an error if any value is a
    probable prime.
 
-Results: TODO
+Results:
+- **n = 62191, 3.27(ii):** 62,190 pairs (k, m), 17,161 distinct integer exponents, range
+  [1743, 31086], the same range `phirep` reports. All 17,161 values 3·2^e + 1 are composite:
+  15,111 by a factor below 2²⁰ and 2,050 by Fermat base 3. No PRP appeared. 209 s wall on 10
+  workers, about 35 CPU-min. Certificate `runs/cert_3x2p1_8_62191.txt`, sha256 `11993eaf…8b4b1d`.
+- **n = 83843, A234451 /12 variant:** 21,452 exponents in [1538, 41897], all composite (18,843
+  by small factor, 2,609 by Fermat). Certificate `runs/cert_3x2p1_12_83843.txt`, sha256
+  `1a61534c…83e055`.
+- **n = 167665, 3.27(iv):** program 1 only. Every attainable exponent (at most 167,642) misses
+  A059608: 3, 4, 6, 8, 10, 12, 18, 20, 26, 32, 36, 56, 66, 118, 130, 150, 166, 206, 226, 550, 706,
+  810, 1136, 1228, 1818, 2368, 2400, 3128, 4532, 5112, 8492, 16028, 16386, 17392, 18582, 21986,
+  24292, 27618, 30918, 32762, 48212, 120440, … So this witness is exactly as reliable as the
+  list's completeness below 167,642, which rests on the PRP searches credited in the OEIS
+  entry (Lifchitz, Underwood, Grantham). **Mark it unverified until certified.**
+- Sanity checks of program 2: for n = 1000 and n = 167 it finds a probable prime
+  (e = 41, 3·2⁴¹ + 1 = 6597069766657; e = 26, 2²⁶ − 5), and for n = 25 it finds no
+  representation, which is consistent with Sun's threshold n > 25.
 
 **Minimality** of 62191 needs only that the listed exponents below 3913 give primes. Those values
 are Proth numbers, proved prime long ago (Golomb 1976, Table I, and the Ballinger–Keller lists), so
