@@ -91,8 +91,10 @@ x-smooth prime sets, per dyadic bucket; `scratchpad/bachsharp/badc1657.txt`):
 | `< 2^28` | 7.0·10^5 | 4.1·10^13 |
 | `< 2^32` | 1.08·10^6 | 5.3·10^14 |
 | `< 2^36` | 1.23·10^6 | 2.9·10^15 |
+| `< 2^40` | 1.25·10^6 | 6.2·10^15 |
 
-(the count is still rising slowly to `2^44`; final figures in §5 once the run finishes.)
+(buckets above `2^39` contribute fewer than 600 moduli each; the last failing moduli are near
+`2^43.4`.)
 
 Cost with the existing checker at `c = 1.657`: the per-modulus loop must run up to the uniform
 threshold `2^51` (`2·10^15` moduli at about `10^5` moduli/s: `~10^10` s), and the search must
@@ -136,13 +138,13 @@ analytic budget for highly composite moduli.
 ## 3. Decision
 
 **The sharp constant for every `m ≥ 3` is not reachable with the existing machinery.** The gap is
-`2^17 ≤ m < 2^52` (with the cheap GRH chunks, `2^20 ≤ m < 2^52`). Closing it needs two new
+`2^17 ≤ m < 5·2^49` (with the cheap GRH chunks, `2^20 ≤ m < 2^52`). Closing it needs two new
 proved-sound checkers:
 
 1. a block checker that enumerates, per block of moduli, the x-smooth squarefree kernels whose
    cost reaches the budget (instead of looping over every modulus up to `2^51`), with a soundness
    proof like `blockOK_sound` (estimated a few hundred lines);
-2. a structural generation certificate for each failing modulus (about 1.3·10^6 moduli up to
+2. a structural generation certificate for each failing modulus (about 1.25·10^6 moduli up to
    `~10^13`): factorisation of `q`, a primitive-root certificate for each prime power, and the
    Frattini rank test for each `ℓ | φ(q)`, proved sound through the CRT decomposition of
    `(ZMod q)ˣ` and characters of prime order (estimated 2–3 weeks of Lean; run time about
@@ -155,9 +157,16 @@ What this project proves now (Phase 1):
 
 * `SharpOptimal` (D): no constant below `2/log² 3` works (`m = 3`).
 * The sharp bound for `3 ≤ m < 2^17` (D, no GRH; breadth-first search, proved-sound).
-* The sharp bound for `m ≥ 2^52` under GRH (C), with constant `1.657 < 2/log² 3`: a
-  parametrised copy of lls-grh's uniform checker for `2^52 ≤ q < 2^7400` and the polynomial
-  tail above.
+* The sharp bound for `m ≥ 5·2^49 ≈ 2.8·10^15` under GRH (C), with constant
+  `1.657 < 2/log² 3`: a parametrised copy of lls-grh's checker for `5·2^49 ≤ q < 2^7400`
+  (every block passes the uniform budget; `[2^51, 5·2^49)` does not) and the polynomial tail.
 * The assembled theorem: under GRH, every proper subgroup misses a unit
-  `≤ (2/log² 3) log² m` when `m < 2^17` or `m ≥ 2^52`, and `≤ 2 log² m` for every `m`
+  `≤ (2/log² 3) log² m` when `m < 2^17` or `m ≥ 5·2^49`, and `≤ 2 log² m` for every `m`
   (lls-grh's `bach2_of_GRH`), with the gap stated.
+
+## 4. Phase 1 outcome (2026-11-26)
+
+Built and checked; measured CPU: `S0` 18 s, `S1` 55 s, `S2` 375 s, `S3` 1335 s (the four
+generation-search chunks for `4 ≤ m < 2^17`), `L0` 26 s, `L1` 11 s (GRH budget chunks). See the
+README for the theorems and `#print axioms`. Remaining: `SharpGap`, the moduli
+`2^17 ≤ m < 5·2^49`, at the cost in §3.
