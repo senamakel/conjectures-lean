@@ -62,11 +62,14 @@ lemma exp_gamma_lt_robinRatio_four : Real.exp Real.eulerMascheroniConstant < rob
   have hl2 := Real.log_two_lt_d9
   have hlog4 : 0 < Real.log 4 := Real.log_pos (by norm_num)
   have hll : Real.log (Real.log 4) ≤ Real.log 4 - 1 := Real.log_le_sub_one_of_pos hlog4
-  have hll0 := Abundant.Check.loglog_pos (show 3 ≤ 4 by norm_num)
+  have hll0 : 0 < Real.log (Real.log 4) := by
+    simpa using Abundant.Check.loglog_pos (show 3 ≤ 4 by norm_num)
   rw [robinRatio, Abundant.Check.sigma_four]
   push_cast
-  rw [lt_div_iff₀ (by positivity)]
-  nlinarith
+  rw [lt_div_iff₀ (mul_pos (by norm_num) hll0)]
+  have hb : Real.log (Real.log 4) < 1 / 2 := by linarith
+  have := mul_lt_mul hEU hb.le hll0 (by norm_num)
+  linarith
 
 /-- `4` is extraordinary (given Robin's inequality for the multiples `4a > 5040`). -/
 theorem isExtraordinary_four (hR : Robin.RobinStatement) : IsExtraordinary 4 := by
