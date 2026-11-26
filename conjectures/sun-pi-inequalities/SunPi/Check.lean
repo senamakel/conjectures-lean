@@ -78,12 +78,12 @@ theorem primeCounting_add_cnt (a : ℕ) : ∀ len, π (a + len) = π a + cnt a l
     rw [hs, ih, cnt, add_assoc]
     congr 2
     by_cases hp : (a + l + 1).Prime
-    · rw [if_pos hp, if_pos ((primeTD_iff _).mpr hp)]
+    · rw [ite_eq_left hp, ite_eq_left ((primeTD_iff _).mpr hp)]
     · have : primeTD (a + l + 1) = false := by
         cases h : primeTD (a + l + 1)
         · rfl
         · exact absurd ((primeTD_iff _).mp h) hp
-      rw [if_neg hp, this]; rfl
+      rw [ite_eq_right hp, this]; rfl
 
 /-! ## Sun's 2.14(ii): `π((n+1)²)^n < π(n²)^(n+1)` -/
 
@@ -141,13 +141,19 @@ theorem checkAk_sound (n bound : ℕ) : ∀ (f k : ℕ), checkAk n bound k (π (
     · exact h.1
     · exact ih (k + 1) h.2 j hlt (by omega) h3 h4
 
-/-- Walk `n, n+1, …` (`fuel` steps), running `checkAk` from `k = 1` for each. -/
-def checkA (bound n : ℕ) : ℕ → Bool
-  | 0 => true
-  | f + 1 => checkAk n bound 1 (cnt 0 n) n && checkA bound (n + 1) f
+/-- The bound on `k n` below which the finite check runs, for each `n`. Above it, the
+analytic argument of `SunPi.Analytic` applies (`n ≥ s` and `k n ≥ 2^j` for one of its regions). -/
+def bndA (n : ℕ) : ℕ :=
+  if 42 ≤ n then 64 else if 30 ≤ n then 128 else if 25 ≤ n then 256 else
+  if 20 ≤ n then 512 else if 17 ≤ n then 1024 else if 15 ≤ n then 2048 else 8192
 
-theorem checkA_sound (bound : ℕ) : ∀ (f n : ℕ), checkA bound n f = true →
-    ∀ m, n ≤ m → m < n + f → ∀ j, 1 ≤ j → j ≤ m → j * m < bound →
+/-- Walk `n, n+1, …` (`fuel` steps), running `checkAk` from `k = 1` for each. -/
+def checkA (n : ℕ) : ℕ → Bool
+  | 0 => true
+  | f + 1 => checkAk n (bndA n) 1 (cnt 0 n) n && checkA (n + 1) f
+
+theorem checkA_sound : ∀ (f n : ℕ), checkA n f = true →
+    ∀ m, n ≤ m → m < n + f → ∀ j, 1 ≤ j → j ≤ m → j * m < bndA m →
       π ((j + 1) * m) ^ j < π (j * m) ^ (j + 1) := by
   intro f
   induction f with
@@ -161,7 +167,7 @@ theorem checkA_sound (bound : ℕ) : ∀ (f n : ℕ), checkA bound n f = true �
         simp only [zero_add, Nat.primeCounting_zero] at this
         rw [one_mul, this]
       rw [h0] at h
-      exact checkAk_sound n bound n 1 h.1 j hj1 (by omega) hj2 hj3
+      exact checkAk_sound n (bndA n) n 1 h.1 j hj1 (by omega) hj2 hj3
     · exact ih (n + 1) h.2 m hlt (by omega) j hj1 hj2 hj3
 
 end SunPi.Check
