@@ -121,8 +121,9 @@ Rules:
 6. **"Done" means tier D, U or U₀ for the full target statement**, with every remaining H
    hypothesis named. A repo whose best result is C or H is not done. It is done as far as it can
    go only when its README explains why no unconditional version is possible.
-7. **Pins must resolve.** Every `[[require]]` rev must exist on the remote's default branch, and
-   its URL must be an HTTPS URL that an anonymous `lake` can fetch.
+7. **Requires resolve in the checkout.** A sibling project is required by local path
+   (`path = "../<name>"`), never by git URL, and its `lake-manifest.json` entry is `"type": "path"`.
+   External packages (Mathlib and its dependencies) stay git requires at the shared pin.
 
 ## Literature status: label every result
 
@@ -197,10 +198,10 @@ Each README follows the shape already used across these repos:
 
 ## Cross-repo issues
 
-- [x] **Dependency pins resolve.** Every repo requires erdos-985 at `9538edb` (an ancestor of
-      its `main`) over HTTPS, and every other `[[require]]` rev is on its remote's `main`.
-- [x] **Require URLs are `https://`** in every repo (rule 7). An anonymous `lake` can fetch
-      them only once the repos are public.
+- [x] **Sibling requires are local paths** (rule 7), switched 2026-11-26. Before the switch each
+      project pinned an older sibling rev (erdos-985 at `9538edb` and others); every project now
+      builds against the sibling folders as they stand. The per-project "Requires X at `<rev>`"
+      notes below record the pins that were checked, not what is built now.
 - [x] **Unconditional checks run on the build box**, 2026-11-24 and 2026-11-25,
       riemann-hypothesis `507a75d91d` (linked from the community cache, not rebuilt from
       source): erdos-985 `57436d3`, lindelof-rh `3975bbb`, density-rh `637fd12`,
