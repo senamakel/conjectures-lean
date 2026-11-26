@@ -120,7 +120,7 @@ Statuses come from arXiv abstract and HTML pages, GitHub issues and the SymCat c
 | 1 | KL coefficients log-concave, no internal zeros (EPW 1412.7408 Conj 2.5) | yes | **refuted**, Cheng–Liu 2607.24186: non-unimodal over every F_q | already settled. The coalescence family is LC with ratios ≥ 11 |
 | 2 | KL real-rooted (GPY 1611.07474 Conj 3.2) | yes | **refuted**, Cheng–Liu; Eberhardt 2609.20903 (Golay) | already settled |
 | 3 | Z real-rooted (PXY 1706.05575 Conj 5.1) | yes | **refuted**, Eberhardt (Golay); proved for sparse paving (Xie–Zhang 2609.07636) | already settled |
-| 4 | Z log-concave (trivial-group case of PXY Conj 6.5) | yes | open (implicit; sub-agent) | **holds on the family**; min ratio `z_i²/(z_{i−1}z_{i+1})` ≥ 6.2 (k ≤ 8, q ≤ 32; worst 6.16 at k = 8, q = 2); all variants ≥ 1.73 |
+| 4 | Z log-concave (trivial-group case of PXY Conj 6.5) | yes | open (implicit; sub-agent) | **holds on the family**; min ratio `z_i²/(z_{i−1}z_{i+1})` ≥ 6.16 (k ≤ 8, q ≤ 32; worst at k = 8, q = 2); all variants ≥ 1.73 |
 | 5 | Q (inverse KL) LC (Gao–Xie 2007.15349 Conj 4.2) | yes | **refuted**, Badalov 2609.13417. Gao–Xie never conjectured real-rootedness | already settled |
 | 5′ | Badalov §8 first-index inequality `c₁² ≥ c₀c₂` for Q | yes | 1337 #299 claims a counterexample (rank 5, q ≥ 17; unrefereed) | reproduced. It also fails at ranks 6–9 for q ≥ 13, and at rank 5 for q = 16 (§3.3) |
 | 6 | Y (inverse Z) unimodal / LC, no internal zeros (Gao–Ruan–Xie 2507.01332 Conj 1.4 / 1.5) | yes | **open**; RealRooted #1405 open; 1337 #300 claims all paving (unrefereed) | **holds on the family and every variant**. See §3.1 for margins and the structural reduction |
@@ -213,7 +213,7 @@ In rank 5, LC fails only if `β24 − β23 = Σ_L (W₂(M/L) − W₁(M/L)) + W�
 left side is bounded by `Σ_H W₂(H)`. Exceeding W₄² needs hyperplanes holding more lines than there
 are hyperplanes, and also non-modular rank-3 contractions. PG(4,q) meets the first condition only
 barely (`[4,2]_q/[5,1]_q → 1⁺`) and fails the second, since its contractions are modular. On the
-family the smallest ratio is 6.2. The gap at rank 5, q = 17 is `z1²−z0z2 = 4.88·10^48`.
+family the smallest ratio is 6.16 (k = 8, q = 2). The gap at rank 5, q = 17 is `z1²−z0z2 = 4.88·10^48`.
 
 ### 3.3 Inverse KL (Q): first index, beyond rank 5
 
