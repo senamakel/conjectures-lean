@@ -46,7 +46,7 @@ def weylOn (P : ℕ → Prop) (p : ℕ → A) :
   T.G := let M (p : ℕ → A) := of fun i j ↦ let s := P (floorOf j) ∧ floorOf j < 𝔰.ϱ ∧ IsUnit (p
       (floorOf j)); ite (i = ite s (oppositeIndex j) j) (ite s (ite (level j <
       𝔰.ϱ) (p (floorOf j)) (star (p (floorOf j)))⁻¹ʳ) 1) 0; by use ⟨M p,
-    M (star p), ?_, ?_⟩ <;> ext <;> simp [M, mul_apply, apply_ite star,
+    M (star p), ?_, ?_⟩ <;> ext <;> simp [M, Matrix.mul_apply, apply_ite star,
     inverse_star] <;> grind [splitGram_eq_ite_oppositeIndex, oppositeIndex_spec, inverse_mul_cancel]
 
 /-- The Weyl element w_p of length l: e_a ↦ p_a e*_a and e*_a ↦ e_a/p̄_a on the first l
