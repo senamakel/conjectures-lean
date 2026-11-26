@@ -196,6 +196,49 @@ Each README follows the shape already used across these repos:
     [`docs/LITERATURE_STATUS.md`](docs/LITERATURE_STATUS.md). No disclaimers about what the
     result is not; gaps to the literature go in the Deviations section with both numbers.
 
+## Mine the lemmas of big proofs
+
+A large Lean proof is worth more for its intermediate lemmas than for its last line. The headline
+of riemann-hypothesis is two theorems; on the way it proves Siegel–Walfisz, Linnik, Brun–Titchmarsh,
+the large sieve, a truncated explicit formula, a truncated Perron kernel, global class field
+theory, Chebotarev, the continuation of `dedekindZeta`, Kronecker–Weber and Hironaka in
+characteristic 0. Four of our projects exist only because of such lemmas: artin-grh (Hecke's
+continuation from the Tate-thesis module), abelian-erh (`kwHom` and `continuedDedekindZeta`),
+mertens-rh (the Perron kernel removed the blocker recorded for it) and hironaka-fc (90 lines of
+glue around the repo's resolution algorithm). Treat every big formalisation the same way.
+
+- **Inventory first, then match.** When a big proof lands (in riemann-hypothesis,
+  1337isnot1337/solved-conjectures, formal-conjectures `formal_proof` targets, Mathlib, or any
+  public Lean repo), list its intermediate statements before thinking about targets, as
+  [`docs/rh-lemmas/`](docs/rh-lemmas/README.md) does. Then match the list against open statements
+  in formal-conjectures and the Conjecture Atlas. Ask of each lemma "which open problem is
+  missing exactly this?", and of each open problem "what is the one input it lacks?".
+- **Our own theorems are premises too.** Bach's constant `2`, the least prime in a progression
+  below `2(q log q)²`, Schoenfeld's `1/(8π)`, Cramér's `22/25`, `ψ(x,χ)` uniform in `q`, the
+  class-number bounds and ERH for abelian fields each have published consequences that are short
+  deductions. A second-order consequence costs days; a new analytic argument costs weeks.
+- **One module is cheap.** Importing a single riemann-hypothesis module took 17 s and 6.6 GB of
+  RAM (artin-grh), against 93 GB of cache and 19 GB of RAM for the whole proof. Smoke-test the
+  one declaration (`#check`, `#print axioms`) before building on it.
+- **Read the definitions, not the names.** A lemma stated over a repo-internal definition
+  (`psi0`, `IsKroneckerChar`, `piMod`, `IsBlowup`) needs a bridging lemma to the Mathlib object,
+  and may be degenerate. Constants in riemann-hypothesis are mostly existential, so its lemmas
+  serve `O(·)` targets and do nothing for a target that ends in a finite check. The explicit ones
+  found so far: Brun–Titchmarsh `48`, the Perron kernel `3`, Mertens' first theorem `log 4 + 4`,
+  `π(y) < 1.26·y/log y`.
+- **Import, don't paste.** A repo with no licence (riemann-hypothesis) may be imported from
+  `Unconditional/` only and never copied. Record the licence of any other source before using it.
+- **Implications between open conjectures count.** `theorem Y_of_X (h : X) : Y` for a published
+  deduction (from abc, Schinzel's hypothesis H, Dickson, Elliott–Halberstam, another Erdős
+  problem) is a tier-C result today and becomes unconditional the day `X` is proved in Lean.
+  Prefer edges where both statements exist word for word in formal-conjectures.
+- **The easy ones go within a week.** After the RH announcement, four people posted RH proofs of
+  one Erdős problem (#462, composite reading) inside eight days. Before starting a target, check
+  1337isnot1337/solved-conjectures, formal-conjectures' `formal_proof` attributes and a GitHub
+  code search, and write down what was searched.
+- **Keep the edges.** Every implication found, kept or rejected, goes into the atlas with its
+  premise, its source and the reason, so the next sweep starts from the graph and not from zero.
+
 ## Cross-repo issues
 
 - [x] **Sibling requires are local paths** (rule 7), switched 2026-11-26. Before the switch each
