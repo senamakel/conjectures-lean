@@ -8,3 +8,5 @@ import Erdos770.Statement2
 import Erdos770.Numerics200
 import Erdos770.Main200
 import Erdos770.GRH200
+import Erdos770.Sharp.Statement
+import Erdos770.Sharp.Main

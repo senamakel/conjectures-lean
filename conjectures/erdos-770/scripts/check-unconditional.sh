@@ -45,7 +45,7 @@ elif [ ! -f "$RH/.lake/build/lib/lean/Main.olean" ]; then
   (cd "$RH" && lake build --no-build Main)
 fi
 
-(cd "$HERE" && lake build)
+(cd "$HERE" && lake build && lake build Erdos770.Sharp.GRH)
 
 cd "$HERE"
 LEAN_PATH="$(cd "$RH" && lake env printenv LEAN_PATH):$(lake env printenv LEAN_PATH)" \

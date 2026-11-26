@@ -78,26 +78,35 @@ For `n ≥ 4` any `C > 0.7722` (extremal `n = 5`), and for `n ≥ 1000` any `C >
 `2.49` at `n = 3` and `1.16` for `n ≥ 5` are `h(n)/log² n`, which overstates what the ceiling
 needs.) The provable `C` is therefore limited by the method (`C > 4`), not by small `n`.
 
-## 4. What will be proved
+## 4. What is proved
 
-`ExplicitBound 5 2`: `h(n) ≤ max(P(n), ⌈5 log² n⌉)` for every `n ≥ 2`, from the single
-hypothesis `LLS.LeastPrimeOutsideSubgroup` (tier H; proved under GRH in lls-grh with standard
-axioms only, so the `_of_GRH` form carries no `native_decide`). The ranges:
+`Sharp.explicitBound5_of_lls : LLS.LeastPrimeOutsideSubgroup → ExplicitBound 5 2`, that is,
+`h(n) ≤ max(P(n), ⌈5 log² n⌉)` for every `n ≥ 2`, from the single hypothesis LLS Theorem 1.1
+(tier H; lls-grh proves it under GRH with standard axioms only). `#print axioms`: `[propext,
+Classical.choice, Quot.sound]`. Every finite check is kernel `decide`, with no `native_decide`.
 
-| Range | Method | Cost |
+| Range | Method | Lean |
 |---|---|---|
-| `2 ≤ n < 2¹¹` | kernel `decide` of `gcd(2ⁿ−1, …) = 1` up to `max(p*, B(n))`, primes `p = d + 1` (`d ∣ n`) stripped | `n`-bit gcds, about 2,000 of them |
-| `r < 3000` (any `n ≥ 2¹¹`) | kernel `decide`: every prime `r < 3000`, every prime `ℓ ∣ r − 1`, some `i ≤ 17` with `i^{(r−1)/ℓ} ≢ 1` | 430 primes |
-| `2¹¹ ≤ n < 2⁴²` | 248 blocks `2^k ≤ n⁸ < 2^{k+1}` (`88 ≤ k ≤ 335`), certificate `(K', j, m, p)`: `K' ≤ ⌈5 (k a/8)²⌉`, `K'^{8j} ≤ 2^m`, `(m b/8 + 13/4)² ≤ ⌈5 (k a/8)²⌉`, `C(p, j)⁸ ≥ 2^{k+1}`, `p ≤ π(K')` counted exactly (`K' ≤ 1024`) | kernel `decide` |
-| `2⁴² ≤ n < 2⁷⁰⁹` | 667 dyadic blocks, the same certificate with `q = 1`, `K' = 2^s` and `π(2^s) ≥ ⌈2^s/s⌉` (Chebyshev, Mathlib) | kernel `decide` |
-| `n ≥ 2⁷⁰⁹` | real analysis: `K' = K`, `j = ⌊(√K − 13/4)/log K⌋`, Chebyshev | none |
+| `2 ≤ n < 216` | `gcd(2ⁿ−1, 3ⁿ−1)`, primes `p < 256` with `p − 1 ∣ n` divided out, then gcd with `iⁿ − 1` up to `i = 3` (`n < 8`) or `17` | `Finite.lean`, `finOK_all` |
+| `r < 3000`, any `n ≥ 216` | every prime `r < 3000`, every prime `ℓ ∣ r − 1`: some `i ≤ 17` with `i^{(r−1)/ℓ} ≢ 1`, so `M < 17 < K` | `Primes.lean`, `smallOK_eq` |
+| `216 ≤ n < 2¹¹` | 104 blocks `2^k ≤ n³² < 2^{k+1}`, `248 ≤ k ≤ 351` | `Certs32.lean` |
+| `2¹¹ ≤ n < 2⁴²` | 248 blocks `2^k ≤ n⁸ < 2^{k+1}`, `88 ≤ k ≤ 335` | `Certs8.lean` |
+| `2⁴² ≤ n < 2⁷⁰⁹` | 667 dyadic blocks, `K' = 2^s`, `π(2^s) ≥ ⌊2^s/s⌋` (Chebyshev) | `Certs1.lean` |
+| `n ≥ 2⁷⁰⁹` | `K' = K`, `j = ⌊(√K − 13/4)/log K⌋`, Chebyshev | `Analytic.lean` |
 
-(`a = 0.693147 < log 2 < b = 0.6931472`.) Below `2¹¹` the certificates fail (the count is too
-small at `K ≈ 300`), so those `n` are checked directly. The same scheme with `C = 9/2` needs the
-direct check up to about `n = 4900` and, because the asymptotic margin `√4.5/2 = 1.06` is thin, the
-analytic cut-over moves to about `n = e^{77000}` (about `10⁵` dyadic blocks); `C = 4` has no margin
-left. So `C = 5` is the target; a smaller constant would need a sharper real-analysis tail.
+A certificate `(K', j, m, p)` for the block `(q, k)` checks `K' ≤ Ka := ⌈5 (k a/q)²⌉`,
+`K'^{jq} ≤ 2^m`, `(m b/q + 13/4)² ≤ Ka`, `C(p, j)^q ≥ 2^{k+1}` and `p ≤ π(K')`, with
+`a = 0.693147 < log 2 < b = 0.6931472`. `π(K')` is an exact count (`K' ≤ 1024`) or Chebyshev at a
+power of two. With `q = 8` the certificates fail just below `n = 2048`, and with `q = 32` below
+`n = 216`. That sets the direct range. A direct check up to 2048 in the kernel was too slow:
+`List.filter` over the primes costs about 0.2 ms per element.
 
-Scripts (Python, run with `-I`): `hn.py` (h(n) data), `size.py`, `size2.py`, `cert.py`
-(sizing), `gen.py` (the certificates). They live in the session scratchpad and are reproduced in
-`scripts/` with the Lean work.
+**`C = 9/2` and below.** The same scheme with `C = 9/2` needs the direct check up to about
+`n = 4900`. Because the asymptotic margin `√4.5/2 = 1.06` is thin, the analytic cut-over moves
+to about `n = e^{77000}`, which means about `10⁵` dyadic blocks. `C = 4` has no margin left.
+Going below `5` would need a sharper real-analysis tail (for example an `e^j/j^j`-type
+`j!` bound and a better `π(K)` lower bound than Chebyshev's `log 2`), not more computation.
+
+Scripts (Python, run with `-I`): `scripts/sharp_hn.py N procs` (the `h(n)` table), and
+`scripts/sharp_gen.py` with `scripts/sharp_gen2.py` (the certificates, the same conditions as
+`blockOK` and `piOK`).

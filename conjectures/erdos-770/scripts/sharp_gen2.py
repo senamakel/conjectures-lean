@@ -29,6 +29,8 @@ def lean_list(name, cs, k0, q, doc):
     out.append(',\n'.join(f'  ({a}, {b}, {c}, {d})' for (a, b, c, d) in cs) + ']')
     return '\n'.join(out)
 if __name__ == '__main__':
+    c32 = [cert(32, k) for k in range(248, 352)]
+    open('certs32.lean.txt', 'w').write(lean_list('certs32', c32, 248, 32, 'Blocks `2^k ≤ n³² < 2^(k+1)` for `k = 248, …, 351` (`216 ≤ n < 2¹¹`).'))
     c8 = [cert(8, k) for k in range(88, 336)]
     c1 = [cert(1, k) for k in range(42, 709)]
     print('exact-pi certs in c8:', sum(1 for c in c8 if c[0] & (c[0] - 1)), 'max m', max(c[2] for c in c1))
