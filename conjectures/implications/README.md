@@ -32,7 +32,7 @@ The edges come from the [implication atlas](../../docs/atlas/).
 [`Implications/HardyLittlewood/Richards.lean`](Implications/HardyLittlewood/Richards.lean) is a
 Lean proof of Richards' theorem (Hensley–Richards, *Acta Arith.* 25 (1973/74), 375–391;
 Richards, *Bull. Amer. Math. Soc.* 80 (1974), 419–438): the first Hardy–Littlewood conjecture
-implies that the second is false. The statement is formal-conjectures'
+implies that the second is false (refutation lane, route b: both conjectures stay open). The statement is formal-conjectures'
 `HardyLittlewood.not_first_and_secondHardyLittlewoodConjecture` (`FormalConjectures/Wikipedia/HardyLittlewood.lean`,
 commit `9097e2f`, marked `research solved` with body `sorry`), copied unchanged:
 
@@ -54,7 +54,8 @@ Proof:
 1. [`Tuple.lean`](Implications/HardyLittlewood/Tuple.lean) holds an admissible 447-tuple
    `0 = m₀ < m₁ = 2 < ⋯ < m₄₄₆ = 3158` of even numbers, `admissible_447_3158.txt` from the
    Polymath8 database of narrow admissible tuples (math.mit.edu/~primegaps); Engelsma first
-   found a 447-tuple of width 3159. For each `q = 2, …, 447` a residue class missed by the tuple
+   found a 447-tuple of this width (largest offset 3158, so it sits in a window of 3159
+   consecutive integers). For each `q = 2, …, 447` a residue class missed by the tuple
    is listed and checked. Also there: `π(3159) ≤ 446`, by trial division with a checker proved
    complete for primes. All checks are kernel `decide`; there is no `native_decide`.
 2. The Hardy–Littlewood constant of the tuple is positive (`tprod_pos`). Every factor is
@@ -84,3 +85,7 @@ running in an [RSI Ralph](https://github.com/tinyhumansai/rsi-ralph) loop.
 ## Building
 
 Lean `v4.36.0`, Mathlib `fc4f59e5`. `lake build Implications`, or one module at a time.
+
+formal-conjectures `9097e2f` is on Lean v4.33.1 and Mathlib `0df444a`; this package is on v4.36.0 and
+`fc4f59e5`. The Hardy–Littlewood statement text is identical, but the proof has been checked at this
+package's pin only.

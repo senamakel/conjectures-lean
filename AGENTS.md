@@ -711,7 +711,10 @@ Rules:
       `HardyLittlewood.not_first_and_secondHardyLittlewoodConjecture` verbatim from formal-conjectures
       (first Hardy–Littlewood conjecture ⇒ the second is false). Standard three axioms, no `native_decide`:
       the 447-tuple's admissibility and `π(3159) ≤ 446` are kernel checks. Both conjectures stay open
-- [ ] PR #12: the independent `proof-auditor` pass was started after the merge and has not reported
+- [x] PR #12 audited 2026-11-26 at `768fd21`: pass. The three modules were rebuilt from source, the axioms
+      re-read (standard three), the statement re-elaborated against a fresh copy of the formal-conjectures
+      text, and no earlier Lean proof was found (GitHub code search, formal-conjectures PRs, 1337). Not
+      checked: the proof at formal-conjectures' own pin (Lean v4.33.1, Mathlib `0df444a`)
 - [ ] Erdős 855 (the form eventual in both `x` and `y`) does not follow from one tuple: it needs dense
       admissible tuples of every large width (the Hensley–Richards sieve). Sized L in
       `docs/atlas/sweeps/2026-11-26/disproof-erdos.md`; not started
