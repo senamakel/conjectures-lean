@@ -80,7 +80,7 @@ theorem rowTest_congr_sphere {f g : ℂ → ℂ}
     (hfg : ∀ z ∈ Metric.sphere (0 : ℂ) (1 / 2), f z = g z) (ell : ℕ) :
     rowTest ell f = rowTest ell g := by
   simp only [rowTest, cauchyPowerSeries_apply]
-  congr 1
+  refine congrArg (fun w => (2 * (Real.pi : ℂ) * Complex.I)⁻¹ • w) ?_
   apply circleIntegral.integral_congr (by norm_num)
   intro z hz
   change (1 / (z - 0)) ^ ell • (z - 0)⁻¹ • f z =
