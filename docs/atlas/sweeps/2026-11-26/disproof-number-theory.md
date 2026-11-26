@@ -152,7 +152,8 @@ Heuristic used to rank: **how the expected number of representations grows with 
 | `phirep`, form 6 | 2·10⁵ < n ≤ 4.69·10⁵ | none | ~1 CPU-min |
 | `phirep`, forms 1 and 3 | 2·10⁵ < n ≤ 2·10⁶ | none | ~10 CPU-min |
 | `phirep`, form 2 | 2·10⁵ < n ≤ 6·10⁵ | 104 more exceptions (largest 574191) | ~2 CPU-min |
-| `verify.py`, three witnesses | n = 62191, 83843, 167665 | TODO | TODO |
+| `verify.py`, certificates | n = 62191, 83843 | all composite (see Verification) | ~35 + ~60 CPU-min (10 workers); a first serial run, about 1 CPU-h, was abandoned |
+| sizing the certificate for n = 167665 | 61,838 exponents | 9,145 need Fermat tests | ~15 CPU-min; the certificate itself was not run (~50–120 CPU-h) |
 | `c326.py`, 3.26(i) | TODO | TODO | TODO |
 | `c326.py`, 3.26(ii), a = 2..8 | 6 ≤ n ≤ 10⁴ | TODO (a = 7: zeros exactly at 6, 7, 10, 17, matching N(7) = 17) | TODO |
 
