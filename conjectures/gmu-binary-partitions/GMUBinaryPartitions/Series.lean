@@ -20,7 +20,7 @@ theorem one_sub_mul_geomPow2 (i : ℕ) : (1 - X ^ (2 ^ i)) * geomPow2 i = 1 := b
   rw [sub_mul, one_mul, map_sub, coeff_X_pow_mul', geomPow2, coeff_mk, coeff_one]
   by_cases hn : n = 0
   · subst hn
-    simp [Nat.pos_iff_ne_zero.mp hd]
+    simp
   · rw [if_neg hn]
     by_cases hle : 2 ^ i ≤ n
     · rw [if_pos hle, coeff_mk]
@@ -58,7 +58,8 @@ theorem coeff_truncatedSeries_succ (m N n : ℕ) (hn : n < 2 ^ N) :
   rw [truncatedSeries, Finset.prod_range_succ, ← truncatedSeries]
   refine coeff_mul_of_dvd_sub_one ?_ hn
   have h1 : X ^ (2 ^ N) ∣ geomPow2 N - 1 :=
-    ⟨geomPow2 N, by rw [geomPow2_eq N]; ring⟩
+    ⟨geomPow2 N, by conv_lhs => rw [geomPow2_eq N]
+                    ring⟩
   calc X ^ (2 ^ N) ∣ geomPow2 N - 1 := h1
     _ ∣ geomPow2 N ^ m - 1 ^ m := sub_dvd_pow_sub_pow _ _ _
     _ = geomPow2 N ^ m - 1 := by rw [one_pow]
