@@ -1,0 +1,25 @@
+This package contains material from two Apache-2.0 sources.
+
+1. Vendor/OAI/NumberTheory/PiExponent/ (869 Lean files) is copied from
+
+     openai/math, lean/OAI/NumberTheory/PiExponent/, commit 3344da59991ed94f9ba711217b29c1d760badfa6
+     https://github.com/openai/math
+     Copyright OpenAI
+     Licensed under the Apache License, Version 2.0 (Vendor/LICENSE)
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   The source files carry no per-file header; the repository's LICENSE file (copied to
+   Vendor/LICENSE) is the Apache License 2.0. The files are unchanged except for the edits below,
+   which porting from Lean v4.34.1 / Mathlib d13f23b7 to Lean v4.36.0 / Mathlib fc4f59e5 forced.
+   Every modified file carries a "Modified" comment at its top naming the change.
+
+   MODIFIED_FILES_PLACEHOLDER
+
+2. CooksonHills/Statement.lean contains two theorem statements copied from
+
+     google-deepmind/formal-conjectures
+     FormalConjectures/Wikipedia/FlintCooksonHills.lean, commit 9097e2f
+     Copyright 2026 The Formal Conjectures Authors
+     Licensed under the Apache License, Version 2.0
+
+   Changes: each theorem statement is given as a definition of type Prop.
