@@ -13,8 +13,8 @@ written here, in the summation style of formal-conjectures'
 * **Pólya (1919).** `L(n) = ∑_{k=1}^{n} λ(k) ≤ 0` for every `n ≥ 2`, where `λ` is Liouville's
   function (`λ(k) = (-1)^Ω(k)`, so `λ(1) = 1`).
 * **von Sterneck.** `|M(x)| < ½ √x` for every integer `x > 200`, where
-  `M(x) = ∑_{k=1}^{x} μ(k)` is the Mertens function. `vonSterneckConjecture` is the real-valued
-  form; `vonSterneckConjectureInt` is the same inequality squared, `4 M(x)² < x`.
+  `M(x) = ∑_{k=1}^{x} μ(k)` is the Mertens function. `VonSterneckConjecture` is the real-valued
+  form; `VonSterneckConjectureInt` is the same inequality squared, `4 M(x)² < x`.
 
 These files are fixed: do not edit them to make a proof go through.
 -/
