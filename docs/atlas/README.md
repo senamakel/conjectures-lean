@@ -57,3 +57,9 @@ axioms read before the merge (standard three only).
 | four exponentials ⇒ `2^t` or `3^t` transcendental for irrational `t` | premise open | #3 |
 | abc ⇒ Erdős 936 (four variants) and Erdős 977 (factorial variant) | premise open | #4 |
 | quantitative density bound for `k`-term progressions ⇒ Erdős 142 (lower variant) and all-`k` Erdős 140 | premise proved in Lean by openai/math, taken here as a hypothesis | #5 |
+| abc ⇒ infinitely many non-Wieferich primes; finitely many consecutive powerful triples; Brocard finiteness; Erdős 366 finiteness forms; equivalence of the three abc forms | premise open | #11 |
+| Dickson ⇒ every admissible pattern at consecutive primes; Erdős 141 and variants, Erdős 218 equal gaps, balanced primes | premise open | #13 |
+| Firoozbakht ⇒ Oppermann, Andrica, Legendre, Brocard; Oppermann ⇒ Andrica; Andrica ⇒ Legendre | premise open | #14 |
+
+Corollaries of our own theorems, each in its own project folder: prime-powers-rh (#7),
+bach-corollaries-grh (#8), legendre-exceptions-rh (#9), ramanujan-rh (#10).

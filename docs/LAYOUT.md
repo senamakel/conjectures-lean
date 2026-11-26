@@ -40,6 +40,7 @@ against the sibling folders in this checkout. A sibling's build output lands in 
 | `grosswald-grh` | `erdos-985` |
 | `hironaka-fc` | — |
 | `implications` | — |
+| `legendre-exceptions-rh` | `erdos-233` |
 | `li-criterion-rh` | `erdos-985` |
 | `lindelof-rh` | `erdos-985` |
 | `littlewood-rh` | `erdos-985`, `lindelof-rh` |
@@ -50,6 +51,7 @@ against the sibling folders in this checkout. A sibling's build output lands in 
 | `nicolas-rh` | `erdos-985`, `robin-rh` |
 | `prime-powers-rh` | `mills-rh` |
 | `psi-grh` | `erdos-985` |
+| `ramanujan-rh` | `schoenfeld-rh` |
 | `robin-rh` | `erdos-985` |
 | `schoenfeld-rh` | `erdos-985` |
 | `shoup-grh` | `erdos-985` |
