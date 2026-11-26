@@ -10,6 +10,7 @@ The edges come from the [implication atlas](../../docs/atlas/).
 
 | Module | Premise | Consequence | Source | Axioms |
 | :--- | :--- | :--- | :--- | :--- |
+| `Dickson/` (`Schinzel`, `Specialisations`, `Erdos891`, `Erdos647`) | Schinzel's H; Dickson's conjecture | Dickson and Bunyakovsky (from H); twin, generalised twin, cousin, sexy and Sophie Germain primes; Erdős 891 Weisenberg variant; Erdős 647 windowed variant (all from Dickson) | specialisations; Weisenberg (erdosproblems.com/891); Erdős 647: our construction, `n = k!·t` with `(k!/j)t − 1` prime | standard three |
 
 ## Building
 
