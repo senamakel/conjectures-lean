@@ -11,10 +11,10 @@ This package proves in Lean that the conjecture is false: at `m = 1`, `k = 3`, `
 `64 ∣ b₁(16) − b₁(4) = 36 − 4 = 32`. The headline theorem uses Lean's three standard axioms only;
 the values are checked by the kernel through a checker whose soundness is proved. It also fails
 at `m = 3`, `4`, `5` (kernel-checked) and `m = 6` (two `native_decide` evaluations). Literature
-label: *new* (refutation lane, route **e**: a finite counterexample found by computation). The
+label: *new*, pending the owner's sign-off (refutation lane, route **e**: a finite counterexample found by computation). The
 `m = 1` failures are a corollary of Churchhouse's congruence, proved by Rødseth (1970) and Gupta
-(1971–72), so only the `m ≥ 3` failures are a new observation. This is a minor correction to one
-conjecture in a long paper, not a major result.
+(1971), so only the `m ≥ 3` failures are a new observation. This is a minor correction to one
+conjecture in a long paper.
 
 ## Headline theorems
 
@@ -87,7 +87,10 @@ The definition is in Section 4 of the same source: `b_m(n) := f_n(−m)`, where
 `∏_{n≥0}(1−x^{2^n})^t = ∑ f_n(t) x^n`, that is, `H_m(x) = F(x)^{−m} = ∑ b_m(n) x^n`. In the paper
 `ℕ` contains `0` (`b_m(0) = 1`; positive integers are `ℕ₊`), so `n` ranges over Lean's `ℕ`. The
 journal text (Monatsh. Math. 185 (2018)) was **not** read; we have not checked that Conjecture
-5.6 appears there in the same form or with the same number.
+5.6 appears there in the same form or with the same number. The arXiv source carries a referee
+acknowledgement (file name "Revision II"), and its numbering of Conjectures 5.2 and 5.8 matches the
+numbers that solved-conjectures issues #429 and #440 cite against the journal DOI. This suggests,
+but does not confirm, that the journal wording and numbering are the same.
 
 **How the statement is encoded.** No formal-conjectures statement exists, so
 `GMUBinaryPartitions/Statement.lean` is ours. `⌊(k+1)/2⌋` is `(k + 1) / 2` in `ℕ`; since
@@ -149,11 +152,11 @@ this one theorem uses `native_decide`. Reproduce with `lake env lean scripts/Axi
 ## Relation to the literature
 
 **`m = 1` is a corollary of a classical theorem.** For the binary partition function
-`b = b₁`, Churchhouse conjectured (1969), and Rødseth (1970) and Gupta (1971–72) proved, that for
-odd `n` and `r ≥ 1`, `b(2^{r+2}n) − b(2^r n)` is divisible by exactly `2^{⌊3r/2⌋+2}`, and by no
-higher power. With `r = k − 1` the exponent `⌊3(k−1)/2⌋ + 2` is below the conjectured
+`b = b₁`, Churchhouse conjectured (1969), and Rødseth (1970) and Gupta (1971) proved, that for
+odd `n` and `r ≥ 1`, `b(2^{r+2}n) − b(2^r n)` is divisible by `2^{⌊3r/2⌋+2}`, and this power is best
+possible. With `r = k − 1` the exponent `⌊3(k−1)/2⌋ + 2` is below the conjectured
 `4⌊(k+1)/2⌋ − 2` for `k = 3` and every `k ≥ 5`, so Conjecture 5.6 already fails at `m = 1` on the
-strength of that theorem. (The exactness statement is as cited in Ulas–Żmija, arXiv:1904.03398,
+strength of that theorem. (The best-possible statement is as cited in Ulas–Żmija, arXiv:1904.03398,
 Section 6; we did not re-read Rødseth's or Gupta's papers.) In our computation `k = 4` is the only
 `k ≤ 8` at which the `m = 1` instance holds for `n = 1`.
 

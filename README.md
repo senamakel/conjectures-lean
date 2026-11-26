@@ -60,7 +60,7 @@ conjectures. Those links are collected in the [implication atlas](docs/atlas/).
 | **38.** Sun's conjecture (OEIS A038098): `π(n^k)/n^k` is strictly decreasing in `n`, proved for every `k ≥ 4` from RH; the run that supplies RH is pending. `k = 3` is proved outside `141 ≤ n < 10⁷` | [`sun-prime-density-rh`](conjectures/sun-prime-density-rh/) | 🟡 | RH-consequence; no proof found in the literature |
 | **39.** Every odd prime `p` has a prime primitive root `q < p` modulo `p²`, hence modulo every `p^k` (Erdős Problem 985 for prime powers): proved from GRH; the run that supplies GRH is pending | [`primitive-root-sq-grh`](conjectures/primitive-root-sq-grh/) | 🟡 | RH-consequence; the all-`p` statement was not found in the literature |
 | **40.** Two monotonicity conjectures of Sun on `π(x)` (arXiv:1402.6641): `π(kn)^{1/k} > π((k+1)n)^{1/(k+1)}` for `n > 4`, `1 ≤ k ≤ n` (Conj. 2.7(i), OEIS A238165), and `π(n²)^{1/n}` strictly decreasing for `n ≥ 3` (Conj. 2.14(ii), OEIS A038107). No RH | [`sun-pi-inequalities`](conjectures/sun-pi-inequalities/) | ✅ | no proof found in the literature |
-| **41.** Conjecture 5.6 of Gawron–Miska–Ulas (2018) on `m`-coloured binary partitions is false: `b₁(16) − b₁(4) = 32` is not divisible by `2^6`; it also fails at `m = 3, 4, 5, 6`. A minor correction; `m = 1` follows from Churchhouse's congruence (Rødseth 1970) | [`gmu-binary-partitions`](conjectures/gmu-binary-partitions/) | ✅ | new |
+| **41.** Conjecture 5.6 of Gawron–Miska–Ulas (2018) on `m`-coloured binary partitions is false: `b₁(16) − b₁(4) = 32` is not divisible by `2^6`; it also fails at `m = 3, 4, 5, 6`. A minor correction; `m = 1` follows from Churchhouse's congruence (Rødseth 1970) | [`gmu-binary-partitions`](conjectures/gmu-binary-partitions/) | ✅ | *new*, pending the owner's sign-off |
 
 **Lean status.** ✅ the target statement is proved, end to end from Lean's three standard axioms plus
 the finite computations its README names. 🟡 part of the target, or a weaker constant, is proved
@@ -131,7 +131,7 @@ A new counterexample, in [`conjectures/gmu-binary-partitions`](conjectures/gmu-b
 
 | Disproved | Lean theorem | Notes |
 | :--- | :--- | :--- |
-| Gawron–Miska–Ulas Conjecture 5.6 (arXiv:1703.01955), `b_{2^m−1}(2^{k+1}n) ≡ b_{2^m−1}(2^{k−1}n) (mod 2^{4⌊(k+1)/2⌋−2})` for `k ≥ m + 2` | `gmu_conjecture_5_6_false` | `m = 1, k = 3, n = 1`: `36 − 4 = 32`. The `m = 1` failures follow from Churchhouse's congruence (Rødseth 1970, Gupta 1971–72); the failures at `m = 3, 4, 5, 6` are not covered by any result we found. Holds for `m = 2` in our computations |
+| Gawron–Miska–Ulas Conjecture 5.6 (arXiv:1703.01955), `b_{2^m−1}(2^{k+1}n) ≡ b_{2^m−1}(2^{k−1}n) (mod 2^{4⌊(k+1)/2⌋−2})` for `k ≥ m + 2` | `gmu_conjecture_5_6_false` | `m = 1, k = 3, n = 1`: `36 − 4 = 32`. The `m = 1` failures follow from Churchhouse's congruence (Rødseth 1970, Gupta 1971); the failures at `m = 3, 4, 5, 6` are not covered by any result we found. Holds for `m = 2` in our computations |
 
 All of the incompatibility links above are between open conjectures. The reports behind this lane, with
 the candidates for outright disproofs, are in [`docs/atlas/sweeps/2026-11-26/`](docs/atlas/sweeps/2026-11-26/)
