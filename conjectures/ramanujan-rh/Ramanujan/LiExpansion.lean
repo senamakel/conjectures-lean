@@ -44,11 +44,11 @@ lemma hasDerivAt_div_log_pow (m : ℕ) {t : ℝ} (ht : 1 < t) :
       (1 / Real.log t ^ m - m * (1 / Real.log t ^ (m + 1))) t := by
   have hl : 0 < Real.log t := Real.log_pos ht
   have ht0 : t ≠ 0 := by linarith
-  have h := (hasDerivAt_id t).div ((Real.hasDerivAt_log ht0).pow m) (pow_ne_zero m hl.ne')
+  have h := (hasDerivAt_id' t).div ((Real.hasDerivAt_log ht0).pow m) (pow_ne_zero m hl.ne')
   convert h using 1
   rcases m with _ | k
   · simp
-  · simp only [id, Nat.cast_add, Nat.cast_one, Nat.add_sub_cancel]
+  · simp only [Nat.cast_add, Nat.cast_one, Nat.add_sub_cancel]
     field_simp
     ring
 
@@ -85,8 +85,8 @@ lemma I_succ_le (m : ℕ) {a y : ℝ} (ha : 1 < a) (hay : a ≤ y) :
   rw [le_div_iff₀ hla]
   unfold I
   rw [← intervalIntegral.integral_mul_const]
-  apply integral_mono_on hay (intervalIntegrable_inv_log_pow (m + 1) ha hay)
-    ((intervalIntegrable_inv_log_pow m ha hay).mul_const _)
+  apply integral_mono_on hay ((intervalIntegrable_inv_log_pow (m + 1) ha hay).mul_const _)
+    (intervalIntegrable_inv_log_pow m ha hay)
   intro t ht
   have hlt : Real.log a ≤ Real.log t := Real.log_le_log (by linarith) ht.1
   have hl : 0 < Real.log t := by linarith
