@@ -453,7 +453,7 @@ The role is `counterexample-hunter` (`.claude/agents/`). Scripts of each sweep a
       speiser-rh `3c73ba5`, mertens-rh `4e9a6ba`, lls-grh `2fd3311`,
       bach-sorenson-grh `bbb0184`, schoenfeld-rh `62ea23a`, cramer-rh `fb22f0a`,
       erdos-770 `a640482`, erdos-233 `651e094`; on 2026-11-26: legendre-exceptions-rh `d673d91`,
-      ramanujan-rh `24c7ca4`, prime-powers-rh `972f715`, bach-corollaries-grh `e9aba6d`, abundant-rh `8ce94d1`. No `sorryAx` in any log.
+      ramanujan-rh `24c7ca4`, prime-powers-rh `972f715`, bach-corollaries-grh `e9aba6d`, abundant-rh `8ce94d1`, sun-prime-density-rh `f621f9b`. No `sorryAx` in any log.
       The shell's hard open-file limit (524288) is too low for the import: run
       `sudo prlimit --pid $$ --nofile=2000000:2000000` first. Up to four checks fit in RAM at once.
 - [x] **Licence.** This repository and every project folder carry the GNU GPL v3 (`LICENSE`,
@@ -867,13 +867,15 @@ The role is `counterexample-hunter` (`.claude/agents/`). Scripts of each sweep a
 - [ ] A cold rebuild from source in the primary checkout has not been timed
 - [ ] OpenAI's proof of `μ(π) = 2` has had no human review that we know of; our kernel accepts it
 
-### sun-prime-density-rh: Sun's conjecture, `π(n^k)/n^k` strictly decreasing (OEIS A038098) · **tier C for `k ≥ 4` verified, U check pending; `k = 3` partial** · *RH-consequence; no proof found in the literature*
+### sun-prime-density-rh: Sun's conjecture, `π(n^k)/n^k` strictly decreasing (OEIS A038098) · **tier U for `k ≥ 4`, verified; `k = 3` partial** · *RH-consequence; no proof found in the literature*
 - [x] `sun_of_RH`: every `k ≥ 4`, `n ≥ 2`; statement verbatim from formal-conjectures `OeisA38098.conjecture1` (`research open`).
       Rebuilt 2026-11-26 at `71e7505`: standard three + 23 `native_decide` from schoenfeld-rh + 2 of its own
       (`Check.chainOK_piTable`, primes below 2,825,761, 32 s; `Check.allOK_eq_true`, 0.9 s), proved-sound checkers
 - [x] `sun_three_of_RH`: `k = 3` for `2 ≤ n ≤ 140` and `n ≥ 10⁷`; `sunConjecture_iff_of_RH` reduces the whole conjecture to the gap
 - [ ] `k = 3`, `141 ≤ n < 10⁷`: needs `π(n³)` up to about `10²¹` or a sharper explicit bound; not in Lean
-- [ ] `Unconditional/SunPrimeDensityUnconditional.lean` written; check started 2026-11-26, result not yet read
+- [x] `Unconditional/SunPrimeDensityUnconditional.lean` (U): `sun_unconditional`, `sunConjectureFrom_four`, `sun_three_unconditional` carry the
+      standard three + 25 `native_decide`, `sunConjecture_iff_three_range` 26; no `sorryAx`. Checked 2026-11-26 at `f621f9b` against
+      riemann-hypothesis `507a75d91d` (3596 s wall, including a wait for the RH-import slot)
 - [ ] Novelty search of 2026-11-26 found no proof of any case (OEIS page, MathOverflow 301662, arXiv, formal-conjectures PRs,
       GitHub, solved-conjectures). The label *new* needs the owner's sign-off before the README uses it
 - [ ] `Check` is a root namespace in this package; move it under `SunPrimeDensity` before another project copies the name
