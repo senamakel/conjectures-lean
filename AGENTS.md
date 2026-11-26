@@ -724,6 +724,12 @@ Rules:
       under `Implications.` before a second module copies the same definition
 - [ ] None of these is a result about the consequence by itself. Never describe one as solving its Erdős problem
 
+### hajos-catlin: Hajós' conjecture is false (Catlin 1979), witness `C₅[K₃]`, `k = 8` · **tier D, complete, audited** · *known* (refutation route c, owner sign-off 2026-11-26)
+- [x] `HajosConjecture.hajos_conjecture`: formal-conjectures statement verbatim (`9097e2f`), standard three, no `native_decide`
+- [x] `hajos_conjecture.variants.catlin_eight` (`CatlinVariant 8`); `χ ≥ 8` and no `K₈`-subdivision proved by a column-counting argument, finite checks by `decide`
+- [x] Audited 2026-11-26 at `8841eaf`, pass: rebuilt from source, axioms re-read (standard three, no `native_decide`), statement re-elaborated against a fresh paste of formal-conjectures `9097e2f`, an independent exhaustive search over all 6,435 branch sets confirmed no `K₈` subdivision and χ = 8, no earlier unconditional Lean disproof found. The owner signed off on this *known*-label target on 2026-11-26
+- [ ] `variants.catlin` for the other `k ≥ 7` (Catlin's other graphs, `k = 7` included) not done
+
 ## Working here
 
 - Changes to this superproject's own files (`AGENTS.md`, `README.md`, `docs/`, `scripts/`) go
