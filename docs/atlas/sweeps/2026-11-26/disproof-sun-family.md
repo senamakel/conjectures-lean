@@ -19,8 +19,8 @@ near-miss counts grow from octave to octave, and the predicted rate was about on
 per octave just above Sun's bound. **Prior art, as of 12:28 UTC on 2026-11-26: none found.**
 The OEIS entry is unchanged since its creation (revision #22, 16 April 2018). joeyhlu's
 repository does not mention A301534. A search of GitHub code, repositories and issues, of
-OEIS full text and of the web for "A301534" and "28662666283" finds nothing. A second check
-was made just before this report was written (see §6.4). The witness has not been checked in
+OEIS full text and of the web for "A301534" and "28662666283" finds nothing. The lane was
+wound down before a second check, so check again before any claim is made (§6.4). The witness has not been checked in
 Lean (this lane writes no Lean). Under AGENTS.md it is therefore a script-verified witness, and
 it becomes a result only once Lean has checked it (§6.5). Every other statement in the pool is
 negative over the ranges in §5.
