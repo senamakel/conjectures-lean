@@ -2280,3 +2280,22 @@ warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/IntegralAffineOpenDimen
 ✔ [19900/19988] Built OAI.NumberTheory.PiExponent.Ampleness.NilpotentAmpleDescent (9.0s)
 ✔ [19904/19988] Built OAI.NumberTheory.PiExponent.Cohomology.AmpleCohomologyFinite (4.4s)
 ✔ [19968/19988] Built OAI.NumberTheory.PiExponent.Ampleness.AmpleFiniteProjectiveEmbedding (3.7s)
+✖ [19978/19988] Building OAI.NumberTheory.PiExponent.Geometry.ProjectiveIntrinsicCoefficientLaw (1948s)
+trace: .> LEAN_PATH=/home/ubuntu/work/personal/conjectures-lean/.lake/packages/Cli/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/batteries/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/Qq/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/aesop/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/importGraph/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/plausible/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/mathlib/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean /home/ubuntu/.elan/toolchains/leanprover--lean4---v4.36.0/bin/lean /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/Vendor/OAI/NumberTheory/PiExponent/Geometry/ProjectiveIntrinsicCoefficientLaw.lean -o /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean/OAI/NumberTheory/PiExponent/Geometry/ProjectiveIntrinsicCoefficientLaw.olean -i /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean/OAI/NumberTheory/PiExponent/Geometry/ProjectiveIntrinsicCoefficientLaw.ilean -c /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/ir/OAI/NumberTheory/PiExponent/Geometry/ProjectiveIntrinsicCoefficientLaw.c --setup /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/ir/OAI/NumberTheory/PiExponent/Geometry/ProjectiveIntrinsicCoefficientLaw.setup.json --json
+error: Vendor/OAI/NumberTheory/PiExponent/Geometry/ProjectiveIntrinsicCoefficientLaw.lean:77:8: (kernel) deterministic timeout
+Some required targets logged failures:
+- OAI.NumberTheory.PiExponent.LocalAlgebra.FiniteFreeResolutionExt
+- OAI.NumberTheory.PiExponent.Cohomology.TupleCechBound
+- OAI.NumberTheory.PiExponent.Analysis.FlintSine
+- OAI.NumberTheory.PiExponent.Approximation.Exponent
+- OAI.NumberTheory.PiExponent.Polynomials.PolynomialPoleBound
+- OAI.NumberTheory.PiExponent.LocalAlgebra.CoordinateTranscendenceBasis
+- OAI.NumberTheory.PiExponent.Polynomials.PolynomialNormalNonzero
+- OAI.NumberTheory.PiExponent.Ampleness.ReesPushdown
+- OAI.NumberTheory.PiExponent.Geometry.CurveLocalOrder
+- OAI.NumberTheory.PiExponent.Analysis.PeriodAnalytic
+- OAI.NumberTheory.PiExponent.Geometry.CartierSequence
+- OAI.NumberTheory.PiExponent.LocalAlgebra.IdealTensorPowers
+- OAI.NumberTheory.PiExponent.Geometry.ProjectiveIntrinsicCoefficientLaw
+error: build failed
+done
