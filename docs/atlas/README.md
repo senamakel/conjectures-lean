@@ -146,3 +146,26 @@ Stronger statements the audit proposes, none in the literature: the sharp genera
 single-digit constant; explicit per-block exception bounds for the four Legendre-type conjectures.
 The audit also notes that Bazzanella's Theorem 2 may give `log³ N` when summed over `[1, N]`,
 the same as ours; this needs checking against the journal version.
+
+## Wave 3 (paused 2026-11-26)
+
+Seven scout lanes ran and were then paused. Reports are in `sweeps/2026-11-26/w3-*.md`, with
+unaudited edge files `w3-*.edges.jsonl` beside them. **The w3 edges are not appended to
+`edges.jsonl`**; they have not been audited. Source scripts are in
+`sweeps/2026-11-26/w3-scripts/<lane>/`, copied unreviewed and not run. Every result is a
+numerically checked candidate, not a Lean proof. The Grosswald mod p² plan is
+[`scoping/grosswald-mod-p2-cluster.md`](scoping/grosswald-mod-p2-cluster.md).
+
+| Lane | Report | Status | Headline |
+| :--- | :--- | :--- | :--- |
+| small-prime-mod-p | [`w3-small-prime-mod-p.md`](sweeps/2026-11-26/w3-small-prime-mod-p.md) | paused, incomplete | Sun Conj. 3.33 (arXiv:1211.1588; primes p in (n,2n) with prescribed (n/p)) provable under GRH, threshold n ≥ ~3·10^5, checked n ≤ 10^7; candidate, not started |
+| prime-counting | [`w3-prime-counting.md`](sweeps/2026-11-26/w3-prime-counting.md) | paused, incomplete | counterexample to Sun Conj. 2.1 of arXiv:1208.2683 at α=0.001, n=9; remark in arXiv:1210.1562 false for q ≥ 27; four provable candidates A1–A4; nothing proved in Lean |
+| arithmetic-functions | [`w3-arithmetic-functions.md`](sweeps/2026-11-26/w3-arithmetic-functions.md) | paused, incomplete | OEIS A057635 comment false at n=48; A337993 infinite, not finite; A279609 "stronger conjecture" false at n=24→25; nothing proved in Lean |
+| openai-corollaries | [`w3-openai-corollaries.md`](sweeps/2026-11-26/w3-openai-corollaries.md) | paused, incomplete | Σ tan(n)/n² converges absolutely from μ(π)=2; Erdős 417 partial liminf; minor |
+| combinatorics | [`w3-combinatorics.md`](sweeps/2026-11-26/w3-combinatorics.md) | paused, incomplete | Hardin recurrence A184557 via transfer matrix; WOWII 189/199 verified on all 11-vertex connected graphs (evidence only) |
+| elementary | [`w3-elementary.md`](sweeps/2026-11-26/w3-elementary.md) | paused, incomplete | no verified candidate; lead A262439 |
+| progressions-fields | [`w3-progressions-fields.md`](sweeps/2026-11-26/w3-progressions-fields.md) | finished | no class-A candidate |
+| Grosswald mod p² plan | [`scoping/grosswald-mod-p2-cluster.md`](scoping/grosswald-mod-p2-cluster.md) | plan | recommends h(p) ≤ p^{log2/log3} under GRH first (~3–4 CPU-hours); big targets ~1100–1150 CPU-hours, one case unsized |
+
+For each headline, "no proof found in the literature" means what the report's search section
+lists; read the report before relying on it.
