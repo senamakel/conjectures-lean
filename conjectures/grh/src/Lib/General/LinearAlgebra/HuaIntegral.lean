@@ -204,6 +204,6 @@ lemma hua_integral_le {ι κ : Type} [Fintype κ] {M : Matrix κ κ ℂ} S (hS :
   grw [pow_succ' (_ / _), mul_assoc, div_mul_comm, ENNReal.ofReal_mul, ← this, add_le_add_left hr,
     ← lintegral_add_right_eq_self _ (-a i ᵥ* S⁻¹), lintegral_eq_det_mul (C * S⁻¹)ᵀ]
   simp (disch := finiteness) only [← lintegral_const_mul', ← ENNReal.ofReal_mul]; congr! 3
-  any_goals simp [vecMulVec_eq Unit, mul_apply, RCLike.mul_conj, mul_pow, ↓mulVec_transpose, *,
+  any_goals simp [vecMulVec_eq Unit, Matrix.mul_apply, RCLike.mul_conj, mul_pow, ↓mulVec_transpose, *,
     ← conjTranspose_replicateRow, replicateRow_vecMul, Matrix.mul_assoc, det_add_mul, add_vecMul]
   rw_mod_cast [norm_of_nonneg]; field; repeat finiteness
