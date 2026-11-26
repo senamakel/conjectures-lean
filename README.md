@@ -16,7 +16,7 @@ conjectures. Those links are collected in the [implication atlas](docs/atlas/).
 
 ## Results
 
-34 projects: 19 proved in full, 12 proved in part, 1 conditional at its ceiling, 1 wound down, and 1 collection of implications between open conjectures (listed in the next section).
+35 projects: 20 proved in full, 12 proved in part, 1 conditional at its ceiling, 1 wound down, and 1 collection of implications between open conjectures (listed in the next section).
 
 | Conjecture | Folder | Lean | Literature |
 | :--- | :--- | :---: | :--- |
@@ -54,6 +54,7 @@ conjectures. Those links are collected in the [implication atlas](docs/atlas/).
 | **32.** Ramanujan's inequality `π(x)² < (e·x/log x)·π(x/e)` for every `x ≥ e⁴⁰`: proved from RH; the run that supplies RH is pending. The range below `e⁴⁰` is a cited hypothesis | [`ramanujan-rh`](conjectures/ramanujan-rh/) | 🟡 | RH-consequence |
 | **33.** Legendre, Oppermann, Andrica and Brocard each fail for at most `O(log³ N)` of the first `N` indices: proved from RH; the run that supplies RH is pending. These bound the exceptions and prove none of the four | [`legendre-exceptions-rh`](conjectures/legendre-exceptions-rh/) | 🟡 | RH-consequence |
 | **34.** Solé–Planat's inequality at every primorial, infinitely many extremely abundant numbers, and `4` as the only extraordinary number: proved from RH and Robin's inequality; the run that supplies both is pending | [`abundant-rh`](conjectures/abundant-rh/) | 🟡 | RH-equivalent |
+| **35.** Hajós's conjecture is false: a Lean proof of Catlin's (1979) disproof, at `k = 8` | [`hajos-catlin`](conjectures/hajos-catlin/) | ✅ | known |
 
 **Lean status.** ✅ the target statement is proved, end to end from Lean's three standard axioms plus
 the finite computations its README names. 🟡 part of the target, or a weaker constant, is proved
