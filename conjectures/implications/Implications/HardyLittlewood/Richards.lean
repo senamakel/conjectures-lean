@@ -44,9 +44,9 @@ lemma mem_tuple_iff (x : ℕ) : x ∈ tuple ↔ ∃ i, m i = x := by
   rw [List.mem_iff_get]
   constructor
   · rintro ⟨j, rfl⟩
-    exact ⟨Fin.cast tuple_length j, rfl⟩
+    exact ⟨Fin.cast tuple_length j, by simp [m]⟩
   · rintro ⟨i, rfl⟩
-    exact ⟨_, rfl⟩
+    exact ⟨Fin.cast tuple_length.symm i, rfl⟩
 
 lemma even_le_of_mem {x : ℕ} (hx : x ∈ tuple) : x % 2 = 0 ∧ x ≤ 3158 := by
   have := List.all_eq_true.mp tuple_even_le x hx
@@ -74,14 +74,14 @@ lemma exists_missing (q : ℕ) (hq2 : 2 ≤ q) (hq : q ≤ 447) :
   have hmem := List.getElem_mem hj
   have h := List.all_eq_true.mp witness_ok _ hmem
   simp only [List.getElem_zip, List.getElem_range', Bool.and_eq_true, decide_eq_true_eq,
-    List.all_eq_true, bne_iff_ne, ne_eq] at h
+    List.all_eq_true, bne_iff_ne, ne_eq, one_mul] at h
   have hq' : 2 + (q - 2) = q := by omega
   rw [hq'] at h
   refine ⟨_, h.1, fun i => h.2 _ (m_mem i)⟩
 
 /-- The number of classes mod `q` met by the tuple is below `q`, for every prime `q`. -/
 lemma numResidues_lt (q : ℕ) (hq : q.Prime) : Nat.numResidues q m < q := by
-  haveI : NeZero q := ⟨hq.ne_zero⟩
+  have : NeZero q := ⟨hq.ne_zero⟩
   unfold Nat.numResidues
   rcases le_or_gt q 447 with hle | hgt
   · obtain ⟨r, hr, hmiss⟩ := exists_missing q hq.two_le hle
@@ -110,81 +110,96 @@ lemma numResidues_eq (q : ℕ) (hq : 3158 < q) : Nat.numResidues q m = 447 := by
   rw [Set.ncard_range_of_injective hinj]
   simp
 
-/-- The elementary estimate behind the convergence of the singular series. -/
-lemma factor_sub_one_le (q : ℝ) (hq : 894 ≤ q) :
-    |(1 - 447 / q) / (1 - 1 / q) ^ 447 - 1| ≤ 2 * 447 ^ 2 * (1 / q ^ 2) := by
-  have hq0 : 0 < q := by linarith
-  obtain ⟨x, hxdef⟩ : ∃ x : ℝ, x = 1 / q := ⟨_, rfl⟩
-  have hx0 : 0 < x := by rw [hxdef]; exact div_pos one_pos hq0
-  have hx1 : 447 * x ≤ 1 / 2 := by
-    rw [hxdef, mul_one_div, div_le_iff₀ hq0]; linarith
-  have h447 : (447 : ℝ) / q = 447 * x := by rw [hxdef, mul_one_div]
-  have hx2 : 1 / q ^ 2 = x ^ 2 := by rw [hxdef, one_div_pow]
-  rw [h447, hx2, ← hxdef]
-  obtain ⟨P, hP⟩ : ∃ P : ℝ, P = (1 - x) ^ 447 := ⟨_, rfl⟩
+/-! ### The analytic part, for a general tuple
+
+Everything below is stated for an arbitrary `t : Fin k.succ → ℕ`, with the arithmetic input as
+hypotheses; it is applied to `m` (with `k = 446`) only at the end. -/
+
+/-- The elementary estimate behind the convergence of the singular series:
+`|(1 - n x)/(1 - x)^n - 1| ≤ 2 n² x²` when `0 < x` and `n x ≤ 1/2`. -/
+lemma factor_sub_one_le (n : ℕ) (x : ℝ) (hx0 : 0 < x) (hx1 : (n : ℝ) * x ≤ 1 / 2) :
+    |(1 - n * x) / (1 - x) ^ n - 1| ≤ 2 * (n : ℝ) ^ 2 * x ^ 2 := by
+  have hnx : 0 ≤ (n : ℝ) * x := mul_nonneg (Nat.cast_nonneg n) hx0.le
+  obtain ⟨P, hP⟩ : ∃ P : ℝ, P = (1 - x) ^ n := ⟨_, rfl⟩
   rw [← hP]
-  have hlow : 1 - 447 * x ≤ P := by
-    have h := one_add_mul_le_pow (a := -x) (by linarith) 447
+  have hlow : 1 - n * x ≤ P := by
+    have h := one_add_mul_le_pow (a := -x) (by nlinarith) n
     rw [← sub_eq_add_neg, ← hP] at h
-    push_cast at h
     linarith
-  have hup : P ≤ 1 - 447 * x + (447 * x) ^ 2 := by
-    have h1 : P ≤ Real.exp (-x) ^ 447 := by
-      rw [hP]; exact pow_le_pow_left₀ (by linarith) (Real.one_sub_le_exp_neg x) 447
-    have h2 : Real.exp (-x) ^ 447 = Real.exp (-(447 * x)) := by
-      rw [← Real.exp_nat_mul]; congr 1; push_cast; ring
-    have h3 := Real.abs_exp_sub_one_sub_id_le (x := -(447 * x))
-      (by rw [abs_neg, abs_of_pos (by linarith : (0 : ℝ) < 447 * x)]; linarith)
+  have hup : P ≤ 1 - n * x + (n * x) ^ 2 := by
+    have h1 : P ≤ Real.exp (-x) ^ n := by
+      rw [hP]
+      have hx1' : x ≤ 1 := by
+        rcases Nat.eq_zero_or_pos n with hn | hn
+        · subst hn; simp at hP; nlinarith [Real.one_sub_le_exp_neg x, hP]
+        · have : (1 : ℝ) ≤ n := by exact_mod_cast hn
+          nlinarith
+      exact pow_le_pow_left₀ (by linarith) (Real.one_sub_le_exp_neg x) n
+    have h2 : Real.exp (-x) ^ n = Real.exp (-(n * x)) := by
+      rw [← Real.exp_nat_mul]; congr 1; ring
+    have h3 := Real.abs_exp_sub_one_sub_id_le (x := -(n * x))
+      (by rw [abs_neg, abs_of_nonneg hnx]; linarith)
     have h4 := (abs_le.mp h3).2
     rw [neg_sq] at h4
     linarith
   have hP0 : 0 < P := by linarith
   rw [div_sub_one hP0.ne', abs_div, abs_of_pos hP0, div_le_iff₀ hP0,
     abs_of_nonpos (by linarith)]
-  nlinarith [mul_nonneg (sq_nonneg x) (by linarith : (0 : ℝ) ≤ 2 * P - 1)]
+  nlinarith [mul_nonneg (mul_nonneg (sq_nonneg (n : ℝ)) (sq_nonneg x))
+    (by linarith : (0 : ℝ) ≤ 2 * P - 1)]
 
-/-- The Hardy–Littlewood factor at `q` for our tuple. -/
-noncomputable def factor (q : { q : ℕ // q.Prime ∧ 3 ≤ q}) : ℝ :=
-  (1 - (Nat.numResidues q m : ℝ) / q) / (1 - 1 / q) ^ (Nat.succ 446)
+/-- The same estimate at `x = 1/q`. -/
+lemma factor_sub_one_le' (n : ℕ) (q : ℝ) (hq : 2 * (n : ℝ) ≤ q) (hq1 : 1 ≤ q) :
+    |(1 - (n : ℝ) / q) / (1 - 1 / q) ^ n - 1| ≤ 2 * (n : ℝ) ^ 2 * (1 / q ^ 2) := by
+  have hq0 : 0 < q := by linarith
+  have h := factor_sub_one_le n (1 / q) (by positivity)
+    (by rw [mul_one_div, div_le_iff₀ hq0]; linarith)
+  rwa [mul_one_div, one_div_pow] at h
 
-lemma factor_pos (q : { q : ℕ // q.Prime ∧ 3 ≤ q}) : 0 < factor q := by
-  have hq3 : (3 : ℝ) ≤ (q : ℕ) := by exact_mod_cast q.2.2
-  have hlt : (Nat.numResidues q m : ℝ) < (q : ℕ) := by exact_mod_cast numResidues_lt q q.2.1
-  unfold factor
-  apply div_pos
-  · rw [sub_pos, div_lt_one (by linarith)]; exact hlt
-  · apply pow_pos
-    rw [sub_pos, div_lt_one (by linarith)]; linarith
-
-lemma summable_log_factor : Summable fun q => Real.log (factor q) := by
-  have hg : Summable fun q : { q : ℕ // q.Prime ∧ 3 ≤ q} => factor q - 1 := by
+/-- A product of Hardy–Littlewood factors is positive when the tuple misses a class mod every
+prime and occupies `k + 1` distinct classes mod every large prime. -/
+lemma tprod_pos {k : ℕ} (t : Fin k.succ → ℕ) (B : ℕ)
+    (hlt : ∀ q : ℕ, q.Prime → Nat.numResidues q t < q)
+    (heq : ∀ q : ℕ, B < q → Nat.numResidues q t = k.succ) :
+    0 < ∏' (q : { q : ℕ // q.Prime ∧ 3 ≤ q}),
+        (1 - (Nat.numResidues q t : ℝ) / q) / (1 - 1 / q) ^ k.succ := by
+  set f : { q : ℕ // q.Prime ∧ 3 ≤ q} → ℝ :=
+    fun q => (1 - (Nat.numResidues q t : ℝ) / q) / (1 - 1 / q) ^ k.succ with hf
+  have hpos : ∀ q, 0 < f q := by
+    intro q
+    have hq3 : (3 : ℝ) ≤ (q : ℕ) := by exact_mod_cast q.2.2
+    have hl : (Nat.numResidues q t : ℝ) < (q : ℕ) := by exact_mod_cast hlt q q.2.1
+    apply div_pos
+    · rw [sub_pos, div_lt_one (by linarith)]; exact hl
+    · apply pow_pos
+      rw [sub_pos, div_lt_one (by linarith)]; linarith
+  have hg : Summable fun q => f q - 1 := by
     have hs : Summable fun q : { q : ℕ // q.Prime ∧ 3 ≤ q} =>
-        2 * 447 ^ 2 * (1 / ((q : ℕ) : ℝ) ^ 2) :=
+        2 * ((k.succ : ℕ) : ℝ) ^ 2 * (1 / ((q : ℕ) : ℝ) ^ 2) :=
       ((Real.summable_one_div_nat_pow.mpr one_lt_two).comp_injective
         Subtype.val_injective).mul_left _
     refine hs.of_norm_bounded_eventually ?_
     rw [Filter.eventually_cofinite]
-    refine ((Set.finite_Iic 3158).preimage Subtype.val_injective.injOn).subset ?_
+    refine ((Set.finite_Iic (B + 2 * k.succ)).preimage Subtype.val_injective.injOn).subset ?_
     intro q hq
-    simp only [Set.mem_setOf_eq, Set.mem_preimage, Set.mem_Iic] at hq ⊢
+    simp only [Set.mem_preimage, Set.mem_Iic]
     by_contra hbig
     apply hq
-    push_neg at hbig
-    have hq' : (894 : ℝ) ≤ (q : ℕ) := by exact_mod_cast (by omega : 894 ≤ (q : ℕ))
-    have := factor_sub_one_le _ hq'
-    rw [Real.norm_eq_abs]
-    unfold factor
-    rw [numResidues_eq _ hbig]
-    exact_mod_cast this
-  exact (Real.summable_log_one_add_of_summable hg).congr fun q => by rw [add_sub_cancel]
-
-/-- The Hardy–Littlewood singular series of the tuple is positive. -/
-lemma tprod_factor_pos : 0 < ∏' q, factor q := by
-  rw [← Real.rexp_tsum_eq_tprod factor_pos summable_log_factor]
+    have hbig' : B + 2 * k.succ < (q : ℕ) := by omega
+    have hq' : 2 * ((k.succ : ℕ) : ℝ) ≤ ((q : ℕ) : ℝ) := by
+      exact_mod_cast (by omega : 2 * k.succ ≤ (q : ℕ))
+    have hq1 : (1 : ℝ) ≤ ((q : ℕ) : ℝ) := by exact_mod_cast (by omega : 1 ≤ (q : ℕ))
+    rw [Real.norm_eq_abs, hf]
+    dsimp only
+    rw [heq _ (by omega)]
+    exact factor_sub_one_le' k.succ _ hq' hq1
+  have hlog : Summable fun q => Real.log (f q) :=
+    (Real.summable_log_one_add_of_summable hg).congr fun q => by rw [add_sub_cancel]
+  rw [← Real.rexp_tsum_eq_tprod hpos hlog]
   exact Real.exp_pos _
 
-lemma integral_pos {n : ℝ} (hn : 3 ≤ n) :
-    0 < ∫ t in (2 : ℝ)..n, 1 / t.log ^ (Nat.succ 446) := by
+lemma integral_pos (k : ℕ) {n : ℝ} (hn : 3 ≤ n) :
+    0 < ∫ t in (2 : ℝ)..n, 1 / t.log ^ k.succ := by
   have hI : Set.uIcc (2 : ℝ) n = Set.Icc 2 n := Set.uIcc_of_le (by linarith)
   have hpos : ∀ t ∈ Set.uIcc (2 : ℝ) n, 0 < Real.log t := by
     intro t ht
@@ -203,27 +218,39 @@ lemma integral_pos {n : ℝ} (hn : 3 ≤ n) :
     positivity
   · linarith
 
-/-- Under the first Hardy–Littlewood conjecture, some `p` makes every `p + mᵢ` prime. -/
-lemma exists_constellation
-    (hHL : ∀ {k : ℕ} (m : Fin k.succ → ℕ), FirstHardyLittlewoodConjectureFor m) :
-    ∃ p, ∀ i, (p + m i).Prime := by
-  have h := hHL (k := 446) m m_zero (fun i _ => m_even i) m_injective
+/-- If the first Hardy–Littlewood conjecture holds for `t` and its constant is positive, some
+`p` makes every `p + tᵢ` prime. -/
+lemma exists_constellation_of {k : ℕ} (t : Fin k.succ → ℕ) (B : ℕ)
+    (h0 : t 0 = 0) (hev : ∀ i ≠ 0, Even (t i)) (hinj : Function.Injective t)
+    (hlt : ∀ q : ℕ, q.Prime → Nat.numResidues q t < q)
+    (heq : ∀ q : ℕ, B < q → Nat.numResidues q t = k.succ)
+    (hHL : FirstHardyLittlewoodConjectureFor t) :
+    ∃ p, ∀ i, (p + t i).Prime := by
+  classical
+  have h := hHL h0 hev hinj
   dsimp only at h
-  have hC : 0 < (2 : ℝ) ^ 446 * ∏' q, factor q := by
-    have := tprod_factor_pos; positivity
+  have hC := tprod_pos t B hlt heq
   have hv : ∀ᶠ n : ℕ in atTop,
-      (2 ^ 446 * ∏' (q : { q : ℕ // q.Prime ∧ 3 ≤ q}),
-        (1 - (Nat.numResidues q m : ℝ) / q) / (1 - 1 / q) ^ (Nat.succ 446)) *
-        (∫ t in (2 : ℝ)..n, 1 / t.log ^ (Nat.succ 446)) ≠ 0 := by
+      (2 ^ k * ∏' (q : { q : ℕ // q.Prime ∧ 3 ≤ q}),
+        (1 - (Nat.numResidues q t : ℝ) / q) / (1 - 1 / q) ^ k.succ) *
+        (∫ x in (2 : ℝ)..n, 1 / x.log ^ k.succ) ≠ 0 := by
     filter_upwards [eventually_ge_atTop 3] with n hn
-    exact (mul_pos hC (integral_pos (by exact_mod_cast hn))).ne'
+    exact (mul_pos (mul_pos (by positivity) hC)
+      (integral_pos k (by exact_mod_cast hn))).ne'
   obtain ⟨n, hn1, hn2⟩ := (hv.and h.isBigO_symm.eq_zero_imp).exists
-  have hcount : Nat.primeTupleCounting m n ≠ 0 := by
+  have hcount : Nat.primeTupleCounting t n ≠ 0 := by
     intro h0; exact hn1 (hn2 (by simp [h0]))
   unfold Nat.primeTupleCounting at hcount
   rw [Nat.count_eq_card_filter_range, Finset.card_ne_zero] at hcount
   obtain ⟨p, hp⟩ := hcount
   exact ⟨p, (Finset.mem_filter.mp hp).2.1.2.2⟩
+
+/-- Under the first Hardy–Littlewood conjecture, some `p` makes every `p + mᵢ` prime. -/
+lemma exists_constellation
+    (hHL : ∀ {k : ℕ} (m : Fin k.succ → ℕ), FirstHardyLittlewoodConjectureFor m) :
+    ∃ p, ∀ i, (p + m i).Prime :=
+  exists_constellation_of m 3158 m_zero (fun i _ => m_even i) m_injective numResidues_lt
+    numResidues_eq hHL
 
 end HardyLittlewood.Richards
 
