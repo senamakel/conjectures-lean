@@ -1,0 +1,13 @@
+HajosCatlin/Statement.lean contains definitions and statement bodies copied from
+
+  google-deepmind/formal-conjectures, commit 9097e2f
+  FormalConjectures/Wikipedia/HajosConjecture.lean
+  Copyright 2026 The Formal Conjectures Authors
+  Licensed under the Apache License, Version 2.0
+  https://www.apache.org/licenses/LICENSE-2.0
+
+Changes: `module`, `public import FormalConjecturesUtil`, `@[expose] public section` and the
+`@[category …]` attributes are dropped and `import Mathlib` is used; the statement of
+`hajos_conjecture` is given as the Prop `HajosConjectureFalse`, and the body of
+`hajos_conjecture.variants.catlin` as the predicate `CatlinVariant k`.
+HajosCatlin/Main.lean restates `hajos_conjecture` with its statement unchanged.

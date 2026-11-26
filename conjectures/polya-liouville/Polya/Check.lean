@@ -35,11 +35,11 @@ theorem le_div_div {x n : ℕ} (h : n ≤ x) : n ≤ x / (x / n) := by
 /-- `blockSum f x n = ∑_{k=n}^{x} f ⌊x/k⌋`, summed over the blocks `[n, ⌊x/⌊x/n⌋⌋]` on which
 `⌊x/k⌋` is constant. -/
 def blockSum (f : ℕ → ℤ) (x n : ℕ) : ℤ :=
-  if h : x < n then 0 else
+  if _h : x < n then 0 else
     ((x / (x / n) + 1 - n : ℕ) : ℤ) * f (x / n) + blockSum f x (x / (x / n) + 1)
 termination_by x + 1 - n
 decreasing_by
-  have := le_div_div (Nat.le_of_not_lt h)
+  have := le_div_div (Nat.le_of_not_lt _h)
   omega
 
 theorem Icc_eq_Ico (a b : ℕ) : Icc a b = Ico a (b + 1) := by

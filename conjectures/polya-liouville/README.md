@@ -4,8 +4,8 @@ Pólya (1919) conjectured that the summatory Liouville function `L(n) = Σ_{k≤
 `L(n) ≤ 0` for every `n ≥ 2`. This package proves in Lean that `L(906150257) = 1`, so the
 conjecture is false. It also proves `M(7725038629) = 43947` for the Mertens function
 `M(x) = Σ_{k≤x} μ(k)`. Since `4 · 43947² = 7725355236 > 7725038629`, this refutes von Sterneck's
-conjecture `|M(x)| < ½√x` for `x > 200`. Both refutations are *known* (route c/e of the
-refutation lane in `AGENTS.md`). Haselgrove (1958) disproved Pólya's conjecture without giving a
+conjecture `|M(x)| < ½√x` for `x > 200`. Both refutations are *known* (route e of the
+refutation lane in `AGENTS.md`: a witness checked by `native_decide`). Haselgrove (1958) disproved Pólya's conjecture without giving a
 witness, and Tanaka (1980) found `906150257`, the smallest counterexample. Neubauer (1963) found
 the first counterexamples to von Sterneck's conjecture, and Cohen and Dress (1979) found
 `7725038629`, the smallest. Lean checks every step from Mathlib's `ArithmeticFunction.liouville`
@@ -38,9 +38,11 @@ def VonSterneckConjectureInt : Prop := ∀ x : ℕ, 200 < x → 4 * mertens x ^ 
 All five theorems are **tier D**: they are closed statements with no hypotheses, and nothing
 here imports riemann-hypothesis. The literature label is *known*.
 
-formal-conjectures has no statement of either conjecture. At `9097e2f` we searched for Pólya,
+At `9097e2f` formal-conjectures has no statement of either conjecture (we searched for Pólya,
 Liouville, Sterneck, `906150257` and `7725038629`. The only Liouville statements there are the
-Chowla conjectures. So the statements were written here, following Pólya's wording: `n ≥ 2`,
+Chowla conjectures). The open formal-conjectures PR #8202 adds the same Pólya statement, plus a
+least-counterexample statement (`906150257`), with no proof. The statements here
+were written independently, so the statements were written here, following Pólya's wording: `n ≥ 2`,
 with `λ(1) = 1`, so that `L(1) = 1` is excluded. The summation style is that of formal-conjectures'
 `Wikipedia/ChowlaLiouvilleConjecture.lean`. Von Sterneck's inequality is stated twice, once with
 the real square root as he wrote it and once squared in integers.
@@ -82,10 +84,10 @@ There are two `native_decide`s, one for each value:
 - `Polya.Check.liouville_906150257_check : runLiouville 906150257 1 = true`. It fills tables of
   `M` at the 60,203 points of `V` (all `y ≤ 30102` and every `⌊906150257/a⌋ > 30102`). It checks
   `Σ_{k≤y} M(⌊y/k⌋) = 1` at each of them by block sums, then adds up `M(⌊906150257/d²⌋)` for
-  `d ≤ 30102`. The module takes about 23 s wall and 2.5 GB of RAM.
+  `d ≤ 30102`. The module takes 23–37 s wall and 2.5 GB of RAM.
 - `Polya.Check.mertens_7725038629_check : runMertens 7725038629 43947 = true`. It runs the same
   check on the 175,783 points of `V` for `X = 7725038629` (`T = 87892`), then reads off
-  `M(X)`. The module takes 110 to 130 s wall on a loaded box, with 2.5 GB of RAM.
+  `M(X)`. The module takes 110–170 s wall on a loaded box, with 2.5 GB of RAM.
 
 Both are evaluated by Lean's IR interpreter, since the module is not precompiled. The soundness theorems
 `runLiouville_sound` and `runMertens_sound` use only the standard three axioms.
@@ -126,7 +128,10 @@ Both are evaluated by Lean's IR interpreter, since the module is not precompiled
 ## Independent recomputation
 
 Before the Lean run, both values were computed in C with the same block algorithm and an
-independent Möbius sieve for the small table. The results were `L(906150256) = 0`,
+independent Möbius sieve for the small table. After the Lean run, an independent segmented
+sieve in C (a different method from the checker) confirmed both values and that they are the
+least counterexamples (`L(906150257)` is the first `L(n) > 0` for `n ≥ 2`; `7725038629` is the
+first `x > 200` with `4M(x)² ≥ x`). That minimality was checked outside Lean only. The results were `L(906150256) = 0`,
 `L(906150257) = 1`, `L(906180359) = 1` (Lehman's value), `M(7725038628) = 43946` and
 `M(7725038629) = 43947`. For `n = 1000` and `n = 123457` they matched a direct sieve in Python.
 
@@ -143,7 +148,7 @@ lake build Polya PolyaChecks
 
 The package uses Lean `v4.36.0` and Mathlib `fc4f59e577feb1a4956671bc04ac18aaaf8cd842`. It
 needs Mathlib only, and its packages come from the repository's shared `.lake/packages`. With
-Mathlib built, the whole package builds in about 2.5 minutes wall. Nearly all of that is the two
+Mathlib built, the whole package builds in 2.5–4 minutes wall on a loaded box. Nearly all of that is the two
 `native_decide` modules.
 
 ## Unconditional version
@@ -161,14 +166,16 @@ No unconditional version is needed. The results are tier D and do not use RH.
   Math. 3 (1980), 187–189: the least counterexample `906150257`.
 - R. D. von Sterneck stated the conjecture `|M(x)| < ½√x` for `x > 200` in a series of papers
   with tables of `M(n)`, from 1897 to 1912. The individual papers were not read.
-- W. Jurkat (1960) disproved it without a witness. G. Neubauer, *Eine empirische Untersuchung
+- W. Jurkat (1960) is said to have disproved it without a witness (unverified: no source seen
+  confirms this). G. Neubauer, *Eine empirische Untersuchung
   zur Mertensschen Funktion*, Numer. Math. 5 (1963), 1–13, found the first explicit
-  counterexamples, near `7.76·10⁹`. H. Cohen and F. Dress (1979) found the least one,
-  `7725038629`, with `M = 43947`.
+  counterexamples, near `7.76·10⁹`. H. Cohen and F. Dress found the least one,
+  `7725038629`, with `M = 43947`: *Calcul numérique de M(x)*, Rapport de l'ATP A12311
+  Informatique 1975, CNRS, 1979, pp. 1–13 (a CNRS report).
 
-The von Sterneck history (Jurkat, Neubauer, Cohen–Dress) was confirmed in A. M. Odlyzko and
-H. J. J. te Riele, *Disproof of the Mertens conjecture*, J. reine angew. Math. 357 (1985), §1,
-and in te Riele's CWI survey *The Mertens conjecture*. The Pólya references come from secondary
+The von Sterneck wording, Neubauer and Cohen–Dress were confirmed in te Riele's CWI survey
+*The Mertens conjecture* (§2) and A. M. Odlyzko and H. J. J. te Riele, *Disproof of the Mertens
+conjecture*, J. reine angew. Math. 357 (1985), §1. Neither source mentions Jurkat's 1960 result. The Pólya references come from secondary
 sources (Wikipedia, OEIS A189229, Brent–van de Lune arXiv:1112.4911) and from bibliographic
 memory. The originals were not read.
 
@@ -179,9 +186,11 @@ memory. The originals were not read.
 - formal-conjectures `9097e2f`, including its `formal_proof` attributes.
 - A GitHub code search for `906150257`, `7725038629`, `sterneck` and `polya conjecture` (Lean),
   which found only C, Perl, GAP and data files.
-- The scout's searches. Its one Lean hit, andyprevalsky/auto-math
-  `disproof-templates.lean`, states `polya_conjecture_false` with `sorry` over an `opaque`
-  summatory function.
+- Other searches, with two Lean hits. andyprevalsky/auto-math `disproof-templates.lean` states
+  `polya_conjecture_false` with `sorry` over an `opaque` summatory function.
+  wappy-x/Mathematics `checks/what_counts_as_a_proof_check.lean` has `polya_fails_at_906150257`,
+  but assumes `L(906150256) = 0` as a hypothesis, so it is not a complete proof.
+- formal-conjectures PR #8202 (open): statements only, no proof.
 
 ## Credits
 

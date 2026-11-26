@@ -211,6 +211,39 @@ LivingBrain is part of the method. Ingest the proofs and lemma inventories we re
 source, repo and path, what it needs, what it gives), so a later search for "what proves a bound
 of this shape?" finds them. Check any identifier it returns against the source.
 
+## Priority: results not yet in the public literature
+
+**Decided 2026-11-26 (owner).** We work on conjectures whose solution is not yet known in the
+public literature: not proved in a paper, a preprint, a problem-site comment, a Zenodo note or a
+public Lean repository. **Do not start a prover on a deduction that is already published**, and
+stop one that is running on it. A Lean version of a known proof is a formalisation; it is not what
+this workspace is for. On 2026-11-26 four provers were stopped for this reason (further Cramér,
+Schinzel, abc and Berge–Fulkerson consequences); their partial branches (`impl-cramer-2`,
+`impl-schinzel-2`, `impl-abc-3`, `impl-combinatorics`) are unmerged and stay that way unless the
+owner asks. The implications already merged stay; the table in `README.md` marks nothing as new.
+
+Every edge in the atlas carries a `novelty` verdict (`docs/atlas/README.md`), and a prover is
+started only on an edge whose verdict is `not-found` or `asserted-unproved`.
+
+What counts, strongest first:
+
+1. An open statement settled outright (proved or disproved) by connecting existing results.
+2. An open statement that becomes a theorem because RH and GRH for Dirichlet L-functions are
+   now proved in Lean, where even the conditional deduction "RH ⇒ X" was never written down, or
+   where the published conditional result leaves a finite range or a constant that we close.
+3. A result strictly stronger than the published one (a better constant, a wider range, a
+   hypothesis removed).
+4. A new implication between open conjectures that was asserted without proof, or not stated.
+
+Every candidate of this kind needs a novelty search before work starts and again before it is
+announced: arXiv, the problem's own page and comment thread, erdosproblems.com and its mirrors,
+Zenodo, formal-conjectures (statements, `formal_proof` links and open PRs),
+1337isnot1337/solved-conjectures, openai/math and a GitHub code search. Record what was
+searched and when. Easy visible corollaries of the RH proof are being posted within days, so a
+search older than a week is stale. The label *new* still needs the owner's sign-off before a
+README uses it (see "Literature status"); until then say exactly what was not found and where
+we looked.
+
 ## Agent roles
 
 Defined in `.claude/agents/`. Research roles write only to `docs/`; proving roles work in a
@@ -674,23 +707,70 @@ Rules:
 - [ ] Literature: the generator bound with constant `2` sharpens the `3` of Bach 1990 §6. Whether factoring from `φ(n)` is
       known without ERH was not checked
 
+### abundant-rh: Solé–Planat, extremely abundant numbers, extraordinary numbers · **tier C verified (Robin as an imported hypothesis), U check pending** · *RH-equivalent*
+- [x] `solePlanat_of_RH`, `extremelyAbundantInfinite_of_RH`, `fourOnlyExtraordinary_of_RH`; the last two take
+      `Robin.RobinStatement` as an argument so the main library never builds robin-rh's sieve. Rebuilt 2026-11-26 at `3b1cb54`;
+      axiom lists pinned by `#guard_msgs` in `AbundantChecks`: standard three + `Nicolas.Check.loop_ok` (+ `Abundant.Check.check_ok`
+      for the extraordinary-number theorem, one `native_decide`, 92 s, proved-sound checker over `n ≤ 5040`)
+- [ ] `Unconditional/AbundantUnconditional.lean` written; its check builds robin-rh's sieve (about 54 core-hours) first. Not run
+- [ ] The separate GA2 statement of Caveney–Nicolas–Sondow is not stated (its definition was not confirmed)
+
+### ramanujan-rh: Ramanujan's inequality `π(x)² < (e·x/log x)·π(x/e)` · **tier C for `x ≥ e⁴⁰` verified, U check pending; full statement tier H** · *RH-consequence*
+- [x] `ramanujan_of_RH : RiemannHypothesis → RamanujanInequalityFrom (Real.exp 40)` (C), no computation. Rebuilt 2026-11-26 at
+      `d2d9ea0`: standard three + 23 `native_decide` inherited from schoenfeld-rh; `ramanujan_of_schoenfeldPi` standard three only
+- [x] `ramanujan_of_RH_of_verified`: the Dudek–Platt statement (`x ≥ 38,358,837,683`) with `RamanujanVerifiedRange`
+      (`[38,358,837,683, e⁴⁰]`, about `6·10¹⁵` primes) as a tier-H hypothesis
+- [ ] `Unconditional/RamanujanUnconditional.lean` written; check not yet run
+- [ ] Literature not confirmed: Axler's `e^3158.442`, Platt–Trudgian's `exp(3915)`. Two unrefereed unconditional claims
+      exist (arXiv:2408.02591, Zenodo 23440770), not checked
+- [ ] Lowering `e⁴⁰` to Dudek–Platt's `1.15·10¹⁶` needs `π(x) < li(x)` for `x ≤ 1.2·10¹⁷`, which we do not have in Lean
+
+### legendre-exceptions-rh: exceptional sets for Legendre, Oppermann, Andrica, Brocard · **tier C verified, U check pending** · *RH-consequence*
+- [x] `legendre_exceptions_of_RH`, `oppermann_exceptions_of_RH`, `andrica_exceptions_of_RH`, `brocard_exceptions_of_RH`:
+      `O(log³ N)` exceptions among the first `N` indices, from erdos-233's `large_gaps_of_RH`. Rebuilt 2026-11-26 at `f3c0776`,
+      standard three only. Conjecture statements verbatim from formal-conjectures
+- [ ] `Unconditional/LegendreExceptionsUnconditional.lean` written; check not yet run
+- [ ] Bazzanella (2000, Thm 2) has `O(f(N) log² N)` for Legendre under RH, one logarithm better; not proved here
+- [ ] The Oppermann, Andrica and Brocard bounds were not found in the literature (search list in the README)
+
 ### implications: `X → Y` between open conjectures · **every theorem tier C or H, verified** · *premise open*
-- [x] PRs #1 to #6, each rebuilt on `main` and its axioms read (standard three): Rotkiewicz; Erdős 382 (i) from Cramér /
+- [x] PRs #1 to #6, #11, #13 and #14, each rebuilt on `main` and its axioms read (standard three): Rotkiewicz; Erdős 382 (i) from Cramér /
       Firoozbakht; Butson ⇒ Hadamard; four exponentials ⇒ `2^t` or `3^t`; abc ⇒ Erdős 936 and 977 (factorial);
       Dickson / Schinzel consequences (Erdős 891 Weisenberg, Erdős 647 infinite variant, twin primes and relatives);
-      Erdős 142 lower variant and all-`k` Erdős 140 from the quantitative density bound
+      Erdős 142 lower variant and all-`k` Erdős 140 from the quantitative density bound; abc ⇒ non-Wieferich primes
+      (Silverman), powerful triples, Brocard, Erdős 366 forms; Dickson ⇒ admissible patterns at consecutive primes
+      (Erdős 141, 218 variant, balanced primes); Firoozbakht ⇒ Oppermann, Andrica, Legendre, Brocard
+- [x] PR #12 (merged 2026-11-26, `42c8652`), refutation lane route b: Richards' incompatibility,
+      `HardyLittlewood.not_first_and_secondHardyLittlewoodConjecture` verbatim from formal-conjectures
+      (first Hardy–Littlewood conjecture ⇒ the second is false). Standard three axioms, no `native_decide`:
+      the 447-tuple's admissibility and `π(3159) ≤ 446` are kernel checks. Both conjectures stay open
+- [x] PR #12 audited 2026-11-26 at `768fd21`: pass. The three modules were rebuilt from source, the axioms
+      re-read (standard three), the statement re-elaborated against a fresh copy of the formal-conjectures
+      text, and no earlier Lean proof was found (GitHub code search, formal-conjectures PRs, 1337). Not
+      checked: the proof at formal-conjectures' own pin (Lean v4.33.1, Mathlib `0df444a`)
+- [ ] Erdős 855 (the form eventual in both `x` and `y`) does not follow from one tuple: it needs dense
+      admissible tuples of every large width (the Hensley–Richards sieve). Sized L in
+      `docs/atlas/sweeps/2026-11-26/disproof-erdos.md`; not started
 - [x] Statements copied word for word from formal-conjectures `9097e2f`; the table is in the root `README.md`
 - [ ] `scripts/erdos142-discharge/` (the link to openai/math's `manuscriptQuantitativeDensityTheorem`) has not been typechecked
 - [ ] Some modules define copied names in root namespaces (`Nat.Full`, `Set.IsAPOfLength…`, `ABC`, `Erdos936`); move them
       under `Implications.` before a second module copies the same definition
 - [ ] None of these is a result about the consequence by itself. Never describe one as solving its Erdős problem
 
-### polya-liouville: Pólya's and von Sterneck's conjectures are false · **tier D, complete; audit pending** · *known* (refutation lane, route c/e, owner sign-off 2026-11-26)
+### hajos-catlin: Hajós' conjecture is false (Catlin 1979), witness `C₅[K₃]`, `k = 8` · **tier D, complete, audited** · *known* (refutation route c, owner sign-off 2026-11-26)
+- [x] `HajosConjecture.hajos_conjecture`: formal-conjectures statement verbatim (`9097e2f`), standard three, no `native_decide`
+- [x] `hajos_conjecture.variants.catlin_eight` (`CatlinVariant 8`); `χ ≥ 8` and no `K₈`-subdivision proved by a column-counting argument, finite checks by `decide`
+- [x] Audited 2026-11-26 at `8841eaf`, pass: rebuilt from source, axioms re-read (standard three, no `native_decide`), statement re-elaborated against a fresh paste of formal-conjectures `9097e2f`, an independent exhaustive search over all 6,435 branch sets confirmed no `K₈` subdivision and χ = 8, no earlier unconditional Lean disproof found. The owner signed off on this *known*-label target on 2026-11-26
+- [ ] `variants.catlin` for the other `k ≥ 7` (Catlin's other graphs, `k = 7` included) not done
+
+### polya-liouville: Pólya's and von Sterneck's conjectures are false · **tier D, complete, audited** · *known* (refutation lane, route e: a witness checked by `native_decide`, owner sign-off 2026-11-26)
 - [x] Statements written here (no formal-conjectures statement): `PolyaConjecture` (`L(n) ≤ 0`, `n ≥ 2`), `VonSterneckConjecture` (real) and `VonSterneckConjectureInt` (`4M(x)² < x`), `x > 200`
-- [x] `liouvilleSum_906150257`, `polya_conjecture_false` (D): standard three + 1 `native_decide` (about 23 s)
-- [x] `mertens_7725038629`, `vonSterneck_conjecture_false`, `vonSterneck_conjecture_int_false` (D): standard three + 1 `native_decide` (about 2 min)
+- [x] `liouvilleSum_906150257`, `polya_conjecture_false` (D): standard three + 1 `native_decide` (23–37 s)
+- [x] `mertens_7725038629`, `vonSterneck_conjecture_false`, `vonSterneck_conjecture_int_false` (D): standard three + 1 `native_decide` (110–170 s; full build 2.5–4 min on a loaded box)
 - [x] Checker `Polya.Check` proved sound (`runLiouville_sound`, `runMertens_sound`, standard three): table check of `Σ_{k≤y} M(⌊y/k⌋) = 1` on `V`, `λ * ζ = 𝟙_□`; the table builders are untrusted
-- [ ] Not proved: minimality of `906150257` (Tanaka 1980) and `7725038629` (Cohen–Dress 1979). Pólya-side citations are from secondary sources
+- [x] Audited 2026-11-26 at `2106d53`, pass: rebuilt from source (3:58 wall, 2.5 GB), axioms re-read (standard three + 2 `native_decide`; both soundness theorems standard three), checker call graph read, tamper tests reject altered tables, and an independent segmented sieve in C reproduced L(906150257) = 1 and M(7725038629) = 43947 and found both are the least counterexamples (that minimality is checked in C only, not in Lean)
+- [ ] Not proved in Lean: minimality of `906150257` (Tanaka 1980) and `7725038629` (Cohen–Dress, CNRS report 1979). Pólya-side citations are from secondary sources; Jurkat (1960) is unverified
+- [x] Prior art: formal-conjectures open PR #8202 (same Pólya statement plus a least-counterexample statement, no proof; no statement exists at `9097e2f`); wappy-x/Mathematics `checks/what_counts_as_a_proof_check.lean` assumes `L(906150256) = 0` as a hypothesis, so it is not a complete proof
 
 ## Working here
 
