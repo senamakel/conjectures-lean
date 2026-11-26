@@ -753,6 +753,16 @@ Rules:
       GitHub, solved-conjectures). The label *new* needs the owner's sign-off before the README uses it
 - [ ] `Check` is a root namespace in this package; move it under `SunPrimeDensity` before another project copies the name
 
+### primitive-root-sq-grh: a prime primitive root `q < p` modulo `p²` and every `p^k` · **tier C verified, U check pending** · *RH-consequence; the all-`p` statement was not found in the literature*
+- [x] `primitiveRootSq_of_GRH`, `primitiveRootPow_of_GRH`: every odd prime, no exceptions. Replayed 2026-11-26 at `7f76f54`:
+      standard three + 20 `native_decide` (`PrimitiveRootSq.Compute.chunk_ok_*`, all `p < 10⁸`, about 26 CPU-minutes, proved-sound checker)
+- [x] Threshold stays at `10⁸`: one extra character of order `p` modulo `p²`; tightest margin 1.6% at `ω(p − 1) = 9`
+- [x] `Lift.lean`: a primitive root mod `p²` is one mod every `p^k` (not in Mathlib)
+- [ ] `Unconditional/PrimitiveRootSqUnconditional.lean` written; check started 2026-11-26, result not yet read
+- [ ] Literature: Martin (Acta Arith. 80, 1997, Cor. 3.1) gives it for all sufficiently large `p` under GRH with no explicit constant.
+      The label *new* needs the owner's sign-off
+- [ ] Next in the cluster, not started: Grosswald's conjecture modulo `p²` (Kerr–McGown–Trudgian), about 1000 CPU-hours of checks
+
 ### implications: `X → Y` between open conjectures · **every theorem tier C or H, verified** · *premise open*
 - [x] PRs #1 to #6, #11, #13 and #14, each rebuilt on `main` and its axioms read (standard three): Rotkiewicz; Erdős 382 (i) from Cramér /
       Firoozbakht; Butson ⇒ Hadamard; four exponentials ⇒ `2^t` or `3^t`; abc ⇒ Erdős 936 and 977 (factorial);

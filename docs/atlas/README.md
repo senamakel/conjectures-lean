@@ -84,8 +84,8 @@ Reports: [`novel-via-rh.md`](sweeps/2026-11-26/novel-via-rh.md), [`novel-oeis-li
 
 | Candidate | Premise | State |
 | :--- | :--- | :--- |
-| Sun, OEIS A038098: `π(n^k)/n^k` strictly decreasing, `k ≥ 4` | Schoenfeld's bound (RH) + check to about `3·10⁸` | prover running |
-| A prime primitive root `q < p` modulo `p²`, every odd prime `p` | erdos-985's argument + one character sum (GRH) | prover running |
+| Sun, OEIS A038098: `π(n^k)/n^k` strictly decreasing, `k ≥ 4` | Schoenfeld's bound (RH) + exact counts to `2.8·10⁶` | **proved**, PR #20 (`k = 3` open for `141 ≤ n < 10⁷`) |
+| A prime primitive root `q < p` modulo `p²`, every odd prime `p` | erdos-985's argument + one character sum (GRH) | **proved**, PR #21; Martin 1997 has it for large `p` without an explicit constant |
 | Sharp generator constant `2/log² 3` for `(ℤ/m)ˣ`, every `m ≥ 3` | lls-grh's analysis (GRH) + finite check | prover running, sizing first |
 | Erdős 770 (iii) with a single-digit constant | Bach's constant 2 (GRH) | prover running |
 | Sun, arXiv:1402.6641 Conj 2.7(i): `π(kn)^{1/k} > π((k+1)n)^{1/(k+1)}` | elementary, no RH | prover running |
