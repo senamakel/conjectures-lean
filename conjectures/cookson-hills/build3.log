@@ -1569,3 +1569,109 @@ warning: Vendor/OAI/NumberTheory/PiExponent/Approximation/DeterminantContradicti
 warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateTranscendenceBasis.lean: imports `Mathlib.Algebra.MvPolynomial.Degrees` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
 ⚠ [19212/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.CoordinateTranscendenceBasis:irArts
 warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateTranscendenceBasis.lean: imports `Mathlib.Algebra.MvPolynomial.Degrees` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19264/19988] Replayed OAI.NumberTheory.PiExponent.Geometry.CurveNormalizationModel
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationModel.lean: imports `Mathlib.Algebra.Polynomial.Laurent` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationModel.lean: imports `Mathlib.AlgebraicGeometry.FunctionField` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationModel.lean: imports `Mathlib.AlgebraicGeometry.Gluing` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationModel.lean: imports `Mathlib.AlgebraicGeometry.Limits` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationModel.lean: imports `Mathlib.AlgebraicGeometry.Normalization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19265/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveNormalizationModel:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationModel.lean: imports `Mathlib.Algebra.Polynomial.Laurent` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationModel.lean: imports `Mathlib.AlgebraicGeometry.FunctionField` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationModel.lean: imports `Mathlib.AlgebraicGeometry.Gluing` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationModel.lean: imports `Mathlib.AlgebraicGeometry.Limits` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationModel.lean: imports `Mathlib.AlgebraicGeometry.Normalization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19266/19988] Replayed OAI.NumberTheory.PiExponent.Geometry.CurveNormalizationLocalRing
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationLocalRing.lean: imports `Mathlib.AlgebraicGeometry.Morphisms.Finite` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19267/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveNormalizationLocalRing:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationLocalRing.lean: imports `Mathlib.AlgebraicGeometry.Morphisms.Finite` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19270/19988] Replayed OAI.NumberTheory.PiExponent.Ampleness.AffineFunctionFieldCompatibility
+warning: Vendor/OAI/NumberTheory/PiExponent/Ampleness/AffineFunctionFieldCompatibility.lean: imports `Mathlib.RingTheory.Localization.LocalizationLocalization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19271/19988] Ran OAI.NumberTheory.PiExponent.Ampleness.AffineFunctionFieldCompatibility:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Ampleness/AffineFunctionFieldCompatibility.lean: imports `Mathlib.RingTheory.Localization.LocalizationLocalization` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19274/19988] Replayed OAI.NumberTheory.PiExponent.Geometry.CurveProperExtension
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveProperExtension.lean: imports `Mathlib.AlgebraicGeometry.ValuativeCriterion` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19275/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveProperExtension:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveProperExtension.lean: imports `Mathlib.AlgebraicGeometry.ValuativeCriterion` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19282/19988] Replayed OAI.NumberTheory.PiExponent.Geometry.CurveGeometricFunctionField
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveGeometricFunctionField.lean: imports `Mathlib.RingTheory.Spectrum.Prime.Topology` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19283/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveGeometricFunctionField:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveGeometricFunctionField.lean: imports `Mathlib.RingTheory.Spectrum.Prime.Topology` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19290/19988] Replayed OAI.NumberTheory.PiExponent.Geometry.CurveModelGenericPoint
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveModelGenericPoint.lean: imports `Mathlib.AlgebraicGeometry.Stalk` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19291/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveModelGenericPoint:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveModelGenericPoint.lean: imports `Mathlib.AlgebraicGeometry.Stalk` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19296/19988] Replayed OAI.NumberTheory.PiExponent.Geometry.CurveNormalizationDimension
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationDimension.lean: imports `Mathlib.AlgebraicGeometry.Noetherian` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19297/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveNormalizationDimension:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationDimension.lean: imports `Mathlib.AlgebraicGeometry.Noetherian` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19306/19988] Replayed OAI.NumberTheory.PiExponent.Geometry.CurveNormalizationNonaffine
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationNonaffine.lean: imports `Mathlib.AlgebraicGeometry.Artinian` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19307/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveNormalizationNonaffine:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationNonaffine.lean: imports `Mathlib.AlgebraicGeometry.Artinian` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19310/19988] Replayed OAI.NumberTheory.PiExponent.Jets.NormalFrameBasis
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/NormalFrameBasis.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19311/19988] Ran OAI.NumberTheory.PiExponent.Jets.NormalFrameBasis:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Jets/NormalFrameBasis.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19320/19988] Replayed OAI.NumberTheory.PiExponent.Cohomology.CurveZeroEuler
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/CurveZeroEuler.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19321/19988] Ran OAI.NumberTheory.PiExponent.Cohomology.CurveZeroEuler:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/CurveZeroEuler.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19322/19988] Replayed OAI.NumberTheory.PiExponent.Cohomology.FiniteZeroEuler
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/FiniteZeroEuler.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19323/19988] Ran OAI.NumberTheory.PiExponent.Cohomology.FiniteZeroEuler:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/FiniteZeroEuler.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19338/19988] Replayed OAI.NumberTheory.PiExponent.LocalAlgebra.LocalSectionOrder
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/LocalSectionOrder.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19339/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.LocalSectionOrder:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/LocalSectionOrder.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19394/19988] Replayed OAI.NumberTheory.PiExponent.LocalAlgebra.CoordinateFiniteSlice
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateFiniteSlice.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19395/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.CoordinateFiniteSlice:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateFiniteSlice.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19412/19988] Replayed OAI.NumberTheory.PiExponent.Analysis.FiniteDeterminantCollision
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/FiniteDeterminantCollision.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19413/19988] Ran OAI.NumberTheory.PiExponent.Analysis.FiniteDeterminantCollision:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/FiniteDeterminantCollision.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19414/19988] Replayed OAI.NumberTheory.PiExponent.Analysis.CollisionLimit
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/CollisionLimit.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19415/19988] Ran OAI.NumberTheory.PiExponent.Analysis.CollisionLimit:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Analysis/CollisionLimit.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19454/19988] Replayed OAI.NumberTheory.PiExponent.Ampleness.CurveBlowupImageBase
+warning: Vendor/OAI/NumberTheory/PiExponent/Ampleness/CurveBlowupImageBase.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19455/19988] Ran OAI.NumberTheory.PiExponent.Ampleness.CurveBlowupImageBase:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Ampleness/CurveBlowupImageBase.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19510/19988] Replayed OAI.NumberTheory.PiExponent.Geometry.FiniteCurveZeros
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/FiniteCurveZeros.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19511/19988] Ran OAI.NumberTheory.PiExponent.Geometry.FiniteCurveZeros:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/FiniteCurveZeros.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19524/19988] Replayed OAI.NumberTheory.PiExponent.Cohomology.FiniteSupportCohomology
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/FiniteSupportCohomology.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19525/19988] Ran OAI.NumberTheory.PiExponent.Cohomology.FiniteSupportCohomology:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/FiniteSupportCohomology.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19526/19988] Replayed OAI.NumberTheory.PiExponent.Cohomology.FiniteLineEuler
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/FiniteLineEuler.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19527/19988] Ran OAI.NumberTheory.PiExponent.Cohomology.FiniteLineEuler:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/FiniteLineEuler.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19532/19988] Replayed OAI.NumberTheory.PiExponent.Cohomology.EulerZeroDimensional
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/EulerZeroDimensional.lean: imports `Mathlib.Algebra.Group.ForwardDiff` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/EulerZeroDimensional.lean: imports `Mathlib.AlgebraicGeometry.Artinian` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19533/19988] Ran OAI.NumberTheory.PiExponent.Cohomology.EulerZeroDimensional:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/EulerZeroDimensional.lean: imports `Mathlib.Algebra.Group.ForwardDiff` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/EulerZeroDimensional.lean: imports `Mathlib.AlgebraicGeometry.Artinian` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19538/19988] Replayed OAI.NumberTheory.PiExponent.LocalAlgebra.IntegralAffineOpenDimension
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/IntegralAffineOpenDimension.lean: imports `Mathlib.AlgebraicGeometry.FunctionField` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/IntegralAffineOpenDimension.lean: imports `Mathlib.AlgebraicGeometry.Morphisms.FiniteType` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/IntegralAffineOpenDimension.lean: imports `Mathlib.AlgebraicGeometry.Stalk` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19539/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.IntegralAffineOpenDimension:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/IntegralAffineOpenDimension.lean: imports `Mathlib.AlgebraicGeometry.FunctionField` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/IntegralAffineOpenDimension.lean: imports `Mathlib.AlgebraicGeometry.Morphisms.FiniteType` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/IntegralAffineOpenDimension.lean: imports `Mathlib.AlgebraicGeometry.Stalk` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19554/19988] Replayed OAI.NumberTheory.PiExponent.Geometry.CurveNormalizationUnit
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationUnit.lean: imports `Mathlib.AlgebraicGeometry.Morphisms.SchemeTheoreticallyDominant` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19555/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveNormalizationUnit:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationUnit.lean: imports `Mathlib.AlgebraicGeometry.Morphisms.SchemeTheoreticallyDominant` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19608/19988] Replayed OAI.NumberTheory.PiExponent.LocalAlgebra.CoordinateSliceLength
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateSliceLength.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19609/19988] Ran OAI.NumberTheory.PiExponent.LocalAlgebra.CoordinateSliceLength:irArts
+warning: Vendor/OAI/NumberTheory/PiExponent/LocalAlgebra/CoordinateSliceLength.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file

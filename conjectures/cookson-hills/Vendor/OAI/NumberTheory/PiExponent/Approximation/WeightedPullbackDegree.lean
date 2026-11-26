@@ -41,35 +41,52 @@ theorem pullback_supportBound (a : σ → ι →₀ ℕ) (z : σ) (hz : a z = 0)
         (lineBundle (R := K) a) n e
         (ProjectiveSectionInterface.pullback (ProjectiveO1.lineBundle (R := K) (σ := σ))
           (projectiveMonomialMap (R := K) a) n s)) := by
-  let D := ProjectiveIntrinsicCoefficientLaw.intrinsicData (R := K) (σ := σ)
+  -- Ported to Lean v4.36.0 / Mathlib fc4f59e5: the original proof went through
+  -- `ProjectiveIntrinsicCoefficientLaw.intrinsicData` and the `rfl` lemmas
+  -- `intrinsic_polynomial` / `intrinsic_ringEquiv`, which the kernel can no longer check in
+  -- reasonable time on this pin. This proof feeds the same ambient data to
+  -- `coefficient_bound` directly, with `coordinate_law` in place of `intrinsic_law`.
   let ev : MvPolynomial (ChartVariables z) K →+* MvPolynomial ι K :=
     (MvPolynomial.aeval (R := K) (fun j : ChartVariables z =>
       MvPolynomial.monomial (a j.val) (1 : K))).toRingHom
-  have hbound : SupportBound ρ ((n : ℝ) * B) (ev (D.polynomial n z (ProjectiveSectionInterface.sectionHom
-      (ProjectiveO1.lineBundle (R := K) (σ := σ)) n s))) := by
-    dsimp only [D]
-    rw [ProjectiveIntrinsicCoefficientLaw.intrinsic_polynomial]
-    rw [← hp]
+  have hbound : SupportBound ρ ((n : ℝ) * B) (ev (ProjectiveGlobalPolynomials.coordinateChartPolynomial
+      (X := ProjectiveO1.projectiveSpace K σ) (R := K) (σ := σ)
+      (ProjectiveO1.lineBundle (R := K) (σ := σ)).sheaf (ProjectiveO1.coordinateSection (R := K) (σ := σ))
+      (ProjectiveO1.scalars (R := K) (σ := σ)) (ProjectiveO1.coordinateSection_cover (R := K) (σ := σ))
+      (Iso.refl (ProjectiveO1.projectiveSpace K σ))
+      (ProjectiveO1.coordinate_sectionsMorphism_identity (R := K) (σ := σ)) n z
+      (ProjectiveSectionInterface.sectionHom (ProjectiveO1.lineBundle (R := K) (σ := σ)) n s))) := by
+    have hp' := hp
+    unfold ProjectiveO1.globalSectionChartPolynomial at hp'
+    rw [← hp']
     change SupportBound ρ ((n : ℝ) * B)
       (MvPolynomial.aeval (fun j : ChartVariables z =>
         MvPolynomial.monomial (a j.val) (1 : K)) (dehomogenize z p.val))
     rw [WeightedHomogeneousSubstitution.dehomogenize_substitution a z hz]
     exact WeightedHomogeneousSubstitution.supportBound_substitution ρ B a ha n p
   exact GlobalPolynomialWeightedBound.coefficient_bound
-    (X := Proj (imageGrade (R := K) a)) (Y := D.scheme) (K := K) (ι := ι)
+    (X := Proj (imageGrade (R := K) a)) (Y := ProjectiveO1.projectiveSpace K σ) (K := K) (ι := ι)
     (B := MvPolynomial (ChartVariables z) K)
-    (ProjectiveIntrinsicCoefficientLaw.intrinsicBundle (R := K) (σ := σ))
+    (ProjectiveO1.lineBundle (R := K) (σ := σ))
     (projectiveMonomialMap (R := K) a)
     (affineChartMap (R := K) a z hz coordinate hcoordinate)
-    (D.chartOpen z) (WeightedChartRingEvaluation.chartFactor (R := K) a z hz coordinate hcoordinate)
+    (WeightedChartRingEvaluation.ambientOpen (R := K) z)
+    (WeightedChartRingEvaluation.chartFactor (R := K) a z hz coordinate hcoordinate)
     (WeightedChartRingEvaluation.chartFactor_comp (R := K) a z hz coordinate hcoordinate) n
-    (D.frame n z) (D.ringEquiv z) (D.polynomial n z)
-    (ProjectiveIntrinsicCoefficientLaw.intrinsic_law (R := K) n z) ev
-    (by
-      intro q
-      dsimp only [D]
-      rw [ProjectiveIntrinsicCoefficientLaw.intrinsic_ringEquiv]
-      exact WeightedChartRingEvaluation.chartFactor_pullback (R := K) a z hz coordinate hcoordinate q)
+    (coordinatePowerFrame (ProjectiveO1.coordinateSection (R := K) (σ := σ) z) n)
+    (WeightedChartRingEvaluation.ambientRingEquiv (R := K) z)
+    (ProjectiveGlobalPolynomials.coordinateChartPolynomial
+      (X := ProjectiveO1.projectiveSpace K σ) (R := K) (σ := σ)
+      (ProjectiveO1.lineBundle (R := K) (σ := σ)).sheaf (ProjectiveO1.coordinateSection (R := K) (σ := σ))
+      (ProjectiveO1.scalars (R := K) (σ := σ)) (ProjectiveO1.coordinateSection_cover (R := K) (σ := σ))
+      (Iso.refl (ProjectiveO1.projectiveSpace K σ))
+      (ProjectiveO1.coordinate_sectionsMorphism_identity (R := K) (σ := σ)) n z)
+    (GlobalPolynomialCoefficientLaw.coordinate_law
+      (ProjectiveO1.lineBundle (R := K) (σ := σ)).sheaf (ProjectiveO1.coordinateSection (R := K) (σ := σ))
+      (ProjectiveO1.scalars (R := K) (σ := σ)) (ProjectiveO1.coordinateSection_cover (R := K) (σ := σ))
+      (Iso.refl (ProjectiveO1.projectiveSpace K σ))
+      (ProjectiveO1.coordinate_sectionsMorphism_identity (R := K) (σ := σ)) n z) ev
+    (fun q => WeightedChartRingEvaluation.chartFactor_pullback (R := K) a z hz coordinate hcoordinate q)
     ρ ((n : ℝ) * B) e s hbound
 
 end PiExponent.WeightedPullbackDegree
