@@ -165,7 +165,52 @@ refuted it first. Credit for it here: nil beyond minimality.
 
 ## 5. The Duhamel–Cazenave corpus: screen and annealing
 
-ANNEAL_PLACEHOLDER
+- **Source.** `index_conjectures.csv` from `preuves_spectrales.zip` (Last-Modified 31 Oct 2026),
+  linked from arXiv:2611.03879 §8. It holds 305,755 rows. The candidates were the 14,150
+  `ouverte` and 3,798 `conditionnelle` rows, 17,948 statements in all.
+- **Evaluator.** `src/spec.py` is my own parser for the prefix column, written to the grammar in
+  the archive's `lang.py`. I read that file and did not run it. Sanity checks:
+  - 0 of 200 sampled proved rows show positive slack.
+  - The pool refutes 247 of 300 sampled rows the authors refuted on their base. The 53 misses need
+    specific small graphs that the pool lacks.
+- **Pool screen.** 10,589 structured and random connected graphs with n ≤ 40:
+  - two cliques joined by one or two edges;
+  - kites, cliques with pendants and clique chains;
+  - G(n, p) with p from 0.08 to 0.95;
+  - random trees.
+
+  Result: no violation, consistent with the authors' testing. Cost: 627 CPU-s.
+- **Annealing.** For each row, 2 restarts × 1,200 steps of simulated annealing on the relative
+  slack. The moves flip edges and add or delete vertices; the pool's best 2 graphs for that row
+  are the seeds. Cost: 10,878 CPU-s (3.0 CPU-h).
+- **Stop condition.** One pass over all 17,948 rows.
+- **Result.** 6 open rows are violated. Each was confirmed by the independent checker
+  `src/verify_hits.py`, which parses the infix `enonce` column instead, computes eigenvalues with
+  mpmath at 60 digits and the rank exactly over ℚ. λ₂ was then certified by Sturm counts at a
+  rational point and the right side bounded by interval arithmetic. **None of the six is in
+  gap-is-one's list of 125 refuted rows**, and GitHub issue and code search found nothing for
+  their ids.
+
+| Corpus row | Statement (as in `enonce`) | Witness | Certificate |
+|---|---|---|---|
+| #121183 | `λ2 ≤ (sqrt(log(rank(A))) ^ Randić)` | tree, n = 12: centres of `K_{1,5}` and `K_{1,4}` joined through one vertex (degrees 6, 5, 2, 1⁹) | λ₂ > 209321/100000; RHS ≤ 2.06331 |
+| #123215 | `λ2 ≤ sqrt((log(rank(A)) ^ Randić))` | tree, n = 13: the same shape with stars 6 and 4 | λ₂ > 2.14134; RHS ≤ 2.13361 |
+| #715458 | `λ2 ≤ (log(rank(A)) ^ (Randić / 2))` | tree, n = 15: the same shape, 6 and 6 | λ₂ > 2.44938; RHS ≤ 2.28882 |
+| #720695 | `λ2 ≤ (sqrt(sqrt(sqrt(rank(A)))) ^ Randić)` | tree, n = 28: the same shape, 13 and 12 | λ₂ > 3.5187; RHS ≤ 3.47479 |
+| #732667 | `λ2 ≤ sqrt((sqrt(sqrt(rank(A))) ^ Randić))` | unicyclic, n = 19: two star centres with two common neighbours (a C₄) | λ₂ > 2.72725; RHS ≤ 2.72347 |
+| #2018745 | `diam ≤ ((rank(A) ^ rad) - λ2)` | n = 33: `K₁ ∨ (K_{1,8} ∪ 23K₁)`; rad = 1, diam = 2, rank 4, so the row says λ₂ ≤ 2 | λ₂ > 25689/12500 = 2.05512 |
+
+Edge lists are in the session file `hunt/runs/hits.jsonl`.
+
+- **Calibration.** These are genuine counterexamples to rows the corpus lists as open and
+  unrefuted. But they are "size-window" failures of ad hoc expressions such as
+  `(log 4)^{R/2}`, the kind Sadullo labels "size only", and nobody would call any of them a
+  conjecture in its own right. Low value.
+- **Lean feasibility.** Rank 4 is a `decide` on a 0/1 matrix. λ₂ needs a two-vector
+  Courant–Fischer certificate, as in gap-is-one's `Rayleigh.lean`. Bounding R needs rational
+  bounds on `1/√(d_u d_v)`, and the right side needs Mathlib bounds on `log 4` and real powers:
+  M per row. #2018745 needs no transcendental functions and is S. I do not recommend spending a
+  project on them. They are better reported to the corpus author.
 
 ## 6. Negative searches (do not repeat)
 
