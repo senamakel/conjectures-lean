@@ -13,7 +13,8 @@ variable {R S n m} [CommRing R] [CommRing S] [Fintype n] {σ : _} [Fintype m] (�
 
 lemma star_aeval {A} [StarRing R] [Ring A] [StarRing A] [Algebra R A] [StarModule R A] (x : A) q :
     star (aeval x q) = aeval (star x) (q.map (starRingEnd R)) := by
-    simp [aeval_def, eval₂_map, eval₂, commutes, starRingEnd_apply, sum]
+    induction q using Polynomial.induction_on' <;>
+      simp_all [commutes, starRingEnd_apply, algebraMap_star_comm]
 
 lemma map_aeval_matrix (Y : Matrix n n R) z : (aeval Y z).map ψ = aeval (Y.map ψ) (z.map ψ) := by
   induction z using recOnHorner <;> simp [*, algebraMap, Matrix.map_add]

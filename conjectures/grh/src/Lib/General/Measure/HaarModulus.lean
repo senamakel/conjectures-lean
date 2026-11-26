@@ -19,7 +19,7 @@ variable {n R A B Z G} [Fintype n] [Group Z] [MeasurableSpace Z] [MeasurableMul 
 @[to_additive] lemma measure_le_of_div_mem {ζ} [IsMulRightInvariant ζ] {E K :
   Set Z} (h : ∀ y ∈ E, ∃ g,
   ∀ z ∈ E, z / g ∈ K) : ζ E ≤ ζ K := E.eq_empty_or_nonempty.elim (by aesop) (·.elim h |>.elim
-  fun _ ↦ ((measurePreserving_div_right ..).measure_preimage_le _).trans' ∘ ζ.mono)
+  fun _ hg ↦ ((measurePreserving_div_right ..).measure_preimage_le _).trans' (measure_mono hg))
 
 /-- For μ bi-invariant on Z, η left invariant on G, π: Z → G a measurable homomorphism, O ⊂ Z
 measurable, each h having a preimage that preserves O on both sides: η(K)·π_*(μ|O) = μ(π⁻¹K ∩ O)·η⁻,
