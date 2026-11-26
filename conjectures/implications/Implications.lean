@@ -2,6 +2,11 @@ import Implications.Basic
 import Implications.Erdos142.FromQuantitativeDensity
 import Implications.ABC.Erdos936
 import Implications.ABC.Erdos977
+import Implications.ABC.Variants
+import Implications.ABC.PowerfulTriples
+import Implications.ABC.Erdos366
+import Implications.ABC.Brocard
+import Implications.ABC.Silverman
 import Implications.FourExponentials.TwoPowThreePow
 import Implications.Hadamard.ButsonDoubling
 import Implications.PrimeGaps.Erdos382
