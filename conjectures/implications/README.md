@@ -26,6 +26,7 @@ The edges come from the [implication atlas](../../docs/atlas/).
 | `Wieferich/Rotkiewicz` | `{n : ℕ \| Squarefree (mersenne n)}.Infinite` | `{p : ℕ \| p.Prime ∧ ¬ IsWieferichPrime p}.Infinite`; also `sq_dvd_mersenne_iff_isWieferichPrime` (no premise) | Rotkiewicz 1965 | standard three |
 | `Dickson/` (`Schinzel`, `Specialisations`, `Erdos891`, `Erdos647`) | Schinzel's H; Dickson's conjecture | Dickson and Bunyakovsky (from H); twin, generalised twin, cousin, sexy and Sophie Germain primes; Erdős 891 Weisenberg variant; Erdős 647 windowed variant (all from Dickson) | specialisations; Weisenberg (erdosproblems.com/891); Erdős 647: our construction, `n = k!·t` with `(k!/j)t − 1` prime | standard three |
 | `Dickson/` (`Consecutive`, `Erdos141`, `Erdos218`, `BalancedPrimes`) | Dickson's conjecture | every admissible pattern occurs infinitely often as consecutive primes; Erdős 141 (`erdos_141`, `variants.eleven`, `.infinite_three`, `.infinite_general_case`); Erdős 218 `variants.infinite_equal_prime_gap`; `BalancedPrimes.balanced_primes`, `.balanced_primes_order` | standard: CRT puts a distinct prime `q_j > H` into each unwanted position, then Dickson on the forms `M t + a + h`; the patterns used are `0, k!, …, (k−1)·k!` | standard three |
+| [`PrimeGaps.Granville`](Implications/PrimeGaps/Granville.lean) (refutations, route b) | Granville's conjecture `CramerConjecture.cramer_conjecture.variants.granville` (`limsup g_n/(log p_n)² ≥ 2e^{−γ}`); Firoozbakht `Firoozbakht.firoozbakht_conjecture` with fc's cited `firoozbakht_conjecture_consequence` (tier H) | the negations of `cramer_conjecture.variants.limsup_eq_one`, `cramer_conjecture.variants.strict_bound` and Shanks's `MaximalPrimeGap.shanks_maximal_prime_gap_conjecture`; Firoozbakht + its consequence ⇒ ¬ Granville | Granville 1995, Scand. Actuar. J. (remark recorded in the fc docstrings; primary source not read); only input `1 < 2e^{−γ}` from `γ < 2/3 < log 2` | standard three |
 
 ## Richards: the two Hardy–Littlewood conjectures are incompatible
 
@@ -81,6 +82,63 @@ on a heavily loaded build box, `Richards` 9 s.
 
 The Lean proof was built with [OpenHuman](https://github.com/tinyhumansai/openhuman) agents
 running in an [RSI Ralph](https://github.com/tinyhumansai/rsi-ralph) loop.
+
+## Refutations between open prime-gap conjectures (`PrimeGaps.Granville`)
+
+These are route-b refutations (`Y ⇒ ¬X`, see `AGENTS.md`, "Disproofs"). Granville's conjecture
+implies that three other open conjectures are false; Granville's conjecture itself stays open,
+and so do the other three. None of the four is proved or disproved here.
+
+```lean
+theorem not_limsupEqOne_of_granville (hG : CramerConjecture.Granville) :
+    ¬ CramerConjecture.LimsupEqOne
+theorem not_strictBound_of_granville (hG : CramerConjecture.Granville) :
+    ¬ CramerConjecture.StrictBound
+theorem not_shanks_of_granville (hG : CramerConjecture.Granville) :
+    ¬ MaximalPrimeGap.ShanksConjecture
+theorem strictBound_of_firoozbakht (hF : Firoozbakht.FiroozbakhtConjecture)
+    (hK : Firoozbakht.FiroozbakhtConsequence) : CramerConjecture.StrictBound
+theorem not_granville_of_firoozbakht (hF : Firoozbakht.FiroozbakhtConjecture)
+    (hK : Firoozbakht.FiroozbakhtConsequence) : ¬ CramerConjecture.Granville
+```
+
+The four statements `Granville`, `LimsupEqOne`, `ShanksConjecture` and `FiroozbakhtConsequence`, and the
+definition `sup_primeGap` that Shanks's statement uses, are in
+[`Granville/Statement.lean`](Implications/PrimeGaps/Granville/Statement.lean), copied word for word
+from formal-conjectures `9097e2f` (Apache-2.0); `cramerRatio`, `StrictBound`
+and `FiroozbakhtConjecture` are the copies in `Erdos382.lean`. formal-conjectures states
+Granville's conjecture without a real `limsup` (for each `c < 2e^{−γ}`, infinitely many `n` have
+`c ≤ g_n / (log p_n)²`), and `limsup_eq_one` as two `ε`-statements, so no junk value of an
+unbounded `limsup` enters any of them.
+
+Small cases (a Python sieve of all primes below 2·10^8, from the audit): the strict bound fails only at
+`p = 2, 3, 7`, which `4 ≤ n` excludes, and the largest ratio `g_n/(log p_n)²` for `n ≥ 4` in that range
+is 0.7395, at `p = 20831323`, so none of the refuted statements is false at small cases as written.
+
+- Granville ⇒ ¬ `limsup_eq_one`: take `c = (1 + 2e^{−γ})/2 > 1` and `ε = (c − 1)/2`.
+- Granville ⇒ ¬ `strict_bound`: take `c = 1`.
+- Granville ⇒ ¬ Shanks: if `g_n ≥ c (log p_n)²` then `G(p_n + 1) ≥ g_n`, while Shanks gives
+  `G(p_n + 1) ≤ (1 + ε)(log(p_n + 1))² ≤ (1 + ε)(log p_n + 1)²`, which is below `c (log p_n)²`
+  once `log p_n ≥ 3(1 + ε)/ε`.
+- Firoozbakht ⇒ ¬ Granville is proved only with fc's `firoozbakht_conjecture_consequence`
+  (`g_n < (log p_n)² − log p_n` for `n > 3`, attributed on Wikipedia to Kourbatov 2015 and not checked; `research solved` in fc
+  but not proved in Lean) as an explicit tier-H hypothesis. The module's own Firoozbakht bound
+  (`cramer_of_firoozbakht` in `Erdos382.lean`, via Chebyshev) has constant `2/log 2 ≈ 2.885`,
+  above `2e^{−γ} ≈ 1.1229`; getting below it without the cited consequence needs an explicit
+  lower bound for `π(x)` of the form `x/(log x − 1)` (Dusart), which Mathlib does not have.
+
+The only arithmetic input is `1 < 2e^{−γ}`, from Mathlib's `Real.eulerMascheroniConstant_lt_two_thirds`
+and `Real.log_two_gt_d9`. The conjecture and the incompatibility are Granville's (*Harald Cramér
+and the distribution of prime numbers*, Scand. Actuar. J. 1995, 12–28); the remark is taken from
+the formal-conjectures docstrings and was not checked against the paper.
+
+```
+'Implications.PrimeGaps.not_limsupEqOne_of_granville' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Implications.PrimeGaps.not_strictBound_of_granville' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Implications.PrimeGaps.not_shanks_of_granville' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Implications.PrimeGaps.strictBound_of_firoozbakht' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Implications.PrimeGaps.not_granville_of_firoozbakht' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
 
 ## Building
 

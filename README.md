@@ -16,7 +16,7 @@ conjectures. Those links are collected in the [implication atlas](docs/atlas/).
 
 ## Results
 
-34 projects: 19 proved in full, 12 proved in part, 1 conditional at its ceiling, 1 wound down, and 1 collection of implications between open conjectures (listed in the next section).
+35 projects: 20 proved in full, 12 proved in part, 1 conditional at its ceiling, 1 wound down, and 1 collection of implications between open conjectures (listed in the next section).
 
 | Conjecture | Folder | Lean | Literature |
 | :--- | :--- | :---: | :--- |
@@ -54,6 +54,7 @@ conjectures. Those links are collected in the [implication atlas](docs/atlas/).
 | **32.** Ramanujan's inequality `π(x)² < (e·x/log x)·π(x/e)` for every `x ≥ e⁴⁰`: proved from RH; the run that supplies RH is pending. The range below `e⁴⁰` is a cited hypothesis | [`ramanujan-rh`](conjectures/ramanujan-rh/) | 🟡 | RH-consequence |
 | **33.** Legendre, Oppermann, Andrica and Brocard each fail for at most `O(log³ N)` of the first `N` indices: proved from RH; the run that supplies RH is pending. These bound the exceptions and prove none of the four | [`legendre-exceptions-rh`](conjectures/legendre-exceptions-rh/) | 🟡 | RH-consequence |
 | **34.** Solé–Planat's inequality at every primorial, infinitely many extremely abundant numbers, and `4` as the only extraordinary number: proved from RH and Robin's inequality; the run that supplies both is pending | [`abundant-rh`](conjectures/abundant-rh/) | 🟡 | RH-equivalent |
+| **35.** Hajós's conjecture is false: a Lean proof of Catlin's (1979) disproof, at `k = 8` | [`hajos-catlin`](conjectures/hajos-catlin/) | ✅ | known |
 
 **Lean status.** ✅ the target statement is proved, end to end from Lean's three standard axioms plus
 the finite computations its README names. 🟡 part of the target, or a weaker constant, is proved
@@ -97,6 +98,25 @@ with the [implication atlas](docs/atlas/).
 | `r_k(N) ≤ C·N·exp(−c (log log N)^{1+η})` for every `k ≥ 3` | Erdős Problem 142, lower variant `r_k(N) = o(N/log N)`; Erdős Problem 140 for every `k` | the premise is a Lean theorem of [openai/math](https://github.com/openai/math) (Erdős #3); it is a hypothesis here because that library is on another Lean version, and the link has not been typechecked |
 | first Hardy–Littlewood conjecture (prime `k`-tuples asymptotic, every tuple) | the second Hardy–Littlewood conjecture `π(x + y) ≤ π(x) + π(y)` is **false** (Hensley–Richards 1973, Richards 1974) | a refutation link: both conjectures stay open, and no explicit counterexample is known. One admissible 447-tuple of width 3158 (Polymath8 database; `π(3159) = 446`) and positivity of its singular series suffice. `sorry` in formal-conjectures until now; no `native_decide` |
 | infinitely many squarefree `2^n − 1` | infinitely many non-Wieferich primes (Rotkiewicz 1965) | a theorem, not a conjecture-to-conjecture link; `sorry` in formal-conjectures until now |
+
+## Disproved and refuted
+
+Conjectures shown false, or shown incompatible with another conjecture. A refutation link
+`X → ¬Y` proves that `X` and `Y` cannot both hold; it disproves neither on its own. Each theorem
+is in [`conjectures/implications`](conjectures/implications/), with statements copied word for
+word from formal-conjectures, and depends on Lean's three standard axioms only.
+
+| Refuted | Given | Lean theorem | Notes |
+| :--- | :--- | :--- | :--- |
+| Second Hardy–Littlewood conjecture, `π(x + y) ≤ π(x) + π(y)` | first Hardy–Littlewood conjecture (prime `k`-tuples) | `not_first_and_secondHardyLittlewoodConjecture` | Hensley–Richards 1973, Richards 1974. Uses one admissible 447-tuple of width 3158 against `π(3159) = 446`. No explicit counterexample is known |
+| Cramér's `limsup g_n / log² p_n = 1` | Granville's conjecture (`limsup ≥ 2e^{−γ}`) | `not_limsupEqOne_of_granville` | Granville 1995; the only arithmetic is `1 < 2e^{−γ}` |
+| Strict Cramér bound `g_n < log² p_n` for `n ≥ 4` | Granville's conjecture | `not_strictBound_of_granville` | |
+| Shanks' conjecture on maximal prime gaps | Granville's conjecture | `not_shanks_of_granville` | |
+| Granville's conjecture | Firoozbakht's conjecture, with its cited consequence `g_n < log² p_n − log p_n` as a second hypothesis | `not_granville_of_firoozbakht` | the cited consequence (Kourbatov) is not proved here |
+
+All of these are incompatibilities between open conjectures. The reports behind this lane, with
+the candidates for outright disproofs, are in [`docs/atlas/sweeps/2026-11-26/`](docs/atlas/sweeps/2026-11-26/)
+(`disproof-erdos.md`, `disproof-fc-other.md`, `disproof-literature.md`).
 
 ## How it was built
 
