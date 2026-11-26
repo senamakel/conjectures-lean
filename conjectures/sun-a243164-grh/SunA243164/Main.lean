@@ -19,3 +19,5 @@ theorem sunA243164_of_GRH_of_numerics (hGRH : Erdos985.DirichletLNonvanishingRig
     Compute.verifiedBelow_10_8
 
 end SunA243164
+
+#print axioms SunA243164.sunA243164_of_GRH_of_numerics

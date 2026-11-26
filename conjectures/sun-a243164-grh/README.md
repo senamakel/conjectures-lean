@@ -34,7 +34,20 @@ is transcribed from Sun's paper, with `p_n = Nat.nth Nat.Prime (n - 1)`.
 
 ## Axioms
 
-AXIOMS_PLACEHOLDER
+Checked 2026-11-26 (`lake build SunA243164`, Lean v4.36.0, Mathlib `fc4f59e5`), no `sorry`:
+
+```
+'SunA243164.sunA243164_of_GRH_of_numerics' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SunA243164.Compute.chunk_ok_0._native.native_decide.ax_1_1,
+ ...  (one for each of chunk_ok_0 … chunk_ok_19)
+ SunA243164.Compute.chunk_ok_9._native.native_decide.ax_1_1]
+```
+
+The standard three plus 20 `native_decide` axioms. Each evaluates the counting checker
+`countFrom` on `5·10^6` consecutive integers (57–105 s CPU and 6.5 GB each, about 23 CPU-minutes
+for all 20); its soundness is `SunA243164.Compute.countFrom_sound`, proved without them.
 
 ## How the proof goes
 
@@ -87,9 +100,13 @@ argument until it is proved. Check with `scripts/check-unconditional.sh /path/to
 (not yet run). The import needs about 93 GB of cache, about 19 GB of RAM and about 900,000 open
 files (`sudo prlimit --pid $$ --nofile=2000000:2000000` on Linux).
 
-*The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.*
+*The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and
+the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh).
+This check links against the community build cache and does not repeat those kernel checks.*
+
+| Theorem | Statement | Axioms |
+|---|---|---|
+| `sunA243164_of_numerics` | `SieveNumerics 100000000 → SunA243164Statement` | not yet checked |
 
 ## How it was built
 

@@ -41,14 +41,9 @@ def SieveNumerics (N : ℕ) : Prop :=
     ∃ S ⊆ (P - 1).primeFactors, 0 < deltaOf S ∧ SieveIneq P S
 
 lemma primeCounting_lt_self {P : ℕ} (hP : 2 ≤ P) : Nat.primeCounting P < P := by
-  rw [Nat.primeCounting, Nat.primeCounting', Nat.count_eq_card_filter_range]
-  have hsub : (range (P + 1)).filter Nat.Prime ⊆ ((range (P + 1)).erase 0).erase 1 := by
-    intro n hn
-    simp only [mem_filter, mem_range] at hn
-    simp only [mem_erase, mem_range]
-    exact ⟨hn.2.one_lt.ne', hn.2.ne_zero, hn.1⟩
-  have := card_le_card hsub
-  rw [card_erase_of_mem (by simp; omega), card_erase_of_mem (by simp; omega), card_range] at this
+  rw [Nat.primeCounting, Nat.primeCounting', show P + 1 = 2 + (P - 1) by omega, Nat.count_add]
+  have h2 : Nat.count Nat.Prime 2 = 0 := by decide
+  have := Nat.count_le (p := fun k => Nat.Prime (2 + k)) (n := P - 1)
   omega
 
 lemma primeCounting_pos {P : ℕ} (hP : 2 ≤ P) : 0 < Nat.primeCounting P :=
@@ -59,7 +54,7 @@ every admissible `S`. -/
 theorem not_sieveIneq_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) {P : ℕ} (hP : P.Prime)
     (hP2 : P ≠ 2) (hbad : ¬ GoodPrime P) {S : Finset ℕ} (hS : S ⊆ (P - 1).primeFactors)
     (hδ : 0 < deltaOf S) : ¬ SieveIneq P S := by
-  haveI : Fact P.Prime := ⟨hP⟩
+  have : Fact P.Prime := ⟨hP⟩
   have hP2' : 2 ≤ P := hP.two_le
   set x := Nat.primeCounting P with hx
   have hx1 : 1 ≤ x := primeCounting_pos hP2'
@@ -94,7 +89,7 @@ theorem not_sieveIneq_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) {P : ℕ
     apply mul_le_mul_of_nonneg_left _ hpos.le
     linarith
   unfold sieveK deltaOf at hmono
-  unfold deltaOf at hineq
+  unfold sieveK deltaOf at hineq
   linarith
 
 /-- GRH plus the numerics give every prime `P ≥ N` (`N ≥ 3`). -/
