@@ -21,7 +21,7 @@ follows their Lemma 3.2: Schoenfeld's bound for `π − li` under RH, against th
 expansion of `li`. Unconditionally, D. R. Johnston, Ramanujan J. (2022), arXiv:2109.02249,
 Theorem 5.1, proves it for `38,358,837,683 ≤ x ≤ exp(103)`, and the large-`x` range has been
 lowered since Dudek–Platt (Platt–Trudgian, as cited by Johnston: `x ≥ exp(3915)`; Axler 2022,
-as cited by the scout report: `x ≥ e^{3158.442}`, not read). The window between `exp(103)` and
+`x ≥ e^{3158.442}`, not read here). The window between `exp(103)` and
 the unconditional large-`x` threshold is open without RH; `ramanujan_of_RH` covers it. Two
 unrefereed preprints claim a complete unconditional proof: S. De, arXiv:2408.02591 (2024,
 claims every `x ≥ exp(43.5102147)`), and J. S. Padhi, Zenodo record 23440770 (2026). Neither has
@@ -114,11 +114,35 @@ def RamanujanVerifiedRange : Prop :=
  Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
  Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
  Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
-'Ramanujan.ramanujan_of_RH_of_verified' depends on axioms: [the same 26]
+'Ramanujan.ramanujan_of_RH_of_verified' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Schoenfeld.Check.checkA_psiCert._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkA_theta._native.native_decide.ax_1_1,
+ Schoenfeld.Check.checkB_pi._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk00._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk01._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk02._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk03._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk04._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk05._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk06._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk07._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk08._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk09._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk10._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk11._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk12._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk13._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk14._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk15._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk16._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk17._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk18._native.native_decide.ax_1_1,
+ Schoenfeld.PsiCert.chunk19._native.native_decide.ax_1_1]
 ```
 
-(The last entry is abbreviated here; the real output repeats the list of `ramanujan_of_RH`
-verbatim.) This project adds no `native_decide`. The 23 non-standard axioms are schoenfeld-rh's
+This project adds no `native_decide`. The 23 non-standard axioms are schoenfeld-rh's
 proved-sound checkers behind `schoenfeldPi_of_RH`: `psiCert` (an exact segmented sieve of
 `|ψ(x) − x| ≤ (4/5)√x` over `[1500, 10¹⁰]`, 20 chunks, about 14 CPU-minutes), the θ bound on
 `[599, 3·10⁴]`, and the π bound on `[2657, 4·10⁵]`; see the schoenfeld-rh README.
