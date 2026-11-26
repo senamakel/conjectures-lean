@@ -82,6 +82,29 @@ LivingBrain by hand, as above.
               └── density-rh, grosswald-grh, li-criterion-rh, speiser-rh, weinberger-grh
   ```
 
+### A second, smaller proof of RH and GRH: lsernau/grh-lean (noted 2026-11-26)
+
+[lsernau/grh-lean](https://github.com/lsernau/grh-lean) is a shorter Lean 4 proof of RH and of GRH for
+Dirichlet L-functions, based on Alpöge's. Facts read from the repository on 2026-11-26:
+
+- **Licence:** Apache-2.0 (Copyright 2026 Anthropic, PBC), with `NOTICE` and `ATTRIBUTION.md`. Unlike
+  riemann-hypothesis it may be vendored, with credit.
+- **Size:** two editions of the same five theorems, each its own Lake project: `grh/` (about 300,000
+  lines, readable) and `grh-compact/` (about 76,000 lines). Mathlib is the only dependency.
+- **Cost:** one to two hours on 12 cores with 24 GB of memory, from source. Compare 93 GB of
+  untrusted cache and 19 GB per import for riemann-hypothesis, which has never been rebuilt here.
+- **Pin:** Lean `v4.35.0`, Mathlib `56a00585`. That is not our pin (`v4.36.0`, `fc4f59e5`), so it cannot
+  be imported as it is. A port of the compact edition to our pin is in progress on branch
+  `grh-compact-port` (`conjectures/grh/`).
+- **Axioms:** its README states `propext`, `Classical.choice`, `Quot.sound` only. Not yet checked here.
+- **Review:** its README says it has passed machine checks only and that no mathematician has read it
+  through.
+
+Once the port builds, `Unconditional/` files should take RH and GRH from it: the check then runs
+from source in an hour or two, needs no raised open-file limit, and the caveat about the untrusted
+cache no longer applies. Until then riemann-hypothesis `507a75d91d` remains the source, and the
+README rule 10 caveat stays word for word.
+
 ## Proof tiers: when a result counts as a direct proof
 
 Each headline theorem has exactly one tier, and the README must say which.
@@ -256,6 +279,7 @@ worktree on one project folder.
 | `implication-prover` | opus | proves one target in `conjectures/<name>/`, statement fixed first, real `#print axioms` at the end | once a candidate is chosen |
 | `lean-mechanic` | sonnet | scaffolds packages, writes `Unconditional/` modules and checkers, repairs builds | work that needs no new mathematical idea |
 | `proof-auditor` | opus | rebuilds, reads axioms, diffs the statement against its source, checks README claims and prior proofs | every finished target, before merge |
+| `counterexample-hunter` | opus | looks for a new witness against an open, unclaimed conjecture: transplants an existing construction to its neighbours, or searches a space first cut down by structure; prior art before compute | the refutation lane |
 
 The order for a target is scout, prover (with the mechanic for scaffolding and checkers), then
 auditor. A prover's own report is never accepted without the audit. The atlas schema is in
@@ -333,6 +357,45 @@ Rules:
   Lean check it. A witness that only a script has seen is not a result.
 - The tier, axiom, fixed-statement and audit rules apply unchanged. Sweep reports are
   `docs/atlas/sweeps/<date>/disproof-*.md`; edges use `"lane": "disproof-…"`.
+
+### What counts, and how to hunt (learned 2026-11-26)
+
+The first day of the lane ran sixteen sweeps. Every substantive hit had already been claimed,
+one of them hours earlier; the unclaimed ones were shallow. The rules below come from that.
+
+- **The goal is a new counterexample to an open, unclaimed conjecture by a named author.** A
+  Lean proof of a disproof already in the literature (Pólya, Hajós, von Sterneck) is tooling,
+  not a result of this lane, and is not started without the owner asking.
+- **A hit is real only if the authors tested and believed the conjecture** and the witness lies
+  beyond what they checked and took structure to find. A statement false at its first small
+  case, contradicting a classical theorem, or dropped from the published version (Gawron–Miska–Ulas
+  5.6 at `36 − 4 = 32`; the `{1,8,k}` formula of arXiv:1401.7183v1) is recorded in one line.
+- **Prior art comes before compute, and again before reporting.** Search the exact wording on
+  arXiv, Zenodo, evidencepress.org, GitHub and the 1337 repo. Taken on the day: Cazenave's
+  spectral Conjecture 2, Wu–Yu–Guo, Sun's A308656 Conjecture 2, Kozma–Nitzan (proved).
+- **Transplant before you search.** The model is the Caiolo–Ferroni–Hoster disproof in
+  1337isnot1337/solved-conjectures: a matroid family built to refute one real-rootedness
+  conjecture (Bérczi–Coron–Eur–Li) was evaluated, by a closed recursion in `q`, on the
+  neighbouring invariant it had never been tried on. The witness has about `17^8` points and
+  was never enumerated; the 53-digit numbers in the announcement are discriminants. A
+  counterexample is an asset: record it in `docs/atlas/constructions.jsonl` with the neighbours
+  it has not been tested against, and test them.
+- **When there is no construction, cut the space first.** Scan only the residue classes where
+  local conditions block most representations (how Sun's conjectures fall near `10^8`–`10^10`);
+  search inside the "minimal counterexample must…" lemmas of the source paper; pass to a
+  parametrised family; let an asymptotic expansion or a zero sum locate the violation; warm-start
+  case `n` from the certificate for `n − 1`. Estimate the expected number of witnesses in reach
+  and drop a target far below 0.1.
+- **A negative result can be evidence for the conjecture.** Brannen's conjecture in dimensions
+  4 to 8: the simplex is exactly optimal among polytopes with `n + 2` facets, and the first-order
+  test changes sign between 8 and 9. Say so; it points a prover at the target instead.
+- **Exact arithmetic for every hit, and read definitions, not headlines.** Floating-point
+  volumes and grid sampling produced false hits. A Lean file that compiles proves only its own
+  definitions: stutxo/gaupenov-guyon-venier "refutes" a conjecture about the identity map, and
+  its 77-digit witness is the SHA-256 of a song lyric.
+
+The role is `counterexample-hunter` (`.claude/agents/`). Scripts of each sweep are kept under
+`docs/atlas/sweeps/<date>/disproof-scripts/`.
 
 ## Cross-repo issues
 
@@ -741,6 +804,27 @@ Rules:
 - [x] The link Flint ⇒ Cookson (`sin² 2x ≤ 4 cos² x`) is ours, about 60 lines; not found written down, no novelty claimed
 - [ ] A cold rebuild from source in the primary checkout has not been timed
 - [ ] OpenAI's proof of `μ(π) = 2` has had no human review that we know of; our kernel accepts it
+
+### sun-prime-density-rh: Sun's conjecture, `π(n^k)/n^k` strictly decreasing (OEIS A038098) · **tier C for `k ≥ 4` verified, U check pending; `k = 3` partial** · *RH-consequence; no proof found in the literature*
+- [x] `sun_of_RH`: every `k ≥ 4`, `n ≥ 2`; statement verbatim from formal-conjectures `OeisA38098.conjecture1` (`research open`).
+      Rebuilt 2026-11-26 at `71e7505`: standard three + 23 `native_decide` from schoenfeld-rh + 2 of its own
+      (`Check.chainOK_piTable`, primes below 2,825,761, 32 s; `Check.allOK_eq_true`, 0.9 s), proved-sound checkers
+- [x] `sun_three_of_RH`: `k = 3` for `2 ≤ n ≤ 140` and `n ≥ 10⁷`; `sunConjecture_iff_of_RH` reduces the whole conjecture to the gap
+- [ ] `k = 3`, `141 ≤ n < 10⁷`: needs `π(n³)` up to about `10²¹` or a sharper explicit bound; not in Lean
+- [ ] `Unconditional/SunPrimeDensityUnconditional.lean` written; check started 2026-11-26, result not yet read
+- [ ] Novelty search of 2026-11-26 found no proof of any case (OEIS page, MathOverflow 301662, arXiv, formal-conjectures PRs,
+      GitHub, solved-conjectures). The label *new* needs the owner's sign-off before the README uses it
+- [ ] `Check` is a root namespace in this package; move it under `SunPrimeDensity` before another project copies the name
+
+### primitive-root-sq-grh: a prime primitive root `q < p` modulo `p²` and every `p^k` · **tier C verified, U check pending** · *RH-consequence; the all-`p` statement was not found in the literature*
+- [x] `primitiveRootSq_of_GRH`, `primitiveRootPow_of_GRH`: every odd prime, no exceptions. Replayed 2026-11-26 at `7f76f54`:
+      standard three + 20 `native_decide` (`PrimitiveRootSq.Compute.chunk_ok_*`, all `p < 10⁸`, about 26 CPU-minutes, proved-sound checker)
+- [x] Threshold stays at `10⁸`: one extra character of order `p` modulo `p²`; tightest margin 1.6% at `ω(p − 1) = 9`
+- [x] `Lift.lean`: a primitive root mod `p²` is one mod every `p^k` (not in Mathlib)
+- [ ] `Unconditional/PrimitiveRootSqUnconditional.lean` written; check started 2026-11-26, result not yet read
+- [ ] Literature: Martin (Acta Arith. 80, 1997, Cor. 3.1) gives it for all sufficiently large `p` under GRH with no explicit constant.
+      The label *new* needs the owner's sign-off
+- [ ] Next in the cluster, not started: Grosswald's conjecture modulo `p²` (Kerr–McGown–Trudgian), about 1000 CPU-hours of checks
 
 ### implications: `X → Y` between open conjectures · **every theorem tier C or H, verified** · *premise open*
 - [x] PRs #1 to #6, #11, #13 and #14, each rebuilt on `main` and its axioms read (standard three): Rotkiewicz; Erdős 382 (i) from Cramér /
