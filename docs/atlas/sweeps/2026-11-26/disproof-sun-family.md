@@ -277,8 +277,8 @@ All counterexamples below 10¹¹, all prime and ≡ 7 (mod 12), each with 0 repr
    `math.isqrt`, so it does not rely on the class-number criterion. It finds **0**
    representations for each of the six witnesses (3 s each).
 
-   Controls: the three primes ≡ 7 (mod 12) on each side of 28662666283 have 30, 40, 35 and
-   19, 29, 58 representations. The script reproduces the first OEIS terms a(1..8) =
+   Controls: the three primes ≡ 7 (mod 12) below 28662666283 have 35, 30 and 40
+   representations, and the three above have 19, 29 and 58. The script reproduces the first OEIS terms a(1..8) =
    0, 2, 3, 4, 5, 5, 2, 6 (p = 7, 19, 31, 43, 67, 79, 103, 127).
 3. **Obstruction certificate** (`work/cert534.txt`). For each z, a prime q ≡ 2 (mod 3) with
    q ∥ m:
