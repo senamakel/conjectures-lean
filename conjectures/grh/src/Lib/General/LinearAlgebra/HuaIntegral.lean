@@ -157,7 +157,7 @@ lemma principalMinor_of_forall_not (h : ∀ i, ¬p i) : principalMinor x p = 1 :
 satisfy Δ_p(xb) = Δ_p(x)Δ_p(b). -/
 lemma principalMinor_mul (h : ∀ i j k, p i → ¬p j → p k → x i j = 0 ∨ b j k = 0) :
   principalMinor (x * b) p = principalMinor x p * principalMinor b p := by
-  simp [principalMinor, toBlock_mul_eq_add p p, ← det_mul]; congr; aesop (add simp mul_apply)
+  simp [principalMinor, toBlock_mul_eq_add p p, ← det_mul]; congr; aesop (add simp Matrix.mul_apply)
 
 lemma principalMinor_submatrix (e : m ≃ n) : principalMinor (x.submatrix e e) (p <| e ·) =
   principalMinor x p := .symm (det_submatrix_equiv_self e.subtypeEquivOfSubtype _).symm
