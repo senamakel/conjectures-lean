@@ -74,15 +74,12 @@ def intrinsicBundle : LineBundle (intrinsicData (R := R) (σ := σ)).scheme :=
 attribute [local semireducible] CoordinateData.Sections CoordinateData.chartOpen
   CoordinateData.polynomial CoordinateData.ringEquiv
 
-set_option debug.skipKernelTC true in -- DIAGNOSTIC ONLY, REMOVE
-theorem intrinsic_polynomial (n : ℕ) (z : σ) :
-    (intrinsicData (R := R) (σ := σ)).polynomial n z =
-      ProjectiveO1.globalSectionChartPolynomial (R := R) (σ := σ) n z := rfl
-
-set_option debug.skipKernelTC true in -- DIAGNOSTIC ONLY, REMOVE
-theorem intrinsic_ringEquiv (z : σ) :
-    (intrinsicData (R := R) (σ := σ)).ringEquiv z =
-      WeightedChartRingEvaluation.ambientRingEquiv (R := R) z := rfl
+-- Ported to Lean v4.36.0 / Mathlib fc4f59e5: the two `rfl` lemmas `intrinsic_polynomial` and
+-- `intrinsic_ringEquiv` that stood here are removed. On this pin the kernel times out on the
+-- first and does not finish the second (its statement already needs the kernel to identify
+-- `Γ(intrinsicData.scheme, intrinsicData.chartOpen z)` with `Γ(projectiveSpace, ambientOpen z)`).
+-- Their only consumer, `WeightedPullbackDegree.pullback_supportBound`, now uses the ambient
+-- data directly.
 
 attribute [local irreducible] intrinsicData intrinsicBundle
   CoordinateData.Sections CoordinateData.chartOpen CoordinateData.polynomial CoordinateData.ringEquiv
