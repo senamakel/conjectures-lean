@@ -101,7 +101,7 @@ lemma map_eq_top_iff_fields : I.map φ.hom = ⊤ ↔ ∀ K (ψ : B ⟶ K), IsFie
   ker (φ ≫ ψ).hom := by simpa using ⟨by aesop, (ne_top_iff_exists_maximal.not_right.2
   fun ⟨m, _, l⟩ ↦ · _ (ofHom (mkₐ ..)) (Quotient.field m).toIsField (map_mk_eq_bot_of_le l))⟩
 
-lemma IsOpenSub.fieldLocus_le : IsOpenSub V → fieldLocus V ≤ V := (· · · |>.elim fun _ h e ↦ by
+lemma IsOpenSub.fieldLocus_le : IsOpenSub V → fieldLocus (fun K x ↦ x ∈ V K) ≤ V := (· · · |>.elim fun _ h e ↦ by
   simpa +contextual [↓map_eq_top_iff_fields, (h ..).1 (e ..)] using h _ (𝟙 _))
 
 lemma IsOpenSub.exists_basicOpen (h : IsOpenSub V) x (k : IsField B) (e : X.map φ x ∈ V B) : ∃ f,
