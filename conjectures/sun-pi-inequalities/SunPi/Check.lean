@@ -74,16 +74,16 @@ theorem primeCounting_add_cnt (a : ℕ) : ∀ len, π (a + len) = π a + cnt a l
   | succ l ih =>
     have hs : π (a + (l + 1)) = π (a + l) + if (a + l + 1).Prime then 1 else 0 := by
       simp only [Nat.primeCounting, Nat.primeCounting', ← add_assoc]
-      exact Nat.count_succ _
+      exact Nat.count_succ (p := Nat.Prime) _
     rw [hs, ih, cnt, add_assoc]
     congr 2
     by_cases hp : (a + l + 1).Prime
-    · simp [hp, (primeTD_iff _).mpr hp]
+    · rw [if_pos hp, if_pos ((primeTD_iff _).mpr hp)]
     · have : primeTD (a + l + 1) = false := by
         cases h : primeTD (a + l + 1)
         · rfl
         · exact absurd ((primeTD_iff _).mp h) hp
-      simp [hp, this]
+      rw [if_neg hp, this]; rfl
 
 /-! ## Sun's 2.14(ii): `π((n+1)²)^n < π(n²)^(n+1)` -/
 
