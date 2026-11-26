@@ -52,10 +52,13 @@ against the sibling folders in this checkout. A sibling's build output lands in 
 | `mills-rh` | `erdos-985`, `schoenfeld-rh` |
 | `nicolas-rh` | `erdos-985`, `robin-rh` |
 | `prime-powers-rh` | `mills-rh` |
+| `primitive-root-sq-grh` | `erdos-985` |
 | `psi-grh` | `erdos-985` |
 | `ramanujan-rh` | `schoenfeld-rh` |
 | `robin-rh` | `erdos-985` |
 | `schoenfeld-rh` | `erdos-985` |
 | `shoup-grh` | `erdos-985` |
 | `speiser-rh` | `erdos-985` |
+| `sun-pi-inequalities` | — (Mathlib only) |
+| `sun-prime-density-rh` | `schoenfeld-rh` |
 | `weinberger-grh` | `erdos-985` |
