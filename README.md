@@ -7,7 +7,7 @@ Levent Alpöge's Lean proof ([riemann-hypothesis](https://github.com/leanprover-
 which the Lean FRO and the Mathlib Initiative
 [certified](https://leanprover-community.github.io/blog/posts/riemann-hypothesis/) on 21 November 2026.
 
-[Docs](docs/) · [Status tracker and rules](AGENTS.md) · [Literature status](docs/LITERATURE_STATUS.md) · [Next targets](docs/NEXT_TARGETS.md) · [Paper](paper/)
+[Docs](docs/) · [Further projects](docs/FURTHER_PROJECTS.md) · [Attempts](docs/ATTEMPTS.md) · [Method](docs/METHOD.md) · [Status tracker and rules](AGENTS.md) · [Literature status](docs/LITERATURE_STATUS.md) · [Next targets](docs/NEXT_TARGETS.md) · [Paper](paper/)
 
 ## Results
 
@@ -54,23 +54,6 @@ equivalent to RH. *known*: proved in the literature without RH. Attributions are
 [`docs/LITERATURE_STATUS.md`](docs/LITERATURE_STATUS.md). Each folder's README gives the exact
 Lean statements, `#print axioms` output and build instructions.
 
-## Attempted, no project
-
-| Problem | Where | Lean | Notes |
-| :--- | :--- | :---: | :--- |
-| Erdős Problem 404(ii) | [`docs/scoping/erdos-404/`](docs/scoping/erdos-404/) | ⬜ | Spike: a plausible invariant, no proof; stopped |
-| Powerful numbers: error term below `x^{1/6}` under RH | [`docs/scoping/powerful-numbers-error-term.md`](docs/scoping/powerful-numbers-error-term.md) | ⬜ | Scoped, not started |
-| Open Erdős problems #3–#1221 | [`docs/scoping/`](docs/scoping/erdos-discovery-part1.md) | ⬜ | Discovery sweep in three parts; nothing kept beyond 985, 770, 233, 969 |
-
-## Layout
-
-| Path | Content |
-|---|---|
-| `conjectures/<name>/` | one Lean package per project (`lakefile`, `lean-toolchain`, `README.md`) |
-| `docs/` | literature status, next targets, scoping and research reports, RH-repo lemma specs |
-| `paper/` | the write-up |
-| `AGENTS.md` | per-project checklist, proof-tier rules and README rules |
-
 ## How it was built
 
 The Lean proofs were built with [OpenHuman](https://github.com/tinyhumansai/openhuman) agents
@@ -87,73 +70,6 @@ The stack behind the agents:
 | Loop | [RSI Ralph](https://github.com/tinyhumansai/rsi-ralph) |
 | Memory | [LivingBrain](https://livingbrain.com) |
 | Search | [Exa](https://exa.ai) ([@ExaAILabs](https://x.com/ExaAILabs)) |
-
-## How the conjectures were attempted
-
-Every repo was built the same way, and most of what went wrong went wrong in the same few places.
-
-**The statement comes first.** Before any proof, the target goes into `<Pkg>/Statement.lean` and
-is not edited again. Where formal-conjectures has the statement, we copy it word for word. Where
-it doesn't, we transcribe it from the paper and say so. This rule exists because the easiest way
-to finish a hard proof is to weaken what it claims, and with a fixed file that shows up in a diff.
-
-**RH is an argument of the theorem.** The main library of each repo never imports the RH proof.
-A theorem reads `RiemannHypothesis → X` or `DirichletLNonvanishingRightOfHalf → X`, and a
-separate `Unconditional/` file supplies the hypothesis from riemann-hypothesis in one line. So
-each repo holds two results: the implication, which stands on Mathlib alone, and the
-unconditional theorem.
-
-**Agents did the proving, one per repo.** [OpenHuman](https://github.com/tinyhumansai/openhuman)
-subagents each took one target on its own branch and opened a pull request. A lead session
-then rebuilt the branch, read the `#print axioms` output itself, ran the unconditional check and
-merged. An agent's report was never accepted without that rebuild. On 2026-11-22 a stale checkout
-printed `sorryAx` under a headline theorem, and the rule dates from then.
-
-**Large `x` by analysis, small `x` by computation.** Most of these theorems hold "for all `x`
-above some point", and an explicit proof only works above a threshold. Below it we check every
-case with a program whose correctness is proved in Lean and which runs through `native_decide`.
-The work is in making the two ranges meet: sharpen the analytic constants until the threshold
-drops to something a machine can reach. Three examples:
-
-- erdos-985 checks every prime below `10^8`.
-- grosswald-grh checks every prime below `10^13` in 2,502 chunks, about 3.3 million CPU-seconds.
-- robin-rh sieves every integer below `1.07·10^13` in 624 chunks, about 54 core-hours.
-- speiser-rh covers the band `5/2 ≤ |Im s| < 7` with 142,446 small discs in three minutes.
-
-Agents write and size these checkers but do not run the large ones. The big runs go last, one at
-a time, after an early attempt to run several at once overloaded the build machine.
-
-**The published constant is the target.** A first proof often lands with a weaker constant than
-the paper's, and the README then states the constant actually proved and why. Each of those
-gaps was later closed. Bach's bound for the least non-residue went from `21/5` to `11/4` to
-Bach's own `2` (lls-grh). Bach and Sorenson's bound went from `7/2` to their `2`. Schoenfeld's
-bounds went from `1/8` to his `1/(8π)`, and Cramér's prime-gap constant from `2` to
-Carneiro, Milinovich and Soundararajan's `22/25`. In every case the first estimate of what the
-paper's constant would cost was too high: the barrier came from one loose step, and keeping
-that step exact removed it.
-
-**Missing background theory becomes a named hypothesis.** Some proofs need a classical theorem
-that Mathlib doesn't have at our pin, such as the Kronecker-Weber theorem or Dirichlet's class
-number formula. Those enter as explicit `Prop` arguments, never as `sorry`, and the
-`Unconditional/` file discharges them from lemmas inside riemann-hypothesis where it has them.
-
-**What did not work.**
-
-- Erdős 233 asks for more than RH is known to give. We proved the classical RH bounds
-  (Selberg's); the problem as posed stays open.
-- A search for open Erdős problems that RH would settle by a new argument found nothing we kept.
-- Several first guesses about attribution were wrong and were corrected against the papers.
-
-The reasoning behind each dead end, and the constants that were sized up and rejected, are in
-LivingBrain. The status of every box is in [`AGENTS.md`](AGENTS.md).
-
-**Public Lean code.** When a repo stalls we search for existing formalisations before writing
-more. The search has turned up kernel-checked zeta enclosures
-([smmercuri/zeta](https://github.com/smmercuri/zeta),
-[teal-sea/zeta-lab](https://github.com/teal-sea/zeta-lab)), explicit zero counting
-([anthropics/zeta-23-lean](https://github.com/anthropics/zeta-23-lean)) and a Weil explicit
-formula inside calr3/ternary-goldbach. These are permissively licensed, so files can be vendored
-with credit. riemann-hypothesis has no licence, so we import it and copy nothing from it.
 
 ## Licence
 
