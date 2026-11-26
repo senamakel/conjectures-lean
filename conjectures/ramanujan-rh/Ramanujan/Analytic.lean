@@ -147,7 +147,7 @@ lemma final_step {u x y P Q : ℝ} (hu : 40 ≤ u) (hx0 : 0 < x) (hey : Real.exp
         have e : Real.exp 1 * x / u * (y * beta u / (u ^ 9 * (u - 1) ^ 8)) -
             (x * alpha u / u ^ 9) ^ 2 =
             x ^ 2 * (u ^ 8 * beta u - alpha u ^ 2 * (u - 1) ^ 8) / (u ^ 18 * (u - 1) ^ 8) := by
-          rw [← hey]; field_simp; ring
+          rw [← hey]; field_simp
         rw [e]
         have : 0 < u ^ 8 * beta u - alpha u ^ 2 * (u - 1) ^ 8 := by linarith
         positivity
