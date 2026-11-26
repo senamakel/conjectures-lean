@@ -95,7 +95,7 @@ theorem numerics (p : ℕ) (hp0 : 10 ^ 8 ≤ p) (θ : ℝ)
   have hSu : ((p : ℝ) / 2 + (√(p : ℝ) / 20 + 3)) / p ≤ 0.5001 := by
     rw [div_le_iff₀ hp0']; nlinarith
   have hpd : (p : ℝ) / 2 = √(p : ℝ) ^ 2 / 2 := by rw [hs2]
-  rw [hpd]
+  rw [hpd] at hSu ⊢
   have hX1 : (1 : ℝ) ≤ 2 ^ (p - 1).primeFactors.card := one_le_pow₀ (by norm_num)
   have hpnz : p - 1 ≠ 0 := by omega
   have hB10 : 0 ≤ (√(p : ℝ) + 2 + 3 / p) * ((2 / 3) * (Real.log p + 5 / 3)) + (Real.log p + 1) + 0.6 := by
@@ -209,7 +209,8 @@ theorem numerics (p : ℕ) (hp0 : 10 ^ 8 ≤ p) (θ : ℝ)
       have : (X - 1) * B1 ≤ 4.87 * t * B1u :=
         mul_le_mul (by linarith) hB1t hB10 (by positivity)
       linarith
-    have hD0pos : 0 < s ^ 2 / 2 - (s / 20 + 3) - 4.87 * t * B1u := by nlinarith
+    have hl : 0 ≤ (4.87 * t + 1) * (0.5001 + B2u) := by positivity
+    have hD0pos : 0 < s ^ 2 / 2 - (s / 20 + 3) - 4.87 * t * B1u := by linarith
     have hXpos : 0 < X := by linarith
     have hmain : X * (0.5001 + B2u) < X * (θ * (s ^ 2 / 2 - (s / 20 + 3) - (X - 1) * B1)) := by
       have e1 : X * (0.5001 + B2u) ≤ (4.87 * t + 1) * (0.5001 + B2u) :=
@@ -217,7 +218,9 @@ theorem numerics (p : ℕ) (hp0 : 10 ^ 8 ≤ p) (θ : ℝ)
       have e2 : 117 * (s ^ 2 / 2 - (s / 20 + 3) - 4.87 * t * B1u)
           ≤ (θ * X) * (s ^ 2 / 2 - (s / 20 + 3) - (X - 1) * B1) :=
         mul_le_mul hθX hD hD0pos.le (by positivity)
-      nlinarith
+      have e3 : (θ * X) * (s ^ 2 / 2 - (s / 20 + 3) - (X - 1) * B1)
+          = X * (θ * (s ^ 2 / 2 - (s / 20 + 3) - (X - 1) * B1)) := by ring
+      linarith
     have hfin := lt_of_mul_lt_mul_left hmain hXpos.le
     linarith
 
