@@ -14,6 +14,7 @@ any of them.
 -/
 
 open Filter
+open scoped Asymptotics
 
 set_option linter.dupNamespace false
 
