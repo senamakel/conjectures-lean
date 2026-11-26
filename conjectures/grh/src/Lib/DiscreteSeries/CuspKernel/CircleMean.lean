@@ -127,7 +127,9 @@ lemma integral_idem_mul_eq_zero [IsTopologicalGroup G] [SecondCountableTopology 
   let U : p →L[ℂ] p := (compContinuousCLM _ _ (.mulLeft (b 1))).restrict fun f k ↦ by
     simp_all +zetaDelta [← mul_assoc]
     intros; convert k.2 _ (by simpa using mul_mem (mul_mem ha ‹_›) (inv_mem ha)) _ using 2; simp
-  let S : p →L[ℂ] p := (T * .mul _ _ m).restrict fun f k ↦ ⟨V _, by simp_all +zetaDelta [hP (_, 1)]⟩
+  let S : p →L[ℂ] p := (T * .mul _ _ m).restrict fun f k ↦ by
+    refine Submodule.mem_inf.2 ⟨LinearMap.mem_eqLocus.2 (V _), ?_⟩
+    simp_all +zetaDelta [hP (_, 1)]
   have w := (1 - U).opNorm_le_bound one_half_pos.le fun ⟨f, k, l⟩ ↦ norm_le_of_nonempty.2 fun x ↦
     show ‖f x - f _‖ ≤ _ * ‖f‖ by
     simp_all [T]; grw [← hW]; simpa [dist_eq_norm', ← mul_assoc, *, integral_sub, he.comp_mul_left,
