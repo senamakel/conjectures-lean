@@ -65,7 +65,7 @@ lemma primeGap_le_sup_primeGap (n : ℕ) :
   apply Finset.le_sup
   rw [Finset.mem_range]
   have hc : Nat.primeCounting' (Nat.nth Nat.Prime n + 1) = n + 1 := by
-    rw [Nat.primeCounting', Nat.count_succ, if_pos (_root_.Nat.prime_nth_prime n)]
+    rw [Nat.primeCounting', Nat.count_succ, ite_eq_left (_root_.Nat.prime_nth_prime n)]
     rw [← Nat.primeCounting', Nat.primeCounting'_nth_eq]
   omega
 
