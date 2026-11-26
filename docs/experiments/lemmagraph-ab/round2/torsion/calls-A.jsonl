@@ -1,0 +1,5 @@
+{"tool":"premises","query":"card torsion units p^e odd <= l","useful":true,"used_lemma":"orderOf_dvd_of_pow_eq_one","rank":1}
+{"tool":"premises","query":"card torsion units 2^e <= 4","useful":true,"used_lemma":"orderOf_dvd_card","rank":7}
+{"tool":"search","query":"units ZMod p^n cyclic odd p","useful":true,"used_lemma":"ZMod.isCyclic_units_of_prime_pow","rank":1}
+{"tool":"search","query":"cyclic group x^n=1 at most n solutions","useful":true,"used_lemma":"IsCyclic.card_pow_eq_one_le","rank":1}
+{"tool":"text_search","query":"IsCyclic ZMod units pow","useful":true,"used_lemma":"ZMod.isCyclic_units_two_pow_quotient_neg_one","rank":2}

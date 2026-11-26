@@ -75,9 +75,11 @@ signatures are exact for our pin, so it suits Mathlib-drift fixes (e.g. the grh-
 and finding existing lemmas to connect. Corpus repos such as riemann-hypothesis are being
 ingested into a separate DB that the MCP does not serve yet.
 
-Load the tools with ToolSearch and try lemmagraph before grepping Mathlib. Whether it speeds up
-solving and discovery is being measured (A/B experiment, 2026-11-26); results will be recorded
-in docs/experiments/lemmagraph-ab.md.
+Load the tools with ToolSearch. Use `get_declaration` and `text_search` for exact names and
+signatures, especially after a Mathlib bump, and `premises` or `search` when you are stuck on a
+goal whose lemmas you don't know. It is not a replacement for reading the error and the local
+code. An A/B test on six WIP tasks (2026-11-26) found no speed-up for tasks within recall; see
+docs/experiments/lemmagraph-ab.md.
 
 ## Shared facts
 

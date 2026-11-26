@@ -1,0 +1,1 @@
+{"tool":"premises","query":"Continuous z -> Continuous (u ∘ z) discrete","useful":true,"used_lemma":"Continuous.comp","rank":1}

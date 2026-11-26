@@ -1,0 +1,3 @@
+{"tool":"get_declaration","query":"mellin_differentiableAt_of_isBigO_rpow_exp","useful":true,"used_lemma":"mellin_differentiableAt_of_isBigO_rpow_exp","rank":null}
+{"tool":"premises","query":"a<s.re -> DifferentiableAt mellin","useful":false,"used_lemma":null,"rank":null}
+{"tool":"premises","query":"integral Ioc <= integral image inv","useful":false,"used_lemma":null,"rank":null}

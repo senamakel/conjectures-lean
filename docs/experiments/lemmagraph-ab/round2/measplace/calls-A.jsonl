@@ -1,0 +1,5 @@
+{"tool":"premises","query":"a∈s,b∈t -> f a b ∈ image2 f s t (guess of goal at line 231)","useful":false,"used_lemma":null,"rank":null}
+{"tool":"get_declaration","query":"Set.Mem.intro","useful":true,"used_lemma":null,"rank":null}
+{"tool":"text_search","query":"image_auto","useful":false,"used_lemma":null,"rank":null}
+{"tool":"premises","query":"a ∈ s -> f a ∈ f '' s","useful":true,"used_lemma":"Set.mem_image_of_mem","rank":10}
+{"tool":"premises","query":"‖g‖ₑ^2 * r ≤ ‖g*√r‖ₑ^2","useful":true,"used_lemma":"Real.eNorm_eq_ofReal, ENNReal.ofReal_pow","rank":29}
