@@ -114,7 +114,7 @@ variable {m n R : Type*}
 @[simp] lemma one_classical {i} [Zero R] [One R] :
   @OfNat.ofNat _ 1 (@One.toOfNat1 _ (@one n R i _ _)) = 1 := by congr!
 @[simp] lemma fromBlocks_one' [Zero R] [One R] :
-  fromBlocks 1 0 0 1 = (1 : Matrix (m ⊕ n) (m ⊕ n) R) := by ext (i|i) (j|j) <;> simp [one_apply]
+  fromBlocks 1 0 0 1 = (1 : Matrix (m ⊕ n) (m ⊕ n) R) := by simp [← ext_iff, Matrix.one_apply]
 variable [CommRing R] [Fintype m] [Fintype n] (A : Matrix m m R) (D : Matrix n n R)
 @[simp] lemma det_classical {i} : @det m i _ R _ A = A.det := by congr
 @[simp] lemma det_fromBlocks_zero₁₂' C : (fromBlocks A 0 C D).det = A.det * D.det := by
