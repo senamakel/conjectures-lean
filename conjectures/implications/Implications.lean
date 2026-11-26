@@ -10,6 +10,7 @@ import Implications.ABC.Silverman
 import Implications.FourExponentials.TwoPowThreePow
 import Implications.Hadamard.ButsonDoubling
 import Implications.PrimeGaps.Erdos382
+import Implications.PrimeGaps.FiroozbakhtOppermann
 import Implications.Wieferich.Rotkiewicz
 import Implications.Dickson.Main
 import Implications.Dickson.ConsecutiveAll
