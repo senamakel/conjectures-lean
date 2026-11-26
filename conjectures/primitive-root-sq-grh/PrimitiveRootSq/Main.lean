@@ -67,6 +67,7 @@ theorem exists_good_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) (p : ℕ) 
   have h2 : (S₀ + (p - 1) * B₂) / p ≤ ((p : ℝ) / 2 + (√(p : ℝ) / 20 + 3)) / p + B₂ := by
     rw [div_add' _ _ _ hpR.ne', div_le_div_iff_of_pos_right hpR]
     nlinarith
+  trace_state
   linarith
 
 /-- **Main theorem (GRH).** Every odd prime `p` has a prime `q < p` that is a primitive root
