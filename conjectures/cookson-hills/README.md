@@ -8,18 +8,20 @@ converges, in the form that
 [formal-conjectures](https://github.com/google-deepmind/formal-conjectures) states as
 `FlintCooksonHills.cookson_hills_series_converges` (there `@[category research open]`, with
 `sorry`). `FlintCooksonHills.cookson_hills_series_converges` here is a complete Lean proof from the
-standard three axioms; it also gives the Flint Hills series `Σ 1/(n³ sin² n)` in the
-formal-conjectures form.
+standard three axioms. The package also proves `FlintCooksonHills.flint_hills_series_converges`,
+the Flint Hills series `Σ 1/(n³ sin² n)` in the formal-conjectures form.
 
 The premise is that the irrationality exponent of `π` is 2, proved by OpenAI in *The
 irrationality exponent of π is 2* (September 24, 2026, `preprints/` of
 [openai/math](https://github.com/openai/math)) and formalised in Lean in the same repository as
 `OAI.PiExponent.pi_eventual_lower_bound`. Their paper derives the Flint Hills series from it
-(Corollary 1.2), following Alekseyev's criterion (*On convergence of the Flint Hills series*,
-arXiv:1104.5100, 2011). Label: **consequence of μ(π) = 2 (OpenAI 2026)**. The OpenAI paper does
+(Corollary 1.2); Alekseyev (*On convergence of the Flint Hills series*, arXiv:1104.5100, 2011)
+had tied that series to μ(π). Label: **consequence of μ(π) = 2 (OpenAI 2026)**. The OpenAI paper does
 not mention the Cookson Hills series. The step from Flint Hills to Cookson Hills used here is
 `sin 2n = 2 sin n cos n`; we did not find it written down in a source we read, and it is
-elementary, so we claim no novelty for it.
+elementary, so we claim no novelty for it. Searched for an earlier formalisation on 2026-11-26:
+GitHub code search for `cookson_hills` and `CooksonHills`, openai/math at `3344da5`, and the
+formal-conjectures statement (no `formal_proof` attribute at `9097e2f`); none found.
 
 ## Main theorems
 
