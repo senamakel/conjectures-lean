@@ -146,7 +146,8 @@ primes needed for minimality would require ECPP, which is not available.
 - **Shallow clones** of 1337isnot1337/solved-conjectures, quietofwinter/solved-conjectures,
   redlazerrobot/solved-conjectures and epoch-research/LeanOpenProblems:
   - filename-level hits for the loose pattern were unrelated (numeric data);
-  - the precise grep for the A-numbers was killed during wind-down, before it gave a result.
+  - the word-bounded grep for `A234451|A234504|A236358` and for `62191` returned no matches in
+    any of the four repos.
 - **Not searched:** MathOverflow, Sun's homepage conjecture lists, evidencepress.org, Zenodo,
   and the OEIS history and b-files of A234451 and A234504. OEIS blocks curl with Cloudflare,
   and WebFetch got HTTP 403; the pages were read through a different fetcher.
