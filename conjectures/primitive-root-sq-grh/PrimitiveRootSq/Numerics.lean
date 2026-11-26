@@ -76,7 +76,7 @@ lemma poly10 (t : ℝ) (ht : 200 ≤ t) :
     mul_nonneg h0 h0]
 
 /-- Abstract finish for the case `ω ≥ 10`. -/
-lemma finish_large (θ X B1 B1u B2 B2u Su S t : ℝ) (hθX : 117 ≤ θ * X) (hθ : 0 ≤ θ) (hX1 : 1 ≤ X)
+lemma finish_large (θ X B1 B1u B2 B2u Su S t : ℝ) (hθX : 117 ≤ θ * X) (hX1 : 1 ≤ X)
     (hXle : X ≤ 4.87 * t + 1) (ht : 0 ≤ t) (hB1 : 0 ≤ B1) (hB1u : B1 ≤ B1u) (hB2 : B2 ≤ B2u)
     (hB2u : 0 ≤ B2u) (hSu : Su ≤ 0.5001)
     (hpoly : (4.87 * t + 1) * (0.5001 + B2u) < 117 * (S - 4.87 * t * B1u)) :
@@ -222,10 +222,6 @@ theorem numerics (p : ℕ) (hp0 : 10 ^ 8 ≤ p) (θ : ℝ)
     have hpoly := poly10 t htge
     rw [ht2] at hpoly
     rw [ht2] at hB1t hB2t
-    have hθ0 : 0 ≤ θ := by
-      have : (0 : ℝ) < 36495360 / 223092870 * (28 / 29) ^ k :=
-        mul_pos (by norm_num) (pow_pos (by norm_num) _)
-      exact (this.trans_le hθ).le
     have ht256 : (0 : ℝ) ≤ t / 256 := by positivity
     have hU0' : (0 : ℝ) ≤ (2 / 3) * (2 * (4 * (5.5451774464 + t / 256 - 1)) + 5 / 3) := by
       linarith only [ht256]
@@ -233,6 +229,6 @@ theorem numerics (p : ℕ) (hp0 : 10 ^ 8 ≤ p) (θ : ℝ)
         + 5 / 3)) + (4 * (5.5451774464 + t / 256 - 1) + 1) + 0.6 := by
       have h := mul_nonneg (by positivity : (0 : ℝ) ≤ √(p : ℝ) + 2.0001) hU0'
       linarith only [h, ht256]
-    exact finish_large _ _ _ _ _ _ _ _ _ hθX hθ0 hX1 hXle htpos.le hB10 hB1t hB2t hB2u0' hSu hpoly
+    exact finish_large _ _ _ _ _ _ _ _ _ hθX hX1 hXle htpos.le hB10 hB1t hB2t hB2u0' hSu hpoly
 
 end PrimitiveRootSq
