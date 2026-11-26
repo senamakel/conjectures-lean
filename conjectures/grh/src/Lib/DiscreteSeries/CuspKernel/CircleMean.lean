@@ -32,7 +32,7 @@ lemma IsBoundedMeasurable.of [TopologicalSpace Z] [BorelSpace Z] [SecondCountabl
   ≤ C) (c : Continuous F := by fun_prop) : IsBoundedMeasurable F := ⟨c.stronglyMeasurable, h⟩
 
 lemma IsBoundedMeasurable.comp (h : IsBoundedMeasurable F) (j : W → Z) (m :
-  Measurable j := by fun_prop) : IsBoundedMeasurable (F <| j ·) := ⟨by fun_prop, h.2.imp (by tauto)⟩
+  Measurable j := by fun_prop) : IsBoundedMeasurable (F <| j ·) := ⟨by fun_prop, h.2.imp fun _ h _ ↦ h _⟩
 
 lemma IsBoundedMeasurable.memLp_top (h : IsBoundedMeasurable F) :
     MemLp F ∞ μ := memLp_top_of_bound ⟨_, h.1, .rfl⟩ _ (.of_forall h.2.choose_spec)
