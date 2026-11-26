@@ -34,5 +34,5 @@ srcDir = ".."
 # Not in the source: the bridge module of our port, outside the vendored `src/` tree.
 [[lean_lib]]
 name = "GRH"
-srcDir = "."
+srcDir = ".."
 roots = ["GRH.Bridge"]
