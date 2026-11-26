@@ -22,11 +22,13 @@ open Complex
 
 namespace Implications.FourExponentials
 
+-- The binder names `h1`, `h2`, `h` are kept from the source although unused.
+set_option linter.unusedVariables false
+
 /-- **Four exponentials conjecture**, verbatim from formal-conjectures `9097e2f`,
 `FormalConjectures/Wikipedia/Exponentials.lean`, `Exponentials.four_exponentials_conjecture`:
 let $x_0, x_1$ and $y_0, y_1$ be $\mathbb Q$-linearly independent pairs of complex numbers,
 then some $e^{x_i y_j}$ is transcendental. -/
-set_option linter.unusedVariables false in
 def FourExponentialsConjecture : Prop :=
   ∀ (x : Fin 2 → ℂ) (y : Fin 2 → ℂ)
     (h1 : LinearIndependent ℚ x) (h2 : LinearIndependent ℚ y),
@@ -35,7 +37,6 @@ def FourExponentialsConjecture : Prop :=
 /-- Verbatim from formal-conjectures `9097e2f`, `FormalConjectures/Wikipedia/Exponentials.lean`,
 `Exponentials.two_pow_three_pow_transcendental`: for any irrational number $t$, at least one of
 the numbers $2^t$ and $3^t$ is transcendental. -/
-set_option linter.unusedVariables false in
 def TwoPowThreePowTranscendental : Prop :=
   ∀ (t : ℝ) (h : Irrational t),
     Transcendental ℚ (2 ^ t : ℝ) ∨ Transcendental ℚ (3 ^ t : ℝ)
