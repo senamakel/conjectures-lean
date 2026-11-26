@@ -28,8 +28,8 @@ lemma EtaleChart.point_mem_locus : a.point ∈ a.locus _ := ⟨_, X.map_id_apply
 /-- Let a be a chart of a functor X on algebras over a commutative ring k. A subfunctor V of X that
 is contained in the image of a and open in that image is open in X. -/
 lemma EtaleChart.isOpenSub_of_le_locus {V} (h : V ≤ a.locus) (o : IsOpenSub (V.preimage
-  a.locus.ι)) : IsOpenSub V := le_antisymm (a := fieldLocus V.1) (o.fieldLocus_le · (a :=
-  ⟨·, a.isOpenSub.fieldLocus_le _ (by tauto)⟩) ·) (V.rec (by tauto)) ▸ isOpenSub_fieldLocus fun
+  a.locus.ι)) : IsOpenSub V := le_antisymm (a := fieldLocus fun K x ↦ x ∈ V K) (o.fieldLocus_le · (a :=
+  ⟨·, a.isOpenSub.fieldLocus_le _ (by tauto)⟩) ·) (fun _ _ e _ φ _ ↦ V.map φ e) ▸ isOpenSub_fieldLocus fun
   A x ↦ ⟨span {f | ∀ B ψ, IsUnit (ψ f) → X.map ψ x ∈ V B}, fun _ φ k ↦ let := k.toField
   by simpa [span_le, not_subset] using
     ⟨fun e ↦ have ⟨f, H, E⟩ := a.isOpenSub.exists_basicOpen φ x k (h _ e)
