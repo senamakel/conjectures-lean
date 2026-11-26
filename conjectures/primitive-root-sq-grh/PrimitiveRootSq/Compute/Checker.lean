@@ -75,7 +75,6 @@ theorem okN_sound {n : ℕ} (hok : okN n = true) (hp : n.Prime) (h2 : n ≠ 2) :
     have hqp := prime_of_mem_smallPrimes hq
     refine ⟨q, hqp, hqn, ?_, ?_⟩
     · apply orderOf_eq_of_pow_and_pow_div_prime
-      · omega
       · exact (zmod_pow_eq_one_iff hn2 _ _).mpr (fermat q hqp.pos hqn)
       · intro r hr hrd
         rw [ne_eq, zmod_pow_eq_one_iff hn2]
