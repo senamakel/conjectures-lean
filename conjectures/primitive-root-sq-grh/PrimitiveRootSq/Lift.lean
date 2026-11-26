@@ -20,7 +20,7 @@ modulo the odd prime `p` and `q ^ (p - 1) ≢ 1 (mod p²)`. -/
 theorem orderOf_prime_pow_succ {p : ℕ} (hp : p.Prime) (hp2 : p ≠ 2) {q : ℕ}
     (hq : orderOf (q : ZMod p) = p - 1) (hsq : (q : ZMod (p ^ 2)) ^ (p - 1) ≠ 1) (n : ℕ) :
     orderOf (q : ZMod (p ^ (n + 1))) = p ^ n * (p - 1) := by
-  haveI := Fact.mk hp
+  have := Fact.mk hp
   have hp3 : 3 ≤ p := by have := hp.two_le; omega
   -- `q` is a unit modulo `p`
   have hq0 : (q : ZMod p) ≠ 0 := by
@@ -41,7 +41,8 @@ theorem orderOf_prime_pow_succ {p : ℕ} (hp : p.Prime) (hp2 : p ≠ 2) {q : ℕ
     apply hsq
     have : ((q ^ (p - 1) : ℕ) : ZMod (p ^ 2)) = 1 := by
       rw [hqa, show 1 + p * (p * b) = 1 + p ^ 2 * b by ring]
-      push_cast; rw [ZMod.natCast_self, zero_mul, add_zero]
+      push_cast
+      rw [← Nat.cast_pow, ZMod.natCast_self, zero_mul, add_zero]
     simpa using this
   -- the order of `q ^ (p - 1)` modulo `p ^ (n + 1)`
   have hord1 : orderOf ((q : ZMod (p ^ (n + 1))) ^ (p - 1)) = p ^ n := by
