@@ -55,8 +55,9 @@ theorem sharp_small (q : ℕ) [NeZero q] (hq : q < 2 ^ 17) (H : Subgroup (ZMod q
   rcases Nat.eq_or_lt_of_le h3 with h | h
   · subst h
     refine hfin 2 closure_three ?_
-    rw [sharpConst_mul_log_three_sq.symm.le.trans_eq rfl |>.antisymm' ?_ |>.symm.le] <;>
-      first | norm_num | (push_cast; rw [sharpConst_mul_log_three_sq])
+    have := sharpConst_mul_log_three_sq
+    push_cast
+    linarith
   have hcase : ∀ {lo n : ℕ}, checkSmall lo n = true → lo ≤ q → q < lo + n →
       ∃ a : (ZMod q)ˣ, a ∉ H ∧ ((a : ZMod q).val : ℝ) ≤ sharpConst * Real.log q ^ 2 := by
     intro lo n hc h1 h2
