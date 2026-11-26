@@ -877,6 +877,15 @@ The role is `counterexample-hunter` (`.claude/agents/`). Scripts of each sweep a
 - [ ] Not proved in Lean: minimality of `906150257` (Tanaka 1980) and `7725038629` (Cohen–Dress, CNRS report 1979). Pólya-side citations are from secondary sources; Jurkat (1960) is unverified
 - [x] Prior art: formal-conjectures open PR #8202 (same Pólya statement plus a least-counterexample statement, no proof; no statement exists at `9097e2f`); wappy-x/Mathematics `checks/what_counts_as_a_proof_check.lean` assumes `L(906150256) = 0` as a hypothesis, so it is not a complete proof
 
+### gmu-binary-partitions: Conjecture 5.6 of Gawron–Miska–Ulas is false · **tier D, complete, audited, awaiting owner's decision** · *new* (refutation lane, route e: a finite witness; the label needs owner sign-off)
+- [x] Statement written here (no formal-conjectures statement), transcribed from the arXiv v1 source (`GMU_MOFM_Revision_II.tex`, label `cong:powerof2-1`); `b m n` is the coefficient of `X^n` in `∏_{i≤n} (∑_j X^{2^i j})^m` in `ℤ⟦X⟧`, tied to the paper's `∏ (1 − x^{2^i})^{−m}` by `one_sub_mul_geomPow2`, `coeff_truncatedSeries`, `b_eq_coeff_of_mul_eq_one`
+- [x] `gmu_conjecture_5_6_false` (D), witness `m = 1, k = 3, n = 1` (`b₁(16) − b₁(4) = 32`, modulus `2^6`): standard three, no `native_decide`
+- [x] `…_fails_at_m1_k5`, `…_fails_at_m3`, `…_fails_at_m4`, `…_fails_at_m5` (D): standard three, values by `decide +kernel` through `bList`, proved sound (`bList_sound`); `…_fails_at_m6` adds 2 `native_decide` (same checker)
+- [x] README says: `m = 1` is a corollary of Churchhouse's congruence (Rødseth 1970, Gupta 1971); only `m ≥ 3` is new; `m = 2` holds for `4 ≤ k ≤ 24`, `2^{k+1} n < 2^26` (C, outside Lean); a minor correction
+- [ ] Audit pending: rebuild, re-read the axioms, re-transcribe the conjecture from the source, recompute the witnesses independently
+- [ ] The journal text (Monatsh. Math. 185 (2018)) was not read; Rødseth's and Gupta's exactness statement is cited through Ulas–Żmija arXiv:1904.03398
+- [ ] Owner sign-off on the *new* label
+
 ## Working here
 
 - Changes to this superproject's own files (`AGENTS.md`, `README.md`, `docs/`, `scripts/`) go
