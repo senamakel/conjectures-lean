@@ -63,6 +63,7 @@ def FanRaspaudConjectureStatement : Prop :=
       ∃ M : Fin 3 → G.Subgraph, (∀ i, (M i).IsPerfectMatching) ∧
         ∀ e, ¬ (e ∈ (M 0).edgeSet ∧ e ∈ (M 1).edgeSet ∧ e ∈ (M 2).edgeSet)
 
+omit [Fintype V] [DecidableEq V] in
 /-- In a family of perfect matchings covering every edge exactly twice, no edge lies in three
 members with distinct indices. -/
 theorem not_mem_three_of_isPerfectMatchingCover_two {G : SimpleGraph V} {k : ℕ}
