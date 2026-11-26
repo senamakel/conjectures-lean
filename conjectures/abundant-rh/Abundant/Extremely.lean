@@ -44,7 +44,7 @@ lemma exists_le_of_bounded {B : ℕ} (hB : ∀ n, IsExtremelyAbundant n → n �
       have hgt : 10080 < n := lt_of_le_of_ne hn (Ne.symm hne)
       have : ¬ ∀ m : ℕ, 10080 ≤ m → m < n → robinRatio m < robinRatio n :=
         fun h ↦ hxa (Or.inr ⟨hgt, h⟩)
-      push_neg at this
+      push Not at this
       obtain ⟨m, hm1, hm2, hm3⟩ := this
       obtain ⟨m', hm'1, hm'2, hm'3⟩ := ih m hm2 hm1
       exact ⟨m', hm'1, hm'2, hm3.trans hm'3⟩
