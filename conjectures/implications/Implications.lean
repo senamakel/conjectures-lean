@@ -12,3 +12,4 @@ import Implications.Hadamard.ButsonDoubling
 import Implications.PrimeGaps.Erdos382
 import Implications.Wieferich.Rotkiewicz
 import Implications.Dickson.Main
+import Implications.Dickson.ConsecutiveAll
