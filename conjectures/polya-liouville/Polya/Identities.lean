@@ -28,7 +28,7 @@ theorem sum_mertens_div {x : ℕ} (hx : 1 ≤ x) :
     simp only [ArithmeticFunction.one_apply]
     rw [sum_ite_eq']
     simp only [mem_Ioc]
-    rw [if_pos ⟨Nat.one_pos, hx⟩]
+    simp [hx]
   rw [h1] at h
   rw [h, Icc_one_eq_Ioc]
   refine sum_congr rfl fun n hn => ?_
