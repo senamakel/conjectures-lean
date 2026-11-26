@@ -67,7 +67,7 @@ lemma I_ibp (m : ℕ) {a y : ℝ} (ha : 1 < a) (hay : a ≤ y) :
   have hftc := integral_eq_sub_of_hasDerivAt hderiv hint
   rw [integral_sub (intervalIntegrable_inv_log_pow m ha hay)
     ((intervalIntegrable_inv_log_pow (m + 1) ha hay).const_mul _),
-    integral_const_mul] at hftc
+    intervalIntegral.integral_const_mul] at hftc
   unfold I
   linarith
 
@@ -84,7 +84,7 @@ lemma I_succ_le (m : ℕ) {a y : ℝ} (ha : 1 < a) (hay : a ≤ y) :
   have hla : 0 < Real.log a := Real.log_pos ha
   rw [le_div_iff₀ hla]
   unfold I
-  rw [← integral_mul_const]
+  rw [← intervalIntegral.integral_mul_const]
   apply integral_mono_on hay (intervalIntegrable_inv_log_pow (m + 1) ha hay)
     ((intervalIntegrable_inv_log_pow m ha hay).mul_const _)
   intro t ht
@@ -161,7 +161,7 @@ lemma logIntegral_bounds {a : ℝ} (ha : 2 ≤ a) :
       have : Real.log 2 ≤ Real.log t := Real.log_le_log (by norm_num) ht.1
       rw [div_le_iff₀ (by linarith)]
       linarith
-    simp only [integral_const, smul_eq_mul] at hint
+    simp only [intervalIntegral.integral_const, smul_eq_mul] at hint
     have := logIntegralTwo_le_two
     unfold Real.logIntegral
     linarith
