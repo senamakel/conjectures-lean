@@ -1,0 +1,23 @@
+name = "BachCorollaries"
+defaultTargets = ["BachCorollaries"]
+
+[leanOptions]
+pp.unicode.fun = true
+autoImplicit = false
+
+[[require]]
+name = "Ankeny"
+path = "../ankeny-grh"
+
+[[require]]
+name = "Miller"
+path = "../miller-grh"
+
+# Needed only by `BachCorollaries/GRH.lean` and `Unconditional/` (Bach's constant 2 under GRH);
+# the default target does not import it.
+[[require]]
+name = "LLS"
+path = "../lls-grh"
+
+[[lean_lib]]
+name = "BachCorollaries"

@@ -27,6 +27,7 @@ against the sibling folders in this checkout. A sibling's build output lands in 
 | `abelian-erh` | `artin-grh`, `erdos-985` |
 | `ankeny-grh` | `erdos-985` |
 | `artin-grh` | `erdos-985` |
+| `bach-corollaries-grh` | `ankeny-grh`, `lls-grh`, `miller-grh` |
 | `bach-sorenson-grh` | `ankeny-grh`, `erdos-985`, `lls-grh` |
 | `cramer-rh` | `erdos-233`, `erdos-985`, `schoenfeld-rh` |
 | `density-rh` | `erdos-985` |
@@ -38,6 +39,7 @@ against the sibling folders in this checkout. A sibling's build output lands in 
 | `goldbach-grh` | `erdos-985` |
 | `grosswald-grh` | `erdos-985` |
 | `hironaka-fc` | — |
+| `implications` | — |
 | `li-criterion-rh` | `erdos-985` |
 | `lindelof-rh` | `erdos-985` |
 | `littlewood-rh` | `erdos-985`, `lindelof-rh` |
@@ -46,6 +48,7 @@ against the sibling folders in this checkout. A sibling's build output lands in 
 | `miller-grh` | `ankeny-grh`, `erdos-985` |
 | `mills-rh` | `erdos-985`, `schoenfeld-rh` |
 | `nicolas-rh` | `erdos-985`, `robin-rh` |
+| `prime-powers-rh` | `mills-rh` |
 | `psi-grh` | `erdos-985` |
 | `robin-rh` | `erdos-985` |
 | `schoenfeld-rh` | `erdos-985` |
