@@ -16,13 +16,13 @@ open ArithmeticFunction Finset
 theorem Icc_one_eq_Ioc (n : ℕ) : Icc 1 n = Ioc 0 n := by
   ext k; simp only [mem_Icc, mem_Ioc]; omega
 
-theorem mertens_eq_Ioc (x : ℕ) : mertens x = ∑ k ∈ Ioc 0 x, μ k := by
+theorem mertens_eq_Ioc (x : ℕ) : mertens x = ∑ k ∈ Ioc 0 x, moebius k := by
   rw [mertens, Icc_one_eq_Ioc]
 
 /-- `∑_{n=1}^{x} M(⌊x/n⌋) = 1` for `x ≥ 1`. -/
 theorem sum_mertens_div {x : ℕ} (hx : 1 ≤ x) :
     ∑ n ∈ Icc 1 x, mertens (x / n) = 1 := by
-  have h := sum_Ioc_mul_eq_sum_sum ((ζ : ArithmeticFunction ℤ)) μ x
+  have h := sum_Ioc_mul_eq_sum_sum ((zeta : ArithmeticFunction ℤ)) moebius x
   rw [coe_zeta_mul_moebius] at h
   have h1 : ∑ n ∈ Ioc 0 x, (1 : ArithmeticFunction ℤ) n = 1 := by
     simp only [ArithmeticFunction.one_apply]
@@ -60,11 +60,11 @@ theorem isSquare_mul_iff_of_coprime {m n : ℕ} (hm : m ≠ 0) (hn : n ≠ 0) (h
       exact hp.one_lt.ne' (Nat.dvd_one.1 this)
     refine ⟨fun p hp => ?_, fun p hp => ?_⟩
     · rcases key p hp with h0 | h0
-      · rw [h0]; exact even_zero
+      · rw [h0]; exact ⟨0, rfl⟩
       · simpa [h0] using H p hp
     · rcases key p hp with h0 | h0
       · simpa [h0] using H p hp
-      · rw [h0]; exact even_zero
+      · rw [h0]; exact ⟨0, rfl⟩
   · rintro ⟨H1, H2⟩ p hp
     exact (H1 p hp).add (H2 p hp)
 
@@ -84,7 +84,7 @@ theorem isSquare_prime_pow_iff {p i : ℕ} (hp : p.Prime) : IsSquare (p ^ i) ↔
     rw [hp.factorization_pow, Finsupp.single_apply]
     split_ifs
     · exact H
-    · exact even_zero
+    · exact ⟨0, rfl⟩
 
 theorem sum_range_neg_one_pow (i : ℕ) :
     ∑ j ∈ range (i + 1), ((-1 : ℤ) ^ j) = if Even i then 1 else 0 := by
@@ -92,17 +92,16 @@ theorem sum_range_neg_one_pow (i : ℕ) :
   | zero => simp
   | succ i ih =>
     rw [sum_range_succ, ih]
-    by_cases h : Even i
+    rcases Nat.even_or_odd i with h | h
     · have h' : ¬ Even (i + 1) := by rw [Nat.even_add_one]; exact not_not.2 h
-      rw [if_pos h, if_neg h', h.neg_one_pow.symm ▸ rfl]
-      rw [pow_succ, h.neg_one_pow]; norm_num
-    · have h' : Even (i + 1) := by rw [Nat.even_add_one]; exact h
-      rw [if_neg h, if_pos h']
-      rw [Nat.not_even_iff_odd] at h
-      rw [h'.neg_one_pow]; norm_num
+      simp only [h, h', if_true, if_false, pow_succ, h.neg_one_pow]
+      norm_num
+    · have h' : Even (i + 1) := by rw [Nat.even_add_one]; exact Nat.not_even_iff_odd.2 h
+      simp only [Nat.not_even_iff_odd.2 h, h', if_true, if_false, pow_succ, h.neg_one_pow]
+      norm_num
 
 /-- `∑_{d ∣ n} λ(d) = 1` if `n` is a nonzero square and `0` otherwise. -/
-theorem liouville_mul_zeta : liouville * (ζ : ArithmeticFunction ℤ) = sqInd := by
+theorem liouville_mul_zeta : liouville * (zeta : ArithmeticFunction ℤ) = sqInd := by
   refine (IsMultiplicative.eq_iff_eq_on_prime_powers _
     (isMultiplicative_liouville.mul isMultiplicative_zeta.intCast) _ isMultiplicative_sqInd).2 ?_
   intro p i hp
@@ -113,7 +112,7 @@ theorem liouville_mul_zeta : liouville * (ζ : ArithmeticFunction ℤ) = sqInd :
   rw [sum_congr rfl this, sum_range_neg_one_pow, isSquare_prime_pow_iff hp]
   simp [hp.ne_zero]
 
-theorem liouville_eq_sqInd_mul_moebius : liouville = sqInd * μ := by
+theorem liouville_eq_sqInd_mul_moebius : liouville = sqInd * moebius := by
   rw [← liouville_mul_zeta, mul_assoc, coe_zeta_mul_moebius, mul_one]
 
 /-- `L(x) = ∑_{d=1}^{⌊√x⌋} M(⌊x/d²⌋)`. -/
