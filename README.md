@@ -69,7 +69,7 @@ and the README says what is left. 🟠 proved with a hypothesis that can't be di
 hypothesis that is itself open.
 
 **Literature.** *RH-consequence*: a published theorem "RH (or GRH) implies X". *RH-equivalent*: X is
-equivalent to RH. *known*: proved in the literature without RH. *new*: not found in the literature (searches listed in the project README). Attributions are in
+equivalent to RH. *known*: proved in the literature without RH. *new*: not found in the literature (searches listed in the project README); the label on the Gawron–Miska–Ulas row is pending the owner's sign-off. Attributions are in
 [`docs/LITERATURE_STATUS.md`](docs/LITERATURE_STATUS.md). Each folder's README gives the exact
 Lean statements, `#print axioms` output and build instructions.
 
