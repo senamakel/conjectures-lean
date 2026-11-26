@@ -30,7 +30,7 @@ lemma amitsur_charpoly_mem_matrix (ρ : Λ →ₐ[R] Matrix σ σ L) (c : ∀ w 
   let φ := (blockFlattenAlgEquiv N).toAlgHom.comp ρ.mapMatrix; amitsur_charpoly_mem_of_span φ
     (top_unique fun P _ ↦ P.matrix_eq_sum_single ▸ sum_mem fun q _ ↦ subset_span fun k ↦ by
     erw [show φ _ = (φ 1).submatrix id (q, ·) * (φ P).submatrix (q, ·) id by
-      ext ⟨⟩; simp [φ, one_apply, Matrix.sum_apply, Matrix.single, ite_and, -map_sum]
+      ext ⟨⟩; simp [φ, Matrix.one_apply, Matrix.sum_apply, Matrix.single, ite_and, -map_sum]
       aesop, ← coeff_X_pow_mul, charpoly_mul_comm', coeff_X_pow_mul', map_one, mul_submatrix_one 1]
     split; apply c (P q q); simp) P k
 
@@ -47,7 +47,7 @@ lemma exists_ribet_element_cramer [Nonempty σ] (u : Y → O[G] →ₐ[O] Matrix
   let ρ := lift S _ G (piRingEquiv.symm.toMonoidHom.comp (.pi ((lift ..).symm ∘
     (ofId O L).mapMatrix.comp ∘ u)))
   have c := amitsur_charpoly_mem_of_span ρ (eq_top_mono (span_mono (Set.range_subset_iff.2 fun g k ↦
-    ⟨⟨_, h₂ g k⟩, by ext x; simpa [ρ] using! ext_iff.1 (charpoly_map (ρ (.single g 1))
+    ⟨⟨_, h₂ g k⟩, by ext x; simpa [ρ] using! Polynomial.ext_iff.1 (charpoly_map (ρ (.single g 1))
     (Pi.evalRingHom _ x)) k⟩)) (basis ..).span_eq)
   let ι := mapRingHom G κ
   have he x r i j : ρ (ι r) i j x = algebraMap O L (u x r i j) := by
@@ -68,7 +68,7 @@ lemma exists_ribet_element_cramer [Nonempty σ] (u : Y → O[G] →ₐ[O] Matrix
   simp [← trace_sum, ← mul_sum]; rw [trace_mul_comm, (_ : ∑ _, _ = ρ (a * ι (V w)))]
   ext; simp [(ρ η).trace_mul_comm, S.smul_def, *]; ring
   simpa! [mulVec, vecMul, *, V.pi_apply_eq_sum_univ w, V.pi_apply_eq_sum_univ (M _),
-    one_apply, smul_sum, apply_ite, sum_mul, a, mul_sub, -Matrix.mul_apply]
+    Matrix.one_apply, smul_sum, apply_ite, sum_mul, a, mul_sub, -Matrix.mul_apply]
     using congr(ρ $((M.map ι).dotProduct_mulVec (_ ᵥ* W) _))
   induction b using induction_on
   convert g ‹_›; simp [↓(u _ r).trace_mul_comm, ← he, ι, Matrix.trace]
