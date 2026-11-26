@@ -39,9 +39,9 @@ def Admissible (hs : Finset ℕ) : Prop :=
 theorem exists_not_dvd_of_card_lt {p : ℕ} (hp : p.Prime) (hs : Finset ℕ) (hc : hs.card < p) :
     ∃ r : ℕ, ∀ h ∈ hs, ¬ p ∣ r + h := by
   classical
-  haveI := Fact.mk hp
+  have := Fact.mk hp
   obtain ⟨e, -, he⟩ := Finset.exists_mem_notMem_of_card_lt_card
-    (s := hs.image (fun h => -(h : ZMod p))) (t := Finset.univ)
+    (s := hs.image (fun h : ℕ => -((h : ℕ) : ZMod p))) (t := Finset.univ)
     (by rw [Finset.card_univ, ZMod.card]; exact (Finset.card_image_le).trans_lt hc)
   refine ⟨e.val, fun h hh hd => he ?_⟩
   rw [← ZMod.natCast_eq_zero_iff] at hd
@@ -72,8 +72,7 @@ theorem infinite_consecutive_of_dickson (hD : DicksonConjecture) (hs : Finset �
     (fun j _ => (hqp j).ne_zero)
     (fun i _ j _ hij => (Nat.coprime_primes (hqp i) (hqp j)).2 (hqinj.ne hij))
   have hmemJ : ∀ j, j ∈ J ↔ j ≤ H ∧ j ∉ hs := fun j => by
-    simp only [hJ, mem_filter, mem_range]
-    omega
+    simp only [hJ, mem_filter, mem_range, Nat.lt_succ_iff]
   have hdvdJ : ∀ j ∈ J, q j ∣ a + j := fun j hj => by
     have hjq : j ≤ q j := by have := hqH j; have := ((hmemJ j).1 hj).1; omega
     have h1 : a + j ≡ q j - j + j [MOD q j] := Nat.ModEq.add_right j (ha j hj)
@@ -133,7 +132,7 @@ theorem infinite_consecutive_of_dickson (hD : DicksonConjecture) (hs : Finset �
       rw [Int.natCast_dvd_natCast, hpq]
       exact hndvd j hj h hh
     · obtain ⟨r, hr⟩ := hadm p hp
-      haveI := Fact.mk hp
+      have := Fact.mk hp
       have hMne : (M : ZMod p) ≠ 0 := by rwa [Ne, ZMod.natCast_eq_zero_iff]
       refine ⟨(((r : ZMod p) - (a : ZMod p)) * (M : ZMod p)⁻¹).val, ?_⟩
       intro f hf
@@ -218,5 +217,18 @@ theorem infinite_consecutive_ap_of_dickson (hD : DicksonConjecture) (k : ℕ) (h
           omega
   intro i hi
   rw [← hcount i hi, Nat.nth_count (hpr' i hi)]
+
+/-- Index form: for every `k ≥ 1` there are infinitely many `c` such that the `c`-th, …,
+`(c + k - 1)`-th primes form an arithmetic progression with difference `k!`. -/
+theorem infinite_index_ap_of_dickson (hD : DicksonConjecture) (k : ℕ) (hk : 0 < k) :
+    {c : ℕ | ∀ i < k,
+      Nat.nth Nat.Prime (c + i) = Nat.nth Nat.Prime c + i * k.factorial}.Infinite := by
+  have H := infinite_consecutive_ap_of_dickson hD k hk
+  have hinj : Set.InjOn (Nat.count Nat.Prime) {n : ℕ | n.Prime ∧ ∀ i < k,
+      Nat.nth Nat.Prime (Nat.count Nat.Prime n + i) = n + i * k.factorial} :=
+    fun m hm n hn hmn => Nat.count_injective hm.1 hn.1 hmn
+  refine (H.image hinj).mono ?_
+  rintro c ⟨n, ⟨hn, hap⟩, rfl⟩ i hi
+  rw [hap i hi, Nat.nth_count hn]
 
 end Implications.Dickson
