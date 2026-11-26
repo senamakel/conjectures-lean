@@ -254,10 +254,12 @@ Rules on top of the ones above:
   an explicit construction (a colouring, a scheme, a vector set), or an UNSAT proof. A
   construction is checked in Lean by `decide`, `native_decide` with a proved-sound checker, or a
   polynomial identity. An UNSAT proof is checked as LRAT, either through Lean core's verified
-  LRAT checker (the one `bv_decide` uses) or a checker proved sound in the project. `#print axioms`
-  then shows the compiler-trust axioms (`Lean.ofReduceBool`, and on some toolchains
-  `Lean.trustCompiler`). They are allowed exactly like `native_decide`'s: counted in the README,
-  each with one sentence on what it checks, how big the certificate is and how long it takes.
+  LRAT checker (the one `bv_decide` uses) or a checker proved sound in the project. At Lean
+  `v4.36.0`, `#print axioms` shows a `bv_decide` proof as `*._native.bv_decide.ax_*` (checked
+  2026-11-26), the same compiler trust as `native_decide`'s `*._native.native_decide.ax_*`.
+  They are allowed exactly like `native_decide`'s: counted in the README, each with one sentence on
+  what it checks, how big the certificate is and how long it takes. Core's LRAT checker is
+  proved sound in Lean, so it needs no soundness proof of our own.
 - **The encoding is part of the statement.** When a SAT or ILP encoding is used, the theorem
   stated in Lean is the mathematical one, and the proof that the encoding is faithful (and that
   symmetry breaking loses no solutions) is in Lean too. A certificate for an encoding that only a
