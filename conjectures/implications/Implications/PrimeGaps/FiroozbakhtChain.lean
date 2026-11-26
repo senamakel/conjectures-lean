@@ -169,7 +169,7 @@ theorem oppChain11_prime : ∀ q ∈ oppChain11, q.Prime := by
 theorem oppChain_prime : ∀ q ∈ oppChain, q.Prime := by
   unfold oppChain
   simp only [List.forall_mem_append]
-  exact ⟨oppChain0_prime, oppChain1_prime, oppChain2_prime, oppChain3_prime, oppChain4_prime, oppChain5_prime, oppChain6_prime, oppChain7_prime, oppChain8_prime, oppChain9_prime, oppChain10_prime, oppChain11_prime⟩
+  exact ⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨oppChain0_prime, oppChain1_prime⟩, oppChain2_prime⟩, oppChain3_prime⟩, oppChain4_prime⟩, oppChain5_prime⟩, oppChain6_prime⟩, oppChain7_prime⟩, oppChain8_prime⟩, oppChain9_prime⟩, oppChain10_prime⟩, oppChain11_prime⟩
 
 /-- Walking a checked chain. -/
 theorem exists_prime_sq_lt_of_chain : ∀ (L : List ℕ) (p : ℕ), oppChainOK p L = true →
