@@ -125,8 +125,8 @@ The values for `m ≤ 5` (the `2^m − 1 ≤ 31` colour counts) are checked by `
 kernel itself reduces the checker `bList` on natural-number lists, with its GMP arithmetic on
 literals. There is no `native_decide` on the path to the headline or to the `m = 1, 3, 4, 5`
 theorems. `gmu_conjecture_5_6_fails_at_m6` uses two `native_decide` calls, one per value
-(`b₆₃(128)` and `b₆₃(512)`); each evaluates the same checker `bList` in compiled code in well under
-a second, and its soundness is `bList_sound`, proved from the standard three. The kernel
+(`b₆₃(128)` and `b₆₃(512)`); each evaluates the same checker `bList` in compiled code (the whole
+`Native` module builds in 12 s), and the checker's soundness is `bList_sound`, proved from the standard three. The kernel
 reduction of `b₆₃(512)` ran for more than six minutes and 8 GB before we stopped it, which is why
 this one theorem uses `native_decide`. Reproduce with `lake env lean scripts/Axioms.lean`.
 
