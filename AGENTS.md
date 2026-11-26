@@ -271,6 +271,36 @@ glue around the repo's resolution algorithm). Treat every big formalisation the 
 - **Keep the edges.** Every implication found, kept or rejected, goes into the atlas with its
   premise, its source and the reason, so the next sweep starts from the graph and not from zero.
 
+## Disproofs: the refutation lane
+
+**Decided 2026-11-26.** Alongside proving, the workspace looks for conjectures it can refute. The
+strategy is the same: connect what exists. A disproof comes from one of five routes, and the
+README says which:
+
+| Route | Meaning | How to describe it |
+|---|---|---|
+| **a** | The negation follows from RH/GRH, a lemma of a big Lean proof, or one of our theorems | "X is false", with the tier of the premise |
+| **b** | Another open conjecture refutes it (`Y ⇒ ¬X`) | "Y implies X is false"; both stay open. Never "X is disproved" |
+| **c** | A disproof published on paper, not yet in Lean | "a Lean proof of (author, year)'s disproof of X" |
+| **d** | The formal statement is false as written (edge case, junk value, quantifier order) | "the formal-conjectures statement of X is false as written"; a misformalisation, not a disproof of X. Report it upstream |
+| **e** | A finite counterexample found by computation | "X is false: witness W", checked in Lean by `decide` or a `native_decide` with a proved-sound checker |
+
+Rules:
+
+- **Searches are educated and bounded.** Python, C and solvers (SAT, SMT, ILP, nauty) are
+  welcome and the box has the cores and RAM, but no search starts without three things written
+  down: why a witness is plausible in the range (a density or size heuristic, a structural
+  reason, a hint from a related conjecture or lemma, or a prior search limit being extended),
+  the bounded search space, and a stop condition. The default cap is about 2 CPU-hours per
+  candidate; go past it only when the estimate says a witness is close. Never redo a range
+  someone already exhausted.
+- **Negative results are recorded.** A search that finds nothing goes in the sweep report with
+  its range and its cost, so it is not repeated.
+- **Re-derive every witness from the literal Lean statement** before it is reported, and have
+  Lean check it. A witness that only a script has seen is not a result.
+- The tier, axiom, fixed-statement and audit rules apply unchanged. Sweep reports are
+  `docs/atlas/sweeps/<date>/disproof-*.md`; edges use `"lane": "disproof-…"`.
+
 ## Cross-repo issues
 
 - [x] **Sibling requires are local paths** (rule 7), switched 2026-11-26. Before the switch each

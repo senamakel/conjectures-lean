@@ -38,8 +38,22 @@ each deduction and, for edges we rejected, the reason.
 
 | Date | Lanes | Status |
 | :--- | :--- | :--- |
-| 2026-11-26 | [formal-conjectures conditional scan](sweeps/2026-11-26/fc-scan.md); [solved-conjectures newsfeed](sweeps/2026-11-26/newsfeed.md) (with an [inventory of 1337isnot1337/solved-conjectures](sweeps/2026-11-26/newsfeed-1337-inventory.md)); [Conjecture Atlas](sweeps/2026-11-26/atlas.md); [reuse of our theorems](sweeps/2026-11-26/toolkit-reuse.md); [implications between open conjectures](sweeps/2026-11-26/implications.md); [Erdős status feed](sweeps/2026-11-26/erdos-feed.md) | 246 edges; the lemma-mining lane is still running |
+| 2026-11-26 | [formal-conjectures conditional scan](sweeps/2026-11-26/fc-scan.md); [solved-conjectures newsfeed](sweeps/2026-11-26/newsfeed.md) (with an [inventory of 1337isnot1337/solved-conjectures](sweeps/2026-11-26/newsfeed-1337-inventory.md)); [Conjecture Atlas](sweeps/2026-11-26/atlas.md); [reuse of our theorems](sweeps/2026-11-26/toolkit-reuse.md); [implications between open conjectures](sweeps/2026-11-26/implications.md); [Erdős status feed](sweeps/2026-11-26/erdos-feed.md); [lemma mining of big proofs](sweeps/2026-11-26/lemma-mining.md) (inventories: [external](sweeps/2026-11-26/lemma-mining-external-inventory.md), [local](sweeps/2026-11-26/lemma-mining-local-inventory.md)) | 268 edges |
 
 The sweep reports are research notes: nothing in them was built, and claims marked
 *(unverified)* were not checked against a primary source. An edge is confirmed only when its
 Lean proof is merged.
+
+## Edges proved so far
+
+Merged into [`conjectures/implications`](../../conjectures/implications/), each rebuilt and its
+axioms read before the merge (standard three only).
+
+| Edge | Kind | PR |
+| :--- | :--- | :--- |
+| infinitely many squarefree `2^n − 1` ⇒ infinitely many non-Wieferich primes (Rotkiewicz), with `sq_dvd_mersenne_iff_isWieferichPrime` | theorem; both were `sorry` in formal-conjectures | #1 |
+| Cramér, its strict form, Firoozbakht, or any `p^ε` gap bound ⇒ Erdős 382 (i); Firoozbakht ⇒ Cramér | premise open | #2 |
+| Butson `H(4, 2m)` ⇒ Hadamard conjecture | premise open | #3 |
+| four exponentials ⇒ `2^t` or `3^t` transcendental for irrational `t` | premise open | #3 |
+| abc ⇒ Erdős 936 (four variants) and Erdős 977 (factorial variant) | premise open | #4 |
+| quantitative density bound for `k`-term progressions ⇒ Erdős 142 (lower variant) and all-`k` Erdős 140 | premise proved in Lean by openai/math, taken here as a hypothesis | #5 |
