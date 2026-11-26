@@ -89,7 +89,10 @@ excess over the conjecture is `j − 1`:
 | 2 | 1369 | 4 | — | — | 3 |
 | 3 | 50653 | 5 | **6** | — | 4 |
 | 4 | 1874161 | 6 | 7 | **8** | 5 |
-| 5 | 69343957 | 7 | (see below) | (see below) | 6 |
+| 5 | 69343957 | 7 (C DP only, `k ≤ 300`) | 6 (C DP) | not computed | 6 |
+
+The `n = 5` FLINT product tree (for `k_5 = 55777784`) was stopped unfinished at wind-down, so
+the `n = 5` row has one implementation only, and the diagonal is verified for `j ≤ 4`.
 
 - **Two infinite families.**
   - At fixed `k = 284`, the table gives `v_37(s(37^n, 37^n − 284)) = n + 2` for
