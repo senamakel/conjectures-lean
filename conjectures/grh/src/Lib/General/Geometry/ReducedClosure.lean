@@ -98,7 +98,7 @@ def LineBundle.IsIsomorphic := ∃ u, (L.mul M.inv).IsFrame u
 /-- The R-module of global sections of L, for a scheme X over R. -/
 def LineBundle.H0 : Submodule R (ι →
   PointFn X) := by use! {s | L.IsSection s ∧ ∀ i A t, ¬LandsIn t (L.opens i) → s i A t =
-  0} <;> simp [IsSection, PointFn.IsRegularOn, HSMul.hSMul, SMul.smul] <;> grind
+  0} <;> simp [IsSection, PointFn.IsRegularOn, HSMul.hSMul, SMul.smul] <;> grind [map_add, map_mul, map_zero]
 
 /-- Let i: Y → Z be a closed immersion and f: X → Z with X reduced. If the preimage under f of
 the image of i is dense in X, then f factors through i. -/
