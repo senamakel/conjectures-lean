@@ -310,7 +310,7 @@ lemma Epp_bound {P x : ℕ} (hx2 : 2 ≤ x) (hxP : x ≤ P) {s0 c3 : ℝ} (hc3 :
     have hr3 : r ^ 3 = x := by
       rw [hr, ← Real.rpow_natCast, ← Real.rpow_mul (by linarith)]; norm_num
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     have h1 : (s / c3) ^ 3 < r ^ 3 := pow_lt_pow_left₀ hcon (by positivity) (by norm_num)
     rw [hr3, div_pow, div_lt_iff₀ (by positivity)] at h1
     have h2 : (x : ℝ) * c3 ^ 3 ≤ s ^ 2 * s := by
@@ -564,7 +564,7 @@ lemma small_eq {P : ℕ} (hP : P.Prime) (h3 : 3 ≤ P) :
     · rintro rfl; simp_all
 
 /-- `δ_S`, `θ_{F∖S}` and `K` for `S = {ℓ ∈ F : ℓ ≥ 5}`. -/
-lemma sieve_data {P : ℕ} (hP : P.Prime) (h3 : 3 ≤ P) (B M e : ℕ) (dM th : ℝ)
+lemma sieve_data {P : ℕ} (B M e : ℕ) (dM th : ℝ)
     (hGc : (G B).card = M) (hGs : dM ≤ 1 - ∑ ℓ ∈ G B, 1 / (ℓ : ℝ)) (hdM : 0 < dM) (hM : 1 ≤ M)
     (he : ((P - 1).primeFactors.filter (fun ℓ => ¬ 5 ≤ ℓ)).card = e)
     (hth : th ≤ θ ((P - 1).primeFactors.filter (fun ℓ => ¬ 5 ≤ ℓ))) (hth0 : 0 ≤ th)
@@ -776,10 +776,10 @@ theorem sieveNumerics_10_8 : SieveNumerics 100000000 := by
   · -- sieve with `S = {ℓ ∈ F : ℓ ≥ 5}`
     refine ⟨S, hSF, ?_⟩
     have hdata := fun B M e dM th hGc hGs hdM hM he hth hth0 hcard =>
-      sieve_data hP h3 B M e dM th hGc hGs hdM hM he hth hth0 hcard
+      sieve_data (P := P) B M e dM th hGc hGs hdM hM he hth hth0 hcard
     by_cases h3F : 3 ∈ F
     · -- `E = {2, 3}`
-      have hEe : F.filter (fun ℓ => ¬ 5 ≤ ℓ) = {2, 3} := by rw [hE, if_pos h3F]
+      have hEe : F.filter (fun ℓ => ¬ 5 ≤ ℓ) = {2, 3} := by rw [hE]; simp [h3F]
       have he : (F.filter (fun ℓ => ¬ 5 ≤ ℓ)).card = 2 := by rw [hEe]; decide
       have hth : (1 / 3 : ℝ) ≤ θ (F.filter (fun ℓ => ¬ 5 ≤ ℓ)) := by rw [hEe, theta_23]
       rcases (show F.card ≤ 8 ∨ F.card = 9 ∨ 10 ≤ F.card by omega) with h8 | h9 | h10
@@ -813,7 +813,7 @@ theorem sieveNumerics_10_8 : SieveNumerics 100000000 := by
           (by norm_num) (by norm_num) (by norm_num) (by norm_num) (by norm_num) hPlow S
           (le_trans (by norm_num) hdt) (hK.trans (by norm_num))⟩
     · -- `E = {2}`
-      have hEe : F.filter (fun ℓ => ¬ 5 ≤ ℓ) = {2} := by rw [hE, if_neg h3F]
+      have hEe : F.filter (fun ℓ => ¬ 5 ≤ ℓ) = {2} := by rw [hE]; simp [h3F]
       have he : (F.filter (fun ℓ => ¬ 5 ≤ ℓ)).card = 1 := by rw [hEe]; decide
       have hth : (1 / 2 : ℝ) ≤ θ (F.filter (fun ℓ => ¬ 5 ≤ ℓ)) := by rw [hEe, theta_2]
       rcases (show F.card ≤ 8 ∨ F.card = 9 ∨ 10 ≤ F.card by omega) with h8 | h9 | h10
