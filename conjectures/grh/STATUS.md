@@ -23,7 +23,7 @@ The port was paused on the owner's instruction before it finished. **The package
 - Bridge `GRH/Bridge.lean` and the demo `prime-powers-rh/Unconditional/PrimePowersViaGRHLean.lean`
   (+ `scripts/check-via-grh-lean.sh`) are written but not built (they need `Main`).
 
-## Modified vendored files (34)
+## Modified vendored files (38)
 
 All changes are inside proofs except one statement re-spelling:
 
@@ -39,7 +39,10 @@ src/Lib/Adelic/Adeles/AdeleIdempotent.lean
 src/Lib/Adelic/Adeles/AdeleTopology.lean
 src/Lib/Adelic/QuotientMeasure/Packing.lean
 src/Lib/Adelic/Witt/FrameAction.lean
+src/Lib/Analytic/DirichletTheta/MellinTheta.lean
 src/Lib/Analytic/PolyaVinogradov/PolyaVinogradov.lean
+src/Lib/ClassField/GaloisCohomology/DiscreteUnits.lean
+src/Lib/ClassField/Places/Places.lean
 src/Lib/ClassField/Places/ProfiniteGalois.lean
 src/Lib/DiscreteSeries/Bruhat/FloorGroups.lean
 src/Lib/DiscreteSeries/CuspKernel/CircleMean.lean
@@ -59,6 +62,7 @@ src/Lib/General/LinearAlgebra/CommonEigenvectors.lean
 src/Lib/General/LinearAlgebra/HuaIntegral.lean
 src/Lib/General/LinearAlgebra/ValuedMatrix.lean
 src/Lib/General/Measure/HaarModulus.lean
+src/Lib/General/Measure/Place.lean
 src/Lib/General/Measure/SubgroupIntegral.lean
 src/Lib/General/NumberTheory/ClassNumberBound.lean
 src/Lib/General/NumberTheory/Embeddings.lean
@@ -77,11 +81,7 @@ src/New/TwistedHecke/InterlacingCone.lean
 
 | File | Error |
 |---|---|
-| `Lib/ClassField/GaloisCohomology/DiscreteUnits.lean:171` | `fun_prop` cannot prove continuity of `Prod.map (fun x ↦ ⇑u ∘ x) …` |
-| `Lib/ClassField/Places/Places.lean:124-145` | mismatches on `le_nhds_of_unique_clusterPt` / `IsPlaceOver.centrePrime_liesOver`; ambiguous `ext`; missing `TopologicalSpace (Ideal _)`, `ContinuousSMul Γ (𝓞 Ω)` |
 | `Lib/Cyclotomic/Voronoi/StickelbergerInteger.lean:21` | whnf heartbeat timeout in `smul_bernoulli_mem_lifts` (`monomial _` degree no longer inferred); the kernel "unknown constant" at line 70 follows. Candidate fix in the pattern list, unverified |
-| `Lib/General/Measure/Place.lean:231` | unknown constant `Membership.mem.intro` / `Set.Mem.intro`; simp max recursion at 232 |
-| `Lib/Analytic/DirichletTheta/MellinTheta.lean:37,163,172` | set-membership vs predicate (`x ∈ {z | 0 < z.re}`); a `rw` under an image of `fun i ↦ (q*i)⁻¹` |
 | `Lib/General/NumberTheory/QuadFieldSplitting.lean:33` | `w.q` (absNorm) no longer defeq to `Nat.card`: rewrite with `absNorm_eq_natCard` |
 
 Everything downstream of these (about 680 modules) has not been elaborated yet. No kernel
@@ -129,3 +129,9 @@ Policy: proofs only; statement re-spelling only when it no longer typechecks for
    axioms, build cost, modified files, credits per NOTICE/ATTRIBUTION, and the source's review
    status: "The proof has passed machine checks only ... No mathematician has read it through").
 5. Get the owner's sign-off on the one re-spelled statement.
+- Placeholder `.principal ∘ _` filters in `le_nhds_of_unique_clusterPt (l := ...)` no longer elaborate: write the filter explicitly (`fun v : FinPlace K ↦ .principal {A | IsPlaceOver A v}`, Places `finite_ramified`). A nonzero side goal of `exists_isPlaceOver_of_val_ne_one` is closed by `v.ne_bot` in the simp set.
+- `𝓞 Ω` needs explicit `have : DiscreteTopology (𝓞 Ω) := ⟨rfl⟩` and `have : ContinuousSMul Γ (𝓞 Ω) := continuousSMul_iff_stabilizer_isOpen.2 ...` (with `(H₁ := MulAction.stabilizer Γ x.1)` and `RingOfIntegers.ext`) (Places).
+- `fun_prop` fails on continuity into a discrete codomain: use `(continuous_of_discreteTopology (f := u.toFun)).comp h` (DiscreteUnits).
+- Set membership is no longer a predicate: state `(2 : ℂ) ∈ {z : ℂ | 0 < z.re}` instead of `0 < re 2`, and give explicit image functions (`(fun t : ℝ ↦ ((q:ℝ) * t)⁻¹) '' Ioo 0 T⁻¹`) so `rw` matches; pass `(b := 0)` explicitly to `mellin_differentiableAt_of_isBigO_rpow_exp` (MellinTheta).
+- `.intro` on a metavariable-typed set (`Membership.mem.intro` is gone): delay with `by exact ⟨((_, _), _, _), ⟨h, k⟩, by simp; ring⟩` (Measure/Place).
+- `simp [← enorm_pow, mul_pow]` loops (`enorm_pow` is a deprecated alias of `eNorm_pow`): use explicit `mul_pow` with `‖√r‖ₑ ^ 2 = r` via `Real.eNorm_eq_ofReal`, `ENNReal.ofReal_pow`, `Real.sq_sqrt` (Measure/Place).
