@@ -82,6 +82,29 @@ LivingBrain by hand, as above.
               └── density-rh, grosswald-grh, li-criterion-rh, speiser-rh, weinberger-grh
   ```
 
+### A second, smaller proof of RH and GRH: lsernau/grh-lean (noted 2026-11-26)
+
+[lsernau/grh-lean](https://github.com/lsernau/grh-lean) is a shorter Lean 4 proof of RH and of GRH for
+Dirichlet L-functions, based on Alpöge's. Facts read from the repository on 2026-11-26:
+
+- **Licence:** Apache-2.0 (Copyright 2026 Anthropic, PBC), with `NOTICE` and `ATTRIBUTION.md`. Unlike
+  riemann-hypothesis it may be vendored, with credit.
+- **Size:** two editions of the same five theorems, each its own Lake project: `grh/` (about 300,000
+  lines, readable) and `grh-compact/` (about 76,000 lines). Mathlib is the only dependency.
+- **Cost:** one to two hours on 12 cores with 24 GB of memory, from source. Compare 93 GB of
+  untrusted cache and 19 GB per import for riemann-hypothesis, which has never been rebuilt here.
+- **Pin:** Lean `v4.35.0`, Mathlib `56a00585`. That is not our pin (`v4.36.0`, `fc4f59e5`), so it cannot
+  be imported as it is. A port of the compact edition to our pin is in progress on branch
+  `grh-compact-port` (`conjectures/grh/`).
+- **Axioms:** its README states `propext`, `Classical.choice`, `Quot.sound` only. Not yet checked here.
+- **Review:** its README says it has passed machine checks only and that no mathematician has read it
+  through.
+
+Once the port builds, `Unconditional/` files should take RH and GRH from it: the check then runs
+from source in an hour or two, needs no raised open-file limit, and the caveat about the untrusted
+cache no longer applies. Until then riemann-hypothesis `507a75d91d` remains the source, and the
+README rule 10 caveat stays word for word.
+
 ## Proof tiers: when a result counts as a direct proof
 
 Each headline theorem has exactly one tier, and the README must say which.
