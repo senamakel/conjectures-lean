@@ -105,7 +105,7 @@ stated with a rational exponent or with "e integral ∧ …". A checker would do
   `Nat.powMod 3 (N-1) N ≠ 1`. Soundness is Fermat's little theorem
   (`ZMod.pow_card_sub_one_eq_one`).
 
-That is about 17,000 exponents, TODO of which need a Fermat test on numbers of at most 31,088
+That is 17,161 exponents, 2,050 of which need a Fermat test on numbers of at most 31,088
 bits. Under `native_decide` with GMP-backed `Nat` this is minutes. The proof of the φ sieve is
 the only real engineering: effort **M**. Part (iv) at 167665 is about 3× larger (numbers up to
 167,642 bits).
