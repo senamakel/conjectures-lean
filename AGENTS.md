@@ -410,7 +410,8 @@ The role is `counterexample-hunter` (`.claude/agents/`). Scripts of each sweep a
       robin-rh `535c9be`, nicolas-rh `4229e63`, li-criterion-rh `f058257`,
       speiser-rh `3c73ba5`, mertens-rh `4e9a6ba`, lls-grh `2fd3311`,
       bach-sorenson-grh `bbb0184`, schoenfeld-rh `62ea23a`, cramer-rh `fb22f0a`,
-      erdos-770 `a640482`, erdos-233 `651e094`. No `sorryAx` in any log.
+      erdos-770 `a640482`, erdos-233 `651e094`; on 2026-11-26: legendre-exceptions-rh `d673d91`,
+      ramanujan-rh `24c7ca4`, prime-powers-rh `972f715`, bach-corollaries-grh `e9aba6d`, abundant-rh `8ce94d1`. No `sorryAx` in any log.
       The shell's hard open-file limit (524288) is too low for the import: run
       `sudo prlimit --pid $$ --nofile=2000000:2000000` first. Up to four checks fit in RAM at once.
 - [x] **Licence.** This repository and every project folder carry the GNU GPL v3 (`LICENSE`,
@@ -754,45 +755,54 @@ The role is `counterexample-hunter` (`.claude/agents/`). Scripts of each sweep a
 - [ ] Washington Thm 4.3 was cited from the scoping report, not re-read
 
 
-### prime-powers-rh: a prime between `x^α` and `(x+1)^α`, real `α ≥ 3` · **tier C verified, tier U check pending** · *RH-consequence*
+### prime-powers-rh: a prime between `x^α` and `(x+1)^α`, real `α ≥ 3` · **tier U, complete, verified** · *RH-consequence*
 - [x] `primeBetweenRealPowers_of_RH`, `primeBetweenIntegerPowers_of_RH` (C), from mills-rh's `primeStrictlyBetweenCubes_of_RH`.
       Rebuilt 2026-11-26 at `61635fb`: standard three + 22 `native_decide` inherited from schoenfeld-rh
-- [ ] `Unconditional/PrimePowersUnconditional.lean` is written; `scripts/check-unconditional.sh` has not been run
+- [x] `Unconditional/PrimePowersUnconditional.lean` (U): standard three + 22 `native_decide`, no `sorryAx`. Checked 2026-11-26 at `972f715`
+      against riemann-hypothesis `507a75d91d` (2323 s wall, including a wait for the RH-import slot)
 - [ ] Literature: the RH result for `α ≥ 9/4` is Chamberland–Straub (arXiv:2602.22502), read from the listing only.
       Which integer exponents are open without RH was not confirmed. No prior-Lean search was done
 - [ ] Not proved: `9/4 ≤ α < 3` (needs a prime-gap computation far beyond a proved-sound checker)
 
-### bach-corollaries-grh: generators of `(ℤ/m)ˣ`, Solovay–Strassen, Miller's factoring · **tier H verified; C and U files not built** · *RH-consequence*
+### bach-corollaries-grh: generators of `(ℤ/m)ˣ`, Solovay–Strassen, Miller's factoring · **tier U, complete, verified** · *RH-consequence*
 - [x] `generators_of_bach`, `solovayStrassen_of_bach`, `solovayStrassenTest_iff_prime`, `millerFactoring_of_bach`,
       `eulerLiars_ne_top`, `jacobiCalc_eq`: from `Ankeny.BachSubgroupBound c`, standard three only. Rebuilt 2026-11-26 at `23ffd52`
-- [ ] `BachCorollaries/GRH.lean` (through `LLS.bach2_of_GRH`) and `Unconditional/` are written and have never been compiled:
-      they need lls-grh's `native_decide` modules built, then the riemann-hypothesis import
+- [x] `BachCorollaries/GRH.lean` (through `LLS.bach2_of_GRH`, C) compiled with no edits, and `Unconditional/` (U): standard three +
+      lls-grh's 15 `native_decide` (`LLS.chunk2_ok_0` to `_14`), no `sorryAx`. Checked 2026-11-26 at `e9aba6d` against
+      riemann-hypothesis `507a75d91d` (2987 s wall, including a wait for the RH-import slot). lls-grh, ankeny-grh and miller-grh builds
+      were replayed from existing builds of byte-identical sources
 - [ ] Literature: the generator bound with constant `2` sharpens the `3` of Bach 1990 §6. Whether factoring from `φ(n)` is
       known without ERH was not checked
 
-### abundant-rh: Solé–Planat, extremely abundant numbers, extraordinary numbers · **tier C verified (Robin as an imported hypothesis), U check pending** · *RH-equivalent*
+### abundant-rh: Solé–Planat, extremely abundant numbers, extraordinary numbers · **tier U, complete, verified** · *RH-equivalent*
 - [x] `solePlanat_of_RH`, `extremelyAbundantInfinite_of_RH`, `fourOnlyExtraordinary_of_RH`; the last two take
       `Robin.RobinStatement` as an argument so the main library never builds robin-rh's sieve. Rebuilt 2026-11-26 at `3b1cb54`;
       axiom lists pinned by `#guard_msgs` in `AbundantChecks`: standard three + `Nicolas.Check.loop_ok` (+ `Abundant.Check.check_ok`
       for the extraordinary-number theorem, one `native_decide`, 92 s, proved-sound checker over `n ≤ 5040`)
-- [ ] `Unconditional/AbundantUnconditional.lean` written; its check builds robin-rh's sieve (about 54 core-hours) first. Not run
+- [x] `Unconditional/AbundantUnconditional.lean` (U): standard three + `Nicolas.Check.loop_ok`; the last two theorems add robin-rh's 624
+      `native_decide` (`RobinCompute.small_ok`, `chunk_0` to `chunk_622`), the extraordinary-number one also `Abundant.Check.check_ok`. No
+      `sorryAx`. Checked 2026-11-26 at `8ce94d1` against riemann-hypothesis `507a75d91d` (2430 s wall, including a wait for the RH-import
+      slot). robin-rh's sieve was replayed from an existing build of byte-identical sources (finality worktree), not recomputed
 - [ ] The separate GA2 statement of Caveney–Nicolas–Sondow is not stated (its definition was not confirmed)
 
-### ramanujan-rh: Ramanujan's inequality `π(x)² < (e·x/log x)·π(x/e)` · **tier C for `x ≥ e⁴⁰` verified, U check pending; full statement tier H** · *RH-consequence*
+### ramanujan-rh: Ramanujan's inequality `π(x)² < (e·x/log x)·π(x/e)` · **tier U for `x ≥ e⁴⁰`, verified; full statement tier H** · *RH-consequence*
 - [x] `ramanujan_of_RH : RiemannHypothesis → RamanujanInequalityFrom (Real.exp 40)` (C), no computation. Rebuilt 2026-11-26 at
       `d2d9ea0`: standard three + 23 `native_decide` inherited from schoenfeld-rh; `ramanujan_of_schoenfeldPi` standard three only
 - [x] `ramanujan_of_RH_of_verified`: the Dudek–Platt statement (`x ≥ 38,358,837,683`) with `RamanujanVerifiedRange`
       (`[38,358,837,683, e⁴⁰]`, about `6·10¹⁵` primes) as a tier-H hypothesis
-- [ ] `Unconditional/RamanujanUnconditional.lean` written; check not yet run
+- [x] `Unconditional/RamanujanUnconditional.lean` (U): `ramanujan_inequality_from_exp40` and `ramanujan_of_verified` (the latter with
+      `RamanujanVerifiedRange` as hypothesis): standard three + schoenfeld-rh's 23 `native_decide`, no `sorryAx`. Checked 2026-11-26 at
+      `24c7ca4` against riemann-hypothesis `507a75d91d` (2106 s wall, including a wait for the RH-import slot)
 - [ ] Literature not confirmed: Axler's `e^3158.442`, Platt–Trudgian's `exp(3915)`. Two unrefereed unconditional claims
       exist (arXiv:2408.02591, Zenodo 23440770), not checked
 - [ ] Lowering `e⁴⁰` to Dudek–Platt's `1.15·10¹⁶` needs `π(x) < li(x)` for `x ≤ 1.2·10¹⁷`, which we do not have in Lean
 
-### legendre-exceptions-rh: exceptional sets for Legendre, Oppermann, Andrica, Brocard · **tier C verified, U check pending** · *RH-consequence*
+### legendre-exceptions-rh: exceptional sets for Legendre, Oppermann, Andrica, Brocard · **tier U, complete, verified** · *RH-consequence*
 - [x] `legendre_exceptions_of_RH`, `oppermann_exceptions_of_RH`, `andrica_exceptions_of_RH`, `brocard_exceptions_of_RH`:
       `O(log³ N)` exceptions among the first `N` indices, from erdos-233's `large_gaps_of_RH`. Rebuilt 2026-11-26 at `f3c0776`,
       standard three only. Conjecture statements verbatim from formal-conjectures
-- [ ] `Unconditional/LegendreExceptionsUnconditional.lean` written; check not yet run
+- [x] `Unconditional/LegendreExceptionsUnconditional.lean` (U): the four `*_exceptions` theorems, standard three only, no `sorryAx`.
+      Checked 2026-11-26 at `d673d91` against riemann-hypothesis `507a75d91d` (1087 s wall)
 - [ ] Bazzanella (2000, Thm 2) has `O(f(N) log² N)` for Legendre under RH, one logarithm better; not proved here
 - [ ] The Oppermann, Andrica and Brocard bounds were not found in the literature (search list in the README)
 
