@@ -76,7 +76,7 @@ lemma IsValuationPair.exists_isPrimitiveMatrix_mul {X : Matrix n k A} (h : HasLe
   obtain ⟨⟨L, _⟩, U, _, D, _, e, f⟩ := h, val.hermite .inr (X.fromRows 0) wt
   cases (congr(toRows₁ $e) : X = U.1.toBlocks₁₂ * D)
   obtain ⟨b, ⟨⟩⟩ := IsUnit.of_mul_eq_one_right _ (by rwa [L.mul_assoc])
-  refine ⟨b⁻¹, ?_, ?_, _, ?_, by simpa [← ext_iff, mul_apply] using congr($f * b⁻¹)⟩
+  refine ⟨b⁻¹, ?_, ?_, _, ?_, by simpa [← ext_iff, Matrix.mul_apply] using congr($f * b⁻¹)⟩
     <;> simp_all [IsIntMatrix, mem_intGL, toBlocks₁₂, blockTriangular_inv_of_blockTriangular]
 
 /-- Hermite form: if the subring R of A satisfies `IsValuationPair`, then for a k×n matrix M over A
@@ -85,7 +85,7 @@ vanish. -/
 lemma IsValuationPair.exists_mul_clear_cols : ∃ V ∈ intGL n R, ∀ᵉ (a) (j ∉ Set.range ι),
   (M * V.1) a j = 0 := have ⟨k, _, D, _, h, _⟩ := val.hermite ι Mᵀ
   have := h ▸ (k.2.mul_assoc ..).symm.trans congr(submatrix $k.inv_mul _ ι * D)
-  ⟨transposeGL k⁻¹, by simp_all [← ext_iff, mul_apply, ne_comm, mul_comm, mem_intGL, transposeGL]⟩
+  ⟨transposeGL k⁻¹, by simp_all [← ext_iff, Matrix.mul_apply, ne_comm, mul_comm, mem_intGL, transposeGL]⟩
 
 end
 

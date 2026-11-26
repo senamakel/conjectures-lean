@@ -61,7 +61,7 @@ lemma map_prod_rootCoeffEval_eq_zero {A} {q : S → MvPolynomial (Fin a) ℤ} (h
         using h)) (prod_hom_rel ⟨1, by simp⟩ fun σ _ _ ↦ mul_mem_mul ?_)
   simp [rootCoeffEval, aeval_eq_eval₂Hom, eval₂_eq', ← sum_fn, ← zsmul_eq_mul]
   refine sum_mem fun d h ↦ zsmul_mem (le_def.1 (pow_le_pow_right' (Submodule.one_le.2 (subset_span
-    (.intro 0 (by ext; simp [e, Multiset.esymm])))) ((le_totalDegree h).trans (hι σ))) ?_) _
+    (Set.mem_range.2 ⟨0, by ext; simp [e, Multiset.esymm]⟩))) ((le_totalDegree h).trans (hι σ))) ?_) _
   simpa [sum_fintype, prod_fn, prod_X_sub_C_coeff, *, e] using prod_pow_mem_graded (span K
     (.range (e σ)) ^ · :) 1 (e σ ·.castSucc.rev) d (by simp [mem_span_of_mem])
 
