@@ -256,6 +256,7 @@ worktree on one project folder.
 | `implication-prover` | opus | proves one target in `conjectures/<name>/`, statement fixed first, real `#print axioms` at the end | once a candidate is chosen |
 | `lean-mechanic` | sonnet | scaffolds packages, writes `Unconditional/` modules and checkers, repairs builds | work that needs no new mathematical idea |
 | `proof-auditor` | opus | rebuilds, reads axioms, diffs the statement against its source, checks README claims and prior proofs | every finished target, before merge |
+| `counterexample-hunter` | opus | looks for a new witness against an open, unclaimed conjecture: transplants an existing construction to its neighbours, or searches a space first cut down by structure; prior art before compute | the refutation lane |
 
 The order for a target is scout, prover (with the mechanic for scaffolding and checkers), then
 auditor. A prover's own report is never accepted without the audit. The atlas schema is in
@@ -333,6 +334,45 @@ Rules:
   Lean check it. A witness that only a script has seen is not a result.
 - The tier, axiom, fixed-statement and audit rules apply unchanged. Sweep reports are
   `docs/atlas/sweeps/<date>/disproof-*.md`; edges use `"lane": "disproof-…"`.
+
+### What counts, and how to hunt (learned 2026-11-26)
+
+The first day of the lane ran sixteen sweeps. Every substantive hit had already been claimed,
+one of them hours earlier; the unclaimed ones were shallow. The rules below come from that.
+
+- **The goal is a new counterexample to an open, unclaimed conjecture by a named author.** A
+  Lean proof of a disproof already in the literature (Pólya, Hajós, von Sterneck) is tooling,
+  not a result of this lane, and is not started without the owner asking.
+- **A hit is real only if the authors tested and believed the conjecture** and the witness lies
+  beyond what they checked and took structure to find. A statement false at its first small
+  case, contradicting a classical theorem, or dropped from the published version (Gawron–Miska–Ulas
+  5.6 at `36 − 4 = 32`; the `{1,8,k}` formula of arXiv:1401.7183v1) is recorded in one line.
+- **Prior art comes before compute, and again before reporting.** Search the exact wording on
+  arXiv, Zenodo, evidencepress.org, GitHub and the 1337 repo. Taken on the day: Cazenave's
+  spectral Conjecture 2, Wu–Yu–Guo, Sun's A308656 Conjecture 2, Kozma–Nitzan (proved).
+- **Transplant before you search.** The model is the Caiolo–Ferroni–Hoster disproof in
+  1337isnot1337/solved-conjectures: a matroid family built to refute one real-rootedness
+  conjecture (Bérczi–Coron–Eur–Li) was evaluated, by a closed recursion in `q`, on the
+  neighbouring invariant it had never been tried on. The witness has about `17^8` points and
+  was never enumerated; the 53-digit numbers in the announcement are discriminants. A
+  counterexample is an asset: record it in `docs/atlas/constructions.jsonl` with the neighbours
+  it has not been tested against, and test them.
+- **When there is no construction, cut the space first.** Scan only the residue classes where
+  local conditions block most representations (how Sun's conjectures fall near `10^8`–`10^10`);
+  search inside the "minimal counterexample must…" lemmas of the source paper; pass to a
+  parametrised family; let an asymptotic expansion or a zero sum locate the violation; warm-start
+  case `n` from the certificate for `n − 1`. Estimate the expected number of witnesses in reach
+  and drop a target far below 0.1.
+- **A negative result can be evidence for the conjecture.** Brannen's conjecture in dimensions
+  4 to 8: the simplex is exactly optimal among polytopes with `n + 2` facets, and the first-order
+  test changes sign between 8 and 9. Say so; it points a prover at the target instead.
+- **Exact arithmetic for every hit, and read definitions, not headlines.** Floating-point
+  volumes and grid sampling produced false hits. A Lean file that compiles proves only its own
+  definitions: stutxo/gaupenov-guyon-venier "refutes" a conjecture about the identity map, and
+  its 77-digit witness is the SHA-256 of a song lyric.
+
+The role is `counterexample-hunter` (`.claude/agents/`). Scripts of each sweep are kept under
+`docs/atlas/sweeps/<date>/disproof-scripts/`.
 
 ## Cross-repo issues
 
