@@ -122,7 +122,7 @@ theorem sq_dvd_mersenne_iff_isWieferichPrime
   unfold mersenne at hdvd ⊢
   constructor
   · intro hsq
-    have h2 : p ≠ 2 := ne_two_of_dvd hdvd
+    have h2 : p ≠ 2 := ne_two_of_dvd hq.pos hdvd
     -- the order of `2` mod `p` is `q`, so `q ∣ p - 1`
     have hqp : q ∣ p - 1 := by
       have hpq : (2 : ZMod p) ^ q = 1 := (dvd_two_pow_sub_one_iff _ _).1 hdvd
