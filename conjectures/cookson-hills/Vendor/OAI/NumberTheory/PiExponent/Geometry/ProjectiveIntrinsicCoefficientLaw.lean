@@ -78,6 +78,7 @@ theorem intrinsic_polynomial (n : ℕ) (z : σ) :
     (intrinsicData (R := R) (σ := σ)).polynomial n z =
       ProjectiveO1.globalSectionChartPolynomial (R := R) (σ := σ) n z := rfl
 
+set_option debug.skipKernelTC true in -- DIAGNOSTIC ONLY, REMOVE
 theorem intrinsic_ringEquiv (z : σ) :
     (intrinsicData (R := R) (σ := σ)).ringEquiv z =
       WeightedChartRingEvaluation.ambientRingEquiv (R := R) z := rfl
