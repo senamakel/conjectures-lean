@@ -2103,3 +2103,37 @@ warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationNonaffine
 ✔ [19340/19988] Built OAI.NumberTheory.PiExponent.Approximation.TwistGlobalExtension (12s)
 ✔ [19342/19988] Built OAI.NumberTheory.PiExponent.Approximation.LinePullbackPowers (14s)
 ✔ [19344/19988] Built OAI.NumberTheory.PiExponent.Approximation.ProjectionFormula (14s)
+✔ [19346/19988] Built OAI.NumberTheory.PiExponent.Approximation.LineClosedUnit (7.7s)
+✔ [19348/19988] Built OAI.NumberTheory.PiExponent.Approximation.SerrePowerDescent (8.4s)
+✔ [19350/19988] Built OAI.NumberTheory.PiExponent.Geometry.LineBundleCoherent (8.5s)
+⚠ [19352/19988] Ran OAI.NumberTheory.PiExponent.Geometry.FiniteCurveZeros
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/FiniteCurveZeros.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19358/19988] Ran OAI.NumberTheory.PiExponent.Cohomology.FiniteSupportCohomology
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/FiniteSupportCohomology.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19360/19988] Ran OAI.NumberTheory.PiExponent.Cohomology.FiniteLineEuler
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/FiniteLineEuler.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19364/19988] Ran OAI.NumberTheory.PiExponent.Cohomology.EulerZeroDimensional
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/EulerZeroDimensional.lean: imports `Mathlib.Algebra.Group.ForwardDiff` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Vendor/OAI/NumberTheory/PiExponent/Cohomology/EulerZeroDimensional.lean: imports `Mathlib.AlgebraicGeometry.Artinian` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [19372/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CurveNormalizationUnit
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CurveNormalizationUnit.lean: imports `Mathlib.AlgebraicGeometry.Morphisms.SchemeTheoreticallyDominant` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [19374/19988] Built OAI.NumberTheory.PiExponent.Approximation.SectionPowerFrames (14s)
+✔ [19376/19988] Built OAI.NumberTheory.PiExponent.Approximation.CocycleTensorIso (10s)
+✔ [19378/19988] Built OAI.NumberTheory.PiExponent.Approximation.PushforwardOpenSections (8.7s)
+✔ [19380/19988] Built OAI.NumberTheory.PiExponent.Approximation.ModulePullbackCoherent (11s)
+✔ [19382/19988] Built OAI.NumberTheory.PiExponent.Approximation.ClosedPullbackUnitRestriction (10s)
+✔ [19384/19988] Built OAI.NumberTheory.PiExponent.Approximation.ClosedAnnihilatedDescent (11s)
+✔ [19386/19988] Built OAI.NumberTheory.PiExponent.Ampleness.AmpleProjectiveSections (7.0s)
+✔ [19388/19988] Built OAI.NumberTheory.PiExponent.Approximation.TwistPresentations (13s)
+✔ [19390/19988] Built OAI.NumberTheory.PiExponent.Geometry.ProjectiveSectionReindex (8.2s)
+✔ [19392/19988] Built OAI.NumberTheory.PiExponent.Approximation.ClosedPushforwardAffine (14s)
+✔ [19394/19988] Built OAI.NumberTheory.PiExponent.Approximation.CoherentCokernels (14s)
+✔ [19396/19988] Built OAI.NumberTheory.PiExponent.Ampleness.ClosedAmpleRestriction (6.0s)
+✔ [19398/19988] Built OAI.NumberTheory.PiExponent.LocalAlgebra.InvertibleIdealLocal (10s)
+✖ [19402/19988] Building OAI.NumberTheory.PiExponent.Geometry.CartierSequence (6.5s)
+trace: .> LEAN_PATH=/home/ubuntu/work/personal/conjectures-lean/.lake/packages/Cli/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/batteries/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/Qq/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/aesop/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/importGraph/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/plausible/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/.lake/packages/mathlib/.lake/build/lib/lean:/home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean /home/ubuntu/.elan/toolchains/leanprover--lean4---v4.36.0/bin/lean /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/Vendor/OAI/NumberTheory/PiExponent/Geometry/CartierSequence.lean -o /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean/OAI/NumberTheory/PiExponent/Geometry/CartierSequence.olean -i /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/lib/lean/OAI/NumberTheory/PiExponent/Geometry/CartierSequence.ilean -c /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/ir/OAI/NumberTheory/PiExponent/Geometry/CartierSequence.c --setup /home/ubuntu/work/personal/conjectures-lean/worktrees/cookson-hills/conjectures/cookson-hills/.lake/build/ir/OAI/NumberTheory/PiExponent/Geometry/CartierSequence.setup.json --json
+error: Vendor/OAI/NumberTheory/PiExponent/Geometry/CartierSequence.lean:57:83: unexpected token '}'; expected '|'
+⚠ [19404/19988] Ran OAI.NumberTheory.PiExponent.Geometry.CartierDegreeLength
+warning: Vendor/OAI/NumberTheory/PiExponent/Geometry/CartierDegreeLength.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✔ [19406/19988] Built OAI.NumberTheory.PiExponent.Geometry.LineBundleInverse (5.8s)
+✔ [19408/19988] Built OAI.NumberTheory.PiExponent.Geometry.LineBundleProduct (8.2s)
