@@ -68,17 +68,12 @@ lemma two_pow_sub_one_eq_one {p : ℕ} (hp : p.Prime) (h2 : p ≠ 2) :
   rw [ZMod.natCast_eq_zero_iff_dvd] at this
   exact h2 ((Nat.prime_dvd_prime_iff_eq hp Nat.prime_two).1 this)
 
-/-- A prime dividing `2 ^ n - 1` is not `2`. -/
-lemma ne_two_of_dvd {p n : ℕ} (hdvd : p ∣ 2 ^ n - 1) : p ≠ 2 := by
+/-- For `n > 0`, a number dividing `2 ^ n - 1` is not `2`. -/
+lemma ne_two_of_dvd {p n : ℕ} (hn : 0 < n) (hdvd : p ∣ 2 ^ n - 1) : p ≠ 2 := by
   rintro rfl
-  rcases Nat.eq_zero_or_pos n with rfl | hn
-  · -- `2 ^ 0 - 1 = 0`; this case is fine, so we argue differently
-    exact absurd hdvd (by
-      intro _
-      exact absurd hdvd (by simp) |>.elim) |>.elim
-  · have hodd : Odd (2 ^ n - 1) := Nat.Even.sub_odd Nat.one_le_two_pow
-      (Nat.even_pow.2 ⟨even_two, hn.ne'⟩) odd_one
-    exact (Nat.not_even_iff_odd.2 hodd) (even_iff_two_dvd.2 hdvd)
+  have hodd : Odd (2 ^ n - 1) := Nat.Even.sub_odd Nat.one_le_two_pow
+    (Nat.even_pow.2 ⟨even_two, hn.ne'⟩) odd_one
+  exact (Nat.not_even_iff_odd.2 hodd) (even_iff_two_dvd.2 hdvd)
 
 /-- **Lifting for Wieferich primes.** If `p` is a Wieferich prime and `p ∣ 2 ^ n - 1`, then
 `p ^ 2 ∣ 2 ^ n - 1`. In `ZMod (p ^ 2)`, `(2 ^ n) ^ p = 1` because `2 ^ n ≡ 1 [MOD p]`, and
