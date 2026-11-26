@@ -2,7 +2,8 @@
 
 Lane `disproof-combinatorics`, 2026-11-26. This lane did research and computation only: no Lean
 file and no existing file was edited. Scripts, logs and downloads are in the session scratchpad
-under `hunt-comb/` (`src/`, `runs/`, `dl/`). Downloaded data went into `dl/`, nothing downloaded
+under `hunt-comb/` (`src/`, `runs/`, `dl/`). The scripts worth keeping are copied to
+`disproof-scripts/disproof-combinatorics/`. Downloaded data went into `dl/`, nothing downloaded
 was executed, and Python that read downloads ran with `-I`. Claims I could not confirm from a
 primary source are marked *(unverified)*.
 
@@ -31,7 +32,9 @@ Status of the verification:
 - **Verification 2:** a second, independently derived algorithm for each count.
   - The algorithms agree on every value they share: n ≤ 28 for C_n(321) and n ≤ 28 for
     C_n(312) (see §2.4).
-  - The second program at n = 29 is reported in §2.4.
+  - At n = 29 the second program confirmed C_29(321). It did not finish for C_29(312): that
+    value comes from one implementation, cross-checked through n = 28. Status: **verified for
+    321; for 312, one implementation plus agreement up to n = 28**.
 - **Prior art:** I found no prior refutation or extension (§2.5).
 
 **Negative searches** (§3), each one recorded so it is not repeated:
@@ -149,7 +152,9 @@ literal definitions (cycle check plus pattern-occurrence check).
     either the largest unused value below the current maximum, or any unused value above it.
     It completes forced tails once n is used, and shares no transition code with `cyc312t`. It
     gives C_26 = 204,968,426,678, C_27 = 732,625,336,887 and C_28 = 2,628,648,068,210, identical.
-    At n = 29: SEE-312P29.
+    At n = 29 the run was stopped at wind-down after 26 min, before it finished. **C_29(312) is
+    therefore confirmed by one implementation only** (`cyc312t`). The second algorithm agrees with
+    it at every n ≤ 28.
 - `src/cyc312s.cpp` (the stack DP without the tail shortcut, sorted-array layers) agrees for
   n ≤ 22.
 
@@ -215,7 +220,8 @@ The statement is `(Finset.univ.filter (fun σ : Equiv.Perm (Fin 29) => σ.IsCycl
 
 ## 4. Best unfinished lead
 
-1. **Make §2 Lean-checkable.** This is the obvious next step for this hit.
+1. **Finish the independent n = 29 count for 312**: `cyc312p2 29`, about 35 min and 13 GB. Then
+   make §2 Lean-checkable.
 2. **Bóna–Cory beyond n = 29.** The ratio trend predicts `C_n(312) > C_n(321)` for every n ≥ 29.
    Proving that needs growth rates: gr(312) > gr(321). Neither is known. The bounds so far are
    ≥ 3.04 and ≥ 3.17 (AGL), and ≤ 4. The data suggest about 3.7 against 3.56. A rigorous
