@@ -198,7 +198,7 @@ of order `x^{3/2}`.
   the upper side. Without it, Schoenfeld's two-sided bound gives the inequality exactly from
   about `x = e^{39.47} ≈ 1.39·10¹⁷` (a high-precision evaluation of
   `(e x/u)(li(x/e) − ε(x/e)) − (li x + ε(x))²`). The explicit eight-term expansion, the base point
-  `e¹⁵` and the integer constants above cost the rest: at `u = 40` the proved margin is `0.17`
+  `e¹⁵` and the integer constants above cost the rest: at `u = 40` the proved margin is `0.10`
   of `x²/u⁶`, against `0.24` for the exact functions. `e⁴⁰ ≈ 2.354·10¹⁷` is well below Johnston's
   unconditional `exp(103)`, so the two ranges overlap.
 * **The range below `e⁴⁰`** is the cited hypothesis `RamanujanVerifiedRange`, not a theorem
