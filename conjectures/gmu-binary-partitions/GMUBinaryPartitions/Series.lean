@@ -58,8 +58,7 @@ theorem coeff_truncatedSeries_succ (m N n : ℕ) (hn : n < 2 ^ N) :
   rw [truncatedSeries, Finset.prod_range_succ, ← truncatedSeries]
   refine coeff_mul_of_dvd_sub_one ?_ hn
   have h1 : X ^ (2 ^ N) ∣ geomPow2 N - 1 :=
-    ⟨geomPow2 N, by conv_lhs => rw [geomPow2_eq N]
-                    ring⟩
+    ⟨geomPow2 N, by linear_combination geomPow2_eq N⟩
   calc X ^ (2 ^ N) ∣ geomPow2 N - 1 := h1
     _ ∣ geomPow2 N ^ m - 1 ^ m := sub_dvd_pow_sub_pow _ _ _
     _ = geomPow2 N ^ m - 1 := by rw [one_pow]

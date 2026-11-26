@@ -63,7 +63,7 @@ theorem get0_drop (l : List ℕ) (d j : ℕ) : get0 (l.drop d) j = get0 l (d + j
   | cons x l ih =>
     cases d with
     | zero => simp
-    | succ d => simp only [List.drop_succ_cons, get0, ih]; congr 1; omega
+    | succ d => rw [List.drop_succ_cons, ih, show d + 1 + j = (d + j) + 1 by omega]; rfl
 
 theorem get0_append_left (a c : List ℕ) (n : ℕ) (h : n < a.length) :
     get0 (a ++ c) n = get0 a n := by
@@ -83,7 +83,7 @@ theorem get0_append_right (a c : List ℕ) (n : ℕ) (h : a.length ≤ n) :
     | zero => simp at h
     | succ n =>
       simp only [List.cons_append, get0, List.length_cons]
-      rw [ih n (by simp at h; omega)]; congr 1
+      rw [ih n (by simp at h; omega)]; congr 1; omega
 
 theorem length_addPre (a l : List ℕ) : (addPre a l).length = l.length := by
   induction a generalizing l with
@@ -134,10 +134,9 @@ theorem get0_stepAux (d : ℕ) (hd : 0 < d) (f : ℕ) (l : List ℕ) (hf : l.len
     cases l with
     | nil => simp at hn
     | cons x l =>
-      set L := x :: l with hL
+      rw [stepAux]
+      generalize x :: l = L at hn hf hc ⊢
       have hlen : (L.take d).length = min d L.length := List.length_take
-      simp only [stepAux]
-      rw [← hL]
       by_cases hnd : n < d
       · rw [get0_append_left _ _ _ (by rw [hlen]; omega), get0_take _ _ _ hnd, hc n hn,
           if_neg (by omega), add_zero]
@@ -145,17 +144,19 @@ theorem get0_stepAux (d : ℕ) (hd : 0 < d) (f : ℕ) (l : List ℕ) (hf : l.len
         rw [get0_append_right _ _ _ (by rw [hlen]; omega), hlen, min_eq_left hdl]
         have hl' : (addPre (L.take d) (L.drop d)).length = L.length - d := by
           rw [length_addPre, List.length_drop]
-        refine ih (addPre (L.take d) (L.drop d)) (by rw [hl']; simp [hL] at hf ⊢; omega)
+        refine ih (addPre (L.take d) (L.drop d)) (by rw [hl']; omega)
           (fun j => c (d + j)) ?_ (n - d) (by rw [hl']; omega) |>.trans (by congr 1; omega)
         intro j hj
         rw [hl'] at hj
         rw [get0_addPre _ _ _ (by rw [List.length_drop]; omega), get0_drop,
           hc (d + j) (by omega), if_pos (by omega), show d + j - d = j by omega]
         by_cases hjd : j < d
-        · rw [get0_take _ _ _ hjd, if_neg (by omega), add_zero, hc j (by omega),
-            if_neg (by omega), add_zero, add_comm]
-        · rw [get0_of_length_le _ _ (by rw [hlen]; omega), zero_add, if_pos (by omega),
+        · rw [get0_take _ _ _ hjd, if_neg (show ¬ d ≤ j by omega), hc j (by omega),
+            if_neg (show ¬ d ≤ j by omega)]
+          omega
+        · rw [get0_of_length_le (L.take d) j (by rw [hlen]; omega), if_pos (show d ≤ j by omega),
             show d + (j - d) = j by omega]
+          omega
 
 /-! ### Soundness against the series -/
 
@@ -191,15 +192,16 @@ theorem represents_stepAux (i F : ℕ) (l : List ℕ) (hF : l.length ≤ F) (A :
   have hnn := coeff_mul_geomPow2_nonneg A i hA
   rw [get0_stepAux _ hd F l hF (fun n => (coeff n (A * geomPow2 i)).toNat) ?_ n hn]
   · exact Int.toNat_of_nonneg (hnn n)
-  · intro n hn
+  · have key : ∀ n, ((coeff n (A * geomPow2 i)).toNat : ℤ) = coeff n (A * geomPow2 i) :=
+      fun n => Int.toNat_of_nonneg (hnn n)
+    intro n hn
     have h1 := coeff_mul_geomPow2 A i n
     rw [← hl n hn] at h1
-    apply Int.ofNat.inj
-    push_cast
-    rw [Int.toNat_of_nonneg (hnn n), h1]
-    split_ifs
-    · push_cast; rw [Int.toNat_of_nonneg (hnn _)]
-    · simp
+    have : ((coeff n (A * geomPow2 i)).toNat : ℤ) =
+        ((get0 l n + if 2 ^ i ≤ n then (coeff (n - 2 ^ i) (A * geomPow2 i)).toNat else 0 : ℕ) :
+          ℤ) := by
+      rw [key, h1]; split_ifs <;> simp [key]
+    exact_mod_cast this
 
 theorem represents_iterPow (i F : ℕ) (k : ℕ) (l : List ℕ) (hF : l.length ≤ F)
     (A : PowerSeries ℤ) (hA : ∀ n, 0 ≤ coeff n A) (hl : Represents l A) :
@@ -246,9 +248,10 @@ theorem represents_one (L : ℕ) : Represents (1 :: List.replicate L 0) 1 := by
 /-- **Soundness of the checker.** Entry `n ≤ L` of `bList m N L` is `b m n` when `L < 2^N`. -/
 theorem bList_sound (m N L n : ℕ) (hL : L < 2 ^ N) (hn : n ≤ L) :
     ((get0 (bList m N L) n : ℕ) : ℤ) = b m n := by
-  obtain ⟨h1, -, -⟩ := represents_coeffList m (L + 1) (1 :: List.replicate L 0) (by simp) 1
+  obtain ⟨h1, h2, -⟩ := represents_coeffList m (L + 1) (1 :: List.replicate L 0) (by simp) 1
     (fun n => by rw [coeff_one]; split_ifs <;> norm_num) (represents_one L) N
   rw [one_mul] at h1
-  rw [bList, h1 n (by simp; omega), coeff_truncatedSeries m n N (by omega)]
+  rw [bList, h1 n (by rw [h2]; simp only [List.length_cons, List.length_replicate]; omega),
+    coeff_truncatedSeries m n N (by omega)]
 
 end GMU
