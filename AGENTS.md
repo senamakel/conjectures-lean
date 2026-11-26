@@ -2,8 +2,8 @@
 
 This repository (`github.com/senamakel/conjectures-lean`) holds 28 Lean 4 projects that formalise
 number-theory conjectures and theorems: the 17 headline results, each a consequence of RH or GRH,
-and 11 further projects (see `README.md`, "Further projects"). Each project is a folder at the top
-level and a Lean package of its own, imported with its full history from the former standalone
+and 11 further projects (see `README.md`, "Further projects"). Each project is a folder under
+`conjectures/` and a Lean package of its own, imported with its full history from the former standalone
 repository `github.com/senamakel/<name>`. This file is the tracker: when a box changes, update it
 here in the same commit as the change.
 
@@ -558,7 +558,7 @@ Each README follows the shape already used across these repos:
   straight to `main`: no worktree, no PR.
 - Work inside the project folders goes on a branch made with `worktree <slug>` here, and lands
   through one PR to this repository, however many folders it touches.
-- Adding a conjecture: create `<name>/` as its own Lean package (`lakefile`, `lean-toolchain`,
+- Adding a conjecture: create `conjectures/<name>/` as its own Lean package (`lakefile`, `lean-toolchain`,
   `README.md`), then give it a row in `README.md` and a section in the checklist below.
 - The lakefiles still require their siblings by git URL (`github.com/senamakel/<name>`) at a
   pinned rev. Switching them to `path = "../<name>"` requires is still to do.

@@ -1,129 +1,75 @@
-# Conjectures
+# Conjectures in Lean
 
-Machine-checked Lean 4 proofs in number theory: 17 projects, each a consequence of the
-Riemann Hypothesis or of GRH for Dirichlet L-functions, and 11 further projects they build on or
-that sit beside them. Each project is a folder of this repository, a Lean package of its own,
-imported with its full commit history from its former standalone repository.
+Machine-checked Lean 4 proofs of conjectures and theorems in number theory, each project in its own
+folder under [`conjectures/`](conjectures/). The table lists every project, finished or not,
+together with the attempts that never became a project. RH and GRH for Dirichlet L-functions come from
+Levent Alpöge's Lean proof ([riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)),
+which the Lean FRO and the Mathlib Initiative
+[certified](https://leanprover-community.github.io/blog/posts/riemann-hypothesis/) on 21 November 2026.
 
-On 20 November 2026 Levent Alpöge released a Lean proof of RH and of GRH for Dirichlet
-L-functions. The Lean FRO and the Mathlib Initiative
-[certified it](https://leanprover-community.github.io/blog/posts/riemann-hypothesis/) the next
-day, and independent kernels accept the exported proof
-([Sutherland's verification files](https://math.mit.edu/~drew/grh/)). With that proof, every row
-below is a theorem that Lean checks end to end from its three standard axioms, plus the
-finite computations each row names. These statements were open before that proof. Rows 1 to 6 are named conjectures: Erdős 985,
-the Lindelöf hypothesis, the density hypothesis, Grosswald's conjecture, the completeness of
-Euler's list of idoneal numbers, and the extended Riemann hypothesis for abelian number fields.
-Rows 7 to 11 are statements known to be equivalent to RH. Rows 12 to 17 are further
-theorems under RH or GRH; rows 12 to 15 carry the papers' own constants. Three rows concern
-Erdős problems: 985 in full, part (iii) of 770, and the RH bounds toward 233.
-
-What this workspace contributes is the Lean proofs themselves. Each implication "RH implies X"
-was proved here in full, with explicit constants where the papers leave them implicit, in
-places with lemmas the papers state without proof, and with proved-sound checkers for every
-finite range.
-The conditional theorems are due to the authors in the last column, and the proof of RH is
-Alpöge's. [`AGENTS.md`](AGENTS.md) holds the status checklist, the proof-tier rules and the README
-rules; attributions are in [`docs/LITERATURE_STATUS.md`](docs/LITERATURE_STATUS.md).
-
-## Abstract
-
-Living Brain and OpenHuman collaborated on a formal mathematics programme
-following Levent Alpöge’s Lean proof of RH and Dirichlet GRH. OpenHuman’s agents
-and the RSI Ralph recursive self-improvement loop developed 17 machine-checked
-results. Living Brain provided persistent, source-linked research memory that
-helped identify consequences within scope, retrieve literature and dependencies,
-and record why other approaches were set aside. Lean checked the proofs. The
-collaboration demonstrated memory-assisted target selection. The effect of
-individual memory scores and Brain Health on proof outcomes remains unmeasured
-in this account.
-
-## TL;DR
-
-Living Brain carried research context across sessions. OpenHuman’s agents and
-RSI Ralph developed the downstream proofs, and Lean checked them using Alpöge’s
-formalisation to discharge RH or GRH.
-
-| Total projects | Named conjectures and RH-equivalent statements | Further consequences of RH or GRH |
-| :---: | :---: | :---: |
-| **17** | **11** | **6** |
-
-The six further consequences include four projects that formalise published
-bounds with their original constants, a proof of part (iii) of Erdős 770, and
-an upper bound toward Erdős 233. The remaining parts of Erdős 770 and the full
-Erdős 233 problem remain open.
-
-Several of the questions go back generations. The Lindelöf hypothesis dates to
-1908, and the question of whether Euler’s 65 idoneal numbers exhaust the list
-goes back to his eighteenth-century work. RH itself dates to 1859.
-
-[Results](#results) · [How it worked](#how-it-worked) · [Build and verification](#build-and-verification) · [Licence](#licence)
+[Docs](docs/) · [Status tracker and rules](AGENTS.md) · [Literature status](docs/LITERATURE_STATUS.md) · [Next targets](docs/NEXT_TARGETS.md) · [Paper](paper/)
 
 ## Results
 
-The projects cover six named conjectures, five statements known to be equivalent
-to RH, and six further consequences. For the RH-equivalent statements, the table
-describes the direction formalised in this collection. Erdős 770 parts (i) and
-(ii) remain open, as does the full Erdős 233 problem.
+28 projects: 19 proved in full, 7 proved in part, 1 conditional at its ceiling, 1 wound down.
 
-### Six named conjectures
+| Conjecture | Folder | Lean | Literature |
+| :--- | :--- | :---: | :--- |
+| **1.** Erdős Problem 985: every odd prime has a prime primitive root `q < p` | [`erdos-985`](conjectures/erdos-985/) | ✅ | RH-consequence |
+| **2.** Lindelöf hypothesis, for ζ and for Dirichlet L-functions | [`lindelof-rh`](conjectures/lindelof-rh/) | ✅ | RH-consequence |
+| **3.** Density hypothesis for ζ (and `N(T) ≪ T log T` with no hypothesis) | [`density-rh`](conjectures/density-rh/) | ✅ | RH-consequence |
+| **4.** Grosswald's conjecture: `g(p) < √p − 2` for every prime `p > 409` | [`grosswald-grh`](conjectures/grosswald-grh/) | ✅ | RH-consequence |
+| **5.** Euler's 65 idoneal numbers are the only ones | [`weinberger-grh`](conjectures/weinberger-grh/) | ✅ | RH-consequence |
+| **6.** Extended Riemann hypothesis for every finite abelian extension of ℚ | [`abelian-erh`](conjectures/abelian-erh/) | ✅ | RH-consequence |
+| **7.** Robin's inequality `σ(n) < e^γ n log log n` for `n > 5040` | [`robin-rh`](conjectures/robin-rh/) | ✅ | RH-equivalent |
+| **8.** Nicolas' inequality at every primorial | [`nicolas-rh`](conjectures/nicolas-rh/) | ✅ | RH-equivalent |
+| **9.** Li's criterion, positivity direction: `λ_n > 0` | [`li-criterion-rh`](conjectures/li-criterion-rh/) | ✅ | RH-equivalent |
+| **10.** Speiser's theorem: `ζ'(s) ≠ 0` for `0 < Re s < 1/2` | [`speiser-rh`](conjectures/speiser-rh/) | ✅ | RH-equivalent |
+| **11.** Mertens bound `M(x) = O(x^{1/2+ε})`, with Riesz, Hardy–Littlewood, Redheffer and Franel–Landau | [`mertens-rh`](conjectures/mertens-rh/) | ✅ | RH-equivalent |
+| **12.** Lamzouri–Li–Soundararajan: every theorem of the paper, and Bach's constant `2` | [`lls-grh`](conjectures/lls-grh/) | ✅ | RH-consequence |
+| **13.** Bach–Sorenson: least prime `p ≡ a (mod q)` is `< 2(q log q)²` | [`bach-sorenson-grh`](conjectures/bach-sorenson-grh/) | ✅ | RH-consequence |
+| **14.** Schoenfeld's bounds for `ψ`, `θ` and `π − li` with constant `1/(8π)` | [`schoenfeld-rh`](conjectures/schoenfeld-rh/) | ✅ | RH-consequence |
+| **15.** Cramér's prime-gap theorem with constant `22/25` | [`cramer-rh`](conjectures/cramer-rh/) | ✅ | RH-consequence |
+| **16.** Littlewood's bound `\|ζ(1/2+it)\| ≤ exp(C log t / log log t)` | [`littlewood-rh`](conjectures/littlewood-rh/) | ✅ | RH-consequence |
+| **17.** `ψ(x,χ)` and primes in arithmetic progressions, uniform in `q` | [`psi-grh`](conjectures/psi-grh/) | ✅ | RH-consequence |
+| **18.** Fujii's average Goldbach bound `Σ G(n) = x²/2 + O(x^{3/2})` | [`goldbach-average-rh`](conjectures/goldbach-average-rh/) | ✅ | RH-equivalent |
+| **19.** Hironaka's resolution of singularities in characteristic 0 | [`hironaka-fc`](conjectures/hironaka-fc/) | ✅ | known |
+| **20.** Erdős Problem 770, part (iii); parts (i) and (ii) open | [`erdos-770`](conjectures/erdos-770/) | 🟡 | RH-consequence |
+| **21.** Erdős Problem 233: the RH bound `O(N log⁴ N)`; `N log² N` open | [`erdos-233`](conjectures/erdos-233/) | 🟡 | RH-consequence |
+| **22.** Erdős Problem 969: Montgomery–Vaughan's `E_k(x) = O(x^{1/(k+1)+ε})` | [`erdos-969`](conjectures/erdos-969/) | 🟡 | RH-consequence |
+| **23.** Bach's explicit Ankeny bound, constant `21/5` here (`2` in lls-grh) | [`ankeny-grh`](conjectures/ankeny-grh/) | 🟡 | RH-consequence |
+| **24.** Deterministic Miller–Rabin, constant `21/5` here (`2` in lls-grh) | [`miller-grh`](conjectures/miller-grh/) | 🟡 | RH-consequence |
+| **25.** Shoup's least primitive root bound: `ω^{21/5} log² p` proved, Shoup's `ω⁴(log ω+1)⁴` not | [`shoup-grh`](conjectures/shoup-grh/) | 🟡 | RH-consequence |
+| **26.** Mills' constant: 87 decimals proved, Caldwell–Cheng's 600 not | [`mills-rh`](conjectures/mills-rh/) | 🟡 | RH-consequence |
+| **27.** Artin's primitive root conjecture (Hooley): proved given Hooley's hypothesis; needs GRH for non-abelian fields | [`artin-grh`](conjectures/artin-grh/) | 🟠 | RH-consequence |
+| **28.** Ternary Goldbach under GRH (proved without GRH by Helfgott 2013) | [`goldbach-grh`](conjectures/goldbach-grh/) | ⬜ | known |
 
-| # | Submodule | Result | Tier | In the literature |
-|---|---|---|---|---|
-| 1 | [erdos-985](erdos-985/) | every odd prime has a prime primitive root `q < p` | U | RH-consequence (McGown–Treviño–Trudgian 2016) |
-| 2 | [lindelof-rh](lindelof-rh/) | Lindelöf hypothesis for ζ and for Dirichlet L-functions | U | RH-consequence |
-| 3 | [density-rh](density-rh/) | density hypothesis for ζ; zero counting `N(T) ≪ T log T` (the latter with no hypothesis) | U (library D) | RH-consequence; the zero count is known |
-| 4 | [grosswald-grh](grosswald-grh/) | Grosswald's conjecture: every prime `p > 409` has least primitive root `g(p) < √p − 2` | U | RH-consequence |
-| 5 | [weinberger-grh](weinberger-grh/) | Euler's 65 idoneal numbers are the only ones | U | RH-consequence |
-| 6 | [abelian-erh](abelian-erh/) | ERH for every finite abelian extension of ℚ (Kronecker–Weber taken from riemann-hypothesis) | U | RH-consequence |
+**Lean status.** ✅ the target statement is proved, end to end from Lean's three standard axioms plus
+the finite computations its README names. 🟡 part of the target, or a weaker constant, is proved
+and the README says what is left. 🟠 proved with a hypothesis that can't be discharged yet.
+⬜ attempted and stopped.
 
-### Five statements equivalent to RH
+**Literature.** *RH-consequence*: a published theorem "RH (or GRH) implies X". *RH-equivalent*: X is
+equivalent to RH. *known*: proved in the literature without RH. Attributions are in
+[`docs/LITERATURE_STATUS.md`](docs/LITERATURE_STATUS.md). Each folder's README gives the exact
+Lean statements, `#print axioms` output and build instructions.
 
-| # | Submodule | Result | Tier | In the literature |
-|---|---|---|---|---|
-| 7 | [robin-rh](robin-rh/) | Robin's inequality for every `n > 5040`, and Lagarias's form | U (624 `native_decide` for the finite range) | RH-equivalent |
-| 8 | [nicolas-rh](nicolas-rh/) | Nicolas' inequality `N_k/φ(N_k) > e^γ log log N_k` for every primorial | U | RH-equivalent |
-| 9 | [li-criterion-rh](li-criterion-rh/) | Li's criterion, positivity direction: `λ_n > 0` for `n ≥ 1` | U | RH-equivalent |
-| 10 | [speiser-rh](speiser-rh/) | `ζ'(s) ≠ 0` for `0 < Re s < 1/2` (the band between heights `5/2` and `7` by a verified computation, 2 `native_decide`) | U | RH-equivalent |
-| 11 | [mertens-rh](mertens-rh/) | `M(x) = O(x^{1/2+ε})`; Titchmarsh's `\|M(x)\| ≤ √x·exp(25 log x/log log x)`, the same for Liouville's `L(x)`, and `1/\|ζ\|` on `σ ≥ 1/2 + 1/log log t`; Riesz, Hardy–Littlewood; convergence of `Σ μ(n)n^{-s}`; Liouville `L(x)`; Franel–Landau; `det R_n = M(n)` | U (Redheffer's identity D) | RH-equivalent (the identity is known) |
+## Attempted, no project
 
-### Six further consequences of RH or GRH
+| Problem | Where | Lean | Notes |
+| :--- | :--- | :---: | :--- |
+| Erdős Problem 404(ii) | [`docs/scoping/erdos-404/`](docs/scoping/erdos-404/) | ⬜ | Spike: a plausible invariant, no proof; stopped |
+| Powerful numbers: error term below `x^{1/6}` under RH | [`docs/scoping/powerful-numbers-error-term.md`](docs/scoping/powerful-numbers-error-term.md) | ⬜ | Scoped, not started |
+| Open Erdős problems #3–#1221 | [`docs/scoping/`](docs/scoping/erdos-discovery-part1.md) | ⬜ | Discovery sweep in three parts; nothing kept beyond 985, 770, 233, 969 |
 
-| # | Submodule | Result | Tier | In the literature |
-|---|---|---|---|---|
-| 12 | [lls-grh](lls-grh/) | Every theorem of Lamzouri–Li–Soundararajan with the paper's constants: the least prime in a coset of a subgroup of index `h` is `≤ 10^9` or `≤ ((h−1) log q + 3(h+1) + (5/2)(log log q)²)²` (Thm 1.4); the least prime outside a proper subgroup of `(ℤ/q)ˣ` is `≤ (log q + B(q))²` for `q ≥ 3000` (Thm 1.1); least quadratic non-residue `≤ (log q)²` for prime `q ≥ 5` (Cor 1.2); `\|L(1,χ)\| ≤ 2e^γ(log log q − log 2 + 1/2 + 1/log log q)` and the matching lower bound (Thm 1.5) and class-number bounds (Cor 1.3) for `q ≥ 10^10`; Bach's bound with Bach's own constant `2`, and deterministic Miller with `2` | U | RH-consequence |
-| 13 | [bach-sorenson-grh](bach-sorenson-grh/) | least prime `p ≡ a (mod q)` is `< 2(q log q)²` (Bach–Sorenson's own constant) | U | RH-consequence |
-| 14 | [schoenfeld-rh](schoenfeld-rh/) | Schoenfeld's bounds with his constant: `\|ψ(x) − x\| < √x log² x / (8π)` (`x ≥ 73.2`), the same for θ (`x ≥ 599`), and `\|π(x) − li(x)\| < √x log x / (8π)` (`x ≥ 2657`) | U | RH-consequence |
-| 15 | [cramer-rh](cramer-rh/) | a prime in `[x, x + (22/25)√x log x]` for every `x ≥ 4` (Cramér's gap bound with the literature's constant `22/25`, Carneiro–Milinovich–Soundararajan); Cramér's mean square `∫_X^{2X} (ψ(x) − x)² dx ≪ X²` and its asymptotic `∫_1^X ((ψ(x) − x)/x)² dx ∼ c₁ log X` | U | RH-consequence |
-| 16 | [erdos-770](erdos-770/) | Erdős 770(iii): `h(n) ≤ max(P(n), ⌈200 log² n⌉)` for every `n ≥ 2` (parts (i) and (ii) stay open) | U | RH-consequence |
-| 17 | [erdos-233](erdos-233/) | `Σ_{n<N} (p_{n+1} − p_n)² = O(N log⁴ N)` (the RH upper bound; Erdős 233 itself stays open); Selberg's theorem that almost all intervals `(x, x + h(x)]` with `h(x)/log² x → ∞` contain a prime, and `π(x+h) − π(x) ~ h/log x` for almost all `x` | U | RH-consequence |
+## Layout
 
-**Proof tiers.** **D** is a direct proof without RH or GRH. **C** leaves RH or
-GRH as an explicit hypothesis. **U** discharges RH or GRH with the upstream
-proof. **U₀** uses a lemma from the upstream repository that is independent of
-RH or GRH. **H** marks a cited result supplied as an explicit hypothesis.
-See the full tier rules and per-theorem axiom counts in [AGENTS.md](AGENTS.md).
-
-
-## Further projects
-
-These folders are not among the 17 results above. Some are dependencies of those results, and the
-others were started beside them. Each folder's README gives its tier, its axioms and its status
-in the literature.
-
-| Folder | Content |
+| Path | Content |
 |---|---|
-| [ankeny-grh](ankeny-grh/) | Bach's explicit Ankeny theorem under GRH; bach-sorenson-grh, erdos-770, lls-grh and miller-grh require it |
-| [miller-grh](miller-grh/) | Deterministic Miller–Rabin under GRH; lls-grh requires it |
-| [littlewood-rh](littlewood-rh/) | Littlewood's bound for ζ(1/2 + it) under RH; mertens-rh requires it |
-| [artin-grh](artin-grh/) | Artin's primitive root conjecture under Hooley's hypothesis; abelian-erh requires it |
-| [shoup-grh](shoup-grh/) | The least primitive root `g(p) ≪ ω(p−1)^{21/5} log² p` under GRH |
-| [psi-grh](psi-grh/) | Primes in arithmetic progressions under GRH |
-| [erdos-969](erdos-969/) | Montgomery–Vaughan's bound for squarefree and k-free numbers under RH |
-| [goldbach-average-rh](goldbach-average-rh/) | Fujii's average Goldbach bound under RH |
-| [mills-rh](mills-rh/) | Mills' constant to 87 decimals under RH |
-| [goldbach-grh](goldbach-grh/) | Ternary Goldbach under GRH (proved without GRH by Helfgott 2013; wound down) |
-| [hironaka-fc](hironaka-fc/) | Hironaka's resolution of singularities in characteristic 0 |
+| `conjectures/<name>/` | one Lean package per project (`lakefile`, `lean-toolchain`, `README.md`) |
+| `docs/` | literature status, next targets, scoping and research reports, RH-repo lemma specs |
+| `paper/` | the write-up |
+| `AGENTS.md` | per-project checklist, proof-tier rules and README rules |
 
 ## How it was built
 
@@ -141,37 +87,6 @@ The stack behind the agents:
 | Loop | [RSI Ralph](https://github.com/tinyhumansai/rsi-ralph) |
 | Memory | [LivingBrain](https://livingbrain.com) |
 | Search | [Exa](https://exa.ai) ([@ExaAILabs](https://x.com/ExaAILabs)) |
-
-## Results
-
-| # | Submodule | Result | Tier | In the literature |
-|---|---|---|---|---|
-| 1 | [erdos-985](erdos-985/) | every odd prime has a prime primitive root `q < p` | U | RH-consequence (McGown–Treviño–Trudgian 2016) |
-| 2 | [lindelof-rh](lindelof-rh/) | Lindelöf hypothesis for ζ and for Dirichlet L-functions | U | RH-consequence |
-| 3 | [density-rh](density-rh/) | density hypothesis for ζ; zero counting `N(T) ≪ T log T` (the latter with no hypothesis) | U (library D) | RH-consequence; the zero count is known |
-| 4 | [grosswald-grh](grosswald-grh/) | Grosswald's conjecture: every prime `p > 409` has least primitive root `g(p) < √p − 2` | U | RH-consequence |
-| 5 | [weinberger-grh](weinberger-grh/) | Euler's 65 idoneal numbers are the only ones | U | RH-consequence |
-| 6 | [abelian-erh](abelian-erh/) | ERH for every finite abelian extension of ℚ (Kronecker–Weber taken from riemann-hypothesis) | U | RH-consequence |
-| 7 | [robin-rh](robin-rh/) | Robin's inequality for every `n > 5040`, and Lagarias's form | U (624 `native_decide` for the finite range) | RH-equivalent |
-| 8 | [nicolas-rh](nicolas-rh/) | Nicolas' inequality `N_k/φ(N_k) > e^γ log log N_k` for every primorial | U | RH-equivalent |
-| 9 | [li-criterion-rh](li-criterion-rh/) | Li's criterion, positivity direction: `λ_n > 0` for `n ≥ 1` | U | RH-equivalent |
-| 10 | [speiser-rh](speiser-rh/) | `ζ'(s) ≠ 0` for `0 < Re s < 1/2` (the band between heights `5/2` and `7` by a verified computation, 2 `native_decide`) | U | RH-equivalent |
-| 11 | [mertens-rh](mertens-rh/) | `M(x) = O(x^{1/2+ε})`; Titchmarsh's `\|M(x)\| ≤ √x·exp(25 log x/log log x)`, the same for Liouville's `L(x)`, and `1/\|ζ\|` on `σ ≥ 1/2 + 1/log log t`; Riesz, Hardy–Littlewood; convergence of `Σ μ(n)n^{-s}`; Liouville `L(x)`; Franel–Landau; `det R_n = M(n)` | U (Redheffer's identity D) | RH-equivalent (the identity is known) |
-| 12 | [lls-grh](lls-grh/) | Every theorem of Lamzouri–Li–Soundararajan with the paper's constants: the least prime in a coset of a subgroup of index `h` is `≤ 10^9` or `≤ ((h−1) log q + 3(h+1) + (5/2)(log log q)²)²` (Thm 1.4); the least prime outside a proper subgroup of `(ℤ/q)ˣ` is `≤ (log q + B(q))²` for `q ≥ 3000` (Thm 1.1); least quadratic non-residue `≤ (log q)²` for prime `q ≥ 5` (Cor 1.2); `\|L(1,χ)\| ≤ 2e^γ(log log q − log 2 + 1/2 + 1/log log q)` and the matching lower bound (Thm 1.5) and class-number bounds (Cor 1.3) for `q ≥ 10^10`; Bach's bound with Bach's own constant `2`, and deterministic Miller with `2` | U | RH-consequence |
-| 13 | [bach-sorenson-grh](bach-sorenson-grh/) | least prime `p ≡ a (mod q)` is `< 2(q log q)²` (Bach–Sorenson's own constant) | U | RH-consequence |
-| 14 | [schoenfeld-rh](schoenfeld-rh/) | Schoenfeld's bounds with his constant: `\|ψ(x) − x\| < √x log² x / (8π)` (`x ≥ 73.2`), the same for θ (`x ≥ 599`), and `\|π(x) − li(x)\| < √x log x / (8π)` (`x ≥ 2657`) | U | RH-consequence |
-| 15 | [cramer-rh](cramer-rh/) | a prime in `[x, x + (22/25)√x log x]` for every `x ≥ 4` (Cramér's gap bound with the literature's constant `22/25`, Carneiro–Milinovich–Soundararajan); Cramér's mean square `∫_X^{2X} (ψ(x) − x)² dx ≪ X²` and its asymptotic `∫_1^X ((ψ(x) − x)/x)² dx ∼ c₁ log X` | U | RH-consequence |
-| 16 | [erdos-770](erdos-770/) | Erdős 770(iii): `h(n) ≤ max(P(n), ⌈200 log² n⌉)` for every `n ≥ 2` (parts (i) and (ii) stay open) | U | RH-consequence |
-| 17 | [erdos-233](erdos-233/) | `Σ_{n<N} (p_{n+1} − p_n)² = O(N log⁴ N)` (the RH upper bound; Erdős 233 itself stays open); Selberg's theorem that almost all intervals `(x, x + h(x)]` with `h(x)/log² x → ∞` contain a prime, and `π(x+h) − π(x) ~ h/log x` for almost all `x` | U | RH-consequence |
-
-Every row was rebuilt and checked on 2026-11-24 or 2026-11-25 against riemann-hypothesis
-`507a75d91d`, the community repository's `main` (the certified release is its commit `40e56bab`,
-since moved to Lean v4.36.0). Our check links against the community build cache; it does
-not repeat the kernel checks cited above.
-
-Tiers: **D** proved directly, with no use of RH. **U** proved unconditionally, with RH or GRH
-supplied by [riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
-**C** conditional on RH or GRH. **H** a cited result taken as a hypothesis. See `AGENTS.md`.
 
 ## How the conjectures were attempted
 

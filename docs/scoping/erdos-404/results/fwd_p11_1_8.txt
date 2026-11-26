@@ -1,0 +1,8 @@
+N=11 v=1 w=7 states=43 density=0.000002 jump=1
+N=22 v=2 w=6 states=8013 density=0.004523 jump=1
+N=33 v=3 w=5 states=161026 density=0.999845 jump=1
+N=44 v=4 w=4 states=14641 density=1.000000 jump=1
+N=55 v=5 w=3 states=1331 density=1.000000 jump=1
+N=66 v=6 w=2 states=121 density=1.000000 jump=1
+N=77 v=7 w=1 states=11 density=1.000000 jump=1
+RESULT p=11 a=1 K=8 reached N=88: f>=K

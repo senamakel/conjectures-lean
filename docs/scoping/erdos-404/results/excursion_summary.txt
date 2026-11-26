@@ -1,0 +1,22 @@
+== exc_p5_D5000.log
+skipped=1 count=634 maxwidth=3 meanwidth=3.00
+skipped=2 count=128 maxwidth=6 meanwidth=5.38
+skipped=3 count=26 maxwidth=8 meanwidth=7.88
+skipped=5 count=5 maxwidth=12 meanwidth=12.00
+skipped=6 count=1 maxwidth=14 meanwidth=14.00
+== exc_p7_D40000.log
+skipped=1 count=4199 maxwidth=2 meanwidth=2.00
+skipped=2 count=600 maxwidth=5 meanwidth=4.50
+skipped=3 count=85 maxwidth=7 meanwidth=6.18
+skipped=4 count=12 maxwidth=8 meanwidth=8.00
+skipped=5 count=2 maxwidth=10 meanwidth=10.00
+== exc_p11_D100000.log
+skipped=1 count=7513 maxwidth=2 meanwidth=2.00
+skipped=2 count=683 maxwidth=4 meanwidth=4.00
+skipped=3 count=62 maxwidth=5 meanwidth=5.00
+skipped=4 count=6 maxwidth=7 meanwidth=7.00
+== exc_p13_D200000.log
+skipped=1 count=13109 maxwidth=2 meanwidth=2.00
+skipped=2 count=1008 maxwidth=4 meanwidth=4.00
+skipped=3 count=78 maxwidth=5 meanwidth=5.00
+skipped=4 count=6 maxwidth=7 meanwidth=7.00

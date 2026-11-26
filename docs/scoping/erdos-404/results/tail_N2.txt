@@ -1,0 +1,8 @@
+RESULT p=5 D=5000 n_elts=20003 bottom_window=1 covered=5/5 full=1 maxw=14 (at level 3892) resets=2923 target=-1 reachable=1
+42.11s 1484948KB
+RESULT p=7 D=3000 n_elts=18009 bottom_window=1 covered=7/7 full=1 maxw=8 (at level 2793) resets=2488 target=-1 reachable=1
+0.70s 7180KB
+RESULT p=11 D=2000 n_elts=20007 bottom_window=1 covered=11/11 full=1 maxw=5 (at level 1459) resets=1803 target=-1 reachable=1
+0.14s 7212KB
+RESULT p=13 D=2000 n_elts=24022 bottom_window=1 covered=13/13 full=1 maxw=4 (at level 1826) resets=1837 target=-1 reachable=1
+0.01s 7060KB

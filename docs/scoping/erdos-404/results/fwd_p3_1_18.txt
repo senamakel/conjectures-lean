@@ -1,0 +1,13 @@
+N=3 v=1 w=17 states=1 density=0.000000 jump=1
+N=6 v=2 w=16 states=3 density=0.000000 jump=1
+N=9 v=4 w=14 states=4 density=0.000001 jump=2
+N=12 v=5 w=13 states=11 density=0.000007 jump=1
+N=15 v=6 w=12 states=29 density=0.000055 jump=1
+N=18 v=8 w=10 states=26 density=0.000440 jump=2
+N=21 v=9 w=9 states=70 density=0.003556 jump=1
+N=24 v=10 w=8 states=179 density=0.027282 jump=1
+N=27 v=13 w=5 states=50 density=0.205761 jump=3
+N=30 v=14 w=4 states=62 density=0.765432 jump=1
+N=33 v=15 w=3 states=27 density=1.000000 jump=1
+N=36 v=17 w=1 states=3 density=1.000000 jump=2
+RESULT p=3 a=1 K=18 reached N=39: f>=K
