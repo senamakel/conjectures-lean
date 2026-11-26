@@ -30,11 +30,11 @@ Known result: Pólya–Vinogradov inequality for sums of a non-principal Dirichl
 lemma polya_vinogradov (h : χ ≠ 1) (X : ℕ) : ‖∑ v ∈ Ioc 0 X, χ v‖ ≤ 2 * √q * (1 + .log q) := by
   let ⟨M, ⟨r, hr⟩, ψ, _, hψ, E⟩ := exists_isPrimitive_changeLevel_eq χ
   have e (v : ℕ) : χ v = ∑ e ∈ (v.gcd r).divisors, μ e • ψ v := by
-    rw [← sum_smul, ← coe_mul_zeta_apply, moebius_mul_coe_zeta, one_apply, ← Int.cast_natCast]
+    rw [← sum_smul, ← coe_mul_zeta_apply, moebius_mul_coe_zeta, ArithmeticFunction.one_apply, ← Int.cast_natCast]
     split <;> grind [Int.cast_natCast, apply_eq_zero_iff, changeLevel_eq_cast_of_dvd',
       coprime_mul_iff_right, isCoprime_iff_coprime]
   grw [funext e, sum_comm' (t' := r.divisors) (s' := fun e ↦ (Ioc 0 (X / e)).image (e * ·)) (by
-    rintro v ⟨⟩ <;> simp [Nat.dvd_gcd_iff, le_div_iff_mul_le, dvd_def (b := v), mul_comm]
+    rintro v ⟨⟩ <;> simp [Nat.dvd_gcd_iff, Nat.le_div_iff_mul_le, dvd_def (b := v), mul_comm]
     aesop), norm_sum_le, sum_le_card_nsmul _ _ (√M * (1 + .log q)) fun d he ↦ ?_, card_le_card
     (t := Ioc 0 r.sqrt ∪ (Ioc 0 r.sqrt).image (r / ·)) fun d he ↦ ?_, card_union_le,
     Finset.card_image_le, congr(√$hr)] <;> clear e <;> simp [zero_lt_iff] at *
