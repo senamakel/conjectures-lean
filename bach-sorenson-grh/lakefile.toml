@@ -1,0 +1,32 @@
+name = "BachSorenson"
+defaultTargets = ["BachSorenson"]
+
+[leanOptions]
+pp.unicode.fun = true
+autoImplicit = false
+
+[[require]]
+name = "Erdos985"
+git = "https://github.com/senamakel/erdos-985.git"
+rev = "9538edb73dc72c8fdc04b4e0df076c8930ee2fba"
+
+[[require]]
+name = "Ankeny"
+git = "https://github.com/senamakel/ankeny-grh.git"
+rev = "129ad575cc65def1860a32a691e106dfe1601bd7"
+
+[[lean_lib]]
+name = "BachSorenson"
+
+[[lean_lib]]
+name = "BachSorensonCheck"
+precompileModules = true
+
+[[require]]
+name = "LLS"
+git = "https://github.com/senamakel/lls-grh.git"
+rev = "b8c5afac3fc273bc1a9fe528d323f65b0e833273"
+
+[[lean_lib]]
+name = "BachSorensonCheck2"
+precompileModules = true
