@@ -25,6 +25,8 @@ Lean (this lane writes no Lean). Under AGENTS.md it is therefore a script-verifi
 it becomes a result only once Lean has checked it (§6.5). Every other statement in the pool is
 negative over the ranges in §5.
 
+Scripts: [`disproof-scripts/disproof-sun-family/`](disproof-scripts/disproof-sun-family/).
+
 ## 0. Prior art, checked before any computation (step 0)
 
 Checked 11:53–12:05 UTC and again at 12:28 UTC.
@@ -212,9 +214,9 @@ near misses (cheap, and not counted as new coverage).
 | A301534 | primes p ≡ 7 (12), p < 2³³ | calibration (Sun: 8·10⁹) | only p = 7 | 0.11 h |
 | **A301534** | **primes p ≡ 7 (12), 2³³ ≤ p < 10¹¹** | **new, exhaustive** | **6 counterexamples** (§6) | 1.17 h |
 | A308623 | [1, 10¹⁰) | calibration (Resta) | none | 0.06 h |
-| A308623 | [10¹⁰, RANGE623) | new, exhaustive | COUNT623 | CPU623 |
+| A308623 | [10¹⁰, 3.6·10¹¹) | new, exhaustive | none; 1 n with r = 1 | 4.4 h |
 | A308621 | [1, 10¹⁰) | calibration (Resta) | none | 0.06 h |
-| A308621 | [10¹⁰, RANGE621) | new, exhaustive | COUNT621 | CPU621 |
+| A308621 | [10¹⁰, 2.6·10¹¹) | new, exhaustive | none; 0 n with r = 1 | 3.2 h |
 | A308584 | [1, 10¹⁰) | new above Sun's 4·10⁸ | none; 24 n with r = 1 | 0.06 h |
 | A308566 | [1, 2³²) | new above Sun's 5·10⁸ | none | 0.11 h |
 | A303401 | [1, 2³²) | new above 7·10⁶ | none (r ≥ 4 for all n > 2¹⁹) | 0.05 h |
@@ -230,11 +232,11 @@ near misses (cheap, and not counted as new coverage).
 | A302984, A303338, A303637 | [1, 2³²) | calibration (refuted statements) | as published (none below 2³²) | 0.48 h |
 | Validation and benchmarks | windows around 8 known witnesses | | all reproduced | ≈ 0.4 h |
 
-Total: TOTALCPU CPU-hours, against a 30 CPU-h budget. Stop conditions, written before each
+Total: about 12 CPU-hours, against a 30 CPU-h budget. Stop conditions, written before each
 run:
 - A301534: stop at the first hit or at 10¹¹ (cap 2 CPU-h). I ran on to 10¹¹ to count the
   exceptions.
-- A308621 and A308623: exhaustive to 10¹² each, with a cap of 8 CPU-h each.
+- A308621 and A308623: exhaustive to 10¹² each, with a cap of 8 CPU-h each. Both were stopped early when the lane was wound down; only completed 5·10¹⁰ chunks are counted.
 - Calibration runs: 2³² (2³³ for A308661 and A301534).
 
 ## 6. The hit: A301534 is false
@@ -299,7 +301,7 @@ All counterexamples below 10¹¹, all prime and ≡ 7 (mod 12), each with 0 repr
 
 ### 6.4 Prior art at the moment of the hit
 
-Checked at 12:28 UTC and again at RECHECK UTC, 2026-11-26:
+Checked at 12:28 UTC and again at 12:28 (no later re-check: the lane was wound down) UTC, 2026-11-26:
 - the OEIS entry, re-fetched: still #22 of 16 April 2018, with no comment after Sun's;
 - an OEIS full-text search for 28662666283: no results;
 - joeyhlu's repository at `22d8e9e`, re-fetched: no mention of A301534 or the number;
@@ -337,7 +339,7 @@ Proof shape:
 
 ## 7. Misses, and what going further needs
 
-- **A308621 and A308623** hold on [1, RANGEBOTH) (Resta to 10¹⁰, this lane beyond). The
+- **A308621 and A308623** hold on [1, 2.6·10¹¹) and [1, 3.6·10¹¹) respectively (Resta to 10¹⁰, this lane beyond). The
   near-miss rate is flat, at about 0.04 expected exceptions per octave. Going further: the
   exhaustive scan costs about 4.5·10⁻⁸ CPU-s per n on this loaded box, so 10¹² → 10¹³ is about
   110 CPU-h per statement. A targeted progression sieve on the worst 3% of classes mod
@@ -360,7 +362,7 @@ Proof shape:
 
 ```jsonl
 {"premise": "Computation: 28662666283 is prime, = 7 mod 12, and not x^2+3y^2+15*2^z (x,y,z>=0); least such prime > 7", "premise_status": "theorem", "premise_lean_source": "", "consequence": "OEIS A301534 conjecture (every prime p > 7, p = 7 mod 12, is x^2+3y^2+15*2^z) is false", "consequence_ref": "OEIS A301534 (Z.-W. Sun, 2018-04-16; verified by Sun for p < 8e9)", "consequence_status": "open", "implication_source": "this lane: hs3.c exhaustive scan of primes = 7 mod 12 below 1e11 (6 counterexamples) + verify534.py full enumeration; prior art none found 2026-11-26 12:28 UTC", "effort": "S", "lean_exists": "", "in_1337": false, "class": 1, "notes": "route (e); script-verified only, Lean check pending (native_decide over 2,968,144 (y,z) pairs, or per-z certificate q = 2 mod 3, q || m); other counterexamples 34777306483, 43394007823, 44172408919, 46796931343, 61044565927", "sweep": "2026-11-26", "lane": "disproof-sun-family"}
-{"premise": "Exhaustive bitset scan, n in [1e10, RANGE623)", "premise_status": "theorem", "premise_lean_source": "", "consequence": "no counterexample to A308623 (T_a + T_b + 2^c*10^(2d)) below RANGE623", "consequence_ref": "OEIS A308623 (Sun 2019; Resta 1e10)", "consequence_status": "open", "implication_source": "this lane, hs2.c", "effort": "S", "lean_exists": "", "in_1337": false, "class": 2, "notes": "negative; flat near-miss rate ~0.04 expected exceptions per octave", "sweep": "2026-11-26", "lane": "disproof-sun-family"}
-{"premise": "Exhaustive bitset scan, n in [1e10, RANGE621)", "premise_status": "theorem", "premise_lean_source": "", "consequence": "no counterexample to A308621 (T_a + T_b + 2^c*5^(3d)) below RANGE621", "consequence_ref": "OEIS A308621 (Sun 2019; Resta 1e10)", "consequence_status": "open", "implication_source": "this lane, hs2.c", "effort": "S", "lean_exists": "", "in_1337": false, "class": 2, "notes": "negative; flat near-miss rate ~0.035 expected exceptions per octave", "sweep": "2026-11-26", "lane": "disproof-sun-family"}
+{"premise": "Exhaustive bitset scan, n in [1e10, 3.6·10¹¹)", "premise_status": "theorem", "premise_lean_source": "", "consequence": "no counterexample to A308623 (T_a + T_b + 2^c*10^(2d)) below 3.6·10¹¹", "consequence_ref": "OEIS A308623 (Sun 2019; Resta 1e10)", "consequence_status": "open", "implication_source": "this lane, hs2.c", "effort": "S", "lean_exists": "", "in_1337": false, "class": 2, "notes": "negative; flat near-miss rate ~0.04 expected exceptions per octave", "sweep": "2026-11-26", "lane": "disproof-sun-family"}
+{"premise": "Exhaustive bitset scan, n in [1e10, 2.6·10¹¹)", "premise_status": "theorem", "premise_lean_source": "", "consequence": "no counterexample to A308621 (T_a + T_b + 2^c*5^(3d)) below 2.6·10¹¹", "consequence_ref": "OEIS A308621 (Sun 2019; Resta 1e10)", "consequence_status": "open", "implication_source": "this lane, hs2.c", "effort": "S", "lean_exists": "", "in_1337": false, "class": 2, "notes": "negative; flat near-miss rate ~0.035 expected exceptions per octave", "sweep": "2026-11-26", "lane": "disproof-sun-family"}
 {"premise": "Exhaustive scans to 2^32 (A308584 to 1e10; A308661 Conj. 2 to n < 3.58e8)", "premise_status": "theorem", "premise_lean_source": "", "consequence": "no counterexample to A303401, A303428 (both), A303432 Conj. 1-3, A303543, A303601, A303233, A303363, A308566, A308584, A308661 Conj. 2 in those ranges", "consequence_ref": "OEIS (Sun 2018-2019)", "consequence_status": "open", "implication_source": "this lane, hs.c/hs2.c", "effort": "S", "lean_exists": "", "in_1337": false, "class": 2, "notes": "negative; near-miss model gives << 0.1 expected exceptions in (8.6e9, 1.8e13) for each", "sweep": "2026-11-26", "lane": "disproof-sun-family"}
 ```

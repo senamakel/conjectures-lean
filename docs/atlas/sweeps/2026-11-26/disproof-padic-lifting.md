@@ -212,7 +212,7 @@ At `n = 1` (all `a`), the mismatch counts are 58, 66, 100, 102, 130, 148 and 312
 
 | Target | Statement | Range covered | Result | Cost |
 |---|---|---|---|---|
-| Hong–Qiu Conj. 5.1(i), 5.2, 5.3 | above | regular `p = 5, 7`; irregular `p ≤ 157` (`n = 1`, all `a`; `n = 2`, `a = 1`); `p = 37`: `n ≤ 4` all `k`, `n = 5` for `k ≤ 300`, `n = 2` for `a ∈ {1,2,3,5,10,16,23,36}` | **refuted**, unbounded family | ≈ 0.5 CPU-h (the `n = 5` tree adds ≈ 1 h) |
+| Hong–Qiu Conj. 5.1(i), 5.2, 5.3 | above | regular `p = 5, 7`; irregular `p ≤ 157` (`n = 1`, all `a`; `n = 2`, `a = 1`); `p = 37`: `n ≤ 4` all `k`, `n = 5` for `k ≤ 300`, `n = 2` for `a ∈ {1,2,3,5,10,16,23,36}` | **refuted**, unbounded family | ≈ 1 CPU-h (the `n = 5` FLINT tree was stopped unfinished) |
 | Adelberg–Lengyel, arXiv:2111.08766, Conjecture `con:a+2` | `ν₂(S(c2^h+2, b2^h+a)) = σ₂(a) + f(b,c) + ν₂(C(a+1,2)) − 1` for `a ≡ 3 (mod 4)`, `3 ≤ a ≤ 2^{h−1}` | `S(n,k) mod 2^64` by row recurrence: `h ≤ 16` with `c ≤ 8`, and `h ≤ 12` with `c ≤ 40`; about 1.3·10⁶ cases | holds wherever the companion theorem's hypothesis `2^{h−2} ≥ ν₂(C(2c−b−1, c))` holds. 35 failures, all outside that hypothesis (e.g. `h = 4`, `c = 33`, `b = 1`, `a = 7`), so they are not counted | 20 CPU-s |
 | Amdeberhan–Manna–Moll, Bennett–Mosteig, Lengyel 2009, Hong–Zhao–Zhao | Stirling second kind | — | proved (Miska; Zhao–Hong–Zhao), not run | — |
 | Amdeberhan–Moll involution tree | above | `p = 59`, levels 1–2 | refuted at level 1 (shallow) | seconds |
