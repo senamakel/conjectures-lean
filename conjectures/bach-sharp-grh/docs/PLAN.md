@@ -7,13 +7,25 @@ Under GRH, for every modulus `m ≥ 3`, every proper subgroup of `(ℤ/m)ˣ` mis
 classes of the positive integers `≤ c log² m`. The constant cannot be lowered: for `m = 3` the
 only non-trivial unit is `2`, and `2 = c log² 3`.
 
-What is published: Bach (Math. Comp. 55 (1990)) proves `2 log² m` for the subgroup form and
-`3 log² m` for generators; the novelty audit (`docs/atlas/sweeps/2026-11-26/novelty-audit.md`,
-item c) quotes his §6 remark that computation allows `2/log² 3` in one theorem and that the
-generator form was not checked. The audit writes the constant as "2/log 3 = 1.657"; the number
-1.657 is `2/log² 3` (`2/log 3 = 1.820`). The paper could not be opened here (AMS returned 403),
-so the quotation is unverified. Lamzouri–Li–Soundararajan 2015 Thm 1.1: `(log q + B(q))²` for
-`q ≥ 3000`, asymptotically constant `1`. Bellotti, arXiv:2610.10177 (2026), quotes Bach's `2`.
+What is published. Bach, *Explicit bounds for primality testing and related problems*, Math.
+Comp. 55 (1990) 355–380 (text read through a search-engine extract of the paper, 2026-11-26;
+the AMS page itself returned 403):
+
+* Theorem 2 (ERH): if a nontrivial subgroup `G` of `ℤ/(m)*` contains every positive `n < x`,
+  then `x < 2 (log m)²`. Here `n` ranges over all positive integers, so a prime `p | m` already
+  lies outside `G`; the highly composite moduli are trivial for this form.
+* Theorem 3 (ERH): the same with `n` restricted to integers prime to `m`, with `3 (log m)²`;
+  checked by computer for `m < 10⁶`. This is the form that generators need, and the form of
+  `Ankeny.BachSubgroupBound` (a *unit* outside `H`).
+* End of §6: "These computations, and the computations used to verify Theorem 3 for small m,
+  showed that in Theorem 2, one can replace "2" by 2/log 3 = 1.657071..., which is the best
+  possible constant. Possibly this is also true of Theorem 3, but no attempt has been made to
+  verify such a claim." (The extract drops the square: `1.657071 = 2/log² 3`; `2/log 3 = 1.820`.)
+
+So the target is Bach's open question for Theorem 3. Later work: Lamzouri–Li–Soundararajan 2015
+Thm 1.1, `(log q + B(q))²` for `q ≥ 3000` (asymptotically constant 1); Bellotti,
+arXiv:2610.10177 (2026), quotes `G(n) < 2 log² n` for `n ≥ 2` as Bach's; lls-grh proves the
+constant `2` for Theorem 3's form in Lean (`LLS.bach2_of_GRH`).
 
 ## 1. The analytic inequality and its threshold `q₀(c)`
 
