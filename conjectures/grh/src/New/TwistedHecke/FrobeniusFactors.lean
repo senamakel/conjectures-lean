@@ -106,7 +106,8 @@ lemma pow_dvd_coeff_conj_frobOperator (ha : a + 1 = a'.1) i (hn : N * n * k * (�
   (ν.curry j)) (g : 2 * c + 1 < |weight (T.excessWeight (i + ℓ) a a') (exponentOf β) - weight
   (T.indexWeight ℓ a a' ·.1) (ν.curry i)|) : T.w ^ c ∣ (T.frobOperator a' ℓ n ψ β γ).coeff ν := by
   obtain ⟨rfl, _, _, ε, hε, g⟩ := hψ, T.prime.ne_zero, T.one_lt_P.le,
-    (RCLike.exists_norm_eq_mul_self _).imp fun _ ↦ And.imp_right g.trans_eq
+    (RCLike.exists_norm_eq_mul_self (weight (T.excessWeight (i + ℓ) a a') (exponentOf β) -
+      weight (T.indexWeight ℓ a a' ·.1) (ν.curry i))).imp fun _ ↦ And.imp_right g.trans_eq
   let A m b := T.indexWeight ℓ a a' b * (ε / 2 * T.P ^ m / T.q)
   let ω | (j, b, c) => ite (j = i) (A N b) (A (j - i).val b - A (j - i).val c)
   have hA {m} (e : m ≤ N) b : ‖A m b‖ ≤ 2⁻¹ / T.P ^ ℓ := by
