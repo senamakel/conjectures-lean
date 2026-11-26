@@ -5,9 +5,13 @@
 #   RH_DIR defaults to ../riemann-hypothesis; it is cloned there if missing.
 #   RH_REV pins the riemann-hypothesis commit (default: the one this was last checked against).
 #
-# The community cache contains outputs of untrusted builds: this links the proofs, it does not
-# re-verify the RH/GRH proof. Set RH_FULL_BUILD=1 to rebuild every riemann-hypothesis module
+# This links against riemann-hypothesis's community build cache and does not repeat the kernel
+# checks of its certified proof. Set RH_FULL_BUILD=1 to rebuild every riemann-hypothesis module
 # from source instead (only Mathlib comes from its official cache; many CPU hours).
+#
+# The unconditional file also imports robin-rh's full library for `Robin.robin_of_RH`, so the
+# first run builds robin-rh's verified-range sieve (about 54 core-hours) unless its build
+# output is already present.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
@@ -45,7 +49,7 @@ elif [ ! -f "$RH/.lake/build/lib/lean/Main.olean" ]; then
   (cd "$RH" && lake build --no-build Main)
 fi
 
-(cd "$HERE" && lake build)
+(cd "$HERE" && lake build Abundant Robin)
 
 cd "$HERE"
 LEAN_PATH="$(cd "$RH" && lake env printenv LEAN_PATH):$(lake env printenv LEAN_PATH)" \
