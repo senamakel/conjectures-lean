@@ -79,4 +79,44 @@ theorem witness_ok :
 
 theorem witness_length : witness.length = 446 := by decide +kernel
 
+/-! ### `π(3159) ≤ 446` by trial division in the kernel -/
+
+/-- Trial division of `n` by `k, k + 1, …`, stopping once `k * k > n`; `fuel` bounds the steps. -/
+def trialOK (n : ℕ) : ℕ → ℕ → Bool
+  | 0, k => decide (n < k * k)
+  | fuel + 1, k => decide (n < k * k) || (n % k != 0 && trialOK n fuel (k + 1))
+
+/-- A Boolean primality test, complete for primes (`isPrimeB_of_prime`). -/
+def isPrimeB (n : ℕ) : Bool := decide (2 ≤ n) && trialOK n n 2
+
+lemma trialOK_of_prime {n : ℕ} (hn : n.Prime) :
+    ∀ fuel k, 2 ≤ k → n + 1 ≤ fuel + k → trialOK n fuel k = true := by
+  intro fuel
+  induction fuel with
+  | zero =>
+    intro k hk hfk
+    simp only [trialOK, decide_eq_true_eq]
+    nlinarith
+  | succ fuel ih =>
+    intro k hk hfk
+    simp only [trialOK, Bool.or_eq_true, decide_eq_true_eq, Bool.and_eq_true, bne_iff_ne, ne_eq]
+    by_cases hlt : n < k * k
+    · exact Or.inl hlt
+    · right
+      refine ⟨fun h0 => ?_, ih (k + 1) (by omega) (by omega)⟩
+      have hkn : k < n := by nlinarith
+      rcases hn.eq_one_or_self_of_dvd k (Nat.dvd_of_mod_eq_zero h0) with h | h <;> omega
+
+lemma isPrimeB_of_prime {n : ℕ} (hn : n.Prime) : isPrimeB n = true := by
+  simp only [isPrimeB, Bool.and_eq_true, decide_eq_true_eq]
+  exact ⟨hn.two_le, trialOK_of_prime hn n 2 le_rfl (by omega)⟩
+
+theorem count_isPrimeB : Nat.count (fun n => isPrimeB n = true) 3160 = 446 := by
+  decide +kernel
+
+/-- `π(3159) ≤ 446` (in fact `= 446`). -/
+theorem primeCounting_3159_le : Nat.primeCounting 3159 ≤ 446 := by
+  rw [← count_isPrimeB]
+  exact Nat.count_monotone_left' fun n hn => isPrimeB_of_prime hn
+
 end HardyLittlewood.Richards
