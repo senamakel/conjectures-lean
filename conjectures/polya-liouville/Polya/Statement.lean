@@ -12,7 +12,7 @@ written here, in the summation style of formal-conjectures'
 
 * **Pólya (1919).** `L(n) = ∑_{k=1}^{n} λ(k) ≤ 0` for every `n ≥ 2`, where `λ` is Liouville's
   function (`λ(k) = (-1)^Ω(k)`, so `λ(1) = 1`).
-* **von Sterneck (1897).** `|M(x)| < ½ √x` for every integer `x > 200`, where
+* **von Sterneck.** `|M(x)| < ½ √x` for every integer `x > 200`, where
   `M(x) = ∑_{k=1}^{x} μ(k)` is the Mertens function. `vonSterneckConjecture` is the real-valued
   form; `vonSterneckConjectureInt` is the same inequality squared, `4 M(x)² < x`.
 
@@ -35,7 +35,7 @@ def mertens (x : ℕ) : ℤ :=
 def PolyaConjecture : Prop :=
   ∀ n : ℕ, 2 ≤ n → liouvilleSum n ≤ 0
 
-/-- Von Sterneck's conjecture (1897): `|M(x)| < ½ √x` for every integer `x > 200`. -/
+/-- Von Sterneck's conjecture: `|M(x)| < ½ √x` for every integer `x > 200`. -/
 def VonSterneckConjecture : Prop :=
   ∀ x : ℕ, 200 < x → |(mertens x : ℝ)| < Real.sqrt x / 2
 
