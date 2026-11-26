@@ -181,7 +181,7 @@ theorem erdos_945_constant_of_cramer (h : CramerConjecture.CramerConjecture) :
 theorem erdos_945_of_cramer (h : CramerConjecture.CramerConjecture) : Erdos945.Erdos945Prop := by
   obtain ⟨A, hA, hgap⟩ := exists_gap_le_of_cramer h
   refine ⟨fun _ ↦ 3, ?_, ?_⟩
-  · simpa [Pi.one_def] using Asymptotics.isBigO_const_const (3 : ℝ) one_ne_zero atTop
+  · simpa [Pi.one_def] using Asymptotics.isBigO_const_const (3 : ℝ) (one_ne_zero (α := ℝ)) (atTop : Filter ℝ)
   filter_upwards [eventually_ge_atTop 2,
     Real.tendsto_log_atTop.eventually_ge_atTop (2 * A + 2)] with x hx2 hlx
   have hlx1 : 1 ≤ Real.log x := by linarith
