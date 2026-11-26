@@ -10,6 +10,7 @@ The edges come from the [implication atlas](../../docs/atlas/).
 
 | Module | Premise | Consequence | Source | Axioms |
 | :--- | :--- | :--- | :--- | :--- |
+| `Wieferich/Rotkiewicz` | `{n : ℕ \| Squarefree (mersenne n)}.Infinite` | `{p : ℕ \| p.Prime ∧ ¬ IsWieferichPrime p}.Infinite`; also `sq_dvd_mersenne_iff_isWieferichPrime` (no premise) | Rotkiewicz 1965 | standard three |
 
 ## Building
 
