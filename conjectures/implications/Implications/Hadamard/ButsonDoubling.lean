@@ -95,8 +95,8 @@ lemma doubling_of_parts {n : ℕ} (A B : Matrix (Fin n) (Fin n) ℝ)
   have hPP : (A + B) * (A + B).transpose + (A - B) * (A - B).transpose =
       ((2 * n : ℕ) : ℝ) • 1 := by
     simp only [transpose_add, transpose_sub, add_mul, mul_add, sub_mul, mul_sub]
-    have : A * A.transpose + A * B.transpose + (B * A.transpose + B * B.transpose) +
-        (A * A.transpose - A * B.transpose - (B * A.transpose - B * B.transpose)) =
+    have : A * A.transpose + B * A.transpose + (A * B.transpose + B * B.transpose) +
+        (A * A.transpose - B * A.transpose - (A * B.transpose - B * B.transpose)) =
         (2 : ℝ) • (A * A.transpose + B * B.transpose) := by
       rw [two_smul]; abel
     rw [this, hre, smul_smul]
@@ -108,7 +108,7 @@ lemma doubling_of_parts {n : ℕ} (A B : Matrix (Fin n) (Fin n) ℝ)
   · intro i j
     rcases i with i | i <;> rcases j with j | j <;>
       simp only [fromBlocks_apply₁₁, fromBlocks_apply₁₂, fromBlocks_apply₂₁,
-        fromBlocks_apply₂₂, neg_apply, add_apply, sub_apply] <;>
+        fromBlocks_apply₂₂, Matrix.neg_apply, Matrix.add_apply, Matrix.sub_apply] <;>
       rcases hentry i j with ⟨ha, hb⟩ | ⟨ha, hb⟩ | ⟨ha, hb⟩ | ⟨ha, hb⟩ <;>
       rw [ha, hb] <;> norm_num
   · rw [fromBlocks_transpose, fromBlocks_multiply, transpose_neg]
@@ -127,11 +127,11 @@ lemma turyn_doubling {n : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (hM : IsButsonHa
   · -- real part of `M M* = n I`
     ext i j
     have := congrArg Complex.re (congrFun (congrFun hmul i) j)
-    rw [add_apply, mul_apply, mul_apply, smul_apply, one_apply]
-    rw [mul_apply, smul_apply, one_apply, Complex.re_sum] at this
-    simp only [conjTranspose_apply, Complex.mul_re, Complex.star_def, Complex.conj_re,
+    rw [Matrix.add_apply, Matrix.mul_apply, Matrix.mul_apply, Matrix.smul_apply, Matrix.one_apply]
+    rw [Matrix.mul_apply, Matrix.smul_apply, Matrix.one_apply, Complex.re_sum] at this
+    simp only [Matrix.conjTranspose_apply, Complex.mul_re, Complex.star_def, Complex.conj_re,
       Complex.conj_im, smul_eq_mul] at this
-    simp only [transpose_apply, map_apply, smul_eq_mul, ← Finset.sum_add_distrib]
+    simp only [Matrix.transpose_apply, Matrix.map_apply, smul_eq_mul, ← Finset.sum_add_distrib]
     rw [show (∑ x, ((M i x).re * (M j x).re + (M i x).im * (M j x).im)) =
       ∑ x, ((M i x).re * (M j x).re - (M i x).im * -(M j x).im) from
         Finset.sum_congr rfl (fun _ _ => by ring), this]
@@ -139,11 +139,11 @@ lemma turyn_doubling {n : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (hM : IsButsonHa
   · -- imaginary part of `M M* = n I`
     ext i j
     have := congrArg Complex.im (congrFun (congrFun hmul i) j)
-    rw [mul_apply, mul_apply]
-    rw [mul_apply, smul_apply, one_apply, Complex.im_sum] at this
-    simp only [conjTranspose_apply, Complex.mul_im, Complex.star_def, Complex.conj_re,
+    rw [Matrix.mul_apply, Matrix.mul_apply]
+    rw [Matrix.mul_apply, Matrix.smul_apply, Matrix.one_apply, Complex.im_sum] at this
+    simp only [Matrix.conjTranspose_apply, Complex.mul_im, Complex.star_def, Complex.conj_re,
       Complex.conj_im, smul_eq_mul] at this
-    simp only [transpose_apply, map_apply]
+    simp only [Matrix.transpose_apply, Matrix.map_apply]
     have h0 : ((n : ℂ) * (if i = j then 1 else 0)).im = 0 := by split_ifs <;> simp
     rw [h0] at this
     rw [← sub_eq_zero, ← Finset.sum_sub_distrib, ← this]
