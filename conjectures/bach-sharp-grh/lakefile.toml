@@ -19,3 +19,7 @@ path = "../bach-corollaries-grh"
 
 [[lean_lib]]
 name = "BachSharp"
+
+[[lean_lib]]
+name = "BachSharpCheck"
+precompileModules = true
