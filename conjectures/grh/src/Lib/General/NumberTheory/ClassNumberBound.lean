@@ -12,7 +12,8 @@ lemma classNumber_le F [Field F] [NumberField F] :
   have {B} (n : Ioc 0 B) := (span {(n : 𝓞 F)}).absNorm_ne_zero_iff.1 (by aesop)
   grw [classNumber, ← card_eq_fintype_card, (card_le_card_of_surjective (fun x ↦ .mk0
     ⟨span {↑x.1, x.2.out}, by simp; grind⟩) fun C ↦ ?_).trans_eq (@card_sigma _ _ _ this),
-    Finset.sum_le_sum fun n _ ↦ (absNorm_span_natCast n.1).trans_le (by grw [n.2.2])]
+    Finset.sum_le_sum fun n _ ↦ ((absNorm_eq_natCard _).symm.trans
+    (absNorm_span_natCast n.1)).trans_le (by grw [n.2.2])]
   simpa [RingOfIntegers.rank] using pow_succ'.ge
   obtain ⟨I, rfl, hI⟩ := exists_ideal_in_class_of_norm_le C
   have := absNorm_pos_of_nonZeroDivisors I
