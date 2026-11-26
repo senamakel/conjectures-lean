@@ -21,71 +21,86 @@ namespace SunA243164.Compute
 
 open Erdos985.Compute
 
-/-- Exact primality test. -/
-def isPrimeB (m : ℕ) : Bool :=
-  decide (2 ≤ m) && (m == 2 || (m % 2 == 1 && powMod 2 (m - 1) m == 1 && m.minFac == m))
-
-theorem isPrimeB_iff (m : ℕ) : isPrimeB m = true ↔ m.Prime := by
-  constructor
-  · intro h
-    simp only [isPrimeB, Bool.and_eq_true, decide_eq_true_eq, Bool.or_eq_true, beq_iff_eq] at h
-    obtain ⟨h2, h | ⟨⟨-, -⟩, h⟩⟩ := h
-    · subst h; exact Nat.prime_two
-    · exact Nat.prime_def_minFac.mpr ⟨h2, h⟩
-  · intro hp
-    simp only [isPrimeB, Bool.and_eq_true, decide_eq_true_eq, Bool.or_eq_true, beq_iff_eq]
-    refine ⟨hp.two_le, ?_⟩
-    by_cases h2 : m = 2
-    · exact Or.inl h2
-    right
-    have hodd : m % 2 = 1 := Nat.odd_iff.mp (hp.odd_of_ne_two h2)
-    have hm3 : 3 ≤ m := by have := hp.two_le; omega
-    refine ⟨⟨hodd, ?_⟩, (Nat.prime_def_minFac.mp hp).2⟩
-    have : Fact m.Prime := ⟨hp⟩
-    rw [← zmod_pow_eq_one_iff (by omega)]
-    apply ZMod.pow_card_sub_one_eq_one
-    intro h0
-    have h0' : ((2 : ℕ) : ZMod m) = 0 := by exact_mod_cast h0
-    rw [ZMod.natCast_eq_zero_iff] at h0'
-    have := Nat.le_of_dvd (by norm_num) h0'
-    omega
-
-/-- A small prime `q < n` with `q n` a primitive root modulo the prime `P`. -/
-def goodB (P n : ℕ) : Bool :=
-  let fs := (P - 1).primeFactorsList.dedup
+/-- A small prime `q < n` such that `g = q n` passes Lucas' test modulo `m`:
+`g^(m-1) ≡ 1` and `g^((m-1)/r) ≢ 1` for every prime `r ∣ m - 1`. This proves at once that `m`
+is prime (`lucas_primality`) and that `q n` is a primitive root modulo `m`. -/
+def lucasB (m n : ℕ) : Bool :=
+  let fs := (m - 1).primeFactorsList.dedup
   smallPrimes.any fun q =>
-    decide (q < n) && (q * n) % P != 0 && fs.all fun r => powMod (q * n) ((P - 1) / r) P != 1
+    decide (q < n) && powMod (q * n) (m - 1) m == 1 &&
+      fs.all fun r => powMod (q * n) ((m - 1) / r) m != 1
 
-theorem goodB_sound {P n : ℕ} (h : goodB P n = true) (hP : P.Prime) :
-    ∃ q, q.Prime ∧ q < n ∧ orderOf ((q * n : ℕ) : ZMod P) = P - 1 := by
-  have : Fact P.Prime := ⟨hP⟩
-  have hP2 : 2 ≤ P := hP.two_le
-  simp only [goodB, List.any_eq_true, Bool.and_eq_true, decide_eq_true_eq, List.all_eq_true,
-    bne_iff_ne, ne_eq] at h
-  obtain ⟨q, hq, ⟨hqn, h0⟩, hfs⟩ := h
-  refine ⟨q, prime_of_mem_smallPrimes hq, hqn, ?_⟩
-  apply orderOf_eq_of_pow_and_pow_div_prime
-  · apply ZMod.pow_card_sub_one_eq_one
-    intro hz
-    rw [ZMod.natCast_eq_zero_iff] at hz
-    exact h0 (Nat.mod_eq_zero_of_dvd hz)
-  · intro r hr hrd
-    rw [ne_eq, zmod_pow_eq_one_iff hP2]
+theorem lucasB_sound {m n : ℕ} (h : lucasB m n = true) (hm : 2 ≤ m) :
+    m.Prime ∧ ∃ q, q.Prime ∧ q < n ∧ orderOf ((q * n : ℕ) : ZMod m) = m - 1 := by
+  simp only [lucasB, List.any_eq_true, Bool.and_eq_true, decide_eq_true_eq, List.all_eq_true,
+    bne_iff_ne, ne_eq, beq_iff_eq] at h
+  obtain ⟨q, hq, ⟨hqn, hferm⟩, hfs⟩ := h
+  have hferm' : ((q * n : ℕ) : ZMod m) ^ (m - 1) = 1 := (zmod_pow_eq_one_iff hm _ _).mpr hferm
+  have hdiv : ∀ r : ℕ, r.Prime → r ∣ m - 1 → ((q * n : ℕ) : ZMod m) ^ ((m - 1) / r) ≠ 1 := by
+    intro r hr hrd
+    rw [ne_eq, zmod_pow_eq_one_iff hm]
     apply hfs r
     rw [List.mem_dedup, Nat.mem_primeFactorsList (by omega)]
     exact ⟨hr, hrd⟩
+  have hprime : m.Prime := lucas_primality m _ hferm' hdiv
+  exact ⟨hprime, q, prime_of_mem_smallPrimes hq, hqn,
+    orderOf_eq_of_pow_and_pow_div_prime hferm' hdiv⟩
+
+/-- One step of the walk: `some (c', ok)` gives the new count and whether the step is fine. -/
+def step (m c : ℕ) : Option ℕ :=
+  if m < 2 then some c
+  else if m % 2 = 0 then (if m = 2 then some (c + 1) else some c)
+  else if powMod 2 (m - 1) m != 1 then some c
+  else if decide (6 < c + 1) && lucasB m (c + 1) then some (c + 1)
+  else if m.minFac = m then (if c + 1 ≤ 6 then some (c + 1) else none)
+  else some c
 
 /-- Walk through `[lo, lo + k)` carrying the prime count `c`; `none` on a failure. -/
 def countFrom : ℕ → ℕ → ℕ → Option ℕ
   | _, 0, c => some c
   | lo, k + 1, c =>
-    if isPrimeB lo then
-      if decide (c + 1 ≤ 6) || goodB lo (c + 1) then countFrom (lo + 1) k (c + 1) else none
-    else countFrom (lo + 1) k c
+    match step lo c with
+    | some c' => countFrom (lo + 1) k c'
+    | none => none
 
 lemma primeCounting_of_prime {P : ℕ} (hP : P.Prime) :
     Nat.primeCounting P = Nat.count Nat.Prime P + 1 := by
   rw [Nat.primeCounting, Nat.primeCounting', Nat.count_succ]; simp [hP]
+
+lemma fermat_two {m : ℕ} (hp : m.Prime) (h2 : m ≠ 2) : powMod 2 (m - 1) m = 1 := by
+  have hm3 : 3 ≤ m := by have := hp.two_le; omega
+  have : Fact m.Prime := ⟨hp⟩
+  rw [← zmod_pow_eq_one_iff (by omega)]
+  apply ZMod.pow_card_sub_one_eq_one
+  intro h0
+  have h0' : ((2 : ℕ) : ZMod m) = 0 := by exact_mod_cast h0
+  rw [ZMod.natCast_eq_zero_iff] at h0'
+  have := Nat.le_of_dvd (by norm_num) h0'
+  omega
+
+theorem step_sound {m c c' : ℕ} (h : step m c = some c') (hc : c = Nat.count Nat.Prime m) :
+    (c' = if m.Prime then c + 1 else c) ∧
+      (m.Prime → 6 < c + 1 →
+        ∃ q, q.Prime ∧ q < c + 1 ∧ orderOf ((q * (c + 1) : ℕ) : ZMod m) = m - 1) := by
+  unfold step at h
+  split_ifs at h with h1 h2 h3 h4 h5 h6 h7 <;> simp only [Option.some.injEq] at h
+  · have : ¬ m.Prime := fun hp => by have := hp.two_le; omega
+    simp [this, ← h]
+  · subst h3
+    have hc0 : c = 0 := by rw [hc]; decide
+    refine ⟨by simp [Nat.prime_two, ← h], fun _ h6 => by omega⟩
+  · have : ¬ m.Prime := fun hp => by
+      rcases hp.eq_two_or_odd with h' | h' <;> omega
+    simp [this, ← h]
+  · have : ¬ m.Prime := fun hp => by simp [fermat_two hp (by omega)] at h4
+    simp [this, ← h]
+  · simp only [Bool.and_eq_true, decide_eq_true_eq] at h5
+    obtain ⟨hp, hq⟩ := lucasB_sound h5.2 (by omega)
+    exact ⟨by simp [hp, ← h], fun _ _ => hq⟩
+  · have hp : m.Prime := Nat.prime_def_minFac.mpr ⟨by omega, h6⟩
+    exact ⟨by simp [hp, ← h], fun _ h' => by omega⟩
+  · have hp : ¬ m.Prime := fun hp => h6 (Nat.prime_def_minFac.mp hp).2
+    simp [hp, ← h]
 
 theorem countFrom_sound : ∀ (k lo c c' : ℕ), countFrom lo k c = some c' →
     c = Nat.count Nat.Prime lo →
@@ -96,31 +111,18 @@ theorem countFrom_sound : ∀ (k lo c c' : ℕ), countFrom lo k c = some c' →
     exact ⟨by rw [← h, hc]; rfl, fun P h1 h2 => by omega⟩
   | k + 1, lo, c, c', h, hc => by
     simp only [countFrom] at h
-    by_cases hp : isPrimeB lo = true
-    · simp only [hp, ↓reduceIte] at h
-      have hlo : lo.Prime := (isPrimeB_iff lo).mp hp
-      split_ifs at h with hg
-      have hc1 : c + 1 = Nat.count Nat.Prime (lo + 1) := by
-        rw [Nat.count_succ, ← hc]; simp [hlo]
-      obtain ⟨ih1, ih2⟩ := countFrom_sound k (lo + 1) (c + 1) c' h hc1
-      refine ⟨by rw [ih1]; ring_nf, fun P h1 h2 hP h6 => ?_⟩
-      rcases Nat.eq_or_lt_of_le h1 with rfl | h1
-      · have hπ : Nat.primeCounting lo = c + 1 := by rw [primeCounting_of_prime hP, hc]
-        simp only [Bool.or_eq_true, decide_eq_true_eq] at hg
-        rcases hg with hg | hg
-        · omega
-        · obtain ⟨q, hq, hqn, hord⟩ := goodB_sound hg hP
-          exact ⟨q, hq, hπ ▸ hqn, hπ ▸ hord⟩
-      · exact ih2 P h1 (by omega) hP h6
-    · have hp' : isPrimeB lo = false := by simpa using hp
-      simp only [hp', Bool.false_eq_true, ↓reduceIte] at h
-      have hlo : ¬ lo.Prime := fun h' => hp ((isPrimeB_iff lo).mpr h')
-      have hc1 : c = Nat.count Nat.Prime (lo + 1) := by
-        rw [Nat.count_succ, ← hc]; simp [hlo]
-      obtain ⟨ih1, ih2⟩ := countFrom_sound k (lo + 1) c c' h hc1
-      refine ⟨by rw [ih1]; ring_nf, fun P h1 h2 hP h6 => ?_⟩
-      rcases Nat.eq_or_lt_of_le h1 with rfl | h1
-      · exact absurd hP hlo
-      · exact ih2 P h1 (by omega) hP h6
+    rcases hs : step lo c with _ | c₁
+    · rw [hs] at h; exact absurd h (by simp)
+    rw [hs] at h
+    obtain ⟨hc₁, hgood⟩ := step_sound hs hc
+    have hc1 : c₁ = Nat.count Nat.Prime (lo + 1) := by
+      rw [Nat.count_succ, ← hc, hc₁]; split_ifs <;> simp
+    obtain ⟨ih1, ih2⟩ := countFrom_sound k (lo + 1) c₁ c' h hc1
+    refine ⟨by rw [ih1]; ring_nf, fun P h1 h2 hP h6 => ?_⟩
+    rcases Nat.eq_or_lt_of_le h1 with rfl | h1
+    · have hπ : Nat.primeCounting lo = c + 1 := by rw [primeCounting_of_prime hP, hc]
+      obtain ⟨q, hq, hqn, hord⟩ := hgood hP (by omega)
+      exact ⟨q, hq, hπ ▸ hqn, hπ ▸ hord⟩
+    · exact ih2 P h1 (by omega) hP h6
 
 end SunA243164.Compute

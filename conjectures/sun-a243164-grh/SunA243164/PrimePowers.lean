@@ -1,4 +1,4 @@
-import SunA243164.TwistedSieve
+import Mathlib
 
 /-!
 # The prime-power term
@@ -11,6 +11,11 @@ import SunA243164.TwistedSieve
 namespace SunA243164.Sieve
 
 open ArithmeticFunction Finset Chebyshev Real
+
+/-- The weighted contribution of the proper prime powers below `x`. -/
+noncomputable def Epp (x : ℕ) : ℝ :=
+  ∑ n ∈ range x, (Λ n : ℝ) * (1 - (n : ℝ) / x) * (if n.Prime then 0 else 1)
+
 
 lemma Epp_le_psi_sub_theta (x : ℕ) : Epp x ≤ ψ x - θ x := by
   have hψθ : ψ x - θ x = ∑ n ∈ Ioc 0 x, (Λ n : ℝ) * (if n.Prime then 0 else 1) := by
@@ -33,14 +38,12 @@ lemma Epp_le_psi_sub_theta (x : ℕ) : Epp x ≤ ψ x - θ x := by
   -- `range x ⊆ {0} ∪ Ioc 0 x` and the `n = 0` term vanishes
   have hsplit : ∑ n ∈ range x, (Λ n : ℝ) * (if n.Prime then 0 else 1)
       ≤ ∑ n ∈ Ioc 0 x, (Λ n : ℝ) * (if n.Prime then 0 else 1) := by
-    rcases Nat.eq_zero_or_pos x with rfl | hx
-    · simp
-    rw [Finset.range_eq_Ico, ← Finset.sum_Ioc_add_eq_sum_Ico_succ_bot] <;> try omega
-    · simp only [vonMangoldt_apply_zero, Nat.cast_zero, zero_mul, zero_add]
-      refine Finset.sum_le_sum_of_subset_of_nonneg (fun n hn => ?_) fun n _ _ => ?_
-      · simp only [Finset.mem_Ioc, Finset.mem_Ico] at hn ⊢; omega
-      · have : (0 : ℝ) ≤ (if n.Prime then 0 else 1) := by split_ifs <;> norm_num
-        exact mul_nonneg vonMangoldt_nonneg this
+    rw [← Finset.sum_erase (f := fun n => (Λ n : ℝ) * (if n.Prime then 0 else 1)) (range x)
+      (a := 0) (by simp)]
+    refine Finset.sum_le_sum_of_subset_of_nonneg (fun n hn => ?_) fun n _ _ => ?_
+    · simp only [Finset.mem_erase, Finset.mem_range, Finset.mem_Ioc] at hn ⊢; omega
+    · have : (0 : ℝ) ≤ (if n.Prime then 0 else 1) := by split_ifs <;> norm_num
+      exact mul_nonneg vonMangoldt_nonneg this
   exact hsplit
 
 /-- `Epp x ≤ log 4 · (√x + ⌊log x / log 2⌋ · x^{1/3})` for `x ≥ 2`. -/
@@ -54,7 +57,7 @@ theorem Epp_le (x : ℕ) (hx : 2 ≤ x) :
   rw [hψ, add_sub_cancel_left] at h1
   refine h1.trans ?_
   have hlog4 : 0 ≤ Real.log 4 := Real.log_nonneg (by norm_num)
-  have hK2 : 2 ≤ K ∨ K < 2 := le_or_lt 2 K
+  have hK2 : 2 ≤ K ∨ K < 2 := le_or_gt 2 K
   -- each term is at most `log 4 · x^{1/n}`
   have hterm : ∀ n ∈ Icc 2 K, θ ((x : ℝ) ^ ((1 : ℝ) / n)) ≤ Real.log 4 * (x : ℝ) ^ ((1 : ℝ) / n) :=
     fun n _ => theta_le_log4_mul_x (by positivity)

@@ -1,4 +1,5 @@
 import Erdos985.Indicator.Lemmas
+import SunA243164.PrimePowers
 
 /-!
 # The MTT sieve inequality, twisted by a unit, with a prime-power term
@@ -61,10 +62,6 @@ noncomputable def coef (T t : Finset ℕ) : ℝ := (∏ ℓ ∈ t, bR ℓ) * ∏
 
 /-- `θ_T = ∏_{ℓ ∈ T} (1 - 1/ℓ)`. -/
 noncomputable def θ (T : Finset ℕ) : ℝ := ∏ ℓ ∈ T, aR ℓ
-
-/-- The weighted contribution of the proper prime powers below `x`. -/
-noncomputable def Epp (x : ℕ) : ℝ :=
-  ∑ n ∈ range x, (Λ n : ℝ) * (1 - (n : ℝ) / x) * (if n.Prime then 0 else 1)
 
 lemma prod_fac_expand (ψ : DirichletCharacter ℂ p) (a : ZMod p) (T : Finset ℕ) (n : ℕ) :
     ∏ ℓ ∈ T, fac p ψ a ℓ n = ∑ t ∈ T.powerset, (coef T t : ℂ) * ∏ ℓ ∈ t, Aψ p ψ a ℓ n := by
