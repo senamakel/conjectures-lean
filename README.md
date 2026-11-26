@@ -16,7 +16,7 @@ conjectures. Those links are collected in the [implication atlas](docs/atlas/).
 
 ## Results
 
-37 projects: 22 proved in full, 12 proved in part, 1 conditional at its ceiling, 1 wound down, and 1 collection of implications between open conjectures (listed in the next section).
+38 projects: 23 proved in full, 12 proved in part, 1 conditional at its ceiling, 1 wound down, and 1 collection of implications between open conjectures (listed in the next section).
 
 | Conjecture | Folder | Lean | Literature |
 | :--- | :--- | :---: | :--- |
@@ -57,6 +57,7 @@ conjectures. Those links are collected in the [implication atlas](docs/atlas/).
 | **35.** Hajós's conjecture is false: a Lean proof of Catlin's (1979) disproof, at `k = 8` | [`hajos-catlin`](conjectures/hajos-catlin/) | ✅ | known |
 | **36.** Pólya's conjecture `L(n) ≤ 0` is false (`L(906150257) = 1`), and so is von Sterneck's `\|M(x)\| < ½√x` (`M(7725038629) = 43947`) | [`polya-liouville`](conjectures/polya-liouville/) | ✅ | known |
 | **37.** The Cookson Hills series `Σ sec²(n)/n³` converges (and the Flint Hills series `Σ csc²(n)/n³`, rebuilt here). From `μ(π) = 2`, proved in Lean by [openai/math](https://github.com/openai/math) and vendored | [`cookson-hills`](conjectures/cookson-hills/) | ✅ | consequence of `μ(π) = 2` (OpenAI 2026) |
+| **38.** Conjecture 5.6 of Gawron–Miska–Ulas (2018) on `m`-coloured binary partitions is false: `b₁(16) − b₁(4) = 32` is not divisible by `2^6`; it also fails at `m = 3, 4, 5, 6`. A minor correction; `m = 1` follows from Churchhouse's congruence (Rødseth 1970) | [`gmu-binary-partitions`](conjectures/gmu-binary-partitions/) | ✅ | new |
 
 **Lean status.** ✅ the target statement is proved, end to end from Lean's three standard axioms plus
 the finite computations its README names. 🟡 part of the target, or a weaker constant, is proved
@@ -65,7 +66,7 @@ and the README says what is left. 🟠 proved with a hypothesis that can't be di
 hypothesis that is itself open.
 
 **Literature.** *RH-consequence*: a published theorem "RH (or GRH) implies X". *RH-equivalent*: X is
-equivalent to RH. *known*: proved in the literature without RH. Attributions are in
+equivalent to RH. *known*: proved in the literature without RH. *new*: not found in the literature (searches listed in the project README). Attributions are in
 [`docs/LITERATURE_STATUS.md`](docs/LITERATURE_STATUS.md). Each folder's README gives the exact
 Lean statements, `#print axioms` output and build instructions.
 
@@ -122,6 +123,12 @@ Outright disproofs, in [`conjectures/polya-liouville`](conjectures/polya-liouvil
 | :--- | :--- | :--- |
 | Pólya's conjecture `L(n) ≤ 0` for `n ≥ 2` | `polya_conjecture_false` | `L(906150257) = 1`; Haselgrove 1958, Tanaka 1980 |
 | von Sterneck's conjecture `\|M(x)\| < ½√x` for `x > 200` | `vonSterneck_conjecture_false` | `M(7725038629) = 43947`; Neubauer 1963, Cohen–Dress 1979 |
+
+A new counterexample, in [`conjectures/gmu-binary-partitions`](conjectures/gmu-binary-partitions/) (tier D, no hypotheses, Lean's three standard axioms; the extra `m = 6` witness uses two `native_decide` with a proved-sound checker).
+
+| Disproved | Lean theorem | Notes |
+| :--- | :--- | :--- |
+| Gawron–Miska–Ulas Conjecture 5.6 (arXiv:1703.01955), `b_{2^m−1}(2^{k+1}n) ≡ b_{2^m−1}(2^{k−1}n) (mod 2^{4⌊(k+1)/2⌋−2})` for `k ≥ m + 2` | `gmu_conjecture_5_6_false` | `m = 1, k = 3, n = 1`: `36 − 4 = 32`. The `m = 1` failures follow from Churchhouse's congruence (Rødseth 1970, Gupta 1971–72); the failures at `m = 3, 4, 5, 6` are not covered by any result we found. Holds for `m = 2` in our computations |
 
 All of the incompatibility links above are between open conjectures. The reports behind this lane, with
 the candidates for outright disproofs, are in [`docs/atlas/sweeps/2026-11-26/`](docs/atlas/sweeps/2026-11-26/)
