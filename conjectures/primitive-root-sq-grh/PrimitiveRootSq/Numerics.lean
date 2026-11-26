@@ -222,15 +222,14 @@ theorem numerics (p : ℕ) (hp0 : 10 ^ 8 ≤ p) (θ : ℝ)
     have hθ0 : 0 ≤ θ := by
       have : (0 : ℝ) < 36495360 / 223092870 * (28 / 29) ^ k :=
         mul_pos (by norm_num) (pow_pos (by norm_num) _)
-      linarith
+      exact (this.trans_le hθ).le
+    have ht256 : (0 : ℝ) ≤ t / 256 := by positivity
     have hU0' : (0 : ℝ) ≤ (2 / 3) * (2 * (4 * (5.5451774464 + t / 256 - 1)) + 5 / 3) := by
-      have : (0 : ℝ) ≤ t / 256 := by positivity
-      linarith
+      linarith only [ht256]
     have hB2u0' : (0 : ℝ) ≤ (√(p : ℝ) + 2.0001) * ((2 / 3) * (2 * (4 * (5.5451774464 + t / 256 - 1))
         + 5 / 3)) + (4 * (5.5451774464 + t / 256 - 1) + 1) + 0.6 := by
-      have := mul_nonneg (by positivity : (0 : ℝ) ≤ √(p : ℝ) + 2.0001) hU0'
-      have : (0 : ℝ) ≤ t / 256 := by positivity
-      linarith
+      have h := mul_nonneg (by positivity : (0 : ℝ) ≤ √(p : ℝ) + 2.0001) hU0'
+      linarith only [h, ht256]
     exact finish_large _ _ _ _ _ _ _ _ _ hθX hθ0 hX1 hXle htpos.le hB10 hB1t hB2t hB2u0' hSu hpoly
 
 end PrimitiveRootSq
