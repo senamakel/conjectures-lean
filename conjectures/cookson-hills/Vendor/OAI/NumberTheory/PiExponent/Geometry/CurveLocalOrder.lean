@@ -42,8 +42,9 @@ theorem enatToIntegerOrder_monotone : Monotone enatToIntegerOrder := by
 noncomputable def localAddValuation
     (A : Type*) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] :
     AddValuation A (WithTop ℤ) :=
-  (IsDiscreteValuationRing.addVal A).map enatToIntegerOrder
-    enatToIntegerOrder_top enatToIntegerOrder_monotone
+  (IsDiscreteValuationRing.addVal A).map
+    { toAddMonoidHom := enatToIntegerOrder, monotone' := enatToIntegerOrder_monotone }
+    enatToIntegerOrder_top
 
 @[simp] theorem localAddValuation_apply
     {A : Type*} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] (a : A) :
