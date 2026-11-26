@@ -48,7 +48,7 @@ lemma hasDerivAt_div_log_pow (m : ℕ) {t : ℝ} (ht : 1 < t) :
   convert h using 1
   rcases m with _ | k
   · simp
-  · simp only [Nat.cast_add, Nat.cast_one, Nat.add_sub_cancel]
+  · simp only [Pi.pow_apply, Nat.cast_add, Nat.cast_one, Nat.add_sub_cancel]
     field_simp
     ring
 
@@ -91,7 +91,7 @@ lemma I_succ_le (m : ℕ) {a y : ℝ} (ha : 1 < a) (hay : a ≤ y) :
   have hlt : Real.log a ≤ Real.log t := Real.log_le_log (by linarith) ht.1
   have hl : 0 < Real.log t := by linarith
   rw [pow_succ, div_mul_eq_mul_div, one_mul, div_le_div_iff₀ (by positivity) (by positivity),
-    one_mul]
+    one_mul, mul_comm (Real.log a)]
   exact mul_le_mul_of_nonneg_left hlt (by positivity)
 
 /-- The remainder bound `I m · (1 − m/log a) ≤ y / log^m y`. -/
