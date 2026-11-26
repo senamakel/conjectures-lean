@@ -196,6 +196,21 @@ Each README follows the shape already used across these repos:
     [`docs/LITERATURE_STATUS.md`](docs/LITERATURE_STATUS.md). No disclaimers about what the
     result is not; gaps to the literature go in the Deviations section with both numbers.
 
+## Scope: any open conjecture, by connecting existing lemmas
+
+**Decided 2026-11-26.** The workspace is no longer limited to consequences of RH and GRH. A
+target may be an open conjecture in any area of mathematics. The strategy is fixed, though: we
+settle a conjecture by connecting results that already exist (lemmas of big Lean proofs, our own
+theorems, recently solved conjectures, published implications between conjectures), not by
+looking for a new argument from nothing. The 28 projects below and their RH/GRH labels are
+unchanged; the rules on tiers, axioms, fixed statements and calibrated claims apply to every
+target. A target outside RH/GRH takes the label that fits (*known*, *new*, or "consequence of
+X" naming the premise) and its row in `docs/NEXT_TARGETS.md` says which.
+
+LivingBrain is part of the method. Ingest the proofs and lemma inventories we read (statement,
+source, repo and path, what it needs, what it gives), so a later search for "what proves a bound
+of this shape?" finds them. Check any identifier it returns against the source.
+
 ## Mine the lemmas of big proofs
 
 A large Lean proof is worth more for its intermediate lemmas than for its last line. The headline

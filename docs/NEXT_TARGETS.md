@@ -8,6 +8,12 @@ Every target follows a published theorem, proved outright or assuming RH/GRH; th
 what gets built here. [`LITERATURE_STATUS.md`](LITERATURE_STATUS.md) labels each one (known; known, via GRH
 here; RH-consequence; RH-equivalent) and says how to describe it.
 
+## Scope widened, 2026-11-26
+
+Targets are no longer limited to RH and GRH consequences: any open conjecture qualifies when it
+can be settled by connecting existing results (see `AGENTS.md`, "Scope" and "Mine the lemmas of
+big proofs"). The rounds below were all run under the older RH/GRH filter.
+
 ## Avoid what 1337isnot1337/solved-conjectures already covers
 
 **Decided 2026-11-26.** Before a target is started, check
