@@ -96,6 +96,7 @@ lemma finish_large (θ X B1 B1u B2 B2u Su S t : ℝ) (hθX : 117 ≤ θ * X) (h�
   have := lt_of_mul_lt_mul_left hmain (by linarith)
   linarith
 
+set_option maxHeartbeats 1600000 in
 theorem numerics (p : ℕ) (hp0 : 10 ^ 8 ≤ p) (θ : ℝ)
     (hθ : (36495360 / 223092870 : ℝ) * (28 / 29) ^ (p - 1).primeFactors.card ≤ θ) :
     ((p : ℝ) / 2 + (√(p : ℝ) / 20 + 3)) / p
