@@ -28,6 +28,6 @@ LivingBrain for the target (dead ends and constants are there).
    real `#print axioms` output into the README, write the README in the house shape, add the row
    to the root `README.md` and the checklist section to `AGENTS.md`.
 
-Never export `CARGO_TARGET_DIR`-style overrides or send build output to a temp directory. Never
+Never send build output to a temp directory. Never
 claim more than the axiom list shows. If the target turns out false as stated, or needs an input
 that does not exist, stop and report exactly what is missing.
