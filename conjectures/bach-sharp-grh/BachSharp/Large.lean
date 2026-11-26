@@ -12,6 +12,8 @@ With constant `1.657 ≤ 2 / log² 3`: `5 · 2^49 ≤ q < 2^7400` by the paramet
 `q ≥ 2^7400` by the polynomial tail `goodQ_tailS`.
 -/
 
+set_option exponentiation.threshold 8000
+
 namespace BachSharp
 
 open Erdos985 (DirichletLNonvanishingRightOfHalf)

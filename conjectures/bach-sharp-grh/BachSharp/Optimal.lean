@@ -48,6 +48,6 @@ theorem sharpOptimal : SharpOptimal := by
     have : (⊤ : Subgroup (ZMod 3)ˣ) ≤ ⊥ := by
       rw [← h, Subgroup.closure_le]
       exact hS
-    exact bot_ne_top_three (le_antisymm bot_le this).symm
+    exact bot_ne_top_three (le_antisymm bot_le this)
 
 end BachSharp
