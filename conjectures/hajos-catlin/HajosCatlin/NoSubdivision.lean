@@ -112,14 +112,16 @@ lemma walk_cross {u v : Fin 5 × Fin 3} (p : catlin.Walk u v) (c : Fin 5)
 `7 + ∑ min (a(c−1)a(c+1)) (3 − a c) < 2 ∑ a(c−1)a(c+1)`. Checked by the kernel over `4⁵` vectors. -/
 lemma arith (a : Fin 5 → ℕ) (ha : ∀ c, a c ≤ 3) (hs : ∑ c, a c = 8) :
     7 + ∑ c, min (a (c - 1) * a (c + 1)) (3 - a c) < 2 * ∑ c, a (c - 1) * a (c + 1) := by
-  have key : ∀ a0 < 4, ∀ a1 < 4, ∀ a2 < 4, ∀ a3 < 4, ∀ a4 < 4, a0 + a1 + a2 + a3 + a4 = 8 →
+  have key : ∀ b0 b1 b2 b3 b4 : Fin 4,
+      let a0 := b0.val; let a1 := b1.val; let a2 := b2.val; let a3 := b3.val; let a4 := b4.val
+      a0 + a1 + a2 + a3 + a4 = 8 →
       7 + (min (a4 * a1) (3 - a0) + min (a0 * a2) (3 - a1) + min (a1 * a3) (3 - a2) +
         min (a2 * a4) (3 - a3) + min (a3 * a0) (3 - a4)) <
       2 * (a4 * a1 + a0 * a2 + a1 * a3 + a2 * a4 + a3 * a0) := by
     decide
   simp only [Fin.sum_univ_five, Fin.isValue, Fin.reduceSub, Fin.reduceAdd] at hs ⊢
-  exact key _ (by have := ha 0; omega) _ (by have := ha 1; omega) _ (by have := ha 2; omega)
-    _ (by have := ha 3; omega) _ (by have := ha 4; omega) hs
+  exact key ⟨a 0, by have := ha 0; omega⟩ ⟨a 1, by have := ha 1; omega⟩
+    ⟨a 2, by have := ha 2; omega⟩ ⟨a 3, by have := ha 3; omega⟩ ⟨a 4, by have := ha 4; omega⟩ hs
 
 variable {f : Fin 8 → Fin 5 × Fin 3}
   {P : ∀ w w', (completeGraph (Fin 8)).Adj w w' → catlin.Walk (f w) (f w')}
@@ -145,7 +147,7 @@ lemma S_ne {c : Fin 5} {p : Fin 8 × Fin 8} (hp : p ∈ S f c) : p.1 ≠ p.2 := 
 
 lemma interior_eq {c : Fin 5} {p : Fin 8 × Fin 8} (hp : p ∈ S f c) :
     interior P ⟨c, p⟩ = (P p.1 p.2 (S_ne hp)).support.tail.dropLast.toFinset :=
-  dif_pos (S_ne hp)
+  dite_eq_left (S_ne hp)
 
 section Model
 
@@ -213,7 +215,7 @@ lemma two_le (c : Fin 5) {p : Fin 8 × Fin 8} (hp : p ∈ S f c) :
   have hcross := walk_cross (P p.1 p.2 (S_ne hp)) c hp'.1 hp'.2
   rcases hcross with ⟨x, hx, hxc⟩ | ⟨x, hx, y, hy, hxy⟩
   · have hx' : x ∈ interior P ⟨c, p⟩ := by rw [interior_eq hp]; exact List.mem_toFinset.mpr hx
-    rw [if_pos ⟨x, hx', hxc⟩]
+    rw [ite_eq_left ⟨x, hx', hxc⟩]
     have := card_pos.mpr ⟨x, hx'⟩
     omega
   · have : 1 < (interior P ⟨c, p⟩).card := by
