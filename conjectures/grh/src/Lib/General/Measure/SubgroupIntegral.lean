@@ -59,7 +59,7 @@ subgroup, and χ(x+y) = χ(x)χ(y) for all x, y in V. Then ∫_M χ dν is ν(M)
 infinite) if χ = 1 on M, and 0 otherwise. -/
 lemma setIntegral_char (ho : @IsOpen V _ M) {χ : V → ℂ} (h : ∀ x y, χ (x + y) = χ x * χ y) :
     ∫ x in M, χ x ∂ν = ite (∀ x ∈ M, χ x = 1) ↑(ν.real M) 0 := by
-  split; simp [setIntegral_congr_fun ho.measurableSet ‹_›]; by_contra
+  split; simp [setIntegral_congr_fun ho.measurableSet ‹_›, Set.univ_inter]; by_contra
   simp_all [← mul_eq_right₀ this, ← integral_const_mul, ← h, setIntegral_add_mem]
 
 lemma setIntegral_eq_finsum [IsFiniteMeasureOnCompacts ν] [CompleteSpace X] [T2Space V] (hc :
