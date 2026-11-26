@@ -13,9 +13,9 @@ import Implications.ABC.Statement
   `c`, so a family with `n ≤ c n` leaves it eventually.
 -/
 
-namespace Implications.ABC
+namespace Implications.Abc
 
-open ABC Finset
+open _root_.ABC Finset
 
 lemma radical_pos (n : ℕ) : 0 < radical n :=
   Finset.prod_pos fun p hp => (Nat.prime_of_mem_primeFactors hp).pos
@@ -93,7 +93,7 @@ lemma eventually_of_abcSet_finite {ε : ℝ} (hfin : (abcSet ε).Finite) (P : �
     (hc : ∀ n, n ≤ (t n).2.2) : ∀ᶠ n in Filter.atTop, ¬ P n := by
   obtain ⟨M, hM⟩ := (hfin.image fun x => x.2.2).bddAbove
   refine Filter.eventually_atTop.2 ⟨max N₀ (M + 1), fun n hn hP => ?_⟩
-  have h1 := hM ⟨t n, hmem n (le_of_max_le_left hn) hP, rfl⟩
+  have h1 : (t n).2.2 ≤ M := hM ⟨t n, hmem n (le_of_max_le_left hn) hP, rfl⟩
   have h2 := hc n
   have h3 := le_of_max_le_right hn
   omega
@@ -111,20 +111,19 @@ lemma two_mul_cube_lt_sq {r c : ℕ} (hr : r ^ 2 ≤ c) (hc : 64 < c) : (2 * r) 
       _ < c * c ^ 3 := Nat.mul_lt_mul_of_pos_right hc hc3
   exact lt_of_pow_lt_pow_left₀ 2 (Nat.zero_le _) this
 
-/-- Arithmetic core for the factorial cases: if `r² ≤ c` and `4096^n < c` then
+/-- Arithmetic core for the factorial cases: if `r² ≤ c` and `(4^n)^6 < c` then
 `(4^n r)³ < c²`. -/
-lemma four_pow_mul_cube_lt_sq {r c n : ℕ} (hr : r ^ 2 ≤ c) (hc : 4096 ^ n < c) :
+lemma four_pow_mul_cube_lt_sq {r c n : ℕ} (hr : r ^ 2 ≤ c) (hc : (4 ^ n) ^ 6 < c) :
     (4 ^ n * r) ^ 3 < c ^ 2 := by
   have h6 : (r ^ 2) ^ 3 ≤ c ^ 3 := Nat.pow_le_pow_left hr 3
   have : ((4 ^ n * r) ^ 3) ^ 2 < (c ^ 2) ^ 2 := by
-    have e1 : ((4 ^ n * r) ^ 3) ^ 2 = 4096 ^ n * (r ^ 2) ^ 3 := by
-      rw [show (4096 : ℕ) = 4 ^ 6 by norm_num, ← pow_mul]; ring
+    have e1 : ((4 ^ n * r) ^ 3) ^ 2 = (4 ^ n) ^ 6 * (r ^ 2) ^ 3 := by ring
     have e2 : (c ^ 2) ^ 2 = c * c ^ 3 := by ring
     rw [e1, e2]
     have hc3 : 0 < c ^ 3 := by
       have : 0 < c := lt_of_le_of_lt (Nat.zero_le _) hc
       positivity
-    calc 4096 ^ n * (r ^ 2) ^ 3 ≤ 4096 ^ n * c ^ 3 := Nat.mul_le_mul_left _ h6
+    calc (4 ^ n) ^ 6 * (r ^ 2) ^ 3 ≤ (4 ^ n) ^ 6 * c ^ 3 := Nat.mul_le_mul_left _ h6
       _ < c * c ^ 3 := Nat.mul_lt_mul_of_pos_right hc hc3
   exact lt_of_pow_lt_pow_left₀ 2 (Nat.zero_le _) this
 
@@ -137,4 +136,4 @@ lemma eventually_pow_lt_factorial (K : ℕ) : ∀ᶠ n in Filter.atTop, K ^ n < 
   rw [div_lt_one hf] at hn
   exact_mod_cast hn
 
-end Implications.ABC
+end Implications.Abc
