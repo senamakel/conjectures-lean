@@ -20,7 +20,7 @@ always holds). Otherwise `x > 0`, `y ≠ 0`, and abc in constant form applied to
 
 namespace Implications.Abc.Hall
 
-open Real
+open Real _root_.ABC
 
 /-- Copied verbatim from `FormalConjectures/Wikipedia/Hall.lean`, `Hall.HallIneq`. -/
 def HallIneq (C : ℝ) (e : ℝ) : Prop :=
@@ -129,8 +129,8 @@ theorem weakHall_of_abcConstantMul (hK : ABCConstantMul) : WeakHallConjecture :=
   set D : ℕ := (y ^ 2 - x ^ 3).natAbs with hDdef
   set X : ℕ := x.natAbs
   have hD1 : 1 ≤ D := Int.natAbs_pos.2 (sub_ne_zero.2 hxy)
-  have hDcast : ((|y ^ 2 - x ^ 3| : ℤ) : ℝ) = (D : ℝ) := by
-    rw [hDdef, Int.cast_abs]; push_cast; rfl
+  have hDcast : |(y : ℝ) ^ 2 - (x : ℝ) ^ 3| = (D : ℝ) := by
+    rw [hDdef, Nat.cast_natAbs, Int.cast_abs]; push_cast; rfl
   have hXcast : (|(x : ℝ)|) = (X : ℝ) := by
     rw [Nat.cast_natAbs, Int.cast_abs]
   have he : (2⁻¹ - ε : ℝ) ≤ 1 := by linarith
@@ -138,7 +138,7 @@ theorem weakHall_of_abcConstantMul (hK : ABCConstantMul) : WeakHallConjecture :=
   have hXe : (0 : ℝ) ≤ (X : ℝ) ^ (2⁻¹ - ε) := Real.rpow_nonneg (Nat.cast_nonneg _) _
   show _ < _
   rw [hXcast]
-  push_cast at hDcast ⊢
+  push_cast
   rw [hDcast]
   by_cases hXD : X ≤ D
   · calc min 2⁻¹ K'⁻¹ * (X : ℝ) ^ (2⁻¹ - ε) ≤ 2⁻¹ * (X : ℝ) ^ (2⁻¹ - ε) := by
