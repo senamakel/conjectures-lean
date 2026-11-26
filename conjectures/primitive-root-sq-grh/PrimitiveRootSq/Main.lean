@@ -51,6 +51,7 @@ theorem exists_good_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) (p : ℕ) 
   set θ := ∏ ℓ ∈ (p - 1).primeFactors, (1 - 1 / (ℓ : ℝ)) with hθ
   have hθ0 := theta_ge (p - 1)
   have hnum := numerics p (not_lt.mp hlt) θ hθ0
+  rw [← hB₁, ← hB₂] at hnum
   have hθpos : 0 ≤ θ := (lt_of_lt_of_le (by positivity) hθ0).le
   set S₀ := ∑ n ∈ Finset.range p, (Λ n : ℝ) * (1 - (n : ℝ) / p) with hS₀
   have hprin := Analytic.bach_principal_of_GRH hGRH p hp1
@@ -67,7 +68,6 @@ theorem exists_good_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) (p : ℕ) 
   have h2 : (S₀ + (p - 1) * B₂) / p ≤ ((p : ℝ) / 2 + (√(p : ℝ) / 20 + 3)) / p + B₂ := by
     rw [div_add' _ _ _ hpR.ne', div_le_div_iff_of_pos_right hpR]
     nlinarith
-  trace_state
   linarith
 
 /-- **Main theorem (GRH).** Every odd prime `p` has a prime `q < p` that is a primitive root
