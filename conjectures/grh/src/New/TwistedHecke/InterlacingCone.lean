@@ -52,8 +52,11 @@ lemma volume_inter_slab_eq_signed_sum {v : Fin (m + 1) → _} (hP : 1 < P) D {Ω
     (∀ j, ∑ b, permStep v P 1 ν (b, j) ∈ Icc (D j - 1) (D j)) ∧ (∀ j b, 0 < β (b, j)) ∧ β ∈ Y}
   -- the map of `σ` is injective, as `P > 1`
   have z σ : (@permStep k _ _ _ v P σ).det ≠ 0 := (bot_lt_ker_of_det_eq_zero · |>.not_ge fun ν h ↦
-    norm_le_zero_iff.1 (by nlinarith [(funext fun x ↦ by simpa [ite_eq_iff'] using (mul_eq_zero.1
-    congr($h (_, _ - 1))) : P • ν = ν ∘ _) ▸ pi_norm_comp_le .., norm_smul P ν, P.le_norm_self]))
+    norm_le_zero_iff.1 (by nlinarith [(funext fun x ↦ by
+      have := congr($h (x.1, x.2 - 1))
+      simp only [permStep_apply, sub_add_cancel, Pi.zero_apply, Prod.mk.eta] at this
+      split_ifs at this <;> simp <;> linarith : P • ν = ν ∘ fun x : Fin k × Fin (m + 1) ↦
+      (σ (x.2 - 1) x.1, x.2 - 1)) ▸ pi_norm_comp_le .., norm_smul P ν, P.le_norm_self]))
   -- change of variables; the walls `β x = 0` are null sets
   have V σ τ Y : volume (S σ τ Y) = .ofReal |(permStep v P σ * (Perm.permMatrix ℝ
     (prodCongrLeft τ)).toLin').det⁻¹| * volume (Y ∩ slab k D) := by
@@ -77,14 +80,19 @@ lemma volume_inter_slab_eq_signed_sum {v : Fin (m + 1) → _} (hP : 1 < P) D {Ω
       simp +zetaDelta [← succ_last, partialProd_succ, permMatrix_mulVec] <;> grind)).det)⟩
   have e ν : ∑ τ, (S 1 τ Ω).indicator (fun _ ↦ 1) ν =
       ∑ σ, (S σ 1 univ).indicator (fun _ ↦ ((List.ofFn σ).prod.sign : ℝ)) ν := ?_
-  · simpa [↓integral_finsetSum, integrable_indicator_iff, fun σ ↦
+  · have hI σ : Integrable ((S σ 1 univ).indicator fun _ ↦ ((List.ofFn σ).prod.sign : ℝ)) :=
+      (integrable_indicator_iff (by simp [S, hΩ, pieriCone, -permStep_apply]; use ?_ <;> fun_prop :
+      MeasurableSet (S σ 1 univ) ∧ MeasurableSet (S 1 σ Ω)).1).2 (integrableOn_const ((V ..).trans_lt
+      (mul_lt_top coe_lt_top (isBounded_inter_slab ..).measure_lt_top)).ne)
+    simpa [↓integral_finsetSum, Set.univ_inter, integrable_indicator_iff, fun σ ↦
       (by simp [S, hΩ, pieriCone, -permStep_apply]; use ?_ <;> fun_prop :
       MeasurableSet (S σ 1 univ) ∧ MeasurableSet (S 1 σ Ω)), ↓(V ..).trans_lt (mul_lt_top coe_lt_top
       (isBounded_inter_slab ..).measure_lt_top), -enorm_mul, Measure.real, hc, field, card_perm,
       ↓← ((prodCongrLeft fun g : Fin m → _ ↦ .mulRight (List.ofFn g).prod⁻¹).trans
         (consEquiv fun _ ↦ Perm
       (Fin k))).sum_comp, sum_prod_type_right, ← sum_mul, div_eq_inv_mul, abs_unit_intCast, V, by
-      simpa [hc] using z 1, mul_right_comm _ _ (Int.cast _), Nat.cast_comm] using congr(∫ ν, $(e ν))
+      simpa [hc] using z 1, mul_right_comm _ _ (Int.cast _), Nat.cast_comm] using
+      congr(∫ ν, $(e ν)).trans (integral_finsetSum _ fun σ _ ↦ hI σ)
   -- the product of the determinants, expanded, and read after sorting
   let τ j := sort (-ν ⟨·, j⟩)
   have anti j := (monotone_sort (-ν ⟨·, j⟩)).neg
