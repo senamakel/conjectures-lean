@@ -114,7 +114,7 @@ lemma doubling_of_parts {n : ℕ} (A B : Matrix (Fin n) (Fin n) ℝ)
   · rw [fromBlocks_transpose, fromBlocks_multiply, transpose_neg]
     simp only [Matrix.neg_mul, Matrix.mul_neg, neg_neg]
     rw [hPP, add_comm ((A - B) * (A - B).transpose), hPP, hPQ]
-    simp only [neg_add_cancel, add_neg_cancel]
+    simp only [neg_add_cancel]
     rw [← fromBlocks_one, fromBlocks_smul, smul_zero]
 
 /-- **Turyn's doubling.** An `H(4, n)` matrix gives a real `2n × 2n` matrix with entries `±1`
