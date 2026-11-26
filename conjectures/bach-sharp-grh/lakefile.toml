@@ -23,3 +23,7 @@ name = "BachSharp"
 [[lean_lib]]
 name = "BachSharpCheck"
 precompileModules = true
+
+[[lean_lib]]
+name = "BachSharpGapCheck"
+precompileModules = true
