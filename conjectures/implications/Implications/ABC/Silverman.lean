@@ -45,7 +45,7 @@ lemma radical_sq_le_of_sq_dvd {m : ℕ} (hm : m ≠ 0) (T : Finset ℕ) (hTp : �
           Finset.prod_dvd_prod_of_subset _ _ _ (Finset.filter_subset _ _)
       _ = m := (Nat.prod_primeFactors_pow_factorization hm).symm
   have hB : ∏ p ∈ m.primeFactors.filter (fun p => ¬ p ^ 2 ∣ m), id p ≤ ∏ p ∈ T, p := by
-    refine Finset.prod_le_prod_of_subset_of_one_le' (fun p hp => ?_)
+    refine Finset.prod_le_prod_of_subset_of_one_le (fun p hp => ?_)
       (fun p hp _ => (hTp p hp).one_le)
     have h := Finset.mem_filter.1 hp
     exact hT p h.1 h.2
@@ -62,7 +62,7 @@ lemma two_mul_radical_cube_lt {r Q m : ℕ} (hr : r ^ 2 ≤ Q ^ 2 * m) (hm : 64 
   have h6 : ((2 * r) ^ 3) ^ 2 < ((m + 1) ^ 2) ^ 2 := by
     have e1 : ((2 * r) ^ 3) ^ 2 = 64 * (r ^ 2) ^ 3 := by ring
     rw [e1]
-    have hm3 : 0 < m ^ 3 := Nat.pos_pow_of_pos 3 (by omega)
+    have hm3 : 0 < m ^ 3 := pow_pos (by omega) 3
     calc 64 * (r ^ 2) ^ 3 ≤ 64 * (Q ^ 2 * m) ^ 3 := Nat.mul_le_mul_left _ (Nat.pow_le_pow_left hr 3)
       _ = (64 * Q ^ 6) * m ^ 3 := by ring
       _ < m * m ^ 3 := Nat.mul_lt_mul_of_pos_right hm hm3
