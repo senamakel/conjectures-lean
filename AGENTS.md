@@ -1,9 +1,11 @@
 # Conjectures workspace
 
-This superproject (`github.com/senamakel/conjectures`) tracks 17 Lean 4 projects that formalise
-number-theory conjectures and theorems, each a consequence of RH or GRH. Each project is a
-submodule (`github.com/senamakel/<name>`) pinned to the commit last reviewed. This file is the
-tracker: when a box changes, update it here and bump the gitlink in the same commit.
+This repository (`github.com/senamakel/conjectures-lean`) holds 28 Lean 4 projects that formalise
+number-theory conjectures and theorems: the 17 headline results, each a consequence of RH or GRH,
+and 11 further projects (see `README.md`, "Further projects"). Each project is a folder at the top
+level and a Lean package of its own, imported with its full history from the former standalone
+repository `github.com/senamakel/<name>`. This file is the tracker: when a box changes, update it
+here in the same commit as the change.
 
 Status as of 2026-11-25. Every box marked **verified** below was rebuilt from source on the
 build box on 2026-11-24 or 2026-11-25, its `#print axioms` output read, and (for tier U) its
@@ -209,7 +211,7 @@ Each README follows the shape already used across these repos:
       erdos-770 `a640482`, erdos-233 `651e094`. No `sorryAx` in any log.
       The shell's hard open-file limit (524288) is too low for the import: run
       `sudo prlimit --pid $$ --nofile=2000000:2000000` first. Up to four checks fit in RAM at once.
-- [x] **Licence.** This repository and all 17 submodules carry the GNU GPL v3 (`LICENSE`,
+- [x] **Licence.** This repository and every project folder carry the GNU GPL v3 (`LICENSE`,
       added 2026-11-25). Vendored files keep their own licences (Apache-2.0, MIT).
 - [ ] riemann-hypothesis has no licence. Its hypothesis definitions are copied word for word
       (rule 2); check that this is acceptable.
@@ -554,12 +556,12 @@ Each README follows the shape already used across these repos:
 
 - Changes to this superproject's own files (`AGENTS.md`, `README.md`, `docs/`, `scripts/`) go
   straight to `main`: no worktree, no PR.
-- For cross-repo work inside the submodules, run `worktree <slug>` here at the top level
-  (never inside a submodule). PR each submodule branch to `senamakel/<repo>`, then commit the
-  updated gitlinks and checklist here. To refresh every pin:
-  `git submodule update --remote` followed by a review of what changed.
-- Adding a conjecture: `git submodule add https://github.com/senamakel/<repo>.git <repo>`, then
-  give it a row in `README.md` and a section in the checklist below.
+- Work inside the project folders goes on a branch made with `worktree <slug>` here, and lands
+  through one PR to this repository, however many folders it touches.
+- Adding a conjecture: create `<name>/` as its own Lean package (`lakefile`, `lean-toolchain`,
+  `README.md`), then give it a row in `README.md` and a section in the checklist below.
+- The lakefiles still require their siblings by git URL (`github.com/senamakel/<name>`) at a
+  pinned rev. Switching them to `path = "../<name>"` requires is still to do.
 - Lean projects with no `.lake` here yet: run `lake exe cache get` first in erdos-985. The
   siblings will build only after the pins are fixed.
 - Build one module at a time when iterating (`lake build LLS.ClassNumber`). The `native_decide`

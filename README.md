@@ -1,8 +1,9 @@
 # Conjectures
 
 Machine-checked Lean 4 proofs in number theory: 17 projects, each a consequence of the
-Riemann Hypothesis or of GRH for Dirichlet L-functions. Each project is a submodule pinned to the
-commit last reviewed.
+Riemann Hypothesis or of GRH for Dirichlet L-functions, and 11 further projects they build on or
+that sit beside them. Each project is a folder of this repository, a Lean package of its own,
+imported with its full commit history from its former standalone repository.
 
 On 20 November 2026 Levent Alpöge released a Lean proof of RH and of GRH for Dirichlet
 L-functions. The Lean FRO and the Mathlib Initiative
@@ -69,33 +70,33 @@ describes the direction formalised in this collection. Erdős 770 parts (i) and
 
 | # | Submodule | Result | Tier | In the literature |
 |---|---|---|---|---|
-| 1 | [erdos-985](https://github.com/senamakel/erdos-985) | every odd prime has a prime primitive root `q < p` | U | RH-consequence (McGown–Treviño–Trudgian 2016) |
-| 2 | [lindelof-rh](https://github.com/senamakel/lindelof-rh) | Lindelöf hypothesis for ζ and for Dirichlet L-functions | U | RH-consequence |
-| 3 | [density-rh](https://github.com/senamakel/density-rh) | density hypothesis for ζ; zero counting `N(T) ≪ T log T` (the latter with no hypothesis) | U (library D) | RH-consequence; the zero count is known |
-| 4 | [grosswald-grh](https://github.com/senamakel/grosswald-grh) | Grosswald's conjecture: every prime `p > 409` has least primitive root `g(p) < √p − 2` | U | RH-consequence |
-| 5 | [weinberger-grh](https://github.com/senamakel/weinberger-grh) | Euler's 65 idoneal numbers are the only ones | U | RH-consequence |
-| 6 | [abelian-erh](https://github.com/senamakel/abelian-erh) | ERH for every finite abelian extension of ℚ (Kronecker–Weber taken from riemann-hypothesis) | U | RH-consequence |
+| 1 | [erdos-985](erdos-985/) | every odd prime has a prime primitive root `q < p` | U | RH-consequence (McGown–Treviño–Trudgian 2016) |
+| 2 | [lindelof-rh](lindelof-rh/) | Lindelöf hypothesis for ζ and for Dirichlet L-functions | U | RH-consequence |
+| 3 | [density-rh](density-rh/) | density hypothesis for ζ; zero counting `N(T) ≪ T log T` (the latter with no hypothesis) | U (library D) | RH-consequence; the zero count is known |
+| 4 | [grosswald-grh](grosswald-grh/) | Grosswald's conjecture: every prime `p > 409` has least primitive root `g(p) < √p − 2` | U | RH-consequence |
+| 5 | [weinberger-grh](weinberger-grh/) | Euler's 65 idoneal numbers are the only ones | U | RH-consequence |
+| 6 | [abelian-erh](abelian-erh/) | ERH for every finite abelian extension of ℚ (Kronecker–Weber taken from riemann-hypothesis) | U | RH-consequence |
 
 ### Five statements equivalent to RH
 
 | # | Submodule | Result | Tier | In the literature |
 |---|---|---|---|---|
-| 7 | [robin-rh](https://github.com/senamakel/robin-rh) | Robin's inequality for every `n > 5040`, and Lagarias's form | U (624 `native_decide` for the finite range) | RH-equivalent |
-| 8 | [nicolas-rh](https://github.com/senamakel/nicolas-rh) | Nicolas' inequality `N_k/φ(N_k) > e^γ log log N_k` for every primorial | U | RH-equivalent |
-| 9 | [li-criterion-rh](https://github.com/senamakel/li-criterion-rh) | Li's criterion, positivity direction: `λ_n > 0` for `n ≥ 1` | U | RH-equivalent |
-| 10 | [speiser-rh](https://github.com/senamakel/speiser-rh) | `ζ'(s) ≠ 0` for `0 < Re s < 1/2` (the band between heights `5/2` and `7` by a verified computation, 2 `native_decide`) | U | RH-equivalent |
-| 11 | [mertens-rh](https://github.com/senamakel/mertens-rh) | `M(x) = O(x^{1/2+ε})`; Titchmarsh's `\|M(x)\| ≤ √x·exp(25 log x/log log x)`, the same for Liouville's `L(x)`, and `1/\|ζ\|` on `σ ≥ 1/2 + 1/log log t`; Riesz, Hardy–Littlewood; convergence of `Σ μ(n)n^{-s}`; Liouville `L(x)`; Franel–Landau; `det R_n = M(n)` | U (Redheffer's identity D) | RH-equivalent (the identity is known) |
+| 7 | [robin-rh](robin-rh/) | Robin's inequality for every `n > 5040`, and Lagarias's form | U (624 `native_decide` for the finite range) | RH-equivalent |
+| 8 | [nicolas-rh](nicolas-rh/) | Nicolas' inequality `N_k/φ(N_k) > e^γ log log N_k` for every primorial | U | RH-equivalent |
+| 9 | [li-criterion-rh](li-criterion-rh/) | Li's criterion, positivity direction: `λ_n > 0` for `n ≥ 1` | U | RH-equivalent |
+| 10 | [speiser-rh](speiser-rh/) | `ζ'(s) ≠ 0` for `0 < Re s < 1/2` (the band between heights `5/2` and `7` by a verified computation, 2 `native_decide`) | U | RH-equivalent |
+| 11 | [mertens-rh](mertens-rh/) | `M(x) = O(x^{1/2+ε})`; Titchmarsh's `\|M(x)\| ≤ √x·exp(25 log x/log log x)`, the same for Liouville's `L(x)`, and `1/\|ζ\|` on `σ ≥ 1/2 + 1/log log t`; Riesz, Hardy–Littlewood; convergence of `Σ μ(n)n^{-s}`; Liouville `L(x)`; Franel–Landau; `det R_n = M(n)` | U (Redheffer's identity D) | RH-equivalent (the identity is known) |
 
 ### Six further consequences of RH or GRH
 
 | # | Submodule | Result | Tier | In the literature |
 |---|---|---|---|---|
-| 12 | [lls-grh](https://github.com/senamakel/lls-grh) | Every theorem of Lamzouri–Li–Soundararajan with the paper's constants: the least prime in a coset of a subgroup of index `h` is `≤ 10^9` or `≤ ((h−1) log q + 3(h+1) + (5/2)(log log q)²)²` (Thm 1.4); the least prime outside a proper subgroup of `(ℤ/q)ˣ` is `≤ (log q + B(q))²` for `q ≥ 3000` (Thm 1.1); least quadratic non-residue `≤ (log q)²` for prime `q ≥ 5` (Cor 1.2); `\|L(1,χ)\| ≤ 2e^γ(log log q − log 2 + 1/2 + 1/log log q)` and the matching lower bound (Thm 1.5) and class-number bounds (Cor 1.3) for `q ≥ 10^10`; Bach's bound with Bach's own constant `2`, and deterministic Miller with `2` | U | RH-consequence |
-| 13 | [bach-sorenson-grh](https://github.com/senamakel/bach-sorenson-grh) | least prime `p ≡ a (mod q)` is `< 2(q log q)²` (Bach–Sorenson's own constant) | U | RH-consequence |
-| 14 | [schoenfeld-rh](https://github.com/senamakel/schoenfeld-rh) | Schoenfeld's bounds with his constant: `\|ψ(x) − x\| < √x log² x / (8π)` (`x ≥ 73.2`), the same for θ (`x ≥ 599`), and `\|π(x) − li(x)\| < √x log x / (8π)` (`x ≥ 2657`) | U | RH-consequence |
-| 15 | [cramer-rh](https://github.com/senamakel/cramer-rh) | a prime in `[x, x + (22/25)√x log x]` for every `x ≥ 4` (Cramér's gap bound with the literature's constant `22/25`, Carneiro–Milinovich–Soundararajan); Cramér's mean square `∫_X^{2X} (ψ(x) − x)² dx ≪ X²` and its asymptotic `∫_1^X ((ψ(x) − x)/x)² dx ∼ c₁ log X` | U | RH-consequence |
-| 16 | [erdos-770](https://github.com/senamakel/erdos-770) | Erdős 770(iii): `h(n) ≤ max(P(n), ⌈200 log² n⌉)` for every `n ≥ 2` (parts (i) and (ii) stay open) | U | RH-consequence |
-| 17 | [erdos-233](https://github.com/senamakel/erdos-233) | `Σ_{n<N} (p_{n+1} − p_n)² = O(N log⁴ N)` (the RH upper bound; Erdős 233 itself stays open); Selberg's theorem that almost all intervals `(x, x + h(x)]` with `h(x)/log² x → ∞` contain a prime, and `π(x+h) − π(x) ~ h/log x` for almost all `x` | U | RH-consequence |
+| 12 | [lls-grh](lls-grh/) | Every theorem of Lamzouri–Li–Soundararajan with the paper's constants: the least prime in a coset of a subgroup of index `h` is `≤ 10^9` or `≤ ((h−1) log q + 3(h+1) + (5/2)(log log q)²)²` (Thm 1.4); the least prime outside a proper subgroup of `(ℤ/q)ˣ` is `≤ (log q + B(q))²` for `q ≥ 3000` (Thm 1.1); least quadratic non-residue `≤ (log q)²` for prime `q ≥ 5` (Cor 1.2); `\|L(1,χ)\| ≤ 2e^γ(log log q − log 2 + 1/2 + 1/log log q)` and the matching lower bound (Thm 1.5) and class-number bounds (Cor 1.3) for `q ≥ 10^10`; Bach's bound with Bach's own constant `2`, and deterministic Miller with `2` | U | RH-consequence |
+| 13 | [bach-sorenson-grh](bach-sorenson-grh/) | least prime `p ≡ a (mod q)` is `< 2(q log q)²` (Bach–Sorenson's own constant) | U | RH-consequence |
+| 14 | [schoenfeld-rh](schoenfeld-rh/) | Schoenfeld's bounds with his constant: `\|ψ(x) − x\| < √x log² x / (8π)` (`x ≥ 73.2`), the same for θ (`x ≥ 599`), and `\|π(x) − li(x)\| < √x log x / (8π)` (`x ≥ 2657`) | U | RH-consequence |
+| 15 | [cramer-rh](cramer-rh/) | a prime in `[x, x + (22/25)√x log x]` for every `x ≥ 4` (Cramér's gap bound with the literature's constant `22/25`, Carneiro–Milinovich–Soundararajan); Cramér's mean square `∫_X^{2X} (ψ(x) − x)² dx ≪ X²` and its asymptotic `∫_1^X ((ψ(x) − x)/x)² dx ∼ c₁ log X` | U | RH-consequence |
+| 16 | [erdos-770](erdos-770/) | Erdős 770(iii): `h(n) ≤ max(P(n), ⌈200 log² n⌉)` for every `n ≥ 2` (parts (i) and (ii) stay open) | U | RH-consequence |
+| 17 | [erdos-233](erdos-233/) | `Σ_{n<N} (p_{n+1} − p_n)² = O(N log⁴ N)` (the RH upper bound; Erdős 233 itself stays open); Selberg's theorem that almost all intervals `(x, x + h(x)]` with `h(x)/log² x → ∞` contain a prime, and `π(x+h) − π(x) ~ h/log x` for almost all `x` | U | RH-consequence |
 
 **Proof tiers.** **D** is a direct proof without RH or GRH. **C** leaves RH or
 GRH as an explicit hypothesis. **U** discharges RH or GRH with the upstream
@@ -103,6 +104,26 @@ proof. **U₀** uses a lemma from the upstream repository that is independent of
 RH or GRH. **H** marks a cited result supplied as an explicit hypothesis.
 See the full tier rules and per-theorem axiom counts in [AGENTS.md](AGENTS.md).
 
+
+## Further projects
+
+These folders are not among the 17 results above. Some are dependencies of those results, and the
+others were started beside them. Each folder's README gives its tier, its axioms and its status
+in the literature.
+
+| Folder | Content |
+|---|---|
+| [ankeny-grh](ankeny-grh/) | Bach's explicit Ankeny theorem under GRH; bach-sorenson-grh, erdos-770, lls-grh and miller-grh require it |
+| [miller-grh](miller-grh/) | Deterministic Miller–Rabin under GRH; lls-grh requires it |
+| [littlewood-rh](littlewood-rh/) | Littlewood's bound for ζ(1/2 + it) under RH; mertens-rh requires it |
+| [artin-grh](artin-grh/) | Artin's primitive root conjecture under Hooley's hypothesis; abelian-erh requires it |
+| [shoup-grh](shoup-grh/) | The least primitive root `g(p) ≪ ω(p−1)^{21/5} log² p` under GRH |
+| [psi-grh](psi-grh/) | Primes in arithmetic progressions under GRH |
+| [erdos-969](erdos-969/) | Montgomery–Vaughan's bound for squarefree and k-free numbers under RH |
+| [goldbach-average-rh](goldbach-average-rh/) | Fujii's average Goldbach bound under RH |
+| [mills-rh](mills-rh/) | Mills' constant to 87 decimals under RH |
+| [goldbach-grh](goldbach-grh/) | Ternary Goldbach under GRH (proved without GRH by Helfgott 2013; wound down) |
+| [hironaka-fc](hironaka-fc/) | Hironaka's resolution of singularities in characteristic 0 |
 
 ## How it was built
 
@@ -125,23 +146,23 @@ The stack behind the agents:
 
 | # | Submodule | Result | Tier | In the literature |
 |---|---|---|---|---|
-| 1 | [erdos-985](https://github.com/senamakel/erdos-985) | every odd prime has a prime primitive root `q < p` | U | RH-consequence (McGown–Treviño–Trudgian 2016) |
-| 2 | [lindelof-rh](https://github.com/senamakel/lindelof-rh) | Lindelöf hypothesis for ζ and for Dirichlet L-functions | U | RH-consequence |
-| 3 | [density-rh](https://github.com/senamakel/density-rh) | density hypothesis for ζ; zero counting `N(T) ≪ T log T` (the latter with no hypothesis) | U (library D) | RH-consequence; the zero count is known |
-| 4 | [grosswald-grh](https://github.com/senamakel/grosswald-grh) | Grosswald's conjecture: every prime `p > 409` has least primitive root `g(p) < √p − 2` | U | RH-consequence |
-| 5 | [weinberger-grh](https://github.com/senamakel/weinberger-grh) | Euler's 65 idoneal numbers are the only ones | U | RH-consequence |
-| 6 | [abelian-erh](https://github.com/senamakel/abelian-erh) | ERH for every finite abelian extension of ℚ (Kronecker–Weber taken from riemann-hypothesis) | U | RH-consequence |
-| 7 | [robin-rh](https://github.com/senamakel/robin-rh) | Robin's inequality for every `n > 5040`, and Lagarias's form | U (624 `native_decide` for the finite range) | RH-equivalent |
-| 8 | [nicolas-rh](https://github.com/senamakel/nicolas-rh) | Nicolas' inequality `N_k/φ(N_k) > e^γ log log N_k` for every primorial | U | RH-equivalent |
-| 9 | [li-criterion-rh](https://github.com/senamakel/li-criterion-rh) | Li's criterion, positivity direction: `λ_n > 0` for `n ≥ 1` | U | RH-equivalent |
-| 10 | [speiser-rh](https://github.com/senamakel/speiser-rh) | `ζ'(s) ≠ 0` for `0 < Re s < 1/2` (the band between heights `5/2` and `7` by a verified computation, 2 `native_decide`) | U | RH-equivalent |
-| 11 | [mertens-rh](https://github.com/senamakel/mertens-rh) | `M(x) = O(x^{1/2+ε})`; Titchmarsh's `\|M(x)\| ≤ √x·exp(25 log x/log log x)`, the same for Liouville's `L(x)`, and `1/\|ζ\|` on `σ ≥ 1/2 + 1/log log t`; Riesz, Hardy–Littlewood; convergence of `Σ μ(n)n^{-s}`; Liouville `L(x)`; Franel–Landau; `det R_n = M(n)` | U (Redheffer's identity D) | RH-equivalent (the identity is known) |
-| 12 | [lls-grh](https://github.com/senamakel/lls-grh) | Every theorem of Lamzouri–Li–Soundararajan with the paper's constants: the least prime in a coset of a subgroup of index `h` is `≤ 10^9` or `≤ ((h−1) log q + 3(h+1) + (5/2)(log log q)²)²` (Thm 1.4); the least prime outside a proper subgroup of `(ℤ/q)ˣ` is `≤ (log q + B(q))²` for `q ≥ 3000` (Thm 1.1); least quadratic non-residue `≤ (log q)²` for prime `q ≥ 5` (Cor 1.2); `\|L(1,χ)\| ≤ 2e^γ(log log q − log 2 + 1/2 + 1/log log q)` and the matching lower bound (Thm 1.5) and class-number bounds (Cor 1.3) for `q ≥ 10^10`; Bach's bound with Bach's own constant `2`, and deterministic Miller with `2` | U | RH-consequence |
-| 13 | [bach-sorenson-grh](https://github.com/senamakel/bach-sorenson-grh) | least prime `p ≡ a (mod q)` is `< 2(q log q)²` (Bach–Sorenson's own constant) | U | RH-consequence |
-| 14 | [schoenfeld-rh](https://github.com/senamakel/schoenfeld-rh) | Schoenfeld's bounds with his constant: `\|ψ(x) − x\| < √x log² x / (8π)` (`x ≥ 73.2`), the same for θ (`x ≥ 599`), and `\|π(x) − li(x)\| < √x log x / (8π)` (`x ≥ 2657`) | U | RH-consequence |
-| 15 | [cramer-rh](https://github.com/senamakel/cramer-rh) | a prime in `[x, x + (22/25)√x log x]` for every `x ≥ 4` (Cramér's gap bound with the literature's constant `22/25`, Carneiro–Milinovich–Soundararajan); Cramér's mean square `∫_X^{2X} (ψ(x) − x)² dx ≪ X²` and its asymptotic `∫_1^X ((ψ(x) − x)/x)² dx ∼ c₁ log X` | U | RH-consequence |
-| 16 | [erdos-770](https://github.com/senamakel/erdos-770) | Erdős 770(iii): `h(n) ≤ max(P(n), ⌈200 log² n⌉)` for every `n ≥ 2` (parts (i) and (ii) stay open) | U | RH-consequence |
-| 17 | [erdos-233](https://github.com/senamakel/erdos-233) | `Σ_{n<N} (p_{n+1} − p_n)² = O(N log⁴ N)` (the RH upper bound; Erdős 233 itself stays open); Selberg's theorem that almost all intervals `(x, x + h(x)]` with `h(x)/log² x → ∞` contain a prime, and `π(x+h) − π(x) ~ h/log x` for almost all `x` | U | RH-consequence |
+| 1 | [erdos-985](erdos-985/) | every odd prime has a prime primitive root `q < p` | U | RH-consequence (McGown–Treviño–Trudgian 2016) |
+| 2 | [lindelof-rh](lindelof-rh/) | Lindelöf hypothesis for ζ and for Dirichlet L-functions | U | RH-consequence |
+| 3 | [density-rh](density-rh/) | density hypothesis for ζ; zero counting `N(T) ≪ T log T` (the latter with no hypothesis) | U (library D) | RH-consequence; the zero count is known |
+| 4 | [grosswald-grh](grosswald-grh/) | Grosswald's conjecture: every prime `p > 409` has least primitive root `g(p) < √p − 2` | U | RH-consequence |
+| 5 | [weinberger-grh](weinberger-grh/) | Euler's 65 idoneal numbers are the only ones | U | RH-consequence |
+| 6 | [abelian-erh](abelian-erh/) | ERH for every finite abelian extension of ℚ (Kronecker–Weber taken from riemann-hypothesis) | U | RH-consequence |
+| 7 | [robin-rh](robin-rh/) | Robin's inequality for every `n > 5040`, and Lagarias's form | U (624 `native_decide` for the finite range) | RH-equivalent |
+| 8 | [nicolas-rh](nicolas-rh/) | Nicolas' inequality `N_k/φ(N_k) > e^γ log log N_k` for every primorial | U | RH-equivalent |
+| 9 | [li-criterion-rh](li-criterion-rh/) | Li's criterion, positivity direction: `λ_n > 0` for `n ≥ 1` | U | RH-equivalent |
+| 10 | [speiser-rh](speiser-rh/) | `ζ'(s) ≠ 0` for `0 < Re s < 1/2` (the band between heights `5/2` and `7` by a verified computation, 2 `native_decide`) | U | RH-equivalent |
+| 11 | [mertens-rh](mertens-rh/) | `M(x) = O(x^{1/2+ε})`; Titchmarsh's `\|M(x)\| ≤ √x·exp(25 log x/log log x)`, the same for Liouville's `L(x)`, and `1/\|ζ\|` on `σ ≥ 1/2 + 1/log log t`; Riesz, Hardy–Littlewood; convergence of `Σ μ(n)n^{-s}`; Liouville `L(x)`; Franel–Landau; `det R_n = M(n)` | U (Redheffer's identity D) | RH-equivalent (the identity is known) |
+| 12 | [lls-grh](lls-grh/) | Every theorem of Lamzouri–Li–Soundararajan with the paper's constants: the least prime in a coset of a subgroup of index `h` is `≤ 10^9` or `≤ ((h−1) log q + 3(h+1) + (5/2)(log log q)²)²` (Thm 1.4); the least prime outside a proper subgroup of `(ℤ/q)ˣ` is `≤ (log q + B(q))²` for `q ≥ 3000` (Thm 1.1); least quadratic non-residue `≤ (log q)²` for prime `q ≥ 5` (Cor 1.2); `\|L(1,χ)\| ≤ 2e^γ(log log q − log 2 + 1/2 + 1/log log q)` and the matching lower bound (Thm 1.5) and class-number bounds (Cor 1.3) for `q ≥ 10^10`; Bach's bound with Bach's own constant `2`, and deterministic Miller with `2` | U | RH-consequence |
+| 13 | [bach-sorenson-grh](bach-sorenson-grh/) | least prime `p ≡ a (mod q)` is `< 2(q log q)²` (Bach–Sorenson's own constant) | U | RH-consequence |
+| 14 | [schoenfeld-rh](schoenfeld-rh/) | Schoenfeld's bounds with his constant: `\|ψ(x) − x\| < √x log² x / (8π)` (`x ≥ 73.2`), the same for θ (`x ≥ 599`), and `\|π(x) − li(x)\| < √x log x / (8π)` (`x ≥ 2657`) | U | RH-consequence |
+| 15 | [cramer-rh](cramer-rh/) | a prime in `[x, x + (22/25)√x log x]` for every `x ≥ 4` (Cramér's gap bound with the literature's constant `22/25`, Carneiro–Milinovich–Soundararajan); Cramér's mean square `∫_X^{2X} (ψ(x) − x)² dx ≪ X²` and its asymptotic `∫_1^X ((ψ(x) − x)/x)² dx ∼ c₁ log X` | U | RH-consequence |
+| 16 | [erdos-770](erdos-770/) | Erdős 770(iii): `h(n) ≤ max(P(n), ⌈200 log² n⌉)` for every `n ≥ 2` (parts (i) and (ii) stay open) | U | RH-consequence |
+| 17 | [erdos-233](erdos-233/) | `Σ_{n<N} (p_{n+1} − p_n)² = O(N log⁴ N)` (the RH upper bound; Erdős 233 itself stays open); Selberg's theorem that almost all intervals `(x, x + h(x)]` with `h(x)/log² x → ∞` contain a prime, and `π(x+h) − π(x) ~ h/log x` for almost all `x` | U | RH-consequence |
 
 Every row was rebuilt and checked on 2026-11-24 or 2026-11-25 against riemann-hypothesis
 `507a75d91d`, the community repository's `main` (the certified release is its commit `40e56bab`,
@@ -221,6 +242,6 @@ with credit. riemann-hypothesis has no licence, so we import it and copy nothing
 
 ## Licence
 
-This repository and the 17 submodules are licensed under the
+This repository, every project folder included, is licensed under the
 [GNU General Public License v3](LICENSE). Files vendored from other projects keep their own
 licences (Apache-2.0 or MIT); each repo's Credits section and NOTICE files list them.
