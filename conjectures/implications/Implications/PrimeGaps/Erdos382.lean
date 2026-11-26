@@ -200,11 +200,10 @@ theorem exists_between_consecutive_primes {u v N : ℕ} (h : LargestPrimeRepeate
     (hN : Nat.nth Nat.Prime N < u) :
     ∃ m, N ≤ m ∧ Nat.nth Nat.Prime m < u ∧ v < Nat.nth Nat.Prime (m + 1) := by
   have hinf := _root_.Nat.infinite_setOfPred_prime
-  set k := _root_.Nat.count Nat.Prime u with hk
-  have hNk : N < k := (_root_.Nat.lt_nth_iff_count_lt hinf).2 hN
-  obtain ⟨m, rfl⟩ : ∃ m, k = m + 1 := ⟨k - 1, by omega⟩
+  have hNk : N < _root_.Nat.count Nat.Prime u := (_root_.Nat.lt_nth_iff_count_lt hinf).2 hN
+  obtain ⟨m, hm⟩ : ∃ m, _root_.Nat.count Nat.Prime u = m + 1 := ⟨_ - 1, by omega⟩
   refine ⟨m, by omega, _root_.Nat.nth_lt_of_lt_count (by omega), ?_⟩
-  have hle : u ≤ Nat.nth Nat.Prime (m + 1) := hk ▸ _root_.Nat.le_nth_count hinf u
+  have hle : u ≤ Nat.nth Nat.Prime (m + 1) := hm ▸ _root_.Nat.le_nth_count hinf u
   by_contra! hv
   exact not_prime_of_mem_of_largestPrimeRepeated h hle hv
     (_root_.Nat.prime_nth_prime (m + 1))
@@ -239,7 +238,7 @@ lemma tendsto_nth_prime_real :
 theorem subpowerGaps_of_cramer (h : CramerConjecture.CramerConjecture) : SubpowerGaps := by
   intro ε hε
   have hlog : (fun x : ℝ => Real.log x ^ 2) =o[atTop] fun x => x ^ ε := by
-    simpa using Real.isLittleO_log_rpow_rpow_atTop (2 : ℝ) hε
+    simpa using isLittleO_log_rpow_rpow_atTop (2 : ℝ) hε
   have ho := h.trans_isLittleO (hlog.comp_tendsto tendsto_nth_prime_real)
   filter_upwards [ho.bound one_pos] with n hn
   have hp : (0 : ℝ) ≤ (Nat.nth Nat.Prime n : ℝ) := by positivity
@@ -284,7 +283,7 @@ theorem cramer_of_firoozbakht (h : Firoozbakht.FiroozbakhtConjecture) :
   have hsmall : ∀ᶠ k : ℕ in atTop, Real.log (Nat.nth Nat.Prime k) ^ 2 ≤
       Real.log 2 * (Nat.nth Nat.Prime k : ℝ) := by
     have hlo : (fun x : ℝ => Real.log x ^ 2) =o[atTop] fun x => x := by
-      simpa using Real.isLittleO_log_rpow_rpow_atTop (2 : ℝ) one_pos
+      simpa using isLittleO_log_rpow_rpow_atTop (2 : ℝ) one_pos
     filter_upwards [(hlo.comp_tendsto tendsto_nth_prime_real).bound hlog2,
       tendsto_nth_prime_real.eventually_ge_atTop 0] with k hk hk0
     simpa [Real.norm_eq_abs, abs_of_nonneg hk0] using hk
@@ -296,31 +295,60 @@ theorem cramer_of_firoozbakht (h : Firoozbakht.FiroozbakhtConjecture) :
   filter_upwards [hsmall, h7] with k hsk h7k
   set a : ℝ := (Nat.nth Nat.Prime k : ℝ) with ha
   set b : ℝ := (Nat.nth Nat.Prime (k + 1) : ℝ) with hb
-  have ha7 : (7 : ℝ) ≤ a := by exact_mod_cast h7k
+  have ha7 : (7 : ℝ) ≤ a := by rw [ha]; exact_mod_cast h7k
   have ha0 : 0 < a := by linarith
   have hb0 : 0 < b := by
     have := (_root_.Nat.prime_nth_prime (k + 1)).pos
     rw [hb]; exact_mod_cast this
-  have hab : a < b := by
-    rw [ha, hb]
-    exact_mod_cast _root_.Nat.nth_strictMono _root_.Nat.infinite_setOfPred_prime (by omega)
+  have habN : Nat.nth Nat.Prime k < Nat.nth Nat.Prime (k + 1) :=
+    _root_.Nat.nth_strictMono _root_.Nat.infinite_setOfPred_prime (by omega)
   have hla : 0 < Real.log a := Real.log_pos (by linarith)
   -- Firoozbakht at `k`, in logarithms
   have hF := h k
   simp only [Firoozbakht.firoozbakhtSeq, hPrime] at hF
   rw [← ha, ← hb] at hF
-  have hF' : Real.log b * (1 / ((k + 1 : ℕ) + 1 : ℝ)) < Real.log a * (1 / (k + 1 : ℝ)) := by
-    have := Real.log_lt_log (Real.rpow_pos_of_pos hb0 _) hF
-    rwa [Real.log_rpow hb0, Real.log_rpow ha0, mul_comm (Real.log a), mul_comm _ (Real.log b)]
-      at this
-  set t : ℝ := Real.log a / (k + 1 : ℝ) with ht
+  have hF' := Real.log_lt_log (Real.rpow_pos_of_pos hb0 _) hF
+  rw [Real.log_rpow hb0, Real.log_rpow ha0] at hF'
+  push_cast at hF'
+  set L := Real.log a with hL
+  set t : ℝ := L / (k + 1 : ℝ) with ht
   have hk1 : (0 : ℝ) < k + 1 := by positivity
-  have hlogb : Real.log b < Real.log a + t := by
-    push_cast at hF'
-    rw [ht]
-    have hk2 : (0 : ℝ) < k + 1 + 1 := by positivity
-    rw [mul_one_div, mul_one_div, div_lt_div_iff₀ hk2 hk1] at hF'
-    rw [lt_div_iff₀ hk1 |>.symm.trans (by ring_nf; rfl) |>.mp ?_] <;> sorry
-  sorry
+  have hlogb : Real.log b < L + t := by
+    have e1 : Real.log b = (k + 1 + 1) * (1 / ((k : ℝ) + 1 + 1) * Real.log b) := by
+      field_simp
+    have e2 : L + t = (k + 1 + 1) * (1 / ((k : ℝ) + 1) * L) := by
+      rw [ht]; field_simp; ring
+    rw [e1, e2]
+    exact mul_lt_mul_of_pos_left hF' (by positivity)
+  have hbexp : b < a * Real.exp t := by
+    have := Real.exp_lt_exp.2 hlogb
+    rwa [Real.exp_log hb0, Real.exp_add, hL, Real.exp_log ha0] at this
+  have ht0 : 0 ≤ t := by positivity
+  have hcheb := nth_mul_log_two_le h7k
+  rw [← ha, ← hL] at hcheb
+  have htL : t ≤ L ^ 2 / (a * Real.log 2) := by
+    rw [ht, div_le_div_iff₀ hk1 (by positivity)]
+    nlinarith
+  have ht1 : t ≤ 1 := htL.trans ((div_le_one (by positivity)).2 (by linarith))
+  have hexp : Real.exp t - 1 ≤ 2 * t := by
+    have := Real.abs_exp_sub_one_le (x := t) (by rw [abs_of_nonneg ht0]; exact ht1)
+    rw [abs_of_nonneg ht0] at this
+    exact (le_abs_self _).trans this
+  have hgap : (primeGap k : ℝ) = b - a := by
+    rw [primeGap, Nat.cast_sub habN.le, hb, ha]
+  have hmain : (primeGap k : ℝ) ≤ 2 / Real.log 2 * L ^ 2 := by
+    rw [hgap]
+    have h1 : b - a ≤ a * (2 * t) := by nlinarith
+    have h2 : a * (2 * t) ≤ 2 / Real.log 2 * L ^ 2 := by
+      have : a * t ≤ L ^ 2 / Real.log 2 := by
+        calc a * t ≤ a * (L ^ 2 / (a * Real.log 2)) := mul_le_mul_of_nonneg_left htL ha0.le
+          _ = L ^ 2 / Real.log 2 := by field_simp
+      calc a * (2 * t) = 2 * (a * t) := by ring
+        _ ≤ 2 * (L ^ 2 / Real.log 2) := by linarith
+        _ = 2 / Real.log 2 * L ^ 2 := by ring
+    linarith
+  have hpg : (0 : ℝ) ≤ primeGap k := by positivity
+  rw [Real.norm_eq_abs, Real.norm_eq_abs, abs_of_nonneg hpg, abs_of_nonneg (sq_nonneg _)]
+  exact hmain
 
 end Implications.PrimeGaps
