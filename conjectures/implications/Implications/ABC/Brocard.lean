@@ -40,6 +40,6 @@ theorem brocardFinite_of_abc (habc : ABCConjecture) : BrocardFinite := by
   have hev := erdos_936_factorial_add_one_of_abc habc
   by_contra hinf
   obtain ⟨n, ⟨m, hm⟩, hn⟩ := ((Nat.frequently_atTop_iff_infinite.2 hinf).and_eventually hev).exists
-  exact hn (hm ▸ powerful_sq m)
+  exact hn (show (n ! + 1).Powerful from hm ▸ powerful_sq m)
 
 end Implications.Abc
