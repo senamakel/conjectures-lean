@@ -120,13 +120,13 @@ lemma exists_prime_lt_le {A : ℝ} (hA : 0 ≤ A)
       omega
   refine ⟨_, _root_.Nat.prime_nth_prime (i + 1), hi2, ?_⟩
   have hg := hgap i
-  rw [primeGap, Nat.cast_sub hi2.le.trans' hi1 |>.trans_le' le_rfl] at hg
-  · have hp2 : (2 : ℝ) ≤ Nat.nth Nat.Prime i := by
-      exact_mod_cast (_root_.Nat.prime_nth_prime i).two_le
-    have hpm : (Nat.nth Nat.Prime i : ℝ) ≤ m := by exact_mod_cast hi1
-    have hlog : Real.log (Nat.nth Nat.Prime i) ^ 2 ≤ Real.log m ^ 2 :=
-      pow_le_pow_left₀ (Real.log_nonneg (by linarith)) (Real.log_le_log (by linarith) hpm) 2
-    nlinarith
+  rw [primeGap, Nat.cast_sub (_root_.Nat.nth_strictMono hinf (Nat.lt_succ_self i)).le] at hg
+  have hp2 : (2 : ℝ) ≤ Nat.nth Nat.Prime i := by
+    exact_mod_cast (_root_.Nat.prime_nth_prime i).two_le
+  have hpm : (Nat.nth Nat.Prime i : ℝ) ≤ m := by exact_mod_cast hi1
+  have hlog : Real.log (Nat.nth Nat.Prime i) ^ 2 ≤ Real.log m ^ 2 :=
+    pow_le_pow_left₀ (Real.log_nonneg (by linarith)) (Real.log_le_log (by linarith) hpm) 2
+  nlinarith
 
 /-! ## Headline theorems -/
 
