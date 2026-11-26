@@ -114,32 +114,34 @@ lemma numResidues_eq (q : ℕ) (hq : 3158 < q) : Nat.numResidues q m = 447 := by
 lemma factor_sub_one_le (q : ℝ) (hq : 894 ≤ q) :
     |(1 - 447 / q) / (1 - 1 / q) ^ 447 - 1| ≤ 2 * 447 ^ 2 * (1 / q ^ 2) := by
   have hq0 : 0 < q := by linarith
-  set x : ℝ := 1 / q with hxdef
-  have hx0 : 0 < x := by positivity
+  obtain ⟨x, hxdef⟩ : ∃ x : ℝ, x = 1 / q := ⟨_, rfl⟩
+  have hx0 : 0 < x := by rw [hxdef]; exact div_pos one_pos hq0
   have hx1 : 447 * x ≤ 1 / 2 := by
     rw [hxdef, mul_one_div, div_le_iff₀ hq0]; linarith
   have h447 : (447 : ℝ) / q = 447 * x := by rw [hxdef, mul_one_div]
   have hx2 : 1 / q ^ 2 = x ^ 2 := by rw [hxdef, one_div_pow]
-  rw [h447, hx2]
-  set P : ℝ := (1 - x) ^ 447 with hP
+  rw [h447, hx2, ← hxdef]
+  obtain ⟨P, hP⟩ : ∃ P : ℝ, P = (1 - x) ^ 447 := ⟨_, rfl⟩
+  rw [← hP]
   have hlow : 1 - 447 * x ≤ P := by
-    have := one_add_mul_le_pow (a := -x) (by linarith) 447
-    rw [hP]; norm_num at this ⊢; linarith
+    have h := one_add_mul_le_pow (a := -x) (by linarith) 447
+    rw [← sub_eq_add_neg, ← hP] at h
+    push_cast at h
+    linarith
   have hup : P ≤ 1 - 447 * x + (447 * x) ^ 2 := by
-    have h1 : P ≤ Real.exp (-x) ^ 447 :=
-      pow_le_pow_left₀ (by linarith) (Real.one_sub_le_exp_neg x) 447
+    have h1 : P ≤ Real.exp (-x) ^ 447 := by
+      rw [hP]; exact pow_le_pow_left₀ (by linarith) (Real.one_sub_le_exp_neg x) 447
     have h2 : Real.exp (-x) ^ 447 = Real.exp (-(447 * x)) := by
       rw [← Real.exp_nat_mul]; congr 1; push_cast; ring
     have h3 := Real.abs_exp_sub_one_sub_id_le (x := -(447 * x))
-      (by rw [abs_neg, abs_of_pos (by positivity)]; linarith)
+      (by rw [abs_neg, abs_of_pos (by linarith : (0 : ℝ) < 447 * x)]; linarith)
     have h4 := (abs_le.mp h3).2
     rw [neg_sq] at h4
     linarith
-  have hPpos : 1 / 2 ≤ P := by linarith
   have hP0 : 0 < P := by linarith
   rw [div_sub_one hP0.ne', abs_div, abs_of_pos hP0, div_le_iff₀ hP0,
     abs_of_nonpos (by linarith)]
-  nlinarith [sq_nonneg x]
+  nlinarith [mul_nonneg (sq_nonneg x) (by linarith : (0 : ℝ) ≤ 2 * P - 1)]
 
 /-- The Hardy–Littlewood factor at `q` for our tuple. -/
 noncomputable def factor (q : { q : ℕ // q.Prime ∧ 3 ≤ q}) : ℝ :=
@@ -247,12 +249,12 @@ theorem not_first_and_secondHardyLittlewoodConjecture :
     by_contra hlt
     have : p = 2 := by omega
     subst this
-    exact absurd h1 (by decide)
+    exact absurd h1 (by norm_num)
   have h2 := hHL2 (x := p - 1) (y := 3159) (by omega) (by norm_num)
   unfold SecondHardyLittlewoodConjectureFor at h2
   have h3 := primeCounting_3159_le
   generalize π 3159 = c at h2 h3
-  simp only [Nat.primeCounting, Nat.primeCounting'] at h2
+  unfold Nat.primeCounting Nat.primeCounting' at h2
   have e1 : p - 1 + 3159 + 1 = p + 3159 := by omega
   have e2 : p - 1 + 1 = p := by omega
   rw [e1, e2, Nat.count_add] at h2
