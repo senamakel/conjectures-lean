@@ -1,0 +1,337 @@
+\documentclass[11pt]{amsart}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+\usepackage{booktabs}
+\usepackage{alltt}
+\emergencystretch=2em
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\Lam}{\Lambda}
+\newcommand{\ord}{\operatorname{ord}}
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+\newcommand{\lean}[1]{\texttt{#1}}
+
+\title[Prime primitive roots under GRH]{Every odd prime has a smaller prime primitive root under GRH:\\ a formalized proof of Erd\H{o}s Problem 985}
+\author[Steven Enamakel]{Steven Enamakel\\[2pt] {\normalfont\small\texttt{\lowercase{enamakel@tinyhumans.ai}}}}
+\date{November 2026}
+
+
+\begin{document}
+\begin{abstract}
+Erd\H{o}s asked whether every odd prime $p$ has a primitive root $q<p$ that is itself prime. We show that the answer is yes under the Generalized Riemann Hypothesis for Dirichlet $L$-functions. The argument combines explicit bounds of Bach type for weighted prime sums twisted by characters, an indicator identity for primitive roots with the sharp constant $2^{\omega(p-1)}-1$, an elementary numerical verification for $p\ge 10^8$, and a machine check for $p<10^8$. The whole proof, including the explicit formula with Bach's constants, has been formalized in Lean~4 with Mathlib and contains no unproved steps. Combined with a recent formalization of GRH for Dirichlet $L$-functions, the Lean development yields an unconditional formal statement.
+\end{abstract}
+\maketitle
+
+\section{Introduction}
+
+For a prime $p$, an integer $q$ is a \emph{primitive root} modulo $p$ if its class generates $(\mathbb{Z}/p\mathbb{Z})^\times$. Erd\H{o}s Problem 985 \cite{erdosproblems} asks:
+
+\begin{quote}
+Is it true that for every prime $p>2$ there is a prime $q<p$ which is a primitive root modulo $p$?
+\end{quote}
+
+The least primitive root $g(p)$ is known to be small on average and, under GRH, satisfies $g(p)\ll (\log p)^6$ \cite{shoup}. Results of this kind give a prime primitive root below $p$ for all sufficiently large $p$, but the implied constants are not effective enough to cover every prime. McGown, Trevi\~no and Trudgian \cite{mtt} proved under GRH the stronger statement that the least prime primitive root is below $\sqrt p-2$ for all $p>2791$, building on explicit estimates of Bach \cite{bach97}. Our argument follows their strategy but is simpler, because Erd\H{o}s's question allows the search range to be all of $[1,p)$.
+
+\begin{theorem}\label{thm:main}
+Assume that for every Dirichlet character $\chi$ the $L$-function $L(s,\chi)$ has no zeros with $\Re s>1/2$. Then every prime $p>2$ has a prime primitive root $q<p$.
+\end{theorem}
+
+The hypothesis is exactly the following statement, which we abbreviate as GRH:
+\begin{equation}\label{eq:grh}
+\forall N\ge 1,\ \forall \chi \bmod N,\ \forall s\in\mathbb{C}:\quad \Re s>\tfrac12,\ (\chi\ne\chi_0 \text{ or } s\ne 1)\ \Longrightarrow\ L(s,\chi)\neq 0 .
+\end{equation}
+Here $\chi_0$ is the trivial character, so for $N=1$ this includes the Riemann Hypothesis.
+
+\subsection*{Formalization} Theorem~\ref{thm:main} is proved in Lean~4 (v4.36.0) using Mathlib, in the repository \url{https://github.com/senamakel/erdos-985}. The formal statement is
+\begin{small}\begin{alltt}
+theorem Erdos985.erdos_985_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
+    \(\forall\) p : \(\mathbb{N}\), p.Prime \(\to\) p \(\neq\) 2 \(\to\)
+      \(\exists\) q, q.Prime \(\wedge\) q < p \(\wedge\) orderOf (q : ZMod p) = p - 1
+\end{alltt}\end{small}
+and its conclusion coincides with the statement \lean{erdos\_985} in Google DeepMind's \emph{formal-conjectures} collection \cite{formalconj}. The hypothesis \lean{DirichletLNonvanishingRightOfHalf} is \eqref{eq:grh}, copied verbatim from the repository \emph{leanprover-community/riemann-hypothesis} \cite{rhrepo}. That repository contains a formal proof of \eqref{eq:grh} (theorem \lean{LFunction\_ne\_zero\_of\_half\_lt\_re}), announced on 20 November 2026, built on the same versions of Lean and Mathlib. Substituting it gives a formal theorem \lean{erdos\_985} without hypotheses. Its axioms are Lean's three standard axioms and the axioms introduced by \lean{native\_decide} for the finite computation of Section~\ref{sec:compute}; the development contains no \lean{sorry}.
+
+\subsection*{Outline} Section~\ref{sec:setup} fixes notation. Section~\ref{sec:indicator} reduces the problem to a comparison between a principal weighted prime sum and its character twists. Section~\ref{sec:bach} proves the needed explicit bounds from GRH. Section~\ref{sec:large} handles $p\ge 10^8$, and Section~\ref{sec:compute} handles $p<10^8$.
+
+\section{Notation}\label{sec:setup}
+
+Throughout, $p$ is an odd prime, $N=p-1$, and $\omega=\omega(N)$ is the number of distinct prime factors of $N$. $\Lam$ is the von Mangoldt function. For a Dirichlet character $\chi$ modulo $p$ and an integer $x\ge 1$ we put
+\[
+S_\chi(x)=\sum_{n<x}\Lam(n)\chi(n)\Bigl(1-\frac nx\Bigr),\qquad S_0(x)=\sum_{n<x}\Lam(n)\Bigl(1-\frac nx\Bigr).
+\]
+For $x\le p$ the principal character takes the value $1$ at every $n$ with $1\le n<x$, so $S_0(x)=S_{\chi_0}(x)$. Finally, for real $p,x>1$ we define Bach's constant
+\begin{equation}\label{eq:cpx}
+c(p,x)=\frac23\Bigl(1+\frac{2}{\sqrt x}+\frac{3}{x^{3/2}}\Bigr)\Bigl(1+\frac{5}{3\log p}\Bigr)+\frac{\log x+2}{\sqrt x\,\log p}.
+\end{equation}
+
+\section{The indicator inequality}\label{sec:indicator}
+
+\begin{proposition}\label{prop:indicator}
+Let $p$ be an odd prime, $2\le x\le p$, and let $B\ge 0$ satisfy $|S_\chi(x)|\le B$ for every non-principal character $\chi$ modulo $p$. If no prime $q<x$ is a primitive root modulo $p$, then
+\[
+S_0(x)\le \bigl(2^{\omega}-1\bigr)B .
+\]
+\end{proposition}
+
+\begin{proof}
+Let $n<x$ with $\Lam(n)\ne 0$, so $n=q^k$ with $q<x$ prime. Since $q$ is not a primitive root, $\ord_p(q)<N$, and $\ord_p(q^k)$ divides $\ord_p(q)$, so $n$ is not a primitive root either. Since $n<p$, also $p\nmid n$.
+
+Fix a character $\eta$ modulo $p$ of order $N$. For a prime $\ell\mid N$ and $p\nmid n$ put
+\[
+f_\ell(n)=1-\frac1\ell\sum_{i=0}^{\ell-1}\eta(n)^{iN/\ell}=\Bigl(1-\frac1\ell\Bigr)-\frac1\ell\sum_{0<i<\ell}\eta^{iN/\ell}(n).
+\]
+Since $\eta(n)^{N/\ell}$ is an $\ell$-th root of unity, $f_\ell(n)=0$ if $\eta(n)^{N/\ell}=1$, and $f_\ell(n)=1$ otherwise. An element of $(\mathbb{Z}/p\mathbb{Z})^\times$ fails to be a generator exactly when $\eta(n)^{N/\ell}=1$ for some prime $\ell\mid N$. Hence $\prod_{\ell\mid N}f_\ell(n)=0$ for every $n$ counted in $S_0(x)$, and
+\begin{equation}\label{eq:zero}
+\sum_{n<x}\Lam(n)\Bigl(1-\frac nx\Bigr)\prod_{\ell\mid N}f_\ell(n)=0 .
+\end{equation}
+Write $P$ for the set of prime divisors of $N$ and expand the product over subsets $T\subseteq P$:
+\[
+\prod_{\ell\in P}f_\ell=\sum_{T\subseteq P}\ \prod_{\ell\notin T}\Bigl(1-\frac1\ell\Bigr)\prod_{\ell\in T}\Bigl(-\frac1\ell\Bigr)\sum_{(i_\ell)_{\ell\in T},\,0<i_\ell<\ell}\eta^{\sum_{\ell\in T} i_\ell N/\ell}.
+\]
+If $T\neq\emptyset$ then $\sum_{\ell\in T}i_\ell N/\ell\not\equiv 0\pmod N$: fix $\ell_0\in T$ and let $v$ be the exponent of $\ell_0$ in $N$. Every term with $\ell\ne\ell_0$ is divisible by $\ell_0^{v}$, while $\ell_0^{v}\nmid i_{\ell_0}N/\ell_0$ because $\ell_0\nmid i_{\ell_0}$ and $\ell_0$ divides $N/\ell_0$ exactly to the power $v-1$. So the sum is not divisible by $\ell_0^{v}$, let alone by $N$. So each character appearing for $T\ne\emptyset$ is non-principal, and there are $\prod_{\ell\in T}(\ell-1)$ of them. With $\theta=\prod_{\ell\in P}(1-1/\ell)$, inserting the expansion into \eqref{eq:zero} gives
+\[
+0=\theta\,S_0(x)+R,\qquad |R|\le\sum_{\emptyset\ne T\subseteq P}\prod_{\ell\notin T}\Bigl(1-\frac1\ell\Bigr)\prod_{\ell\in T}\frac{\ell-1}{\ell}\,B=(2^\omega-1)\,\theta B .
+\]
+Dividing by $\theta>0$ proves the claim.
+\end{proof}
+
+\begin{remark}
+The usual route expresses the indicator of primitive roots through the M\"obius function and sorts characters by order. The product form above avoids that classification and gives the constant $2^\omega-1$ directly; it is also considerably shorter to formalize.
+\end{remark}
+
+\section{Explicit bounds from GRH}\label{sec:bach}
+
+The analytic input is the following pair of estimates. They are Lemma~1 of \cite{mtt}, derived there from the proof of Lemma~2.1 of \cite{bach97}. We give a complete proof, which is the one carried out in the formalization.
+
+\begin{theorem}\label{thm:bach}
+Assume GRH. Let $x\ge1$ be an integer.
+\begin{enumerate}
+\item $\displaystyle \Bigl|S_0(x)-\frac x2\Bigr|\le\frac{\sqrt x}{20}+3$.
+\item For a prime $p$ and a non-principal character $\chi$ modulo $p$, $\displaystyle |S_\chi(x)|\le c(p,x)\sqrt x\,\log p$.
+\end{enumerate}
+\end{theorem}
+
+\subsection{Completed $L$-functions and the Hadamard product}
+
+Let $\chi$ be a primitive non-principal character modulo $N$, with parity $a\in\{0,1\}$ ($\chi(-1)=(-1)^a$). Following Mathlib's normalization we put
+\[
+\Lam(s,\chi)=\pi^{-(s+a)/2}\,\Gamma\Bigl(\frac{s+a}{2}\Bigr)L(s,\chi),
+\]
+without the conductor factor $N^{s/2}$. This is entire, satisfies the functional equation $\Lam(1-s,\bar\chi)=\varepsilon(\chi)N^{s-1/2}\Lam(s,\chi)$ with $|\varepsilon(\chi)|=1$, and $\Lam(0,\chi)\ne0$. For $\zeta$ we use $\xi(s)=s(s-1)\pi^{-s/2}\Gamma(s/2)\zeta(s)$, which is entire with $\xi(0)=\xi(1)=1$ and $\xi(1-s)=\xi(s)$.
+
+\begin{theorem}[Hadamard]\label{thm:hadamard}
+Let $f$ be entire with $f(0)\ne0$ and $|f(z)|\le C\exp\bigl(C|z|\log(|z|+2)\bigr)$ for some $C$. Let $\rho$ run over the zeros of $f$ with multiplicity $m_\rho$. Then $\sum_\rho m_\rho|\rho|^{-1-\varepsilon}<\infty$ for every $\varepsilon>0$, and there is $b\in\mathbb{C}$ such that for every $z$ with $f(z)\ne0$,
+\[
+\frac{f'}{f}(z)=b+\sum_\rho m_\rho\Bigl(\frac1{z-\rho}+\frac1\rho\Bigr),
+\]
+the series converging absolutely.
+\end{theorem}
+
+In the formalization this is derived from the Hadamard factorization in the PrimeNumberTheoremAnd project \cite{pntplus}. A Mellin-transform estimate shows that $\Lam(s,\chi)$ and $\xi$ satisfy the growth hypothesis.
+
+Write $D(s)=\Lam'/\Lam(s,\chi)$ and $G(s)=-\tfrac12\log\pi+\tfrac12\psi\bigl(\tfrac{s+a}2\bigr)$, where $\psi=\Gamma'/\Gamma$, so that $D=G+L'/L$. Under GRH every zero $\rho$ of $\Lam(s,\chi)$ satisfies $\Re\rho=\tfrac12$. Indeed, $L(s,\chi)\ne0$ for $\Re s\ge 1$ and for $\tfrac12<\Re s<1$, the Gamma factor has no zeros, and the functional equation reflects $\Re s<\tfrac12$ to $\Re s>\tfrac12$ for $\bar\chi$.
+
+\subsection{The weighted explicit formula}
+
+For $y>0$ and $c>0$,
+\[
+\frac1{2\pi i}\int_{(c)}\frac{y^s}{s(s+1)}\,ds=\begin{cases}1-1/y,&y\ge1,\\ 0,&y<1.\end{cases}
+\]
+Applying this with $y=x/n$ and $c=2$ to $-L'/L(s,\chi)=\sum\Lam(n)\chi(n)n^{-s}$ gives
+\begin{equation}\label{eq:perron}
+S_\chi(x)=\frac1{2\pi i}\int_{(2)}-\frac{L'}{L}(s,\chi)\,\frac{x^s}{s(s+1)}\,ds .
+\end{equation}
+Decompose $-L'/L(s)=-(D(s)-D(2))+(G(s)-G(2))-L'/L(2)$. The constant contributes $-(1-1/x)L'/L(2,\chi)$. By Theorem~\ref{thm:hadamard}, applied at $s$ and at $2$, the unknown constant $b$ cancels:
+\[
+D(s)-D(2)=\sum_\rho m_\rho\Bigl(\frac1{s-\rho}-\frac1{2-\rho}\Bigr).
+\]
+The paired summand equals $(2-s)/((s-\rho)(2-\rho))$. On the line $\Re s=2$ it is $O(|s|^{-1}|\rho|^{-2})$ uniformly, so it may be integrated term by term against $x^s/(s(s+1))$. (Without the pairing the terms would sum like $\sum|\rho|^{-1}$, which diverges.) Shifting each contour to the left and collecting residues at $s=\rho,0,-1$ shows that the zero $\rho$ contributes $m_\rho\,Z_x(\rho)$, where
+\[
+Z_x(\rho)=\frac{1-1/x}{2-\rho}-\frac{x^\rho}{\rho(\rho+1)}+\frac1\rho-\frac{x^{-1}}{1+\rho}.
+\]
+Define the Gamma contribution
+\[
+\Gamma_\chi(x)=\frac1{2\pi i}\int_{(2)}\bigl(G(s)-G(2)\bigr)\frac{x^s}{s(s+1)}\,ds .
+\]
+Then, for primitive non-principal $\chi$,
+\begin{equation}\label{eq:ef}
+S_\chi(x)=\sum_\rho m_\rho Z_x(\rho)+\Gamma_\chi(x)-\Bigl(1-\frac1x\Bigr)\frac{L'}{L}(2,\chi).
+\end{equation}
+For $\zeta$ the same computation applies to $\xi$. Now $-\zeta'/\zeta$ has a pole at $s=1$, whose residue against the kernel is $x/2$, and the factor $s(s-1)$ in $\xi$ contributes further residues at $s=0,-1$. One obtains
+\begin{equation}\label{eq:efzeta}
+S_0(x)=\sum_\rho m_\rho Z_x(\rho)+\Gamma_{\chi_0}(x)+\frac x2+\log x-\frac72+\frac3x-\Bigl(1-\frac1x\Bigr)\frac{\zeta'}{\zeta}(2),
+\end{equation}
+where $\rho$ now runs over the zeros of $\xi$ and $\Gamma_{\chi_0}$ is built from $G(s)=-\tfrac12\log\pi+\tfrac12\psi(s/2)$.
+
+\subsection{Bounding the terms}
+
+\begin{lemma}\label{lem:zeroterm}
+If $\Re\rho=\tfrac12$ then $|Z_x(\rho)|\le(\sqrt x+2+3/x)/|\rho(\rho+1)|$.
+\end{lemma}
+\begin{proof}
+Grouping terms,
+\[
+Z_x(\rho)=-\frac{x^\rho}{\rho(\rho+1)}+\frac{2}{\rho(2-\rho)}-\frac{3}{x(2-\rho)(1+\rho)}.
+\]
+When $\Re\rho=\tfrac12$ we have $2-\rho=1+\bar\rho$, so $|2-\rho|=|1+\rho|\ge|\rho|$ and $|x^\rho|=\sqrt x$. Hence $|\rho(2-\rho)|=|\rho(\rho+1)|$ and $|(2-\rho)(1+\rho)|\ge|\rho(\rho+1)|$.
+\end{proof}
+
+\begin{lemma}\label{lem:gamma}
+For every integer $x\ge1$:
+\begin{enumerate}
+\item $|\Gamma_\chi(x)|\le\log x+1$;
+\item $\Gamma_{\chi_0}(x)$ is real and satisfies $1-\frac{3}{2x}\le\Gamma_{\chi_0}(x)+\log x\le1$.
+\end{enumerate}
+\end{lemma}
+\begin{proof}[Sketch]
+By the series $\psi(z)=-\gamma+\sum_{k\ge0}\bigl(\frac1{k+1}-\frac1{k+z}\bigr)$ we get $G(s)-G(2)=\tfrac12\sum_{k\ge0}\bigl(\frac1{k+(2+a)/2}-\frac1{k+(s+a)/2}\bigr)$, with poles at the trivial zeros $s=-a-2k$. Integrating term by term and collecting the residues at $s=-a-2k$, $0$ and $-1$ expresses $\Gamma_\chi(x)$ as an explicit convergent series in $x^{-1}$ plus a $\log x$ term from the double pole at $s=0$ when $a=0$. The stated bounds follow from elementary estimates on this series.
+\end{proof}
+
+\begin{lemma}\label{lem:two}
+$|L'/L(2,\chi)|\le\sum_n\Lam(n)n^{-2}=-\zeta'/\zeta(2)\le0.6$. In particular $-0.6\le\zeta'/\zeta(2)\le0$.
+\end{lemma}
+
+\begin{lemma}\label{lem:zerosum}
+Assume GRH.
+\begin{enumerate}
+\item For primitive non-principal $\chi$ modulo $N$: $\displaystyle\sum_\rho\frac{m_\rho}{|\rho(\rho+1)|}\le\frac23\Bigl(\log N+\frac53\Bigr)$.
+\item For the zeros of $\xi$: $\displaystyle\sum_\rho\frac{m_\rho}{|\rho(\rho+1)|}\le 2+\gamma-\log4\pi<\frac1{20}$.
+\end{enumerate}
+\end{lemma}
+\begin{proof}
+(1) Write $\rho=\tfrac12+i\gamma_\rho$. Then
+\[
+|\rho(\rho+1)|^2=\bigl(\tfrac14+\gamma_\rho^2\bigr)\bigl(\tfrac94+\gamma_\rho^2\bigr)\ge\tfrac9{16}\bigl(1+\gamma_\rho^2\bigr)^2,
+\]
+since the difference is $\tfrac{22}{16}\gamma_\rho^2+\tfrac7{16}\gamma_\rho^4\ge0$. Hence $1/|\rho(\rho+1)|\le\tfrac43(1+\gamma_\rho^2)^{-1}=\tfrac43\Re\frac1{3/2-\rho}$. Applying Theorem~\ref{thm:hadamard} at $s$ and at $1-s$ and using the functional equation gives the classical identity
+\[
+\sum_\rho m_\rho\Re\frac1{s-\rho}=\frac12\log N+\Re D(s)\qquad(\Re s>1).
+\]
+At $s=\tfrac32$ we have $\Re D(\tfrac32)=-\tfrac12\log\pi+\tfrac12\psi\bigl(\tfrac{3/2+a}{2}\bigr)+\Re\frac{L'}{L}(\tfrac32,\chi)$. We use $\psi(3/4)\le-1.08$, $\psi(5/4)\le-0.22$, $\log\pi>1.1447$ and
+\[
+\Bigl|\frac{L'}{L}\bigl(\tfrac32,\chi\bigr)\Bigr|\le\sum_n\frac{\Lam(n)}{n^{3/2}}\le1.515 .
+\]
+These give $2\Re D(\tfrac32)\le-1.1447-0.22+3.03<\tfrac53$, and therefore $\sum_\rho m_\rho/|\rho(\rho+1)|\le\tfrac43\bigl(\tfrac12\log N+\tfrac56\bigr)$, which is the claim.
+
+(2) Since $|\rho+1|\ge|\rho|$ and $\Re\rho=\tfrac12$, we get $1/|\rho(\rho+1)|\le|\rho|^{-2}=2\Re(1/\rho)$. The Hadamard constant for $\xi$ is classical, and $\sum_\rho\Re(1/\rho)=1+\tfrac\gamma2-\tfrac12\log4\pi$ \cite[Ch.~12]{davenport}. Finally $2+\gamma-\log 4\pi<2+0.5773-2.5310<0.05$.
+\end{proof}
+
+\begin{remark}
+The bound $\sum\Lam(n)n^{-3/2}\le1.515$ (the true value is about $1.5052$) is proved from finite partial sums of $\zeta(3/2)$ and $\zeta'(3/2)$ with tail estimates. It is the tightest numerical input: case $a=1$ of Lemma~\ref{lem:zerosum}(1) leaves a margin of about $0.001$.
+\end{remark}
+
+\begin{proof}[Proof of Theorem~\ref{thm:bach}]
+(2) Every non-principal character modulo a prime is primitive. By \eqref{eq:ef} and Lemmas~\ref{lem:zeroterm}--\ref{lem:zerosum},
+\[
+|S_\chi(x)|\le\Bigl(\sqrt x+2+\frac3x\Bigr)\cdot\frac23\Bigl(\log p+\frac53\Bigr)+\log x+1+0.6 .
+\]
+Expanding \eqref{eq:cpx} shows that $c(p,x)\sqrt x\log p=\tfrac23(\sqrt x+2+3/x)(\log p+\tfrac53)+\log x+2$, which is at least the right-hand side.
+
+(1) By \eqref{eq:efzeta}, $S_0(x)-x/2=\Sigma+E$ with $\Sigma=\sum_\rho m_\rho Z_x(\rho)$ and
+\[
+E=\bigl(\Gamma_{\chi_0}(x)+\log x\bigr)-\frac72+\frac3x-\Bigl(1-\frac1x\Bigr)\frac{\zeta'}{\zeta}(2).
+\]
+By Lemmas~\ref{lem:zeroterm} and~\ref{lem:zerosum}(2), $|\Re\Sigma|\le(\sqrt x+5)/20$. By Lemmas~\ref{lem:gamma}(2) and~\ref{lem:two}, $-\tfrac52\le E\le\tfrac52$. Since $S_0(x)$ is real, $|S_0(x)-x/2|\le\sqrt x/20+\tfrac14+\tfrac52$.
+\end{proof}
+
+\section{Large primes}\label{sec:large}
+
+\begin{proposition}\label{prop:large}
+For every prime $p\ge10^8$,
+\[
+\bigl(2^{\omega(p-1)}-1\bigr)\,c(p,p)\sqrt p\,\log p<\frac p2-\frac{\sqrt p}{20}-3 .
+\]
+\end{proposition}
+\begin{proof}
+Bound $c(p,p)$ from above using lower bounds for $\sqrt p$ and $\log p$, and bound $\log p$ from above by tangent lines $\log p\le\log a+p/a-1$. There are three cases.
+
+\emph{Case $\omega\le8$.} Here $2^\omega-1\le255$. At $p=10^8$ we have $c(p,p)\le0.728$, and the left side is about $3.4\cdot10^7$ while the right side is about $5\cdot10^7$. The ratio of the two sides decreases for larger $p$.
+
+\emph{Case $\omega=9$.} Here $p-1$ is at least the product of the first nine primes, $223092870$. With $2^9-1=511$ the inequality holds with a margin of about $4\%$ at $p=223092871$, and the margin improves as $p$ grows.
+
+\emph{Case $\omega\ge10$.} For $B\ge2$ and $n\ge1$ one has $B^{\omega(n)}\prod_{r<B}r\le n\,B^{\pi(B-1)}$, the product running over primes. With $B=16$ this gives $16^{\omega}\cdot30030\le16^6(p-1)$, so $2^\omega\le4.87\,p^{1/4}$. Since $p\ge 6469693231$ in this case, the inequality reduces to $p^{1/4}>2\cdot4.87\cdot c(p,p)\log p+o(1)$, which holds there with room to spare.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:main} for $p\ge10^8$]
+Suppose no prime $q<p$ is a primitive root. Apply Proposition~\ref{prop:indicator} with $x=p$ and $B=c(p,p)\sqrt p\log p$, which is admissible by Theorem~\ref{thm:bach}(2). Theorem~\ref{thm:bach}(1) then gives
+\[
+\frac p2-\frac{\sqrt p}{20}-3\le S_0(p)\le\bigl(2^\omega-1\bigr)c(p,p)\sqrt p\log p,
+\]
+contradicting Proposition~\ref{prop:large}. Together with Proposition~\ref{prop:small} below, this proves Theorem~\ref{thm:main}.
+\end{proof}
+
+\section{Small primes}\label{sec:compute}
+
+\begin{proposition}\label{prop:small}
+Every odd prime $p<10^8$ has a prime primitive root $q<p$.
+\end{proposition}
+
+This is a finite computation. For each odd $n<10^8$ the checker accepts if $n$ fails the base-$2$ Fermat test, if $n$ is visibly composite, or if some prime $q<\min(n,2000)$ satisfies
+\[
+q^{(n-1)/r}\not\equiv1\pmod n\quad\text{for every prime } r\mid n-1 .
+\]
+For prime $n$ the last condition, together with Fermat's little theorem, shows that $q$ has order exactly $n-1$. The soundness of the checker is proved formally: if it accepts every $n<10^8$, then Proposition~\ref{prop:small} holds. The run itself is split into twenty ranges of length $5\cdot10^6$ and evaluated with Lean's \lean{native\_decide}, which trusts the compiled code. It takes about two minutes on 18 cores.
+
+\begin{remark}
+The analytic bound alone fails for only $8021$ primes, all below $4.25\cdot10^7$; the largest is $42450871$. We check all primes below $10^8$ anyway, because it keeps Proposition~\ref{prop:large} to three short cases. The thresholds $T_\omega$ beyond which the inequality of Proposition~\ref{prop:large} holds are approximately
+\begin{center}
+\small\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+$\omega$ & 6 & 7 & 8 & 9 & 10 & 11\\
+\midrule
+$T_\omega$ & $1.84\cdot10^6$ & $8.98\cdot10^6$ & $4.28\cdot10^7$ & $2.01\cdot10^8$ & $9.27\cdot10^8$ & $4.23\cdot10^9$\\
+least $p$ & $30031$ & $510511$ & $9699691$ & $223092871$ & $6.47\cdot10^9$ & $2.01\cdot10^{11}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+From $\omega=9$ on, every prime with that many prime factors in $p-1$ already lies above its threshold.
+\end{remark}
+
+\section{About the formalization}
+
+The Lean development has about $6{,}260$ lines written for this project and reuses about $9{,}900$ lines of Hadamard factorization from PrimeNumberTheoremAnd \cite{pntplus} (Apache~2.0). The table lists the main formal results.
+
+\begin{center}
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+Result & Lean name\\
+\midrule
+Proposition~\ref{prop:indicator} & \lean{principal\_le\_of\_no\_prime\_primitive\_root}\\
+Theorem~\ref{thm:hadamard} & \lean{hadamard\_logDeriv}\\
+Explicit formulas \eqref{eq:ef}, \eqref{eq:efzeta} & \lean{explicit\_formula}, \lean{explicit\_formula\_zeta}\\
+Lemma~\ref{lem:zerosum} & \lean{zeroSum\_le}, \lean{zeroSum\_zeta\_le}\\
+Theorem~\ref{thm:bach} & \lean{bach\_principal\_of\_GRH}, \lean{bach\_nonprincipal\_of\_GRH}\\
+Proposition~\ref{prop:large} & \lean{bach\_inequality\_large}\\
+Proposition~\ref{prop:small} & \lean{small\_primes\_have\_prime\_primitive\_root}\\
+Theorem~\ref{thm:main} & \lean{erdos\_985\_of\_GRH}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Apart from the computation of Section~\ref{sec:compute}, all of these results use only Lean's three standard axioms. A separate file imports the riemann-hypothesis repository and fills the hypothesis of Theorem~\ref{thm:main} with its theorem \lean{LFunction\_ne\_zero\_of\_half\_lt\_re}, which gives the theorem \lean{erdos\_985} with no hypotheses.
+
+\begin{thebibliography}{99}
+\bibitem{bach97} E. Bach, \emph{Comments on search procedures for primitive roots}, Math. Comp. \textbf{66} (1997), 1719--1727.
+\bibitem{davenport} H. Davenport, \emph{Multiplicative Number Theory}, 3rd ed., Graduate Texts in Mathematics 74, Springer, 2000.
+\bibitem{erdosproblems} T. Bloom, \emph{Erd\H{o}s Problems}, Problem 985, \url{https://www.erdosproblems.com/985}.
+\bibitem{formalconj} Google DeepMind, \emph{formal-conjectures}, \url{https://github.com/google-deepmind/formal-conjectures}.
+\bibitem{mtt} K. McGown, E. Trevi\~no, T. Trudgian, \emph{Resolving Grosswald's conjecture on GRH}, Funct. Approx. Comment. Math. (2016); arXiv:1508.05182.
+\bibitem{mathlib} The mathlib Community, \emph{The Lean mathematical library}, CPP 2020, 367--381.
+\bibitem{pntplus} A. Kontorovich, T. Tao, et al., \emph{PrimeNumberTheoremAnd}, \url{https://github.com/AlexKontorovich/PrimeNumberTheoremAnd}.
+\bibitem{rhrepo} \emph{leanprover-community/riemann-hypothesis}, \url{https://github.com/leanprover-community/riemann-hypothesis}.
+\bibitem{shoup} V. Shoup, \emph{Searching for primitive roots in finite fields}, Math. Comp. \textbf{58} (1992), 369--380.
+\end{thebibliography}
+
+\end{document}
