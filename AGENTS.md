@@ -1,8 +1,9 @@
 # Conjectures workspace
 
-This repository (`github.com/senamakel/conjectures-lean`) holds 28 Lean 4 projects that formalise
-number-theory conjectures and theorems: the 17 headline results, each a consequence of RH or GRH,
-and 11 further projects (see the table in `README.md`). Each project is a folder under
+This repository (`github.com/senamakel/conjectures-lean`) holds Lean 4 projects that formalise
+conjectures and theorems: the 17 headline results, each a consequence of RH or GRH, and further
+projects (see the table in `README.md`). Since 2026-11-26 the scope is any open conjecture in
+mathematics, theoretical computer science or mathematical physics (see "Scope"). Each project is a folder under
 `conjectures/` and a Lean package of its own, imported with its full history from the former standalone
 repository `github.com/senamakel/<name>`. This file is the tracker: when a box changes, update it
 here in the same commit as the change.
@@ -229,6 +230,44 @@ looking for a new argument from nothing. The 28 projects below and their RH/GRH 
 unchanged; the rules on tiers, axioms, fixed statements and calibrated claims apply to every
 target. A target outside RH/GRH takes the label that fits (*known*, *new*, or "consequence of
 X" naming the premise) and its row in `docs/NEXT_TARGETS.md` says which.
+
+### Computer science and physics
+
+**Decided 2026-11-26 (owner).** The scope also covers theoretical computer science and
+mathematical physics, not only pure mathematics, and nothing in it has to involve RH or GRH. A
+target qualifies when it is a precise mathematical statement that can be written against Mathlib:
+a complexity or algorithmic bound with a finite open case (tensor rank of small matrix
+multiplication, optimal sorting networks, Busy Beaver values), an extremal problem of the kind SAT
+solvers settle (Ramsey, Schur, van der Waerden, Erdős–Szekeres numbers), or a finite or algebraic
+problem from physics (Kochen–Specker sets, mutually unbiased bases, SIC-POVMs, kissing numbers,
+quantum codes). Open problems in physics that are not mathematical statements (quantum gravity,
+interpretation questions), and Millennium-hard ones (the Yang–Mills mass gap, Navier–Stokes, P vs
+NP), are out of scope. Candidates and their status are in the sweep reports
+`docs/atlas/sweeps/2026-11-26/cs-physics-*.md`.
+
+Rules on top of the ones above:
+
+- **Physical assumptions are hypotheses, never axioms.** A modelling assumption (a Hamiltonian, a
+  noise model, a locality condition) is an explicit `Prop` argument (tier H) or a definition
+  stated in Mathlib's terms. The statement says which.
+- **Certificate results.** Many targets here are settled by a search that outputs a certificate:
+  an explicit construction (a colouring, a scheme, a vector set), or an UNSAT proof. A
+  construction is checked in Lean by `decide`, `native_decide` with a proved-sound checker, or a
+  polynomial identity. An UNSAT proof is checked as LRAT, either through Lean core's verified
+  LRAT checker (the one `bv_decide` uses) or a checker proved sound in the project. `#print axioms`
+  then shows the compiler-trust axioms (`Lean.ofReduceBool`, and on some toolchains
+  `Lean.trustCompiler`). They are allowed exactly like `native_decide`'s: counted in the README,
+  each with one sentence on what it checks, how big the certificate is and how long it takes.
+- **The encoding is part of the statement.** When a SAT or ILP encoding is used, the theorem
+  stated in Lean is the mathematical one, and the proof that the encoding is faithful (and that
+  symmetry breaking loses no solutions) is in Lean too. A certificate for an encoding that only a
+  script relates to the problem is not a result.
+- **Record how it was found.** The README's proof outline gives the search method, solver and
+  version, the parameters, the wall and CPU time, and the certificate's size and hash, so the
+  search can be rerun. The refutation lane's rules on bounded searches apply to every search.
+- **Bound improvements count.** A better bound on an open extremal quantity (a new lower bound by
+  construction, a smaller scheme) is a priority-3 result ("strictly stronger than the published
+  one") even when the exact value stays open; say both the old and the new bound.
 
 LivingBrain is part of the method. Ingest the proofs and lemma inventories we read (statement,
 source, repo and path, what it needs, what it gives), so a later search for "what proves a bound
