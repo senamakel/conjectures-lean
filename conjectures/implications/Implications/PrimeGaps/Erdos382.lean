@@ -25,6 +25,8 @@ commit `9097e2f`, with the source file and declaration named at each definition.
 
 open Filter
 
+set_option linter.dupNamespace false
+
 namespace Implications.PrimeGaps
 
 /-! ## Definitions copied from formal-conjectures (commit `9097e2f`) -/
@@ -201,7 +203,7 @@ theorem exists_between_consecutive_primes {u v N : ℕ} (h : LargestPrimeRepeate
     ∃ m, N ≤ m ∧ Nat.nth Nat.Prime m < u ∧ v < Nat.nth Nat.Prime (m + 1) := by
   have hinf := _root_.Nat.infinite_setOfPred_prime
   have hNk : N < _root_.Nat.count Nat.Prime u := (_root_.Nat.lt_nth_iff_count_lt hinf).2 hN
-  obtain ⟨m, hm⟩ : ∃ m, _root_.Nat.count Nat.Prime u = m + 1 := ⟨_ - 1, by omega⟩
+  obtain ⟨m, hm⟩ : ∃ m, _root_.Nat.count Nat.Prime u = m + 1 := ⟨_root_.Nat.count Nat.Prime u - 1, by omega⟩
   refine ⟨m, by omega, _root_.Nat.nth_lt_of_lt_count (by omega), ?_⟩
   have hle : u ≤ Nat.nth Nat.Prime (m + 1) := hm ▸ _root_.Nat.le_nth_count hinf u
   by_contra! hv
@@ -317,7 +319,7 @@ theorem cramer_of_firoozbakht (h : Firoozbakht.FiroozbakhtConjecture) :
     have e1 : Real.log b = (k + 1 + 1) * (1 / ((k : ℝ) + 1 + 1) * Real.log b) := by
       field_simp
     have e2 : L + t = (k + 1 + 1) * (1 / ((k : ℝ) + 1) * L) := by
-      rw [ht]; field_simp; ring
+      rw [ht]; field_simp
     rw [e1, e2]
     exact mul_lt_mul_of_pos_left hF' (by positivity)
   have hbexp : b < a * Real.exp t := by
