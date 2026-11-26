@@ -138,7 +138,8 @@ literal definitions (cycle check plus pattern-occurrence check).
 
 - **321.** `src/cyc321.cpp` is a separate implementation: the same characterisation, no tail
   shortcut, a different hash table. It gives C_28(321) = 2,707,924,923,904, identical. At n = 29,
-  `src/cyc321p.cpp` (a re-implementation with 64-bit keys) gives: SEE-321P.
+  `src/cyc321p.cpp` (the non-tail DP re-implemented with 64-bit keys) gives
+  9,388,443,765,578, identical (948 s, 8.4 GB).
 - **312.** Two programs use different characterisations, not the stack.
   - `src/cyc231.cpp` counts the inverse class Av(231) with its own rule, derived from the
     definition of 231: π(i) must lie in the lowest run of consecutive unused values. Its state
@@ -147,7 +148,7 @@ literal definitions (cycle check plus pattern-occurrence check).
   - `src/cyc312p.cpp` / `cyc312p2.cpp` use a position sweep from the 312 definition: π(i) is
     either the largest unused value below the current maximum, or any unused value above it.
     It completes forced tails once n is used, and shares no transition code with `cyc312t`. It
-    gives C_26 = 204,968,426,678, C_27 = 732,625,336,887 and C_28 = SEE-312P28, identical.
+    gives C_26 = 204,968,426,678, C_27 = 732,625,336,887 and C_28 = 2,628,648,068,210, identical.
     At n = 29: SEE-312P29.
 - `src/cyc312s.cpp` (the stack DP without the tail shortcut, sorted-array layers) agrees for
   n ≤ 22.
