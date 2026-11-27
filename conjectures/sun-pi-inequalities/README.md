@@ -8,8 +8,8 @@ pp. 169–187; also OEIS A238165, conjecture (ii)). On the same day he conjectur
 conjecture (i), "to the limit 1"). This package proves both statements in Lean, with no
 hypothesis. The arguments are elementary: Chebyshev's lower bound `ψ(x) ≥ x log 2`, a count of
 the integers prime to 6 or to 210 in a short interval, and a finite computation. Nothing here
-uses RH. We found no proof of either statement in the sources listed below (searched
-2026-11-26).
+uses RH. F8Labs published earlier Lean proofs of both paper inequalities, including 2.7(i)
+for all positive `k`. [Earlier formalization](https://github.com/F8Labs-ai/sun_conjectures/tree/388a290aea68b0e59fa767d23a4ab296c592432d).
 
 ## Headline theorems
 
@@ -47,9 +47,8 @@ def OeisA038107_i : Prop :=
 ## Tier and provenance
 
 All four theorems are **tier D**: closed statements with no hypotheses, proved from Mathlib
-alone. Nothing here imports riemann-hypothesis. The literature status is that of an open
-conjecture for which we found no published proof; no label from `docs/LITERATURE_STATUS.md` is
-claimed, and the label *new* awaits the owner's sign-off.
+alone. The two paper inequalities are **known** from the earlier Lean formalization. This package
+also checks the exact OEIS formulations, including the limit in A038107.
 
 The statements were transcribed from Sun's paper (arXiv:1402.6641 v12, read 2026-11-26) and
 from the OEIS comments (A238165, A038107, read the same day). Sun's paper form of 2.7(i) runs
@@ -165,7 +164,10 @@ No unconditional version is needed: the results are tier D and do not use RH.
 - OEIS A238165 (comment (ii)) and A038107 (Sun's comment of Feb 17 2014, part (i)).
 - P. L. Chebyshev's bound in Mathlib's form `Chebyshev.psi_ge_of_seven_le`.
 
-**Searches for a proof** (2026-11-26), none of which found one:
+Exa surfaced the earlier F8Labs Lean proofs on 2026-11-27. See `SunComplete.sun_roots`
+and `SunSquares.sun_sq_roots` in the pinned [F8Labs repository](https://github.com/F8Labs-ai/sun_conjectures/tree/388a290aea68b0e59fa767d23a4ab296c592432d).
+
+The searches on 2026-11-26 missed that repository:
 
 - arXiv and the web (web search for the two inequalities and "Sun conjecture π(kn)^{1/k}");
   Sun–Zhao, arXiv:2004.01080, concerns `π(kn)` being prime, not 2.7(i); Wang–Zhu,

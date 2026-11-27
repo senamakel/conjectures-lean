@@ -928,7 +928,7 @@ The role is `counterexample-hunter` (`.claude/agents/`). Scripts of each sweep a
       The label *new* needs the owner's sign-off
 - [ ] Next in the cluster, not started: Grosswald's conjecture modulo `p²` (Kerr–McGown–Trudgian), about 1000 CPU-hours of checks
 
-### sun-pi-inequalities: Sun's Conjectures 2.7(i) and 2.14(ii) on `π(x)` (arXiv:1402.6641; OEIS A238165 (ii), A038107 (i)) · **tier D, complete, audited** · *no proof found in the literature*
+### sun-pi-inequalities: Sun's Conjectures 2.7(i) and 2.14(ii) on `π(x)` (arXiv:1402.6641; OEIS A238165 (ii), A038107 (i)) · **tier D, complete, audited** · *known*
 - [x] `sun_2_7_i`, `oeis_A238165_ii`, `sun_2_7_i_nat`: `π(kn)^{1/k} > π((k+1)n)^{1/(k+1)}` for `n > 4`, `1 ≤ k ≤ n`. Rebuilt from source
       2026-11-26 at `98a1b97` (merged as PR #23, `9594f71`): standard three only; finite range (391 pairs, `n ≤ 63`) by `decide +kernel`
 - [x] `sun_2_14_ii`, `oeis_A038107_i` (with limit 1), `sun_2_14_ii_nat`: `π(n²)^{1/n}` strictly decreasing for `n ≥ 3`. Standard three
@@ -936,8 +936,7 @@ The role is `counterexample-hunter` (`.claude/agents/`). Scripts of each sweep a
 - [x] Statements transcribed from arXiv:1402.6641 v12 and the OEIS comments, compared by the auditor 2026-11-26 (ranges, direction,
       strictness); `a` verbatim from formal-conjectures `OeisA38107.a`, which states neither conjecture. Python check: both hold on
       small cases and fail just outside their ranges (`n = 4, k = 1`; `n = 1, 2`)
-- [x] Novelty search 2026-11-26 (arXiv/Exa, OEIS, MathOverflow, formal-conjectures PRs, GitHub code): no proof found. The label *new*
-      needs the owner's sign-off
+- [x] Prior Lean proofs of both paper inequalities found on 2026-11-27 in [F8Labs/sun_conjectures](https://github.com/F8Labs-ai/sun_conjectures/tree/388a290aea68b0e59fa767d23a4ab296c592432d). Its proof of 2.7(i) covers every `k ≥ 1`. See [the OMA attack note](docs/atlas/sweeps/2026-11-27/oma-audited-targets.md) for statement matching.
 - [ ] Other parts of Conjectures 2.7 and 2.14 (2.7(ii), 2.14(i), 2.14(iii)) and A238165 (i) not attempted
 
 ### bach-sharp-grh: Bach's sharp generator constant `2/log² 3` for `(ℤ/m)ˣ` · **tier D + C outside `2^17 ≤ m < 5·2^49`, verified; full statement not proved; U check pending** · *RH-consequence; the sharp constant was not found in the literature*
