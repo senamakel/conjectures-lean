@@ -155,3 +155,27 @@ pairs at multiplier 19. Moduli through 97 suffice and the direct
 residue test covers every pair. The pinned Lean theorem uses only
 the three standard axioms. Together the checks through multiplier
 19 leave odd cross multipliers at least 21 in the coprime branch.
+
+### Parity in the shared-divisor branch
+
+The GCD normalization merged upstream. Its normalization obligation now
+has a separate proof submission reusing the checked theorem from the
+merged reduction. [Merged reduction #4633](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4633) · [Normalization proof #4974](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4974)
+
+[CrystalEven.lean](CrystalEven.lean) verifies that for positive
+`a ≤ b`, the divisibility `(a+1)(b+1) ∣ (a+b)²` forces both
+components to be odd. Mixed parity would make an even denominator
+divide an odd square. If both components are even, shift to the
+odd integers `X = a+1` and `Y = b+1`. The Vieta partner
+`(X−2)²/Y` is positive and odd and lies below `X` when `X ≥ 3`.
+Descent reaches `X = 1`, where the quotient equation forces `Y = 1`.
+The zero components contradict positivity. A preliminary exhaustive
+screen of even smaller components through 100,000, using divisors of
+`(a−1)²` to enumerate `b+1`, found no pair. The Lean proof
+excludes every size with only standard axioms.
+
+The exact OMA reduction uses this to split by whether the smaller
+normalized coprime factor is 1 or at least 3. Both odd-parameter
+branches remain open. The desk rejected the exact lease request with
+`not_found_or_solved`, as disclosed in the submission.
+[Odd-parameter reduction #4990](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4990)
