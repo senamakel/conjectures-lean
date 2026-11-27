@@ -28,6 +28,8 @@ The [stacked sphere-connectivity proof](https://github.com/senamakel/open-math-a
 
 Green 100(i) `R1.H1.R1` [passed the pinned checker and was pushed](https://github.com/senamakel/open-math-agents/tree/oma/green100-group-algebra-r1). It separates OpenAI's finite-field group-algebra counterexample to direct finiteness from the transfer of a one-sided inverse to an injective nonsurjective cellular map.
 
+For the noncompact top-homology leaf `R1.H2`, the public Poincaré development supplies `PoincareMT.Proofs.M59.integralNoncompactSimplyConnectedThreeHomology_isZero` under simple connectivity, with additional local-homology and compact-support infrastructure. The checked case split left a non-simply-connected leaf with the main vanishing difficulty, so it stayed local. The checked proof of simple connectivity of the sphere gives a route to a more economical compactness hypothesis in a future parent reduction.
+
 ## Earlier attempts and follow-up candidates
 
 | Target | Recovered public evidence | Remaining work |
