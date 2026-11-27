@@ -3,19 +3,13 @@ import Mathlib.Tactic
 import Implications.C4PolarityCanonical
 import Implications.C4PolarityCnfGates
 import Implications.C4PolarityDeletion
-import Implications.C4DegreeBounds
 
 set_option maxRecDepth 10000
 set_option maxHeartbeats 0
 
-noncomputable section
-local instance {α : Type*} [Fintype α] (s : Set α) : Fintype s := Fintype.ofFinite s
-
 /-! Exact Boolean inputs emitted by `scripts/encode_c4_polarity_42_cnf.py`. -/
 
 namespace Implications.C4PolarityEncoderInputs
-
-classical
 
 open C4PolarityOrderSeven Implications.C4PolarityDeletion
 
@@ -234,112 +228,24 @@ theorem neighbor_survivor_clauses_of_min_degree (D : Finset (Fin 57))
     rw [List.mem_map]
     exact ⟨j, Finset.mem_toList.mpr hjS, by simp [hjD]⟩
 
-/-- The vertices retained after deleting `D`. -/
-def survivorVertices (D : Finset (Fin 57)) : Finset (Fin 57) := Finset.univ \ D
-
-/-- The polarity graph induced on the retained vertices. -/
-def survivorGraph (D : Finset (Fin 57)) : SimpleGraph {v // v ∈ survivorVertices D} :=
-  graph.induce (survivorVertices D : Set (Fin 57))
-
-private theorem edge_le_138_of_deletion_bound {V : Type*} [Fintype V]
-    [DecidableEq V] (G : SimpleGraph V) [DecidableRel G.Adj]
-    (hcard : Fintype.card V = 42)
-    (hDel : ∀ v, (G.induce ({v}ᶜ : Set V)).edgeFinset.card ≤ 132) :
-    G.edgeFinset.card ≤ 138 := by
-  classical
-  let E := G.edgeFinset.card
-  let del := fun v : V => (G.induce ({v}ᶜ : Set V)).edgeFinset.card
-  have hdegreeBound : ∀ v ∈ (Finset.univ : Finset V), G.degree v ≤ E := by
-    intro v hv
-    exact (SimpleGraph.degree_le_card_edgeFinset G v).trans_eq rfl
-  have hsum : (∑ v : V, del v) = 40 * E := by
-    have hterm : ∀ v, del v = E - G.degree v := by
-      intro v
-      simp [del, E, SimpleGraph.card_edgeFinset_induce_compl_singleton,
-        SimpleGraph.card_edgeFinset_deleteIncidenceSet]
-    calc
-      _ = ∑ v : V, (E - G.degree v) := by
-        apply Finset.sum_congr rfl
-        intro v hv
-        exact hterm v
-      _ = (∑ _v : V, E) - ∑ v : V, G.degree v :=
-        Finset.sum_tsub_distrib Finset.univ hdegreeBound
-      _ = 40 * E := by
-        rw [SimpleGraph.sum_degrees_eq_twice_card_edges]
-        simp only [Finset.sum_const, Finset.card_univ]
-        rw [hcard]
-        norm_num [E]
-        omega
-  have hsumBound : (∑ v : V, del v) ≤ 42 * 132 := by
-    calc
-      _ ≤ ∑ _v : V, 132 := Finset.sum_le_sum fun v _ => hDel v
-      _ = 42 * 132 := by simp [hcard]
-  rw [hsum] at hsumBound
+/-- A canonical candidate's Boolean score clears the threshold 34 in the
+script, using the exact deleted-edge score identity. -/
+theorem candidate_score_at_least_34 (D : Finset (Fin 57))
+    (hCand : C4PolarityCanonical.Candidate D) :
+    34 ≤ (scoreInputs D).countP id := by
+  rw [scoreInputs_count_true]
+  have hret := C4PolarityOrderSeven.retained_edge_count D hCand.1
+  rw [hret] at hCand
   omega
-
-private theorem survivor_degree_eq_neighbor_count (D : Finset (Fin 57))
-    {i : Fin 57} (hi : i ∈ survivorVertices D) :
-    (survivorGraph D).degree ⟨i, hi⟩ =
-      (graph.neighborFinset i \ D).card := by
-  classical
-  let H := survivorGraph D
-  let v : {x // x ∈ survivorVertices D} := ⟨i, hi⟩
-  have hcard : (H.neighborFinset v).card =
-      (graph.neighborFinset i ∩ survivorVertices D).card := by
-    apply Finset.card_bij (s := H.neighborFinset v)
-      (t := graph.neighborFinset i ∩ survivorVertices D)
-      (fun x _ => x.val) ?_ ?_ ?_
-    · intro x hx
-      have hadj := (H.mem_neighborFinset v x).mp hx
-      apply Finset.mem_inter.mpr
-      exact ⟨(graph.mem_neighborFinset i x.val).mpr
-        (SimpleGraph.induce_adj.mp hadj), x.property⟩
-    · intro x hx y hy hxy
-      exact Subtype.ext hxy
-    · intro x hx
-      refine ⟨⟨x, (Finset.mem_inter.mp hx).2⟩, ?_, rfl⟩
-      apply (H.mem_neighborFinset v).mpr
-      exact SimpleGraph.induce_adj.mpr
-        ((graph.mem_neighborFinset i x).mp (Finset.mem_inter.mp hx).1)
-  have hsets : graph.neighborFinset i ∩ survivorVertices D =
-      graph.neighborFinset i \ D := by
-    ext x
-    simp [survivorVertices]
-  rw [← H.card_neighborFinset_eq_degree, hcard, hsets]
-
-/-- A canonical deletion candidate plus the 41-vertex deletion bound forces all
-neighbor-survivor clauses emitted by the script. The deletion bound supplies
-the degree-six condition through the existing handshake reduction. -/
-theorem candidate_neighbor_survivor_clauses (D : Finset (Fin 57))
-    (hCand : C4PolarityCanonical.Candidate D)
-    (hDel : ∀ v : {x // x ∈ survivorVertices D},
-      ((survivorGraph D).induce ({v}ᶜ : Set {x // x ∈ survivorVertices D})).edgeFinset.card ≤ 132) :
-    ∀ i, ∀ S ∈ neighborExcesses i,
-      Implications.C4PolarityCnfGates.clauseSat (neighborSurvivorClause D i S) = true := by
-  classical
-  have hcard : Fintype.card {x // x ∈ survivorVertices D} = 42 := by
-    rw [Fintype.card_coe, survivorVertices]
-    rw [Finset.card_sdiff_of_subset (Finset.subset_univ D)]
-    simp [hCand.1.1]
-  have hEupper := edge_le_138_of_deletion_bound (survivorGraph D) hcard hDel
-  have hElower : 138 ≤ (survivorGraph D).edgeFinset.card := by
-    simpa [C4PolarityDeletion.inducedEdgeCount, survivorGraph,
-      survivorVertices] using hCand.2
-  have hE : (survivorGraph D).edgeFinset.card = 138 := by omega
-  have hmin := C4PolarityDeletion.min_degree_six_of_delete_bound
-    (survivorGraph D) hcard hE hDel
-  have hminAmbient : ∀ i, i ∉ D → 6 ≤ (graph.neighborFinset i \ D).card := by
-    intro i hiD
-    have hiR : i ∈ survivorVertices D := by simp [survivorVertices, hiD]
-    have hdeg := hmin ⟨i, hiR⟩
-    rw [survivor_degree_eq_neighbor_count D hiR] at hdeg
-    exact hdeg
-  exact neighbor_survivor_clauses_of_min_degree D hminAmbient
 
 end Implications.C4PolarityEncoderInputs
 
+#print axioms Implications.C4PolarityEncoderInputs.orthogonal_pair_score_count
+#print axioms Implications.C4PolarityEncoderInputs.absolute_score_count
 #print axioms Implications.C4PolarityEncoderInputs.scoreInputs_count_true
 #print axioms Implications.C4PolarityEncoderInputs.scoreInputs_length
+#print axioms Implications.C4PolarityEncoderInputs.neighbor_survivor_clauses_of_min_degree
+#print axioms Implications.C4PolarityEncoderInputs.candidate_score_at_least_34
 #print axioms Implications.C4PolarityEncoderInputs.orthogonalPairs_lex_ordered
 #print axioms Implications.C4PolarityEncoderInputs.neighbor_survivor_clauses_of_min_degree
 #print axioms Implications.C4PolarityEncoderInputs.candidate_neighbor_survivor_clauses
