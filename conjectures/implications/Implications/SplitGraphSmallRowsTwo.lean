@@ -253,15 +253,16 @@ theorem outer_endpoints_of_overlapping_rows
     ∃ e f, e ∈ C ∧ f ∈ C ∧ e ≠ c ∧ e ≠ d ∧ f ≠ c ∧ f ≠ d ∧ e ≠ f ∧
       G.Adj e v ∧ G.Adj v c ∧ G.Adj c u ∧ G.Adj u d ∧ G.Adj d w ∧ G.Adj w f := by
   classical
-  have hvC : v ∈ I := (Finset.mem_filter.mp (by rw [hrowC]; simp)).1
-  have hwI : w ∈ I := (Finset.mem_filter.mp (by rw [hrowD]; simp)).1
-  have huI : u ∈ I := (Finset.mem_filter.mp (by rw [hrowC]; simp)).1
+  have hvSel : v ∈ selectedRow I left right c := by rw [hrowC]; simp [hvw]
+  have hwSel : w ∈ selectedRow I left right d := by rw [hrowD]; simp [hvw.symm]
+  have huSel : u ∈ selectedRow I left right c := by rw [hrowC]; simp [huv]
+  have hvC : v ∈ I := (Finset.mem_filter.mp hvSel).1
+  have hwI : w ∈ I := (Finset.mem_filter.mp hwSel).1
+  have huI : u ∈ I := (Finset.mem_filter.mp huSel).1
   have hvAtC : left v = c ∨ right v = c := by
-    have hv : v ∈ selectedRow I left right c := by rw [hrowC]; simp [hvw]
-    exact (Finset.mem_filter.mp hv).2
+    exact (Finset.mem_filter.mp hvSel).2
   have hwAtD : left w = d ∨ right w = d := by
-    have hw : w ∈ selectedRow I left right d := by rw [hrowD]; simp [hvw.symm]
-    exact (Finset.mem_filter.mp hw).2
+    exact (Finset.mem_filter.mp hwSel).2
   let e := if left v = c then right v else left v
   let f := if left w = d then right w else left w
   have hev : (left v = c ∧ e = right v) ∨ (right v = c ∧ e = left v) := by
