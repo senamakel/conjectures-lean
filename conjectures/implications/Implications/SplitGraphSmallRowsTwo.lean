@@ -51,10 +51,8 @@ theorem two_original_rows_shape
   obtain ⟨u, huC, huD⟩ := two_original_rows_intersect G I c d hc hd hdiff
   have hcEraseCard : ((row G I c).erase u).card = 1 := by
     rw [Finset.card_erase_of_mem huC, hc]
-    decide
   have hdEraseCard : ((row G I d).erase u).card = 1 := by
     rw [Finset.card_erase_of_mem huD, hd]
-    decide
   obtain ⟨v, hvErase⟩ := Finset.card_eq_one.mp hcEraseCard
   obtain ⟨w, hwErase⟩ := Finset.card_eq_one.mp hdEraseCard
   have hCeq : row G I c = {u, v} := by
@@ -76,17 +74,16 @@ theorem two_original_rows_shape
       rw [hx, hwErase]
       simp [hxu]
   have huv : u ≠ v := by
-    intro h
-    have huNot : u ∉ (row G I c).erase u := (Finset.mem_erase.mp (by simp [hvErase])).1
-    exact huNot (by rw [h]; simp [hvErase])
+    have hvMem : v ∈ (row G I c).erase u := by rw [hvErase]; simp
+    have hvNe : v ≠ u := (Finset.mem_erase.mp hvMem).1
+    exact fun h => hvNe h.symm
   have huw : u ≠ w := by
-    intro h
-    have huNot : u ∉ (row G I d).erase u := (Finset.mem_erase.mp (by simp [hwErase])).1
-    exact huNot (by rw [h]; simp [hwErase])
+    have hwMem : w ∈ (row G I d).erase u := by rw [hwErase]; simp
+    have hwNe : w ≠ u := (Finset.mem_erase.mp hwMem).1
+    exact fun h => hwNe h.symm
   by_cases hvw : v = w
   · left
     rw [hCeq, hDeq, hvw]
-    simp
   · right
     exact ⟨u, v, w, huv, huw, hvw, hCeq, hDeq⟩
 
