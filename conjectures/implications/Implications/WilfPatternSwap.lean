@@ -210,6 +210,34 @@ noncomputable def markedEquivOfSwap (n : ℕ) (marks : Finset ℕ)
   right_inv := swapMarked_swapMarked marks q p hoverlapQ hoverlap hfirstQ hsecondQ hcrossQ
     hfirst hsecond hcross hqp hpq
 
+/-- A bijection between the permutations realizing all prescribed starts for
+the two patterns. -/
+noncomputable def markedEquiv (n : ℕ) (marks : Finset ℕ) :
+    {f : Equiv.Perm (Fin n) // Marked sigma marks f} ≃
+      {f : Equiv.Perm (Fin n) // Marked tau marks f} where
+  exact markedEquivOfSwap n marks sigma tau
+    sigma_overlap_compatible_only_at_5_or_7 tau_overlap_compatible_only_at_5_or_7
+    (by decide) (by decide) (by decide) (by decide) (by decide) (by decide)
+    windowSwap_sigma windowSwap_tau
+
+/-- All starting positions where the permutation has the designated pattern. -/
+noncomputable def occurrenceSet {n : ℕ} (p : Fin 8 → Fin 8) (π : Equiv.Perm (Fin n)) :
+    Finset (Fin n) := by
+  classical
+  exact Finset.univ.filter fun i => ContainsAt π i.val p
+
+private theorem subset_occurrenceSet_iff {n : ℕ} (p : Fin 8 → Fin 8)
+    (marks : Finset (Fin n)) (π : Equiv.Perm (Fin n)) :
+    marks ⊆ occurrenceSet p π ↔ Marked p (marks.image Fin.val) π := by
+  classical
+  constructor
+  · intro h s hs
+    obtain ⟨i, hi, rfl⟩ := Finset.mem_image.mp hs
+    exact (Finset.mem_filter.mp (h hi)).2
+  · intro h i hi
+    exact Finset.mem_filter.mpr ⟨Finset.mem_univ i,
+      h i.val (Finset.mem_image_of_mem Fin.val hi)⟩
+
 /-- The same marked-window argument yields equality of exact occurrence-set
 counts for any pair satisfying its checked overlap and rank hypotheses. -/
 theorem exactOccurrenceCount_eq_of_swap (n : ℕ) (marks : Finset (Fin n))
@@ -231,52 +259,6 @@ theorem exactOccurrenceCount_eq_of_swap (n : ℕ) (marks : Finset (Fin n))
     ((markedEquivOfSwap n (chosen.image Fin.val) p q hoverlap hoverlapQ hfirst hsecond
       hcross hfirstQ hsecondQ hcrossQ hpq hqp).trans
       (Equiv.subtypeEquivRight (subset_occurrenceSet_iff q chosen)).symm)
-
-/-- A bijection between the permutations realizing all prescribed starts for
-the two patterns. -/
-noncomputable def markedEquiv (n : ℕ) (marks : Finset ℕ) :
-    {f : Equiv.Perm (Fin n) // Marked sigma marks f} ≃
-      {f : Equiv.Perm (Fin n) // Marked tau marks f} where
-  toFun := swapMarked marks sigma tau sigma_overlap_compatible_only_at_5_or_7
-    (by intro i hi; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide)
-    (by intro i hi hi2; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide)
-    (by decide) windowSwap_sigma
-  invFun := swapMarked marks tau sigma tau_overlap_compatible_only_at_5_or_7
-    (by intro i hi; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide)
-    (by intro i hi hi2; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide)
-    (by decide) windowSwap_tau
-  left_inv := swapMarked_swapMarked marks sigma tau sigma_overlap_compatible_only_at_5_or_7
-    tau_overlap_compatible_only_at_5_or_7
-    (by intro i hi; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide)
-    (by intro i hi hi2; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide) (by decide)
-    (by intro i hi; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide)
-    (by intro i hi hi2; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide) (by decide)
-    windowSwap_sigma windowSwap_tau
-  right_inv := swapMarked_swapMarked marks tau sigma tau_overlap_compatible_only_at_5_or_7
-    sigma_overlap_compatible_only_at_5_or_7
-    (by intro i hi; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide)
-    (by intro i hi hi2; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide) (by decide)
-    (by intro i hi; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide)
-    (by intro i hi hi2; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide) (by decide)
-    windowSwap_tau windowSwap_sigma
-
-/-- All starting positions where the permutation has the designated pattern. -/
-noncomputable def occurrenceSet {n : ℕ} (p : Fin 8 → Fin 8) (π : Equiv.Perm (Fin n)) :
-    Finset (Fin n) := by
-  classical
-  exact Finset.univ.filter fun i => ContainsAt π i.val p
-
-private theorem subset_occurrenceSet_iff {n : ℕ} (p : Fin 8 → Fin 8)
-    (marks : Finset (Fin n)) (π : Equiv.Perm (Fin n)) :
-    marks ⊆ occurrenceSet p π ↔ Marked p (marks.image Fin.val) π := by
-  classical
-  constructor
-  · intro h s hs
-    obtain ⟨i, hi, rfl⟩ := Finset.mem_image.mp hs
-    exact (Finset.mem_filter.mp (h hi)).2
-  · intro h i hi
-    exact Finset.mem_filter.mpr ⟨Finset.mem_univ i,
-      h i.val (Finset.mem_image_of_mem Fin.val hi)⟩
 
 /-- The two patterns are super-strongly c-Wilf equivalent: every prescribed
 exact occurrence set is realized by the same number of permutations. -/
