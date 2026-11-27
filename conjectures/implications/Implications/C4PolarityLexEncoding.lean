@@ -74,8 +74,8 @@ theorem lexPrefixScan_length (a : Nat → Bool) (pref : Bool)
       | nil => rfl
       | cons y ys =>
           by_cases hxy : x = y
-          · simp [lexPrefixScan, lexFreshIds, hxy, ih]
-          · simp [lexPrefixScan, lexFreshIds, hxy, ih]
+          · simp [lexPrefixScan, lexFreshIds, hxy, ih, lexFreshIds_length]
+          · simp [lexPrefixScan, lexFreshIds, hxy, ih, lexFreshIds_length]
 
 /-- The lex auxiliary assignment uses the scan values at the consecutive DIMACS
 IDs beginning at `base`; IDs outside that block retain their original value. -/
