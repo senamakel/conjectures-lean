@@ -183,26 +183,20 @@ private def maskGraph (g : Array Nat)
     (hloop : ∀ u : Fin 41, Nat.testBit g[u.val]! u.val = false) :
     SimpleGraph (Fin 41) :=
   { Adj := fun u v => Nat.testBit g[u.val]! v.val = true
-    symm := by
-      intro u v huv
-      rw [hsym]
-      exact huv
-    loopless := by
-      intro u hu
-      rw [hloop u] at hu
-      contradiction }
+    symm := ⟨fun {u v} huv => by simpa [hsym u v] using huv⟩
+    loopless := ⟨fun {u} hu => by simpa [hloop u] using hu⟩ }
 
 private theorem seed1_graph_symm : ∀ u v : Fin 41,
     Nat.testBit seed1[u.val]! v.val = Nat.testBit seed1[v.val]! u.val := by
-  decide +kernel
+  decide +kernel +revert
 
 private theorem seed2_graph_symm : ∀ u v : Fin 41,
     Nat.testBit seed2[u.val]! v.val = Nat.testBit seed2[v.val]! u.val := by
-  decide +kernel
+  decide +kernel +revert
 
 private theorem seed3_graph_symm : ∀ u v : Fin 41,
     Nat.testBit seed3[u.val]! v.val = Nat.testBit seed3[v.val]! u.val := by
-  decide +kernel
+  decide +kernel +revert
 
 private theorem seed1_graph_loop : ∀ u : Fin 41,
     Nat.testBit seed1[u.val]! u.val = false := by decide +kernel
@@ -238,13 +232,14 @@ disjoint open neighborhoods in any graph isomorphic to one of the masks.
 The statement is intentionally conditional on the supplied seed; it does not
 assert that the three records exhaust the extremal 41-vertex graphs. -/
 theorem no_disjoint_six_of_seed_iso (G : SimpleGraph (Fin 41))
-    (hseed : G ≃g seed1Graph ∨ G ≃g seed2Graph ∨ G ≃g seed3Graph) :
+    (hseed : Nonempty (G ≃g seed1Graph) ∨ Nonempty (G ≃g seed2Graph) ∨
+      Nonempty (G ≃g seed3Graph)) :
     ¬ ∃ chosen : List (Fin 41), chosen.length = 6 ∧
       chosen.Sublist (List.finRange 41) ∧
       chosen.Pairwise (fun u v => Disjoint (G.neighborSet u) (G.neighborSet v)) := by
   intro h
   obtain ⟨chosen, hlen, hsub, hpairs⟩ := h
-  rcases hseed with hiso | hseed
+  rcases hseed with ⟨hIso⟩ | hseed
   · let mapped := chosen.map hIso
     have hmappedLen : mapped.length = 6 := by simp [mapped, hlen]
     have hmappedSub : mapped.map Fin.val |>.Sublist (List.range 41) := by
@@ -262,7 +257,7 @@ theorem no_disjoint_six_of_seed_iso (G : SimpleGraph (Fin 41))
       · simpa [hmappedLen]
       · simpa using hcompat
     exact seed1_no_compatible_six hc
-  · rcases hseed with hIso | hIso
+  · rcases hseed with ⟨hIso⟩ | ⟨hIso⟩
     · let mapped := chosen.map hIso
       have hmappedLen : mapped.length = 6 := by simp [mapped, hlen]
       have hmappedSub : mapped.map Fin.val |>.Sublist (List.range 41) := by
