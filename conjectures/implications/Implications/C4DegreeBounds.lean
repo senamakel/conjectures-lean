@@ -166,7 +166,8 @@ theorem sum_innerNeighbors_card_ge_seven (v : V)
       40 ≤ ∑ u ∈ S, (outerNeighbors G u v).card := htotalLower
       _ = (∑ u ∈ S, (T u).card) +
           (∑ u ∈ S, (innerNeighbors G u v).card) := hpartition
-  omega
+  have hinner : 7 ≤ ∑ u ∈ S, (innerNeighbors G u v).card := by omega
+  simpa [S] using hinner
 
 theorem sum_outerNeighbors_card_le (v : V)
     (hC4 : C4VertexExtension.C4Free G) :
