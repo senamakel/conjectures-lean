@@ -121,7 +121,8 @@ theorem core_path_ending_at_each_independent
     (hi : i ∈ ({a, b, c, z} : Finset V)) :
     ∃ core : List V, core.Nodup ∧ core.IsChain G.Adj ∧
       core.getLast? = some i ∧ (∀ q ∈ I, q ∈ core) ∧
-      t ∈ core ∧ x ∈ core ∧ y ∈ core := by
+      t ∈ core ∧ x ∈ core ∧ y ∈ core ∧
+      (∀ q ∈ core, q ∈ I ∨ q = t ∨ q = x ∨ q = y) := by
   classical
   have hit : i = a ∨ i = b ∨ i = c ∨ i = z := by
     simpa [Finset.mem_insert, Finset.mem_singleton, or_comm, or_left_comm, or_assoc] using hi
@@ -151,36 +152,52 @@ theorem core_path_ending_at_each_independent
       exact hz
   rcases hit with hia | hib | hic | hiz
   · subst i
-    refine ⟨[b, x, z, y, c, t, a], hcoreNodup.1, ?_, ?_, ?_, ?_, ?_, ?_⟩
+    refine ⟨[b, x, z, y, c, t, a], hcoreNodup.1, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · simp [List.isChain_cons, hxb.symm, hxz, hyz.symm, hyc, hct.symm, hat]
     · simp
     · exact hcoverA _ (by simp) (by simp) (by simp) (by simp)
     · simp
     · simp
     · simp
+    · intro q hq
+      simp only [List.mem_cons, List.not_mem_nil, or_false] at hq
+      rcases hq with rfl | rfl | rfl | rfl | rfl | rfl | rfl <;>
+        simp [hI, Finset.mem_insert, Finset.mem_singleton, or_comm, or_left_comm, or_assoc]
   · subst i
-    refine ⟨[a, t, c, y, z, x, b], hcoreNodup.2.1, ?_, ?_, ?_, ?_, ?_, ?_⟩
+    refine ⟨[a, t, c, y, z, x, b], hcoreNodup.2.1, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · simp [List.isChain_cons, hat.symm, hct, hyc.symm, hyz, hxz.symm, hxb]
     · simp
     · exact hcoverA _ (by simp) (by simp) (by simp) (by simp)
     · simp
     · simp
     · simp
+    · intro q hq
+      simp only [List.mem_cons, List.not_mem_nil, or_false] at hq
+      rcases hq with rfl | rfl | rfl | rfl | rfl | rfl | rfl <;>
+        simp [hI, Finset.mem_insert, Finset.mem_singleton, or_comm, or_left_comm, or_assoc]
   · subst i
-    refine ⟨[b, t, a, x, z, y, c], hcoreNodup.2.2.1, ?_, ?_, ?_, ?_, ?_, ?_⟩
+    refine ⟨[b, t, a, x, z, y, c], hcoreNodup.2.2.1, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · simp [List.isChain_cons, hbt.symm, hat, hxa.symm, hxz, hyz.symm, hyc]
     · simp
     · exact hcoverA _ (by simp) (by simp) (by simp) (by simp)
     · simp
     · simp
     · simp
+    · intro q hq
+      simp only [List.mem_cons, List.not_mem_nil, or_false] at hq
+      rcases hq with rfl | rfl | rfl | rfl | rfl | rfl | rfl <;>
+        simp [hI, Finset.mem_insert, Finset.mem_singleton, or_comm, or_left_comm, or_assoc]
   · subst i
-    refine ⟨[b, x, a, t, c, y, z], hcoreNodup.2.2.2, ?_, ?_, ?_, ?_, ?_, ?_⟩
+    refine ⟨[b, x, a, t, c, y, z], hcoreNodup.2.2.2, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · simp [List.isChain_cons, hxb.symm, hxa, hat.symm, hct, hyc.symm, hyz]
     · simp
     · exact hcoverA _ (by simp) (by simp) (by simp) (by simp)
     · simp
     · simp
     · simp
+    · intro q hq
+      simp only [List.mem_cons, List.not_mem_nil, or_false] at hq
+      rcases hq with rfl | rfl | rfl | rfl | rfl | rfl | rfl <;>
+        simp [hI, Finset.mem_insert, Finset.mem_singleton, or_comm, or_left_comm, or_assoc]
 
 end SplitGraphOneOutsiderDifferent
