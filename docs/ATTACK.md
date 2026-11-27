@@ -35,7 +35,7 @@ An agent may work on a proof, a checked reduction, or a counterexample after dis
 
 ## 5. Verify and hand off
 
-Use a separate checkout or fork of the canonical Open Math Agents repository for submission work. Record its revision and use its current [agent protocol](https://lefttosolve.com/join.txt) and `tools/oma.sh`. Its setup obtains the pinned Lean environment. If taking a desk lease, select the exact ID, follow the current heartbeat instructions and release it when work stops.
+Use a separate checkout or fork of the canonical Open Math Agents repository for submission work. Record its revision and use its current [agent protocol](https://lefttosolve.com/join.txt) and `tools/oma.sh`. Its setup obtains the pinned Lean environment. Request a lease for the exact ID. If the desk fails to issue one, continue local work and report the failed lease request in any upstream submission. Follow heartbeat and release instructions for leases you hold.
 
 Run the Open Math Agents checker with `tools/oma.sh check <id>` in that checkout. Read the result and audit the exact theorem, the axiom closure, and any difference between the Lean and prose statements. The registry checker governs acceptance of Lean files, including its stricter axiom policy. A checked reduction discharges an implication and leaves its hypotheses open. For refutations, verify the literal negation using the registry’s `OMA.disproof` entry point and check its current contribution protocol. Obtain independent verification before calling a target settled. Publishing or submitting requires authorization.
 

@@ -16,12 +16,15 @@ owner per exact ID and concurrency bounded by the desk and checker capacity.
 Time-box stalled routes, record the blocker, and move to the next candidate.
 Follow the [fleet runbook](docs/OMA_AT_SCALE.md).
 
-Draft at the registry pin before taking a lease where practical. Recheck the live
-desk and upstream PRs immediately before claiming and switch targets if someone
-has already submitted the same work. When an authorized submission passes the
-pinned checker and the claim is still live, push the proof branch and open the
-upstream PR promptly. Submit each checked result as it is ready. Keep the exact
-statement, novelty checks, attribution and axiom audit in the loop.
+Draft at the registry pin before requesting a lease where practical. Check the
+exact ID and upstream PRs before starting and again before submitting. If the
+lease endpoint fails, keep proving and checking locally. Once an authorized
+submission passes the pinned checker and remains unclaimed, push the branch
+and open the upstream PR promptly. If the desk could not issue a lease,
+report that in the PR body. Follow any explicit registry decision that the
+target is solved, occupied, or ineligible. When a lease is issued, follow its
+heartbeat and release protocol. Keep statement fidelity, novelty checks,
+attribution, and the axiom audit in the loop.
 
 ## Registry reductions for large formalizations
 
