@@ -97,6 +97,26 @@ theorem eulerCost_div_rootScale_tendsto_zero :
     heq.mono fun _ h => h.symm
   exact Filter.Tendsto.congr' heq' hratio
 
+/-- For any fixed multiplicative constant, the logarithmic cost remains
+negligible compared with the stretched-exponential scale. -/
+theorem eventually_const_mul_eulerCost_le_eighth_rootScale (D : ℝ) (hD : 0 < D) :
+    ∀ᶠ L : ℝ in atTop,
+      D * (L ^ (1 / 4 : ℝ) * Real.log L) ≤ rootScale L / 8 := by
+  have hsmall := eulerCost_div_rootScale_tendsto_zero.eventually
+    (Iio_mem_nhds (show 0 < 1 / (8 * D) by positivity))
+  filter_upwards [hsmall, eventually_gt_atTop (1 : ℝ)] with L hcost hL
+  have hroot : 0 < rootScale L := by
+    apply Real.sqrt_pos.2
+    exact mul_pos (by linarith) (Real.log_pos hL)
+  have hcost' : L ^ (1 / 4 : ℝ) * Real.log L <
+      (1 / (8 * D)) * rootScale L :=
+    (div_lt_iff₀ hroot).mp hcost
+  have hmul := mul_lt_mul_of_pos_left hcost' hD
+  have heq : D * ((1 / (8 * D)) * rootScale L) = rootScale L / 8 := by
+    field_simp
+  rw [heq] at hmul
+  exact hmul.le
+
 /-- Eventually the logarithmic Euler-product cost is at most one eighth of
 `R`, a convenient single bound for combining with Rankin and the reciprocal
 prime product estimates. -/
@@ -116,4 +136,5 @@ end Implications.SmoothGapAsymptotic
 
 #print axioms Implications.SmoothGapAsymptotic.rankinDelta_mul_self
 #print axioms Implications.SmoothGapAsymptotic.exp_rankinDelta_log_smoothCutoff
+#print axioms Implications.SmoothGapAsymptotic.eventually_const_mul_eulerCost_le_eighth_rootScale
 #print axioms Implications.SmoothGapAsymptotic.eventually_eulerCost_le_eighth_rootScale
