@@ -94,8 +94,8 @@ theorem lexStep_extension (a : Nat → Bool) (pref x y same : Nat)
     (hp : a pref = true) (hx : a x = true) (hy : a y = false)
     (hps : pref ≠ same) (hxs : x ≠ same) (hys : y ≠ same) :
     ∃ b : Nat → Bool, (∀ n, n ≠ same → b n = a n) ∧
-      b same = (a prefix && (a x == a y)) ∧
-      cnfValue b (lexStepClauses prefix x y same) = true := by
+      b same = (a pref && (a x == a y)) ∧
+      cnfValue b (lexStepClauses pref x y same) = true := by
   refine ⟨Function.update a same (a pref && (a x == a y)), ?_, ?_, ?_⟩
   · intro n hns
     simp [Function.update, hns]
