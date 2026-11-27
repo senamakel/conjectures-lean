@@ -181,14 +181,15 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
         intro hnd hmem
         have hiI := hmem i (by simp)
         have hblock : (block i).IsChain G.Adj := by
-          simp [block, List.isChain_cons, hleftAdj i hiI, G.symm (hrightAdj i hiI)]
+          simp [block, List.isChain_cons, hleftAdj i hiI, (hrightAdj i hiI).symm]
         rw [List.flatMap_cons, List.isChain_append]
         refine ⟨hblock, ih (List.nodup_cons.mp hnd).2 (by
           intro j hj
           exact hmem j (by simp [hj])), ?_⟩
-        rcases l with [] | j :: rest
-        · simp
-        · have hjI := hmem j (by simp)
+        cases l with
+        | nil => simp
+        | cons j rest =>
+          have hjI := hmem j (by simp)
           have hij : i ≠ j := by
             intro heq
             subst j
