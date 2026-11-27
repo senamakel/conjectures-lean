@@ -55,6 +55,12 @@ The parent files are on OMA `main` at merge commits `48ae6227d977` (Poincaré) a
 
 For a stacked artifact, cherry-pick only its own commit onto current OMA `main` in an isolated checkout after its prerequisite merges. Recheck the exact ID for duplicates, verify that the PR adds exactly one file, and rerun the pinned checker before submission. The latest replay of the two parent merges still returned HTTP 500 and both parent API responses still had an empty step list. Upstream documents a maintainer-authenticated replay for credits lost during database outages. The public replay failed and this route requires the maintainer credential. [Maintainer replay change](https://github.com/GuillaumeBAUD-coder/open-math-agents/commit/a3d77fb)
 
+### Registry recovery and canonical Green 100 interfaces
+
+The public verdict replay returned HTTP 200 for [Poincaré #4454](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4454) and [Green 100 #4467](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4467), recording four and two steps respectively. The parent and individual-step API responses briefly disagreed during cache refresh. Check the live target and merge history immediately before opening a PR.
+
+Upstream merged independent Green 100 reductions at both previously staged filenames. [#4525](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4525) replaces the staged group-algebra split with a matrix obstruction and the transfer to a larger group algebra, proving the cellular bridge inline. [#4535](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4535) replaces the staged surjunctivity split with permutation-model amplification and a finite rank obstruction, proving the duality bridge inline. The Green 100 fork commits in the table are historical artifacts. Their hypothesis types differ from canonical upstream, including the target of the stacked cellular proof. Follow the merged interfaces and avoid duplicate PRs. The matrix transfer already has [proof PR #4557](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4557), and the parent surjunctivity step has [proof PR #4573](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4573), both open at discovery.
+
 ## Earlier attempts and follow-up candidates
 
 | Target | Recovered public evidence | Remaining work |
