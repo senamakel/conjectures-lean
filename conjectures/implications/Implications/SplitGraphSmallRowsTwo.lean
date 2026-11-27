@@ -498,10 +498,12 @@ theorem hamiltonian_of_split_partition_two_double_rows
       have hfv' := hcross f hfC v hvI
       have hfu' := hcross f hfC u huI
       have hfw' := hcross f hfC w hwI
-      simp [pref, List.nodup_cons, hcentersNodup, huv, huw, hvw,
+      simp [pref, List.nodup_cons, hec, hed, hef, hcd, Ne.symm hfc, Ne.symm hfd,
+        huv, Ne.symm huv, huw, hvw,
         hev', hew', heu', hcv', hcw', hcu', hdv', hdu', hdw', hfv', hfu', hfw',
         Ne.symm hcv', Ne.symm hcw', Ne.symm hcu', Ne.symm hdv', Ne.symm hdu',
-        Ne.symm hdw', Ne.symm hfv', Ne.symm hfu', Ne.symm hfw']
+        Ne.symm hdw', Ne.symm hfv', Ne.symm hfu', Ne.symm hfw',
+        Ne.symm hfc, Ne.symm hfd]
     have hprefChain : pref.IsChain G.Adj := by
       simp [pref, List.isChain_cons, hev, hvc, hcu, hud, hdw, hwf]
     have hspecial : ∀ i ∈ I, i ∈ pref ↔ i ∈ S := by
@@ -511,11 +513,17 @@ theorem hamiltonian_of_split_partition_two_double_rows
         simp only [pref, List.mem_cons, List.not_mem_nil, or_false] at hmem
         rcases hmem with h | h | h | h | h | h | h
         · exact False.elim ((Finset.disjoint_left.mp hdisj) heC (h ▸ hi))
-        · exact Or.inl h.symm
+        · change i ∈ ({u,v,w} : Finset V)
+          simp only [Finset.mem_insert, Finset.mem_singleton]
+          exact Or.inr (Or.inl h)
         · exact False.elim ((Finset.disjoint_left.mp hdisj) hcC (h ▸ hi))
-        · exact Or.inr (Or.inl h.symm)
+        · change i ∈ ({u,v,w} : Finset V)
+          simp only [Finset.mem_insert, Finset.mem_singleton]
+          exact Or.inl h
         · exact False.elim ((Finset.disjoint_left.mp hdisj) hdC (h ▸ hi))
-        · exact Or.inr (Or.inr h.symm)
+        · change i ∈ ({u,v,w} : Finset V)
+          simp only [Finset.mem_insert, Finset.mem_singleton]
+          exact Or.inr (Or.inr h)
         · exact False.elim ((Finset.disjoint_left.mp hdisj) hfC (h ▸ hi))
       · intro hmem
         simp only [S, Finset.mem_insert, Finset.mem_singleton] at hmem
@@ -556,10 +564,20 @@ theorem hamiltonian_of_split_partition_two_double_rows
         rcases hqD with hqc | hqd
         · rw [hqc, hrowC]
           intro i hi
-          simp [S] at hi ⊢
+          simp only [Finset.mem_insert, Finset.mem_singleton] at hi
+          change i ∈ ({u,v,w} : Finset V)
+          simp only [Finset.mem_insert, Finset.mem_singleton]
+          rcases hi with h | h
+          · exact Or.inl h
+          · exact Or.inr (Or.inl h)
         · rw [hqd, hrowD]
           intro i hi
-          simp [S] at hi ⊢)
+          simp only [Finset.mem_insert, Finset.mem_singleton] at hi
+          change i ∈ ({u,v,w} : Finset V)
+          simp only [Finset.mem_insert, Finset.mem_singleton]
+          rcases hi with h | h
+          · exact Or.inl h
+          · exact Or.inr (Or.inr h))
       hprefixClique
 end SplitGraphSmallRowsTwo
 
@@ -568,3 +586,6 @@ end SplitGraphSmallRowsTwo
 #print axioms SplitGraphSmallRowsTwo.two_original_rows_shape
 #print axioms SplitGraphSmallRowsTwo.four_cycle_path_block
 #print axioms SplitGraphSmallRowsTwo.one_overlap_path_block
+#print axioms SplitGraphSmallRowsTwo.chosen_two_double_rows_have_shape
+#print axioms SplitGraphSmallRowsTwo.outer_endpoints_of_overlapping_rows
+#print axioms SplitGraphSmallRowsTwo.hamiltonian_of_split_partition_two_double_rows
