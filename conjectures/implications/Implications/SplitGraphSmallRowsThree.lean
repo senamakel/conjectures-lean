@@ -63,14 +63,21 @@ theorem hamiltonian_of_prefix_and_remaining_chain
     intro x hx
     by_cases hrest : rest = []
     · subst rest
-      simpa [base] using hprefLastC x hx
+      have hlast : base.getLast? = pref.getLast? := by simp [base]
+      rw [hlast] at hx
+      exact hprefLastC x hx
     · have hlast : base.getLast? = rest.getLast? := by
         simp [base, hrest]
       rw [hlast] at hx
       exact hrestLastC x hx
   apply hamiltonian_of_list G (base ++ tail) (by simpa [base] using hne)
   · rw [List.nodup_append']
-    exact ⟨hbaseNodup, htailNodup, by simpa [base] using hbaseTailDisjoint⟩
+    rw [List.disjoint_append]
+    refine ⟨?_, ?_⟩
+    · intro x hx hy
+      exact hbaseTailDisjoint x (List.mem_append_left _ hx) hy
+    · intro x hx hy
+      exact hbaseTailDisjoint x (List.mem_append_right _ hx) hy
   · rw [List.isChain_append]
     refine ⟨hbaseChain, ?_, ?_⟩
     · rw [List.isChain_iff_forall_rel_of_append_cons_cons]
@@ -116,14 +123,28 @@ theorem triangle_prefix_is_nodup_chain
   have hxI : x ∉ I := fun h => (Finset.disjoint_left.mp hdisj) hx h
   have hyI : y ∉ I := fun h => (Finset.disjoint_left.mp hdisj) hy h
   have hzI : z ∉ I := fun h => (Finset.disjoint_left.mp hdisj) hz h
+  have hIC : ∀ i ∈ I, ∀ q ∈ C, i ≠ q := by
+    intro i hi q hq heq
+    subst q
+    exact (Finset.disjoint_left.mp hdisj) hq hi
+  have haxne := hIC a ha x hx
+  have hayne := hIC a ha y hy
+  have hazne := hIC a ha z hz
+  have hxbne := (hIC b hb x hx).symm
+  have hxcne := (hIC c hc x hx).symm
+  have hbyne := hIC b hb y hy
+  have hbzne := hIC b hb z hz
+  have hycne := (hIC c hc y hy).symm
+  have hczne := hIC c hc z hz
   have hnodup : ([a, x, b, y, c, z] : List V).Nodup := by
-    simp [hab, hac, hbc, hxy, hxz, hyz, haC, hbC, hcC, hxI, hyI, hzI,
-      hab.symm, hac.symm, hbc.symm, hxy.symm, hxz.symm, hyz.symm]
+    simp [hab, hac, hbc, hxy, hxz, hyz, haxne, hayne, hazne,
+      hxbne, hxcne, hbyne, hbzne, hycne, hczne]
   have hchain : ([a, x, b, y, c, z] : List V).IsChain G.Adj := by
     simp [List.isChain_cons, hax, hxb, hby, hyc, hcz]
   refine ⟨hnodup, hchain, ?_⟩
   intro v hv
-  simpa using hz
+  have hvz : v = z := by simpa using hv
+  exact hvz ▸ hz
 
 /-- A triangle of selected pair rows supplies the prefix; any disjoint chain
 of the remaining clique-ended blocks and the unused clique tail completes it. -/
