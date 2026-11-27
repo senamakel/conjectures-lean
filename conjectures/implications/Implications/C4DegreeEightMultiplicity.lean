@@ -179,7 +179,8 @@ theorem degree_eight_vertex_has_seven_degree_six_neighbors
       N.card = (N ∩ A ∪ N ∩ E).card := by rw [← hpartition]
       _ = (N ∩ A).card + (N ∩ E).card := Finset.card_union_of_disjoint hdisj
   rw [hNcard, hseven] at hcard
-  omega
+  have hAcard : (N ∩ A).card = 7 := by omega
+  simpa [N, A] using hAcard
 
 /-- In the equality case, every degree-six vertex belongs to the union of
 degree-eight neighborhoods. -/
