@@ -195,11 +195,11 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
             subst j
             exact (List.nodup_cons.mp hnd).1 (by simp)
           intro x hx y hy
-          have hxEq : x = right i := by simpa [block] using hx
-          have hyEq : y = left j := by simpa [List.flatMap_cons, block] using hy
+          have hxEq : right i = x := by simpa [block] using hx
+          have hyEq : left j = y := by simpa [List.flatMap_cons, block] using hy
           have hneEnds : right i ≠ left j :=
             (hcross_endpoints i j hiI hjI hij).2.2.1
-          exact hC (hrightC i hiI) (hleftC j hjI) hneEnds
+          exact hxEq ▸ hyEq ▸ hC (hrightC i hiI) (hleftC j hjI) hneEnds
     change (I.toList.flatMap block).IsChain G.Adj
     exact chain_flat I.toList I.nodup_toList (fun i hi => Finset.mem_toList.mp hi)
 
@@ -246,11 +246,10 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
         by_cases htail : l.flatMap block = []
         · have hc' : c ∈ (block i).getLast? := by
             simpa [List.flatMap_cons, htail] using hc
-          simp [block] at hc'
-          rcases hc' with h | h
-          · exact h ▸ hleftC i hiI
-          · exact h ▸ hrightC i hiI
+          have hcEq : c = right i := by simpa [block] using hc'
+          exact hcEq ▸ hrightC i hiI
         · have hc' : c ∈ (l.flatMap block).getLast? := by
+            change c ∈ ((block i) ++ l.flatMap block).getLast? at hc
             rw [List.getLast?_append_of_ne_nil _ htail] at hc
             simpa [List.flatMap_cons] using hc
           exact ih (by
@@ -270,7 +269,7 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
     · intro x hx y hy
       have hxC := hbase_last_C x hx
       have hyC : y ∈ C := by
-        exact (Finset.mem_sdiff.mp (Finset.mem_toList.mp hy)).1
+        exact (Finset.mem_sdiff.mp (Finset.mem_toList.mp (List.mem_of_mem_head? hy))).1
       have hxy : x ≠ y := by
         intro he
         exact hbase_unused x (List.mem_of_mem_getLast? hx) (he ▸ List.mem_of_mem_head? hy)
