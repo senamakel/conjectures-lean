@@ -56,11 +56,10 @@ theorem swapIndex_val_right (marks : Finset Nat)
     (i : Fin n) (hi : IsRight marks i) :
     (swapIndex marks hbounded hsep i).val = i.val - 2 := by
   have hright := hi
-  obtain ⟨s, hs, hsi⟩ := hi
   have hnot : ¬ IsLeft marks i := by
     intro hleft
     exact no_left_right marks hsep i ⟨hleft, hright⟩
-  simp [swapIndex, hnot, hi]
+  simp [swapIndex, hnot, hright]
 
 theorem swapIndex_val_other (marks : Finset Nat)
     (hbounded : ∀ s ∈ marks, s + 7 < n)
@@ -78,10 +77,11 @@ theorem swapIndex_involutive (marks : Finset Nat)
   apply Fin.ext
   by_cases hleft : IsLeft marks i
   · have hright : IsRight marks (swapIndex marks hbounded hsep i) := by
+      have hleft0 := hleft
       obtain ⟨s, hs, hsi⟩ := hleft
       refine ⟨s, hs, ?_⟩
-      rw [swapIndex_val_left marks hbounded hsep i hleft]
-      omega
+      have hv := swapIndex_val_left marks hbounded hsep i hleft0
+      simpa [hv] using hsi
     have hnot : ¬ IsLeft marks (swapIndex marks hbounded hsep i) := by
       intro h
       exact no_left_right marks hsep _ ⟨h, hright⟩
@@ -91,10 +91,11 @@ theorem swapIndex_involutive (marks : Finset Nat)
     omega
   · by_cases hright : IsRight marks i
     · have hleft' : IsLeft marks (swapIndex marks hbounded hsep i) := by
+        have hright0 := hright
         obtain ⟨s, hs, hsi⟩ := hright
         refine ⟨s, hs, ?_⟩
-        rw [swapIndex_val_right marks hbounded hsep i hright]
-        omega
+        have hv := swapIndex_val_right marks hbounded hsep i hright0
+        simpa [hv] using hsi
       have hnot : ¬ IsRight marks (swapIndex marks hbounded hsep i) := by
         intro h
         exact no_left_right marks hsep _ ⟨hleft', h⟩
@@ -104,7 +105,13 @@ theorem swapIndex_involutive (marks : Finset Nat)
       omega
     · have hnot' : ¬ IsRight marks (swapIndex marks hbounded hsep i) := by
         simpa [swapIndex, hleft, hright]
+      have hnotL' : ¬ IsLeft marks (swapIndex marks hbounded hsep i) := by
+        intro hh
+        have hv := swapIndex_val_other marks hbounded hsep i hleft hright
+        obtain ⟨s, hs, hsi⟩ := hh
+        rw [hv] at hsi
+        exact hleft ⟨s, hs, hsi⟩
       have hval := swapIndex_val_other marks hbounded hsep i hleft hright
-      rw [swapIndex_val_other marks hbounded hsep _ hleft hnot', hval]
+      rw [swapIndex_val_other marks hbounded hsep _ hnotL' hnot', hval]
 
 end Implications.WilfGlobalSwap
