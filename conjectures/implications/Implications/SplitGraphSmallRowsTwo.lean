@@ -210,13 +210,15 @@ theorem chosen_two_double_rows_have_shape
   let S := C.filter (fun q => (selectedRow I left right q).card = 2)
   have hSCard : S.card = 2 := hcount
   obtain ⟨c,d,hcd,hS⟩ := Finset.card_eq_two.mp hSCard
-  have hcC : c ∈ C := by rw [hS] at *; simp
-  have hdC : d ∈ C := by rw [hS] at *; simp [hcd]
+  have hcS : c ∈ S := by rw [hS]; simp
+  have hdS : d ∈ S := by rw [hS]; simp [hcd]
+  have hcC : c ∈ C := (Finset.mem_filter.mp hcS).1
+  have hdC : d ∈ C := (Finset.mem_filter.mp hdS).1
   have hcCard : (selectedRow I left right c).card = 2 := by
-    have := (Finset.mem_filter.mp hcC).2
+    have := (Finset.mem_filter.mp hcS).2
     exact this
   have hdCard : (selectedRow I left right d).card = 2 := by
-    have := (Finset.mem_filter.mp hdC).2
+    have := (Finset.mem_filter.mp hdS).2
     exact this
   have hselectedEqC : selectedRow I left right c = row G I c :=
     selected_row_eq_original_of_card_two G I left right c hleftAdj hrightAdj hcCard (hrow c hcC)
@@ -226,14 +228,14 @@ theorem chosen_two_double_rows_have_shape
     two_original_rows_shape G I c d (by rw [← hselectedEqC]; exact hcCard)
       (by rw [← hselectedEqD]; exact hdCard)
       (hdiff c hcC d hdC hcd)
-  · obtain ⟨u,v,huv,hrowPair⟩ := Finset.card_eq_two.mp (by rw [← hselectedEqC]; exact hcCard)
+  · have hrowCCard : (row G I c).card = 2 := by rw [← hselectedEqC]; exact hcCard
+    obtain ⟨u,v,huv,hrowPair⟩ := Finset.card_eq_two.mp hrowCCard
     refine ⟨c,d,u,v,v,hcC,hdC,hcd,?_⟩
     constructor
-    · rw [hselectedEqC, hselectedEqD, hsame, hrowPair]
-    · rw [hselectedEqC, hselectedEqD, hsame, hrowPair]
+    · exact hselectedEqC.trans hrowPair
+    · exact hselectedEqD.trans (hsame.trans hrowPair)
   · refine ⟨c,d,u,v,w,hcC,hdC,hcd,Or.inr ?_⟩
-    rw [← hselectedEqC, ← hselectedEqD]
-    exact ⟨hcRow, hdRow, huv, huw, hvw⟩
+    exact ⟨hselectedEqC.trans hcRow, hselectedEqD.trans hdRow, huv, huw, hvw⟩
 
 end SplitGraphSmallRowsTwo
 
