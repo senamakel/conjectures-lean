@@ -130,10 +130,9 @@ theorem hamiltonian_of_shared_block_and_remaining_chain
   obtain ⟨pBlock, hBlockPath, hBlockSupport⟩ := shared_clique_neighbor_block
     G C I hdisjCI a c b i j ha hc hb hi hj hij hac hcb hab hai hci hcj hbj
   have hblockNodup : ([a, i, c, j, b] : List V).Nodup := by
-    apply (SimpleGraph.Walk.isPath_def pBlock).1 hBlockPath
-    simpa [hBlockSupport]
+    simpa [hBlockSupport] using (SimpleGraph.Walk.isPath_def pBlock).1 hBlockPath
   have hblockChain : ([a, i, c, j, b] : List V).IsChain G.Adj := by
-    simpa [hBlockSupport] using pBlock.adj_support
+    simp [List.isChain_cons, hai, hci.symm, hcj, hbj.symm]
   have hbaseNodup : ([a, i, c, j, b] ++ rest).Nodup := by
     rw [List.nodup_append']
     exact ⟨hblockNodup, hrestNodup, hdisjointSpecial⟩
@@ -141,29 +140,22 @@ theorem hamiltonian_of_shared_block_and_remaining_chain
     rw [List.isChain_append]
     refine ⟨hblockChain, hrestChain, ?_⟩
     intro x hx y hy
-    have hxEq : x = b := by simpa using hx
+    have hxEq : x = b := by simpa using hx.symm
     have hxC : x ∈ C := hxEq ▸ hb
     have hyC := hrestHeadC y hy
     have hxy : x ≠ y := by
       intro h
       subst y
+      subst x
       exact hdisjointSpecial b (by simp) (List.mem_of_mem_head? hy)
     exact hC hxC hyC hxy
   have hbaseLastC : ∀ x, x ∈ ([a, i, c, j, b] ++ rest).getLast? → x ∈ C := by
     intro x hx
     by_cases hrest : rest = []
-    · simpa [hrest] using (show x ∈ ([a, i, c, j, b] : List V).getLast? from by
-        simpa [hrest] using hx)
-      exact hb
+    · have hxEq : x = b := by simpa [hrest] using hx
+      exact hxEq ▸ hb
     · rw [List.getLast?_append_of_ne_nil _ hrest] at hx
       exact hrestLastC x (by simpa using hx)
-  have hneqTailStart : ∀ x, x ∈ ([a, i, c, j, b] ++ rest).getLast? →
-      ∀ y, y ∈ tail.head? → x ≠ y := by
-    intro x hx y hy heq
-    subst y
-    exact hdisjointTail x (List.mem_of_mem_getLast? hx) (List.mem_of_mem_head? hy)
-  have hfinalne : ([a, i, c, j, b] ++ rest) ++ tail ≠ [] := by
-    simpa [List.append_assoc] using hne
   exact hamiltonian_of_clique_ended_chain G C hC
     ([a, i, c, j, b] ++ rest) tail hbaseNodup hbaseChain hbaseLastC
     htailNodup htailC hdisjointTail hcover (by simpa [List.append_assoc] using hne)
