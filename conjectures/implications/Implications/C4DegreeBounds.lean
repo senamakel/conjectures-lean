@@ -73,57 +73,6 @@ theorem innerNeighbors_card_le_one {v u : V}
   have hnot := hC4 (x := v) (y := u) (z := w) (w := z) hvu hwz hvw hwu
   exact hnot ⟨hvz, hzu⟩
 
-/-- The neighborhood of a degree-eight vertex in a 42-vertex C4-free graph
-of minimum degree six induces a perfect matching, expressed as degree one
-at every vertex of the induced graph. -/
-theorem degree_eight_neighborhood_degree_one (v : V)
-    (hcard : Fintype.card V = 42) (hmin : ∀ u, 6 ≤ G.degree u)
-    (hC4 : C4VertexExtension.C4Free G) (hv : G.degree v = 8) :
-    ∀ u : (G.neighborSet v), (G.induce (G.neighborSet v)).degree u = 1 := by
-  classical
-  let S := G.neighborFinset v
-  let H := G.induce (G.neighborSet v)
-  have hdeg (u : G.neighborSet v) : H.degree u = (innerNeighbors G u v).card := by
-    have hmap := G.map_neighborFinset_induce u
-    have hsets : (G.neighborSet v).toFinset = S := by ext; simp [S]
-    rw [hsets] at hmap
-    have heq : G.neighborFinset (u : V) ∩ S = innerNeighbors G u v := by
-      ext; simp [innerNeighbors, S]
-    rw [heq] at hmap
-    have h := congrArg Finset.card hmap
-    simpa [H, SimpleGraph.degree] using h
-  have hupper (u : G.neighborSet v) : H.degree u ≤ 1 :=
-    (hdeg u).trans_le (innerNeighbors_card_le_one G hC4 (by simpa using u.property))
-  let e : {u // u ∈ S} ≃ G.neighborSet v :=
-    Equiv.subtypeEquivRight (fun _ => by simp [S])
-  have hsum : (∑ u : G.neighborSet v, H.degree u) =
-      ∑ u ∈ S, (innerNeighbors G u v).card := by
-    calc
-      _ = ∑ u : {u // u ∈ S}, H.degree (e u) := (e.sum_comp _).symm
-      _ = ∑ u : {u // u ∈ S}, (innerNeighbors G u v).card := by
-        apply Finset.sum_congr rfl
-        intro u _
-        exact hdeg (e u)
-      _ = _ := Finset.sum_attach _ _
-  have hlow : 7 ≤ ∑ u : G.neighborSet v, H.degree u := by
-    rw [hsum]
-    exact sum_innerNeighbors_card_ge_seven G v hcard hmin hC4 hv
-  have hn : Fintype.card (G.neighborSet v) = 8 := by
-    simpa [SimpleGraph.degree, SimpleGraph.card_neighborFinset_eq_card_neighborSet] using hv
-  have hhi : (∑ u : G.neighborSet v, H.degree u) ≤ 8 := by
-    simpa [hn] using Finset.sum_le_sum (s := Finset.univ) (f := H.degree)
-      (g := fun _ => 1) (fun u _ => hupper u)
-  have hparity := H.sum_degrees_eq_twice_card_edges
-  have htotal : (∑ u : G.neighborSet v, H.degree u) = 8 := by omega
-  intro u
-  by_contra hne
-  have hzero : H.degree u = 0 := by have := hupper u; omega
-  have hlt : (∑ u : G.neighborSet v, H.degree u) <
-      ∑ _ : G.neighborSet v, (1 : ℕ) :=
-    Finset.sum_lt_sum (fun w _ => hupper w)
-      ⟨u, Finset.mem_univ _, by simp [hzero]⟩
-  simpa [htotal, hn] using hlt
-
 /-- For a degree-eight vertex in a 42-vertex C4-free graph of minimum degree
 six, the total number of edges induced by its neighborhood, counted by their
 endpoint, is at least seven. -/
@@ -219,6 +168,62 @@ theorem sum_innerNeighbors_card_ge_seven (v : V)
           (∑ u ∈ S, (innerNeighbors G u v).card) := hpartition
   have hinner : 7 ≤ ∑ u ∈ S, (innerNeighbors G u v).card := by omega
   simpa [S] using hinner
+
+/-- The neighborhood of a degree-eight vertex in a 42-vertex C4-free graph
+of minimum degree six induces a perfect matching, expressed as degree one
+at every vertex of the induced graph. -/
+theorem degree_eight_neighborhood_degree_one (v : V)
+    (hcard : Fintype.card V = 42) (hmin : ∀ u, 6 ≤ G.degree u)
+    (hC4 : C4VertexExtension.C4Free G) (hv : G.degree v = 8) :
+    ∀ u : (G.neighborSet v), (G.induce (G.neighborSet v)).degree u = 1 := by
+  let S := G.neighborFinset v
+  let H := G.induce (G.neighborSet v)
+  have hdeg (u : G.neighborSet v) : H.degree u = (innerNeighbors G u v).card := by
+    have hmap := G.map_neighborFinset_induce u
+    have hsets : (G.neighborSet v).toFinset = S := by ext; simp [S]
+    rw [hsets] at hmap
+    have heq : G.neighborFinset (u : V) ∩ S = innerNeighbors G u v := by
+      ext; simp [innerNeighbors, S]
+    rw [heq] at hmap
+    have h := congrArg Finset.card hmap
+    rw [Finset.card_map, SimpleGraph.card_neighborFinset_eq_degree] at h
+    exact h
+  have hupper (u : G.neighborSet v) : H.degree u ≤ 1 :=
+    (hdeg u).trans_le (innerNeighbors_card_le_one G hC4 (SimpleGraph.mem_neighborFinset.mpr u.property))
+  let e : {u // u ∈ S} ≃ G.neighborSet v :=
+    Equiv.subtypeEquivRight (fun _ => by simp [S])
+  have hsum : (∑ u : G.neighborSet v, H.degree u) =
+      ∑ u ∈ S, (innerNeighbors G u v).card := by
+    calc
+      _ = ∑ u : {u // u ∈ S}, H.degree (e u) := (e.sum_comp _).symm
+      _ = ∑ u : {u // u ∈ S}, (innerNeighbors G u v).card := by
+        apply Finset.sum_congr rfl
+        intro u _
+        exact hdeg (e u)
+      _ = _ := by
+        change (∑ u ∈ S.attach, (innerNeighbors G u v).card) = _
+        exact Finset.sum_attach S (fun u => (innerNeighbors G u v).card)
+  have hlow : 7 ≤ ∑ u : G.neighborSet v, H.degree u := by
+    rw [hsum]
+    exact sum_innerNeighbors_card_ge_seven G v hcard hmin hC4 hv
+  have hn : Fintype.card (G.neighborSet v) = 8 := by
+    rw [G.card_neighborSet_eq_degree, hv]
+  have hhi : (∑ u : G.neighborSet v, H.degree u) ≤ 8 := by
+    calc
+      _ ≤ ∑ _ : G.neighborSet v, (1 : ℕ) :=
+        Finset.sum_le_sum (fun u _ => hupper u)
+      _ = 8 := by simp [hn]
+  have hparity := H.sum_degrees_eq_twice_card_edges
+  have htotal : (∑ u : G.neighborSet v, H.degree u) = 8 := by omega
+  intro u
+  change H.degree u = 1
+  by_contra hne
+  have hzero : H.degree u = 0 := by have := hupper u; omega
+  have hlt : (∑ u : G.neighborSet v, H.degree u) <
+      ∑ _ : G.neighborSet v, (1 : ℕ) :=
+    Finset.sum_lt_sum (fun w _ => hupper w)
+      ⟨u, Finset.mem_univ _, by simp [hzero]⟩
+  simpa [htotal, hn] using hlt
 
 theorem sum_outerNeighbors_card_le (v : V)
     (hC4 : C4VertexExtension.C4Free G) :
