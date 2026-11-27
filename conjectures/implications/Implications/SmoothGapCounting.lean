@@ -11,6 +11,8 @@ telescoping the consecutive prime gaps.
 
 namespace Implications.SmoothGapCounting
 
+open Filter
+
 /-- The `n`th prime, in the indexing convention used by formal-conjectures. -/
 noncomputable def primeAt (n : ℕ) : ℕ := Nat.nth Nat.Prime n
 
