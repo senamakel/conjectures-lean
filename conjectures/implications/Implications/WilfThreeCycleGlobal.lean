@@ -346,7 +346,7 @@ theorem exactOccurrenceCount_eq_23145786_24135786 (n : ℕ) (marks : Finset (Fin
   · intro i hi
     have hm : ∀ i : Fin 8, swap13 i ≠ i → i = 1 ∨ i = 3 ∨ i = 4 := by decide
     exact hm i hi
-  · by decide
+  · simpa [swap13]
   · intro d hd hsmall
     interval_cases d <;> decide
   · intro d hd hsmall
