@@ -180,7 +180,7 @@ theorem hamiltonian_of_all_four_triple_rows
         A.erase i = row G I (r i) := (hrows i hi).2.symm
         _ = row G I (r j) := by rw [heq]
         _ = A.erase j := (hrows j hj).2
-    have hmem : i ∈ A.erase j := Finset.mem_erase.mpr ⟨(by intro h; exact hne h.symm), hi⟩
+    have hmem : i ∈ A.erase j := Finset.mem_erase.mpr ⟨hne, hi⟩
     have hmem' : i ∈ A.erase i := hsets ▸ hmem
     exact (Finset.mem_erase.mp hmem').1 rfl
   have hcross (i : V) (hi : i ∈ I) (q : V) (hq : q ∈ C) : i ≠ q := by
@@ -202,18 +202,29 @@ theorem hamiltonian_of_all_four_triple_rows
     have hrdB := hrowIndepNe d b (by simp [A]) (by simp [A])
     have hrdC := hrowIndepNe d c (by simp [A]) (by simp [A])
     have hrdD := hrowIndepNe d d (by simp [A]) (by simp [A])
+    have haRd := (hrowIndepNe d a (by simp [A]) (by simp [A])).symm
+    have haRa := (hrowIndepNe a a (by simp [A]) (by simp [A])).symm
+    have haRb := (hrowIndepNe b a (by simp [A]) (by simp [A])).symm
+    have haRc := (hrowIndepNe c a (by simp [A]) (by simp [A])).symm
+    have hbRa := (hrowIndepNe a b (by simp [A]) (by simp [A])).symm
+    have hbRb := (hrowIndepNe b b (by simp [A]) (by simp [A])).symm
+    have hbRc := (hrowIndepNe c b (by simp [A]) (by simp [A])).symm
+    have hcRb := (hrowIndepNe b c (by simp [A]) (by simp [A])).symm
+    have hcRc := (hrowIndepNe c c (by simp [A]) (by simp [A])).symm
+    have hdRc := (hrowIndepNe c d (by simp [A]) (by simp [A])).symm
     have hraC := hrowIndepNe a c (by simp [A]) (by simp [A])
     have hraD := hrowIndepNe a d (by simp [A]) (by simp [A])
     have hrbD := hrowIndepNe b d (by simp [A]) (by simp [A])
     simp [pref, hab, hac, had, hbc, hbd, hcd, hrdra, hrdrb, hrdrc,
-      hrarb, hrarc, hrbrc, hrdB, hrdC, hrdD, hraC, hraD, hrbD]
+      hrarb, hrarc, hrbrc, hrdB, hrdC, hrdD, hraC, hraD, hrbD,
+      haRd, haRa, haRb, haRc, hbRa, hbRb, hbRc, hcRb, hcRc, hdRc]
   have hAdjRow (i j : V) (hi : i ∈ A) (hj : j ∈ A) (hne : i ≠ j) :
       G.Adj (r i) j := by
-    have hjErase : j ∈ A.erase i := Finset.mem_erase.mpr ⟨hne, hj⟩
+    have hjErase : j ∈ A.erase i := Finset.mem_erase.mpr ⟨(by intro h; exact hne h.symm), hj⟩
     have hjRow : j ∈ row G I (r i) := by rw [(hrows i hi).2]; exact hjErase
     exact (Finset.mem_filter.mp hjRow).2
   have hrdA : G.Adj a (r d) := (hAdjRow d (by simp [A]) (by simp [A]) (by intro heq; exact had heq.symm)).symm
-  have hrdB : G.Adj (r d) b := hAdjRow d (by simp [A]) (by simp [A]) hbd
+  have hrdB : G.Adj (r d) b := hAdjRow d (by simp [A]) (by simp [A]) (by intro h; exact hbd h.symm)
   have hraB : G.Adj b (r a) := (hAdjRow a (by simp [A]) (by simp [A]) (by intro heq; exact hab heq.symm)).symm
   have hraC : G.Adj (r a) c := hAdjRow a (by simp [A]) (by simp [A]) hac
   have hrbC : G.Adj c (r b) := (hAdjRow b (by simp [A]) (by simp [A]) (by intro heq; exact hbc heq.symm)).symm
