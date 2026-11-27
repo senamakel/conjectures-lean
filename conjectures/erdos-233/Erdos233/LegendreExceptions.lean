@@ -60,6 +60,10 @@ lemma legendreFailure_gap {n : ℕ} (hn : 2 ≤ n) (hbad : legendreFailure n) :
     exact Nat.not_prime_mul (by omega) (by omega)
   have hnextgt : n ^ 2 < (k + 1).nth Nat.Prime := by
     have hp := Nat.prime_nth_prime (k + 1)
+    have hneq : (k + 1).nth Nat.Prime ≠ n ^ 2 := by
+      intro heq
+      apply hsq_not_prime
+      simpa [heq] using hp
     omega
   have hupper : (n + 1) ^ 2 ≤ (k + 1).nth Nat.Prime := by
     by_contra h
