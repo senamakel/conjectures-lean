@@ -26,6 +26,9 @@ private def outerNeighbors (u v : V) : Finset V := (G.neighborFinset u).erase v
 private def innerNeighbors (u v : V) : Finset V :=
   (G.neighborFinset u).filter fun w => w ∈ G.neighborFinset v
 
+private def externalNeighbors (u v : V) : Finset V :=
+  outerNeighbors G u v \ innerNeighbors G u v
+
 theorem outerNeighbors_disjoint {v u w : V}
     (hC4 : C4VertexExtension.C4Free G)
     (hu : u ∈ G.neighborFinset v) (hw : w ∈ G.neighborFinset v) (huw : u ≠ w) :
@@ -69,6 +72,97 @@ theorem innerNeighbors_card_le_one {v u : V}
   have hvu : v ≠ u := G.ne_of_adj (by simpa using hu)
   have hnot := hC4 (x := v) (y := u) (z := w) (w := z) hvu hwz hvw hwu
   exact hnot ⟨hvz, hzu⟩
+
+/-- For a degree-eight vertex in a 42-vertex C4-free graph of minimum degree
+six, the total number of edges induced by its neighborhood, counted by their
+endpoint, is at least seven. -/
+theorem sum_innerNeighbors_card_ge_seven (v : V)
+    (hcard : Fintype.card V = 42)
+    (hmin : ∀ u, 6 ≤ G.degree u)
+    (hC4 : C4VertexExtension.C4Free G)
+    (hv : G.degree v = 8) :
+    7 ≤ ∑ u ∈ G.neighborFinset v, (innerNeighbors G u v).card := by
+  classical
+  let S := G.neighborFinset v
+  let T := fun u => externalNeighbors G u v
+  have hScard : S.card = 8 := by
+    simpa [S, G.card_neighborFinset_eq_degree] using hv
+  have hSsub : S ⊆ Finset.univ.erase v := by
+    intro z hz
+    have hzv : z ≠ v := by
+      intro h
+      subst z
+      have : G.Adj v v := by simpa using hz
+      exact G.loopless.irrefl v this
+    exact Finset.mem_erase.mpr ⟨hzv, Finset.mem_univ _⟩
+  have hdisj : (S : Set V).PairwiseDisjoint T := by
+    intro u hu w hw huw
+    apply Finset.disjoint_left.mpr
+    intro z hzu hzw
+    have hzu' : z ∈ outerNeighbors G u v := (Finset.mem_sdiff.mp hzu).1
+    have hzw' : z ∈ outerNeighbors G w v := (Finset.mem_sdiff.mp hzw).1
+    exact (outerNeighbors_disjoint G hC4 hu hw huw).not_mem_of_mem_left hzu' hzw'
+  let U := S.biUnion T
+  have hUsub : U ⊆ Finset.univ.erase v \ S := by
+    intro z hz
+    rcases Finset.mem_biUnion.mp hz with ⟨u, hu, huz⟩
+    have huzOuter : z ∈ outerNeighbors G u v := (Finset.mem_sdiff.mp huz).1
+    have hzv : z ≠ v := (Finset.mem_erase.mp huzOuter).1
+    have hzS : z ∉ S := by
+      intro hzS
+      have hzu : z ∈ innerNeighbors G u v := by
+        apply Finset.mem_filter.mpr
+        exact ⟨by
+          have := (Finset.mem_erase.mp huzOuter).2
+          simpa using this, hzS⟩
+      exact (Finset.mem_sdiff.mp huz).2 hzu
+    exact Finset.mem_sdiff.mpr ⟨Finset.mem_erase.mpr ⟨hzv, Finset.mem_univ _⟩, hzS⟩
+  have hUcard : U.card ≤ 33 := by
+    have hcardU := Finset.card_le_card hUsub
+    have hcomp : (Finset.univ.erase v \ S).card = 33 := by
+      rw [Finset.card_sdiff_of_subset hSsub]
+      simp [hcard, hScard]
+    omega
+  have hexternal : (∑ u ∈ S, (T u).card) ≤ 33 := by
+    have hsum : (∑ u ∈ S, (T u).card) = U.card := by
+      dsimp [U]
+      exact (Finset.card_biUnion hdisj).symm
+    omega
+  have htotalLower : 40 ≤ ∑ u ∈ S, (outerNeighbors G u v).card := by
+    have hterm : ∀ u ∈ S, 5 ≤ (outerNeighbors G u v).card := by
+      intro u hu
+      have huv : v ∈ G.neighborFinset u := by
+        have huv' : G.Adj v u := by simpa using hu
+        simpa using G.symm.symm v u huv'
+      have hcardOuter : (outerNeighbors G u v).card = G.degree u - 1 := by
+        change #((G.neighborFinset u).erase v) = G.degree u - 1
+        rw [Finset.card_erase_of_mem huv, G.card_neighborFinset_eq_degree]
+      rw [hcardOuter]
+      have := hmin u
+      omega
+    have := Finset.sum_le_sum (s := S) (fun u hu => hterm u hu)
+    rw [Finset.sum_const, nsmul_eq_mul, hScard] at this
+    norm_num at this ⊢
+    exact this
+  have hpartition :
+      (∑ u ∈ S, (outerNeighbors G u v).card) =
+        (∑ u ∈ S, (T u).card) +
+          (∑ u ∈ S, (innerNeighbors G u v).card) := by
+    rw [Finset.sum_add_distrib]
+    apply Finset.sum_congr rfl
+    intro u hu
+    dsimp [T, externalNeighbors]
+    have hsub : innerNeighbors G u v ⊆ outerNeighbors G u v := by
+      intro z hz
+      rcases Finset.mem_filter.mp hz with ⟨hzu, hzv⟩
+      have hz_ne_v : z ≠ v := by
+        intro hz
+        subst z
+        have : G.Adj v v := by simpa using hzv
+        exact G.loopless.irrefl v this
+      exact Finset.mem_erase.mpr ⟨hz_ne_v, by simpa using hzu⟩
+    exact (Finset.card_sdiff_add_card_eq_card hsub).symm
+  omega
 
 theorem sum_outerNeighbors_card_le (v : V)
     (hC4 : C4VertexExtension.C4Free G) :
