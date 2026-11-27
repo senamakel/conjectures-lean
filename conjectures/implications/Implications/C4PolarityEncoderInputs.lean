@@ -77,7 +77,7 @@ theorem orthogonal_pair_score_count (D : Finset (Fin 57)) :
     have horth := (Finset.mem_filter.mp hp').2.2
     change Sym2.mk _ _ ∈ H.edgeFinset
     rw [SimpleGraph.mem_edgeFinset, SimpleGraph.mem_edgeSet]
-    exact (SimpleGraph.induce_adj).2 ⟨by omega, horth⟩
+    exact (SimpleGraph.induce_adj).2 ⟨ne_of_lt (Finset.mem_filter.mp hp').2.1, horth⟩
   · intro p hp q hq heq
     simp only [Sym2.eq_iff] at heq
     rcases heq with heq | heq
@@ -106,7 +106,7 @@ theorem orthogonal_pair_score_count (D : Finset (Fin 57)) :
         exact ⟨Finset.mem_univ _, hlt, (SimpleGraph.induce_adj.mp hab).2⟩
       · change Sym2.mk a b = e
         exact habeq
-    · have hba : graph.Adj b.val a.val := graph.symm b.val a.val (SimpleGraph.induce_adj.mp hab)
+    · have hba : graph.Adj b.val a.val := graph.symm.symm b.val a.val (SimpleGraph.induce_adj.mp hab)
       refine ⟨(b.val, a.val), ?_, ?_⟩
       · apply Finset.mem_filter.mpr
         refine ⟨?_, ⟨b.property, a.property⟩⟩
