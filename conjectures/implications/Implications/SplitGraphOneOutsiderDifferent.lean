@@ -110,8 +110,11 @@ needed when extending through additional clique vertices. -/
 theorem core_path_ending_at_each_independent
     (G : SimpleGraph V) (I : Finset V) (a b c z t x y i : V)
     (hI : I = {a, b, c, z})
-    (hvertices : ∀ p ∈ ([a, b, c, z, t, x, y] : List V),
-      ∀ q ∈ ([a, b, c, z, t, x, y] : List V), p ≠ q)
+    (hcoreNodup :
+      ([b, x, z, y, c, t, a] : List V).Nodup ∧
+      ([a, t, c, y, z, x, b] : List V).Nodup ∧
+      ([b, t, a, x, z, y, c] : List V).Nodup ∧
+      ([b, x, a, t, c, y, z] : List V).Nodup)
     (htrow : row G I t = {a, b, c})
     (hxrow : row G I x = {a, b, z})
     (hyrow : row G I y = {a, c, z})
@@ -131,61 +134,50 @@ theorem core_path_ending_at_each_independent
   have hya : G.Adj y a := (Finset.mem_filter.mp (show a ∈ row G I y by rw [hyrow]; simp [hI])).2
   have hyc : G.Adj y c := (Finset.mem_filter.mp (show c ∈ row G I y by rw [hyrow]; simp [hI])).2
   have hyz : G.Adj y z := (Finset.mem_filter.mp (show z ∈ row G I y by rw [hyrow]; simp [hI])).2
-  have hdistinct (l : List V) (hl : ∀ q ∈ l, q ∈ ([a,b,c,z,t,x,y] : List V)) :
-      ∀ p ∈ l, ∀ q ∈ l, p ≠ q := by
-    intro p hp q hq
-    exact hvertices p (hl p hp) q (hl q hq)
-  have hcoverA (l : List V) (hl : ∀ q ∈ l, q ∈ ({a,b,c,z,t,x,y} : Finset V)) :
+  have hcoverA (l : List V) :
       ∀ q ∈ I, q ∈ l := by
     intro q hq
     have hq' : q = a ∨ q = b ∨ q = c ∨ q = z := by
       simpa [hI, Finset.mem_insert, Finset.mem_singleton, or_comm, or_left_comm, or_assoc] using hq
     rcases hq' with hqa | hqb | hqc | hqz
     · subst q
-      exact hl a (by simp)
+      simp
     · subst q
-      exact hl b (by simp)
+      simp
     · subst q
-      exact hl c (by simp)
+      simp
     · subst q
-      exact hl z (by simp)
+      simp
   rcases hit with hia | hib | hic | hiz
-  · refine ⟨[b, x, z, y, c, t, a], ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
-    · apply nodup_of_all_distinct
-      exact hdistinct _ (by simp)
+  · subst i
+    refine ⟨[b, x, z, y, c, t, a], hcoreNodup.1, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · simp [List.isChain_cons, hxb.symm, hxz, hyz.symm, hyc, hct.symm, hat]
     · simp
-    · exact hcoverA _ (by intro q hq; simp at hq ⊢ <;> tauto)
+    · exact hcoverA _
     · simp
     · simp
     · simp
   · subst i
-    refine ⟨[a, t, c, y, z, x, b], ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
-    · apply nodup_of_all_distinct
-      exact hdistinct _ (by simp)
+    refine ⟨[a, t, c, y, z, x, b], hcoreNodup.2.1, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · simp [List.isChain_cons, hat.symm, hct, hyc.symm, hyz, hxz.symm, hxb]
     · simp
-    · exact hcoverA _ (by intro q hq; simp at hq ⊢ <;> tauto)
+    · exact hcoverA _
     · simp
     · simp
     · simp
   · subst i
-    refine ⟨[b, t, a, x, z, y, c], ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
-    · apply nodup_of_all_distinct
-      exact hdistinct _ (by simp)
+    refine ⟨[b, t, a, x, z, y, c], hcoreNodup.2.2.1, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · simp [List.isChain_cons, hbt.symm, hat, hxa.symm, hxz, hyz.symm, hyc]
     · simp
-    · exact hcoverA _ (by intro q hq; simp at hq ⊢ <;> tauto)
+    · exact hcoverA _
     · simp
     · simp
     · simp
   · subst i
-    refine ⟨[b, x, a, t, c, y, z], ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
-    · apply nodup_of_all_distinct
-      exact hdistinct _ (by simp)
+    refine ⟨[b, x, a, t, c, y, z], hcoreNodup.2.2.2, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · simp [List.isChain_cons, hxb.symm, hxa, hat.symm, hct, hyc.symm, hyz]
     · simp
-    · exact hcoverA _ (by intro q hq; simp at hq ⊢ <;> tauto)
+    · exact hcoverA _
     · simp
     · simp
     · simp
