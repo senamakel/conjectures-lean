@@ -12,6 +12,8 @@ set_option maxHeartbeats 0
 
 namespace Implications.C4PolarityEncoderInputs
 
+classical
+
 open C4PolarityOrderSeven Implications.C4PolarityDeletion
 
 /-- The absolute point indices, in the ascending order used by Python's
@@ -293,7 +295,7 @@ private theorem survivor_degree_eq_neighbor_count (D : Finset (Fin 57))
       exact Subtype.ext hxy
     · intro x hx
       refine ⟨⟨x, (Finset.mem_inter.mp hx).2⟩, ?_, rfl⟩
-      apply H.mem_neighborFinset.mpr
+      apply (H.mem_neighborFinset v).mpr
       exact SimpleGraph.induce_adj.mpr
         ((graph.mem_neighborFinset i x).mp (Finset.mem_inter.mp hx).1)
   have hsets : graph.neighborFinset i ∩ survivorVertices D =
@@ -314,11 +316,11 @@ theorem candidate_neighbor_survivor_clauses (D : Finset (Fin 57))
   classical
   have hcard : Fintype.card {x // x ∈ survivorVertices D} = 42 := by
     rw [Fintype.card_coe]
-    simp [survivorVertices, (C4PolarityCanonical.Candidate).mp hCand |>.1]
+    simp [survivorVertices, hCand.1]
   have hEupper := edge_le_138_of_deletion_bound (survivorGraph D) hcard hDel
   have hElower : 138 ≤ (survivorGraph D).edgeFinset.card := by
-    change 138 ≤ inducedEdgeCount graph (Finset.univ \ D)
-    exact hCand.2
+    change 138 ≤ inducedEdgeCount graph (survivorVertices D)
+    simpa [survivorVertices] using hCand.2
   have hE : (survivorGraph D).edgeFinset.card = 138 := by omega
   have hmin := C4PolarityDeletion.min_degree_six_of_delete_bound
     (survivorGraph D) hcard hE hDel
