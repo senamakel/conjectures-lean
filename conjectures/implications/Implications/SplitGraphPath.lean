@@ -349,6 +349,77 @@ private theorem hamiltonian_of_list
     exact hcover v
   exact ⟨_, _, p, hpath.isHamiltonian_of_mem hvertices⟩
 
+/-- A list of distinct clique vertices is an adjacency chain. -/
+private theorem clique_subset_list_chain (G : SimpleGraph V) (C : Finset V)
+    (hC : G.IsClique (C : Set V)) (l : List V) (hnodup : l.Nodup)
+    (hsub : ∀ x ∈ l, x ∈ C) : l.IsChain G.Adj := by
+  rw [List.isChain_iff_forall_rel_of_append_cons_cons]
+  intro x y l₁ l₂ heq
+  have hx : x ∈ l := by rw [heq]; simp
+  have hy : y ∈ l := by rw [heq]; simp
+  have hxy : x ≠ y := by
+    intro h
+    subst y
+    have hcount := (List.nodup_iff_count_le_one.mp hnodup) x
+    rw [heq] at hcount
+    simp [List.count_append, List.count_cons] at hcount
+    omega
+  exact hC (hsub x hx) (hsub y hy) hxy
+
+/-- The two-outsider triple-row path. The list `rest` contains the unused clique
+vertices, which are appended after the second outsider's clique neighbour. -/
+theorem hamiltonian_of_split_partition_two_outsiders
+    (G : SimpleGraph V) (C I : Finset V)
+    (a b c z w t x y r s : V) (rest : List V)
+    (hC : G.IsClique (C : Set V))
+    (hpartition : (Finset.univ : Finset V) = C ∪ I)
+    (hI : I = {a, b, c, z, w})
+    (hct : G.Adj c t) (hta : G.Adj t a) (hax : G.Adj a x)
+    (hxz : G.Adj x z) (hzy : G.Adj z y) (hyb : G.Adj y b)
+    (hbr : G.Adj b r) (hrw : G.Adj r w) (hws : G.Adj w s)
+    (htC : t ∈ C) (hxC : x ∈ C) (hyC : y ∈ C) (hrC : r ∈ C) (hsC : s ∈ C)
+    (hbaseNodup : ([c, t, a, x, z, y, b, r, w, s] : List V).Nodup)
+    (hrestNodup : rest.Nodup)
+    (hrestC : ∀ v ∈ rest, v ∈ C)
+    (hbaseRest : ∀ v ∈ ([c, t, a, x, z, y, b, r, w, s] : List V), v ∉ rest)
+    (hcoverC : ∀ v ∈ C, v = t ∨ v = x ∨ v = y ∨ v = r ∨ v = s ∨ v ∈ rest) :
+    ∃ (u v : V) (p : G.Walk u v), p.IsHamiltonian := by
+  classical
+  let base : List V := [c, t, a, x, z, y, b, r, w, s]
+  let l := base ++ rest
+  have hnodup : l.Nodup := by
+    rw [List.nodup_append']
+    exact ⟨hbaseNodup, hrestNodup, hbaseRest⟩
+  have hbaseChain : base.IsChain G.Adj := by
+    simp [base, List.isChain_cons, hct, hta, hax, hxz, hzy, hyb, hbr, hrw, hws]
+  have hrestChain : rest.IsChain G.Adj := clique_subset_list_chain G C hC rest hrestNodup hrestC
+  have hchain : l.IsChain G.Adj := by
+    rw [List.isChain_append]
+    refine ⟨hbaseChain, hrestChain, ?_⟩
+    intro u hu v hv
+    simp [base] at hu
+    subst u
+    exact hC hsC (hrestC v hv) (by
+      intro h
+      exact hbaseRest s (by simp [base]) (h ▸ hv))
+  have hcover : ∀ v : V, v ∈ l := by
+    intro v
+    have hv : v ∈ C ∨ v ∈ I := by
+      have : v ∈ C ∪ I := by simpa [hpartition] using (Finset.mem_univ v)
+      exact Finset.mem_union.mp this
+    rcases hv with hvC | hvI
+    · rcases hcoverC v hvC with rfl | rfl | rfl | rfl | rfl | hvrest
+      · simp [l, base]
+      · simp [l, base]
+      · simp [l, base]
+      · simp [l, base]
+      · simp [l, base]
+      · exact List.mem_append_right _ hvrest
+    · have hv' : v = a ∨ v = b ∨ v = c ∨ v = z ∨ v = w := by
+        simpa [hI, Finset.mem_insert, Finset.mem_singleton, or_comm, or_left_comm, or_assoc] using hvI
+      rcases hv' with rfl | rfl | rfl | rfl | rfl <;> simp [l, base]
+  exact hamiltonian_of_list G l (by simp [l, base]) hnodup hchain hcover
+
 private theorem clique_order_chain (G : SimpleGraph V) (C : Finset V)
     (hC : G.IsClique (C : Set V)) (l : List V)
     (hnodup : l.Nodup) (hfin : l.toFinset = C) : l.IsChain G.Adj := by
