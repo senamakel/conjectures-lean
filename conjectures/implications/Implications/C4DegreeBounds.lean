@@ -61,17 +61,12 @@ theorem innerNeighbors_card_le_one {v u : V}
   by_contra hwz
   have hwu : G.Adj u w := by simpa using hw'.1
   have hvw : G.Adj v w := by
-    have : G.Adj w v := by simpa using hw'.2
-    exact G.symm.symm w v this
+    simpa using hw'.2
   have hzu : G.Adj u z := by simpa using hz'.1
   have hvz : G.Adj v z := by
-    have : G.Adj z v := by simpa using hz'.2
-    exact G.symm.symm z v this
-  have huv : u ≠ v := by
-    intro huv
-    subst v
-    exact G.neighborFinset.not_mem_self hu
-  have hnot := hC4 (x := v) (y := u) (z := w) (w := z) huv hwz hvw hwu
+    simpa using hz'.2
+  have hvu : v ≠ u := G.ne_of_adj (by simpa using hu)
+  have hnot := hC4 (x := v) (y := u) (z := w) (w := z) hvu hwz hvw hwu
   exact hnot ⟨hvz, hzu⟩
 
 theorem sum_outerNeighbors_card_le (v : V)
