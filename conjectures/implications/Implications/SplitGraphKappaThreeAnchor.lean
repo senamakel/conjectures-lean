@@ -406,10 +406,10 @@ theorem hamiltonian_of_common_pair [Fintype V]
     have hKsub : K ⊆ row G I c := by
       intro x hx
       rcases Finset.mem_insert.mp hx with rfl | hx
-      · exact Finset.mem_filter.mpr ⟨ha, (hcommon c hc).1⟩
+      · simp [row, ha, (hcommon c hc).1]
       · have hxb := Finset.mem_singleton.mp hx
         subst x
-        exact Finset.mem_filter.mpr ⟨hb, (hcommon c hc).2⟩
+        simp [row, hb, (hcommon c hc).2]
     have hcap : ((row G I c) \ K).card ≤ 1 := by
       have hc' := Finset.card_sdiff_add_card_inter (row G I c) K
       rw [Finset.inter_eq_right.mpr hKsub, show K.card = 2 by simp [K, hab]] at hc'
@@ -418,7 +418,7 @@ theorem hamiltonian_of_common_pair [Fintype V]
     have hmem (x : V) (hx : x ∈ O) (hadj : G.Adj c x) :
         x ∈ row G I c \ K := by
       obtain ⟨hxI, hxK⟩ := Finset.mem_sdiff.mp hx
-      exact Finset.mem_sdiff.mpr ⟨Finset.mem_filter.mpr ⟨hxI, hadj⟩, hxK⟩
+      exact Finset.mem_sdiff.mpr ⟨by simp [row, hxI, hadj], hxK⟩
     exact hkl (Finset.card_le_one.mp hcap k (hmem k hk hck') l (hmem l hl hcl'))
   obtain ⟨blocks, hbn, hbc, hbh, hbl, hbm, _⟩ :=
     outside_path_of_disjoint_attachments G C I O ∅ Finset.sdiff_subset hCI hC hdis (by
