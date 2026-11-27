@@ -367,6 +367,43 @@ theorem selected_two_rows_card_le_three_of_original
     exact hdiff c hc d hd hcd
   · exact hdegree
 
+/-- Choosing two distinct original clique neighbors for each independent vertex
+produces the selected-incidence hypotheses above. -/
+theorem chosen_neighbor_rows_card_le_three
+    {C I : Type*} [Fintype C] [Fintype I] [DecidableEq C] [DecidableEq I]
+    (clique : Finset C) (indep : Finset I)
+    (original : C → Finset I) (left right : I → C)
+    (horiginalSub : ∀ c ∈ clique, original c ⊆ indep)
+    (horiginal : ∀ c ∈ clique, (original c).card ≤ 2)
+    (hdiff : ∀ c ∈ clique, ∀ d ∈ clique, c ≠ d →
+      (original c \\ original d ∪ original d \\ original c).card ≤ 2)
+    (hleftC : ∀ i ∈ indep, left i ∈ clique)
+    (hrightC : ∀ i ∈ indep, right i ∈ clique)
+    (hleftRow : ∀ i ∈ indep, i ∈ original (left i))
+    (hrightRow : ∀ i ∈ indep, i ∈ original (right i))
+    (hneq : ∀ i ∈ indep, left i ≠ right i) :
+    (clique.filter (fun c =>
+      (indep.filter (fun i => left i = c ∨ right i = c)).card = 2)).card ≤ 3 := by
+  classical
+  let selected : C → Finset I := fun c => indep.filter (fun i => left i = c ∨ right i = c)
+  have hselectedSub : ∀ c ∈ clique, selected c ⊆ original c := by
+    intro c hc i hi
+    have hi' := Finset.mem_filter.mp hi
+    rcases hi'.2 with h | h
+    · exact h ▸ hleftRow i hi'.1
+    · exact h ▸ hrightRow i hi'.1
+  have hdegree : ∀ i ∈ indep,
+      (clique.filter (fun c => i ∈ selected c)).card = 2 := by
+    intro i hi
+    have hEq : clique.filter (fun c => i ∈ selected c) = {left i, right i} := by
+      ext c
+      simp [selected, hi, hleftC i hi, hrightC i hi, eq_comm,
+        or_comm, or_left_comm, or_assoc]
+    rw [hEq]
+    simp [hneq i hi]
+  exact selected_two_rows_card_le_three_of_original clique indep original selected
+    horiginalSub hselectedSub horiginal hdiff hdegree
+
 /-! The exact family statement applied to clique rows. -/
 theorem clique_rows_two_set_structure
     {V : Type*} [Fintype V] [DecidableEq V]
@@ -416,4 +453,6 @@ end SplitGraphSmallRows
 #print axioms SplitGraphSmallRows.pairwise_intersecting_two_sets
 #print axioms SplitGraphSmallRows.card_le_three_of_no_common_center
 #print axioms SplitGraphSmallRows.selected_two_rows_card_le_three
+#print axioms SplitGraphSmallRows.selected_two_rows_card_le_three_of_original
+#print axioms SplitGraphSmallRows.chosen_neighbor_rows_card_le_three
 #print axioms SplitGraphSmallRows.clique_rows_two_set_structure
