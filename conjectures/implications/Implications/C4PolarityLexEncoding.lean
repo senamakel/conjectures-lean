@@ -64,9 +64,10 @@ theorem lexFreshIds_length (next : Nat) (left right : List Nat) :
       cases right with
       | nil => rfl
       | cons y ys =>
+          simp only [lexFreshIds, List.zip_cons_cons, List.countP_cons]
           by_cases hxy : x = y
-          · simp [lexFreshIds, hxy, List.countP, ih]
-          · simp [lexFreshIds, hxy, List.countP, ih]
+          · simp [hxy, ih]
+          · simp [hxy, ih]
 
 /-- The final unused variable is the starting ID plus the number of non-skipped
 positions. This is the numbering convention of the Python loop. -/
@@ -86,22 +87,6 @@ theorem lexNext_eq (next : Nat) (left right : List Nat) :
           by_cases hxy : x = y
           · simp [lexNext, lexFreshIds, hxy, ih]
           · simp [lexNext, lexFreshIds, hxy, ih, Nat.add_assoc, Nat.add_comm]
-
-/-- The lex-loop allocator uses consecutive IDs starting at `next`. -/
-theorem lexFreshIds_eq_range (next : Nat) (left right : List Nat) :
-    lexFreshIds next left right =
-      (List.range (lexFreshIds next left right).length).map (fun i => i + next) := by
-  induction left generalizing right next with
-  | nil => cases right <;> simp [lexFreshIds]
-  | cons x xs ih =>
-      cases right with
-      | nil => simp [lexFreshIds]
-      | cons y ys =>
-          by_cases hxy : x = y
-          · simpa [lexFreshIds, hxy] using ih next ys
-          · simp only [lexFreshIds, hxy, if_false, List.length_cons]
-            rw [ih (next + 1) ys]
-            simp [List.range_succ, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
 
 /-- DIMACS clauses for an equality-prefix gate are satisfied when `same` is
 assigned the exact prefix conjunction. -/
@@ -125,5 +110,4 @@ end Implications.C4PolarityLexEncoding
 
 #print axioms Implications.C4PolarityLexEncoding.lexFreshIds_length
 #print axioms Implications.C4PolarityLexEncoding.lexNext_eq
-#print axioms Implications.C4PolarityLexEncoding.lexFreshIds_eq_range
 #print axioms Implications.C4PolarityLexEncoding.lexStep_extension
