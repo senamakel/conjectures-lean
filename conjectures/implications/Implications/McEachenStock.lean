@@ -76,6 +76,66 @@ lemma prime_not_dvd_x_before {p : ℕ} (hp : p.Prime) (n : ℕ) (hn : 1 ≤ n)
         have hle := Nat.div_le_self (k + 2) (Nat.gcd (x (k + 1)) (k + 2))
         exact Nat.not_dvd_of_pos_of_lt hpos (by omega) hright
 
+lemma prime_dvd_x_at_next {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p) :
+    p ∣ x (p - 1) ↔ p ∣ x (p - 2) := by
+  have he : p - 1 = (p - 2) + 1 := by omega
+  rw [he, x_succ_mul_a _ (by omega), hp.dvd_mul]
+  constructor
+  · rintro (h | h)
+    · exact h
+    · have hb := a_le (p - 2) (by omega)
+      have ha := a_dvd (p - 2) (by omega)
+      have hupper : a (p - 2) + 2 < 2 * p := by omega
+      have heq : a (p - 2) + 2 = p := by
+        obtain ⟨k, hk⟩ := h
+        have hkpos : 0 < k := by nlinarith
+        have hkone : k = 1 := by nlinarith
+        simpa only [hkone, Nat.mul_one] using hk
+      have hane : a (p - 2) = p - 2 := by omega
+      rw [hane] at ha
+      have hh : p - 2 ∣ 1 := by
+        have ha' : p - 2 ∣ (p - 2) + 1 := by
+          simpa [Nat.sub_add_cancel (by omega : 1 ≤ p)] using ha
+        exact (Nat.dvd_add_iff_right (dvd_refl (p - 2))).mpr ha'
+      have := Nat.le_of_dvd (by decide : 0 < (1 : ℕ)) hh
+      omega
+  · exact Or.inl
+
+lemma prime_dvd_x_iff {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p) :
+    p ∣ x (p - 1) ↔ a (p - 3) = p - 2 := by
+  rw [prime_dvd_x_at_next hp hp5]
+  have he : p - 2 = (p - 3) + 1 := by omega
+  rw [he, x_succ_mul_a _ (by omega), hp.dvd_mul]
+  have hpre := prime_not_dvd_x_before hp (p - 3) (by omega) (by omega)
+  rw [or_iff_right hpre]
+  constructor
+  · intro hd
+    have hb := a_le (p - 3) (by omega)
+    have hl := Nat.le_of_dvd (by omega : 0 < a (p - 3) + 2) hd
+    omega
+  · intro ha
+    have heq : a (p - 3) + 2 = p := by omega
+    rw [heq]
+
+lemma prime_target_iff {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p) :
+    a (p - 1) = p ↔ a (p - 3) ≠ p - 2 := by
+  constructor
+  · intro ha heq
+    have hd := (prime_dvd_x_iff hp hp5).mpr heq
+    rw [a_at_prime p hp, if_pos hd] at ha
+    omega
+  · intro heq
+    have hd : ¬ p ∣ x (p - 1) := fun hd => heq ((prime_dvd_x_iff hp hp5).mp hd)
+    rw [a_at_prime p hp, if_neg hd]
+
+lemma a_at_prime (p : ℕ) (hp : p.Prime) :
+    a (p - 1) = if p ∣ x (p - 1) then 1 else p := by
+  rw [a_eq_div_gcd _ (by have := hp.two_le; omega), Nat.sub_add_cancel hp.one_le]
+  split_ifs with hd
+  · rw [Nat.gcd_eq_right hd, Nat.div_self hp.pos]
+  · have hc : Nat.Coprime (x (p - 1)) p := (hp.coprime_iff_not_dvd.mpr hd).symm
+    rw [hc.gcd_eq_one, Nat.div_one]
+
 lemma prime_mod_three_two {p : ℕ} (hp : p.Prime) (hmod : p % 3 = 2)
     (h11 : 11 ≤ p) : a (p - 1) = p := by
   have hthree : ∀ n : ℕ, 4 ≤ n → 3 ∣ x n := by
@@ -83,55 +143,20 @@ lemma prime_mod_three_two {p : ℕ} (hp : p.Prime) (hmod : p % 3 = 2)
     induction n, hn using Nat.le_induction with
     | base => decide
     | succ k hk ih => exact ih.trans (x_dvd_succ k (by omega))
-  have hiff : p ∣ x (p - 1) ↔ a (p - 3) = p - 2 := by
-    have he : p - 2 = (p - 3) + 1 := by omega
-    rw [he, x_succ_mul_a _ (by omega), hp.dvd_mul]
-    have hbefore := prime_not_dvd_x_before hp (p - 3) (by omega) (by omega)
-    rw [or_iff_right hbefore]
-    constructor
-    · intro hd
-      have hb := a_le (p - 3) (by omega)
-      have hl := Nat.le_of_dvd (by omega : 0 < a (p - 3) + 2) hd
-      omega
-    · intro ha
-      have heq : a (p - 3) + 2 = p := by omega
-      rw [heq]
-  have htarget : a (p - 1) = p ↔ a (p - 3) ≠ p - 2 := by
-    constructor
-    · intro ha heq
-      have hd := hiff.mpr heq
-      rw [show a (p - 1) = if p ∣ x (p - 1) then 1 else p by
-        rw [a_eq_div_gcd _ (by have := hp.two_le; omega), Nat.sub_add_cancel hp.one_le]
-        split_ifs with hd
-        · rw [Nat.gcd_eq_right hd, Nat.div_self hp.pos]
-        · have hc : Nat.Coprime (x (p - 1)) p := (hp.coprime_iff_not_dvd.mpr hd).symm
-          rw [hc.gcd_eq_one, Nat.div_one]] at ha
-      rw [if_pos hd] at ha
-      omega
-    · intro hne
-      have hd : ¬ p ∣ x (p - 1) := fun hd => hne (hiff.mp hd)
-      rw [show a (p - 1) = if p ∣ x (p - 1) then 1 else p by
-        rw [a_eq_div_gcd _ (by have := hp.two_le; omega), Nat.sub_add_cancel hp.one_le]
-        split_ifs with hd
-        · rw [Nat.gcd_eq_right hd, Nat.div_self hp.pos]
-        · have hc : Nat.Coprime (x (p - 1)) p := (hp.coprime_iff_not_dvd.mpr hd).symm
-          rw [hc.gcd_eq_one, Nat.div_one]]
-      rw [if_neg hd]
-  have hp7 : 7 ≤ p := by omega
-  exact (htarget).mpr (by
-    intro ha
-    have hd := hthree (p - 3) (by omega)
-    have hm : 3 ∣ (p - 3) + 1 := Nat.dvd_of_mod_eq_zero (by omega)
-    have hg : 3 ∣ Nat.gcd (x (p - 3)) ((p - 3) + 1) := Nat.dvd_gcd hd hm
-    have hmul : a (p - 3) * Nat.gcd (x (p - 3)) ((p - 3) + 1) = (p - 3) + 1 := by
-      rw [a_eq_div_gcd _ (by omega)]
-      exact Nat.div_mul_cancel (Nat.gcd_dvd_right _ _)
-    have hgpos := Nat.le_of_dvd (Nat.gcd_pos_of_pos_right _ (by omega)) hg
-    have hrel : p - 2 = (p - 3) + 1 := by omega
-    rw [ha, hrel] at hmul
-    have hb := Nat.mul_le_mul_left ((p - 3) + 1) hgpos
-    rw [hmul] at hb
-    omega)
+  rw [prime_target_iff hp (by omega)]
+  intro ha
+  have hd := hthree (p - 3) (by omega)
+  have hm : 3 ∣ (p - 3) + 1 := Nat.dvd_of_mod_eq_zero (by omega)
+  have hg : 3 ∣ Nat.gcd (x (p - 3)) ((p - 3) + 1) := Nat.dvd_gcd hd hm
+  have hmul : a (p - 3) * Nat.gcd (x (p - 3)) ((p - 3) + 1) = (p - 3) + 1 := by
+    rw [a_eq_div_gcd _ (by omega)]
+    exact Nat.div_mul_cancel (Nat.gcd_dvd_right _ _)
+  have hgpos := Nat.le_of_dvd (Nat.gcd_pos_of_pos_right _ (by omega)) hg
+  have hrel : p - 2 = (p - 3) + 1 := by omega
+  rw [ha, hrel] at hmul
+  have hb := Nat.mul_le_mul_left ((p - 3) + 1) hgpos
+  rw [hmul] at hb
+  omega
 
 /-- For a prime `r ≥ 11` with `r ≡ 2 (mod 3)`, the recurrence inserts `r + 2`
 into `x r`; divisibility monotonicity keeps it in every later state. -/
