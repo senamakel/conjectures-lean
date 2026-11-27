@@ -69,7 +69,7 @@ theorem thresholdFreshVariables_nodup (nextVar limit inputCount : Nat) :
     (f := fun j : Nat => Int.ofNat (nextVar + j + 1))
   · intro i j hij
     change Int.ofNat (nextVar + i + 1) = Int.ofNat (nextVar + j + 1) at hij
-    have hNat : nextVar + i + 1 = nextVar + j + 1 := by exact_mod_cast hij
+    have hNat : nextVar + i + 1 = nextVar + j + 1 := Int.ofNat.inj hij
     omega
   · exact List.nodup_range
 
