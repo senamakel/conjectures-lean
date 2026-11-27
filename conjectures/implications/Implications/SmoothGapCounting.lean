@@ -149,6 +149,41 @@ private theorem eventually_logLogCutoff_log_lower :
   rw [← Real.log_sqrt (le_of_lt hLpos)]
   exact Real.log_le_log (by positivity) hB_lower
 
+private theorem eventually_logLogCutoff_primeCount_le :
+    ∀ᶠ n : ℕ in atTop,
+      ((logLogCutoff n).primesBelow.card : ℝ) ≤
+        Real.log (primeAt n : ℝ) / 4 := by
+  filter_upwards [eventually_primeBelow_count_le logLogCutoff logLogCutoff_tendsto_atTop,
+    eventually_logLogCutoff_log_lower,
+    (Real.tendsto_log_atTop.comp (Real.tendsto_log_atTop.comp
+      (tendsto_natCast_atTop_atTop.comp (by
+        rw [tendsto_atTop_atTop]
+        intro b
+        refine ⟨b, fun n hbn => ?_⟩
+        have hp := Nat.add_two_le_nth_prime n
+        change b ≤ Nat.nth Nat.Prime n
+        omega)))).eventually_ge_atTop 1]
+    with n hpi hlogB hLL
+  have hL : 0 < Real.log (primeAt n : ℝ) := by
+    have := Nat.add_two_le_nth_prime n
+    have hp : 1 < (primeAt n : ℝ) := by exact_mod_cast (by omega : 1 < primeAt n)
+    exact Real.log_pos hp
+  have hLLpos : 0 < Real.log (Real.log (primeAt n : ℝ)) := by linarith
+  have hBupper : (logLogCutoff n : ℝ) ≤
+      Real.log (primeAt n : ℝ) * Real.log (Real.log (primeAt n : ℝ)) / 16 :=
+    Nat.floor_le (by positivity)
+  have hbound : 2 * (logLogCutoff n : ℝ) / Real.log (logLogCutoff n : ℝ) ≤
+      Real.log (primeAt n : ℝ) / 4 := by
+    calc
+      2 * (logLogCutoff n : ℝ) / Real.log (logLogCutoff n : ℝ) ≤
+          2 * (Real.log (primeAt n : ℝ) * Real.log (Real.log (primeAt n : ℝ)) / 16) /
+            (Real.log (Real.log (primeAt n : ℝ)) / 2) := by
+        gcongr
+      _ = Real.log (primeAt n : ℝ) / 4 := by
+        field_simp
+        <;> ring
+  exact hpi.trans hbound
+
 private theorem primeAt_strictMono : StrictMono primeAt := by
   intro a b hab
   exact Nat.nth_strictMono Nat.infinite_setOfPred_prime hab
