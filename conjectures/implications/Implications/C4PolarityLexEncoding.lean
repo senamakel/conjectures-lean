@@ -157,6 +157,9 @@ theorem lexAssignment_cons_neq (a : Nat → Bool) (base : Nat)
     · have habove : base < n := by omega
       have hbelow' : ¬ n < base + 1 := by omega
       have hidx : n - base = (n - (base + 1)) + 1 := by omega
+      have hnotLe : ¬ n ≤ base := Nat.not_le_of_gt habove
+      have hlen' : (lexPrefixScan a nextPref xs ys).length + 1 =
+          1 + (lexPrefixScan a nextPref xs ys).length := by omega
       have hthreshold :
           (n < base + (lexPrefixScan a initialPref (x :: xs) (y :: ys)).length) ↔
           (n < (base + 1) + (lexPrefixScan a nextPref xs ys).length) := by
@@ -165,12 +168,14 @@ theorem lexAssignment_cons_neq (a : Nat → Bool) (base : Nat)
       by_cases hinside : n < base + (lexPrefixScan a initialPref (x :: xs) (y :: ys)).length
       · have hinside' : n < (base + 1) + (lexPrefixScan a nextPref xs ys).length :=
           hthreshold.mp hinside
-        simp [lexAssignment, hbelow, hbelow', hinside, hinside', hscan, hscanExt,
-          hidx, extendVariable, Nat.ne_of_gt habove]
+        simp [lexAssignment, hbelow, hbelow', hnotLe, hinside, hinside', hscan,
+          hlen', hidx, extendVariable, Nat.ne_of_gt habove]
+        rw [hscanExt]
       · have hinside' : ¬ n < (base + 1) + (lexPrefixScan a nextPref xs ys).length :=
           fun hh => hinside (hthreshold.mpr hh)
-        simp [lexAssignment, hbelow, hbelow', hinside, hinside', hscan, hscanExt,
-          extendVariable, Nat.ne_of_gt habove]
+        simp [lexAssignment, hbelow, hbelow', hnotLe, hinside, hinside', hscan,
+          hlen', extendVariable, Nat.ne_of_gt habove]
+        rw [hscanExt]
 
 /-- Each unequal variable pair allocates exactly one fresh prefix variable;
 identical variables are skipped. -/
