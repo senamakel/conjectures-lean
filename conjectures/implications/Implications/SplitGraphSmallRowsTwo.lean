@@ -130,12 +130,15 @@ theorem one_overlap_path_block
     (hdisj : Disjoint C I)
     (heC : e ∈ C) (hcC : c ∈ C) (hdC : d ∈ C) (hfC : f ∈ C)
     (hvI : v ∈ I) (huI : u ∈ I) (hwI : w ∈ I)
-    (hec : e ≠ c) (hcd : c ≠ d) (hdf : d ≠ f)
-    (hef : e ≠ f) (hvw : v ≠ w) (hvu : v ≠ u) (huw : u ≠ w)
+    (hcentersNodup : ([e, c, d, f] : List V).Nodup)
+    (hvw : v ≠ w) (hvu : v ≠ u) (huw : u ≠ w)
     (hev : G.Adj e v) (hvc : G.Adj v c) (hcu : G.Adj c u)
     (hud : G.Adj u d) (hdw : G.Adj d w) (hwf : G.Adj w f) :
     ∃ p : G.Walk e f, p.IsPath ∧ p.support = [e, v, c, u, d, w, f] := by
   have hnodup : ([e, v, c, u, d, w, f] : List V).Nodup := by
+    have hcenters := hcentersNodup
+    simp only [List.nodup_cons, List.not_mem_nil, List.mem_cons, List.mem_singleton,
+      not_or, not_false_eq_true] at hcenters
     have hcross (x : V) (hxC : x ∈ C) (y : V) (hyI : y ∈ I) : x ≠ y := by
       intro h
       subst y
@@ -152,7 +155,9 @@ theorem one_overlap_path_block
     have hfv : f ≠ v := hcross f hfC v hvI
     have hfu : f ≠ u := hcross f hfC u huI
     have hfw : f ≠ w := hcross f hfC w hwI
-    simp [List.nodup_cons, hec, hcd, hdf, hef, hvw, hvu, huw,
+    simp [List.nodup_cons, hcenters.1.1, hcenters.1.2.1, hcenters.1.2.2,
+      hcenters.2.1.1, hcenters.2.1.2, hcenters.2.2,
+      hvw, hvu, huw,
       hev', hew, heu, hcv, hcw, hcu', hdv, hdu, hdw', hfv, hfu, hfw]
   have hchain : ([e, v, c, u, d, w, f] : List V).IsChain G.Adj := by
     simp [List.isChain_cons, hev, hvc, hcu, hud, hdw, hwf]
