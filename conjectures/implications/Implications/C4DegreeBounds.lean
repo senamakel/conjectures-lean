@@ -189,7 +189,7 @@ theorem degree_eight_neighborhood_degree_one (v : V)
     rw [Finset.card_map, SimpleGraph.card_neighborFinset_eq_degree] at h
     exact h
   have hupper (u : G.neighborSet v) : H.degree u ≤ 1 :=
-    (hdeg u).trans_le (innerNeighbors_card_le_one G hC4 (SimpleGraph.mem_neighborFinset.mpr u.property))
+    (hdeg u).trans_le (innerNeighbors_card_le_one G hC4 ((G.mem_neighborFinset v u).mpr u.property))
   let e : {u // u ∈ S} ≃ G.neighborSet v :=
     Equiv.subtypeEquivRight (fun _ => by simp [S])
   have hsum : (∑ u : G.neighborSet v, H.degree u) =
@@ -223,7 +223,7 @@ theorem degree_eight_neighborhood_degree_one (v : V)
       ∑ _ : G.neighborSet v, (1 : ℕ) :=
     Finset.sum_lt_sum (fun w _ => hupper w)
       ⟨u, Finset.mem_univ _, by simp [hzero]⟩
-  simpa [htotal, hn] using hlt
+  simp [htotal, hn] at hlt
 
 theorem sum_outerNeighbors_card_le (v : V)
     (hC4 : C4VertexExtension.C4Free G) :
