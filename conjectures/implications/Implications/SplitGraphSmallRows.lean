@@ -342,6 +342,7 @@ theorem selected_two_rows_card_le_three_of_original
     {C I : Type*} [Fintype C] [Fintype I] [DecidableEq C] [DecidableEq I]
     (clique : Finset C) (indep : Finset I)
     (original selected : C → Finset I)
+    (horiginalSub : ∀ c ∈ clique, original c ⊆ indep)
     (hselected : ∀ c ∈ clique, selected c ⊆ original c)
     (horiginal : ∀ c ∈ clique, (original c).card ≤ 2)
     (hdiff : ∀ c ∈ clique, ∀ d ∈ clique, c ≠ d →
@@ -350,8 +351,9 @@ theorem selected_two_rows_card_le_three_of_original
       (clique.filter (fun c => i ∈ selected c)).card = 2) :
     (clique.filter (fun c => (selected c).card = 2)).card ≤ 3 := by
   apply selected_two_rows_card_le_three clique indep selected
-  · exact fun c hc => (hselected c hc).trans (horiginal c hc)
-  · exact horiginal
+  · exact fun c hc => (hselected c hc).trans (horiginalSub c hc)
+  · intro c hc
+    exact (Finset.card_le_card (hselected c hc)).trans (horiginal c hc)
   · intro c hc d hd hcd hcardC hcardD
     have hEqC : selected c = original c := by
       apply Finset.eq_of_subset_of_card_le (hselected c hc)
