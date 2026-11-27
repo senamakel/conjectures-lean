@@ -25,7 +25,7 @@ theorem family_rep (t : ℕ) (ht : 0 < t) :
   have hp : familyPrime t + 1 = 4 * t ^ 2 + 2 * t := by
     unfold familyPrime
     omega
-  linear_combination (familyPrime t)^2 * t * (t+1) * hp
+  linear_combination -(familyPrime t)^2 * t * (t+1) * hp
 
 /-- In a Type II representation the non-multiple denominator is x, and the two
 multiples are p*u and p*v, with u < v. -/
@@ -117,13 +117,16 @@ private theorem not_one_multiple (t p a b w : ℕ) (ht : 0 < t)
     rw [← hp] at hp'
     have htwo : 2 ≤ t := by omega
     have hdle := Nat.le_of_dvd (show 0 < 4*w-1 by omega) hd
-    nlinarith [mul_nonneg (show 0 ≤ (t : ℤ) - 2 by omega) (show 0 ≤ (t : ℤ) by positivity)]
+    have hwbound : p + 1 ≤ 4 * w := by omega
+    have hprod : 0 ≤ ((t : ℤ) - 2) * (t + 1) := mul_nonneg (by omega) (by positivity)
+    zify at hp' hwbound hsmall htwo
+    nlinarith only [hp', hwbound, hsmall, htwo, hprod]
 
 private theorem not_three_multiples (p a b c : ℕ) (hp : 0 < p) (ha : 0 < a)
     (hb : 0 < b) (hc : 0 < c) (he : IsRep p (p*a) (p*b) (p*c)) : False := by
   unfold IsRep at he
   have he' : 4*a*b*c = a*b+a*c+b*c := by
-    apply Nat.eq_of_mul_eq_mul_left (m := p^3) (by positivity)
+    apply Nat.eq_of_mul_eq_mul_left (n := p^3) (by positivity)
     nlinarith only [he]
   have hab : a*b ≤ a*b*c := Nat.le_mul_of_pos_right _ hc
   have hac : a*c ≤ a*b*c := by
@@ -142,10 +145,110 @@ private theorem typeII_at_most (t p a u v : ℕ) (ht : 0 < t)
     a = t*(t+1) ∧ u = t ∧ v = t+1 := by
   have he' : 4*a*u*v = a*(u+v)+p*u*v := by
     unfold IsRep at he
-    apply Nat.eq_of_mul_eq_mul_left (m := p^2) (by positivity)
+    apply Nat.eq_of_mul_eq_mul_left (n := p^2) (by positivity)
     nlinarith only [he]
   obtain ⟨hle, huniq⟩ := typeII_sharp t p a u v ht hp hpp ha hu huv he'
   have heq := Nat.le_antisymm hv hle
   exact ⟨(huniq heq).2, (huniq heq).1, Nat.eq_of_mul_eq_mul_left hpp.pos heq⟩
 
+/-- The increasing representation of the family prime with the smallest third
+denominator is unique. The hypothesis uses the denominator-cleared equation. -/
+theorem optimal_triple_of_le (t p x y z : ℕ) (ht : 0 < t)
+    (hp : p = familyPrime t) (hpp : p.Prime) (hx : 0 < x)
+    (hxy : x < y) (hyz : y < z) (h : IsRep p x y z) (hz : z ≤ p*(t+1)) :
+    x = t*(t+1) ∧ y = p*t ∧ z = p*(t+1) := by
+  have hy : 0 < y := by omega
+  have hzpos : 0 < z := by omega
+  have hg := familyPrime_gt t ht
+  rw [← hp] at hg
+  have hfam : t*(t+1) < p*t := by
+    rw [mul_comm t (t+1), mul_comm p t]
+    exact Nat.mul_lt_mul_left ht hg
+  have hxmax : x ≤ p*(t+1) := by omega
+  have hymax : y ≤ p*(t+1) := by omega
+  have hdiv : p ∣ x ∨ p ∣ y ∨ p ∣ z := by
+    have hprod : p ∣ 4*x*y*z := by
+      rw [h]
+      exact dvd_mul_right _ _
+    have hfour : ¬p ∣ 4 := by
+      intro hd
+      have hdle := Nat.le_of_dvd (by decide : 0 < 4) hd
+      have hf := familyPrime_add_one t ht
+      rw [← hp] at hf
+      nlinarith
+    rcases hpp.dvd_mul.mp hprod with hdiv | hz
+    · rcases hpp.dvd_mul.mp hdiv with hdiv | hy
+      · exact Or.inl ((hpp.dvd_mul.mp hdiv).resolve_left hfour)
+      · exact Or.inr (Or.inl hy)
+    · exact Or.inr (Or.inr hz)
+  by_cases hxd : p ∣ x
+  · obtain ⟨u, rfl⟩ := hxd
+    have hu : 0 < u := Nat.pos_of_mul_pos_left hx
+    by_cases hyd : p ∣ y
+    · obtain ⟨v, rfl⟩ := hyd
+      have hv : 0 < v := Nat.pos_of_mul_pos_left hy
+      by_cases hzd : p ∣ z
+      · obtain ⟨w, rfl⟩ := hzd
+        exact (not_three_multiples p u v w hpp.pos hu hv
+          (Nat.pos_of_mul_pos_left hzpos) h).elim
+      · have h' : IsRep p z (p*u) (p*v) := by
+          unfold IsRep at *
+          nlinarith only [h]
+        have huv := Nat.lt_of_mul_lt_mul_left hxy
+        obtain ⟨rfl, rfl, rfl⟩ := typeII_at_most t p z u v ht hp hpp hzd hu huv hymax h'
+        omega
+    · by_cases hzd : p ∣ z
+      · obtain ⟨v, rfl⟩ := hzd
+        have h' : IsRep p y (p*u) (p*v) := by
+          unfold IsRep at *
+          nlinarith only [h]
+        have huv := Nat.lt_of_mul_lt_mul_left (hxy.trans hyz)
+        obtain ⟨rfl, rfl, rfl⟩ := typeII_at_most t p y u v ht hp hpp hyd hu huv hz h'
+        omega
+      · have h' : IsRep p y z (p*u) := by
+          unfold IsRep at *
+          nlinarith only [h]
+        exact (not_one_multiple t p y z u ht hp hpp hyd hzd hu
+          (Nat.le_of_mul_le_mul_left hxmax hpp.pos) h').elim
+  · by_cases hyd : p ∣ y
+    · obtain ⟨u, rfl⟩ := hyd
+      have hu : 0 < u := Nat.pos_of_mul_pos_left hy
+      by_cases hzd : p ∣ z
+      · obtain ⟨v, rfl⟩ := hzd
+        have huv := Nat.lt_of_mul_lt_mul_left hyz
+        obtain ⟨rfl, rfl, rfl⟩ := typeII_at_most t p x u v ht hp hpp hxd hu huv hz h
+        exact ⟨rfl, rfl, rfl⟩
+      · have h' : IsRep p x z (p*u) := by
+          unfold IsRep at *
+          nlinarith only [h]
+        exact (not_one_multiple t p x z u ht hp hpp hxd hzd hu
+          (Nat.le_of_mul_le_mul_left hymax hpp.pos) h').elim
+    · have hzd := (hdiv.resolve_left hxd).resolve_left hyd
+      obtain ⟨u, rfl⟩ := hzd
+      exact (not_one_multiple t p x y u ht hp hpp hxd hyd (Nat.pos_of_mul_pos_left hzpos)
+        (Nat.le_of_mul_le_mul_left hz hpp.pos) h).elim
+
+/-- For this prime family the displayed triple is admissible, optimal, and
+the only increasing triple attaining the minimum maximum denominator. -/
+theorem family_optimal (t : ℕ) (ht : 0 < t) (hp : (familyPrime t).Prime) :
+    let p := familyPrime t
+    let a := t*(t+1)
+    let b := p*t
+    let c := p*(t+1)
+    (0 < a ∧ a < b ∧ b < c ∧ IsRep p a b c) ∧
+      ∀ x y z, 0 < x → x < y → y < z → IsRep p x y z →
+        c ≤ z ∧ (z ≤ c → x = a ∧ y = b ∧ z = c) := by
+  dsimp
+  have hab : t*(t+1) < familyPrime t*t := by
+    rw [mul_comm t (t+1), mul_comm (familyPrime t) t]
+    exact Nat.mul_lt_mul_left ht (familyPrime_gt t ht)
+  refine ⟨⟨by positivity, hab, Nat.mul_lt_mul_of_pos_left (by omega) hp.pos, family_rep t ht⟩, ?_⟩
+  intro x y z hx hxy hyz hrep
+  have huniq := optimal_triple_of_le t _ x y z ht rfl hp hx hxy hyz hrep
+  refine ⟨?_, huniq⟩
+  by_contra! hless
+  obtain ⟨_, _, heq⟩ := huniq hless.le
+  omega
+
 end Implications.ErdosStrausOptimal
+
