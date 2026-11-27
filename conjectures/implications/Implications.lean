@@ -32,6 +32,7 @@ import Implications.SplitGraphPath
 import Implications.C4VertexExtension
 import Implications.C4PolarityOrderSeven
 import Implications.C4PolarityCanonical
+import Implications.C4PolarityEncoderInputs
 import Implications.WilfPatternSwap
 import Implications.WilfTwoWindowOrder
 import Implications.WilfCertifiedSwap

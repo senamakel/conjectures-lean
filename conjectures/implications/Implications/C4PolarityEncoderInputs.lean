@@ -1,7 +1,9 @@
+import Mathlib.Data.Finset.Sort
 import Mathlib.Combinatorics.SimpleGraph.DegreeSum
 import Mathlib.Tactic
 import Implications.C4PolarityCanonical
 import Implications.C4PolarityCnfGates
+import Implications.C4PolarityEdgeEncoding
 import Implications.C4PolarityDeletion
 
 set_option maxRecDepth 10000
@@ -167,8 +169,6 @@ count reduction: induced deleted edges plus deleted absolute points. -/
 theorem scoreInputs_count_true (D : Finset (Fin 57)) :
     (scoreInputs D).countP id = inducedEdgeCount graph D + (D ∩ absolute).card := by
   rw [scoreInputs, List.countP_append]
-  change (absoluteIndices.map (fun i => decide (i ∈ D))).countP id +
-    (orthogonalPairs.map (fun p => decide (p.1 ∈ D ∧ p.2 ∈ D))).countP id = _
   rw [absolute_score_count, orthogonal_pair_score_count]
   omega
 
@@ -181,7 +181,7 @@ def neighborExcesses (i : Fin 57) : Finset (Finset (Fin 57)) :=
 /-- One clause emitted for vertex `i` and a selected neighbor subset. -/
 noncomputable def neighborSurvivorClause (D : Finset (Fin 57)) (i : Fin 57)
     (S : Finset (Fin 57)) : List Bool :=
-  decide (i ∈ D) :: S.toList.map (fun j => !(decide (j ∈ D)))
+  decide (i ∈ D) :: (S.sort (· ≤ ·)).map (fun j => !(decide (j ∈ D)))
 
 private theorem survivor_neighbor_subset_exists (D N S : Finset (Fin 57))
     (hSN : S ⊆ N) (hS : S.card = N.card - 5)
@@ -226,7 +226,7 @@ theorem neighbor_survivor_clauses_of_min_degree (D : Finset (Fin 57))
     rw [neighborSurvivorClause, List.mem_cons]
     right
     rw [List.mem_map]
-    exact ⟨j, Finset.mem_toList.mpr hjS, by simp [hjD]⟩
+    exact ⟨j, by simpa using hjS, by simp [hjD]⟩
 
 /-- A canonical candidate's Boolean score clears the threshold 34 in the
 script, using the exact deleted-edge score identity. -/
@@ -235,8 +235,102 @@ theorem candidate_score_at_least_34 (D : Finset (Fin 57))
     34 ≤ (scoreInputs D).countP id := by
   rw [scoreInputs_count_true]
   have hret := C4PolarityOrderSeven.retained_edge_count D hCand.1
-  rw [hret] at hCand
+  have hLower := hCand.2
+  rw [hret] at hLower
   omega
+
+/-- The 41-vertex edge bound is formulated using set cardinality so it is
+independent of the enumeration used for each successive induced graph. -/
+def SurvivorDeletionBound (D : Finset (Fin 57)) : Prop :=
+  ∀ v : {i // i ∈ (Finset.univ : Finset (Fin 57)) \ D},
+    ((graph.induce ((Finset.univ \ D : Finset (Fin 57)) : Set (Fin 57))).induce
+      ({v}ᶜ : Set {i // i ∈ (Finset.univ : Finset (Fin 57)) \ D})).edgeSet.ncard ≤ 132
+
+theorem candidate_survivor_min_degree (D : Finset (Fin 57))
+    (hCand : C4PolarityCanonical.Candidate D) (hDel : SurvivorDeletionBound D) :
+    ∀ i, i ∉ D → 6 ≤ (graph.neighborFinset i \ D).card := by
+  classical
+  let R : Finset (Fin 57) := Finset.univ \ D
+  let H := graph.induce (R : Set (Fin 57))
+  have hEdgeN : 138 ≤ H.edgeSet.ncard := by
+    simpa only [H, R, inducedEdgeCount, SimpleGraph.edgeFinset_card,
+      Set.fintypeCard_eq_ncard] using hCand.2
+  have hEdge : 138 ≤ H.edgeFinset.card := by
+    simpa only [SimpleGraph.edgeFinset_card, Set.fintypeCard_eq_ncard] using hEdgeN
+  intro i hi
+  have hiR : i ∈ R := by simp [R, hi]
+  let v : R := ⟨i, hiR⟩
+  have hDelCount : (H.induce ({v}ᶜ : Set R)).edgeFinset.card ≤ 132 := by
+    simpa only [SimpleGraph.edgeFinset_card, Set.fintypeCard_eq_ncard] using hDel v
+  rw [SimpleGraph.card_edgeFinset_induce_compl_singleton,
+    SimpleGraph.card_edgeFinset_deleteIncidenceSet] at hDelCount
+  have hdegree : 6 ≤ H.degree v := by omega
+  have hneighbors : (H.neighborFinset v).card = (graph.neighborFinset i \ D).card := by
+    apply Finset.card_bij (fun x _ => x.val)
+    · intro x hx
+      have hadj := (H.mem_neighborFinset v x).mp hx
+      have hxD : x.val ∉ D := (Finset.mem_sdiff.mp x.property).2
+      exact Finset.mem_sdiff.mpr ⟨(graph.mem_neighborFinset i x.val).mpr hadj, hxD⟩
+    · intro x _ y _ hxy
+      exact Subtype.ext hxy
+    · intro x hx
+      obtain ⟨hxN, hxD⟩ := Finset.mem_sdiff.mp hx
+      refine ⟨⟨x, by simp [R, hxD]⟩, ?_, rfl⟩
+      exact (H.mem_neighborFinset v _).mpr ((graph.mem_neighborFinset i x).mp hxN)
+  rw [← hneighbors, H.card_neighborFinset_eq_degree]
+  exact hdegree
+
+open C4PolarityEdgeEncoding C4PolarityDimacs
+
+/-- The signed DIMACS clause corresponding to one survivor constraint. -/
+noncomputable def neighborDimacsClause (i : Fin 57) (S : Finset (Fin 57)) : List Int :=
+  (deletionId i : Int) :: (S.sort (· ≤ ·)).map (fun j => -(deletionId j : Int))
+
+theorem neighborDimacsClause_satisfied (D : Finset (Fin 57))
+    (hmin : ∀ i, i ∉ D → 6 ≤ (graph.neighborFinset i \ D).card)
+    (a : Nat → Bool) (ha : ∀ j : Fin 57, a (deletionId j) = decide (j ∈ D))
+    (i : Fin 57) (S : Finset (Fin 57)) (hS : S ∈ neighborExcesses i) :
+    (neighborDimacsClause i S).any (evalLiteral a) = true := by
+  have hpos (j : Fin 57) :
+      evalLiteral a (deletionId j : Int) = decide (j ∈ D) := by
+    have hd : 0 < deletionId j := by unfold deletionId; omega
+    simp [evalLiteral, hd, ha]
+  have hneg (j : Fin 57) :
+      evalLiteral a (-(deletionId j : Int)) = !(decide (j ∈ D)) := by
+    have hd : ¬ (deletionId j : Int) < 0 := by omega
+    simp [evalLiteral, hd, ha]
+  have hmap : (neighborDimacsClause i S).map (evalLiteral a) = neighborSurvivorClause D i S := by
+    simp [neighborDimacsClause, neighborSurvivorClause, hpos, hneg, List.map_map,
+      Function.comp_def]
+  have hsat := neighbor_survivor_clauses_of_min_degree D hmin i S hS
+  rw [C4PolarityCnfGates.clauseSat, ← hmap, List.any_map] at hsat
+  exact hsat
+
+/-- The signed input literals passed to the score counter are the deletion
+bits of the absolute points, followed by all edge output variables. -/
+def scoreDimacsInputs : List Int :=
+  absoluteIndices.map (fun i => (deletionId i : Int)) ++
+    List.ofFn (fun k : Fin orthogonalPairs.length => (edgeId k.val : Int))
+
+theorem scoreDimacsInputs_eval (D : Finset (Fin 57)) (base : Nat → Bool)
+    (hbase : ∀ i : Fin 57, base (deletionId i) = decide (i ∈ D)) :
+    scoreDimacsInputs.map (evalLiteral (extendEdges base orthogonalPairs)) = scoreInputs D := by
+  have hpos (n : Nat) (hn : 0 < n) :
+      evalLiteral (extendEdges base orthogonalPairs) (n : Int) =
+        extendEdges base orthogonalPairs n := by
+    simp [evalLiteral, hn]
+  have hd (i : Fin 57) : 0 < deletionId i := by unfold deletionId; omega
+  have he (k : Nat) : 0 < edgeId k := by unfold edgeId; omega
+  simp only [scoreDimacsInputs, scoreInputs, List.map_append, List.map_map, List.map_ofFn]
+  congr 1
+  · apply List.map_congr_left
+    intro i _
+    rw [Function.comp_apply, hpos _ (hd i), extendEdges_at_deletion, hbase]
+  · rw [← List.ofFn_getElem_eq_map]
+    congr 1
+    funext k
+    simp only [Function.comp_apply, hpos _ (he k.val), extendEdges_at_edge _ _ _ k.isLt,
+      hbase, Bool.decide_and]
 
 end Implications.C4PolarityEncoderInputs
 
@@ -247,5 +341,6 @@ end Implications.C4PolarityEncoderInputs
 #print axioms Implications.C4PolarityEncoderInputs.neighbor_survivor_clauses_of_min_degree
 #print axioms Implications.C4PolarityEncoderInputs.candidate_score_at_least_34
 #print axioms Implications.C4PolarityEncoderInputs.orthogonalPairs_lex_ordered
-#print axioms Implications.C4PolarityEncoderInputs.neighbor_survivor_clauses_of_min_degree
-#print axioms Implications.C4PolarityEncoderInputs.candidate_neighbor_survivor_clauses
+#print axioms Implications.C4PolarityEncoderInputs.candidate_survivor_min_degree
+#print axioms Implications.C4PolarityEncoderInputs.neighborDimacsClause_satisfied
+#print axioms Implications.C4PolarityEncoderInputs.scoreDimacsInputs_eval
