@@ -3,20 +3,19 @@ import Implications.WilfPatternSwap
 /-!
 # Reversal preserves exact consecutive Wilf counts
 
-Reversing a permutation and its length-eight pattern reflects occurrence starts
-about the midpoint of the interval. This gives equality of exact occurrence
-counts after applying the same reflection to the prescribed starts.
+Reversing an ambient permutation and its length-eight pattern reflects the
+occurrence starts. We prove the exact-count transfer for every pattern and
+every prescribed exact set of starts.
 -/
 
 namespace Implications.WilfReversal
 
-open Implications.WilfPatternSwap
+open Implications.WilfPatternSwap WilfMarked
 
-/-- Reversal of the eight positions of a pattern. -/
-def reversePattern (p : Fin 8 → Fin 8) : Fin 8 → Fin 8 :=
-  p ∘ Fin.revPerm
+/-- Reverse the positions of a length-eight pattern. -/
+def reversePattern (p : Fin 8 → Fin 8) : Fin 8 → Fin 8 := p ∘ Fin.revPerm
 
-/-- Reflect a valid length-eight start, and leave invalid start indices fixed. -/
+/-- Reflect valid length-eight starts, fixing the invalid tail of `Fin n`. -/
 def reverseStartFun {n : ℕ} (s : Fin n) : Fin n :=
   if hs : s.val + 7 < n then ⟨n - 8 - s.val, by omega⟩ else s
 
@@ -24,18 +23,21 @@ private theorem reverseStartFun_involutive {n : ℕ} :
     Function.Involutive (@reverseStartFun n) := by
   intro s
   by_cases hs : s.val + 7 < n
-  · simp only [reverseStartFun, dif_pos hs]
-    have hreflect : n - 8 - s.val + 7 < n := by omega
-    simp only [dif_pos hreflect]
+  · have hr : n - 8 - s.val + 7 < n := by omega
     apply Fin.ext
+    simp only [reverseStartFun, dif_pos hs, dif_pos hr]
+    change n - 8 - (n - 8 - s.val) = s.val
     omega
-  · simp only [reverseStartFun, dif_neg hs]
+  · simp [reverseStartFun, hs]
 
-/-- The involution on all start indices, including the unused tail of `Fin n`. -/
-noncomputable def reverseStartEquiv (n : ℕ) : Fin n ≃ Fin n :=
-  Equiv.ofInvolutive reverseStartFun reverseStartFun_involutive
+/-- The start-index involution on all of `Fin n`. -/
+noncomputable def reverseStartEquiv (n : ℕ) : Fin n ≃ Fin n where
+  toFun := reverseStartFun
+  invFun := reverseStartFun
+  left_inv := reverseStartFun_involutive
+  right_inv := reverseStartFun_involutive
 
-/-- Reversal of an ambient permutation. -/
+/-- Reverse an ambient permutation by precomposing with `Fin.revPerm`. -/
 noncomputable def reversePermEquiv (n : ℕ) :
     Equiv.Perm (Fin n) ≃ Equiv.Perm (Fin n) where
   toFun π := Fin.revPerm.trans π
@@ -47,56 +49,53 @@ noncomputable def reversePermEquiv (n : ℕ) :
     ext i
     simp
 
+private theorem reverseIndex_eq {n : ℕ} (s : ℕ) (hs : s + 7 < n)
+    (i : Fin 8) :
+    Fin.revPerm ⟨s + (Fin.rev i).val, by have hi := (Fin.rev i).isLt; omega⟩ =
+      ⟨n - 8 - s + i.val, by have hi := i.isLt; omega⟩ := by
+  apply Fin.ext
+  simp [Fin.revPerm_apply, Fin.rev]
+  omega
+
+/-- A reversed permutation contains the reversed pattern at the reflected
+start exactly when the original permutation contains the original pattern. -/
 private theorem containsAt_reverse_iff {n : ℕ} (π : Equiv.Perm (Fin n))
     (p : Fin 8 → Fin 8) (s : Fin n) (hs : s.val + 7 < n) :
     ContainsAt (Fin.revPerm.trans π) s.val (reversePattern p) ↔
       ContainsAt π (n - 8 - s.val) p := by
+  have hr : n - 8 - s.val + 7 < n := by omega
   constructor
-  · rintro ⟨_, h⟩
-    refine ⟨by omega, ?_⟩
+  · rintro ⟨_, hrev⟩
+    refine ⟨hr, ?_⟩
     intro i j
-    have hi : s.val + i.val < n := by omega
-    have hj : s.val + j.val < n := by omega
-    have hi' : n - 1 - (s.val + i.val) = n - 8 - s.val + (7 - i.val) := by omega
-    have hj' : n - 1 - (s.val + j.val) = n - 8 - s.val + (7 - j.val) := by omega
-    have hrev_i : Fin.revPerm ⟨s.val + i.val, hi⟩ =
-        ⟨n - 1 - (s.val + i.val), by omega⟩ := by
-      apply Fin.ext
-      simp [Fin.revPerm_apply]
-    have hrev_j : Fin.revPerm ⟨s.val + j.val, hj⟩ =
-        ⟨n - 1 - (s.val + j.val), by omega⟩ := by
-      apply Fin.ext
-      simp [Fin.revPerm_apply]
-    have hcmp := h i j
-    change (π (Fin.revPerm ⟨s.val + i.val, hi⟩) <
-        π (Fin.revPerm ⟨s.val + j.val, hj⟩)) ↔
-      reversePattern p i < reversePattern p j at hcmp
-    rw [hrev_i, hrev_j, hi', hj'] at hcmp
-    simpa [reversePattern, Fin.revPerm_apply] using hcmp
+    have h := hrev (Fin.rev i) (Fin.rev j)
+    have hi := reverseIndex_eq s.val hs i
+    have hj := reverseIndex_eq s.val hs j
+    change (π (Fin.revPerm ⟨s.val + (Fin.rev i).val, by
+        have hk := (Fin.rev i).isLt
+        omega⟩) <
+      π (Fin.revPerm ⟨s.val + (Fin.rev j).val, by
+        have hk := (Fin.rev j).isLt
+        omega⟩)) ↔
+      reversePattern p (Fin.rev i) < reversePattern p (Fin.rev j) at h
+    rw [hi, hj] at h
+    simpa [reversePattern, Fin.revPerm_apply] using h
   · rintro ⟨_, h⟩
     refine ⟨hs, ?_⟩
     intro i j
-    have hi : s.val + i.val < n := by omega
-    have hj : s.val + j.val < n := by omega
-    have hi' : n - 1 - (s.val + i.val) = n - 8 - s.val + (7 - i.val) := by omega
-    have hj' : n - 1 - (s.val + j.val) = n - 8 - s.val + (7 - j.val) := by omega
-    have hrev_i : Fin.revPerm ⟨s.val + i.val, hi⟩ =
-        ⟨n - 1 - (s.val + i.val), by omega⟩ := by
-      apply Fin.ext
-      simp [Fin.revPerm_apply]
-    have hrev_j : Fin.revPerm ⟨s.val + j.val, hj⟩ =
-        ⟨n - 1 - (s.val + j.val), by omega⟩ := by
-      apply Fin.ext
-      simp [Fin.revPerm_apply]
-    have hcmp := h i j
-    change (π ⟨n - 8 - s.val + i.val, by omega⟩ <
-        π ⟨n - 8 - s.val + j.val, by omega⟩) ↔ p i < p j at hcmp
-    have hcmp' : (π (Fin.revPerm ⟨s.val + i.val, hi⟩) <
-        π (Fin.revPerm ⟨s.val + j.val, hj⟩)) ↔ p (Fin.revPerm i) < p (Fin.revPerm j) := by
-      simpa [hrev_i, hrev_j, hi', hj', Fin.revPerm_apply] using hcmp
-    simpa [reversePattern, Fin.revPerm_apply] using hcmp'
+    have h' := h (Fin.rev i) (Fin.rev j)
+    have hi := reverseIndex_eq s.val hs i
+    have hj := reverseIndex_eq s.val hs j
+    have hcmp : (π (Fin.revPerm ⟨s.val + i.val, by
+        have hk := i.isLt
+        omega⟩) <
+      π (Fin.revPerm ⟨s.val + j.val, by
+        have hk := j.isLt
+        omega⟩)) ↔ p (Fin.rev i) < p (Fin.rev j) := by
+      simpa [hi, hj, Fin.rev, Fin.revPerm_apply] using h'
+    simpa [reversePattern, Fin.revPerm_apply] using hcmp
 
-/-- Reversal carries the exact occurrence-start set to its reflected image. -/
+/-- Reversal maps the exact occurrence-start set to its reflected image. -/
 theorem occurrenceSet_reverse {n : ℕ} (p : Fin 8 → Fin 8)
     (π : Equiv.Perm (Fin n)) :
     occurrenceSet (reversePattern p) (reversePermEquiv n π) =
@@ -105,64 +104,72 @@ theorem occurrenceSet_reverse {n : ℕ} (p : Fin 8 → Fin 8)
   ext s
   constructor
   · intro hs
-    have hcontains := (Finset.mem_filter.mp hs).2
-    have hvalid : s.val + 7 < n := hcontains.1
-    have hsource := (containsAt_reverse_iff π p s hvalid).mp hcontains
-    refine Finset.mem_map.mpr ⟨(reverseStartEquiv n) s, ?_, ?_⟩
+    have hc := (Finset.mem_filter.mp hs).2
+    have hv := hc.1
+    have hsource := (containsAt_reverse_iff π p s hv).mp hc
+    refine Finset.mem_map.mpr ⟨reverseStartEquiv n s, ?_, ?_⟩
     · exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, hsource⟩
-    · simp [reverseStartEquiv, reverseStartFun, hvalid]
+    · exact reverseStartFun_involutive s
   · intro hs
     rcases Finset.mem_map.mp hs with ⟨t, ht, hts⟩
-    have hcontains := (Finset.mem_filter.mp ht).2
-    have hvalid : t.val + 7 < n := hcontains.1
-    have hst : (reverseStartEquiv n) t = s := hts
-    have hreflected : s.val + 7 < n := by
-      have := hvalid
-      simp [reverseStartEquiv, reverseStartFun, hvalid] at hst
-      apply Fin.ext at hst
+    have hc := (Finset.mem_filter.mp ht).2
+    have hvt := hc.1
+    have hts' := congrArg (reverseStartEquiv n) hts
+    have hts'' : reverseStartEquiv n s = t := by
+      simpa [reverseStartFun_involutive] using hts'.symm
+    have hvs : s.val + 7 < n := by
+      by_contra hbad
+      have hfix : reverseStartEquiv n s = s := by
+        simp [reverseStartEquiv, reverseStartFun, hbad]
+      rw [hfix] at hts''
+      have := congrArg Fin.val hts''
       omega
-    have hsource := (containsAt_reverse_iff π p s hreflected).mpr ?_
-    · exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, hsource⟩
-    · simpa [reversePermEquiv, hst, reverseStartEquiv, reverseStartFun, hvalid] using hcontains
+    have hsource : ContainsAt (Fin.revPerm.trans π) s.val (reversePattern p) := by
+      apply (containsAt_reverse_iff π p s hvs).mpr
+      simpa [hts'', reverseStartEquiv, reverseStartFun, hvt] using hc
+    exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, hsource⟩
 
-private theorem exactCount_eq_of_equiv_occurrenceSets {α X Y : Type*}
-    [Fintype α] [DecidableEq α] [Fintype X] [Fintype Y]
-    (occX : X → Finset α) (occY : Y → Finset α) (e : X ≃ Y)
-    (h : ∀ x, occY (e x) = occX x)
+private theorem exactCount_eq_of_equiv_occurrenceSets {α β X Y : Type*}
+    [Fintype α] [DecidableEq α] [Fintype β] [DecidableEq β]
+    [Fintype X] [Fintype Y]
+    (occX : X → Finset α) (occY : Y → Finset β)
+    (eX : X ≃ Y) (eα : α ≃ β)
+    (h : ∀ x, occY (eX x) = (occX x).map eα.toEmbedding)
     (marks : Finset α) :
-    WilfCounts.exactCount occX marks = WilfCounts.exactCount occY marks := by
+    WilfCounts.exactCount occX marks =
+      WilfCounts.exactCount occY (marks.map eα.toEmbedding) := by
   classical
   unfold WilfCounts.exactCount
   have card_eq :
       Fintype.card {x : X // occX x = marks} =
-        Fintype.card {y : Y // occY y = marks} :=
+        Fintype.card {y : Y // occY y = marks.map eα.toEmbedding} :=
     Fintype.card_congr {
-      toFun := fun x => ⟨e x.1, by rw [← h]; exact x.2⟩
-      invFun := fun y => ⟨e.symm y.1, by rw [h]; simpa using y.2⟩
+      toFun := fun x => ⟨eX x.1, by rw [h, x.2]⟩
+      invFun := fun y => ⟨eX.symm y.1, by
+        apply Finset.map_injective eα.toEmbedding
+        simpa using (h (eX.symm y.1)).symm.trans y.2⟩
       left_inv := by intro x; cases x; simp
       right_inv := by intro y; cases y; simp
     }
   have hx : Fintype.card {x : X // occX x = marks} =
       (Finset.univ.filter fun x : X => occX x = marks).card :=
     Fintype.card_of_subtype _ (by intro x; simp)
-  have hy : Fintype.card {y : Y // occY y = marks} =
-      (Finset.univ.filter fun y : Y => occY y = marks).card :=
+  have hy : Fintype.card {y : Y // occY y = marks.map eα.toEmbedding} =
+      (Finset.univ.filter fun y : Y => occY y = marks.map eα.toEmbedding).card :=
     Fintype.card_of_subtype _ (by intro y; simp)
   rw [← hx, card_eq, hy]
 
-/-- Every exact occurrence set has the same count after reversing both the
-pattern and the prescribed set of starts. -/
+/-- Exact consecutive Wilf counts are preserved by simultaneous reversal of the
+pattern and the prescribed starts. -/
 theorem exactOccurrenceCount_eq_reverse (n : ℕ) (p : Fin 8 → Fin 8)
-    (π : Equiv.Perm (Fin n)) (marks : Finset (Fin n)) :
+    (marks : Finset (Fin n)) :
     WilfCounts.exactCount (occurrenceSet p) marks =
       WilfCounts.exactCount (occurrenceSet (reversePattern p))
-        ((marks.map (reverseStartEquiv n).toEmbedding)) := by
-  classical
+        (marks.map (reverseStartEquiv n).toEmbedding) := by
   apply exactCount_eq_of_equiv_occurrenceSets
     (occurrenceSet p) (occurrenceSet (reversePattern p))
-    (reversePermEquiv n)
-  · intro σ
-    rw [occurrenceSet_reverse]
+    (reversePermEquiv n) (reverseStartEquiv n)
+  · exact occurrenceSet_reverse p
   · exact marks
 
 end Implications.WilfReversal
