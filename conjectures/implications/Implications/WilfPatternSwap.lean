@@ -222,9 +222,9 @@ theorem exactOccurrenceCount_eq (n : ℕ) (marks : Finset (Fin n)) :
       WilfCounts.exactCount (occurrenceSet tau) marks := by
   apply WilfEquivalence.exactCount_eq_of_markedEquiv
   intro chosen
-  exact ⟨(Equiv.subtypeEquivRight (subset_occurrenceSet_iff sigma chosen)).trans
+  exact (Equiv.subtypeEquivRight (subset_occurrenceSet_iff sigma chosen)).trans
     ((markedEquiv n (chosen.image Fin.val)).trans
-      (Equiv.subtypeEquivRight (subset_occurrenceSet_iff tau chosen)).symm)⟩
+      (Equiv.subtypeEquivRight (subset_occurrenceSet_iff tau chosen)).symm)
 
 #print axioms exactOccurrenceCount_eq
 
