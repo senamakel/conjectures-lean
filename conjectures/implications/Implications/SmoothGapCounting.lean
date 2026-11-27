@@ -106,4 +106,29 @@ theorem primeGapSmoothCountBound {N j : ℕ} (S U : Finset ℕ)
   · exact hlarge
   · exact hsub
 
+/-- The cutoff form of the multi-hit bound for gaps no longer than `Y`.
+Every qualifying integer then has all prime factors below `Y`, and lies below
+the `N`th prime. Thus `j` hits in each selected gap consume `j` distinct
+members of the finite set of `Y`-smooth integers below `p_N`. -/
+theorem smallGapMultiHitBound {N Y j : ℕ} (S : Finset ℕ)
+    (hS : S ⊆ Finset.range N)
+    (hgap : ∀ r ∈ S, primeGap r ≤ Y)
+    (hlarge : ∀ r ∈ S, j ≤
+      ((Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
+        (fun m => m.maxPrimeFac < primeGap r)).card) :
+    j * S.card ≤
+      ((Finset.range (primeAt N + 1)).filter (fun m => m.maxPrimeFac < Y)).card := by
+  apply primeGapSmoothCountBound S
+    ((Finset.range (primeAt N + 1)).filter (fun m => m.maxPrimeFac < Y)) hS hlarge
+  intro m hm
+  rcases Finset.mem_biUnion.mp hm with ⟨r, hr, hmr⟩
+  have hmi := Finset.mem_filter.mp hmr
+  have hmIoo := Finset.mem_Ioo.mp hmi.1
+  have hrN := Finset.mem_range.mp (hS hr)
+  have hrp : r + 1 ≤ N := by omega
+  have hp : primeAt (r + 1) ≤ primeAt N := primeAt_strictMono.monotone hrp
+  apply Finset.mem_filter.mpr
+  refine ⟨Finset.mem_range.mpr (by omega), ?_⟩
+  exact lt_of_lt_of_le hmi.2 (hgap r hr)
+
 end Implications.SmoothGapCounting
