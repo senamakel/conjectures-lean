@@ -364,12 +364,12 @@ theorem hamiltonian_of_split_partition_two_double_rows
   have hdoubleRows : doubleRows = {c,d} := by
     have hcD : c ∈ doubleRows := by
       rcases hshape with h | h
-      · exact Finset.mem_filter.mpr ⟨hcC, by rw [h.1]; simp⟩
-      · exact Finset.mem_filter.mpr ⟨hcC, by rw [h.1]; simp [h.2.2.1]⟩
+      · exact Finset.mem_filter.mpr ⟨hcC, by rw [h.1]; simp [selectedRow, h.2.2]⟩
+      · exact Finset.mem_filter.mpr ⟨hcC, by rw [h.1]; simp [selectedRow, h.2.2.1]⟩
     have hdD : d ∈ doubleRows := by
       rcases hshape with h | h
-      · exact Finset.mem_filter.mpr ⟨hdC, by rw [h.2]; simp⟩
-      · exact Finset.mem_filter.mpr ⟨hdC, by rw [h.2.1]; simp [h.2.2.2.1]⟩
+      · exact Finset.mem_filter.mpr ⟨hdC, by rw [h.2.1]; simp [selectedRow, h.2.2]⟩
+      · exact Finset.mem_filter.mpr ⟨hdC, by rw [h.2.1]; simp [selectedRow, h.2.2.2.1]⟩
     have hsub : ({c,d} : Finset V) ⊆ doubleRows := by
       intro q hq
       simp only [Finset.mem_insert, Finset.mem_singleton] at hq
@@ -420,7 +420,7 @@ theorem hamiltonian_of_split_partition_two_double_rows
       have huc' : u ≠ c := fun h => hcross c hcC u huI h.symm
       have hud' : u ≠ d := fun h => hcross d hdC u huI h.symm
       have hcv' : c ≠ v := hcross c hcC v hvI
-      have hvd' : v ≠ d := hcross d hdC v hvI
+      have hvd' : v ≠ d := (hcross d hdC v hvI).symm
       simp [pref, List.nodup_cons, huc', huv, hud', hcv', hcd, hvd']
     have hprefChain : pref.IsChain G.Adj := by
       simp [pref, List.isChain_cons, (hselectedAdj c u huc).symm,
@@ -437,9 +437,9 @@ theorem hamiltonian_of_split_partition_two_double_rows
         simp only [pref, List.mem_cons, List.not_mem_nil, or_false] at hqPref
         rcases hqPref with h | h | h | h
         · exact False.elim ((Finset.disjoint_left.mp hdisj) hq (h ▸ huI))
-        · exact Or.inl h.symm
+        · exact Or.inl h
         · exact False.elim ((Finset.disjoint_left.mp hdisj) hq (h ▸ hvI))
-        · exact Or.inr h.symm
+        · exact Or.inr h
       rcases hq' with h | h
       · subst q
         exact ⟨u,huI,by simp [S],(Finset.mem_filter.mp huc).2⟩
@@ -447,7 +447,8 @@ theorem hamiltonian_of_split_partition_two_double_rows
         exact ⟨u,huI,by simp [S],(Finset.mem_filter.mp hud).2⟩
     have hprefLastC : ∀ x, x ∈ pref.getLast? → x ∈ C := by
       intro x hx
-      simpa [pref] using (show x ∈ ({d} : Finset V) by simpa using hx)
+      have hxd : x = d := by simpa [pref] using hx
+      simpa [hxd] using hdC
     exact SplitGraphSmallRowsCompletion.hamiltonian_of_selected_prefix_of_double_rows
       G C S pref hC hdisj hpartition (by simp [pref]) hprefNodup hprefChain
       hprefLastC hspecial left right hleftC hrightC hleftAdj hrightAdj hneq hcap
@@ -457,10 +458,10 @@ theorem hamiltonian_of_split_partition_two_double_rows
         rw [hdoubleRows] at hqD
         simp only [Finset.mem_insert, Finset.mem_singleton] at hqD
         rcases hqD with rfl | rfl
-        · rw [hrowC]
+        · change ({u,v} : Finset V) ⊆ S
           intro i hi
           simpa [S] using hi
-        · rw [hrowD]
+        · change ({u,v} : Finset V) ⊆ S
           intro i hi
           simpa [S] using hi)
       hprefixClique
