@@ -263,7 +263,7 @@ theorem selected_two_rows_card_le_three
       · simp [hce]
       by_cases hde : e = d
       · simp [hde]
-      obtain ⟨i, hic, hie⟩ := hinter c hc e he (Ne.symm hce)
+      obtain ⟨i, hic, hie⟩ := hinter c hc e he hce
       have hiI : i ∈ indep := hsub c (Finset.mem_filter.mp hc).1 hic
       have htriple : ({c, d, e} : Finset C) ⊆ clique.filter (fun q => i ∈ r q) := by
         intro q hq
@@ -273,15 +273,13 @@ theorem selected_two_rows_card_le_three
         · exact Finset.mem_filter.mpr ⟨(Finset.mem_filter.mp hd).1, by simpa [hrows] using hic⟩
         · exact Finset.mem_filter.mpr ⟨(Finset.mem_filter.mp he).1, hie⟩
       have hthree : ({c, d, e} : Finset C).card = 3 := by
-        simp [hcd, hce, hde]
+        simp [hcd, hce, hde.symm]
       have hle := Finset.card_le_card htriple
       rw [hdegree i hiI, hthree] at hle
-      have htwo : ({c, d} : Finset C).card ≤ 3 := by simp
-      have hbound : ({c, d, e} : Finset C).card ≤ 2 := hle
       omega
     have hle := Finset.card_le_card hFsub
-    have : ({c, d} : Finset C).card ≤ 3 := by simp
-    simpa [F] using (hle.trans this)
+    change F.card ≤ 3
+    exact hle.trans (by simp [hcd])
   · have hinj : Set.InjOn r F := by
       intro c hc d hd hrows
       by_contra hcd
@@ -321,8 +319,8 @@ theorem selected_two_rows_card_le_three
           exact Finset.mem_filter.mpr ⟨(Finset.mem_filter.mp hc).1, hcenter c hc⟩
         have hle := Finset.card_le_card hFsub
         rw [hdegree i hiI] at hle
-        have : 2 ≤ 3 := by omega
-        simpa [F] using (hle.trans this)
+        change F.card ≤ 3
+        omega
       · obtain ⟨a, b, c, hab, hac, hbc, hsubset⟩ := htriangle
         have hRsub : R ⊆ ({a, b, c} : Finset I).powersetCard 2 := by
           intro A hA
@@ -333,8 +331,9 @@ theorem selected_two_rows_card_le_three
             show ({a, b, c} : Finset I).card = 3 by simp [hab, hac, hbc]] at hle
           exact hle
         have hcardEq : R.card = F.card := Finset.card_image_of_injOn hinj
+        change F.card ≤ 3
         rw [← hcardEq]
-        simpa [F] using hRle
+        exact hRle
 
 /-! The exact family statement applied to clique rows. -/
 theorem clique_rows_two_set_structure
