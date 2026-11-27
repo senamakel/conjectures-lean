@@ -104,7 +104,7 @@ relative order when read from either window. -/
 theorem same_pattern_overlap_compatible {n : Nat} (π : Equiv.Perm (Fin n))
     (p : Fin 8 → Fin 8) (s t : Nat) (hs : ContainsAt π s p) (ht : ContainsAt π t p)
     (hst : s < t) (hts : t - s < 8) :
-    overlapCompatible p ⟨t - s, by omega⟩ = true := by
+    overlapCompatible p (t - s) = true := by
   rcases hs with ⟨hbs, hs⟩
   rcases ht with ⟨hbt, ht⟩
   apply of_decide_eq_true
@@ -146,18 +146,22 @@ theorem same_pattern_overlap_compatible {n : Nat} (π : Equiv.Perm (Fin n))
     rw [hidxi, hidxj]
   have hrel : (p bi < p bj) ↔ (p ai < p aj) :=
     hsi.symm.trans (hsame.trans htj)
-  simpa [ai, aj, bi, bj] using hrel
+  have hbi := rankList_get p bi
+  have hbj := rankList_get p bj
+  have hai := rankList_get p ai
+  have haj := rankList_get p aj
+  simpa [ai, aj, bi, bj, hbi, hbj, hai, haj] using hrel
 
 theorem same_pattern_start_distance {n : Nat} (π : Equiv.Perm (Fin n))
     (p : Fin 8 → Fin 8) (hp : p = sigma ∨ p = tau)
     (s t : Nat) (hs : ContainsAt π s p) (ht : ContainsAt π t p)
     (hst : s < t) (hts : t - s < 8) : t - s = 5 ∨ t - s = 7 := by
   have hov := same_pattern_overlap_compatible π p s t hs ht hst hts
-  let d : Fin 8 := ⟨t - s, by omega⟩
+  let d := t - s
   rcases hp with rfl | rfl
-  · have h := sigma_overlap_compatible_only_at_5_or_7 d (by omega) (by simpa [d] using hov)
+  · have h := sigma_overlap_compatible_only_at_5_or_7 d (by omega) hts (by simpa [d] using hov)
     simpa [d] using h
-  · have h := tau_overlap_compatible_only_at_5_or_7 d (by omega) (by simpa [d] using hov)
+  · have h := tau_overlap_compatible_only_at_5_or_7 d (by omega) hts (by simpa [d] using hov)
     simpa [d] using h
 
 theorem same_pattern_starts_separated {n : Nat} (π : Equiv.Perm (Fin n))
