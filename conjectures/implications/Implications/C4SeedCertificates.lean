@@ -386,8 +386,10 @@ theorem no_compatible_six_in_seed_deletion (G : SimpleGraph (Fin 42))
       have hnd := hTnodup.sublist hab
       have heq' : a = b := Subtype.ext heq
       exact (by simpa [heq'] using hnd)
-    have haT : a ∈ T := List.Sublist.subset hab (by simp)
-    have hbT : b ∈ T := List.Sublist.subset hab (by simp)
+    have haTList : a ∈ T.toList := hab.subset (by simp)
+    have hbTList : b ∈ T.toList := hab.subset (by simp)
+    have haT : a ∈ T := by simpa using haTList
+    have hbT : b ∈ T := by simpa using hbTList
     obtain ⟨a', ha'S, haEq⟩ := Finset.mem_map.mp haT
     obtain ⟨b', hb'S, hbEq⟩ := Finset.mem_map.mp hbT
     have haS : a.1 ∈ S := by
