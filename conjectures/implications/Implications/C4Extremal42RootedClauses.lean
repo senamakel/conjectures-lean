@@ -23,7 +23,7 @@ private theorem nonroot_apply (G : SimpleGraph (Fin 42)) (h : NonrootCycleClause
     (hux : G.Adj u x) (hvx : G.Adj v x) (huy : G.Adj u y) (hvy : G.Adj v y) :
     False := by
   wlog huv' : u < v generalizing u v
-  · exact this v u huv.symm hxy hv hu hx hy hvx hux hvy huy (lt_of_le_of_ne (le_of_not_gt huv') huv.symm)
+  · exact this v u huv.symm hv hu hvx hux hvy huy (lt_of_le_of_ne (le_of_not_gt huv') huv.symm)
   wlog hxy' : x < y generalizing x y
   · exact this y x hxy.symm hy hx huy hvy hux hvx (lt_of_le_of_ne (le_of_not_gt hxy') hxy.symm)
   by_cases hux' : u < x
