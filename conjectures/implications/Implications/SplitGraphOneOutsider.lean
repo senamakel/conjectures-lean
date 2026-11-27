@@ -66,36 +66,27 @@ theorem hamiltonian_of_one_outsider_shared_pair_path
   have hsegmentC : ∀ v ∈ segment, v ∈ C := by
     intro v hv
     simp only [segment, List.mem_append, List.mem_singleton] at hv
-    rcases hv with hvu | hv
-    · subst v
-      exact hu
-    · rcases List.mem_append.mp hv with hv | hv
-      · exact hspareC v hv
-      · simp only [List.mem_singleton] at hv
-        exact hv ▸ hy
+    rcases hv with hv | hv
+    · rcases hv with hvu | hvspare
+      · exact hvu ▸ hu
+      · exact hspareC v hvspare
+    · simp only [List.mem_singleton] at hv
+      exact hv ▸ hy
   have hsegmentChain : segment.IsChain G.Adj :=
     clique_list_chain G C hC segment hsegmentNodup hsegmentC
   have htailChain : tail.IsChain G.Adj := by
     refine List.IsChain.append hsegmentChain (by simp) ?_
     intro v hv w hw
-    simp only [segment, List.getLast?_append_of_ne_nil, List.getLast?_cons,
-      List.getLast?_singleton, Option.mem_def, Option.some.injEq] at hv
-    simp only [List.head?_append_of_ne_nil, List.head?_cons, Option.mem_def,
-      Option.some.injEq] at hw
-    subst v
-    subst w
-    exact hby
+    simp [segment] at hv
+    simp [tail, segment] at hw
+    simpa [hv, hw] using hby
   have hchain : path.IsChain G.Adj := by
     refine List.IsChain.append ?_ htailChain ?_
     · simpa [core] using hcoreChain
     · intro v hv w hw
-      simp only [core, List.getLast?_cons, List.getLast?_singleton,
-        Option.mem_def, Option.some.injEq] at hv
-      simp only [tail, List.head?_append_of_ne_nil, List.head?_cons,
-        Option.mem_def, Option.some.injEq] at hw
-      subst v
-      subst w
-      exact hcu
+      simp [core] at hv
+      simp [tail, segment] at hw
+      simpa [hv, hw] using hcu
   have hcover : ∀ v : V, v ∈ path := by
     intro v
     have hv : v ∈ C ∨ v ∈ I := by
