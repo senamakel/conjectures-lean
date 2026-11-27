@@ -34,14 +34,17 @@ theorem shared_clique_neighbor_block
     intro h
     subst j
     exact (Finset.disjoint_left.mp hdisj) hb hj
+  have hne_aj : a ≠ j := by
+    intro h
+    subst j
+    exact (Finset.disjoint_left.mp hdisj) ha hj
+  have hne_ib : i ≠ b := by
+    intro h
+    subst b
+    exact (Finset.disjoint_left.mp hdisj) hb hi
   have hnodup : ([a, i, c, j, b] : List V).Nodup := by
     simp [List.nodup_cons, hne_ai, hne_ic, hne_cj, hne_jb, hij,
-      hac, hcb, hab, (Finset.disjoint_left.mp hdisj) ha hi,
-      (Finset.disjoint_left.mp hdisj) ha hj,
-      (Finset.disjoint_left.mp hdisj) hc hi,
-      (Finset.disjoint_left.mp hdisj) hc hj,
-      (Finset.disjoint_left.mp hdisj) hb hi,
-      (Finset.disjoint_left.mp hdisj) hb hj]
+      hac, hcb, hab, hne_aj, hne_ib]
   have hchain : ([a, i, c, j, b] : List V).IsChain G.Adj := by
     simp [List.isChain_cons, hai, hia, hcj, hbj.symm]
   let p := SimpleGraph.Walk.ofSupport ([a, i, c, j, b] : List V) (by simp) hchain
