@@ -194,7 +194,7 @@ theorem assemble_apply_of_lifted_support {n : ℕ} (marks shifts : Finset ℕ)
   exact WilfDisjointPermutations.assemble_apply_of_mem_support
     (Finset.univ : Finset (MarkedStart marks)) (markedComponent marks m hb)
     (markedComponents_disjoint marks shifts m hb hsep htranslate)
-    ⟨t, ht⟩ (Finset.mem_univ _) hx
+    (i := ⟨t, ht⟩) (Finset.mem_univ _) hx
 
 /-- If no marked-window summand moves a point, the assembled permutation fixes it. -/
 theorem assemble_apply_of_no_lifted_support {n : ℕ} (marks shifts : Finset ℕ)
