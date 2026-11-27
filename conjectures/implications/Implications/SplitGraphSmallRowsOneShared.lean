@@ -245,16 +245,18 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
     · have hxC : x ∈ C := haX.symm ▸ hCabc.1
       rcases hxBlock with hL | hK | hR
       · have hxe : x ≠ c := by simpa [haX] using hneqac
-        have hki := hunique x hxC hxe k hkI i hi (Or.inl hL.symm) (Or.inl hlefti)
+        have hki := hunique x hxC hxe k hkI i hi (Or.inl hL.symm)
+          (Or.inl (hlefti.trans haX.symm))
         exact (other_labels_ne I i j k hij hkO).1 hki
       · exact (Finset.disjoint_left.mp hdisj) hxC (hK.symm ▸ hkI)
       · have hxe : x ≠ c := by simpa [haX] using hneqac
-        have hki := hunique x hxC hxe k hkI i hi (Or.inr hR.symm) (Or.inl hlefti)
+        have hki := hunique x hxC hxe k hkI i hi (Or.inr hR.symm)
+          (Or.inl (hlefti.trans haX.symm))
         exact (other_labels_ne I i j k hij hkO).1 hki
     · rcases hxBlock with hL | hK | hR
       · have hiC : x ∈ C := hL.symm ▸ hleftC k hkI
         exact (Finset.disjoint_left.mp hdisj) hiC (hiX.symm ▸ hi)
-      · exact (other_labels_ne I i j k hij hkO).1 (hiX.symm.trans hK)
+      · exact (other_labels_ne I i j k hij hkO).1 (hiX.symm.trans hK).symm
       · have hiC : x ∈ C := hR.symm ▸ hrightC k hkI
         exact (Finset.disjoint_left.mp hdisj) hiC (hiX.symm ▸ hi)
     · have hxC : x ∈ C := hcX.symm ▸ hCabc.2.1
@@ -265,17 +267,23 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
     · rcases hxBlock with hL | hK | hR
       · have hjC : x ∈ C := hL.symm ▸ hleftC k hkI
         exact (Finset.disjoint_left.mp hdisj) hjC (hjX.symm ▸ hj)
-      · exact (other_labels_ne I i j k hij hkO).2 (hjX.symm.trans hK)
+      · exact (other_labels_ne I i j k hij hkO).2 (hjX.symm.trans hK).symm
       · have hjC : x ∈ C := hR.symm ▸ hrightC k hkI
         exact (Finset.disjoint_left.mp hdisj) hjC (hjX.symm ▸ hj)
     · have hxC : x ∈ C := hbX.symm ▸ hCabc.2.2
       rcases hxBlock with hL | hK | hR
-      · have hxe : x ≠ c := by simpa [hbX] using hneqcb.symm
-        have hkj := hunique x hxC hxe k hkI j hj (Or.inl hL.symm) (Or.inr hrightj)
+      · have hxe : x ≠ c := by
+          intro h
+          exact hneqcb ((hbX.symm.trans h).symm)
+        have hkj := hunique x hxC hxe k hkI j hj (Or.inl hL.symm)
+          (Or.inr (hrightj.trans hbX.symm))
         exact (other_labels_ne I i j k hij hkO).2 hkj
       · exact (Finset.disjoint_left.mp hdisj) hxC (hK.symm ▸ hkI)
-      · have hxe : x ≠ c := by simpa [hbX] using hneqcb.symm
-        have hkj := hunique x hxC hxe k hkI j hj (Or.inr hR.symm) (Or.inr hrightj)
+      · have hxe : x ≠ c := by
+          intro h
+          exact hneqcb ((hbX.symm.trans h).symm)
+        have hkj := hunique x hxC hxe k hkI j hj (Or.inr hR.symm)
+          (Or.inr (hrightj.trans hbX.symm))
         exact (other_labels_ne I i j k hij hkO).2 hkj
 
 end SplitGraphSmallRowsOneShared
