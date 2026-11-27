@@ -355,9 +355,15 @@ theorem lexClauses_extend_of_constraint (a : Nat → Bool) (base : Nat)
           · subst y
             have hconstraint' :
                 lexConstraint initialPref (xs.map a) (ys.map a) = true := by
-              simp [lexConstraint] at hconstraint
-              exact (Bool.and_eq_true_iff.mp hconstraint).2
-            apply ih base initialPref prefVar ys hlen hpref0 hprefBase hprefix
+              simp only [lexConstraint] at hconstraint
+              exact hconstraint.2
+            have hassign : lexAssignment a base initialPref (x :: xs) (x :: ys) =
+                lexAssignment a base initialPref xs ys := by
+              funext n
+              simp [lexAssignment, lexPrefixScan]
+            rw [hassign]
+            simp only [lexClauses, if_pos rfl]
+            exact ih base initialPref prefVar ys hlen hpref0 hprefBase hprefix
               htailLp htailRp htailL htailR hconstraint' 
           · have hconstraint' :
                 ((!initialPref || a x || !a y) &&
@@ -410,10 +416,11 @@ theorem lexClauses_extend_of_constraint (a : Nat → Bool) (base : Nat)
                 have := htailR z hz
                 omega
             have htailSat' : cnfValue g (lexClauses base (base + 1) xs ys) = true := by
+              dsimp [g]
               rw [hassign]
               exact htailSat
-            simp only [lexClauses, hxy]
-            simp [cnfValue, List.all_append, hstep, htailSat']
+            simp only [lexClauses, if_neg hxy]
+            simp [cnfValue, hstep, htailSat']
 
 end Implications.C4PolarityLexEncoding
 
