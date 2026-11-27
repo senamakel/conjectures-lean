@@ -11,7 +11,7 @@ their product. The theorem here packages that input without assuming any unprove
 statement about the recurrence.
 -/
 
-open Filter Finset Nat Real
+open Filter Finset Nat Real Topology
 
 namespace McEachenDensity
 
@@ -38,9 +38,9 @@ theorem tendsto_finiteSieveMass {q : ℕ} [NeZero q] (A : Finset ℕ)
       (fun x : ℝ => ∑ a ∈ A,
         (primeCountInClass q a x : ℝ) * Real.log x / x)
       atTop (𝓝 (∑ _a ∈ A, (q.totient : ℝ)⁻¹)) := by
-    apply tendsto_finset_sum
+    apply tendsto_finsetSum A
     intro a ha
-    exact tendsto_finset_sum fun _ _ => hclass a ha
+    exact hclass a ha
   convert hsum using 1
   · ext x
     simp [finiteSieveMass, Finset.sum_mul, div_eq_mul_inv, mul_assoc]
