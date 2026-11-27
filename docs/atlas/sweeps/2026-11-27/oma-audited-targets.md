@@ -40,8 +40,7 @@ uses its eventual consequence.
 
 `tools/oma.sh check Erdos770.erdos_770.parts.iii.R2` accepted the reduction
 and reported only `propext`, `Classical.choice`, and `Quot.sound`. The two
-analytic inputs remain open obligations on this pin. The draft is local and
-has no desk lease or PR. [Merged R1](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/1280)
+analytic inputs remain open obligations on this pin. The reduction was submitted under a parent lease. [OMA PR #4219](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4219) · [Merged R1](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/1280)
 
 ## Sun catalogue intake
 
@@ -113,3 +112,17 @@ article and the preprint. The available publisher abstract does not
 establish whether the conjecture survived peer review. The exact local
 refutation remains tied to the preprint pending a full-text comparison.
 [Publisher record](https://doi.org/10.1007/s00605-017-1041-2) · [Preprint v1](https://arxiv.org/abs/1703.01955v1)
+
+## Lindelöf statement and adapter
+
+OMA listed the ζ Lindelöf hypothesis as a text-only target. Its source
+specifies little-o for every positive real exponent as real `t → +∞`.
+The Mathlib statement uses the complex zeta value and a real comparison
+function. The statement checker accepted it for human review. [Source](https://en.wikipedia.org/wiki/Lindel%C3%B6f_hypothesis) · [OMA PR #4230](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4230)
+
+The Lean adapter `Lindelof.lindelof_littleO_of_bigO` applies the existing
+big-O formulation at half the requested exponent, then composes it with
+`t^(ε/2) = o(t^ε)`. A standalone check of the adapter at OMA's pin reported
+only the standard three axioms. The existing zeta theorem supplies the
+big-O premise under RH. OMA acceptance of the unconditional proof would
+still need a checker-compatible RH and analytic proof path.
