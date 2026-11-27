@@ -1,6 +1,7 @@
 import Mathlib.Combinatorics.SimpleGraph.DegreeSum
 import Mathlib.Tactic
 import Implications.C4VertexExtension
+import Implications.C4PolarityDeletion
 
 /-! The order-seven polarity graph in the vertex order of the DIMACS encoder. -/
 
@@ -78,6 +79,16 @@ theorem c4_free : C4VertexExtension.C4Free graph := by
       (graph.mem_neighborFinset j y).mpr h.2⟩
   exact hxy ((Finset.card_le_one.mp (common_neighbor_card_le_one i j hij)) x hx y hy)
 
+/-- The score used in the SAT encoding reflects the exact edge count after
+deleting fifteen vertices from the concrete projective graph. -/
+theorem retained_edge_count (D : Finset (Fin 57)) (hD : D.card = 15) :
+    Implications.C4PolarityDeletion.inducedEdgeCount graph (Finset.univ \ D) =
+      104 + Implications.C4PolarityDeletion.inducedEdgeCount graph D +
+        (D ∩ absolute).card := by
+  exact Implications.C4PolarityDeletion.retained_edge_count_eq_104_add_deleted_score
+    graph absolute D ⟨by decide, absolute_card, edge_card, degree_profile⟩ hD
+
+#print axioms retained_edge_count
 #print axioms absolute_card
 #print axioms degree_profile
 #print axioms edge_card
