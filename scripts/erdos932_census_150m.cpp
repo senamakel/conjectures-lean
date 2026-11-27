@@ -50,8 +50,8 @@ int main(int argc, char** argv) {
   std::vector<std::uint32_t> primes;
   for (std::uint32_t n = 2; n <= sieve_endpoint; ++n)
     if (is_prime[n]) primes.push_back(n);
-  const auto left_count = std::upper_bound(primes.begin(), primes.end(), endpoint) -
-                          primes.begin();
+  const std::size_t left_count = static_cast<std::size_t>(
+      std::upper_bound(primes.begin(), primes.end(), endpoint) - primes.begin());
   if (left_count >= primes.size()) {
     std::cerr << "sieve did not contain the next prime after endpoint\n";
     return 2;
@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
   // The maximum gap is computed from the actual scanned range. Iterating this
   // list and breaking at ell >= gap enforces the strict threshold exactly.
   std::uint32_t max_gap = 0;
-  for (std::size_t i = 0; i < static_cast<std::size_t>(left_count); ++i)
+  for (std::size_t i = 0; i < left_count; ++i)
     max_gap = std::max(max_gap, primes[i + 1] - primes[i]);
   std::vector<std::uint32_t> small_primes;
   for (auto p : primes) {
@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
   std::uint32_t last_term_r = 0, last_term_p = 0, last_term_q = 0, last_gap = 0;
   std::uint32_t last_n1 = 0, last_n2 = 0;
 
-  for (std::size_t i = 0; i < static_cast<std::size_t>(left_count); ++i) {
+  for (std::size_t i = 0; i < left_count; ++i) {
     const std::uint32_t p = primes[i];
     const std::uint32_t q = primes[i + 1];
     const std::uint32_t gap = q - p;
