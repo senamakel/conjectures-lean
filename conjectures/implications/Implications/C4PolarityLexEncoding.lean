@@ -354,21 +354,31 @@ theorem lexClauses_extend_of_constraint (a : Nat → Bool) (base : Nat)
           by_cases hxy : x = y
           · have hconstraint' :
                 lexConstraint initialPref (xs.map a) (ys.map a) = true := by
-              simpa [lexConstraint, hxy] using hconstraint
+              have hparts := (Bool.and_eq_true_iff.mp hconstraint)
+              exact hparts.2
             have hassign : lexAssignment a base initialPref (x :: xs) (y :: ys) =
                 lexAssignment a base initialPref xs ys := by
               funext n
               simp [lexAssignment, lexPrefixScan, hxy]
             simpa [lexClauses, hxy, hassign] using
-              (ih ys base initialPref prefVar rfl hpref0 hprefBase hprefix
-                htailLp htailRp htailL htailR hconstraint')
+              (by
+                apply ih
+                · rfl
+                · exact hpref0
+                · exact hprefBase
+                · exact hprefix
+                · exact htailLp
+                · exact htailRp
+                · exact htailL
+                · exact htailR
+                · exact hconstraint')
           · have hconstraint' :
                 ((!initialPref || a x || !a y) &&
                   lexConstraint (initialPref && (a x == a y)) (xs.map a) (ys.map a)) = true := by
               change ((!initialPref || a x || !a y) &&
                 lexConstraint (initialPref && (a x == a y)) (xs.map a) (ys.map a)) = true at hconstraint
               exact hconstraint
-            rcases Bool.and_eq_true.mp hconstraint' with ⟨hguard, htailConstraint⟩
+            rcases Bool.and_eq_true_iff.mp hconstraint' with ⟨hguard, htailConstraint⟩
             let nextPref := initialPref && (a x == a y)
             let g := lexAssignment a base initialPref (x :: xs) (y :: ys)
             have hgpref : g prefVar = initialPref := by
