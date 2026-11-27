@@ -277,9 +277,158 @@ theorem degree_six_vertex_in_degree_eight_union
   · exact hxnotD hxD
   · exact hxnotE (Finset.mem_sdiff.mp hxE).1
 
+/-- A degree-six vertex is adjacent to at most two degree-eight vertices in
+the four-vertex equality case. -/
+theorem degree_six_vertex_has_at_most_two_degree_eight_neighbors
+    (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    (hDel : ∀ v, C4Extremal42.inducedDeletionCount G v ≤ 132)
+    (he : G.edgeFinset.card = 138)
+    (hC4 : C4VertexExtension.C4Free G)
+    (h8 : (Finset.univ.filter fun v => G.degree v = 8).card = 4)
+    {x : Fin 42} (hx : G.degree x = 6) :
+    (G.neighborFinset x ∩ Finset.univ.filter fun v => G.degree v = 8).card ≤ 2 := by
+  classical
+  let D := Finset.univ.filter fun v : Fin 42 => G.degree v = 8
+  let N := fun u : Fin 42 => G.neighborFinset u
+  let U := D.biUnion N
+  have hDcard : D.card = 4 := by simpa [D] using h8
+  have hUcard : U.card = 26 := degree_eight_neighborhood_union_card_eq_26 G hDel he hC4 h8
+  have hPair : ∀ u ∈ D, ∀ v ∈ D, u ≠ v → (N u ∩ N v).card = 1 := by
+    intro u hu v hv huv
+    exact degree_eight_pair_has_one_common_neighbor G hDel he hC4 h8
+      (Finset.mem_filter.mp hu).2 (Finset.mem_filter.mp hv).2 huv
+  have hNcard : ∀ u ∈ D, (N u).card = 8 := by
+    intro u hu
+    simpa [N, G.card_neighborFinset_eq_degree] using (Finset.mem_filter.mp hu).2
+  by_contra hnot
+  change ¬ (G.neighborFinset x ∩ D).card ≤ 2 at hnot
+  have hthree : 3 ≤ (G.neighborFinset x ∩ D).card := Nat.not_le.mp hnot
+  obtain ⟨S, hSD, hScard⟩ := Finset.exists_subset_card_eq hthree
+  obtain ⟨u, huS⟩ := Finset.card_pos.mp (by omega : 0 < S.card)
+  have hvCard : (S.erase u).card = 2 := by
+    rw [Finset.card_erase_of_mem huS, hScard]
+    norm_num
+  obtain ⟨v, hvErase⟩ := Finset.card_pos.mp (by omega : 0 < (S.erase u).card)
+  have hwCard : ((S.erase u).erase v).card = 1 := by
+    rw [Finset.card_erase_of_mem hvErase, hvCard]
+    norm_num
+  obtain ⟨w, hwErase⟩ := Finset.card_pos.mp (by omega : 0 < ((S.erase u).erase v).card)
+  have huS' : u ∈ S := huS
+  have hvS' : v ∈ S := (Finset.mem_erase.mp hvErase).2
+  have hwS' : w ∈ S := (Finset.mem_erase.mp (Finset.mem_erase.mp hwErase).2).2
+  have huv : u ≠ v := (Finset.mem_erase.mp hvErase).1.symm
+  have huw : u ≠ w := (Finset.mem_erase.mp (Finset.mem_erase.mp hwErase).2).1.symm
+  have hvw : v ≠ w := (Finset.mem_erase.mp hwErase).1.symm
+  have huD : u ∈ D := (Finset.mem_inter.mp (hSD huS')).2
+  have hvD : v ∈ D := (Finset.mem_inter.mp (hSD hvS')).2
+  have hwD : w ∈ D := (Finset.mem_inter.mp (hSD hwS')).2
+  have hxN (a : Fin 42) (ha : a ∈ S) : x ∈ N a := by
+    have hax : a ∈ G.neighborFinset x := (Finset.mem_inter.mp (hSD ha)).1
+    have hAdj : G.Adj x a := (G.mem_neighborFinset x a).mp hax
+    have hxa : x ∈ G.neighborFinset a :=
+      (G.mem_neighborFinset a x).mpr (G.symm.symm x a hAdj)
+    simpa [N] using hxa
+  have huCard : (N u).card = 8 := hNcard u huD
+  have hvCardN : (N v).card = 8 := hNcard v hvD
+  have hwCardN : (N w).card = 8 := hNcard w hwD
+  have hUvInter : (N u ∩ N v).card = 1 := hPair u huD v hvD huv
+  have hUvUnion : (N u ∪ N v).card = 15 := by
+    have hcard := Finset.card_union_add_card_inter (N u) (N v)
+    rw [hUvInter, huCard, hvCardN] at hcard
+    omega
+  have hUwInter : (N u ∩ N w).card = 1 := hPair u huD w hwD huw
+  have hVwInter : (N v ∩ N w).card = 1 := hPair v hvD w hwD hvw
+  have hWinterUnion : N w ∩ (N u ∪ N v) = {x} := by
+    ext y
+    constructor
+    · intro hy
+      rcases Finset.mem_inter.mp hy with ⟨hyw, hyuv⟩
+      rcases Finset.mem_union.mp hyuv with hyu | hyv
+      · have hyCommon : y ∈ N u ∩ N w := Finset.mem_inter.mpr ⟨hyu, hyw⟩
+        have hxCommon : x ∈ N u ∩ N w := Finset.mem_inter.mpr
+          ⟨hxN u huS', hxN w hwS'⟩
+        have hle : (N u ∩ N w).card ≤ 1 := by omega
+        have hEq := Finset.card_le_one.mp hle y x hyCommon hxCommon
+        simpa using hEq.symm
+      · have hyCommon : y ∈ N v ∩ N w := Finset.mem_inter.mpr ⟨hyv, hyw⟩
+        have hxCommon : x ∈ N v ∩ N w := Finset.mem_inter.mpr
+          ⟨hxN v hvS', hxN w hwS'⟩
+        have hle : (N v ∩ N w).card ≤ 1 := by omega
+        have hEq := Finset.card_le_one.mp hle y x hyCommon hxCommon
+        simpa using hEq.symm
+    · intro hy
+      have hyx : y = x := Finset.mem_singleton.mp hy
+      subst y
+      exact Finset.mem_inter.mpr
+        ⟨hxN w hwS', Finset.mem_union.mpr (Or.inl (hxN u huS'))⟩
+  let U3 := N u ∪ N v ∪ N w
+  have hU3card : U3.card = 22 := by
+    have hcard := Finset.card_union_add_card_inter (N u ∪ N v) (N w)
+    have hinter : (N u ∪ N v) ∩ N w = {x} := by
+      rw [Finset.inter_comm]
+      exact hWinterUnion
+    rw [hinter, hUvUnion, hwCardN] at hcard
+    simp [U3]
+    omega
+  have hz : ∃ z ∈ D, z ∉ S := by
+    by_contra hnone
+    have hDsub : D ⊆ S := by
+      intro z hzD
+      by_contra hzS
+      exact hnone ⟨z, hzD, hzS⟩
+    have hDle : D.card ≤ S.card := Finset.card_le_card hDsub
+    omega
+  obtain ⟨z, hzD, hzS⟩ := hz
+  have hzNotU : z ≠ u ∧ z ≠ v ∧ z ≠ w := by
+    refine ⟨?_, ?_, ?_⟩
+    · intro h; subst z; exact hzS huS'
+    · intro h; subst z; exact hzS hvS'
+    · intro h; subst z; exact hzS hwS'
+  have hzCard : (N z).card = 8 := hNcard z hzD
+  have hintersection : (N z ∩ U3).card ≤ 3 := by
+    have hsubset : N z ∩ U3 ⊆
+        (N z ∩ N u) ∪ (N z ∩ N v) ∪ (N z ∩ N w) := by
+      intro y hy
+      rcases Finset.mem_inter.mp hy with ⟨hyz, hy3⟩
+      rcases Finset.mem_union.mp hy3 with hyuv | hyw
+      · rcases Finset.mem_union.mp hyuv with hyu | hyv
+        · exact Finset.mem_union.mpr (Or.inl (Finset.mem_union.mpr
+            (Or.inl (Finset.mem_inter.mpr ⟨hyz, hyu⟩))))
+        · exact Finset.mem_union.mpr (Or.inl (Finset.mem_union.mpr
+            (Or.inr (Finset.mem_inter.mpr ⟨hyz, hyv⟩))))
+      · exact Finset.mem_union.mpr (Or.inr (Finset.mem_inter.mpr ⟨hyz, hyw⟩))
+    have hle : ((N z ∩ N u) ∪ (N z ∩ N v) ∪ (N z ∩ N w)).card ≤ 3 := by
+      calc
+        _ ≤ ((N z ∩ N u) ∪ (N z ∩ N v)).card + (N z ∩ N w).card :=
+          Finset.card_union_le
+        _ ≤ (N z ∩ N u).card + (N z ∩ N v).card + (N z ∩ N w).card := by
+          have h := Finset.card_union_le (N z ∩ N u) (N z ∩ N v)
+          omega
+        _ = 3 := by
+          rw [hPair z hzD u huD hzNotU.1, hPair z hzD v hvD hzNotU.2.1,
+            hPair z hzD w hwD hzNotU.2.2]
+          norm_num
+    exact (Finset.card_le_card hsubset).trans hle
+  have hU4lower : 27 ≤ (U3 ∪ N z).card := by
+    have hcard := Finset.card_union_add_card_inter U3 (N z)
+    rw [hU3card, hzCard] at hcard
+    omega
+  have hsubU : U3 ∪ N z ⊆ U := by
+    intro y hy
+    rcases Finset.mem_union.mp hy with hy3 | hyz
+    · rcases Finset.mem_union.mp hy3 with hyuv | hyw
+      · rcases Finset.mem_union.mp hyuv with hyu | hyv
+        · exact Finset.mem_biUnion.mpr ⟨u, huD, hyu⟩
+        · exact Finset.mem_biUnion.mpr ⟨v, hvD, hyv⟩
+      · exact Finset.mem_biUnion.mpr ⟨w, hwD, hyw⟩
+    · exact Finset.mem_biUnion.mpr ⟨z, hzD, hyz⟩
+  have hU4le : (U3 ∪ N z).card ≤ U.card := Finset.card_le_card hsubU
+  omega
+
 end C4DegreeEightMultiplicity
 
 #print axioms C4DegreeEightMultiplicity.degree_eight_neighborhood_union_card_eq_26
 #print axioms C4DegreeEightMultiplicity.degree_eight_pair_has_one_common_neighbor
 #print axioms C4DegreeEightMultiplicity.degree_eight_vertex_has_seven_degree_six_neighbors
 #print axioms C4DegreeEightMultiplicity.degree_six_vertex_in_degree_eight_union
+#print axioms C4DegreeEightMultiplicity.degree_six_vertex_has_at_most_two_degree_eight_neighbors
