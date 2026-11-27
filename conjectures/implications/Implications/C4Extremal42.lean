@@ -1,6 +1,7 @@
 import Mathlib.Data.Fin.Basic
 import Mathlib.Tactic
 import Mathlib.Combinatorics.SimpleGraph.DeleteEdges
+import Mathlib.Combinatorics.SimpleGraph.DegreeSum
 
 /-!
 # The one-vertex counting reduction for `ex(42, C4)`
@@ -13,7 +14,8 @@ If `e = 138`, at least one deletion must retain all 132 edges; that vertex has d
 namespace C4Extremal42
 
 /-- The actual edge count after taking the induced subgraph off one vertex. -/
-noncomputable def inducedDeletionCount (G : SimpleGraph (Fin 42)) (v : Fin 42) : ℕ := by
+noncomputable def inducedDeletionCount (G : SimpleGraph (Fin 42)) (v : Fin 42)
+    [DecidableRel G.Adj] : ℕ := by
   classical
   exact (G.induce ({v}ᶜ : Set (Fin 42))).edgeFinset.card
 
@@ -42,7 +44,7 @@ theorem sum_inducedDeletionCount (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
     _ = (∑ _v : Fin 42, G.edgeFinset.card) - ∑ v : Fin 42, G.degree v := by
       rw [Finset.sum_tsub_distrib Finset.univ hle]
     _ = 40 * G.edgeFinset.card := by
-      rw [G.sum_degrees_eq_twice_card_edges]
+      rw [SimpleGraph.sum_degrees_eq_twice_card_edges G]
       simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin]
       omega
 
