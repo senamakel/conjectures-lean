@@ -6,7 +6,7 @@ namespace Implications.SmoothGapRankin
 
 /-- The multiplicative weight `n ↦ n ^ (-s)`. -/
 noncomputable def rankinWeight (s : ℝ) : ℕ →* ℝ where
-  toFun n := (n : ℝ) ^ (-s)
+  toFun n := (n.val : ℝ) ^ (-s)
   map_one' := by simp
   map_mul' m n := by
     rw [Nat.cast_mul, Real.mul_rpow (by positivity) (by positivity)]
@@ -32,12 +32,10 @@ theorem smoothNumbersUpTo_card_le_rankin (X Y : ℕ) (s : ℝ) (hX : 0 < X)
   have hf_nonneg (m : Y.smoothNumbers) : 0 ≤ f m := by
     dsimp [f, rankinWeight]
     exact Real.rpow_nonneg (by positivity) _
-  let e : (↑S) ↪ Y.smoothNumbers where
-    toFun n := (⟨(n : ℕ), (Nat.mem_smoothNumbersUpTo.mp
-      (show (n : ℕ) ∈ X.smoothNumbersUpTo Y from n.property)).2⟩ : Y.smoothNumbers)
+  let e : {n : ℕ // n ∈ X.smoothNumbersUpTo Y} ↪ Y.smoothNumbers where
+    toFun n := (⟨n.val, (Nat.mem_smoothNumbersUpTo.mp n.property).2⟩ : Y.smoothNumbers)
     inj' := by
       intro a b h
-      apply Subtype.ext
       apply Subtype.ext
       exact congrArg Subtype.val h
   let T := S.attach.map e
@@ -47,22 +45,21 @@ theorem smoothNumbersUpTo_card_le_rankin (X Y : ℕ) (s : ℝ) (hX : 0 < X)
     calc
       (∑ m ∈ T, f m) ≤ ∑' m : Y.smoothNumbers, f m := hf.sum_le_tsum T (by intro m hm; exact hf_nonneg m)
       _ = ∏ p ∈ Y.primesBelow, (1 - f p)⁻¹ := hEuler.2.tsum_eq
-  have hpoint (n : ↑S) : 1 ≤ (X : ℝ) ^ s * f (e n) := by
-    have hn0 : 0 < (n : ℕ) := Nat.pos_of_ne_zero
-      (Nat.mem_smoothNumbersUpTo.mp (show (n : ℕ) ∈ X.smoothNumbersUpTo Y from n.property)).2.1
-    have hnX : (n : ℝ) ≤ X := by
-      exact_mod_cast (Nat.mem_smoothNumbersUpTo.mp
-        (show (n : ℕ) ∈ X.smoothNumbersUpTo Y from n.property)).1
-    have hn0R : 0 < (n : ℝ) := by exact_mod_cast hn0
-    have hpow : (n : ℝ) ^ s ≤ (X : ℝ) ^ s :=
+  have hpoint (n : {n : ℕ // n ∈ X.smoothNumbersUpTo Y}) : 1 ≤ (X : ℝ) ^ s * f (e n) := by
+    have hn0 : 0 < n.val := Nat.pos_of_ne_zero
+      (Nat.mem_smoothNumbersUpTo.mp n.property).2.1
+    have hnX : (n.val : ℝ) ≤ X := by
+      exact_mod_cast (Nat.mem_smoothNumbersUpTo.mp n.property).1
+    have hn0R : 0 < (n.val : ℝ) := by exact_mod_cast hn0
+    have hpow : (n.val : ℝ) ^ s ≤ (X : ℝ) ^ s :=
       Real.rpow_le_rpow (by positivity) hnX hs.le
-    have hden : 0 < (n : ℝ) ^ s := Real.rpow_pos_of_pos hn0R s
-    have hratio : 1 ≤ (X : ℝ) ^ s / (n : ℝ) ^ s := (le_div_iff₀ hden).2 hpow
+    have hden : 0 < (n.val : ℝ) ^ s := Real.rpow_pos_of_pos hn0R s
+    have hratio : 1 ≤ (X : ℝ) ^ s / (n.val : ℝ) ^ s := (le_div_iff₀ hden).2 hpow
     calc
-      1 ≤ (X : ℝ) ^ s / (n : ℝ) ^ s := hratio
+      1 ≤ (X : ℝ) ^ s / (n.val : ℝ) ^ s := hratio
       _ = (X : ℝ) ^ s * f (e n) := by
         dsimp [f, rankinWeight, e]
-        rw [div_eq_mul_inv, ← Real.rpow_neg (by positivity : 0 ≤ (n : ℝ)) s]
+        rw [div_eq_mul_inv, ← Real.rpow_neg (by positivity : 0 ≤ (n.val : ℝ)) s]
   have hcard : (S.card : ℝ) ≤ (X : ℝ) ^ s * ∑ m ∈ T, f m := by
     calc
       (S.card : ℝ) = ∑ n ∈ S.attach, (1 : ℝ) := by simp
