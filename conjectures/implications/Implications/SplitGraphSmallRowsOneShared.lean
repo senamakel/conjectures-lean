@@ -189,16 +189,17 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
           intro x hx y hy
           have hxEq : right k = x := by simpa [block] using hx
           have hyEq : left l = y := by simpa [List.flatMap_cons, block] using hy
-          have hxe : right k ≠ c := by
+          have hxy : x ≠ y := by
             intro h
-            exact hnotC k hkO (Or.inr h)
-          have hkl' := hunique (right k) (hrightC k (Finset.mem_sdiff.mp hkO).1)
-            hxe k (Finset.mem_sdiff.mp hkO).1 l (Finset.mem_sdiff.mp hlO).1
-            (Or.inr rfl) (Or.inl (hxEq.trans hyEq))
-          have hxy : right k ≠ left l := by
-            intro h
-            exact hkl (by simpa [h] using hkl')
-          exact hxEq ▸ hyEq ▸ hC (hrightC k (Finset.mem_sdiff.mp hkO).1)
+            have hxL : x ∈ block k := List.mem_of_mem_getLast? hx
+            have hxR : x ∈ block l := by
+              have hlx : left l = x := hyEq.trans h.symm
+              simp [block, hlx]
+            exact (List.disjoint_left.mp
+              (hblocksDisjoint k (Finset.mem_toList.mpr hkO) l
+                (Finset.mem_toList.mpr hlO) hkl)) x hxL hxR
+          exact hxEq.symm ▸ hyEq.symm ▸ hC
+            (hrightC k (Finset.mem_sdiff.mp hkO).1)
             (hleftC l (Finset.mem_sdiff.mp hlO).1) hxy
     change (others.toList.flatMap block).IsChain G.Adj
     exact hchain others.toList others.nodup_toList
