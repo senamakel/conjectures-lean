@@ -2,6 +2,7 @@ import Mathlib.Data.Nat.Bitwise
 import Mathlib.Data.List.Basic
 import Mathlib.Data.List.Pairwise
 import Mathlib.Combinatorics.SimpleGraph.Maps
+import Implications.C4Extremal42
 
 /-!
 # Finite certificates for the three published 41-vertex `C₄` extremal seeds
@@ -250,21 +251,21 @@ private theorem compatible_of_nodup_pairwise {g : Array Nat} (l : List (Fin 41))
   refine ⟨sorted.map Fin.val, ?_, ?_, ?_⟩
   · simpa only [List.length_map] using hperm.length_eq.symm
   · have hbase : (List.finRange 41).map Fin.val = List.range 41 := by decide +kernel
-    have hfilter : (List.finRange 41).filter (· ∈ s) <+ List.finRange 41 :=
+    have hfilter : List.Sublist ((List.finRange 41).filter (· ∈ s)) (List.finRange 41) :=
       List.filter_sublist
     have hsub := hfilter.map Fin.val
     rw [hbase] at hsub
     simpa [sorted] using hsub
-  · exact List.pairwise_map.mpr hsorted
+  · exact List.Pairwise.map Fin.val (by intro u v huv; exact huv) hsorted
 
 /-- Six distinct vertices cannot have pairwise disjoint open neighborhoods in
 any graph isomorphic to one of the masks.
 The statement is intentionally conditional on the supplied seed; it does not
 assert that the three records exhaust the extremal 41-vertex graphs. -/
-theorem no_disjoint_six_of_seed_iso (G : SimpleGraph (Fin 41))
+theorem no_disjoint_six_of_seed_iso {V : Type*} (G : SimpleGraph V)
     (hseed : Nonempty (G ≃g seed1Graph) ∨ Nonempty (G ≃g seed2Graph) ∨
       Nonempty (G ≃g seed3Graph)) :
-    ¬ ∃ chosen : List (Fin 41), chosen.length = 6 ∧ chosen.Nodup ∧
+    ¬ ∃ chosen : List V, chosen.length = 6 ∧ chosen.Nodup ∧
       chosen.Pairwise (fun u v => Disjoint (G.neighborSet u) (G.neighborSet v)) := by
   intro h
   obtain ⟨chosen, hlen, hnd, hpairs⟩ := h
@@ -352,8 +353,73 @@ theorem no_disjoint_six_of_seed_iso (G : SimpleGraph (Fin 41))
         simpa [hmappedLen] using hc
       exact seed3_no_compatible_six hc'
 
+/-- A classified extremal deletion cannot contain a six-set satisfying the
+compatibility condition used by `C4Extremal42`: such a set would give six
+pairwise disjoint open neighborhoods in the deletion graph. -/
+theorem no_compatible_six_in_seed_deletion (G : SimpleGraph (Fin 42))
+    [DecidableRel G.Adj] (v : Fin 42)
+    (hseed : Nonempty (G.induce ({v}ᶜ : Set (Fin 42)) ≃g seed1Graph) ∨
+      Nonempty (G.induce ({v}ᶜ : Set (Fin 42)) ≃g seed2Graph) ∨
+      Nonempty (G.induce ({v}ᶜ : Set (Fin 42)) ≃g seed3Graph)) :
+    ¬ ∃ S : Finset (Fin 42), S.card = 6 ∧ v ∉ S ∧
+      ∀ u ∈ S, ∀ w ∈ S, u ≠ w → ∀ x, x ≠ v → G.Adj u x → ¬ G.Adj w x := by
+  intro h
+  obtain ⟨S, hcard, hvS, hcompat⟩ := h
+  let e : {x : Fin 42 // x ∈ S} ↪ {x : Fin 42 // x ∈ ({v}ᶜ : Set (Fin 42))} :=
+    ⟨fun x => ⟨x.1, by
+      change x.1 ≠ v
+      intro hx
+      apply hvS
+      simpa [hx] using x.2⟩, fun a b hab => by
+      apply Subtype.ext
+      exact congrArg Subtype.val hab⟩
+  let T : Finset {x : Fin 42 // x ∈ ({v}ᶜ : Set (Fin 42))} := S.attach.map e
+  have hTcard : T.card = 6 := by simp [T, e, hcard]
+  have hTnodup : T.toList.Nodup := Finset.nodup_toList T
+  have hTpair : T.toList.Pairwise (fun a b =>
+      Disjoint ((G.induce ({v}ᶜ : Set (Fin 42))).neighborSet a)
+        ((G.induce ({v}ᶜ : Set (Fin 42))).neighborSet b)) := by
+    apply List.pairwise_iff_forall_sublist.mpr
+    intro a b hab
+    have hab' : a.1 ≠ b.1 := by
+      intro heq
+      subst b
+      have hnd := hTnodup.sublist hab
+      simpa using hnd
+    apply Set.disjoint_left.mpr
+    intro x hx₁ hx₂
+    have hx₁' : G.Adj a.1 x.1 := by simpa [SimpleGraph.induce_adj] using hx₁
+    have hx₂' : G.Adj b.1 x.1 := by simpa [SimpleGraph.induce_adj] using hx₂
+    exact hcompat a.1 (by simpa using a.2) b.1 (by simpa using b.2)
+      hab' x.1 (by simpa using x.2) hx₁' hx₂'
+  have hn := no_disjoint_six_of_seed_iso
+    (G.induce ({v}ᶜ : Set (Fin 42))) hseed
+  apply hn
+  refine ⟨T.toList, ?_, hTnodup, hTpair⟩
+  simpa using hTcard
+
+/-- If every 132-edge deletion is isomorphic to one of the three certified
+seeds, then the one-vertex counting reduction gives the 137-edge bound.  This
+is conditional on that classification premise; the three records are not
+claimed to exhaust all extremal 41-vertex graphs. -/
+theorem simpleGraph_c4Free_edge_count_le_137_of_seed_classification
+    (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    (hfree : (SimpleGraph.cycleGraph 4).Free G)
+    (h41 : ∀ v, C4Extremal42.inducedDeletionCount G v ≤ 132)
+    (hclass : ∀ v, C4Extremal42.inducedDeletionCount G v = 132 →
+      Nonempty (G.induce ({v}ᶜ : Set (Fin 42)) ≃g seed1Graph) ∨
+        Nonempty (G.induce ({v}ᶜ : Set (Fin 42)) ≃g seed2Graph) ∨
+        Nonempty (G.induce ({v}ᶜ : Set (Fin 42)) ≃g seed3Graph)) :
+    G.edgeFinset.card ≤ 137 := by
+  apply C4Extremal42.simpleGraph_c4Free_edge_count_le_137 G hfree h41
+  intro v hd
+  exact no_compatible_six_in_seed_deletion G v (hclass v hd)
+
 #print axioms seed1_no_compatible_six
 #print axioms seed2_no_compatible_six
 #print axioms seed3_no_compatible_six
+#print axioms no_disjoint_six_of_seed_iso
+#print axioms no_compatible_six_in_seed_deletion
+#print axioms simpleGraph_c4Free_edge_count_le_137_of_seed_classification
 
 end C4SeedCertificates
