@@ -1,4 +1,4 @@
-import Mathlib.Tactic
+import Implications.SplitGraphBoundedDeletions
 
 /-!
 Small arithmetic cuts arising in the connectivity-three split-graph case.
@@ -23,19 +23,16 @@ def rowDiff (S : Finset V) (inc : V → V → Prop) (c d : V)
     [DecidableRel inc] : Finset V :=
   row S inc c \ row S inc d ∪ row S inc d \ row S inc c
 
-/-- A full anchor row and pairwise symmetric difference at most three force
-every row to have at most one element outside the anchor. -/
-theorem outside_anchor_le_one_of_rowDiff
+private theorem outside_anchor_card_bound
     (C S : Finset V) (inc : V → V → Prop) [DecidableRel inc] (a : V)
     (hanchor : (row S inc a).card = 4)
-    (hrow : ∀ c ∈ C, (row S inc c).card ≤ 4)
     (hdiff : ∀ c ∈ C, c ≠ a → (rowDiff S inc c a).card ≤ 3) :
-    ∀ c ∈ C, ((row S inc c) \ row S inc a).card ≤ 1 := by
+    ∀ c ∈ C, 2 * ((row S inc c) \ row S inc a).card + 1 ≤ (row S inc c).card := by
   classical
   intro c hc
   by_cases hca : c = a
   · subst c
-    simp
+    simp [hanchor]
   · let R := row S inc c
     let A := row S inc a
     have hdisj : Disjoint (A \ R) (R \ A) := by
@@ -55,11 +52,23 @@ theorem outside_anchor_le_one_of_rowDiff
       rw [Finset.inter_comm] at this
       omega
     have hAcard : A.card = 4 := hanchor
-    have hRcard : R.card ≤ 4 := hrow c hc
     have hd := hdiff c hc hca
     rw [hdiffcard] at hd
     dsimp [A, R] at *
     omega
+
+/-- A full anchor row and row differences of at most three leave at most
+one point outside the anchor in each row of size at most four. -/
+theorem outside_anchor_le_one_of_rowDiff
+    (C S : Finset V) (inc : V → V → Prop) [DecidableRel inc] (a : V)
+    (hanchor : (row S inc a).card = 4)
+    (hrow : ∀ c ∈ C, (row S inc c).card ≤ 4)
+    (hdiff : ∀ c ∈ C, c ≠ a → (rowDiff S inc c a).card ≤ 3) :
+    ∀ c ∈ C, ((row S inc c) \ row S inc a).card ≤ 1 := by
+  intro c hc
+  have h := outside_anchor_card_bound C S inc a hanchor hdiff c hc
+  have hs := hrow c hc
+  omega
 
 /-- Count incidences by rows or by left vertices. -/
 theorem sum_row_card_eq_sum_degree (C S : Finset V) (inc : V → V → Prop)
@@ -226,6 +235,115 @@ theorem small_set_capacity_cut (s incidences capacity : ℕ)
     2 * s - 2 ≤ capacity := by
   exact capacity_two_cut_from_incidence s incidences capacity hsmall hdegree hcapacity
 
+/-- The capacity-two flow cut loses at most two incidences, with capacity
+one on each individual incidence edge. -/
+theorem capacity_two_cut_of_row_constraints
+    (C S : Finset V) (inc : V → V → Prop) [DecidableRel inc]
+    (hdegree : ∀ x ∈ S, 3 ≤ (C.filter (fun c => inc c x)).card)
+    (hrow : ∀ c ∈ C, (row S inc c).card ≤ 4)
+    (hdiff : ∀ c ∈ C, ∀ d ∈ C, c ≠ d → (rowDiff S inc c d).card ≤ 3) :
+    2 * S.card - 2 ≤ ∑ c ∈ C, min 2 (row S inc c).card := by
+  classical
+  let K := ∑ c ∈ C, min 2 (row S inc c).card
+  let E := ∑ c ∈ C, (row S inc c).card
+  change 2 * S.card - 2 ≤ K
+  have hlo (T : Finset V) (hT : T ⊆ S) :
+      3 * T.card ≤ ∑ c ∈ C, (row T inc c).card := by
+    rw [sum_row_card_eq_sum_degree]
+    calc
+      _ = ∑ _x ∈ T, (3 : ℕ) := by simp [Nat.mul_comm]
+      _ ≤ _ := Finset.sum_le_sum fun x hx => hdegree x (hT hx)
+  have hE : 3 * S.card ≤ E := hlo S (fun _ hx => hx)
+  have hEK : E ≤ 2 * K := by
+    dsimp [E, K]
+    rw [Finset.mul_sum]
+    apply Finset.sum_le_sum
+    intro c hc
+    have h := hrow c hc
+    by_cases hr : (row S inc c).card ≤ 2
+    · rw [min_eq_right hr]
+      omega
+    · rw [min_eq_left (by omega)]
+      omega
+  by_cases hs : S.card ≤ 5
+  · exact capacity_two_cut_from_incidence _ _ _ hs hE hEK
+  by_cases hfull : ∃ a ∈ C, (row S inc a).card = 4
+  · obtain ⟨a, ha, hanchor⟩ := hfull
+    let A := row S inc a
+    let B := C.filter fun c => 2 ≤ (row S inc c).card
+    have hbK : 2 * B.card ≤ K := by
+      calc
+        _ = ∑ c ∈ B, (2 : ℕ) := by simp [Nat.mul_comm]
+        _ = ∑ c ∈ C, if 2 ≤ (row S inc c).card then 2 else 0 := by
+          exact Finset.sum_filter (s := C) (fun c => 2 ≤ (row S inc c).card) (fun _ => (2 : ℕ))
+        _ ≤ K := by
+          apply Finset.sum_le_sum
+          intro c _
+          by_cases h : 2 ≤ (row S inc c).card
+          · simp [h, min_eq_left h]
+          · simp [h]
+    have hdiffBound := outside_anchor_card_bound C S inc a hanchor
+      (fun c hc hca => hdiff c hc a ha hca)
+    have hOut : (∑ c ∈ C, (row (S \ A) inc c).card) ≤ B.card := by
+      calc
+        _ = ∑ c ∈ C, ((row S inc c) \ A).card := by
+          apply Finset.sum_congr rfl
+          intro c _
+          congr 1
+          ext x
+          simp [row, A, and_assoc, and_left_comm, and_comm]
+        _ ≤ ∑ c ∈ C, if 2 ≤ (row S inc c).card then (1 : ℕ) else 0 := by
+          apply Finset.sum_le_sum
+          intro c hc
+          have hb := hdiffBound c hc
+          change 2 * ((row S inc c) \ A).card + 1 ≤ (row S inc c).card at hb
+          have hrc := hrow c hc
+          split <;> omega
+        _ = B.card := by simp [B]
+    have hMass := (hlo (S \ A) Finset.sdiff_subset).trans hOut
+    have hSout : S.card - 4 ≤ (S \ A).card := by
+      have hcount := Finset.card_sdiff_add_card_inter S A
+      have hinter := Finset.card_le_card (Finset.inter_subset_right (s := S) (t := A))
+      have hA : A.card = 4 := hanchor
+      omega
+    have h := Nat.mul_le_mul_left 3 hSout
+    omega
+  · have hscaled : 2 * E ≤ 3 * K := by
+      dsimp [E, K]
+      rw [Finset.mul_sum, Finset.mul_sum]
+      apply Finset.sum_le_sum
+      intro c hc
+      have h := hrow c hc
+      have hne : (row S inc c).card ≠ 4 := fun heq => hfull ⟨c, hc, heq⟩
+      by_cases hr : (row S inc c).card ≤ 2
+      · rw [min_eq_right hr]
+        omega
+      · rw [min_eq_left (by omega)]
+        omega
+    omega
+
+/-- The capacity bound for every independent-side cut of a split graph
+with three-connectivity and induced-tree size at most five. -/
+theorem split_graph_capacity_two_cut
+    (G : SimpleGraph V) [DecidableRel G.Adj] (C I S : Finset V)
+    (hpartition : (Finset.univ : Finset V) = C ∪ I)
+    (hCI : Disjoint C I) (hC : G.IsClique (C : Set V))
+    (hI : G.IsIndepSet (I : Set V)) (hS : S ⊆ I)
+    (hcard : 4 ≤ Fintype.card V)
+    (hconn : ∀ D : Finset V, D.card < 3 → (G.induce {x | x ∉ D}).Connected)
+    (hTree : SplitGraphTrees.inducedTreeBound G 3) :
+    2 * S.card - 2 ≤ ∑ c ∈ C, min 2 (row S G.Adj c).card := by
+  have hdegree := SplitGraphBoundedDeletions.attachment_count_of_bounded_deletion_connected
+    G C I 3 hI hpartition hcard hconn
+  have ⟨hrows, hdiff⟩ := SplitGraphBoundedDeletions.restricted_row_bounds G C I S 3 hS hTree hC hI hCI
+  apply capacity_two_cut_of_row_constraints C S G.Adj
+  · intro x hx
+    exact hdegree x (hS hx)
+  · intro c hc
+    exact hrows c hc
+  · intro c hc d hd hcd
+    exact hdiff c hc d hd hcd
+
 end SplitGraphKappaThreeHall
 
 #print axioms SplitGraphKappaThreeHall.sum_row_card_eq_sum_degree
@@ -235,3 +353,6 @@ end SplitGraphKappaThreeHall
 #print axioms SplitGraphKappaThreeHall.capacity_two_cut_from_incidence
 #print axioms SplitGraphKappaThreeHall.large_set_rows_force_small
 #print axioms SplitGraphKappaThreeHall.small_set_capacity_cut
+
+#print axioms SplitGraphKappaThreeHall.capacity_two_cut_of_row_constraints
+#print axioms SplitGraphKappaThreeHall.split_graph_capacity_two_cut
