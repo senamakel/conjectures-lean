@@ -397,8 +397,22 @@ theorem chosen_neighbor_rows_card_le_three
     intro i hi
     have hEq : clique.filter (fun c => i ∈ selected c) = {left i, right i} := by
       ext c
-      simp [selected, hi, hleftC i hi, hrightC i hi, eq_comm,
-        or_comm, or_left_comm, or_assoc]
+      constructor
+      · intro hc
+        have hc' := Finset.mem_filter.mp hc
+        have hi' := Finset.mem_filter.mp hc'.2
+        rcases hi'.2 with h | h
+        · exact Or.inl h.symm
+        · exact Or.inr h.symm
+      · intro hc
+        simp only [Finset.mem_insert, Finset.mem_singleton] at hc
+        rcases hc with h | h
+        · subst c
+          exact Finset.mem_filter.mpr ⟨hleftC i hi,
+            Finset.mem_filter.mpr ⟨hi, Or.inl rfl⟩⟩
+        · subst c
+          exact Finset.mem_filter.mpr ⟨hrightC i hi,
+            Finset.mem_filter.mpr ⟨hi, Or.inr rfl⟩⟩
     rw [hEq]
     simp [hneq i hi]
   exact selected_two_rows_card_le_three_of_original clique indep original selected
