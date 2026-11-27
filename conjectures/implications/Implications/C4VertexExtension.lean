@@ -23,14 +23,8 @@ def addVertex {V : Type*} (G : SimpleGraph V) (s : Set V) : SimpleGraph (Option 
       | none, some x => x ∈ s
       | some x, none => x ∈ s
       | none, none => False
-    symm := by
-      intro a b h
-      cases a <;> cases b <;> simp_all [G.symm]
-    loopless := by
-      intro a h
-      cases a with
-      | none => exact h
-      | some x => exact G.loopless h }
+    symm := by aesop_graph
+    loopless := by aesop_graph }
 
 @[simp] theorem addVertex_adj_some_some {V : Type*} (G : SimpleGraph V) (s : Set V)
     (x y : V) : (addVertex G s).Adj (some x) (some y) ↔ G.Adj x y := Iff.rfl
@@ -47,20 +41,19 @@ theorem addVertex_c4Free_iff {V : Type*} (G : SimpleGraph V) (s : Set V) :
   · intro h
     constructor
     · intro x y z w hxy hzw hxz hyz
-      exact h hxy hzw hxz hyz
+      exact h (x := some x) (y := some y) (z := some z) (w := some w)
+        (by simpa using hxy) (by simpa using hzw) hxz hyz
     · intro x y z hxy hx hsx hsy hcommon
       have hnew : (addVertex G s).Adj none (some x) := by simp [hsx]
       have hnew' : (addVertex G s).Adj none (some y) := by simp [hsy]
-      have hold : (addVertex G s).Adj (some z) (some x) := by simpa using hcommon.1.symm
-      have hold' : (addVertex G s).Adj (some z) (some y) := by simpa using hcommon.2.symm
-      have := h (x := some x) (y := some y) (z := none) (w := some z)
+      have hold : (addVertex G s).Adj (some x) (some z) := by simpa using hcommon.1
+      have hold' : (addVertex G s).Adj (some y) (some z) := by simpa using hcommon.2
+      have hnot := h (x := some x) (y := some y) (z := none) (w := some z)
         (by simpa using hxy) (by simp) hnew hnew'
-      exact this ⟨by simpa using hold, by simpa using hold'⟩
+      exact hnot ⟨hold, hold'⟩
   · rintro ⟨hG, hS⟩ x y z w hxy hzw hxz hyz htwo
     cases x <;> cases y <;> cases z <;> cases w <;>
-      simp_all [addVertex, C4Free] <;>
-      try exact hG hxy hzw hxz hyz htwo
-      try exact hS hxy ‹_› ‹_› ⟨by assumption, by assumption⟩
+      simp_all [addVertex, C4Free] <;> aesop
 
 #print axioms addVertex_c4Free_iff
 
