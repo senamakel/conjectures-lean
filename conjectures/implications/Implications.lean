@@ -28,6 +28,7 @@ import Implications.C4DegreeEightCap
 import Implications.C4DegreeEightEquality
 import Implications.C4DegreeEightMultiplicity
 import Implications.C4DegreeEightPairWitnesses
+import Implications.C4RootWitnessCountIdentity
 import Implications.C4SeedCertificates
 import Implications.SmoothGapCounting
 import Implications.SmoothGapInfinitude
