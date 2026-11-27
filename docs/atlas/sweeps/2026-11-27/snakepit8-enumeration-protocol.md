@@ -53,6 +53,14 @@ before exclude, keeping the same node, wall, CPU, and memory limits; its goal is
 to measure whether eligible leaves are reached promptly. No symmetry reduction
 or Q8 search is included.
 
+The include-first diagnostic reached a full assignment in 65 nodes and exposed
+a classification bug: the first such assignment had maximum degree two but
+contained cycles. The search had incorrectly treated every leaf as an expected
+forest and stopped on `edges != vertices - components`. This is a legitimate
+candidate rejection, not an invariant failure. The next run corrects this by
+counting and rejecting cyclic leaves while retaining the degree-sum invariant;
+all resource caps remain unchanged.
+
 ## Interpretation
 
 Finishing the count reproduces only the Q7 enumeration stage; it does not prove
