@@ -204,6 +204,103 @@ theorem exactOccurrenceCount_eq_45162783_46152783 (n : ℕ) (marks : Finset (Fin
     (by decide) (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide) (by decide) (by decide)
 
+/-! The tokens below are the archive's original orientations, obtained by reversing the
+corresponding target windows. The supplementary `left8.pkl` archive places the first six in
+blocks 11 and 57 and the remaining pairs in blocks 18, 37, 49, 56, 69, and 70. -/
+
+def pattern18756243 : Fin 8 → Fin 8 := reversePattern pattern34265781
+def pattern18746253 : Fin 8 → Fin 8 := reversePattern pattern35264781
+def pattern18745263 : Fin 8 → Fin 8 := reversePattern pattern36254781
+def pattern28756143 : Fin 8 → Fin 8 := reversePattern pattern34165782
+def pattern28745163 : Fin 8 → Fin 8 := reversePattern pattern36154782
+def pattern28746153 : Fin 8 → Fin 8 := reversePattern pattern35164782
+def pattern18725364 : Fin 8 → Fin 8 := reversePattern pattern46352781
+def pattern18726354 : Fin 8 → Fin 8 := reversePattern pattern45362781
+def pattern18735264 : Fin 8 → Fin 8 := reversePattern pattern46253781
+def pattern18736254 : Fin 8 → Fin 8 := reversePattern pattern45263781
+def pattern28715364 : Fin 8 → Fin 8 := reversePattern pattern46351782
+def pattern28716354 : Fin 8 → Fin 8 := reversePattern pattern45361782
+def pattern28735164 : Fin 8 → Fin 8 := reversePattern pattern46153782
+def pattern28736154 : Fin 8 → Fin 8 := reversePattern pattern45163782
+def pattern38716254 : Fin 8 → Fin 8 := reversePattern pattern45261783
+def pattern38715264 : Fin 8 → Fin 8 := reversePattern pattern46251783
+def pattern38726154 : Fin 8 → Fin 8 := reversePattern pattern45162783
+def pattern38725164 : Fin 8 → Fin 8 := reversePattern pattern46152783
+
+theorem exactOccurrenceCount_eq_18756243_18746253 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern18756243) marks =
+      WilfCounts.exactCount (occurrenceSet pattern18746253) marks :=
+  WilfReversal.exactOccurrenceCount_eq_reverse_of_eq n pattern34265781 pattern35264781
+    (fun m => exactOccurrenceCount_eq_34265781_35264781 n m) marks
+
+theorem exactOccurrenceCount_eq_18756243_18745263 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern18756243) marks =
+      WilfCounts.exactCount (occurrenceSet pattern18745263) marks :=
+  WilfReversal.exactOccurrenceCount_eq_reverse_of_eq n pattern34265781 pattern36254781
+    (fun m => exactOccurrenceCount_eq_34265781_36254781 n m) marks
+
+theorem exactOccurrenceCount_eq_28756143_28745163 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern28756143) marks =
+      WilfCounts.exactCount (occurrenceSet pattern28745163) marks :=
+  WilfReversal.exactOccurrenceCount_eq_reverse_of_eq n pattern34165782 pattern36154782
+    (fun m => exactOccurrenceCount_eq_34165782_36154782 n m) marks
+
+theorem exactOccurrenceCount_eq_28756143_28746153 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern28756143) marks =
+      WilfCounts.exactCount (occurrenceSet pattern28746153) marks :=
+  WilfReversal.exactOccurrenceCount_eq_reverse_of_eq n pattern34165782 pattern35164782
+    (fun m => exactOccurrenceCount_eq_34165782_35164782 n m) marks
+
+theorem exactOccurrenceCount_eq_18725364_18726354 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern18725364) marks =
+      WilfCounts.exactCount (occurrenceSet pattern18726354) marks :=
+  WilfReversal.exactOccurrenceCount_eq_reverse_of_eq n pattern46352781 pattern45362781
+    (fun m => exactOccurrenceCount_eq_46352781_45362781 n m) marks
+
+theorem exactOccurrenceCount_eq_18735264_18736254 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern18735264) marks =
+      WilfCounts.exactCount (occurrenceSet pattern18736254) marks :=
+  WilfReversal.exactOccurrenceCount_eq_reverse_of_eq n pattern46253781 pattern45263781
+    (fun m => exactOccurrenceCount_eq_46253781_45263781 n m) marks
+
+theorem exactOccurrenceCount_eq_28715364_28716354 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern28715364) marks =
+      WilfCounts.exactCount (occurrenceSet pattern28716354) marks :=
+  WilfReversal.exactOccurrenceCount_eq_reverse_of_eq n pattern46351782 pattern45361782
+    (fun m => exactOccurrenceCount_eq_46351782_45361782 n m) marks
+
+theorem exactOccurrenceCount_eq_28735164_28736154 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern28735164) marks =
+      WilfCounts.exactCount (occurrenceSet pattern28736154) marks :=
+  WilfReversal.exactOccurrenceCount_eq_reverse_of_eq n pattern46153782 pattern45163782
+    (fun m => exactOccurrenceCount_eq_46153782_45163782 n m) marks
+
+theorem exactOccurrenceCount_eq_38716254_38715264 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern38716254) marks =
+      WilfCounts.exactCount (occurrenceSet pattern38715264) marks :=
+  WilfReversal.exactOccurrenceCount_eq_reverse_of_eq n pattern45261783 pattern46251783
+    (fun m => exactOccurrenceCount_eq_45261783_46251783 n m) marks
+
+theorem exactOccurrenceCount_eq_38726154_38725164 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern38726154) marks =
+      WilfCounts.exactCount (occurrenceSet pattern38725164) marks :=
+  WilfReversal.exactOccurrenceCount_eq_reverse_of_eq n pattern45162783 pattern46152783
+    (fun m => exactOccurrenceCount_eq_45162783_46152783 n m) marks
+
+/-- Transitivity closes every member of source archive block 11. -/
+theorem exactOccurrenceCount_eq_block11_common (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern18746253) marks =
+      WilfCounts.exactCount (occurrenceSet pattern18745263) marks := by
+  exact (exactOccurrenceCount_eq_18756243_18746253 n marks).symm.trans
+    (exactOccurrenceCount_eq_18756243_18745263 n marks)
+
+/-- Transitivity closes every member of source archive block 57. -/
+theorem exactOccurrenceCount_eq_block57_common (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern28745163) marks =
+      WilfCounts.exactCount (occurrenceSet pattern28746153) marks := by
+  exact (exactOccurrenceCount_eq_28756143_28745163 n marks).symm.trans
+    (exactOccurrenceCount_eq_28756143_28746153 n marks)
+
 #print axioms exactOccurrenceCount_eq_34265781_35264781
 #print axioms exactOccurrenceCount_eq_34265781_36254781
 #print axioms exactOccurrenceCount_eq_34165782_36154782
@@ -214,4 +311,16 @@ theorem exactOccurrenceCount_eq_45162783_46152783 (n : ℕ) (marks : Finset (Fin
 #print axioms exactOccurrenceCount_eq_46153782_45163782
 #print axioms exactOccurrenceCount_eq_45261783_46251783
 #print axioms exactOccurrenceCount_eq_45162783_46152783
+#print axioms exactOccurrenceCount_eq_18756243_18746253
+#print axioms exactOccurrenceCount_eq_18756243_18745263
+#print axioms exactOccurrenceCount_eq_28756143_28745163
+#print axioms exactOccurrenceCount_eq_28756143_28746153
+#print axioms exactOccurrenceCount_eq_18725364_18726354
+#print axioms exactOccurrenceCount_eq_18735264_18736254
+#print axioms exactOccurrenceCount_eq_28715364_28716354
+#print axioms exactOccurrenceCount_eq_28735164_28736154
+#print axioms exactOccurrenceCount_eq_38716254_38715264
+#print axioms exactOccurrenceCount_eq_38726154_38725164
+#print axioms exactOccurrenceCount_eq_block11_common
+#print axioms exactOccurrenceCount_eq_block57_common
 
