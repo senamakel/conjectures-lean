@@ -261,6 +261,123 @@ theorem three_pair_rows_are_triangle
       (by rw [hcardF, htargetCard])
     exact ⟨a,b,c,hab,hac,hbc,hEq⟩
 
+/-- A three-element family of selected double rows with exact incidence two
+has the triangle shape, and its three row indices map to the three distinct
+pair sets. -/
+theorem three_selected_rows_form_triangle
+    {C I : Type*} [Fintype C] [Fintype I] [DecidableEq C] [DecidableEq I]
+    (clique : Finset C) (indep : Finset I) (S : Finset C)
+    (selected : C → Finset I)
+    (hSsub : S ⊆ clique) (hScard : S.card = 3)
+    (hrowCard : ∀ q ∈ S, (selected q).card = 2)
+    (hselectedSub : ∀ q ∈ S, selected q ⊆ indep)
+    (hdegree : ∀ i ∈ indep, (clique.filter (fun q => i ∈ selected q)).card = 2)
+    (hmeet : ∀ q ∈ S, ∀ d ∈ S, q ≠ d → ∃ i, i ∈ selected q ∧ i ∈ selected d) :
+    ∃ x y z a b c, x ∈ S ∧ y ∈ S ∧ z ∈ S ∧ x ≠ y ∧ x ≠ z ∧ y ≠ z ∧
+      a ≠ b ∧ a ≠ c ∧ b ≠ c ∧
+      selected x = {a,b} ∧ selected y = {b,c} ∧ selected z = {a,c} := by
+  classical
+  let F : Finset (Finset I) := S.image selected
+  have hnoCenter : ¬ ∃ i, ∀ q ∈ S, i ∈ selected q := by
+    rintro ⟨i, hi⟩
+    have hiI : i ∈ indep := by
+      obtain ⟨q, hq⟩ := S.nonempty_iff_ne_empty.mpr (by intro h; rw [h] at hScard; simp at hScard)
+      exact hselectedSub q hq (hi q hq)
+    have hsub : S ⊆ clique.filter (fun q => i ∈ selected q) := by
+      intro q hq
+      exact Finset.mem_filter.mpr ⟨hSsub hq, hi q hq⟩
+    have hle := Finset.card_le_card hsub
+    rw [hdegree i hiI] at hle
+    omega
+  have hinj : Set.InjOn selected S := by
+    intro q hq d hd heq
+    by_contra hqd
+    obtain ⟨e, he, hqe, hde⟩ := by
+      have hpairSub : ({q,d} : Finset C) ⊆ S := by
+        intro c hc
+        simp only [Finset.mem_insert, Finset.mem_singleton] at hc
+        rcases hc with rfl | rfl
+        · exact hq
+        · exact hd
+      have hpairCard : ({q,d} : Finset C).card = 2 := by simp [hqd]
+      have hdiffCard : (S \ {q,d}).card = 1 := by
+        rw [Finset.card_sdiff_of_subset hpairSub, hScard, hpairCard]
+      obtain ⟨e, he⟩ := Finset.card_pos.mp (by omega : 0 < (S \ {q,d}).card)
+      have heS := (Finset.mem_sdiff.mp he).1
+      have heNot := (Finset.mem_sdiff.mp he).2
+      have hqe : e ≠ q := by simpa using (Finset.mem_insert.mp (Finset.mem_insert.mpr (Or.inl rfl)))
+      have hqNot : q ∉ ({q,d} : Finset C) := by simpa [hqd]
+      have hde : e ≠ d := by
+        intro h
+        subst e
+        exact heNot (by simp)
+      exact ⟨e, heS, hqe, hde⟩
+    obtain ⟨i, hiq, hie⟩ := hmeet q hq e he hqe
+    have hid : i ∈ selected d := by simpa [heq] using hiq
+    have hiI : i ∈ indep := hselectedSub q hq hiq
+    have hthree : ({q,d,e} : Finset C) ⊆ clique.filter (fun c => i ∈ selected c) := by
+      intro c hc
+      simp only [Finset.mem_insert, Finset.mem_singleton] at hc
+      rcases hc with rfl | rfl | rfl
+      · exact Finset.mem_filter.mpr ⟨hSsub hq, hiq⟩
+      · exact Finset.mem_filter.mpr ⟨hSsub hd, hid⟩
+      · exact Finset.mem_filter.mpr ⟨hSsub he, hie⟩
+    have hthreeCard : ({q,d,e} : Finset C).card = 3 := by simp [hqd, hqe, hde]
+    have hle := Finset.card_le_card hthree
+    rw [hdegree i hiI, hthreeCard] at hle
+    omega
+  have hFcard : F.card = 3 := by
+    dsimp [F]
+    rw [Finset.card_image_of_injOn hinj, hScard]
+  have hFrows : ∀ A ∈ F, A.card = 2 := by
+    intro A hA
+    obtain ⟨q, hq, rfl⟩ := Finset.mem_image.mp hA
+    exact hrowCard q hq
+  have hFmeet : ∀ A ∈ F, ∀ B ∈ F, A ≠ B → ∃ i, i ∈ A ∧ i ∈ B := by
+    intro A hA B hB hAB
+    obtain ⟨q, hq, rfl⟩ := Finset.mem_image.mp hA
+    obtain ⟨d, hd, rfl⟩ := Finset.mem_image.mp hB
+    have hqd : q ≠ d := by
+      intro he
+      apply hAB
+      simpa [he]
+    exact hmeet q hq d hd hqd
+  have hFnoCenter : ¬ ∃ i, ∀ A ∈ F, i ∈ A := by
+    rintro ⟨i, hi⟩
+    apply hnoCenter
+    refine ⟨i, ?_⟩
+    intro q hq
+    exact hi (selected q) (Finset.mem_image.mpr ⟨q, hq, rfl⟩)
+  obtain ⟨a,b,c,hab,hac,hbc,hF⟩ :=
+    three_pair_rows_are_triangle F hFcard hFrows hFmeet hFnoCenter
+  have hmemAB : ({a,b} : Finset I) ∈ F := by rw [hF]; simp
+  have hmemBC : ({b,c} : Finset I) ∈ F := by rw [hF]; simp
+  have hmemAC : ({a,c} : Finset I) ∈ F := by rw [hF]; simp
+  obtain ⟨x, hx, hxEq⟩ := Finset.mem_image.mp hmemAB
+  obtain ⟨y, hy, hyEq⟩ := Finset.mem_image.mp hmemBC
+  obtain ⟨z, hz, hzEq⟩ := Finset.mem_image.mp hmemAC
+  have hxy : x ≠ y := by intro he; apply (by
+    intro h; have hc : c ∈ ({a,b} : Finset I) := h ▸ (by simp); simp [hac, hbc] at hc)
+    rw [he, hxEq] at hyEq
+    exact Finset.mem_singleton.mp (by simp [hyEq] : b ∈ ({a,c} : Finset I))
+  have hxz : x ≠ z := by
+    intro he
+    have hEq : ({a,b} : Finset I) = {a,c} := hxEq.symm.trans (by simpa [he] using hzEq.symm)
+    have hbmem : b ∈ ({a,c} : Finset I) := hEq.symm ▸ (by simp)
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hbmem
+    rcases hbmem with h | h
+    · exact hab h.symm
+    · exact hbc h
+  have hyz : y ≠ z := by
+    intro he
+    have hEq : ({b,c} : Finset I) = {a,c} := hyEq.symm.trans (by simpa [he] using hzEq.symm)
+    have hbmem : b ∈ ({a,c} : Finset I) := hEq ▸ (by simp)
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hbmem
+    rcases hbmem with h | h
+    · exact hab h.symm
+    · exact hbc h
+  exact ⟨x,y,z,a,b,c,hSsub hx,hSsub hy,hSsub hz,hxy,hxz,hyz,hab,hac,hbc,hxEq,hyEq,hzEq⟩
+
 end SplitGraphSmallRowsThree
 
 #print axioms SplitGraphSmallRowsThree.three_pair_rows_are_triangle
