@@ -171,12 +171,11 @@ theorem lexAssignment_cons_neq (a : Nat → Bool) (base : Nat)
       · have hinside' : n < (base + 1) + (lexPrefixScan a nextPref xs ys).length :=
           hthreshold.mp hinside
         simp [lexAssignment, hbelow, hbelow', hnotLe, hinside, hinside', hscan,
-          hlen', hthresholdEq, hidx, extendVariable, Nat.ne_of_gt habove]
-        rw [if_pos hinside']
+          hscanExt, hlen', hthresholdEq, hidx, extendVariable, Nat.ne_of_gt habove]
       · have hinside' : ¬ n < (base + 1) + (lexPrefixScan a nextPref xs ys).length :=
           fun hh => hinside (hthreshold.mpr hh)
         simp [lexAssignment, hbelow, hbelow', hnotLe, hinside, hinside', hscan,
-          hlen', hthresholdEq, extendVariable, Nat.ne_of_gt habove]
+          hscanExt, hlen', hthresholdEq, extendVariable, Nat.ne_of_gt habove]
         intro hlt
         exact (hinside' hlt).elim
 
