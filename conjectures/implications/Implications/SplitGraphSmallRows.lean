@@ -336,6 +336,35 @@ theorem selected_two_rows_card_le_three
         rw [← hcardEq]
         exact hRle
 
+/-! If each selected row is a subset of its original row, size-two selected rows
+inherit the symmetric-difference bound from the original rows. -/
+theorem selected_two_rows_card_le_three_of_original
+    {C I : Type*} [Fintype C] [Fintype I] [DecidableEq C] [DecidableEq I]
+    (clique : Finset C) (indep : Finset I)
+    (original selected : C → Finset I)
+    (hselected : ∀ c ∈ clique, selected c ⊆ original c)
+    (horiginal : ∀ c ∈ clique, (original c).card ≤ 2)
+    (hdiff : ∀ c ∈ clique, ∀ d ∈ clique, c ≠ d →
+      (original c \ original d ∪ original d \ original c).card ≤ 2)
+    (hdegree : ∀ i ∈ indep,
+      (clique.filter (fun c => i ∈ selected c)).card = 2) :
+    (clique.filter (fun c => (selected c).card = 2)).card ≤ 3 := by
+  apply selected_two_rows_card_le_three clique indep selected
+  · exact fun c hc => (hselected c hc).trans (horiginal c hc)
+  · exact horiginal
+  · intro c hc d hd hcd hcardC hcardD
+    have hEqC : selected c = original c := by
+      apply Finset.eq_of_subset_of_card_le (hselected c hc)
+      rw [hcardC]
+      exact horiginal c hc
+    have hEqD : selected d = original d := by
+      apply Finset.eq_of_subset_of_card_le (hselected d hd)
+      rw [hcardD]
+      exact horiginal d hd
+    rw [hEqC, hEqD]
+    exact hdiff c hc d hd hcd
+  · exact hdegree
+
 /-! The exact family statement applied to clique rows. -/
 theorem clique_rows_two_set_structure
     {V : Type*} [Fintype V] [DecidableEq V]
