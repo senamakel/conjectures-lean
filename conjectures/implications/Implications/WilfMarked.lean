@@ -14,6 +14,17 @@ namespace WilfMarked
 def sigma : Fin 8 → Fin 8 := ![0, 5, 1, 2, 6, 3, 7, 4]
 def tau : Fin 8 → Fin 8 := ![0, 5, 1, 3, 6, 2, 7, 4]
 
+def pair16238475 : Fin 8 → Fin 8 := ![0, 5, 1, 2, 7, 3, 6, 4]
+def pair16248375 : Fin 8 → Fin 8 := ![0, 5, 1, 3, 7, 2, 6, 4]
+def pair17236485 : Fin 8 → Fin 8 := ![0, 6, 1, 2, 5, 3, 7, 4]
+def pair17246385 : Fin 8 → Fin 8 := ![0, 6, 1, 3, 5, 2, 7, 4]
+def pair17238465 : Fin 8 → Fin 8 := ![0, 6, 1, 2, 7, 3, 5, 4]
+def pair17248365 : Fin 8 → Fin 8 := ![0, 6, 1, 3, 7, 2, 5, 4]
+def pair18237465 : Fin 8 → Fin 8 := ![0, 7, 1, 2, 6, 3, 5, 4]
+def pair18247365 : Fin 8 → Fin 8 := ![0, 7, 1, 3, 6, 2, 5, 4]
+def pair18236475 : Fin 8 → Fin 8 := ![0, 7, 1, 2, 5, 3, 6, 4]
+def pair18246375 : Fin 8 → Fin 8 := ![0, 7, 1, 3, 5, 2, 6, 4]
+
 def rankList (p : Fin 8 → Fin 8) : List Nat := List.ofFn fun i => (p i).val
 
 theorem rankList_get (p : Fin 8 → Fin 8) (i : Fin 8) :
@@ -72,6 +83,63 @@ theorem tau_overlap_compatible_only_at_5_or_7 (shift : Nat)
     rw [hf] at hok
     contradiction
   · exact Or.inr rfl
+
+theorem overlap_compatible_only_at_5_or_7_of_decide (p : Fin 8 → Fin 8)
+    (hcheck : ∀ shift, 1 ≤ shift → shift < 8 →
+      (overlapCompatible p shift = true ↔ shift = 5 ∨ shift = 7))
+    (shift : Nat) (hpos : 1 ≤ shift) (hsmall : shift < 8)
+    (hok : overlapCompatible p shift = true) : shift = 5 ∨ shift = 7 :=
+  (hcheck shift hpos hsmall).mp hok
+
+theorem overlap_check_pair16238475 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair16238475 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
+
+theorem overlap_check_pair16248375 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair16248375 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
+
+theorem overlap_check_pair17236485 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair17236485 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
+
+theorem overlap_check_pair17246385 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair17246385 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
+
+theorem overlap_check_pair17238465 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair17238465 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
+
+theorem overlap_check_pair17248365 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair17248365 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
+
+theorem overlap_check_pair18237465 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair18237465 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
+
+theorem overlap_check_pair18247365 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair18247365 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
+
+theorem overlap_check_pair18236475 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair18236475 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
+
+theorem overlap_check_pair18246375 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair18246375 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
 
 /-- The adjacent transposition of the fourth and sixth positions. -/
 def windowSwap (i : Fin 8) : Fin 8 :=

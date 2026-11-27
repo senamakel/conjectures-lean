@@ -209,6 +209,28 @@ noncomputable def markedEquivOfSwap (n : ℕ) (marks : Finset ℕ)
   right_inv := swapMarked_swapMarked marks q p hoverlapQ hoverlap hfirstQ hsecondQ hcrossQ
     hfirst hsecond hcross hqp hpq
 
+/-- The same marked-window argument yields equality of exact occurrence-set
+counts for any pair satisfying its checked overlap and rank hypotheses. -/
+theorem exactOccurrenceCount_eq_of_swap (n : ℕ) (marks : Finset (Fin n))
+    (p q : Fin 8 → Fin 8)
+    (hoverlap : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
+    (hoverlapQ : ∀ d, 1 ≤ d → d < 8 → overlapCompatible q d = true → d = 5 ∨ d = 7)
+    (hfirst : ∀ i : Fin 8, i ≠ 0 → p 0 < p i)
+    (hsecond : ∀ i : Fin 8, i ≠ 0 → i ≠ 2 → p 2 < p i)
+    (hcross : p 3 < p 7)
+    (hfirstQ : ∀ i : Fin 8, i ≠ 0 → q 0 < q i)
+    (hsecondQ : ∀ i : Fin 8, i ≠ 0 → i ≠ 2 → q 2 < q i)
+    (hcrossQ : q 3 < q 7)
+    (hpq : p ∘ windowSwap = q) (hqp : q ∘ windowSwap = p) :
+    WilfCounts.exactCount (occurrenceSet p) marks =
+      WilfCounts.exactCount (occurrenceSet q) marks := by
+  apply WilfEquivalence.exactCount_eq_of_markedEquiv
+  intro chosen
+  exact (Equiv.subtypeEquivRight (subset_occurrenceSet_iff p chosen)).trans
+    ((markedEquivOfSwap n (chosen.image Fin.val) p q hoverlap hoverlapQ hfirst hsecond
+      hcross hfirstQ hsecondQ hcrossQ hpq hqp).trans
+      (Equiv.subtypeEquivRight (subset_occurrenceSet_iff q chosen)).symm)
+
 /-- A bijection between the permutations realizing all prescribed starts for
 the two patterns. -/
 noncomputable def markedEquiv (n : ℕ) (marks : Finset ℕ) :
@@ -260,11 +282,80 @@ exact occurrence set is realized by the same number of permutations. -/
 theorem exactOccurrenceCount_eq (n : ℕ) (marks : Finset (Fin n)) :
     WilfCounts.exactCount (occurrenceSet sigma) marks =
       WilfCounts.exactCount (occurrenceSet tau) marks := by
-  apply WilfEquivalence.exactCount_eq_of_markedEquiv
-  intro chosen
-  exact (Equiv.subtypeEquivRight (subset_occurrenceSet_iff sigma chosen)).trans
-    ((markedEquiv n (chosen.image Fin.val)).trans
-      (Equiv.subtypeEquivRight (subset_occurrenceSet_iff tau chosen)).symm)
+  exact exactOccurrenceCount_eq_of_swap n marks sigma tau
+    sigma_overlap_compatible_only_at_5_or_7 tau_overlap_compatible_only_at_5_or_7
+    (by intro i hi; fin_cases i <;> decide)
+    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
+    (by intro i hi; fin_cases i <;> decide)
+    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
+    windowSwap_sigma windowSwap_tau
+
+theorem exactOccurrenceCount_eq_16238475_16248375 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pair16238475) marks =
+      WilfCounts.exactCount (occurrenceSet pair16248375) marks := by
+  exact exactOccurrenceCount_eq_of_swap n marks pair16238475 pair16248375
+    (overlap_compatible_only_at_5_or_7_of_decide pair16238475
+      (overlap_check_pair16238475))
+    (overlap_compatible_only_at_5_or_7_of_decide pair16248375
+      (overlap_check_pair16248375))
+    (by intro i hi; fin_cases i <;> decide)
+    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
+    (by intro i hi; fin_cases i <;> decide)
+    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
+    (by funext i; fin_cases i <;> rfl)
+    (by funext i; fin_cases i <;> rfl)
+
+theorem exactOccurrenceCount_eq_17236485_17246385 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pair17236485) marks =
+      WilfCounts.exactCount (occurrenceSet pair17246385) marks := by
+  exact exactOccurrenceCount_eq_of_swap n marks pair17236485 pair17246385
+    (overlap_compatible_only_at_5_or_7_of_decide pair17236485 overlap_check_pair17236485)
+    (overlap_compatible_only_at_5_or_7_of_decide pair17246385 overlap_check_pair17246385)
+    (by intro i hi; fin_cases i <;> decide)
+    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
+    (by intro i hi; fin_cases i <;> decide)
+    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
+    (by funext i; fin_cases i <;> rfl)
+    (by funext i; fin_cases i <;> rfl)
+
+theorem exactOccurrenceCount_eq_17238465_17248365 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pair17238465) marks =
+      WilfCounts.exactCount (occurrenceSet pair17248365) marks := by
+  exact exactOccurrenceCount_eq_of_swap n marks pair17238465 pair17248365
+    (overlap_compatible_only_at_5_or_7_of_decide pair17238465 overlap_check_pair17238465)
+    (overlap_compatible_only_at_5_or_7_of_decide pair17248365 overlap_check_pair17248365)
+    (by intro i hi; fin_cases i <;> decide)
+    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
+    (by intro i hi; fin_cases i <;> decide)
+    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
+    (by funext i; fin_cases i <;> rfl)
+    (by funext i; fin_cases i <;> rfl)
+
+theorem exactOccurrenceCount_eq_18237465_18247365 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pair18237465) marks =
+      WilfCounts.exactCount (occurrenceSet pair18247365) marks := by
+  exact exactOccurrenceCount_eq_of_swap n marks pair18237465 pair18247365
+    (overlap_compatible_only_at_5_or_7_of_decide pair18237465 overlap_check_pair18237465)
+    (overlap_compatible_only_at_5_or_7_of_decide pair18247365 overlap_check_pair18247365)
+    (by intro i hi; fin_cases i <;> decide)
+    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
+    (by intro i hi; fin_cases i <;> decide)
+    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
+    (by funext i; fin_cases i <;> rfl)
+    (by funext i; fin_cases i <;> rfl)
+
+theorem exactOccurrenceCount_eq_18236475_18246375 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pair18236475) marks =
+      WilfCounts.exactCount (occurrenceSet pair18246375) marks := by
+  exact exactOccurrenceCount_eq_of_swap n marks pair18236475 pair18246375
+    (overlap_compatible_only_at_5_or_7_of_decide pair18236475 overlap_check_pair18236475)
+    (overlap_compatible_only_at_5_or_7_of_decide pair18246375 overlap_check_pair18246375)
+    (by intro i hi; fin_cases i <;> decide)
+    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
+    (by intro i hi; fin_cases i <;> decide)
+    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
+    (by funext i; fin_cases i <;> rfl)
+    (by funext i; fin_cases i <;> rfl)
 
 #print axioms exactOccurrenceCount_eq
 
