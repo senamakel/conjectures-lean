@@ -474,19 +474,23 @@ theorem hamiltonian_of_split_partition_row_bounds
         simp [hvl]
       · have : v = i := by simpa [hi] using hvI
         simp [this]
-  · have hempty : I = ∅ := Finset.card_eq_zero.mp (by omega)
-    let l := C.toList
-    have hnodup : l.Nodup := C.nodup_toList
-    have hfin : l.toFinset = C := C.toList_toFinset
-    have hchain : l.IsChain G.Adj := clique_order_chain G C hC l hnodup hfin
-    have hne : l ≠ [] := by
-      intro he
-      have : C = ∅ := by simpa [l] using congrArg List.toFinset he
-      exact hCne.ne_empty this
-    apply hamiltonian_of_list G l hne hnodup hchain
-    intro v
-    have hv : v ∈ C ∪ I := by rw [← hpartition]; exact Finset.mem_univ v
-    simpa [l, hempty, hfin] using (Finset.mem_union.mp hv).resolve_right (by simp [hempty])
+    · have hempty : I = ∅ := Finset.card_eq_zero.mp (by omega)
+      let l := C.toList
+      have hnodup : l.Nodup := C.nodup_toList
+      have hfin : l.toFinset = C := C.toList_toFinset
+      have hchain : l.IsChain G.Adj := clique_order_chain G C hC l hnodup hfin
+      have hne : l ≠ [] := by
+        intro he
+        have : C = ∅ := by simpa [l] using congrArg List.toFinset he
+        exact hCne.ne_empty this
+      apply hamiltonian_of_list G l hne hnodup hchain
+      intro v
+      have hv : v ∈ C ∪ I := by rw [← hpartition]; exact Finset.mem_univ v
+      have hvC : v ∈ C := by
+        rcases Finset.mem_union.mp hv with hvC | hvI
+        · exact hvC
+        · simpa [hempty] using hvI
+      exact List.mem_toFinset.mp (by simpa [l, hfin] using hvC)
 
 end SplitGraphPath
 
