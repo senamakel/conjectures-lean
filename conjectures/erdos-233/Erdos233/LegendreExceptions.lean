@@ -146,7 +146,7 @@ theorem legendreBadBlock_length_le_gapSum (a : ℕ) (ha : 2 ≤ a) :
     have hnlo : a ≤ n := (Finset.mem_Ico.mp hnmem).1
     have hbad := (Finset.mem_filter.mp hn).2
     have hinc : squareInterval n ⊆ primeGapInterval (squareGapIndex n) :=
-      legendreFailure_squareInterval_subset (le_trans ha hnlo) hbad
+      legendreFailure_squareInterval_subset_gap (le_trans ha hnlo) hbad
     have hk : squareGapIndex n ∈ G := by
       exact Finset.mem_image.mpr ⟨n, hn, rfl⟩
     exact Finset.mem_biUnion.mpr ⟨squareGapIndex n, hk, hinc hx⟩
