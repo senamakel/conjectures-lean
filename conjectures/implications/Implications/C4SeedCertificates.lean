@@ -2,7 +2,7 @@ import Mathlib.Data.Nat.Bitwise
 import Mathlib.Data.List.Basic
 import Mathlib.Data.List.Pairwise
 import Mathlib.Combinatorics.SimpleGraph.Maps
-import Implications.C4Extremal42
+import Implications.C4Extremal42SearchConstraints
 
 /-!
 # Finite certificates for the three published 41-vertex `C₄` extremal seeds
@@ -258,100 +258,53 @@ private theorem compatible_of_nodup_pairwise {g : Array Nat} (l : List (Fin 41))
     simpa [sorted] using hsub
   · exact List.Pairwise.map Fin.val (by intro u v huv; exact huv) hsorted
 
-/-- Six distinct vertices cannot have pairwise disjoint open neighborhoods in
-any graph isomorphic to one of the masks.
-The statement is intentionally conditional on the supplied seed; it does not
-assert that the three records exhaust the extremal 41-vertex graphs. -/
+private theorem no_disjoint_six_of_mask_iso {V : Type*} {G : SimpleGraph V}
+    {g : Array Nat}
+    {hsym : ∀ u v : Fin 41, Nat.testBit g[u.val]! v.val = Nat.testBit g[v.val]! u.val}
+    {hloop : ∀ u : Fin 41, Nat.testBit g[u.val]! u.val = false}
+    (iso : G ≃g maskGraph g hsym hloop)
+    (hcompat : ∀ u v : Fin 41, Disjoint (maskNeighbors g u) (maskNeighbors g v) ↔
+      compatible g u.val v.val = true)
+    (hcert : ¬ ExistsCompatibleClique g (List.range 41) 6) :
+    ¬ ∃ chosen : List V, chosen.length = 6 ∧ chosen.Nodup ∧
+      chosen.Pairwise (fun u v => Disjoint (G.neighborSet u) (G.neighborSet v)) := by
+  rintro ⟨chosen, hlen, hnd, hpairs⟩
+  let mapped := chosen.map iso
+  have hmappedLen : mapped.length = 6 := by simp [mapped, hlen]
+  have hmappedNodup : mapped.Nodup := hnd.map iso.injective
+  have hmappedPairs : mapped.Pairwise (fun u v => compatible g u.val v.val = true) := by
+    apply List.pairwise_map.mpr
+    apply hpairs.imp
+    intro u v huv
+    apply (hcompat _ _).mp
+    apply Finset.disjoint_left.mpr
+    intro x hx₁ hx₂
+    have hx₁' : iso.symm x ∈ G.neighborSet u := by
+      apply (SimpleGraph.Iso.apply_mem_neighborSet_iff iso).mp
+      rw [show iso (iso.symm x) = x from iso.right_inv x]
+      simpa [maskNeighbors, maskGraph] using hx₁
+    have hx₂' : iso.symm x ∈ G.neighborSet v := by
+      apply (SimpleGraph.Iso.apply_mem_neighborSet_iff iso).mp
+      rw [show iso (iso.symm x) = x from iso.right_inv x]
+      simpa [maskNeighbors, maskGraph] using hx₂
+    exact (Set.disjoint_left.mp huv hx₁') hx₂'
+  have hc := compatible_of_nodup_pairwise mapped hmappedNodup hmappedPairs
+  exact hcert (by simpa [hmappedLen] using hc)
+
+/-- An isomorphism to a certified seed rules out six distinct vertices
+with pairwise disjoint open neighborhoods. -/
 theorem no_disjoint_six_of_seed_iso {V : Type*} (G : SimpleGraph V)
     (hseed : Nonempty (G ≃g seed1Graph) ∨ Nonempty (G ≃g seed2Graph) ∨
       Nonempty (G ≃g seed3Graph)) :
     ¬ ∃ chosen : List V, chosen.length = 6 ∧ chosen.Nodup ∧
       chosen.Pairwise (fun u v => Disjoint (G.neighborSet u) (G.neighborSet v)) := by
-  intro h
-  obtain ⟨chosen, hlen, hnd, hpairs⟩ := h
-  rcases hseed with hseed1 | hseed
-  · obtain ⟨hIso⟩ := hseed1
-    let mapped := chosen.map hIso
-    have hmappedLen : mapped.length = 6 := by simp [mapped, hlen]
-    have hmappedNodup : mapped.Nodup := hnd.map hIso.injective
-    have hmappedPairs : mapped.Pairwise (fun u v =>
-        Disjoint (seed1Graph.neighborSet u) (seed1Graph.neighborSet v)) := by
-      apply List.pairwise_map.mpr
-      exact hpairs.imp (fun {u v} huv => by
-        apply Set.disjoint_left.mpr
-        intro x hx₁ hx₂
-        have hx₁' : hIso.symm x ∈ G.neighborSet u :=
-          (SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₁)
-        have hx₂' : hIso.symm x ∈ G.neighborSet v :=
-          (SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₂)
-        exact (Set.disjoint_left.mp huv hx₁') hx₂')
-    have hcompat : mapped.Pairwise (fun u v => compatible seed1 u.val v.val = true) := by
-      exact hmappedPairs.imp (fun {u v} huv => by
-        apply (seed1_neighbor_disjoint_iff u v).1
-        apply Finset.disjoint_left.mpr
-        intro x hx₁ hx₂
-        exact (Set.disjoint_left.mp huv)
-          (by simpa [maskNeighbors, seed1Graph, maskGraph] using hx₁)
-          (by simpa [maskNeighbors, seed1Graph, maskGraph] using hx₂))
-    have hc := compatible_of_nodup_pairwise mapped hmappedNodup hcompat
-    have hc' : ExistsCompatibleClique seed1 (List.range 41) 6 := by
-      simpa [hmappedLen] using hc
-    exact seed1_no_compatible_six hc'
-  · rcases hseed with hseed2 | hseed3
-    · obtain ⟨hIso⟩ := hseed2
-      let mapped := chosen.map hIso
-      have hmappedLen : mapped.length = 6 := by simp [mapped, hlen]
-      have hmappedNodup : mapped.Nodup := hnd.map hIso.injective
-      have hmappedPairs : mapped.Pairwise (fun u v =>
-          Disjoint (seed2Graph.neighborSet u) (seed2Graph.neighborSet v)) := by
-        apply List.pairwise_map.mpr
-        exact hpairs.imp (fun {u v} huv => by
-          apply Set.disjoint_left.mpr
-          intro x hx₁ hx₂
-          have hx₁' : hIso.symm x ∈ G.neighborSet u :=
-            (SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₁)
-          have hx₂' : hIso.symm x ∈ G.neighborSet v :=
-            (SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₂)
-          exact (Set.disjoint_left.mp huv hx₁') hx₂')
-      have hcompat : mapped.Pairwise (fun u v => compatible seed2 u.val v.val = true) := by
-        exact hmappedPairs.imp (fun {u v} huv => by
-          apply (seed2_neighbor_disjoint_iff u v).1
-          apply Finset.disjoint_left.mpr
-          intro x hx₁ hx₂
-          exact (Set.disjoint_left.mp huv)
-            (by simpa [maskNeighbors, seed2Graph, maskGraph] using hx₁)
-            (by simpa [maskNeighbors, seed2Graph, maskGraph] using hx₂))
-      have hc := compatible_of_nodup_pairwise mapped hmappedNodup hcompat
-      have hc' : ExistsCompatibleClique seed2 (List.range 41) 6 := by
-        simpa [hmappedLen] using hc
-      exact seed2_no_compatible_six hc'
-    · obtain ⟨hIso⟩ := hseed3
-      let mapped := chosen.map hIso
-      have hmappedLen : mapped.length = 6 := by simp [mapped, hlen]
-      have hmappedNodup : mapped.Nodup := hnd.map hIso.injective
-      have hmappedPairs : mapped.Pairwise (fun u v =>
-          Disjoint (seed3Graph.neighborSet u) (seed3Graph.neighborSet v)) := by
-        apply List.pairwise_map.mpr
-        exact hpairs.imp (fun {u v} huv => by
-          apply Set.disjoint_left.mpr
-          intro x hx₁ hx₂
-          have hx₁' : hIso.symm x ∈ G.neighborSet u :=
-            (SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₁)
-          have hx₂' : hIso.symm x ∈ G.neighborSet v :=
-            (SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₂)
-          exact (Set.disjoint_left.mp huv hx₁') hx₂')
-      have hcompat : mapped.Pairwise (fun u v => compatible seed3 u.val v.val = true) := by
-        exact hmappedPairs.imp (fun {u v} huv => by
-          apply (seed3_neighbor_disjoint_iff u v).1
-          apply Finset.disjoint_left.mpr
-          intro x hx₁ hx₂
-          exact (Set.disjoint_left.mp huv)
-            (by simpa [maskNeighbors, seed3Graph, maskGraph] using hx₁)
-            (by simpa [maskNeighbors, seed3Graph, maskGraph] using hx₂))
-      have hc := compatible_of_nodup_pairwise mapped hmappedNodup hcompat
-      have hc' : ExistsCompatibleClique seed3 (List.range 41) 6 := by
-        simpa [hmappedLen] using hc
-      exact seed3_no_compatible_six hc'
+  rcases hseed with h | h | h
+  · obtain ⟨iso⟩ := h
+    exact no_disjoint_six_of_mask_iso iso seed1_neighbor_disjoint_iff seed1_no_compatible_six
+  · obtain ⟨iso⟩ := h
+    exact no_disjoint_six_of_mask_iso iso seed2_neighbor_disjoint_iff seed2_no_compatible_six
+  · obtain ⟨iso⟩ := h
+    exact no_disjoint_six_of_mask_iso iso seed3_neighbor_disjoint_iff seed3_no_compatible_six
 
 /-- A classified extremal deletion cannot contain a six-set satisfying the
 compatibility condition used by `C4Extremal42`: such a set would give six
@@ -428,6 +381,36 @@ theorem simpleGraph_c4Free_edge_count_le_137_of_seed_classification
   intro v hd
   exact no_compatible_six_in_seed_deletion G v (hclass v hd)
 
+/-- Exhaustiveness of the three certificates among 41-vertex four-cycle-free
+graphs with 132 edges. This is an explicit mathematical input. -/
+def Ex41SeedClassification : Prop :=
+  ∀ {V : Type} [Fintype V] [DecidableEq V] (H : SimpleGraph V),
+    Fintype.card V = 41 → C4VertexExtension.C4Free H → H.edgeSet.ncard = 132 →
+      Nonempty (H ≃g seed1Graph) ∨ Nonempty (H ≃g seed2Graph) ∨ Nonempty (H ≃g seed3Graph)
+
+/-- Together, the published 41-vertex upper bound and an exhaustive
+classification by the three certified seeds would give the 137-edge upper bound. -/
+theorem edge_count_le_137_of_ex41_and_seed_classification
+    (h41 : Implications.C4PolaritySurvivorBound.Ex41C4Bound)
+    (hclass : Ex41SeedClassification) (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    (hfree : (SimpleGraph.cycleGraph 4).Free G) : G.edgeFinset.card ≤ 137 := by
+  classical
+  have hC4 : C4VertexExtension.C4Free G := by
+    rintro x y z w hxy hzw hxz hyz ⟨hxw, hyw⟩
+    exact hzw (C4Extremal42.commonNeighbors_subsingleton_of_cycleGraph_free G hfree x y hxy
+      ⟨hxz, hyz⟩ ⟨hxw, hyw⟩)
+  apply simpleGraph_c4Free_edge_count_le_137_of_seed_classification G hfree
+    (C4Extremal42.deletion_count_le_132_of_ex41 h41 G hC4)
+  intro v hv
+  let S : Set (Fin 42) := {v}ᶜ
+  have hcard : Fintype.card S = 41 := by
+    change Fintype.card {i : Fin 42 // i ≠ v} = 41
+    simp [Fintype.card_subtype_compl]
+  apply hclass (G.induce S) hcard (Implications.C4PolaritySurvivorBound.c4Free_induce G hC4 S)
+  simpa only [C4Extremal42.inducedDeletionCount, S, SimpleGraph.edgeFinset_card,
+    Set.fintypeCard_eq_ncard] using hv
+
+#print axioms edge_count_le_137_of_ex41_and_seed_classification
 #print axioms seed1_no_compatible_six
 #print axioms seed2_no_compatible_six
 #print axioms seed3_no_compatible_six
