@@ -231,6 +231,8 @@ theorem same_pattern_start_distance {n : Nat} (π : Equiv.Perm (Fin n))
   rcases hp with rfl | rfl
   · have h := sigma_overlap_compatible_only_at_5_or_7 d (by omega) hts (by simpa [d] using hov)
     simpa [d] using h
+  · have h := tau_overlap_compatible_only_at_5_or_7 d (by omega) hts (by simpa [d] using hov)
+    simpa [d] using h
 
 /-- Generic form of the overlap-distance argument, parameterized by the finite
 overlap check for a pattern. -/
@@ -241,8 +243,6 @@ theorem same_pattern_start_distance_of_overlap {n : Nat} (π : Equiv.Perm (Fin n
     (hst : s < t) (hts : t - s < 8) : t - s = 5 ∨ t - s = 7 := by
   have hov := same_pattern_overlap_compatible π p s t hs ht hst hts
   exact hoverlap (t - s) (by omega) hts (by simpa using hov)
-  · have h := tau_overlap_compatible_only_at_5_or_7 d (by omega) hts (by simpa [d] using hov)
-    simpa [d] using h
 
 theorem same_pattern_starts_separated {n : Nat} (π : Equiv.Perm (Fin n))
     (p : Fin 8 → Fin 8) (hp : p = sigma ∨ p = tau)
