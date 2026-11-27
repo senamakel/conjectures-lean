@@ -28,6 +28,9 @@ import Implications.C4DegreeEightCap
 import Implications.C4SeedCertificates
 import Implications.SmoothGapCounting
 import Implications.SmoothGapInfinitude
+import Implications.SmoothPrimeReciprocal
+import Implications.SmoothGapRankin
+import Implications.SmoothGapAnalytic
 import Implications.SplitGraphPath
 import Implications.C4VertexExtension
 import Implications.WilfPatternSwap
