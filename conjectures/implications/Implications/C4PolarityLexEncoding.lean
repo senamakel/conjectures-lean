@@ -120,15 +120,19 @@ def orbitLexNext (next : Nat) (deleted : List Nat) : List (List Nat) → Nat
       let image := permutationVariables deleted permutation
       orbitLexNext (lexNext next deleted image) deleted rest
 
+/-- Number of non-skipped positions over a list of permutations. -/
+def orbitLexFreshCount (deleted : List Nat) : List (List Nat) → Nat
+  | [] => 0
+  | permutation :: rest =>
+      (lexFreshIds 0 deleted (permutationVariables deleted permutation)).length +
+        orbitLexFreshCount deleted rest
+
 theorem orbitLexNext_eq (next : Nat) (deleted : List Nat) (permutations : List (List Nat)) :
-    orbitLexNext next deleted permutations =
-      next + permutations.foldl
-        (fun count permutation => count +
-          (lexFreshIds next deleted (permutationVariables deleted permutation)).length) 0 := by
+    orbitLexNext next deleted permutations = next + orbitLexFreshCount deleted permutations := by
   induction permutations generalizing next with
-  | nil => simp [orbitLexNext]
+  | nil => simp [orbitLexNext, orbitLexFreshCount]
   | cons permutation rest ih =>
-      simp only [orbitLexNext, List.foldl_cons]
+      simp only [orbitLexNext, orbitLexFreshCount]
       rw [ih]
       rw [lexNext_eq]
       simp_rw [lexFreshIds_length]
