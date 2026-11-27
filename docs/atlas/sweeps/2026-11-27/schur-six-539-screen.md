@@ -58,16 +58,12 @@ available.
 
 ## Bounded search and stop rule
 
-The initial exact test covered all zero- or one-recolor extensions of the 995
-evolved-word classes up to color renaming. For each base word it tried all six
-colors for position 539, with either no old change or one of 538 old positions
-changed to any of the other five colors. This is exactly
-\(995\cdot6\cdot(1+538\cdot5)=16{,}065{,}270\) candidates. It found none.
-
 The persisted script
 [`schur-six-539-neighborhood.py`](schur-six-539-neighborhood.py) extends that
 screen to at most two changed old positions and includes both published
-McKenna words. For a chosen appended color (c), each pair
+McKenna words. Neither baseline was in the evolved-word corpus, giving 997
+distinct input words up to color renaming. For a chosen appended color (c),
+each pair
 \((x,539-x)\) already colored (c,c) must be hit by a recolored endpoint.
 These 269 complementary pairs are disjoint. Hence:
 
@@ -100,7 +96,24 @@ python3 docs/atlas/sweeps/2026-11-27/schur-six-539-neighborhood.py --inventory
 python3 docs/atlas/sweeps/2026-11-27/schur-six-539-neighborhood.py --max-candidates 100000000
 ```
 
-The radius-two output and exact candidate count will be filled in after the
-bounded run. This screen only tests the listed stored certificates and the
-specified Hamming neighborhood; it says nothing about other six-colorings of
-`[1,538]` or a construction from scratch.
+The inventory found that all 5,982 input-word/appended-color combinations have
+more than two complementary pairs colored (c,c). The extension pairs are
+disjoint, and changing at most two old positions can affect at most two of
+them. Therefore the additional radius-two candidate set is empty. The script
+exhaustively checked the radius-zero/one neighborhood: 16,097,562 candidate
+colorings (5,982 with no old recolor and 16,091,580 with one). It found no
+witness. The total bounded search count was below the 100,000,000 cap; it
+completed in 15.3 seconds. The radius-two stage skipped all 5,982 word/color
+combinations by the pair-count obstruction and tested zero additional
+assignments.
+
+An independent small-instance check by the parent agent compared the
+change-aware old-triple test against direct triple enumeration for every
+two-recolor mutation of every 3-color sum-free word of length 7: 21,672
+mutations, all agreed. No two-recolor candidate survived the complementary-pair
+filter here, so this check validates the helper logic rather than a surviving
+candidate.
+
+This screen only tests the listed stored certificates and the specified
+Hamming neighborhood; it says nothing about other six-colorings of `[1,538]`
+or a construction from scratch.
