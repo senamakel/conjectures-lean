@@ -384,4 +384,5 @@ end SplitGraphSmallRows
 
 #print axioms SplitGraphSmallRows.pairwise_intersecting_two_sets
 #print axioms SplitGraphSmallRows.card_le_three_of_no_common_center
+#print axioms SplitGraphSmallRows.selected_two_rows_card_le_three
 #print axioms SplitGraphSmallRows.clique_rows_two_set_structure
