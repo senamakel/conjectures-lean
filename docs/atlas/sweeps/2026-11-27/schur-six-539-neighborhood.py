@@ -227,18 +227,17 @@ def load_words() -> tuple[dict[tuple[int, ...], set[str]], int, int, dict[str, b
 def candidate_count(
     words: dict[tuple[int, ...], set[str]],
 ) -> tuple[int, Counter[str]]:
+    """Count the additional exactly-two-recolour candidates after radius one."""
     total = 0
     distribution: Counter[str] = Counter()
     for word in words:
         conflicts = bad_endpoint_pairs(word)
         for pairs in conflicts:
             if len(pairs) == 0:
-                total += 1
                 distribution["zero-pair-colours"] += 1
             elif len(pairs) == 1:
-                # 10 one-site edits; 1,073 unordered two-site supports, 25
-                # replacement assignments on each.
-                total += 10 + 1073 * 25
+                # Radius one has already covered the 10 one-site edits.
+                total += 1073 * 25
                 distribution["one-pair-colours"] += 1
             elif len(pairs) == 2:
                 # Choose one endpoint and one replacement colour in each pair.
@@ -249,10 +248,56 @@ def candidate_count(
     return total, distribution
 
 
-def search(
+def search_radius_one(
     words: dict[tuple[int, ...], set[str]],
     triples: list[tuple[int, int, int]],
 ) -> tuple[int, Counter[str]]:
+    """Test every append colour and every zero/one old-coordinate recolour."""
+    checked = 0
+    distribution: Counter[str] = Counter()
+    for word, labels in sorted(words.items(), key=lambda item: min(item[1])):
+        if len(word) != N or not is_sum_free(word):
+            raise RuntimeError(f"invalid input word: {sorted(labels)}")
+        single_counts = single_conflict_counts(word, triples)
+        for position in range(1, N + 1):
+            if single_counts[position][word[position - 1]]:
+                raise AssertionError("input word has an old monochromatic triple")
+        conflicts = bad_endpoint_pairs(word)
+        for append_colour in range(K):
+            changes: dict[int, int] = {}
+            checked += 1
+            distribution["zero-recolour"] += 1
+            if endpoint_extension_is_legal(word, conflicts, append_colour, changes):
+                witness = make_witness(word, changes, append_colour)
+                print("WITNESS", sorted(labels), append_colour, changes)
+                print("word", "".join(map(str, witness)))
+                return checked, distribution | Counter({"witness": 1})
+            for position in range(1, N + 1):
+                old = word[position - 1]
+                for replacement in range(K):
+                    if replacement == old:
+                        continue
+                    changes = {position: replacement}
+                    checked += 1
+                    distribution["one-recolour"] += 1
+                    if (
+                        single_counts[position][replacement] == 0
+                        and endpoint_extension_is_legal(
+                            word, conflicts, append_colour, changes
+                        )
+                    ):
+                        witness = make_witness(word, changes, append_colour)
+                        print("WITNESS", sorted(labels), append_colour, changes)
+                        print("word", "".join(map(str, witness)))
+                        return checked, distribution | Counter({"witness": 1})
+    return checked, distribution
+
+
+def search_radius_two(
+    words: dict[tuple[int, ...], set[str]],
+    triples: list[tuple[int, int, int]],
+) -> tuple[int, Counter[str]]:
+    """Test the additional exactly-two-recolour candidates using pair counts."""
     checked = 0
     distribution: Counter[str] = Counter()
     for word, labels in sorted(words.items(), key=lambda item: min(item[1])):
@@ -266,12 +311,7 @@ def search(
 
         for append_colour, pairs in enumerate(conflicts):
             if len(pairs) == 0:
-                checked += 1
-                distribution["zero-recolour"] += 1
-                witness = make_witness(word, {}, append_colour)
-                print("WITNESS", sorted(labels), append_colour, {})
-                print("word", "".join(map(str, witness)))
-                return checked, distribution | Counter({"witness": 1})
+                raise AssertionError("radius-one search should have found this extension")
 
             if len(pairs) > 2:
                 distribution["skipped-more-than-two-pairs"] += 1
@@ -279,25 +319,6 @@ def search(
 
             if len(pairs) == 1:
                 (a, b) = pairs[0]
-                for endpoint in (a, b):
-                    old_endpoint_colour = word[endpoint - 1]
-                    for replacement in range(K):
-                        if replacement == old_endpoint_colour:
-                            continue
-                        one_change = {endpoint: replacement}
-                        checked += 1
-                        distribution["one-recolour"] += 1
-                        if (
-                            single_counts[endpoint][replacement] == 0
-                            and endpoint_extension_is_legal(
-                                word, conflicts, append_colour, one_change
-                            )
-                        ):
-                            witness = make_witness(word, one_change, append_colour)
-                            print("WITNESS", sorted(labels), append_colour, one_change)
-                            print("word", "".join(map(str, witness)))
-                            return checked, distribution | Counter({"witness": 1})
-
                 # Every two-site support meeting {a,b}, with each unordered
                 # support generated once. It has 2*537 - 1 = 1,073 members.
                 supports = set()
@@ -369,13 +390,17 @@ def main() -> None:
     baseline_unique = len({canonical("".join(map(str, word))) for word in words})
     assert baseline_unique == len(words)
     assert all(is_sum_free(word) for word in words)
-    total, distribution = candidate_count(words)
+    one_recolour_total = len(words) * K * (1 + N * (K - 1))
+    radius_two_total, distribution = candidate_count(words)
+    total = one_recolour_total + radius_two_total
     print("evolved_raw_words", raw_count)
     print("evolved_up_to_renaming", evolved_unique)
     print("unique_words_including_McKenna_baselines", len(words))
     print("McKenna_baseline_already_in_evolved_corpus", baseline_present)
     print("append_colours_by_endpoint_conflict_count", dict(sorted(distribution.items())))
-    print("candidate_assignments_in_radius_two", total)
+    print("candidate_assignments_radius_zero_or_one", one_recolour_total)
+    print("additional_candidate_assignments_radius_two", radius_two_total)
+    print("total_candidate_assignments_in_search", total)
     print("hard_candidate_cap", args.max_candidates)
     if args.inventory:
         return
@@ -384,12 +409,25 @@ def main() -> None:
     triples = triples_538()
     if len(triples) != 72_361:
         raise AssertionError(f"unexpected old-triple count: {len(triples)}")
-    checked, result_distribution = search(words, triples)
-    print("candidate_assignments_checked", checked)
-    print("search_outcomes", dict(sorted(result_distribution.items())))
-    if "witness" not in result_distribution:
-        if checked != total:
-            raise AssertionError(f"incomplete enumeration: checked {checked}, expected {total}")
+    checked_one, result_one = search_radius_one(words, triples)
+    print("candidate_assignments_checked_radius_zero_or_one", checked_one)
+    print("radius_zero_or_one_outcomes", dict(sorted(result_one.items())))
+    if "witness" in result_one:
+        return
+    if checked_one != one_recolour_total:
+        raise AssertionError(
+            f"incomplete radius-one enumeration: checked {checked_one}, "
+            f"expected {one_recolour_total}"
+        )
+    checked_two, result_two = search_radius_two(words, triples)
+    print("additional_candidate_assignments_checked_radius_two", checked_two)
+    print("radius_two_outcomes", dict(sorted(result_two.items())))
+    if "witness" not in result_two:
+        if checked_two != radius_two_total:
+            raise AssertionError(
+                f"incomplete radius-two enumeration: checked {checked_two}, "
+                f"expected {radius_two_total}"
+            )
         print("NO_WITNESS_WITH_AT_MOST_TWO_RECOLOURS")
 
 
