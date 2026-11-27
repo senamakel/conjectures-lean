@@ -441,10 +441,10 @@ theorem chosen_three_double_rows_form_triangle
     intro q hq i hi
     have hi' := Finset.mem_filter.mp hi
     rcases hi'.2 with heq | heq
-    · exact Finset.mem_row.mp (by
-        rw [row]; exact Finset.mem_filter.mpr ⟨hi'.1, heq ▸ hleftAdj i hi'.1⟩)
-    · exact Finset.mem_row.mp (by
-        rw [row]; exact Finset.mem_filter.mpr ⟨hi'.1, heq ▸ hrightAdj i hi'.1⟩)
+    · change i ∈ I ∧ G.Adj q i
+      exact ⟨hi'.1, heq ▸ hleftAdj i hi'.1⟩
+    · change i ∈ I ∧ G.Adj q i
+      exact ⟨hi'.1, heq ▸ hrightAdj i hi'.1⟩
   have hselectedEq : ∀ q ∈ S, selected q = row G I q := by
     intro q hq
     apply Finset.eq_of_subset_of_card_le (hselectedSubRow q (hSsub hq))
@@ -454,13 +454,15 @@ theorem chosen_three_double_rows_form_triangle
     intro q hq d hd hqd
     rw [hselectedEq q hq, hselectedEq d hd]
     apply intersecting_pair_rows
-    · exact hrow q (hSsub hq)
-    · exact hrow d (hSsub hd)
+    · rw [← hselectedEq q hq]
+      exact hrowCard q hq
+    · rw [← hselectedEq d hd]
+      exact hrowCard d hd
     · simpa [rowDiff] using hdiff q (hSsub hq) d (hSsub hd) hqd
   obtain ⟨x,y,z,a,b,c,hx,hy,hz,hxy,hxz,hyz,hab,hac,hbc,hxEq,hyEq,hzEq⟩ :=
     three_selected_rows_form_triangle C I S selected hSsub hSCard hrowCard
       hselectedSub hdegree hmeet
-  exact ⟨x,y,z,a,b,c,hx,hy,hz,hxy,hxz,hyz,hab,hac,hbc,hxEq,hyEq,hzEq⟩
+  exact ⟨x,y,z,a,b,c,hSsub hx,hSsub hy,hSsub hz,hxy,hxz,hyz,hab,hac,hbc,hxEq,hyEq,hzEq⟩
 
 end SplitGraphSmallRowsThree
 
