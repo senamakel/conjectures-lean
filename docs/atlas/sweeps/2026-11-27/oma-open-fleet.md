@@ -224,3 +224,20 @@ eliminate 8,045 candidate states with `g ≠ 3`. For `g = 3`,
 the bound `y*z ≤ 63` makes the original square divisibility a
 small exact check. This proves the slice for every possible
 common divisor and larger factor, using only the standard axioms.
+
+[CrystalSharedDualBounds.lean](CrystalSharedDualBounds.lean) uses the
+full integral quotients to strengthen both component divisibilities.
+For a pair `(a,b)` with quotient `p` and Vieta partner `r`, the
+quadratic gives `r+b−3=(a+1)(p−2)`. This removes the factor 16
+from the earlier single-divisor bound. In normalized coordinates,
+`g*x+1` divides `((x+y)*(d+(y−x)*y*(x+2*y)))²` and
+`g*y+1` divides `((x+y)*(d+(y−x)*x*(y+2*x)))²`. Every common
+divisor of these two shifted components divides `y−x`. The
+bounds check at the OMA pin with only the standard axioms.
+
+For `x = 1` and odd `3 ≤ y ≤ 31`, an exact integer screen
+retains nine triples `(y,d,g)` after imposing both divisor
+bounds and the necessary parity, order and coprimality
+constraints. None has a square discriminant. This larger
+range is an exploratory result until the finite certificate
+checks in Lean.
