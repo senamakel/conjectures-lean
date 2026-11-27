@@ -1,26 +1,7 @@
 import Lean.Data.Json
-import Implications.C4PolarityCounterAssignment
-import Implications.C4PolarityEncoderInputs
-import Implications.C4PolarityLexEncoding
+import Implications.C4PolarityCertifiedFormula
 
-open Lean
-open C4PolarityOrderSeven
-open Implications.C4PolarityCounterAssignment Implications.C4PolarityEncoderInputs
-open Implications.C4PolarityEdgeEncoding Implications.C4PolarityLexEncoding
-
-private def survivorClauses : List (List Int) :=
-  (List.finRange 57).flatMap fun i =>
-    let neighbors := (List.finRange 57).filter fun j => decide (i ≠ j ∧ orthogonal i j)
-    (neighbors.sublistsLen (neighbors.length - 5)).reverse.map fun excess =>
-      (deletionId i : Int) :: excess.map fun j => -(deletionId j : Int)
-
-private def deletionVariables : List Nat :=
-  (List.finRange 57).map deletionId
-
-private def instanceClauses (permutations : List (List Nat)) : List (List Int) :=
-  [[1]] ++ numberedCounter 58 16 (deletionVariables.map Int.ofNat) ++ [[969], [-970]] ++
-    edgeFormula orthogonalPairs ++ numberedCounter 1194 34 scoreDimacsInputs ++ [[9082]] ++
-    survivorClauses ++ orbitLexClauses 1 9083 deletionVariables permutations
+open Lean Implications.C4PolarityCertifiedFormula Implications.C4PolarityLexEncoding
 
 /-- Emit the Lean reconstruction of the DIMACS instance. Use the encoder's
 ordered permutation list as input so this check compares clause generation
