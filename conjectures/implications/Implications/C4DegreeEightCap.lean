@@ -155,6 +155,57 @@ theorem degree_seven_neighbors_card_le_one (G : SimpleGraph (Fin 42))
     simpa [hxy] using hsumSubset
   omega
 
+/-- The degree counts in a 138-edge graph whose degrees lie in the window
+from six to eight satisfy the handshake identity. -/
+theorem degree_seven_add_twice_degree_eight
+    (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    (hmin : ∀ v, 6 ≤ G.degree v) (hdeg8 : ∀ v, G.degree v ≤ 8)
+    (he : G.edgeFinset.card = 138) :
+    (Finset.univ.filter fun v => G.degree v = 7).card +
+      2 * (Finset.univ.filter fun v => G.degree v = 8).card = 24 := by
+  classical
+  let D := Finset.univ.filter fun v => G.degree v = 8
+  let E := Finset.univ.filter fun v => G.degree v = 7
+  change E.card + 2 * D.card = 24
+  have hsumDeg : (∑ v : Fin 42, G.degree v) = 276 := by
+    rw [G.sum_degrees_eq_twice_card_edges, he]
+  have hsumExcess : (∑ v : Fin 42, (G.degree v - 6)) = 24 := by
+    have hdecomp : (∑ v : Fin 42, G.degree v) =
+        (∑ v : Fin 42, (G.degree v - 6)) + 252 := by
+      calc
+        _ = ∑ v : Fin 42, ((G.degree v - 6) + 6) := by
+          apply Finset.sum_congr rfl
+          intro v hv
+          exact (Nat.sub_add_cancel (hmin v)).symm
+        _ = _ := by simp [Finset.sum_add_distrib]
+    omega
+  have hclass : (∑ v : Fin 42, (G.degree v - 6)) = E.card + 2 * D.card := by
+    have hterm : ∀ v, G.degree v - 6 =
+        (if G.degree v = 7 then 1 else 0) + (if G.degree v = 8 then 2 else 0) := by
+      intro v
+      have hlow := hmin v
+      have hhigh := hdeg8 v
+      by_cases h7 : G.degree v = 7 <;> by_cases h8 : G.degree v = 8 <;> simp [h7, h8] <;> omega
+    calc
+      _ = ∑ v : Fin 42, ((if G.degree v = 7 then 1 else 0) +
+          (if G.degree v = 8 then 2 else 0)) := by
+        apply Finset.sum_congr rfl
+        intro v hv
+        exact hterm v
+      _ = E.card + 2 * D.card := by
+        rw [Finset.sum_add_distrib]
+        have hseven : (∑ v : Fin 42, if G.degree v = 7 then 1 else 0) = E.card := by
+          simp [E, Finset.sum_ite_mem_eq]
+        have height : (∑ v : Fin 42, if G.degree v = 8 then 2 else 0) = 2 * D.card := by
+          calc
+            _ = ∑ v ∈ D, (2 : ℕ) := by
+              exact (Finset.sum_filter (s := Finset.univ)
+                (fun v : Fin 42 => G.degree v = 8) (fun _ => (2 : ℕ))).symm
+            _ = D.card * 2 := by simp
+            _ = 2 * D.card := Nat.mul_comm _ _
+        rw [hseven, height]
+  omega
+
 /-- The degree handshake identity and the number of degree-seven vertices
 exclude five, six, or seven degree-eight vertices. Combined with the
 neighborhood-union bound, the extremal graph has at most four. -/
@@ -238,45 +289,8 @@ theorem degree_eight_count_le_four_of_extremal_42
         omega
       _ ≤ (Finset.univ \ U).card := Finset.card_le_card houtsideD
       _ = 42 - U.card := by rw [Finset.card_sdiff_of_subset (Finset.subset_univ U)]; simp
-  have hEcount : E.card + 2 * D.card = 24 := by
-    have hsumDeg : (∑ v : Fin 42, G.degree v) = 276 := by
-      rw [G.sum_degrees_eq_twice_card_edges, he]
-    have hsumExcess : (∑ v : Fin 42, (G.degree v - 6)) = 24 := by
-      have hdecomp : (∑ v : Fin 42, G.degree v) =
-          (∑ v : Fin 42, (G.degree v - 6)) + 252 := by
-        calc
-          _ = ∑ v : Fin 42, ((G.degree v - 6) + 6) := by
-            apply Finset.sum_congr rfl
-            intro v hv
-            exact (Nat.sub_add_cancel (hmin v)).symm
-          _ = _ := by simp [Finset.sum_add_distrib]
-      omega
-    have hclass : (∑ v : Fin 42, (G.degree v - 6)) = E.card + 2 * D.card := by
-      have hterm : ∀ v, G.degree v - 6 =
-          (if G.degree v = 7 then 1 else 0) + (if G.degree v = 8 then 2 else 0) := by
-        intro v
-        have hlow := hmin v
-        have hhigh := hdeg8 v
-        by_cases h7 : G.degree v = 7 <;> by_cases h8 : G.degree v = 8 <;> simp [h7, h8] <;> omega
-      calc
-        _ = ∑ v : Fin 42, ((if G.degree v = 7 then 1 else 0) +
-            (if G.degree v = 8 then 2 else 0)) := by
-          apply Finset.sum_congr rfl
-          intro v hv
-          exact hterm v
-        _ = E.card + 2 * D.card := by
-          rw [Finset.sum_add_distrib]
-          have hseven : (∑ v : Fin 42, if G.degree v = 7 then 1 else 0) = E.card := by
-            simp [E, Finset.sum_ite_mem_eq]
-          have height : (∑ v : Fin 42, if G.degree v = 8 then 2 else 0) = 2 * D.card := by
-            calc
-              _ = ∑ v ∈ D, (2 : ℕ) := by
-                exact (Finset.sum_filter (s := Finset.univ)
-                  (fun v : Fin 42 => G.degree v = 8) (fun _ => (2 : ℕ))).symm
-              _ = D.card * 2 := by simp
-              _ = 2 * D.card := Nat.mul_comm _ _
-          rw [hseven, height]
-    omega
+  have hEcount : E.card + 2 * D.card = 24 :=
+    degree_seven_add_twice_degree_eight G hmin hdeg8 he
   have htarget : D.card ≤ 4 := by
     by_contra hgt
     have hkCases : D.card = 5 ∨ D.card = 6 ∨ D.card = 7 := by omega
@@ -298,8 +312,71 @@ theorem degree_eight_count_le_four_of_extremal_42
       omega
   exact hnot htarget
 
+/-- Candidate 138-edge graphs have exactly eighteen plus the degree-eight
+count many deletions leaving 132 edges. The deleted vertices are labelled. -/
+theorem count_extremal_deletions_eq
+    (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    (hDel : ∀ v, C4Extremal42.inducedDeletionCount G v ≤ 132)
+    (he : G.edgeFinset.card = 138)
+    (hC4 : C4VertexExtension.C4Free G) :
+    (Finset.univ.filter fun v => C4Extremal42.inducedDeletionCount G v = 132).card =
+      18 + (Finset.univ.filter fun v => G.degree v = 8).card := by
+  classical
+  let A := Finset.univ.filter fun v => G.degree v = 6
+  let E := Finset.univ.filter fun v => G.degree v = 7
+  let D := Finset.univ.filter fun v => G.degree v = 8
+  have hwindow := C4DegreeBounds.degree_window_of_extremal_42 G hDel he hC4
+  have hcover : (A ∪ E) ∪ D = (Finset.univ : Finset (Fin 42)) := by
+    ext v
+    have h := hwindow v
+    simp [A, E, D]
+    omega
+  have hAE : Disjoint A E := by
+    apply Finset.disjoint_left.mpr
+    intro v ha he
+    simp [A] at ha
+    simp [E] at he
+    omega
+  have hAED : Disjoint (A ∪ E) D := by
+    apply Finset.disjoint_left.mpr
+    intro v hAE hD
+    simp [A, E] at hAE
+    simp [D] at hD
+    omega
+  have hsize : A.card + E.card + D.card = 42 := by
+    rw [← Finset.card_union_of_disjoint hAE, ← Finset.card_union_of_disjoint hAED, hcover]
+    simp
+  have hhandshake : E.card + 2 * D.card = 24 :=
+    degree_seven_add_twice_degree_eight G (fun v => (hwindow v).1)
+      (fun v => (hwindow v).2) he
+  have hA : (Finset.univ.filter fun v => C4Extremal42.inducedDeletionCount G v = 132) = A := by
+    ext v
+    simp only [A, Finset.mem_filter, Finset.mem_univ, true_and]
+    rw [C4Extremal42.inducedDeletionCount_eq, he]
+    omega
+  rw [hA]
+  change A.card = 18 + D.card
+  omega
+
+/-- A candidate 138-edge graph has between eighteen and twenty-two labelled
+vertex deletions leaving an extremal 41-vertex graph. -/
+theorem count_extremal_deletions_bounds
+    (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    (hDel : ∀ v, C4Extremal42.inducedDeletionCount G v ≤ 132)
+    (he : G.edgeFinset.card = 138)
+    (hC4 : C4VertexExtension.C4Free G) :
+    let k := (Finset.univ.filter fun v => C4Extremal42.inducedDeletionCount G v = 132).card
+    18 ≤ k ∧ k ≤ 22 := by
+  dsimp
+  rw [count_extremal_deletions_eq G hDel he hC4]
+  have h := degree_eight_count_le_four_of_extremal_42 G hDel he hC4
+  omega
+
 end C4DegreeEightCap
 
 #print axioms C4DegreeEightCap.degree_eight_count_le_seven
 #print axioms C4DegreeEightCap.degree_eight_count_le_seven_of_extremal_42
 #print axioms C4DegreeEightCap.degree_eight_count_le_four_of_extremal_42
+
+#print axioms C4DegreeEightCap.count_extremal_deletions_eq
+#print axioms C4DegreeEightCap.count_extremal_deletions_bounds

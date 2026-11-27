@@ -24,54 +24,9 @@ theorem degree_seven_count_eq_sixteen
     (he : G.edgeFinset.card = 138)
     (h8 : (Finset.univ.filter fun v => G.degree v = 8).card = 4) :
     (Finset.univ.filter fun v => G.degree v = 7).card = 16 := by
-  classical
-  let D7 := Finset.univ.filter fun v => G.degree v = 7
-  let D8 := Finset.univ.filter fun v => G.degree v = 8
-  have hsumDeg : (∑ v : Fin 42, G.degree v) = 276 := by
-    rw [G.sum_degrees_eq_twice_card_edges, he]
-  have hsumExcess : (∑ v : Fin 42, (G.degree v - 6)) = 24 := by
-    have hdecomp : (∑ v : Fin 42, G.degree v) =
-        (∑ v : Fin 42, (G.degree v - 6)) + 252 := by
-      calc
-        _ = ∑ v : Fin 42, ((G.degree v - 6) + 6) := by
-          apply Finset.sum_congr rfl
-          intro v hv
-          exact (Nat.sub_add_cancel (hmin v)).symm
-        _ = _ := by simp [Finset.sum_add_distrib]
-    omega
-  have hclass : (∑ v : Fin 42, (G.degree v - 6)) = D7.card + 2 * D8.card := by
-    have hterm : ∀ v, G.degree v - 6 =
-        (if G.degree v = 7 then 1 else 0) + (if G.degree v = 8 then 2 else 0) := by
-      intro v
-      have hlo := hmin v
-      have hhi := hmax v
-      by_cases h7 : G.degree v = 7 <;> by_cases h8' : G.degree v = 8 <;>
-        simp [h7, h8'] <;> omega
-    calc
-      _ = ∑ v : Fin 42, ((if G.degree v = 7 then 1 else 0) +
-          (if G.degree v = 8 then 2 else 0)) := by
-        apply Finset.sum_congr rfl
-        intro v hv
-        exact hterm v
-      _ = D7.card + 2 * D8.card := by
-        rw [Finset.sum_add_distrib]
-        have h7 : (∑ v : Fin 42, if G.degree v = 7 then 1 else 0) = D7.card := by
-          simp [D7]
-        have h8' : (∑ v : Fin 42, if G.degree v = 8 then 2 else 0) = 2 * D8.card := by
-          calc
-            _ = (Finset.univ.filter fun v : Fin 42 => G.degree v = 8).sum (fun _ => 2) := by
-              change _ = Finset.sum
-                (Finset.univ.filter (fun v : Fin 42 => G.degree v = 8)) (fun _ => (2 : ℕ))
-              exact (Finset.sum_filter (s := Finset.univ)
-                (fun v : Fin 42 => G.degree v = 8) (fun _ => (2 : ℕ))).symm
-            _ = D8.card * 2 := by simp [D8]
-            _ = 2 * D8.card := Nat.mul_comm _ _
-        rw [h7, h8']
-  have h8' : D8.card = 4 := by simpa [D8] using h8
-  rw [hclass, h8'] at hsumExcess
-  change D7.card = 16
+  have h := degree_seven_add_twice_degree_eight G hmin hmax he
+  rw [h8] at h
   omega
-
 
 /-- With four degree-eight vertices in the extremal degree window, every
 degree-eight vertex has exactly one degree-seven neighbor. -/
