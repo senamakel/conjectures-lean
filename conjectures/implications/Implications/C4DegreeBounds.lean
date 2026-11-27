@@ -21,6 +21,10 @@ variable (G : SimpleGraph V) [DecidableRel G.Adj]
 
 private def outerNeighbors (u v : V) : Finset V := (G.neighborFinset u).erase v
 
+/-- Neighbors of `u` which are also neighbors of the center `v`. -/
+private def innerNeighbors (u v : V) : Finset V :=
+  (G.neighborFinset u).filter fun w => w ∈ G.neighborFinset v
+
 theorem outerNeighbors_disjoint {v u w : V}
     (hC4 : C4VertexExtension.C4Free G)
     (hu : u ∈ G.neighborFinset v) (hw : w ∈ G.neighborFinset v) (huw : u ≠ w) :
@@ -39,6 +43,36 @@ theorem outerNeighbors_disjoint {v u w : V}
   have hwv : G.Adj w v := G.symm.symm v w (by simpa using hw)
   have hnot := hC4 (x := u) (y := w) (z := v) (w := z) huw hzw'.1.symm huv hwv
   exact hnot ⟨hzu'.2, hzw'.2⟩
+
+/-- The C4 condition forces the graph induced on the neighborhood of a vertex
+to have maximum degree at most one: each neighbor has at most one neighbor
+inside that neighborhood. -/
+theorem innerNeighbors_card_le_one {v u : V}
+    (hC4 : C4VertexExtension.C4Free G)
+    (hu : u ∈ G.neighborFinset v) :
+    (innerNeighbors G u v).card ≤ 1 := by
+  classical
+  apply Finset.card_le_one.mpr
+  intro w hw z hz
+  have hw' : w ∈ G.neighborFinset u ∧ w ∈ G.neighborFinset v :=
+    Finset.mem_filter.mp hw
+  have hz' : z ∈ G.neighborFinset u ∧ z ∈ G.neighborFinset v :=
+    Finset.mem_filter.mp hz
+  by_contra hwz
+  have hwu : G.Adj u w := by simpa using hw'.1
+  have hvw : G.Adj v w := by
+    have : G.Adj w v := by simpa using hw'.2
+    exact G.symm.symm w v this
+  have hzu : G.Adj u z := by simpa using hz'.1
+  have hvz : G.Adj v z := by
+    have : G.Adj z v := by simpa using hz'.2
+    exact G.symm.symm z v this
+  have huv : u ≠ v := by
+    intro huv
+    subst v
+    exact G.neighborFinset.not_mem_self hu
+  have hnot := hC4 (x := v) (y := u) (z := w) (w := z) huv hwz hvw hwu
+  exact hnot ⟨hvz, hzu⟩
 
 theorem sum_outerNeighbors_card_le (v : V)
     (hC4 : C4VertexExtension.C4Free G) :
