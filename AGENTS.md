@@ -23,6 +23,29 @@ pinned checker and the claim is still live, push the proof branch and open the
 upstream PR promptly. Submit each checked result as it is ready. Keep the exact
 statement, novelty checks, attribution and axiom audit in the loop.
 
+## Registry reductions for large formalizations
+
+For an explicitly authorized port of a published proof, use the published development
+as a blueprint and credit its authors. When its library cannot pass the registry's
+import and file-size rules, split the exact target into smaller Lean obligations.
+Prove the parent implication at the registry pin using the current reduction protocol.
+Give each obligation an explicit statement, a source, and a dependency path to the
+parent. Check each reduction and leaf with `tools/oma.sh check <id>` under the current
+import, size and axiom rules. Use the registry-generated interfaces for merged
+reductions. Record the outstanding leaves and count the parent as closed only once
+the registry accepts all required steps. Check the license of any copied source.
+
+For `PoincareConjecture.poincare_conjecture`, start by separating the passage
+from homotopy equivalence with the standard three-sphere to the hypotheses of the
+compact topological endpoint from the proof of that endpoint. Look for an existing
+simply-connectedness transfer, derive compactness via nonvanishing top homology
+and vanishing for connected noncompact three-manifolds, and derive second
+countability from a finite chart cover. Treat these as candidate obligations until
+their statements and proofs check. Split the endpoint along the published proof's
+actual prerequisites, including Moise smoothing and the smooth three-dimensional
+theorem. Break those further where an obligation exceeds the checker limits.
+See the [port audit](docs/atlas/sweeps/2026-11-27/poincare-registry-port.md).
+
 The tracker below describes the existing Lean packages and their proof standards.
 For those packages, update the tracker and [results inventory](RESULTS.md) when the
 verified status changes.
