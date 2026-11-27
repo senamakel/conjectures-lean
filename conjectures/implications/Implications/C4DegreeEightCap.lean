@@ -227,13 +227,13 @@ theorem degree_eight_count_le_four_of_extremal_42
   have hcap : D.card + (E \ U).card ≤ 42 - U.card := by
     calc
       _ = (D ∪ (E \ U)).card := by
-        rw [Finset.card_union_of_disjoint]
-        · rfl
-        · apply Finset.disjoint_left.mpr
-          intro x hxD hxE
-          have hx8 := (Finset.mem_filter.mp hxD).2
-          have hx7 := (Finset.mem_filter.mp (Finset.mem_sdiff.mp hxE).1).2
-          omega
+        symm
+        apply Finset.card_union_of_disjoint
+        apply Finset.disjoint_left.mpr
+        intro x hxD hxE
+        have hx8 := (Finset.mem_filter.mp hxD).2
+        have hx7 := (Finset.mem_filter.mp (Finset.mem_sdiff.mp hxE).1).2
+        omega
       _ ≤ (Finset.univ \ U).card := Finset.card_le_card houtsideD
       _ = 42 - U.card := by rw [Finset.card_sdiff_of_subset (Finset.subset_univ U)]; simp
   have hEcount : E.card + 2 * D.card = 24 := by
@@ -263,25 +263,29 @@ theorem degree_eight_count_le_four_of_extremal_42
           apply Finset.sum_congr rfl
           intro v hv
           exact hterm v
-        _ = E.card + 2 * D.card := by simp [E, D, Finset.sum_add_distrib]
+        _ = E.card + 2 * D.card := by
+          simp [E, D, Finset.sum_add_distrib, Finset.sum_ite_mem_eq]
     omega
   have htarget : D.card ≤ 4 := by
     by_contra hgt
     have hkCases : D.card = 5 ∨ D.card = 6 ∨ D.card = 7 := by omega
     rcases hkCases with hk | hk | hk
     · have hE : E.card = 14 := by omega
-      have hlowE : 9 ≤ (E \ U).card := by rw [hEoutside, hWbound]; omega
-      have hupper : (E \ U).card ≤ 2 := by rw [hcap]; rw [hk] at hUlower; norm_num at hUlower ⊢; omega
+      have hlowE : 9 ≤ (E \ U).card := by omega
+      rw [hk] at hUnionBound
+      norm_num at hUnionBound
       omega
     · have hE : E.card = 12 := by omega
-      have hlowE : 6 ≤ (E \ U).card := by rw [hEoutside, hWbound]; omega
-      have hupper : (E \ U).card ≤ 3 := by rw [hcap]; rw [hk] at hUlower; norm_num at hUlower ⊢; omega
+      have hlowE : 6 ≤ (E \ U).card := by omega
+      rw [hk] at hUnionBound
+      norm_num at hUnionBound
       omega
     · have hE : E.card = 10 := by omega
-      have hlowE : 3 ≤ (E \ U).card := by rw [hEoutside, hWbound]; omega
-      have hupper : (E \ U).card ≤ 3 := by rw [hcap]; rw [hk] at hUlower; norm_num at hUlower ⊢; omega
+      have hlowE : 3 ≤ (E \ U).card := by omega
+      rw [hk] at hUnionBound
+      norm_num at hUnionBound
       omega
-  simpa [D] using htarget
+  exact htarget
 
 end C4DegreeEightCap
 
