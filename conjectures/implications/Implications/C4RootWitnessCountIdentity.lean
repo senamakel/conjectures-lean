@@ -247,7 +247,6 @@ theorem outer_edge_count_from_local_counts
         simp [Finset.sum_add_distrib, Nat.mul_comm]
       _ = 36 + ∑ x ∈ S, (G.neighborFinset x ∩ O).card := by
         rw [hOcard, cross_neighbor_sum_comm]
-        norm_num
       _ = 36 + 2 * inducedEdgeCount G S := by
         rw [hsumS]
   have hfinal := within_neighbor_sum_eq G O
