@@ -90,7 +90,7 @@ class Cnf:
                 f.write(" 0\n")
 
 
-def build() -> tuple[Cnf, dict[tuple[int, int], int]]:
+def build(deduplicate_c4: bool = False) -> tuple[Cnf, dict[tuple[int, int], int]]:
     cnf = Cnf()
     edges: dict[tuple[int, int], int] = {}
     vertices = range(1, 42)
@@ -105,6 +105,10 @@ def build() -> tuple[Cnf, dict[tuple[int, int], int]]:
     for u, v in combinations(vertices, 2):
         others = [w for w in vertices if w != u and w != v]
         for x, y in combinations(others, 2):
+            # The same four-cycle clause is also generated with {x,y} as the
+            # distinguished pair. Exactly one orientation has u < x.
+            if deduplicate_c4 and u > x:
+                continue
             cnf.clause(-edge(u, x), -edge(v, x), -edge(u, y), -edge(v, y))
 
     # C4s through root 0: two root-neighbors cannot share any other neighbor.
@@ -127,11 +131,8 @@ def build() -> tuple[Cnf, dict[tuple[int, int], int]]:
         thresholds = cnf.equivalent_atleast(incident, 9)
         degree_thresholds[v] = thresholds
         # 1..6 have one fixed root edge, all others have none.
-        low = 6
         high_plus_one = 9
-        if v <= 6:
-            low = 6
-        cnf.clause(thresholds[low])
+        cnf.clause(thresholds[6])
         cnf.clause(-thresholds[high_plus_one])
         degree_eight.append(thresholds[8])
 
@@ -154,8 +155,10 @@ def build() -> tuple[Cnf, dict[tuple[int, int], int]]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("output", type=Path, help="DIMACS path (keep generated data under .lake/)")
+    parser.add_argument("--deduplicate-c4", action="store_true",
+                        help="emit one copy of each opposite-pair C4 clause")
     args = parser.parse_args()
-    cnf, _ = build()
+    cnf, _ = build(args.deduplicate_c4)
     cnf.emit(args.output)
     print(f"wrote {args.output}: {cnf.nvars} variables, {len(cnf.clauses)} clauses")
 

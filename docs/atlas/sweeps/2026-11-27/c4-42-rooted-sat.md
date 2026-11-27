@@ -39,3 +39,23 @@ statement. Label-fixing is complete because every candidate has a degree-six roo
 its neighbors can be relabeled 1..6 and all other vertices 7..41. Sorting degrees
 within either block is complete because arbitrary permutations within each block
 preserve the root-neighbor set.
+
+## First capped run
+
+The first DIMACS was emitted before the opposite-pair deduplication described
+below. It had 114,586 variables, 1,060,462 clauses, and SHA-256
+`72fd863a9e29ca2422c129f2e885bba2a7343c9fb2a47dc482764aeae8b985a5`.
+The encoder took 0.80 s wall time and 219,864 KB peak RSS. CaDiCaL 2.1.2 hit its
+120 s real-time limit after 113.99 s process CPU, 107,474 conflicts and
+651,354,304 propagations; result `UNKNOWN`, exit 0. It wrote a 103 MB partial
+LRAT trace, which is not a proof and was not replayed. Thus the first screen
+neither establishes UNSAT nor yields a model.
+
+The original protocol called this a CPU cap, but CaDiCaL's `-t` option is a
+real-time limit. The observed CPU use stayed below 120 s. The next precise
+option, if separately authorized, is to regenerate the same formula after
+deduplicating the C4 clauses: swapping the two opposite vertex-pairs emits the
+same clause twice, so requiring the first pair's lower endpoint to be smaller
+retains exactly one copy and halves that block from 671,580 to 335,790 clauses.
+This leaves all constraints and symmetries unchanged. Do not treat this as a
+second run under the first screen's stop condition.
