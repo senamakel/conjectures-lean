@@ -15,6 +15,11 @@ open Implications.WilfPatternSwap WilfMarked
 /-- Reverse the positions of a length-eight pattern. -/
 def reversePattern (p : Fin 8 → Fin 8) : Fin 8 → Fin 8 := p ∘ Fin.revPerm
 
+private theorem reversePattern_involutive (p : Fin 8 → Fin 8) :
+    reversePattern (reversePattern p) = p := by
+  funext i
+  simp [reversePattern, Fin.revPerm]
+
 /-- Reflect valid length-eight starts, fixing the invalid tail of `Fin n`. -/
 def reverseStartFun {n : ℕ} (s : Fin n) : Fin n :=
   if hs : s.val + 7 < n then ⟨n - 8 - s.val, by omega⟩ else s
@@ -207,7 +212,8 @@ theorem exactOccurrenceCount_eq_reverse_of_eq (n : ℕ)
       WilfCounts.exactCount (occurrenceSet (reversePattern q)) marks := by
   rw [exactOccurrenceCount_eq_reverse n (reversePattern p) marks,
     exactOccurrenceCount_eq_reverse n (reversePattern q) marks]
-  simpa [reversePattern] using h (marks.map (reverseStartEquiv n).toEmbedding)
+  rw [reversePattern_involutive, reversePattern_involutive]
+  exact h (marks.map (reverseStartEquiv n).toEmbedding)
 
 theorem exactOccurrenceCount_eq_reverse_sigma_tau (n : ℕ) (marks : Finset (Fin n)) :
     WilfCounts.exactCount (occurrenceSet (reversePattern sigma)) marks =
