@@ -25,7 +25,7 @@ def cnfValue (a : Nat → Bool) (clauses : List (List Int)) : Bool :=
   clauses.all (clauseValue a)
 
 private def pos (v : Nat) : Int := Int.ofNat v
-private def neg (v : Nat) : Int := -(Int.ofNat v)
+private def neg (v : Nat) : Int := Int.negOfNat v
 
 @[simp] private theorem literalValue_pos (a : Nat → Bool) (v : Nat) (_hv : 0 < v) :
     literalValue a (pos v) = a v := by
@@ -33,8 +33,7 @@ private def neg (v : Nat) : Int := -(Int.ofNat v)
 
 @[simp] private theorem literalValue_neg (a : Nat → Bool) (v : Nat) (hv : 0 < v) :
     literalValue a (neg v) = !a v := by
-  have hneg : neg v = Int.negOfNat v := by simp [neg, Int.negOfNat_eq]
-  rw [hneg]
+  change literalValue a (Int.negOfNat v) = !a v
   cases v with
   | zero => omega
   | succ n => simp [literalValue, Int.negOfNat]
@@ -115,8 +114,7 @@ theorem lexFreshIds_ge (next : Nat) (left right : List Nat) :
             simp [lexFreshIds, hbeq] at hv
             rcases hv with rfl | hv
             · exact Nat.le_refl _
-            · have hge := lexFreshIds_ge (next + 1) xs ys v hv
-              omega
+            · exact le_trans (Nat.le_succ _) (ih (next + 1) ys v hv)
 
 /-- The lex allocator never reuses an auxiliary DIMACS variable. -/
 theorem lexFreshIds_nodup (next : Nat) (left right : List Nat) :
@@ -130,7 +128,12 @@ theorem lexFreshIds_nodup (next : Nat) (left right : List Nat) :
           by_cases hxy : x = y
           · simpa [lexFreshIds, hxy] using ih next ys
           · have hbeq : (x == y) = false := by simp [hxy]
-            simp [lexFreshIds, hbeq]
+            simp only [lexFreshIds, hbeq, Bool.false_eq_true, ↓reduceIte]
+            constructor
+            · intro hmem
+              have hge := ih (next + 1) ys next hmem
+              omega
+            · exact ih (next + 1) ys
 
 /-- Identical DIMACS variables have the same assigned bit, which justifies
 skipping that position without an auxiliary equality gate. -/
@@ -147,7 +150,7 @@ theorem lexStep_auxiliary_assignment_satisfies (a : Nat → Bool)
     (hp : a pref = true) (hx : a x = true) (hy : a y = false)
     (hs : a same = (a pref && (a x == a y))) :
     cnfValue a (lexStepClauses pref x y same) = true := by
-  simp [cnfValue, clauseValue, lexStepClauses, hp, hx, hy, hs]
+  simp [cnfValue, clauseValue, lexStepClauses, literalValue, hp, hx, hy, hs]
 
 end Implications.C4PolarityLexEncoding
 
