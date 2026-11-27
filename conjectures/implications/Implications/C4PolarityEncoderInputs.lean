@@ -49,9 +49,10 @@ private theorem countP_map_indicator {α : Type*} (l : List α) (P : α → Prop
   rw [List.countP_map]
   change List.countP (fun x => decide (P x)) l = _
   rw [List.countP_eq_length_filter]
-  rfl
 
 /-- The pair indicators count exactly the edges induced by the deletion set. -/
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
 theorem orthogonal_pair_score_count (D : Finset (Fin 57)) :
     (orthogonalPairs.map (fun p => decide (p.1 ∈ D ∧ p.2 ∈ D))).countP id =
       inducedEdgeCount graph D := by
@@ -111,17 +112,21 @@ theorem absolute_score_count (D : Finset (Fin 57)) :
   rw [countP_map_indicator]
   have hnodup := (List.nodup_finRange 57).filter
     (fun i : Fin 57 => decide (orthogonal i i))
+  have hnodupD := hnodup.filter (fun i => decide (i ∈ D))
+  have hlen : (absoluteIndices.filter fun i => decide (i ∈ D)).length =
+      (absoluteIndices.filter fun i => decide (i ∈ D)).toFinset.card :=
+    (List.toFinset_card_of_nodup hnodupD).symm
   have hfset : (absoluteIndices.filter fun i => decide (i ∈ D)).toFinset =
       D ∩ absolute := by
     ext i
     simp [absoluteIndices, absolute, List.toFinset_filter, List.toFinset_finRange]
-  rw [← List.toFinset_card_of_nodup (hnodup.filter fun i => decide (i ∈ D)), hfset]
+  rw [hlen, hfset]
 
 /-- The Boolean score list has exactly the deletion score used in the edge
 count reduction: induced deleted edges plus deleted absolute points. -/
 theorem scoreInputs_count_true (D : Finset (Fin 57)) :
     (scoreInputs D).countP id = inducedEdgeCount graph D + (D ∩ absolute).card := by
-  rw [scoreInputs, List.countP_append, List.countP_map]
+  simp only [scoreInputs, List.countP_append, List.countP_map, Function.comp_apply]
   rw [absolute_score_count, orthogonal_pair_score_count]
 
 end Implications.C4PolarityEncoderInputs
