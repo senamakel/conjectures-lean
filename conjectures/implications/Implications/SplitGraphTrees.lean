@@ -23,6 +23,16 @@ noncomputable def row (G : SimpleGraph V) (I : Finset V) (c : V) : Finset V := b
 noncomputable def rowDiff (G : SimpleGraph V) (I : Finset V) (c d : V) : Finset V :=
   (row G I c \ row G I d) ∪ (row G I d \ row G I c)
 
+/-- A vertex in the row difference belongs to the independent side and is adjacent
+to exactly one of the two clique vertices. -/
+theorem mem_rowDiff_iff (G : SimpleGraph V) (I : Finset V) (c d x : V) :
+    x ∈ rowDiff G I c d ↔ x ∈ I ∧
+      (G.Adj c x ∧ ¬ G.Adj d x ∨ G.Adj d x ∧ ¬ G.Adj c x) := by
+  classical
+  simp only [rowDiff, Finset.mem_union, Finset.mem_sdiff, row,
+    Finset.mem_filter]
+  tauto
+
 /-- A Mathlib-level formulation of the bound on the largest induced tree. -/
 def inducedTreeBound (G : SimpleGraph V) (k : ℕ) : Prop :=
   ∀ s : Finset V, (G.induce (s : Set V)).IsTree → s.card ≤ k + 2
