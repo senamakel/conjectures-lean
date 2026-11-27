@@ -1,0 +1,3 @@
+[submodule "open-math-agents"]
+	path = open-math-agents
+	url = https://github.com/GuillaumeBAUD-coder/open-math-agents.git
