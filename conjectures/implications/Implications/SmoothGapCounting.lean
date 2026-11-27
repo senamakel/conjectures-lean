@@ -643,7 +643,7 @@ private theorem eventually_twoHitGapCount_tail_tendsto_zero :
       omega
     exact tendsto_natCast_atTop_atTop.comp hnat
   have hlogsmall :=
-    (isLittleO_log_rpow_atTop (by norm_num : (0 : ℝ) < 1 / 4)).tendsto' atTop
+    (isLittleO_log_rpow_atTop (by norm_num : (0 : ℝ) < 1 / 4)).tendsto_div_nhds_zero
   have hlogsmall' : Tendsto (fun n : ℕ =>
       Real.log (primeAt n : ℝ) / (primeAt n : ℝ) ^ (1 / 4 : ℝ))
       atTop (nhds 0) := by
@@ -722,10 +722,10 @@ theorem twoHitGapCount_proportion_tendsto_zero :
           have hp := Nat.add_two_le_nth_prime n
           change b ≤ Nat.nth Nat.Prime n
           omega)))
-    simpa using (tendsto_const_nhds.div_atTop hll).const_mul 64
+    convert (tendsto_const_nhds.div_atTop hll).const_mul 64 using 1 <;>
+      simp [div_eq_mul_inv, mul_comm]
   have hsum := hfirst.add eventually_twoHitGapCount_tail_tendsto_zero
-  filter_upwards [eventually_twoHitGapCount_bound] with n hn
-  exact squeeze_zero hsum (by
+  exact squeeze_zero tendsto_const_nhds hsum (by
     filter_upwards [eventually_twoHitGapCount_bound] with n hn
     exact ⟨by positivity, hn⟩)
 
