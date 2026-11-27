@@ -36,11 +36,10 @@ theorem smoothNumbersUpTo_card_le_rankin (X Y : ℕ) (s : ℝ) (hX : 0 < X)
     ⟨(fun n : {n : ℕ // n ∈ X.smoothNumbersUpTo Y} =>
       (⟨n.val, (Nat.mem_smoothNumbersUpTo.mp n.property).2⟩ : Y.smoothNumbers)), by
       intro a b h
-      apply Subtype.ext
-      exact congrArg Subtype.val h⟩
+      exact Subtype.ext (congrArg Subtype.val h)⟩
   let T := S.attach.map e
   have hsum_map : (∑ m ∈ T, f m) = ∑ n ∈ S.attach, f (e n) := by
-    simp [T, Finset.sum_map]
+    rw [Finset.sum_map]
   have hsum_le : (∑ m ∈ T, f m) ≤ ∏ p ∈ Y.primesBelow, (1 - f p)⁻¹ := by
     calc
       (∑ m ∈ T, f m) ≤ ∑' m : Y.smoothNumbers, f m := hf.sum_le_tsum T (by intro m hm; exact hf_nonneg m)
@@ -54,11 +53,14 @@ theorem smoothNumbersUpTo_card_le_rankin (X Y : ℕ) (s : ℝ) (hX : 0 < X)
     have hpow : (n.val : ℝ) ^ s ≤ (X : ℝ) ^ s :=
       Real.rpow_le_rpow (by positivity) hnX hs.le
     have hden : 0 < (n.val : ℝ) ^ s := Real.rpow_pos_of_pos hn0R s
-    have hratio : 1 ≤ (X : ℝ) ^ s / (n.val : ℝ) ^ s := (le_div_iff₀ hden).2 hpow
+    have hratio : 1 ≤ (X : ℝ) ^ s / (n.val : ℝ) ^ s := by
+      apply (le_div_iff₀ hden).2
+      simpa using hpow
     calc
       1 ≤ (X : ℝ) ^ s / (n.val : ℝ) ^ s := hratio
       _ = (X : ℝ) ^ s * f (e n) := by
-        dsimp [f, rankinWeight, e]
+        change (X : ℝ) ^ s / (n.val : ℝ) ^ s =
+          (X : ℝ) ^ s * ((n.val : ℝ) ^ (-s))
         rw [div_eq_mul_inv, ← Real.rpow_neg (by positivity : 0 ≤ (n.val : ℝ)) s]
   have hcard : (S.card : ℝ) ≤ (X : ℝ) ^ s * ∑ m ∈ T, f m := by
     calc
