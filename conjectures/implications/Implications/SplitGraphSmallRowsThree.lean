@@ -73,11 +73,11 @@ theorem hamiltonian_of_prefix_and_remaining_chain
       exact hrestLastC x hx
   apply hamiltonian_of_list G (base ++ tail) (by simpa [base] using hne)
   · rw [List.nodup_append']
-    rw [List.disjoint_left]
-    intro x hx hy
-    rcases List.mem_append.mp hx with hx | hx
-    · exact hbaseTailDisjoint x (List.mem_append_left _ hx) hy
-    · exact hbaseTailDisjoint x (List.mem_append_right _ hx) hy
+    exact List.disjoint_left.mpr (by
+      intro x hx hy
+      rcases List.mem_append.mp hx with hx | hx
+      · exact hbaseTailDisjoint x (List.mem_append_left _ hx) hy
+      · exact hbaseTailDisjoint x (List.mem_append_right _ hx) hy)
   · rw [List.isChain_append]
     refine ⟨hbaseChain, ?_, ?_⟩
     · rw [List.isChain_iff_forall_rel_of_append_cons_cons]
