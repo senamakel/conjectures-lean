@@ -79,14 +79,14 @@ theorem eulerCost_div_rootScale_tendsto_zero :
         1 / L ^ (1 / 4 : ℝ) := by
       rw [Real.sqrt_eq_rpow]
       field_simp
-      rw [← Real.rpow_add hLpos]
+      rw [← Real.rpow_mul_natCast hLpos.le (1 / 4 : ℝ) 2]
       norm_num
     have hlogratio : Real.log L / Real.sqrt (Real.log L) =
         Real.log L ^ (1 / 2 : ℝ) := by
       rw [Real.sqrt_eq_rpow]
-      have hsq := Real.sq_sqrt hlogpos.le
       field_simp
-      rw [Real.sq_sqrt hlogpos.le]
+      rw [← Real.rpow_mul_natCast hlogpos.le (1 / 2 : ℝ) 2]
+      norm_num
     rw [hsqrt]
     calc
       _ = (L ^ (1 / 4 : ℝ) / Real.sqrt L) *
