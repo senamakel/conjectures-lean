@@ -10,18 +10,6 @@ open SplitGraphTrees
 
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
-private theorem nodup_of_all_distinct (l : List V)
-    (h : ∀ p ∈ l, ∀ q ∈ l, p ≠ q) : l.Nodup := by
-  induction l with
-  | nil => simp
-  | cons a l ih =>
-    simp only [List.nodup_cons]
-    refine ⟨?_, ih ?_⟩
-    · intro ha
-      exact h a (by simp) a (by simp) rfl
-    · intro p hp q hq
-      exact h p (by simp [hp]) q (by simp [hq])
-
 private theorem clique_list_chain (G : SimpleGraph V) (C : Finset V)
     (hC : G.IsClique (C : Set V)) (l : List V) (hnodup : l.Nodup)
     (hsub : ∀ x ∈ l, x ∈ C) : l.IsChain G.Adj := by
@@ -63,9 +51,8 @@ private theorem hamiltonian_of_core_with_clique_tail
     (hpathNodup : (core ++ [u] ++ spare).Nodup)
     (htailNodup : ([u] ++ spare).Nodup)
     (hcoreChain : core.IsChain G.Adj) (hcoreLast : core.getLast? = some i)
-    (hiI : i ∈ I) (hcoreI : ∀ v ∈ I, v ∈ core)
-    (hu : u ∈ C) (hattach : G.Adj i u)
-    (hspareNodup : spare.Nodup) (hspareC : ∀ v ∈ spare, v ∈ C)
+    (hcoreI : ∀ v ∈ I, v ∈ core) (hu : u ∈ C) (hattach : G.Adj i u)
+    (hspareC : ∀ v ∈ spare, v ∈ C)
     (hcoverC : ∀ v ∈ C, v ∈ core ∨ v = u ∨ v ∈ spare) :
     ∃ (v w : V) (p : G.Walk v w), p.IsHamiltonian := by
   classical
@@ -201,3 +188,5 @@ theorem core_path_ending_at_each_independent
         simp [hI, Finset.mem_insert, Finset.mem_singleton, or_comm, or_left_comm, or_assoc]
 
 end SplitGraphOneOutsiderDifferent
+
+#print axioms SplitGraphOneOutsiderDifferent.core_path_ending_at_each_independent
