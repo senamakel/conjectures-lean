@@ -325,7 +325,7 @@ stop one that is running on it. A Lean version of a known proof is a formalisati
 this workspace is for. On 2026-11-26 four provers were stopped for this reason (further Cramér,
 Schinzel, abc and Berge–Fulkerson consequences); their partial branches (`impl-cramer-2`,
 `impl-schinzel-2`, `impl-abc-3`, `impl-combinatorics`) are unmerged and stay that way unless the
-owner asks. The implications already merged stay; the table in `README.md` marks nothing as new.
+owner asks. The implications already merged stay; the table in `RESULTS.md` marks nothing as new.
 
 Every edge in the atlas carries a `novelty` verdict (`docs/atlas/README.md`), and a prover is
 started only on an edge whose verdict is `not-found` or `asserted-unproved`.
@@ -976,7 +976,7 @@ The role is `counterexample-hunter` (`.claude/agents/`). Scripts of each sweep a
 - [ ] Erdős 855 (the form eventual in both `x` and `y`) does not follow from one tuple: it needs dense
       admissible tuples of every large width (the Hensley–Richards sieve). Sized L in
       `docs/atlas/sweeps/2026-11-26/disproof-erdos.md`; not started
-- [x] Statements copied word for word from formal-conjectures `9097e2f`; the table is in the root `README.md`
+- [x] Statements copied word for word from formal-conjectures `9097e2f`; the table is in the root `RESULTS.md`
 - [ ] `scripts/erdos142-discharge/` (the link to openai/math's `manuscriptQuantitativeDensityTheorem`) has not been typechecked
 - [ ] Some modules define copied names in root namespaces (`Nat.Full`, `Set.IsAPOfLength…`, `ABC`, `Erdos936`); move them
       under `Implications.` before a second module copies the same definition

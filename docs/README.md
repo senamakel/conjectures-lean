@@ -2,6 +2,7 @@
 
 | File | Content |
 | :--- | :--- |
+| [ATTACK.md](ATTACK.md) | Open Math Agents discovery, prior work, Lean verification, and handoff |
 | [`FURTHER_PROJECTS.md`](FURTHER_PROJECTS.md) | the 11 folders beyond the 17 headline results: dependencies, side projects, wound down |
 | [`ATTEMPTS.md`](ATTEMPTS.md) | problems that were attempted or scoped and never became a project |
 | [`METHOD.md`](METHOD.md) | how targets are chosen and how every project was built: connecting existing results, fixed statements, RH as an argument, analysis plus verified computation |
