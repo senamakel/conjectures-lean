@@ -193,17 +193,18 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
     sorry
 
   have hpath_chain : pathList.IsChain G.Adj := by
-    rw [pathList, List.isChain_append]
+    change (base ++ unused.toList).IsChain G.Adj
+    rw [List.isChain_append]
     refine ⟨hbase_chain, ?_, ?_⟩
     · exact by
         apply clique_list_chain G C hC unused.toList
         exact unused.nodup_toList
         intro c hc
-        exact (Finset.mem_sdiff.mp (List.mem_toFinset.mp hc)).1
+        exact (Finset.mem_sdiff.mp (Finset.mem_toList.mp hc)).1
     · intro x hx y hy
       have hxC := hbase_last_C x hx
       have hyC : y ∈ C := by
-        exact (Finset.mem_sdiff.mp (List.mem_toFinset.mp hy)).1
+        exact (Finset.mem_sdiff.mp (Finset.mem_toList.mp hy)).1
       have hxy : x ≠ y := by
         intro he
         exact hbase_unused x (List.mem_of_mem_getLast? hx) (he ▸ List.mem_of_mem_head? hy)
@@ -218,7 +219,7 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
     rcases hv with hvC | hvI
     · by_cases hvUsed : v ∈ used
       · obtain ⟨i, hi, hvi⟩ := Finset.mem_biUnion.mp hvUsed
-        have hiList : i ∈ I.toList := List.mem_toList.mpr hi
+        have hiList : i ∈ I.toList := Finset.mem_toList.mpr hi
         have hvmemBlock : v ∈ block i := by
           simp [block] at hvi ⊢
           rcases hvi with h | h
@@ -226,14 +227,16 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
           · exact Or.inr (Or.inr h)
         exact List.mem_append_left _ (List.mem_flatMap.mpr ⟨i, hiList, hvmemBlock⟩)
       · have hvUnused : v ∈ unused := Finset.mem_sdiff.mpr ⟨hvC, hvUsed⟩
-        exact List.mem_append_right _ (List.mem_toList.mpr hvUnused)
+        exact List.mem_append_right _ (Finset.mem_toList.mpr hvUnused)
     · exact List.mem_append_left _ (List.mem_flatMap.mpr
-        ⟨v, List.mem_toList.mpr hvI, by simp [block]⟩)
+        ⟨v, Finset.mem_toList.mpr hvI, by simp [block]⟩)
 
   have hne : pathList ≠ [] := by
     intro hnil
     obtain ⟨v⟩ := huniv
-    exact (List.not_mem_nil v) (by rw [← hnil]; exact hcover v)
+    have hvPath := hcover v
+    rw [hnil] at hvPath
+    simp at hvPath
   exact hamiltonian_of_list G pathList hne hpath_nodup hpath_chain hcover
 
 end SplitGraphSmallRowsPath
