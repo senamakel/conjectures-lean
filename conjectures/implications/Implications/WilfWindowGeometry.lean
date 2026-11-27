@@ -44,10 +44,9 @@ theorem lifted_windows_pairwise_disjoint {n : ℕ} (marks shifts : Finset ℕ)
     (hsep : SeparatedBy marks shifts)
     (htranslate : ∀ d ∈ shifts, ∀ i j : Fin 8,
       i ∈ m.support → j ∈ m.support → i.val ≠ d + j.val) :
-    (marks : Set ℕ).Pairwise
-      (fun s t => Equiv.Perm.Disjoint
-        (liftWindow s (hb s (by assumption)) m)
-        (liftWindow t (hb t (by assumption)) m)) := by
+    ∀ s ∈ marks, ∀ t ∈ marks, s ≠ t →
+      Equiv.Perm.Disjoint (liftWindow s (hb s ‹s ∈ marks›) m)
+        (liftWindow t (hb t ‹t ∈ marks›) m) := by
   have hordered {s t : ℕ} (hs : s ∈ marks) (ht : t ∈ marks) (hst : s < t) :
       Equiv.Perm.Disjoint (liftWindow s (hb s hs) m) (liftWindow t (hb t ht) m) := by
     rw [Equiv.Perm.disjoint_iff_disjoint_support]
