@@ -16,12 +16,38 @@ owner per exact ID and concurrency bounded by the desk and checker capacity.
 Time-box stalled routes, record the blocker, and move to the next candidate.
 Follow the [fleet runbook](docs/OMA_AT_SCALE.md).
 
-Draft at the registry pin before taking a lease where practical. Recheck the live
-desk and upstream PRs immediately before claiming and switch targets if someone
-has already submitted the same work. When an authorized submission passes the
-pinned checker and the claim is still live, push the proof branch and open the
-upstream PR promptly. Submit each checked result as it is ready. Keep the exact
-statement, novelty checks, attribution and axiom audit in the loop.
+Draft at the registry pin before requesting a lease where practical. Check the
+exact ID and upstream PRs before starting and again before submitting. If the
+lease endpoint fails, keep proving and checking locally. Once an authorized
+submission passes the pinned checker and remains unclaimed, push the branch
+and open the upstream PR promptly. If the desk could not issue a lease,
+report that in the PR body. Follow any explicit registry decision that the
+target is solved, occupied, or ineligible. When a lease is issued, follow its
+heartbeat and release protocol. Keep statement fidelity, novelty checks,
+attribution, and the axiom audit in the loop.
+
+## Registry reductions for large formalizations
+
+For an explicitly authorized port of a published proof, use the published development
+as a blueprint and credit its authors. When its library cannot pass the registry's
+import and file-size rules, split the exact target into smaller Lean obligations.
+Prove the parent implication at the registry pin using the current reduction protocol.
+Give each obligation an explicit statement, a source, and a dependency path to the
+parent. Check each reduction and leaf with `tools/oma.sh check <id>` under the current
+import, size and axiom rules. Use the registry-generated interfaces for merged
+reductions. Record the outstanding leaves and count the parent as closed only once
+the registry accepts all required steps. Check the license of any copied source.
+
+For `PoincareConjecture.poincare_conjecture`, start by separating the passage
+from homotopy equivalence with the standard three-sphere to the hypotheses of the
+compact topological endpoint from the proof of that endpoint. Look for an existing
+simply-connectedness transfer, derive compactness via nonvanishing top homology
+and vanishing for connected noncompact three-manifolds, and derive second
+countability from a finite chart cover. Treat these as candidate obligations until
+their statements and proofs check. Split the endpoint along the published proof's
+actual prerequisites, including Moise smoothing and the smooth three-dimensional
+theorem. Break those further where an obligation exceeds the checker limits.
+See the [port audit](docs/atlas/sweeps/2026-11-27/poincare-registry-port.md).
 
 The tracker below describes the existing Lean packages and their proof standards.
 For those packages, update the tracker and [results inventory](RESULTS.md) when the

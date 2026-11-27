@@ -149,6 +149,46 @@ private theorem eventually_logLogCutoff_log_lower :
   rw [← Real.log_sqrt (le_of_lt hLpos)]
   exact Real.log_le_log (by positivity) hB_lower
 
+private theorem eventually_logLogCutoff_lower :
+    ∀ᶠ n : ℕ in atTop,
+      Real.log (primeAt n : ℝ) * Real.log (Real.log (primeAt n : ℝ)) / 32 ≤
+        (logLogCutoff n : ℝ) := by
+  have hprime : Tendsto (fun n : ℕ => (primeAt n : ℝ)) atTop atTop := by
+    have hnat : Tendsto primeAt atTop atTop := by
+      rw [tendsto_atTop_atTop]
+      intro b
+      refine ⟨b, fun n hbn => ?_⟩
+      have hp := Nat.add_two_le_nth_prime n
+      change b ≤ Nat.nth Nat.Prime n
+      omega
+    exact tendsto_natCast_atTop_atTop.comp hnat
+  have hlog := Real.tendsto_log_atTop.comp hprime
+  have hloglog := Real.tendsto_log_atTop.comp hlog
+  filter_upwards [hlog.eventually_ge_atTop 1024, hloglog.eventually_ge_atTop 1]
+    with n hL hLL
+  change 1024 ≤ Real.log (primeAt n : ℝ) at hL
+  change 1 ≤ Real.log (Real.log (primeAt n : ℝ)) at hLL
+  have hX : 2 ≤ Real.log (primeAt n : ℝ) *
+      Real.log (Real.log (primeAt n : ℝ)) / 16 := by nlinarith
+  have hf : Real.log (primeAt n : ℝ) *
+      Real.log (Real.log (primeAt n : ℝ)) / 16 <
+      (logLogCutoff n : ℝ) + 1 := Nat.lt_floor_add_one _
+  nlinarith
+
+private theorem eventually_primeAt_over_index_le :
+    ∀ᶠ n : ℕ in atTop,
+      (primeAt n : ℝ) / ((n + 1 : ℕ) : ℝ) ≤ 2 * Real.log (primeAt n : ℝ) := by
+  have hratio := primeAt_count_asymptotic
+  filter_upwards [hratio.eventually (Ioi_mem_nhds (by norm_num : (1 / 2 : ℝ) < 1))]
+    with n hn
+  have hx : 0 < (primeAt n : ℝ) := by exact_mod_cast (Nat.prime_nth_prime n).pos
+  have hN : 0 < ((n + 1 : ℕ) : ℝ) := by positivity
+  have hmul : (1 / 2 : ℝ) * (primeAt n : ℝ) <
+      ((n + 1 : ℕ) : ℝ) * Real.log (primeAt n : ℝ) :=
+    (lt_div_iff₀ hx).mp hn
+  apply (div_le_iff₀ hN).2
+  nlinarith
+
 private theorem eventually_logLogCutoff_primeCount_le :
     ∀ᶠ n : ℕ in atTop,
       ((logLogCutoff n).primesBelow.card : ℝ) ≤
@@ -364,23 +404,17 @@ theorem smoothGapUniverseCardBound (N B : ℕ) :
     have hmem := Finset.mem_filter.mp hm
     by_cases hm0 : m = 0
     · simp [hm0]
-    · apply Finset.mem_insert.mpr
-      right
+    · apply Finset.mem_insert_of_mem
       apply Nat.mem_smoothNumbersUpTo.mpr
       refine ⟨Nat.le_of_lt_succ (Finset.mem_range.mp hmem.1), ?_⟩
       apply Nat.mem_smoothNumbers'.2
       intro p hp hpd
-      by_cases hm1 : m = 1
-      · subst m
-        exact (hp.not_dvd_one hpd).elim
-      · have htwo : 1 < m := by omega
-        exact lt_of_le_of_lt (Nat.le_maxPrimeFac hm0 hp hpd) hmem.2
+      exact lt_of_le_of_lt (Nat.le_maxPrimeFac hm0 hp hpd) hmem.2
   calc
     U.card ≤ (insert 0 (Nat.smoothNumbersUpTo (primeAt N) B)).card :=
       Finset.card_le_card hsubset
     _ ≤ 1 + (Nat.smoothNumbersUpTo (primeAt N) B).card := by
-      simpa [Nat.add_comm] using
-        (Finset.card_insert_le 0 (Nat.smoothNumbersUpTo (primeAt N) B))
+      simpa [Nat.add_comm] using Finset.card_insert_le 0 (Nat.smoothNumbersUpTo (primeAt N) B)
     _ ≤ 1 + 2 ^ B.primesBelow.card * (primeAt N).sqrt := by
       exact Nat.add_le_add_left (Nat.smoothNumbersUpTo_card_le _ _) 1
 
@@ -462,7 +496,7 @@ theorem cutoffHitCount (N B j : ℕ) (hB : 0 < B) :
     _ ≤ (j : ℝ) * primeAt N + (B : ℝ) * (U.card : ℝ) := add_le_add hLscaled hSscaled
 
 /-- The finite cutoff estimate with the smooth-number term evaluated using
-Mathlib's bound `2^π(B) * √p_N` (and one extra element for zero). -/
+Mathlib's bound using the number of primes strictly below `B` (and one extra element for zero). -/
 theorem cutoffHitCount_smoothNumbers (N B j : ℕ) (hB : 0 < B) :
     (B : ℝ) * j * (((Finset.range N).filter (fun r =>
       j ≤ ((Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
@@ -514,5 +548,82 @@ theorem hitIndexProportionBound (N B j : ℕ) (hB : 0 < B) :
       field_simp
       push_cast
       rfl
+
+/-- An explicit eventual two-term upper bound for the relative count of
+two-hit gaps. The first term is the logarithmic cutoff contribution; the
+second is the smooth-number tail after applying Mathlib's square-root bound.
+-/
+theorem eventually_twoHitGapCount_bound :
+    ∀ᶠ n : ℕ in atTop,
+      (((Finset.range n).filter (fun r =>
+        2 ≤ ((Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
+          (fun m => m.maxPrimeFac < primeGap r)).card)).card : ℝ) /
+          (n + 1 : ℝ) ≤
+        64 / Real.log (Real.log (primeAt n : ℝ)) +
+          (1 + Real.exp (3 * Real.log (primeAt n : ℝ) / 4)) /
+            (2 * (n + 1 : ℝ)) := by
+  filter_upwards [eventually_logLogCutoff_lower,
+    eventually_primeAt_over_index_le,
+    eventually_logLogCutoff_smoothFactor_le,
+    (Real.tendsto_log_atTop.comp (Real.tendsto_log_atTop.comp
+      (tendsto_natCast_atTop_atTop.comp (by
+        rw [tendsto_atTop_atTop]
+        intro b
+        refine ⟨b, fun n hbn => ?_⟩
+        have hp := Nat.add_two_le_nth_prime n
+        change b ≤ Nat.nth Nat.Prime n
+        omega)))).eventually_gt_atTop 0]
+    with n hB hindex htail hLLpos
+  change 0 < Real.log (Real.log (primeAt n : ℝ)) at hLLpos
+  have hLpos : 0 < Real.log (primeAt n : ℝ) := by
+    exact Real.log_pos (by
+      exact_mod_cast (show 1 < Nat.nth Nat.Prime n from
+        Nat.Prime.one_lt (Nat.prime_nth_prime n)))
+  have hBpos : 0 < logLogCutoff n := by
+    have : 0 < Real.log (primeAt n : ℝ) *
+        Real.log (Real.log (primeAt n : ℝ)) / 32 := by positivity
+    exact Nat.cast_pos.mp (lt_of_lt_of_le this hB)
+  have hNpos : (0 : ℝ) < (n + 1 : ℝ) := by positivity
+  have hprop := hitIndexProportionBound n (logLogCutoff n) 2 hBpos
+  let C := (((Finset.range n).filter (fun r =>
+    2 ≤ ((Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
+      (fun m => m.maxPrimeFac < primeGap r)).card)).card : ℝ)
+  have hcount : C / (n + 1 : ℝ) ≤
+      ((primeAt n : ℝ) / (n + 1 : ℝ)) / (logLogCutoff n) +
+        (1 + 2 ^ (logLogCutoff n).primesBelow.card *
+          (primeAt n).sqrt) / (2 * (n + 1 : ℝ)) := by
+    dsimp [C] at hprop ⊢
+    have hden : (0 : ℝ) < 2 * (n + 1 : ℝ) * logLogCutoff n := by positivity
+    field_simp at hprop ⊢
+    nlinarith
+  have hindex' : (primeAt n : ℝ) / (n + 1 : ℝ) ≤
+      2 * Real.log (primeAt n : ℝ) := by
+    simpa [Nat.cast_add] using hindex
+  have hfirst : ((primeAt n : ℝ) / (n + 1 : ℝ)) /
+        (logLogCutoff n) ≤ 64 / Real.log (Real.log (primeAt n : ℝ)) := by
+    calc
+      _ ≤ (2 * Real.log (primeAt n : ℝ)) / (logLogCutoff n) :=
+        div_le_div_of_nonneg_right hindex' (by positivity)
+      _ ≤ (2 * Real.log (primeAt n : ℝ)) /
+          (Real.log (primeAt n : ℝ) * Real.log (Real.log (primeAt n : ℝ)) / 32) := by
+        gcongr
+      _ = 64 / Real.log (Real.log (primeAt n : ℝ)) := by
+        field_simp
+        <;> ring
+  have htail' :
+      (1 + 2 ^ (logLogCutoff n).primesBelow.card * (primeAt n).sqrt) /
+          (2 * (n + 1 : ℝ)) ≤
+        (1 + Real.exp (3 * Real.log (primeAt n : ℝ) / 4)) /
+          (2 * (n + 1 : ℝ)) := by
+    apply div_le_div_of_nonneg_right _ (by positivity)
+    calc
+      1 + 2 ^ (logLogCutoff n).primesBelow.card * (primeAt n).sqrt ≤
+          1 + 2 ^ (logLogCutoff n).primesBelow.card *
+            Real.sqrt (primeAt n : ℝ) := by
+        gcongr
+        exact Real.nat_sqrt_le_real_sqrt
+      _ ≤ 1 + Real.exp (3 * Real.log (primeAt n : ℝ) / 4) := by
+        simpa [add_comm] using add_le_add_left htail 1
+  simpa [C] using hcount.trans (add_le_add hfirst htail')
 
 end Implications.SmoothGapCounting

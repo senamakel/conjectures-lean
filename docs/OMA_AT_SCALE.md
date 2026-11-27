@@ -97,7 +97,7 @@ The upstream launcher creates detached worktrees and restarts headless sessions 
    gh api --paginate "repos/$repo/pulls/$pr/files?per_page=100" --jq '.[].filename'
    ```
 
-4. Record the local assignment and elaborate a complete draft in scratch before claiming a desk lease where possible. Refresh the desk, local claims, and upstream PRs just before leasing. Hold one lease at a time, heartbeat according to the current desk instructions, and release promptly if the target changes, is solved, or hits a blocker.
+4. Record the local assignment and elaborate a complete draft in scratch before claiming a desk lease where possible. Refresh the desk, local claims, and upstream PRs just before leasing. Keep working and checking if the lease endpoint fails. Recheck duplicates before submission and disclose the desk failure in the PR body. Hold one issued lease at a time, heartbeat it, and release it when work stops.
 5. Point `OMA_FC` at a worker-private pinned checkout for final verification. The checker copies reductions and statements, edits `lakefile.toml`, and builds modules. Serialize access if workers share a writable checker checkout. Keep setup and updates out of concurrent runs. [OMA checker](https://github.com/GuillaumeBAUD-coder/open-math-agents/blob/ea1ab6394ba60f3b80439548deb8baba0838c75c/tools/check.sh)
 6. Limit heavy commands across workers. Both `check` and `submit` take a slot because submit reruns check. From the worker's OMA checkout, with `conjectures_checkout` pointing to this repository:
 
