@@ -56,9 +56,9 @@ theorem tripleRow_outside_attachments_eq
   obtain ⟨hBi, hBo⟩ := tripleRow_outside_counts A B hA hB hAB ⟨b, hb⟩
   obtain ⟨hDi, hDo⟩ := tripleRow_outside_counts A D hA hD hAD ⟨d, hd⟩
   have hbD : b ∉ D := fun h =>
-    hne (Finset.card_le_one.mp hDo.le (Finset.mem_sdiff.mpr ⟨h, (Finset.mem_sdiff.mp hb).2⟩) hd)
+    hne (Finset.card_le_one_iff.mp hDo.le (Finset.mem_sdiff.mpr ⟨h, (Finset.mem_sdiff.mp hb).2⟩) hd)
   have hdB : d ∉ B := fun h =>
-    hne (Finset.card_le_one.mp hBo.le hb (Finset.mem_sdiff.mpr ⟨h, (Finset.mem_sdiff.mp hd).2⟩))
+    hne (Finset.card_le_one_iff.mp hBo.le hb (Finset.mem_sdiff.mpr ⟨h, (Finset.mem_sdiff.mp hd).2⟩))
   have hbDiff : b ∈ B \ D := Finset.mem_sdiff.mpr ⟨(Finset.mem_sdiff.mp hb).1, hbD⟩
   have hdDiff : d ∈ D \ B := Finset.mem_sdiff.mpr ⟨(Finset.mem_sdiff.mp hd).1, hdB⟩
   rw [card_row_difference] at hBD
@@ -68,10 +68,35 @@ theorem tripleRow_outside_attachments_eq
   obtain ⟨hxA, hxB⟩ := Finset.mem_inter.mp hx
   refine Finset.mem_inter.mpr ⟨hxA, ?_⟩
   by_contra hxd
-  have hxb := Finset.card_le_one.mp hsmall (Finset.mem_sdiff.mpr ⟨hxB, hxd⟩) hbDiff
+  have hxb := Finset.card_le_one_iff.mp hsmall (Finset.mem_sdiff.mpr ⟨hxB, hxd⟩) hbDiff
   exact (Finset.mem_sdiff.mp hb).2 (hxb ▸ hxA)
+
+/-- If two distinct outside vertices occur, every row meeting the outside
+attaches to one common pair in the three-element row. -/
+theorem tripleRow_common_outside_pair
+    {α : Type*} [DecidableEq α] (A : Finset α) (R : Finset (Finset α))
+    (hA : A.card = 3) (hAR : A ∈ R)
+    (hsize : ∀ B ∈ R, B.card ≤ 3)
+    (hdiff : ∀ B ∈ R, ∀ D ∈ R, (B \ D ∪ D \ B).card ≤ 2)
+    {B D : Finset α} (hBR : B ∈ R) (hDR : D ∈ R) {b d : α}
+    (hb : b ∈ B \ A) (hd : d ∈ D \ A) (hne : b ≠ d) :
+    ∃ P : Finset α, P ⊆ A ∧ P.card = 2 ∧
+      ∀ T ∈ R, (T \ A).Nonempty → A ∩ T = P := by
+  have hBD : A ∩ B = A ∩ D :=
+    tripleRow_outside_attachments_eq A B D hA (hsize B hBR) (hsize D hDR)
+      (hdiff A hAR B hBR) (hdiff A hAR D hDR) (hdiff B hBR D hDR) hb hd hne
+  refine ⟨A ∩ B, Finset.inter_subset_left,
+    (tripleRow_outside_counts A B hA (hsize B hBR) (hdiff A hAR B hBR) ⟨b, hb⟩).1, ?_⟩
+  rintro T hTR ⟨t, ht⟩
+  by_cases htb : t = b
+  · have htd : t ≠ d := htb ▸ hne
+    exact (tripleRow_outside_attachments_eq A T D hA (hsize T hTR) (hsize D hDR)
+      (hdiff A hAR T hTR) (hdiff A hAR D hDR) (hdiff T hTR D hDR) ht hd htd).trans hBD.symm
+  · exact tripleRow_outside_attachments_eq A T B hA (hsize T hTR) (hsize B hBR)
+      (hdiff A hAR T hTR) (hdiff A hAR B hBR) (hdiff T hTR B hBR) ht hb htb
 
 end SplitGraphComponents
 
 #print axioms SplitGraphComponents.tripleRow_outside_counts
 #print axioms SplitGraphComponents.tripleRow_outside_attachments_eq
+#print axioms SplitGraphComponents.tripleRow_common_outside_pair
