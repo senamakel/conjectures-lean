@@ -79,7 +79,9 @@ theorem thresholdGateDimacs_iff (assignment : Nat → Bool)
         | zero => contradiction
         | succ n => rfl
     | negSucc n =>
-        have hcast : (Int.ofNat n : Int) + 1 = Int.ofNat (n + 1) := by omega
+        have hcast : (Int.ofNat n : Int) + 1 = Int.ofNat (n + 1) := by
+          push_cast
+          rfl
         change literalValue assignment (Int.ofNat n + 1) =
           !literalValue assignment (Int.negSucc n)
         rw [hcast]
