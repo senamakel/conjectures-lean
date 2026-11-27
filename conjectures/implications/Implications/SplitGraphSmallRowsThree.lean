@@ -314,7 +314,7 @@ theorem three_selected_rows_form_triangle
       intro h
       subst e
       exact heNot (by simp)
-    let hthird := ⟨e, heS, hqe, hde⟩
+    have hthird : ∃ e ∈ S, e ≠ q ∧ e ≠ d := ⟨e, heS, hqe, hde⟩
     obtain ⟨e, he, hqe, hde⟩ := hthird
     obtain ⟨i, hiq, hie⟩ := hmeet q hq e he hqe
     have hid : i ∈ selected d := by simpa [heq] using hiq
@@ -367,24 +367,24 @@ theorem three_selected_rows_form_triangle
     simp only [Finset.mem_insert, Finset.mem_singleton] at hc
     rcases hc with hc | hc
     · exact hac hc.symm
-    · exact hbc hc
+    · exact hbc hc.symm
   have hxz : x ≠ z := by
     intro he
-    have hEq : ({a,b} : Finset I) = {a,c} := hxEq.symm.trans (by simpa [he] using hzEq.symm)
-    have hbmem : b ∈ ({a,c} : Finset I) := hEq.symm ▸ (by simp)
+    have hEq : ({a,b} : Finset I) = {a,c} := hxEq.symm.trans (by simpa [he] using hzEq)
+    have hbmem : b ∈ ({a,c} : Finset I) := hEq ▸ (by simp)
     simp only [Finset.mem_insert, Finset.mem_singleton] at hbmem
     rcases hbmem with h | h
     · exact hab h.symm
     · exact hbc h
   have hyz : y ≠ z := by
     intro he
-    have hEq : ({b,c} : Finset I) = {a,c} := hyEq.symm.trans (by simpa [he] using hzEq.symm)
+    have hEq : ({b,c} : Finset I) = {a,c} := hyEq.symm.trans (by simpa [he] using hzEq)
     have hbmem : b ∈ ({a,c} : Finset I) := hEq ▸ (by simp)
     simp only [Finset.mem_insert, Finset.mem_singleton] at hbmem
     rcases hbmem with h | h
     · exact hab h.symm
     · exact hbc h
-  exact ⟨x,y,z,a,b,c,hSsub hx,hSsub hy,hSsub hz,hxy,hxz,hyz,hab,hac,hbc,hxEq,hyEq,hzEq⟩
+  exact ⟨x,y,z,a,b,c,hx,hy,hz,hxy,hxz,hyz,hab,hac,hbc,hxEq,hyEq,hzEq⟩
 
 end SplitGraphSmallRowsThree
 
