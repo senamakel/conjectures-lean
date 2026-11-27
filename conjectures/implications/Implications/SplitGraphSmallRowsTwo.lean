@@ -123,6 +123,45 @@ theorem four_cycle_path_block
     simpa [p, SimpleGraph.Walk.support_ofSupport (by simp) hchain] using hnodup
   exact ⟨p, hp, SimpleGraph.Walk.support_ofSupport (by simp) hchain⟩
 
+/-- If two selected size-two rows share exactly one label, their incidence
+component is the seven-vertex path through both repeated clique centers. -/
+theorem one_overlap_path_block
+    (G : SimpleGraph V) (C I : Finset V) (e c d f v u w : V)
+    (hdisj : Disjoint C I)
+    (heC : e ∈ C) (hcC : c ∈ C) (hdC : d ∈ C) (hfC : f ∈ C)
+    (hvI : v ∈ I) (huI : u ∈ I) (hwI : w ∈ I)
+    (hec : e ≠ c) (hcd : c ≠ d) (hdf : d ≠ f)
+    (hef : e ≠ f) (hvw : v ≠ w) (hvu : v ≠ u) (huw : u ≠ w)
+    (hev : G.Adj e v) (hvc : G.Adj v c) (hcu : G.Adj c u)
+    (hud : G.Adj u d) (hdw : G.Adj d w) (hwf : G.Adj w f) :
+    ∃ p : G.Walk e f, p.IsPath ∧ p.support = [e, v, c, u, d, w, f] := by
+  have hnodup : ([e, v, c, u, d, w, f] : List V).Nodup := by
+    have hcross (x : V) (hxC : x ∈ C) (y : V) (hyI : y ∈ I) : x ≠ y := by
+      intro h
+      subst y
+      exact (Finset.disjoint_left.mp hdisj) hxC hyI
+    have hev' : e ≠ v := hcross e heC v hvI
+    have hew : e ≠ w := hcross e heC w hwI
+    have heu : e ≠ u := hcross e heC u huI
+    have hcv : c ≠ v := hcross c hcC v hvI
+    have hcw : c ≠ w := hcross c hcC w hwI
+    have hcu' : c ≠ u := hcross c hcC u huI
+    have hdv : d ≠ v := hcross d hdC v hvI
+    have hdu : d ≠ u := hcross d hdC u huI
+    have hdw' : d ≠ w := hcross d hdC w hwI
+    have hfv : f ≠ v := hcross f hfC v hvI
+    have hfu : f ≠ u := hcross f hfC u huI
+    have hfw : f ≠ w := hcross f hfC w hwI
+    simp [List.nodup_cons, hec, hcd, hdf, hef, hvw, hvu, huw,
+      hev', hew, heu, hcv, hcw, hcu', hdv, hdu, hdw', hfv, hfu, hfw]
+  have hchain : ([e, v, c, u, d, w, f] : List V).IsChain G.Adj := by
+    simp [List.isChain_cons, hev, hvc, hcu, hud, hdw, hwf]
+  let p := SimpleGraph.Walk.ofSupport ([e, v, c, u, d, w, f] : List V) (by simp) hchain
+  have hp : p.IsPath := by
+    apply (SimpleGraph.Walk.isPath_def p).2
+    simpa [p, SimpleGraph.Walk.support_ofSupport (by simp) hchain] using hnodup
+  exact ⟨p, hp, SimpleGraph.Walk.support_ofSupport (by simp) hchain⟩
+
 end SplitGraphSmallRowsTwo
 
 #print axioms SplitGraphSmallRowsTwo.two_original_rows_intersect
