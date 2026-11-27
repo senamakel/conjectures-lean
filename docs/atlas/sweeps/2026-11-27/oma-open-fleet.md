@@ -139,3 +139,13 @@ description of the first remaining coprime branch. Whenever odd
 quotient four the odd components are coprime. Both checks use only the
 standard axioms. The companion crystal divisibility remains the
 arithmetic obligation after substituting `b = m*a`.
+
+[CrystalM17.lean](CrystalM17.lean) checks both quotient branches at
+`m = 17`, so any remaining coprime collision has `m ≥ 19`. The
+direct residue test leaves `(p,q) = (60,4)` and `(264,4)`. In each
+case the eliminant has a factor `a−1`, which is nonzero for `a ≥ 3`.
+The remaining cubic has no roots modulo 13 and 19, respectively.
+The combined quotient equality theorem checks at the pinned
+formal-conjectures revision with only the standard axioms. OMA PR
+#4741 covers multipliers through 15 and remains the upstream
+submission for the parent step.
