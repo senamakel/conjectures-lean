@@ -1,6 +1,7 @@
 import Implications.SplitGraphManyOutsiders
 import Implications.SplitGraphOneOutsiderRows
 import Implications.SplitGraphTripleRowPath
+import Implications.SplitGraphTwoConnected
 
 /-!
 The central-triple case of the split-graph row formulation holds for every
@@ -42,6 +43,26 @@ theorem hamiltonian_of_triple_row
   · exact SplitGraphManyOutsiders.hamiltonian_of_many_outsiders
       G C I t hC hdisj hpartition ht hA (by omega) hrow hdiff hdeg
 
+/-- The central-triple split-graph case follows directly from the induced-tree
+bound of four and connectivity after every single-vertex deletion. -/
+theorem hamiltonian_of_inducedTreeBound_of_triple_row
+    (G : SimpleGraph V) (C I : Finset V) (t : V)
+    (hC : G.IsClique (C : Set V)) (hI : G.IsIndepSet (I : Set V))
+    (hdisj : Disjoint C I) (hpartition : (Finset.univ : Finset V) = C ∪ I)
+    (ht : t ∈ C) (htriple : (row G I t).card = 3)
+    (hTree : inducedTreeBound G 2)
+    (hconn : ∀ q : V, (G.induce {x | x ≠ q}).Connected) :
+    ∃ (v w : V) (p : G.Walk v w), p.IsHamiltonian := by
+  classical
+  have hcard : 3 ≤ Fintype.card V := by
+    simpa [htriple] using (Finset.card_le_univ (row G I t))
+  obtain ⟨hrow, hdiff⟩ := rows_bounded_of_inducedTreeBound G C I 2 hTree hC hI hdisj
+  exact SplitGraphTripleRowComplete.hamiltonian_of_triple_row
+    G C I t hC hdisj hpartition ht htriple hrow hdiff
+      (SplitGraphTwoConnected.two_attachments_of_deletion_connected G C I hI hpartition hcard hconn)
+
 end SplitGraphTripleRowComplete
 
 #print axioms SplitGraphTripleRowComplete.hamiltonian_of_triple_row
+
+#print axioms SplitGraphTripleRowComplete.hamiltonian_of_inducedTreeBound_of_triple_row
