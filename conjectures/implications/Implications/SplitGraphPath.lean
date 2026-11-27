@@ -227,6 +227,33 @@ theorem hamiltonian_of_clique_order_with_two_endpoints
       rcases hvij with rfl | rfl <;> simp
   exact ⟨_, _, p, hpath.isHamiltonian_of_mem hcover⟩
 
+/-- In a split partition, distinct clique neighbours of the two independent vertices
+are enough: erase them from the clique and put them at opposite ends of its ordering. -/
+theorem hamiltonian_of_split_partition_two_endpoints
+    (G : SimpleGraph V) (C : Finset V) (i j a b : V)
+    (hC : G.IsClique (C : Set V))
+    (hpartition : (Finset.univ : Finset V) = C ∪ {i, j})
+    (hi : i ∉ C) (hj : j ∉ C) (hij : i ≠ j)
+    (ha : a ∈ C) (hb : b ∈ C) (hab : a ≠ b)
+    (hia : G.Adj i a) (hbj : G.Adj b j) :
+    ∃ (u v : V) (p : G.Walk u v), p.IsHamiltonian := by
+  classical
+  let M := (C.erase a).erase b
+  let l := a :: (M.toList ++ [b])
+  have haM : a ∉ M := by simp [M]
+  have hbM : b ∉ M := by simp [M, hab]
+  have hl_nodup : l.Nodup := by
+    simp [l, haM, hbM, hab, Finset.nodup_toList]
+  have hl_finset : l.toFinset = C := by
+    ext x
+    simp [l, M, and_left_comm, and_assoc]
+  have hl_head : l.head? = some a := by simp [l]
+  have hl_last : l.getLast? = some b := by simp [l, M]
+  exact hamiltonian_of_clique_order_with_two_endpoints G C i j a b l
+    hC hpartition hi hj hij hl_nodup hl_finset hl_head hl_last hia hbj
+
 end SplitGraphPath
 
 #print axioms SplitGraphPath.independent_card_le_two_of_row_bounds
+#print axioms SplitGraphPath.hamiltonian_of_clique_order_with_two_endpoints
+#print axioms SplitGraphPath.hamiltonian_of_split_partition_two_endpoints
