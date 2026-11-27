@@ -120,42 +120,69 @@ theorem doubleStar_isTree (G : SimpleGraph V) (C I : Finset V) (c d : V)
   have hacyc : H.IsAcyclic := by
     rw [SimpleGraph.isAcyclic_iff_forall_not_isCycle]
     intro x p hp
-    have hnoLeaf (z : {x // x ∈ (S : Finset V)}) (hz : z ∈ p.support) :
-        z = c' ∨ z = d' := by
-      by_cases hzc : z = c'
-      · exact Or.inl hzc
-      by_cases hzd : z = d'
-      · exact Or.inr hzd
-      rcases hleaf z hzc hzd with hleft | hright
+    have hx : x = c' ∨ x = d' := by
+      by_cases hxc : x = c'
+      · exact Or.inl hxc
+      by_cases hxd : x = d'
+      · exact Or.inr hxd
+      rcases hleaf x hxc hxd with hleft | hright
       · have h1 := (hleft p.snd).mp (p.adj_snd hp.not_nil)
         have h2 := (hleft p.penultimate).mp (p.adj_penultimate hp.not_nil).symm
         exact (hp.snd_ne_penultimate (h1.trans h2.symm)).elim
       · have h1 := (hright p.snd).mp (p.adj_snd hp.not_nil)
         have h2 := (hright p.penultimate).mp (p.adj_penultimate hp.not_nil).symm
         exact (hp.snd_ne_penultimate (h1.trans h2.symm)).elim
-    have hx := hnoLeaf x (p.start_mem_support)
-    have hsnd := hnoLeaf p.snd p.snd_mem_support
-    have hpen := hnoLeaf p.penultimate p.penultimate_mem_support
-    have hxs : p.snd ≠ x := hp.snd_ne_start
-    have hxp : p.penultimate ≠ x := hp.penultimate_ne_start
+    have hnoLeaf (z : {x // x ∈ (S : Finset V)}) (hz : z ∈ p.support)
+        (hzx : z ≠ x) : z = c' ∨ z = d' := by
+      by_cases hzc : z = c'
+      · exact Or.inl hzc
+      by_cases hzd : z = d'
+      · exact Or.inr hzd
+      rcases hleaf z hzc hzd with hleft | hright
+      · have hsub : (H.neighborSet z).Subsingleton := by
+          intro a b ha hb
+          have ha' : H.Adj z a := by simpa using ha
+          have hb' : H.Adj z b := by simpa using hb
+          exact ((hleft a).mp ha').trans ((hleft b).mp hb').symm
+        exact (hp.isTrail.notMem_support_of_subsingleton_neighborSet hzx hzx hsub) hz |>.elim
+      · have hsub : (H.neighborSet z).Subsingleton := by
+          intro a b ha hb
+          have ha' : H.Adj z a := by simpa using ha
+          have hb' : H.Adj z b := by simpa using hb
+          exact ((hright a).mp ha').trans ((hright b).mp hb').symm
+        exact (hp.isTrail.notMem_support_of_subsingleton_neighborSet hzx hzx hsub) hz |>.elim
+    have hsndMem : p.snd ∈ p.support :=
+      List.mem_of_mem_tail (p.snd_mem_tail_support hp.not_nil)
+    have hpenMem : p.penultimate ∈ p.support :=
+      List.mem_of_mem_dropLast (p.penultimate_mem_dropLast_support hp.not_nil)
+    have hsndX : p.snd ≠ x := by
+      intro h
+      subst p.snd
+      exact H.irrefl (p.adj_snd hp.not_nil)
+    have hpenX : p.penultimate ≠ x := by
+      intro h
+      subst p.penultimate
+      exact H.irrefl (p.adj_penultimate hp.not_nil)
+    have hsnd := hnoLeaf p.snd hsndMem hsndX
+    have hpen := hnoLeaf p.penultimate hpenMem hpenX
     rcases hx with rfl | rfl
     · have hsnd' : p.snd = d' := by
         rcases hsnd with hsnd | hsnd
-        · exact (hxs hsnd).elim
+        · exact (hsndX hsnd).elim
         · exact hsnd
       have hpen' : p.penultimate = d' := by
         rcases hpen with hpen | hpen
-        · exact (hxp hpen).elim
+        · exact (hpenX hpen).elim
         · exact hpen
       exact hp.snd_ne_penultimate (hsnd'.trans hpen'.symm)
     · have hsnd' : p.snd = c' := by
         rcases hsnd with hsnd | hsnd
         · exact hsnd
-        · exact (hxs hsnd).elim
+        · exact (hsndX hsnd).elim
       have hpen' : p.penultimate = c' := by
         rcases hpen with hpen | hpen
         · exact hpen
-        · exact (hxp hpen).elim
+        · exact (hpenX hpen).elim
       exact hp.snd_ne_penultimate (hsnd'.trans hpen'.symm)
   simpa [H, S, R] using (show H.IsTree from ⟨hconn, hacyc⟩)
 
