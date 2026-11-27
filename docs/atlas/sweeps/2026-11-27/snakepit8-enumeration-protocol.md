@@ -137,6 +137,11 @@ emitting 81,326 eligible masks and rejecting 186,240 cyclic leaves at 7,100
 KiB maximum RSS. This is also incomplete; no retry is planned. Proceed to `E=24`
 then `E=23` once each.
 
+The single `E=24` run hit the 6-billion-node cap after 122.89 CPU seconds,
+emitting 592,878 eligible masks and rejecting 732,873 cyclic leaves at 7,140
+KiB maximum RSS. It is incomplete; no retry is planned. Run `E=23` once under
+the same caps, provided the aggregate CPU budget remains available.
+
 ## Interpretation
 
 Finishing the count reproduces only the Q7 enumeration stage; it does not prove
