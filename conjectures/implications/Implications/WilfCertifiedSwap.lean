@@ -92,8 +92,13 @@ private theorem containsAt_swapped_of_certificate {n : ℕ} (marks : Finset ℕ)
       have hpne : p 0 ≠ p (windowSwap i) := by
         intro he
         exact hi ((windowSwap_involutive.injective (hswap₀.trans (hinj he))).symm)
-      simpa only [lt_iff_not_ge, le_iff_lt_or_eq, hπne, hpne, or_false] using
-        not_congr (hcompare i hi)
+      constructor
+      · intro h
+        exact lt_of_le_of_ne (le_of_not_gt fun hy =>
+          (not_lt_of_gt h) ((hcompare i hi).mpr hy)) hpne.symm
+      · intro h
+        exact lt_of_le_of_ne (le_of_not_gt fun hy =>
+          (not_lt_of_gt h) ((hcompare i hi).mp hy)) hπne.symm
     · rw [hnonfirst i hi, hnonfirst j hj]
       exact hpattern _ _
 
