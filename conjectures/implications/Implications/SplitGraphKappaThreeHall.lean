@@ -12,8 +12,8 @@ enough for a deficient capacity cut.
 
 namespace SplitGraphKappaThreeHall
 
-/-- Three incidences per left vertex and a capacity-two upper bound imply the
-deficit-one cut inequality. -/
+/-- For a set of at most five vertices, three incidences per left vertex and
+a capacity-two upper bound imply the deficit-one cut inequality. -/
 theorem capacity_two_cut_from_incidence (s incidences capacity : ℕ)
     (hsmall : s ≤ 5)
     (hdegree : 3 * s ≤ incidences)
