@@ -175,22 +175,22 @@ theorem legendreBadGapIndices_subset_three_blocks (a : ℕ) (ha : 2 ≤ a)
   · have hfirst' : (squareGapIndex n).nth Nat.Prime < 2 * (a ^ 2 / 2) := by
       calc
         (squareGapIndex n).nth Nat.Prime < a ^ 2 := hfirst
-        _ = 2 * (a ^ 2 / 2) := by omega
+        _ = 2 * (a ^ 2 / 2) := hdivEq.symm
     have hmem := mem_block_of_nth_prime_bounds hfirstLower hfirst'
     have hlongmem : squareGapIndex n ∈ longGapBlock (a ^ 2 / 2) (2 * a) := by
       simp [longGapBlock, hmem, hlong]
-    exact Finset.mem_union.mpr (Or.inl hlongmem)
+    exact Finset.mem_union.mpr (Or.inl (Finset.mem_union.mpr (Or.inl hlongmem)))
   · have hsecondLower : a ^ 2 ≤ (squareGapIndex n).nth Nat.Prime := le_of_not_gt hfirst
     by_cases hsecond : (squareGapIndex n).nth Nat.Prime < 2 * a ^ 2
     · have hmem := mem_block_of_nth_prime_bounds hsecondLower hsecond
       have hlongmem : squareGapIndex n ∈ longGapBlock (a ^ 2) (2 * a) := by
         simp [longGapBlock, hmem, hlong]
-      exact Finset.mem_union.mpr (Or.inr (Finset.mem_union.mpr (Or.inl hlongmem)))
+      exact Finset.mem_union.mpr (Or.inl (Finset.mem_union.mpr (Or.inr hlongmem)))
     · have hthirdLower : 2 * a ^ 2 ≤ (squareGapIndex n).nth Nat.Prime := le_of_not_gt hsecond
       have hmem := mem_block_of_nth_prime_bounds hthirdLower hlastUpper
       have hlongmem : squareGapIndex n ∈ longGapBlock (2 * a ^ 2) (2 * a) := by
         simp [longGapBlock, hmem, hlong]
-      exact Finset.mem_union.mpr (Or.inr (Finset.mem_union.mpr (Or.inr hlongmem)))
+      exact Finset.mem_union.mpr (Or.inr hlongmem)
 
 /-- The total square-interval length in one block is bounded by the total length of
 the prime gaps which contain those intervals. -/
