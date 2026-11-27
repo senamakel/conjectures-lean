@@ -13,8 +13,9 @@ If `e = 138`, at least one deletion must retain all 132 edges; that vertex has d
 namespace C4Extremal42
 
 /-- The actual edge count after taking the induced subgraph off one vertex. -/
-noncomputable def inducedDeletionCount (G : SimpleGraph (Fin 42)) (v : Fin 42) : ℕ :=
-  (G.induce ({v}ᶜ : Set (Fin 42))).edgeFinset.card
+noncomputable def inducedDeletionCount (G : SimpleGraph (Fin 42)) (v : Fin 42) : ℕ := by
+  classical
+  exact (G.induce ({v}ᶜ : Set (Fin 42))).edgeFinset.card
 
 /-- An induced deletion has exactly the original edge count minus the deleted vertex degree. -/
 theorem inducedDeletionCount_eq (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]

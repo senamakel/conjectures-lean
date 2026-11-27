@@ -136,7 +136,7 @@ theorem same_pattern_overlap_compatible {n : Nat} (π : Equiv.Perm (Fin n))
 theorem same_pattern_start_distance {n : Nat} (π : Equiv.Perm (Fin n))
     (s t : Nat) (hs : ContainsAt π s sigma) (ht : ContainsAt π t sigma)
     (hst : s < t) (hts : t - s < 8) : t - s = 5 ∨ t - s = 7 := by
-  apply sigma_overlap_compatible_only_at_5_or_7 (by omega) hts
+  apply sigma_overlap_compatible_only_at_5_or_7 (t - s) (by omega) hts
   exact same_pattern_overlap_compatible π s t hs ht hst hts
 
 theorem same_pattern_starts_separated {n : Nat} (π : Equiv.Perm (Fin n))
