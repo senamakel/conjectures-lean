@@ -64,14 +64,13 @@ def ContainsAt {n : Nat} (π : Equiv.Perm (Fin n)) (s : Nat)
 /-- The common part of two same-pattern windows must itself have the same
 relative order when read from either window. -/
 theorem same_pattern_overlap_compatible {n : Nat} (π : Equiv.Perm (Fin n))
-    (s t : Nat) (hs : ContainsAt π s sigma) (ht : ContainsAt π t sigma)
+    (p : Fin 8 → Fin 8) (s t : Nat) (hs : ContainsAt π s p) (ht : ContainsAt π t p)
     (hst : s < t) (hts : t - s < 8) :
-    overlapCompatible sigmaList (t - s) = true := by
+    overlapCompatible p ⟨t - s, by omega⟩ = true := by
   rcases hs with ⟨hbs, hs⟩
   rcases ht with ⟨hbt, ht⟩
   apply of_decide_eq_true
-  simp only [overlapCompatible, List.all_eq_true, List.mem_range,
-    decide_eq_true_eq]
+  simp only [overlapCompatible, List.all_eq_true, List.mem_range, decide_eq_true_eq]
   intro i hi j hj
   let ai : Fin 8 := ⟨i, by omega⟩
   let aj : Fin 8 := ⟨j, by omega⟩
@@ -107,25 +106,28 @@ theorem same_pattern_overlap_compatible {n : Nat} (π : Equiv.Perm (Fin n))
         have ha : aj.val ≤ 7 := Nat.le_of_lt_succ aj.isLt
         omega⟩) := by
     rw [hidxi, hidxj]
-  have hrel : (sigma bi < sigma bj) ↔ (sigma ai < sigma aj) :=
+  have hrel : (p bi < p bj) ↔ (p ai < p aj) :=
     hsi.symm.trans (hsame.trans htj)
-  have hlefti := sigmaList_get (t - s + i) (by omega)
-  have hleftj := sigmaList_get (t - s + j) (by omega)
-  have hrighti := sigmaList_get i (by omega)
-  have hrightj := sigmaList_get j (by omega)
-  simpa [ai, aj, bi, bj, hlefti, hleftj, hrighti, hrightj] using hrel
+  simpa [ai, aj, bi, bj] using hrel
 
 theorem same_pattern_start_distance {n : Nat} (π : Equiv.Perm (Fin n))
-    (s t : Nat) (hs : ContainsAt π s sigma) (ht : ContainsAt π t sigma)
+    (p : Fin 8 → Fin 8) (hp : p = sigma ∨ p = tau)
+    (s t : Nat) (hs : ContainsAt π s p) (ht : ContainsAt π t p)
     (hst : s < t) (hts : t - s < 8) : t - s = 5 ∨ t - s = 7 := by
-  apply sigma_overlap_compatible_only_at_5_or_7 (t - s) (by omega) hts
-  exact same_pattern_overlap_compatible π s t hs ht hst hts
+  have hov := same_pattern_overlap_compatible π p s t hs ht hst hts
+  let d : Fin 8 := ⟨t - s, by omega⟩
+  rcases hp with rfl | rfl
+  · have h := sigma_overlap_compatible_only_at_5_or_7 d (by omega) (by simpa [d] using hov)
+    simpa [d] using h
+  · have h := tau_overlap_compatible_only_at_5_or_7 d (by omega) (by simpa [d] using hov)
+    simpa [d] using h
 
 theorem same_pattern_starts_separated {n : Nat} (π : Equiv.Perm (Fin n))
-    (s t : Nat) (hs : ContainsAt π s sigma) (ht : ContainsAt π t sigma)
+    (p : Fin 8 → Fin 8) (hp : p = sigma ∨ p = tau)
+    (s t : Nat) (hs : ContainsAt π s p) (ht : ContainsAt π t p)
     (hst : s < t) : 5 ≤ t - s := by
   by_cases hsmall : t - s < 8
-  · rcases same_pattern_start_distance π s t hs ht hst hsmall with h | h <;> omega
+  · rcases same_pattern_start_distance π p hp s t hs ht hst hsmall with h | h <;> omega
   · omega
 
 end WilfMarked

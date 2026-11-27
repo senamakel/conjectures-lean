@@ -61,14 +61,48 @@ theorem addVertex_c4Free_iff {V : Type*} (G : SimpleGraph V) (s : Set V) :
         (by simpa using hxy) (by simp) hnew hnew'
       exact hnot ⟨hold, hold'⟩
   · rintro ⟨hG, hS⟩ x y z w hxy hzw hxz hyz htwo
-    cases x <;> cases y <;> cases z <;> cases w <;>
-      simp only [addVertex] at * <;> aesop (config := { maxRuleApplications := 1000 })
-    all_goals
-      first
-      | exact (hS (x := val_1) (y := val_2) (z := val) hzw hxz left)
-          ⟨G.symm.symm val val_1 hyz, G.symm.symm val val_2 right⟩
-      | exact (hS (x := val_2) (y := val_1) (z := val) (Ne.symm hzw) right hyz)
-          ⟨G.symm.symm val val_2 left, G.symm.symm val val_1 hxz⟩
+    cases x with
+    | none =>
+      cases y with
+      | none => exact hxy rfl
+      | some y =>
+        cases z with
+        | none => simp [addVertex] at hxz
+        | some z =>
+          cases w with
+          | none => simp [addVertex] at htwo
+          | some w =>
+            simp only [addVertex] at *
+            exact (hS (x := z) (y := w) (z := y) hzw hxz htwo.1)
+              ⟨G.symm.symm y z hyz, G.symm.symm y w htwo.2⟩
+    | some x =>
+      cases y with
+      | none =>
+        cases z with
+        | none => simp [addVertex] at hyz
+        | some z =>
+          cases w with
+          | none => simp [addVertex] at htwo
+          | some w =>
+            simp only [addVertex] at *
+            exact (hS (x := z) (y := w) (z := x) hzw hyz htwo.2)
+              ⟨G.symm.symm x z hxz, G.symm.symm x w htwo.1⟩
+      | some y =>
+        cases z with
+        | none =>
+          cases w with
+          | none => exact hzw rfl
+          | some w =>
+            simp only [addVertex] at *
+            exact (hS (x := x) (y := y) (z := w) hxy hxz hyz) htwo
+        | some z =>
+          cases w with
+          | none =>
+            simp only [addVertex] at *
+            exact (hS (x := x) (y := y) (z := z) hxy hxz hyz) htwo
+          | some w =>
+            simp only [addVertex] at *
+            exact (hG (x := x) (y := y) (z := z) (w := w) hxy hzw hxz hyz) htwo
 
 #print axioms addVertex_c4Free_iff
 
