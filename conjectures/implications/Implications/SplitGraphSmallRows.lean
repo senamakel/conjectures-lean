@@ -235,6 +235,102 @@ theorem card_le_three_of_no_common_center
     rw [Finset.card_powersetCard, show S.card = 3 by simp [S, hab, hac, hbc]] at hle
     exact hle
 
+/-- If every label is selected at exactly two clique vertices, at most three
+clique vertices can have a selected row of size two. -/
+theorem selected_two_rows_card_le_three
+    {C I : Type*} [Fintype C] [Fintype I] [DecidableEq C] [DecidableEq I]
+    (clique : Finset C) (indep : Finset I) (r : C → Finset I)
+    (hsub : ∀ c ∈ clique, r c ⊆ indep)
+    (hrow : ∀ c ∈ clique, (r c).card ≤ 2)
+    (hdiff : ∀ c ∈ clique, ∀ d ∈ clique, c ≠ d →
+      (r c \ r d ∪ r d \ r c).card ≤ 2)
+    (hdegree : ∀ i ∈ indep, (clique.filter (fun c => i ∈ r c)).card = 2) :
+    (clique.filter (fun c => (r c).card = 2)).card ≤ 3 := by
+  classical
+  let F := clique.filter (fun c => (r c).card = 2)
+  have hFcard (c : C) (hc : c ∈ F) : (r c).card = 2 :=
+    (Finset.mem_filter.mp hc).2
+  have hinter (c : C) (hc : c ∈ F) (d : C) (hd : d ∈ F) (hcd : c ≠ d) :
+      ∃ i, i ∈ r c ∧ i ∈ r d :=
+    twoRows_intersect_of_symmDiff_card_le_two (r c) (r d)
+      (hFcard c hc) (hFcard d hd) (hdiff c (Finset.mem_filter.mp hc).1
+        d (Finset.mem_filter.mp hd).1 hcd)
+  by_cases hdup : ∃ c ∈ F, ∃ d ∈ F, c ≠ d ∧ r c = r d
+  · obtain ⟨c, hc, d, hd, hcd, hrows⟩ := hdup
+    have hFsub : F ⊆ {c, d} := by
+      intro e he
+      by_cases hce : e = c
+      · simp [hce]
+      by_cases hde : e = d
+      · simp [hde]
+      obtain ⟨i, hic, hie⟩ := hinter c hc e he hce.symm
+      have hiI : i ∈ indep := hsub c (Finset.mem_filter.mp hc).1 hic
+      have htriple : ({c, d, e} : Finset C) ⊆ clique.filter (fun q => i ∈ r q) := by
+        intro q hq
+        simp only [Finset.mem_insert, Finset.mem_singleton] at hq
+        rcases hq with rfl | rfl | rfl
+        · exact Finset.mem_filter.mpr ⟨(Finset.mem_filter.mp hc).1, hic⟩
+        · exact Finset.mem_filter.mpr ⟨(Finset.mem_filter.mp hd).1, by simpa [hrows] using hic⟩
+        · exact Finset.mem_filter.mpr ⟨(Finset.mem_filter.mp he).1, hie⟩
+      have hthree : ({c, d, e} : Finset C).card = 3 := by simp [hcd, hce, hde]
+      have hle := Finset.card_le_card htriple
+      rw [hdegree i hiI, hthree] at hle
+      omega
+    have hle := Finset.card_le_card hFsub
+    simpa [F] using hle
+  · have hinj : Set.InjOn r F := by
+      intro c hc d hd hrows
+      by_contra hcd
+      exact hdup ⟨c, hc, d, hd, hcd, hrows⟩
+    by_cases hFempty : F = ∅
+    · simp [F, hFempty]
+    · have hFne : F.Nonempty := Finset.nonempty_iff_ne_empty.mpr hFempty
+      let R := F.image r
+      have hRne : R.Nonempty := by
+        obtain ⟨c, hc⟩ := hFne
+        exact ⟨r c, Finset.mem_image.mpr ⟨c, hc, rfl⟩⟩
+      have hRcard : ∀ A ∈ R, A.card = 2 := by
+        intro A hA
+        obtain ⟨c, hc, rfl⟩ := Finset.mem_image.mp hA
+        exact hFcard c hc
+      have hRint : ∀ A ∈ R, ∀ B ∈ R, A ≠ B → ∃ i, i ∈ A ∧ i ∈ B := by
+        intro A hA B hB hAB
+        obtain ⟨c, hc, rfl⟩ := Finset.mem_image.mp hA
+        obtain ⟨d, hd, rfl⟩ := Finset.mem_image.mp hB
+        have hcd : c ≠ d := by
+          intro heq
+          apply hAB
+          rw [heq]
+        exact hinter c hc d hd hcd
+      obtain hcenter | htriangle := pairwise_intersecting_two_sets R hRne hRcard hRint
+      · have hxI : ∃ i ∈ indep, ∀ c ∈ F, i ∈ r c := by
+          obtain ⟨i, hi⟩ := hcenter
+          have hsome : ∃ c ∈ F, i ∈ r c := by
+            obtain ⟨c, hc⟩ := hFne
+            exact ⟨c, hc, hi (r c) (Finset.mem_image.mpr ⟨c, hc, rfl⟩)⟩
+          obtain ⟨c, hc, hci⟩ := hsome
+          have hiI := hsub c (Finset.mem_filter.mp hc).1 hci
+          exact ⟨i, hiI, fun d hd => hi (r d) (Finset.mem_image.mpr ⟨d, hd, rfl⟩)⟩
+        obtain ⟨i, hiI, hcenter⟩ := hxI
+        have hFsub : F ⊆ clique.filter (fun c => i ∈ r c) := by
+          intro c hc
+          exact Finset.mem_filter.mpr ⟨(Finset.mem_filter.mp hc).1, hcenter c hc⟩
+        have hle := Finset.card_le_card hFsub
+        rw [hdegree i hiI] at hle
+        simpa [F] using hle
+      · obtain ⟨a, b, c, hab, hac, hbc, hsubset⟩ := htriangle
+        have hRsub : R ⊆ ({a, b, c} : Finset I).powersetCard 2 := by
+          intro A hA
+          exact Finset.mem_powersetCard.mpr ⟨hsubset A hA, hRcard A hA⟩
+        have hRle : R.card ≤ 3 := by
+          have hle := Finset.card_le_card hRsub
+          rw [Finset.card_powersetCard,
+            show ({a, b, c} : Finset I).card = 3 by simp [hab, hac, hbc]] at hle
+          exact hle
+        have hcardEq : R.card = F.card := Finset.card_image_of_injOn r hinj
+        rw [← hcardEq]
+        simpa [F] using hRle
+
 /-! The exact family statement applied to clique rows. -/
 theorem clique_rows_two_set_structure
     {V : Type*} [Fintype V] [DecidableEq V]
