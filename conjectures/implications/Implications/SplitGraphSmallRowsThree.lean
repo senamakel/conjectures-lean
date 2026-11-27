@@ -639,7 +639,8 @@ theorem hamiltonian_of_split_partition_three_double_rows
     rcases hcase with h | h | h
     · have hleftMem : left k ∈ ({x,y,z} : Finset V) := h.symm ▸ hq
       exact (hOavoidSpecial k hk).1 hleftMem
-    · exact (Finset.disjoint_left.mp hdisj) hqC hkI
+    · subst k
+      exact (Finset.disjoint_left.mp hdisj) hqC hkI
     · have hrightMem : right k ∈ ({x,y,z} : Finset V) := h.symm ▸ hq
       exact (hOavoidSpecial k hk).2 hrightMem
   have hprefixRestDisjoint : ∀ v ∈ ([a,x,b,y,c,z] : List V), v ∉ rest := by
