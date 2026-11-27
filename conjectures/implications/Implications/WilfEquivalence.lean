@@ -29,3 +29,22 @@ def HasExactOccurrences (occurs : α → X → Prop) (M : Finset α) (x : X)
   occurrenceSet occurs x = M
 
 end WilfEquivalence
+
+namespace WilfEquivalence
+
+variable {α : Type*} [Fintype α] [DecidableEq α]
+variable {X Y : Type*} [Fintype X] [Fintype Y]
+
+/-- A bijection for each prescribed marked set gives equal counts for all
+permutations containing that set of occurrences. -/
+theorem marked_card_eq_of_equiv
+    (occX : α → X → Prop) (occY : α → Y → Prop)
+    (h : ∀ M : Finset α,
+      {x : X // HasMarkedOccurrences occX M x} ≃
+        {y : Y // HasMarkedOccurrences occY M y})
+    (M : Finset α) :
+    Fintype.card {x : X // HasMarkedOccurrences occX M x} =
+      Fintype.card {y : Y // HasMarkedOccurrences occY M y} := by
+  exact Fintype.card_congr (h M)
+
+end WilfEquivalence
