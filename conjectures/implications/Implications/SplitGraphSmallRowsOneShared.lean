@@ -473,4 +473,31 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
       rw [hnil] at hxa
       simp at hxa)
 
+/-- Cardinal formulation of the exact-one-shared-incidence case. The shared
+clique vertex has selected row size two, and every other clique vertex has
+selected row size at most one. -/
+theorem hamiltonian_of_one_shared_selected_row
+    (G : SimpleGraph V) (C I : Finset V)
+    (hC : G.IsClique (C : Set V)) (hdisj : Disjoint C I)
+    (hpartition : (Finset.univ : Finset V) = C ∪ I)
+    (left right : V → V)
+    (hleftC : ∀ k ∈ I, left k ∈ C) (hrightC : ∀ k ∈ I, right k ∈ C)
+    (hleftAdj : ∀ k ∈ I, G.Adj (left k) k)
+    (hrightAdj : ∀ k ∈ I, G.Adj (right k) k)
+    (hneq : ∀ k ∈ I, left k ≠ right k)
+    (c a b i j : V) (hi : i ∈ I) (hj : j ∈ I) (hij : i ≠ j)
+    (hlefti : left i = a) (hrighti : right i = c)
+    (hleftj : left j = c) (hrightj : right j = b)
+    (hcenterCard : (I.filter (fun k => left k = c ∨ right k = c)).card = 2)
+    (hrows : ∀ x ∈ C, x ≠ c →
+      (I.filter (fun k => left k = x ∨ right k = x)).card ≤ 1)
+    (huniv : (Finset.univ : Finset V).Nonempty) :
+    ∃ u v : V, ∃ p : G.Walk u v, p.IsHamiltonian := by
+  have hprops := selected_incidence_properties I left right c i j hi hj hij
+    (Or.inr hrighti) (Or.inl hleftj) hcenterCard
+    (fun x _ hx => hrows x (Finset.mem_univ x) hx)
+  exact hamiltonian_of_one_shared_selected_clique_vertex G C I hC hdisj hpartition
+    left right hleftC hrightC hleftAdj hrightAdj hneq c a b i j hi hj hij
+    hlefti hrighti hleftj hrightj hprops.1 hprops.2 huniv
+
 end SplitGraphSmallRowsOneShared
