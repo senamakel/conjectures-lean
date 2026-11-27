@@ -229,3 +229,35 @@ the log and LRAT only under `.lake/c4-42-k4-canonical/`. Stop at SAT, complete
 UNSAT, or UNKNOWN at the cap; do not repeat or vary parameters. A SAT model
 requires an independent graph check. UNSAT requires Lean LRAT replay and the
 encoder-to-graph bridge; UNKNOWN is only a bounded screen.
+
+## Four cases for the matching on N(0): bounded protocol (written before run)
+
+The unique-codegree theorem makes the induced graph on the eight neighbors of
+D8 label 0 a perfect matching. Its vertices are shared labels `{4,5,6}`, private
+labels `{10,11,12,13}`, and owner label `26`. The label-preserving action is
+`S3 × S4`: permuting D8 labels 1..3 permutes shared labels 4..6, and the four
+private neighbors of D8 label 0 may be permuted independently; owner 26 stays
+fixed. `--check-matching-orbits` enumerates all 105 perfect matchings under all
+144 group elements and verifies four orbits, with sizes 9, 36, 24, and 36.
+The listed representatives in cases 1..4 lie in distinct orbits, so the union
+of the four CNF cases is complete. Cases are disjoint because the induced
+matching is unique and each branch fixes all 28 possible edges within N(0) to
+one particular matching.
+
+For each case, edge lookup treats the four matching edges as true and the
+other 24 edges within N(0) as false. This removes those 28 edge variables and
+simplifies C4 clauses and degree counters. Every branch has 8,643 variables
+and 229,626 clauses, against 9,195 variables and 258,093 clauses for the
+canonical formula without matching normalization. This should help by exposing
+the forced neighborhood pattern as constants before propagation; it does not
+assume which partner any vertex has except for the selected exhaustive orbit.
+
+Run only case 1 as a bounded feasibility screen. Generate
+`.lake/c4-42-k4-matching-cases/case1.cnf`; run the existing CaDiCaL 2.1.2
+binary with `--lrat --checkproof=2 -t 120` and a 120-second per-process CPU
+limit (`ulimit -t 120`). Stop on SAT, complete UNSAT, or either the solver's
+120-second real-time cap or the process CPU cap. Store CNF, log, and LRAT only
+under `.lake/c4-42-k4-matching-cases/`. Do not rerun case 1 or run cases 2..4
+in this screen. This one result cannot rule out the graph: a full UNSAT claim
+requires all four disjoint cases to have complete LRAT proofs and Lean replay,
+plus the canonical encoder bridge. A SAT model must be checked independently.
