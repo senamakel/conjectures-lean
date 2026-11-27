@@ -73,7 +73,13 @@ lemma legendreFailure_gap {n : ℕ} (hn : 2 ≤ n) (hbad : legendreFailure n) :
   have hsum : n ^ 2 + (2 * n + 1) ≤ (k + 1).nth Nat.Prime := by
     rw [← hpow]
     exact hupper
+  have hsum' : n ^ 2 + (2 * n + 1) ≤ (idx (n ^ 2)).nth Nat.Prime := by
+    simpa [hsucc] using hsum
+  have hpk' : (idx (n ^ 2) - 1).nth Nat.Prime < n ^ 2 := by
+    simpa [k] using hpk
   unfold primeGap
+  rw [hsucc]
+  change 2 * n + 1 ≤ (idx (n ^ 2)).nth Nat.Prime - (idx (n ^ 2) - 1).nth Nat.Prime
   omega
 
 lemma squareInterval_subset_gap {n k : ℕ}
