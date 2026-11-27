@@ -33,6 +33,102 @@ theorem mem_rowDiff_iff (G : SimpleGraph V) (I : Finset V) (c d x : V) :
     Finset.mem_filter]
   tauto
 
+/-- The induced double star made from a clique edge and the vertices seeing exactly one
+of its endpoints is a tree. -/
+theorem doubleStar_isTree (G : SimpleGraph V) (C I : Finset V) (c d : V)
+    (hC : G.IsClique (C : Set V)) (hI : G.IsIndepSet (I : Set V))
+    (hCI : Disjoint C I) (hc : c ∈ C) (hd : d ∈ C) (hcd : c ≠ d) :
+    (G.induce
+      ((insert c (insert d (rowDiff G I c d) : Finset V) : Finset V) : Set V)).IsTree := by
+  classical
+  let R := rowDiff G I c d
+  let S := insert c (insert d R)
+  let H := G.induce (S : Set V)
+  let c' : {x // x ∈ (S : Finset V)} := ⟨c, by simp [S]⟩
+  let d' : {x // x ∈ (S : Finset V)} := ⟨d, by simp [S, hcd]⟩
+  have hcdG : G.Adj c d := hC hc hd hcd
+  have hcR : c ∉ R := by
+    intro h
+    have hi := (mem_rowDiff_iff G I c d c).mp h |>.1
+    exact (Finset.disjoint_left.mp hCI hc) hi
+  have hdR : d ∉ R := by
+    intro h
+    have hi := (mem_rowDiff_iff G I c d d).mp h |>.1
+    exact (Finset.disjoint_left.mp hCI hd) hi
+  have hc'ne : c' ≠ d' := by
+    intro h
+    exact hcd (congrArg Subtype.val h)
+  have hc'd' : H.Adj c' d' := by
+    simp [H, c', d', SimpleGraph.induce_adj, hcdG]
+  have hleaf (x : {x // x ∈ (S : Finset V)}) (hxC : x ≠ c') (hxD : x ≠ d') :
+      ∃ z, ∀ y, H.Adj x y ↔ y = z := by
+    have hxR : x.val ∈ R := by
+      have hxS := x.property
+      simp only [S, Finset.mem_insert] at hxS
+      rcases hxS with h | h
+      · exact (hxC (Subtype.ext h)).elim
+      · rcases Finset.mem_insert.mp h with h | h
+        · exact (hxD (Subtype.ext h)).elim
+        · exact h
+    have hxI := (mem_rowDiff_iff G I c d x.val).mp hxR |>.1
+    rcases (mem_rowDiff_iff G I c d x.val).mp hxR |>.2 with hcx | hdx
+    · refine ⟨c', ?_⟩
+      intro y
+      constructor
+      · intro hxy
+        have hxyG : G.Adj x.val y.val := by simpa [H] using hxy
+        have hyS := y.property
+        simp only [S, Finset.mem_insert] at hyS
+        rcases hyS with hyc | hydR
+        · exact Subtype.ext hyc
+        · rcases Finset.mem_insert.mp hydR with hyd | hyr
+          · have : G.Adj d x.val := hxyG.symm
+            exact (hdx.2 this).elim
+          · have hyI := (mem_rowDiff_iff G I c d y.val).mp hyr |>.1
+            have hne : x.val ≠ y.val := fun h => G.irrefl (h ▸ hxyG)
+            exact (hI hxI hyI hne hxyG).elim
+      · rintro rfl
+        simpa [H, c'] using hcx.1
+    · refine ⟨d', ?_⟩
+      intro y
+      constructor
+      · intro hxy
+        have hxyG : G.Adj x.val y.val := by simpa [H] using hxy
+        have hyS := y.property
+        simp only [S, Finset.mem_insert] at hyS
+        rcases hyS with hyc | hydR
+        · have : G.Adj x.val c := hxyG
+          exact (hcx.2 this).elim
+        · rcases Finset.mem_insert.mp hydR with hyd | hyr
+          · exact Subtype.ext hyd
+          · have hyI := (mem_rowDiff_iff G I c d y.val).mp hyr |>.1
+            have hne : x.val ≠ y.val := fun h => G.irrefl (h ▸ hxyG)
+            exact (hI hxI hyI hne hxyG).elim
+      · rintro rfl
+        simpa [H, d'] using hdx.1
+  have hconn : H.Connected := by
+    rw [connected_iff_exists_forall_reachable]
+    refine ⟨c', fun x => ?_⟩
+    by_cases hxc : x = c'
+    · simpa [hxc]
+    by_cases hxd : x = d'
+    · exact hxd ▸ hc'd'.reachable.symm
+    · obtain ⟨z, hz⟩ := hleaf x hxc hxd
+      by_cases hzc : z = c'
+      · rw [hzc] at hz
+        exact ((hz c').2 rfl).reachable.symm
+      · have hzd : z = d' := by
+          have hzcd := hz d'
+          have hzd' : H.Adj x d' := by
+            have hzx := ((hz z).2 rfl)
+            have hzx' := (hC hc hd hcd).reachable
+            sorry
+          sorry
+        sorry
+  rw [SimpleGraph.isTree_iff]
+  refine ⟨hconn, ?_⟩
+  sorry
+
 /-- A Mathlib-level formulation of the bound on the largest induced tree. -/
 def inducedTreeBound (G : SimpleGraph V) (k : ℕ) : Prop :=
   ∀ s : Finset V, (G.induce (s : Set V)).IsTree → s.card ≤ k + 2
