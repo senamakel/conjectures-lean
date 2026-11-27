@@ -53,7 +53,7 @@ private theorem twice_union_card_add_square_bound {V : Type*} [Fintype V]
         _ ≤ ∑ _v ∈ S, 1 := Finset.sum_le_sum fun v hv => hintera v hv
         _ = S.card := by simp
     have hUnion : (insert a S).biUnion f = f a ∪ U := by
-      simp [U, Finset.biUnion_insert, ha]
+      simp [U, Finset.biUnion_insert]
     have hUnionCard := Finset.card_union_add_card_inter (f a) U
     have hcardInsert : (insert a S).card = S.card + 1 := by simp [ha]
     rw [hcardInsert]
@@ -98,18 +98,22 @@ theorem degree_eight_count_le_seven (G : SimpleGraph (Fin 42)) [DecidableRel G.A
     rcases Finset.mem_biUnion.mp hx with ⟨u, hu, hux⟩
     have huD := hSD hu
     have huDeg := (Finset.mem_filter.mp huD).2
-    have huxAdj : G.Adj u x := by simpa using hux
+    have huxAdj : G.Adj u x := (G.mem_neighborFinset u x).mp hux
     have hxnot : x ∉ D := by
       intro hxD
       have hxDeg := (Finset.mem_filter.mp hxD).2
+      have hux' : u ∈ G.neighborFinset x :=
+        (G.mem_neighborFinset x u).mpr (G.symm.symm u x huxAdj)
       have hdegreeBound := C4DegreeBounds.neighbor_degree_le_seven_of_degree_eight
-        G x (by simp) hmin hC4 hxDeg (G.mem_neighborFinset x u).mpr (G.symm.symm u x huxAdj)
+        G x (by simp) hmin hC4 hxDeg hux'
       omega
     exact Finset.mem_sdiff.mpr ⟨Finset.mem_univ _, hxnot⟩
   have hUnionUpper : (S.biUnion N).card ≤ 42 - D.card := by
     calc
       _ ≤ (Finset.univ \ D).card := Finset.card_le_card hnotD
-      _ = 42 - D.card := by simp [D]
+      _ = 42 - D.card := by
+        rw [Finset.card_sdiff_of_subset (Finset.subset_univ D)]
+        simp [D]
   omega
 
 /-- The first and second codegree moments for degree-eight vertices in a
