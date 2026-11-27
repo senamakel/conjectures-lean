@@ -38,3 +38,14 @@ Stop at the first distinct-pair collision or after enumerating and sorting the
 interval, with a 30-second wall limit. The C++ search used unsigned 128-bit
 products. It found no collision among 1,532,047 pairs in 0.16 seconds with
 approximately 67 MiB peak memory. This finite search has no Lean certificate.
+
+### Fixed-parameter uniqueness
+
+[CrystalParameter.lean](CrystalParameter.lean) checks directly against the
+registry's `IsCrystalWithComponents` definition. For fixed product `n`,
+write `s = a+b` and `t = c+d`. If both pairs share parameter `w`, their
+equations are `s² = w(n+s+1)` and `t² = w(n+t+1)`. Cross multiplication
+gives `(s−t)((s+t)(n+1)+st)=0`. Nonnegative distinct sums make the second
+factor positive, so the sums agree. Equal sums and products determine the
+unordered pair. The checked result uses only the three standard axioms and
+leaves collisions between distinct parameters open.
