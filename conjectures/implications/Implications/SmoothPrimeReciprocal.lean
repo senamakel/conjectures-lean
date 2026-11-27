@@ -245,6 +245,32 @@ theorem finite_geometric_product_le_exp_four_sum {ι : Type*} [DecidableEq ι]
       congr 1
       rw [Finset.mul_sum]
 
+/-- Weighted form of the finite Euler product estimate.  The pointwise hypothesis
+`u p ≤ Y^(1-σ)/p` is the elementary comparison used for prime powers in Rankin's
+method. -/
+theorem weighted_geometric_product_le_exp {s : Finset ℕ} {Y : ℝ} {σ : ℝ}
+    (u : ℕ → ℝ) (hY : 0 < Y) (hσ : σ ≤ 1)
+    (hu0 : ∀ p ∈ s, 0 ≤ u p) (hu3 : ∀ p ∈ s, u p ≤ 3 / 4)
+    (hu : ∀ p ∈ s, u p ≤ Y ^ (1 - σ) / p) :
+    (∏ p ∈ s, (1 - u p)⁻¹) ≤
+      Real.exp (4 * Y ^ (1 - σ) * ∑ p ∈ s, (1 : ℝ) / p) := by
+  have hsum : (∑ p ∈ s, u p) ≤ Y ^ (1 - σ) * ∑ p ∈ s, (1 : ℝ) / p := by
+    calc
+      _ ≤ ∑ p ∈ s, Y ^ (1 - σ) / p := Finset.sum_le_sum fun p hp => hu p hp
+      _ = Y ^ (1 - σ) * ∑ p ∈ s, (1 : ℝ) / p := by
+        rw [Finset.mul_sum]
+        apply Finset.sum_congr rfl
+        intro p hp
+        ring
+  calc
+    _ ≤ Real.exp (4 * ∑ p ∈ s, u p) :=
+      finite_geometric_product_le_exp_four_sum s u hu0 hu3
+    _ ≤ Real.exp (4 * Y ^ (1 - σ) * ∑ p ∈ s, (1 : ℝ) / p) := by
+      apply Real.exp_le_exp.mpr
+      have hpow : 0 ≤ Y ^ (1 - σ) := Real.rpow_nonneg hY.le _
+      nlinarith
+
 end Implications.SmoothPrimeReciprocal
 
 #print axioms Implications.SmoothPrimeReciprocal.reciprocalPrimeSum_le_dyadic_harmonic
+#print axioms Implications.SmoothPrimeReciprocal.weighted_geometric_product_le_exp
