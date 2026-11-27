@@ -255,4 +255,21 @@ theorem outer_edge_count_from_local_counts
 
 #print axioms outer_edge_count_from_local_counts
 
+/-- A tier-H bound of 21 edges for C4-free graphs on twelve vertices turns
+the global count into the SAT-ready shared-edge cap. -/
+theorem shared_edge_count_le_three_of_outer_bound
+    {V : Type*} [Fintype V] [DecidableEq V]
+    (G : SimpleGraph V) [DecidableRel G.Adj] (S O : Finset V)
+    (hOcard : O.card = 12)
+    (hSlocal : ∀ x ∈ S,
+      (G.neighborFinset x ∩ O).card = (G.neighborFinset x ∩ S).card)
+    (hOlocal : ∀ x ∈ O,
+      (G.neighborFinset x ∩ O).card = 3 + (G.neighborFinset x ∩ S).card)
+    (hOuterEdges : inducedEdgeCount G O ≤ 21) :
+    inducedEdgeCount G S ≤ 3 := by
+  have hglobal := outer_edge_count_from_local_counts G S O hOcard hSlocal hOlocal
+  omega
+
+#print axioms shared_edge_count_le_three_of_outer_bound
+
 end C4RootWitnessCountIdentity
