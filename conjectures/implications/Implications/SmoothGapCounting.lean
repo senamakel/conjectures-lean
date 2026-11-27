@@ -324,7 +324,6 @@ theorem hitIndexProportionBound (N B j : ℕ) (hB : 0 < B) :
           (fun m => m.maxPrimeFac < primeGap r)).card)).card : ℝ)) /
           ((B : ℝ) * (N + 1 : ℝ)) := by
       field_simp
-      <;> ring
     _ ≤ ((j : ℝ) * primeAt N + (B : ℝ) *
         ((1 + 2 ^ B.primesBelow.card * (primeAt N).sqrt : ℕ) : ℝ)) /
           ((B : ℝ) * (N + 1 : ℝ)) :=
