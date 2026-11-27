@@ -492,8 +492,26 @@ theorem hamiltonian_of_split_partition_row_bounds
         · simpa [hempty] using hvI
       exact List.mem_toFinset.mp (by simpa [l, hfin] using hvC)
 
+/-- A split graph with induced-tree bound three has a Hamiltonian path when
+every independent vertex has a clique neighbour. -/
+theorem hamiltonian_of_split_partition_of_inducedTreeBound
+    (G : SimpleGraph V) (C I : Finset V)
+    (hC : G.IsClique (C : Set V)) (hI : G.IsIndepSet (I : Set V))
+    (hdisj : Disjoint C I)
+    (hpartition : (Finset.univ : Finset V) = C ∪ I)
+    (hTreeBound : inducedTreeBound G 1)
+    (hcover : ∀ i ∈ I, ∃ c ∈ C, G.Adj c i)
+    (hCne : C.Nonempty) :
+    ∃ (u v : V) (p : G.Walk u v), p.IsHamiltonian := by
+  obtain ⟨hrow, hdiff⟩ := rows_bounded_of_inducedTreeBound G C I 1 hTreeBound hC hI hdisj
+  exact hamiltonian_of_split_partition_row_bounds G C I hC hI hdisj hpartition
+    (by simpa using hrow) (by simpa using hdiff) hcover hCne
+
 end SplitGraphPath
 
 #print axioms SplitGraphPath.independent_card_le_two_of_row_bounds
 #print axioms SplitGraphPath.hamiltonian_of_clique_order_with_two_endpoints
 #print axioms SplitGraphPath.hamiltonian_of_split_partition_two_endpoints
+#print axioms SplitGraphPath.exists_distinct_row_attachments
+#print axioms SplitGraphPath.hamiltonian_of_split_partition_row_bounds
+#print axioms SplitGraphPath.hamiltonian_of_split_partition_of_inducedTreeBound
