@@ -1,4 +1,3 @@
-import Mathlib
 import Implications.C4PolarityOrderSeven
 
 /-! Exact lex-sorted projective orthogonal symmetries used by the C4 encoder. -/
