@@ -36,7 +36,7 @@ def compatibleCliqueSearchBool (g : Array Nat) : List Nat → Nat → Bool
   | v :: vs, k + 1 =>
       compatibleCliqueSearchBool g vs (k + 1) ||
         compatibleCliqueSearchBool g (vs.filter (compatible g v)) k
-termination_by candidates.length
+termination_by candidates remaining => candidates.length
 decreasing_by
   · simp_wf
   · simp_wf
@@ -67,7 +67,7 @@ theorem search_sound (g : Array Nat) (candidates : List Nat) (size : Nat)
       have hsplit :
           compatibleCliqueSearchBool g vs (size + 1) = true ∨
             compatibleCliqueSearchBool g (vs.filter (compatible g v)) size = true := by
-        simpa [compatibleCliqueSearchBool, Bool.or_eq_true] using h
+        simpa only [compatibleCliqueSearchBool, Bool.or_eq_true] using h
       rcases hsplit with hskip | htake
       · obtain ⟨chosen, hlen, hsub, hpairs⟩ := search_sound g vs (size + 1) hskip
         exact ⟨chosen, hlen, hsub.cons v, hpairs⟩
@@ -79,7 +79,7 @@ theorem search_sound (g : Array Nat) (candidates : List Nat) (size : Nat)
           · intro w hw
             exact (List.mem_filter.mp (hsub.subset hw)).2
           · exact hpairs
-termination_by candidates.length
+termination_by candidates size => candidates.length
 decreasing_by
   · simp_wf
     omega
@@ -98,8 +98,7 @@ theorem search_complete (g : Array Nat) (candidates : List Nat) (size : Nat)
   | succ size =>
     cases candidates with
     | nil =>
-        have hlenBound := hsub.length_le
-        simp at hlenBound
+        have hlenBound : chosen.length ≤ 0 := by simpa using hsub.length_le
         omega
     | cons v vs =>
         cases chosen with
@@ -110,7 +109,9 @@ theorem search_complete (g : Array Nat) (candidates : List Nat) (size : Nat)
           ·
             have hskip : ExistsCompatibleClique g vs (size + 1) :=
               ⟨a :: tail, hlen, htail, hpairs⟩
-            rw [compatibleCliqueSearchBool, Bool.or_eq_true]
+            change (compatibleCliqueSearchBool g vs (size + 1) ||
+              compatibleCliqueSearchBool g (vs.filter (compatible g v)) size) = true
+            simp only [Bool.or_eq_true]
             exact Or.inl (search_complete g vs (size + 1) hskip)
           ·
             subst a
@@ -119,7 +120,7 @@ theorem search_complete (g : Array Nat) (candidates : List Nat) (size : Nat)
               hpairs.of_cons
             have hcompatible : ∀ w ∈ tail, compatible g v w = true := by
               intro w hw
-              exact hpairs.rel_of_pairwise_cons hw
+              exact List.rel_of_pairwise_cons hpairs hw
             have htailFiltered :
                 List.Sublist tail (vs.filter (compatible g v)) := by
               rw [← List.filter_eq_self.mpr hcompatible]
@@ -127,9 +128,11 @@ theorem search_complete (g : Array Nat) (candidates : List Nat) (size : Nat)
             have htake :
                 ExistsCompatibleClique g (vs.filter (compatible g v)) size :=
               ⟨tail, hlenTail, htailFiltered, hpairsTail⟩
-            rw [compatibleCliqueSearchBool, Bool.or_eq_true]
+            change (compatibleCliqueSearchBool g vs (size + 1) ||
+              compatibleCliqueSearchBool g (vs.filter (compatible g v)) size) = true
+            simp only [Bool.or_eq_true]
             exact Or.inr (search_complete g (vs.filter (compatible g v)) size htake)
-termination_by candidates.length
+termination_by candidates size => candidates.length
 decreasing_by
   · simp_wf
     omega
