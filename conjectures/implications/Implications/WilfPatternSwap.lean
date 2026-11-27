@@ -214,8 +214,8 @@ noncomputable def markedEquivOfSwap (n : ℕ) (marks : Finset ℕ)
 the two patterns. -/
 noncomputable def markedEquiv (n : ℕ) (marks : Finset ℕ) :
     {f : Equiv.Perm (Fin n) // Marked sigma marks f} ≃
-      {f : Equiv.Perm (Fin n) // Marked tau marks f} where
-  exact markedEquivOfSwap n marks sigma tau
+      {f : Equiv.Perm (Fin n) // Marked tau marks f} :=
+  markedEquivOfSwap n marks sigma tau
     sigma_overlap_compatible_only_at_5_or_7 tau_overlap_compatible_only_at_5_or_7
     (by decide) (by decide) (by decide) (by decide) (by decide) (by decide)
     windowSwap_sigma windowSwap_tau
@@ -267,10 +267,10 @@ theorem exactOccurrenceCount_eq (n : ℕ) (marks : Finset (Fin n)) :
       WilfCounts.exactCount (occurrenceSet tau) marks := by
   exact exactOccurrenceCount_eq_of_swap n marks sigma tau
     sigma_overlap_compatible_only_at_5_or_7 tau_overlap_compatible_only_at_5_or_7
-    (by intro i hi; fin_cases i <;> decide)
-    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
-    (by intro i hi; fin_cases i <;> decide)
-    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
+    (by intro i hi; fin_cases i <;> simp_all [sigma])
+    (by intro i hi hi2; fin_cases i <;> simp_all [sigma]) (by decide)
+    (by intro i hi; fin_cases i <;> simp_all [tau])
+    (by intro i hi hi2; fin_cases i <;> simp_all [tau]) (by decide)
     windowSwap_sigma windowSwap_tau
 
 theorem exactOccurrenceCount_eq_16238475_16248375 (n : ℕ) (marks : Finset (Fin n)) :
@@ -281,10 +281,10 @@ theorem exactOccurrenceCount_eq_16238475_16248375 (n : ℕ) (marks : Finset (Fin
       (overlap_check_pair16238475))
     (overlap_compatible_only_at_5_or_7_of_decide pair16248375
       (overlap_check_pair16248375))
-    (by intro i hi; fin_cases i <;> decide)
-    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
-    (by intro i hi; fin_cases i <;> decide)
-    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
+    (by intro i hi; fin_cases i <;> simp_all [pair16238475])
+    (by intro i hi hi2; fin_cases i <;> simp_all [pair16238475]) (by decide)
+    (by intro i hi; fin_cases i <;> simp_all [pair16248375])
+    (by intro i hi hi2; fin_cases i <;> simp_all [pair16248375]) (by decide)
     (by funext i; fin_cases i <;> rfl)
     (by funext i; fin_cases i <;> rfl)
 
@@ -294,10 +294,10 @@ theorem exactOccurrenceCount_eq_17236485_17246385 (n : ℕ) (marks : Finset (Fin
   exact exactOccurrenceCount_eq_of_swap n marks pair17236485 pair17246385
     (overlap_compatible_only_at_5_or_7_of_decide pair17236485 overlap_check_pair17236485)
     (overlap_compatible_only_at_5_or_7_of_decide pair17246385 overlap_check_pair17246385)
-    (by intro i hi; fin_cases i <;> decide)
-    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
-    (by intro i hi; fin_cases i <;> decide)
-    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
+    (by intro i hi; fin_cases i <;> simp_all [pair17236485])
+    (by intro i hi hi2; fin_cases i <;> simp_all [pair17236485]) (by decide)
+    (by intro i hi; fin_cases i <;> simp_all [pair17246385])
+    (by intro i hi hi2; fin_cases i <;> simp_all [pair17246385]) (by decide)
     (by funext i; fin_cases i <;> rfl)
     (by funext i; fin_cases i <;> rfl)
 
@@ -307,10 +307,10 @@ theorem exactOccurrenceCount_eq_17238465_17248365 (n : ℕ) (marks : Finset (Fin
   exact exactOccurrenceCount_eq_of_swap n marks pair17238465 pair17248365
     (overlap_compatible_only_at_5_or_7_of_decide pair17238465 overlap_check_pair17238465)
     (overlap_compatible_only_at_5_or_7_of_decide pair17248365 overlap_check_pair17248365)
-    (by intro i hi; fin_cases i <;> decide)
-    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
-    (by intro i hi; fin_cases i <;> decide)
-    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
+    (by intro i hi; fin_cases i <;> simp_all [pair17238465])
+    (by intro i hi hi2; fin_cases i <;> simp_all [pair17238465]) (by decide)
+    (by intro i hi; fin_cases i <;> simp_all [pair17248365])
+    (by intro i hi hi2; fin_cases i <;> simp_all [pair17248365]) (by decide)
     (by funext i; fin_cases i <;> rfl)
     (by funext i; fin_cases i <;> rfl)
 
@@ -320,10 +320,10 @@ theorem exactOccurrenceCount_eq_18237465_18247365 (n : ℕ) (marks : Finset (Fin
   exact exactOccurrenceCount_eq_of_swap n marks pair18237465 pair18247365
     (overlap_compatible_only_at_5_or_7_of_decide pair18237465 overlap_check_pair18237465)
     (overlap_compatible_only_at_5_or_7_of_decide pair18247365 overlap_check_pair18247365)
-    (by intro i hi; fin_cases i <;> decide)
-    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
-    (by intro i hi; fin_cases i <;> decide)
-    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
+    (by intro i hi; fin_cases i <;> simp_all [pair18237465])
+    (by intro i hi hi2; fin_cases i <;> simp_all [pair18237465]) (by decide)
+    (by intro i hi; fin_cases i <;> simp_all [pair18247365])
+    (by intro i hi hi2; fin_cases i <;> simp_all [pair18247365]) (by decide)
     (by funext i; fin_cases i <;> rfl)
     (by funext i; fin_cases i <;> rfl)
 
@@ -333,10 +333,10 @@ theorem exactOccurrenceCount_eq_18236475_18246375 (n : ℕ) (marks : Finset (Fin
   exact exactOccurrenceCount_eq_of_swap n marks pair18236475 pair18246375
     (overlap_compatible_only_at_5_or_7_of_decide pair18236475 overlap_check_pair18236475)
     (overlap_compatible_only_at_5_or_7_of_decide pair18246375 overlap_check_pair18246375)
-    (by intro i hi; fin_cases i <;> decide)
-    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
-    (by intro i hi; fin_cases i <;> decide)
-    (by intro i hi hi2; fin_cases i <;> decide) (by decide)
+    (by intro i hi; fin_cases i <;> simp_all [pair18236475])
+    (by intro i hi hi2; fin_cases i <;> simp_all [pair18236475]) (by decide)
+    (by intro i hi; fin_cases i <;> simp_all [pair18246375])
+    (by intro i hi hi2; fin_cases i <;> simp_all [pair18246375]) (by decide)
     (by funext i; fin_cases i <;> rfl)
     (by funext i; fin_cases i <;> rfl)
 
