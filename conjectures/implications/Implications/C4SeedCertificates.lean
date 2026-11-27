@@ -1,5 +1,6 @@
 import Mathlib.Data.Nat.Bitwise
 import Mathlib.Data.List.Basic
+import Mathlib.Data.List.Pairwise
 
 /-!
 # Finite certificates for the three published 41-vertex `C₄` extremal seeds
@@ -54,22 +55,18 @@ def ExistsCompatibleClique (g : Array Nat) (candidates : List Nat) (size : Nat) 
     chosen.Pairwise (fun u v => compatible g u v = true)
 
 /-- A true checker result produces an actual compatible sublist witness. -/
-theorem search_sound (g : Array Nat) (candidates : List Nat) (size : Nat)
-    (h : compatibleCliqueSearchBool g candidates size = true) :
-    ExistsCompatibleClique g candidates size := by
-  cases size with
-  | zero =>
-      exact ⟨[], by simp, List.nil_sublist _, List.Pairwise.nil⟩
-  | succ size =>
-    cases candidates with
-    | nil => simp [compatibleCliqueSearchBool] at h
-    | cons v vs =>
+def search_sound (g : Array Nat) : (candidates : List Nat) → (size : Nat) →
+    compatibleCliqueSearchBool g candidates size = true →
+      ExistsCompatibleClique g candidates size
+  | _, 0, _ => ⟨[], by simp, List.nil_sublist _, List.Pairwise.nil⟩
+  | [], Nat.succ _, h => by simp [compatibleCliqueSearchBool] at h
+  | v :: vs, Nat.succ size, h => by
       have hsplit :
-          compatibleCliqueSearchBool g vs (size + 1) = true ∨
+          compatibleCliqueSearchBool g vs (Nat.succ size) = true ∨
             compatibleCliqueSearchBool g (vs.filter (compatible g v)) size = true := by
         simpa only [compatibleCliqueSearchBool, Bool.or_eq_true] using h
       rcases hsplit with hskip | htake
-      · obtain ⟨chosen, hlen, hsub, hpairs⟩ := search_sound g vs (size + 1) hskip
+      · obtain ⟨chosen, hlen, hsub, hpairs⟩ := search_sound g vs (Nat.succ size) hskip
         exact ⟨chosen, hlen, hsub.cons v, hpairs⟩
       · obtain ⟨chosen, hlen, hsub, hpairs⟩ :=
           search_sound g (vs.filter (compatible g v)) size htake
@@ -79,42 +76,34 @@ theorem search_sound (g : Array Nat) (candidates : List Nat) (size : Nat)
           · intro w hw
             exact (List.mem_filter.mp (hsub.subset hw)).2
           · exact hpairs
-termination_by candidates size => candidates.length
+termination_by candidates => candidates.length
 decreasing_by
   · simp_wf
-    omega
   · simp_wf
     have hfilter : (vs.filter (compatible g v)).length ≤ vs.length :=
       List.length_filter_le _ _
     omega
 
 /-- A genuine compatible sublist is found by the depth-pruned checker. -/
-theorem search_complete (g : Array Nat) (candidates : List Nat) (size : Nat)
-    (h : ExistsCompatibleClique g candidates size) :
-    compatibleCliqueSearchBool g candidates size = true := by
-  obtain ⟨chosen, hlen, hsub, hpairs⟩ := h
-  cases size with
-  | zero => simp [compatibleCliqueSearchBool]
-  | succ size =>
-    cases candidates with
-    | nil =>
-        have hlenBound : chosen.length ≤ 0 := by simpa using hsub.length_le
-        omega
-    | cons v vs =>
-        cases chosen with
-        | nil => simp at hlen
-        | cons a tail =>
-          have hsplit : List.Sublist (a :: tail) (v :: vs) := hsub
-          rcases (List.cons_sublist_cons'.mp hsplit) with htail | ⟨hav, htail⟩
-          ·
-            have hskip : ExistsCompatibleClique g vs (size + 1) :=
-              ⟨a :: tail, hlen, htail, hpairs⟩
-            change (compatibleCliqueSearchBool g vs (size + 1) ||
-              compatibleCliqueSearchBool g (vs.filter (compatible g v)) size) = true
-            simp only [Bool.or_eq_true]
-            exact Or.inl (search_complete g vs (size + 1) hskip)
-          ·
-            subst a
+def search_complete (g : Array Nat) : (candidates : List Nat) → (size : Nat) →
+    ExistsCompatibleClique g candidates size →
+      compatibleCliqueSearchBool g candidates size = true
+  | _, 0, _ => by simp [compatibleCliqueSearchBool]
+  | [], Nat.succ _, h => by
+      obtain ⟨chosen, hlen, hsub, _⟩ := h
+      have hlenBound : chosen.length ≤ 0 := by simpa using hsub.length_le
+      omega
+  | v :: vs, Nat.succ size, h => by
+      obtain ⟨chosen, hlen, hsub, hpairs⟩ := h
+      cases chosen with
+      | nil => simp at hlen
+      | cons a tail =>
+          rcases List.cons_sublist_cons'.mp hsub with hskip | ⟨hav, htail⟩
+          · have hskipSpec : ExistsCompatibleClique g vs (Nat.succ size) :=
+                ⟨a :: tail, hlen, hskip, hpairs⟩
+            simp only [compatibleCliqueSearchBool, Bool.or_eq_true]
+            exact Or.inl (search_complete g vs (Nat.succ size) hskipSpec)
+          · subst a
             have hlenTail : tail.length = size := by simpa using hlen
             have hpairsTail : tail.Pairwise (fun u w => compatible g u w = true) :=
               hpairs.of_cons
@@ -125,17 +114,13 @@ theorem search_complete (g : Array Nat) (candidates : List Nat) (size : Nat)
                 List.Sublist tail (vs.filter (compatible g v)) := by
               rw [← List.filter_eq_self.mpr hcompatible]
               exact htail.filter (compatible g v)
-            have htake :
-                ExistsCompatibleClique g (vs.filter (compatible g v)) size :=
+            have htakeSpec : ExistsCompatibleClique g (vs.filter (compatible g v)) size :=
               ⟨tail, hlenTail, htailFiltered, hpairsTail⟩
-            change (compatibleCliqueSearchBool g vs (size + 1) ||
-              compatibleCliqueSearchBool g (vs.filter (compatible g v)) size) = true
-            simp only [Bool.or_eq_true]
-            exact Or.inr (search_complete g (vs.filter (compatible g v)) size htake)
-termination_by candidates size => candidates.length
+            simp only [compatibleCliqueSearchBool, Bool.or_eq_true]
+            exact Or.inr (search_complete g (vs.filter (compatible g v)) size htakeSpec)
+termination_by candidates => candidates.length
 decreasing_by
   · simp_wf
-    omega
   · simp_wf
     have hfilter : (vs.filter (compatible g v)).length ≤ vs.length :=
       List.length_filter_le _ _
