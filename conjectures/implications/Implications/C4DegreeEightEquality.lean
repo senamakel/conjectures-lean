@@ -126,6 +126,7 @@ theorem every_other_vertex_has_unique_common_neighbor
         _ = ∑ u ∈ S, ((G.degree u - 1) + 1) := by
           apply Finset.sum_congr rfl
           intro u hu
+          have huMin := hmin u
           omega
         _ = _ := by simp [Finset.sum_add_distrib]
     have houterEq : (∑ u ∈ S, (O u).card) = ∑ u ∈ S, (G.degree u - 1) := by
@@ -138,7 +139,7 @@ theorem every_other_vertex_has_unique_common_neighbor
     exact C4DegreeBounds.outerNeighbors_disjoint G hC4 hu hw huw
   have hUcard : U.card = 41 := by
     calc
-      _ = ∑ u ∈ S, (O u).card := (Finset.card_biUnion hdisj).symm
+      _ = ∑ u ∈ S, (O u).card := by simpa [U] using (Finset.card_biUnion hdisj).symm
       _ = 41 := houterSum
   have hUsubset : U ⊆ Finset.univ.erase v := by
     intro w hw
@@ -174,7 +175,7 @@ theorem every_other_vertex_has_unique_common_neighbor
     have hwx := (G.mem_neighborFinset w x).mp (Finset.mem_inter.mp hx).2
     have hvy := (G.mem_neighborFinset v y).mp (Finset.mem_inter.mp hy).1
     have hwy := (G.mem_neighborFinset w y).mp (Finset.mem_inter.mp hy).2
-    exact hC4 hwv hxy hvx hwx ⟨hvy, hwy⟩
+    exact hC4 hwv.symm hxy hvx hwx ⟨hvy, hwy⟩
   have hcardGe : 1 ≤ (G.neighborFinset v ∩ G.neighborFinset w).card :=
     Finset.card_pos.mpr ⟨u, huCommon⟩
   omega
