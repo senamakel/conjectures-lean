@@ -49,88 +49,46 @@ theorem two_original_rows_shape
         row G I c = {u, v} ∧ row G I d = {u, w} := by
   classical
   obtain ⟨u, huC, huD⟩ := two_original_rows_intersect G I c d hc hd hdiff
-  obtain ⟨x, y, hxy, hCeq⟩ := Finset.card_eq_two.mp hc
-  have huxy : u = x ∨ u = y := by
-    rw [hCeq] at huC
-    simpa using huC
-  rcases huxy with hux | huy
-  · obtain ⟨r, s, hrs, hDeq⟩ := Finset.card_eq_two.mp hd
-    have hur : u = r ∨ u = s := by rw [hDeq] at huD; simpa using huD
-    rcases hur with hur | hus
-    · subst x r
-      by_cases heq : y = s
-      · left
-        rw [hCeq, hDeq]
-        simp [heq]
-      · right
-        refine ⟨u, y, s, ?_, ?_, ?_, hCeq, ?_⟩
-        · intro h
-          subst y
-          exact hxy rfl
-        · intro h
-          subst s
-          exact hrs rfl
-        · intro h
-          subst s
-          exact heq rfl
-        · rw [hDeq]
-          simp [hur]
-    · subst x s
-      by_cases heq : y = r
-      · left
-        rw [hCeq, hDeq]
-        simp [heq, Finset.pair_comm]
-      · right
-        refine ⟨u, y, r, ?_, ?_, ?_, hCeq, ?_⟩
-        · intro h
-          subst y
-          exact hxy rfl
-        · intro h
-          subst r
-          exact hrs rfl
-        · exact heq
-        · rw [hDeq]
-          simp [Finset.pair_comm, hus]
-  · subst y
-    obtain ⟨r, s, hrs, hDeq⟩ := Finset.card_eq_two.mp hd
-    have hur : u = r ∨ u = s := by rw [hDeq] at huD; simpa using huD
-    rcases hur with hur | hus
-    · subst y r
-      by_cases heq : x = s
-      · left
-        rw [hCeq, hDeq]
-        simp [heq, Finset.pair_comm]
-      · right
-        refine ⟨u, x, s, ?_, ?_, ?_, ?_, ?_⟩
-        · intro h
-          subst x
-          exact hxy rfl
-        · intro h
-          subst s
-          exact hrs rfl
-        · exact heq.symm
-        · rw [hCeq]
-          simp [Finset.pair_comm]
-        · rw [hDeq]
-          simp [hus]
-    · subst y s
-      by_cases heq : x = r
-      · left
-        rw [hCeq, hDeq]
-        simp [heq]
-      · right
-        refine ⟨u, x, r, ?_, ?_, ?_, ?_, ?_⟩
-        · intro h
-          subst x
-          exact hxy rfl
-        · intro h
-          subst r
-          exact hrs rfl
-        · exact heq.symm
-        · rw [hCeq]
-          simp
-        · rw [hDeq]
-          simp [hus, Finset.pair_comm]
+  have hcEraseCard : ((row G I c).erase u).card = 1 := by
+    rw [Finset.card_erase_of_mem huC, hc]
+    decide
+  have hdEraseCard : ((row G I d).erase u).card = 1 := by
+    rw [Finset.card_erase_of_mem huD, hd]
+    decide
+  obtain ⟨v, hvErase⟩ := Finset.card_eq_one.mp hcEraseCard
+  obtain ⟨w, hwErase⟩ := Finset.card_eq_one.mp hdEraseCard
+  have hCeq : row G I c = {u, v} := by
+    ext x
+    by_cases hxu : x = u
+    · subst x
+      simp [huC]
+    · have hx : x ∈ row G I c ↔ x ∈ (row G I c).erase u := by
+        simp [Finset.mem_erase, hxu]
+      rw [hx, hvErase]
+      simp [hxu]
+  have hDeq : row G I d = {u, w} := by
+    ext x
+    by_cases hxu : x = u
+    · subst x
+      simp [huD]
+    · have hx : x ∈ row G I d ↔ x ∈ (row G I d).erase u := by
+        simp [Finset.mem_erase, hxu]
+      rw [hx, hwErase]
+      simp [hxu]
+  have huv : u ≠ v := by
+    intro h
+    have huNot : u ∉ (row G I c).erase u := (Finset.mem_erase.mp (by simp [hvErase])).1
+    exact huNot (by rw [h]; simp [hvErase])
+  have huw : u ≠ w := by
+    intro h
+    have huNot : u ∉ (row G I d).erase u := (Finset.mem_erase.mp (by simp [hwErase])).1
+    exact huNot (by rw [h]; simp [hwErase])
+  by_cases hvw : v = w
+  · left
+    rw [hCeq, hDeq, hvw]
+    simp
+  · right
+    exact ⟨u, v, w, huv, huw, hvw, hCeq, hDeq⟩
 
 end SplitGraphSmallRowsTwo
 
