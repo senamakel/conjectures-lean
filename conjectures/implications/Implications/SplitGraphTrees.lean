@@ -1,6 +1,6 @@
 import Mathlib
 
-/--!
+/-!
 Bridge lemmas for the split-graph case of Written on the Wall II #199.
 
 The Formal Conjectures helpers for largest induced trees are not a dependency of this package.
