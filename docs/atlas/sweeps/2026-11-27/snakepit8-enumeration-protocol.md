@@ -125,6 +125,13 @@ completes. If any target hits both its cap and its vertex bound without
 completing, preserve it as partial and stop that target; the remaining targets
 still proceed under the aggregate limit.
 
+The pruned `E=26` retry again hit 6 billion nodes, after 125.43 CPU seconds,
+emitting 5,860 eligible masks and rejecting 32,214 cyclic leaves at 7,092 KiB
+maximum RSS. Compared with the prior unpruned run, it reached the same forest
+count and reduced cyclic leaves but did not reduce nodes. Treat this exact-edge
+slice as incomplete; do not retry it again within this budget. Proceed with one
+run each for `E=25,24,23`, using the already-recorded caps.
+
 ## Interpretation
 
 Finishing the count reproduces only the Q7 enumeration stage; it does not prove
