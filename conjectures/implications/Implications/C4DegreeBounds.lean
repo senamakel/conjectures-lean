@@ -89,11 +89,7 @@ theorem sum_innerNeighbors_card_ge_seven (v : V)
     simpa [S, G.card_neighborFinset_eq_degree] using hv
   have hSsub : S ⊆ Finset.univ.erase v := by
     intro z hz
-    have hzv : z ≠ v := by
-      intro h
-      subst z
-      have : G.Adj v v := by simpa using hz
-      exact G.loopless.irrefl v this
+    have hzv : z ≠ v := G.ne_of_adj (by simpa using hz)
     exact Finset.mem_erase.mpr ⟨hzv, Finset.mem_univ _⟩
   have hdisj : (S : Set V).PairwiseDisjoint T := by
     intro u hu w hw huw
@@ -101,7 +97,7 @@ theorem sum_innerNeighbors_card_ge_seven (v : V)
     intro z hzu hzw
     have hzu' : z ∈ outerNeighbors G u v := (Finset.mem_sdiff.mp hzu).1
     have hzw' : z ∈ outerNeighbors G w v := (Finset.mem_sdiff.mp hzw).1
-    exact (outerNeighbors_disjoint G hC4 hu hw huw).not_mem_of_mem_left hzu' hzw'
+    exact (Finset.disjoint_left.mp (outerNeighbors_disjoint G hC4 hu hw huw)) z hzu' hzw'
   let U := S.biUnion T
   have hUsub : U ⊆ Finset.univ.erase v \ S := by
     intro z hz
@@ -132,7 +128,7 @@ theorem sum_innerNeighbors_card_ge_seven (v : V)
     have hterm : ∀ u ∈ S, 5 ≤ (outerNeighbors G u v).card := by
       intro u hu
       have huv : v ∈ G.neighborFinset u := by
-        have huv' : G.Adj v u := by simpa using hu
+        have huv' : G.Adj v u := by simpa [S] using hu
         simpa using G.symm.symm v u huv'
       have hcardOuter : (outerNeighbors G u v).card = G.degree u - 1 := by
         change #((G.neighborFinset u).erase v) = G.degree u - 1
@@ -148,7 +144,7 @@ theorem sum_innerNeighbors_card_ge_seven (v : V)
       (∑ u ∈ S, (outerNeighbors G u v).card) =
         (∑ u ∈ S, (T u).card) +
           (∑ u ∈ S, (innerNeighbors G u v).card) := by
-    rw [Finset.sum_add_distrib]
+    rw [← Finset.sum_add_distrib]
     apply Finset.sum_congr rfl
     intro u hu
     dsimp [T, externalNeighbors]
@@ -161,7 +157,8 @@ theorem sum_innerNeighbors_card_ge_seven (v : V)
         have : G.Adj v v := by simpa using hzv
         exact G.loopless.irrefl v this
       exact Finset.mem_erase.mpr ⟨hz_ne_v, by simpa using hzu⟩
-    exact (Finset.card_sdiff_add_card_eq_card hsub).symm
+    simpa [Finset.union_eq_left.mpr hsub] using
+      (Finset.card_sdiff_add_card_eq_card (innerNeighbors G u v) (outerNeighbors G u v)).symm
   omega
 
 theorem sum_outerNeighbors_card_le (v : V)
