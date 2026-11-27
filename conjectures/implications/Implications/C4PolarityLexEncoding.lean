@@ -355,14 +355,17 @@ theorem lexClauses_extend_of_constraint (a : Nat → Bool) (base : Nat)
           · subst y
             have hconstraint' :
                 lexConstraint initialPref (xs.map a) (ys.map a) = true := by
-              simp only [lexConstraint] at hconstraint
-              exact hconstraint.2
+              change (((!initialPref || a x || !(a x)) &&
+                lexConstraint initialPref (xs.map a) (ys.map a)) = true) at hconstraint
+              exact (Bool.and_eq_true_iff.mp (by simpa using hconstraint)).2
+            have hscan : lexPrefixScan a initialPref (x :: xs) (x :: ys) =
+                lexPrefixScan a initialPref xs ys := by
+              simp [lexPrefixScan]
             have hassign : lexAssignment a base initialPref (x :: xs) (x :: ys) =
                 lexAssignment a base initialPref xs ys := by
-              funext n
-              simp [lexAssignment, lexPrefixScan]
+              simp [lexAssignment, hscan]
             rw [hassign]
-            simp only [lexClauses, if_pos rfl]
+            simp [lexClauses]
             exact ih base initialPref prefVar ys hlen hpref0 hprefBase hprefix
               htailLp htailRp htailL htailR hconstraint' 
           · have hconstraint' :
@@ -377,7 +380,7 @@ theorem lexClauses_extend_of_constraint (a : Nat → Bool) (base : Nat)
             have hgpref : g prefVar = initialPref := by
               dsimp [g]
               rw [lexAssignment_preserves_below_base a base initialPref (x :: xs) (y :: ys)
-                (Nat.lt_trans hprefBase (by omega))]
+                hprefBase]
               exact hprefix
             have hgx : g x = a x := by
               dsimp [g]
@@ -406,7 +409,8 @@ theorem lexClauses_extend_of_constraint (a : Nat → Bool) (base : Nat)
             have htailSat :
                 cnfValue (lexAssignment (extendVariable a base nextPref) (base + 1)
                   nextPref xs ys) (lexClauses base (base + 1) xs ys) = true := by
-              apply ih (base + 1) nextPref base ys hlen hpref0 ?_ ?_ htailLp htailRp ?_ ?_ htailConstraint
+              apply ih (base + 1) nextPref base ys hlen ?_ ?_ ?_ htailLp htailRp ?_ ?_ htailConstraint
+              · omega
               · omega
               · simp [extendVariable]
               · intro z hz
@@ -419,8 +423,7 @@ theorem lexClauses_extend_of_constraint (a : Nat → Bool) (base : Nat)
               dsimp [g]
               rw [hassign]
               exact htailSat
-            simp only [lexClauses, if_neg hxy]
-            simp [cnfValue, hstep, htailSat']
+            simp [lexClauses, hxy, cnfValue, hstep, htailSat']
 
 end Implications.C4PolarityLexEncoding
 
