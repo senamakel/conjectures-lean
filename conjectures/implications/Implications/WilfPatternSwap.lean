@@ -30,7 +30,6 @@ private theorem swaps_nonfirst {n : ℕ} (marks : Finset ℕ)
   · subst i
     rw [swapIndex_val_right _ _ _ _ ⟨s, hs, rfl⟩]
     simp [atOffset, windowSwap]
-    omega
   have hleft : ¬ IsLeft marks (atOffset s (hb s hs) i) := by
     rintro ⟨t, ht, he⟩
     change s + i.val = t + 3 at he
@@ -103,8 +102,11 @@ private theorem windowSwap_nonfirst (i : Fin 8) (hi : i ≠ 0) : windowSwap i �
 
 private noncomputable def swapPerm {n : ℕ} (marks : Finset ℕ)
     (hb : ∀ s ∈ marks, s + 7 < n)
-    (hd : ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t) : Equiv.Perm (Fin n) :=
-  Equiv.ofInvolutive _ (swapIndex_involutive marks hb hd)
+    (hd : ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t) : Equiv.Perm (Fin n) where
+  toFun := swapIndex marks hb hd
+  invFun := swapIndex marks hb hd
+  left_inv := swapIndex_involutive marks hb hd
+  right_inv := swapIndex_involutive marks hb hd
 
 /-- Swapping marked windows changes their order type from either pattern to the other. -/
 theorem containsAt_swapped {n : ℕ} (marks : Finset ℕ)
@@ -149,7 +151,10 @@ private def Marked {n : ℕ} (p : Fin 8 → Fin 8) (marks : Finset ℕ)
 
 private theorem marked_bounded {n : ℕ} {p : Fin 8 → Fin 8} {marks : Finset ℕ}
     {π : Equiv.Perm (Fin n)} (h : Marked p marks π) :
-    ∀ s ∈ marks, s + 7 < n := fun s hs => (h s hs).choose
+    ∀ s ∈ marks, s + 7 < n := by
+  intro s hs
+  obtain ⟨hb, _⟩ := h s hs
+  exact hb
 
 private theorem marked_separated {n : ℕ} {p : Fin 8 → Fin 8} {marks : Finset ℕ}
     {π : Equiv.Perm (Fin n)} (hp : p = sigma ∨ p = tau) (h : Marked p marks π) :
