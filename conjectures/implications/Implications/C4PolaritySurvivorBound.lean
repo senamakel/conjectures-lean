@@ -38,12 +38,12 @@ private theorem c4Free_induce {α : Type*} (G : SimpleGraph α)
   · exact (SimpleGraph.induce_adj.mp hyz).2
   · intro h
     apply htwo
-    exact ⟨(SimpleGraph.induce_adj.mpr ⟨by
-      intro hval
-      exact h.1 (Subtype.ext hval), h.1⟩),
-      (SimpleGraph.induce_adj.mpr ⟨by
+    exact ⟨SimpleGraph.induce_adj.mpr ⟨by
         intro hval
-        exact h.2 (Subtype.ext hval), h.2⟩)⟩
+        exact h.1.1 (Subtype.ext hval), h.1.2⟩,
+      SimpleGraph.induce_adj.mpr ⟨by
+        intro hval
+        exact h.2.1 (Subtype.ext hval), h.2.2⟩⟩
 
 /-- Assuming the published general 41-vertex C4-free edge bound, every
 one-vertex deletion from the 42-vertex survivor graph has at most 132 edges.
