@@ -30,6 +30,8 @@ def W : ℕ := 614889782588491410
 def E : ℕ :=
   5397346292805549782720214077673687806275517530364350655459511599582614290
 
+def decimalLimitExponent : ℕ := 10 ^ 74
+
 def crtExponent : List ℕ :=
   [946866288615739509321066849959644752832899644419237537322679246829569143,
    2343225385769350445363922254029248522876362434355196192526458056824627189,
@@ -119,17 +121,18 @@ theorem exponentDecimalBound : 18 * E + 2 < 10 ^ 74 := by
 
 /-- The finite construction bound from Gyarmati's Lemma 6 is verified without
 expanding `W^E`. -/
-theorem publishedNumericalBound : 49 * W ^ E < 10 ^ (10 ^ 74) := by
+theorem publishedNumericalBound : 49 * W ^ E < 10 ^ decimalLimitExponent := by
   have hW : W ≤ 10 ^ 18 := by norm_num [W]
   have hWE : W ^ E ≤ 10 ^ (18 * E) := by
     calc
-      W ^ E ≤ (10 ^ 18) ^ E := Nat.pow_le_pow_left hW
+      W ^ E ≤ (10 ^ 18) ^ E := Nat.pow_le_pow_left hW E
       _ = 10 ^ (18 * E) := by rw [← Nat.pow_mul]
   calc
     49 * W ^ E ≤ 49 * 10 ^ (18 * E) := Nat.mul_le_mul_left 49 hWE
     _ < 100 * 10 ^ (18 * E) := by
       exact Nat.mul_lt_mul_of_pos_right (by omega) (by positivity)
-    _ = 10 ^ (18 * E + 2) := by rw [Nat.pow_add]; norm_num
-    _ < 10 ^ (10 ^ 74) := Nat.pow_lt_pow_right (by norm_num) exponentDecimalBound
+    _ = 10 ^ (18 * E + 2) := by rw [Nat.pow_add]; norm_num [Nat.mul_comm]
+    _ < 10 ^ decimalLimitExponent := Nat.pow_lt_pow_right (by norm_num)
+      (by simpa [decimalLimitExponent] using exponentDecimalBound)
 
 end Implications.PerfectPowerGapCRT

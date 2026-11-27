@@ -129,6 +129,7 @@ theorem rows_bounded_of_inducedTreeBound
     (G : SimpleGraph V) (C I : Finset V) (k : ℕ)
     (hTreeBound : inducedTreeBound G k)
     (hI : G.IsIndepSet (I : Set V))
+    (hdisj : Disjoint C I)
     (hDoubleStar : ∀ c ∈ C, ∀ d ∈ C, c ≠ d →
       (G.induce
         ((insert c (insert d (rowDiff G I c d) : Finset V) : Finset V) : Set V)).IsTree) :
