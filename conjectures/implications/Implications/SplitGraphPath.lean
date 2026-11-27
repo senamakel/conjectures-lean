@@ -387,9 +387,16 @@ theorem hamiltonian_of_split_partition_row_bounds
   · by_cases hCtwo : 2 ≤ C.card
     · obtain ⟨i, j, a, b, hi, hj, hij, ha, hb, hab, hia, hbj⟩ :=
         exists_distinct_row_attachments G C I hrow hdiff hcover htwo hCtwo
+      have hiC : i ∉ C := by
+        intro hmem
+        exact (Finset.disjoint_left.mp hdisj) hmem hi
+      have hjC : j ∉ C := by
+        intro hmem
+        exact (Finset.disjoint_left.mp hdisj) hmem hj
+      have hpart : (Finset.univ : Finset V) = C ∪ {i, j} := by
+        simpa [hIeq, Finset.union_assoc, Finset.union_left_comm, Finset.union_comm] using hpartition
       exact hamiltonian_of_split_partition_two_endpoints G C i j a b hC
-        (by simpa [Finset.pair_comm] using hpartition) (hdisj.not_mem_of_mem_left hi)
-        (hdisj.not_mem_of_mem_left hj) hij ha hb hab hia hbj
+        hpart hiC hjC hij ha hb hab hia hbj
     · have hCone : C.card = 1 := by omega
       obtain ⟨c, hc, hCeq⟩ := Finset.card_eq_one.mp hCone
       obtain ⟨i, j, hij, hIeq⟩ := Finset.card_eq_two.mp htwo
