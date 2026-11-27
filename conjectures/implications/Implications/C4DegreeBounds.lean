@@ -159,7 +159,13 @@ theorem sum_innerNeighbors_card_ge_seven (v : V)
         exact G.loopless.irrefl v (by simpa using hvz)
       exact Finset.mem_erase.mpr ⟨hz_ne_v, by simpa using hzu⟩
     exact (Finset.card_sdiff_add_card_eq_card hsub).symm
-  have hsum := hpartition
+  have htotalLower' :
+      40 ≤ (∑ u ∈ S, (T u).card) +
+        (∑ u ∈ S, (innerNeighbors G u v).card) := by
+    calc
+      40 ≤ ∑ u ∈ S, (outerNeighbors G u v).card := htotalLower
+      _ = (∑ u ∈ S, (T u).card) +
+          (∑ u ∈ S, (innerNeighbors G u v).card) := hpartition
   omega
 
 theorem sum_outerNeighbors_card_le (v : V)
