@@ -126,3 +126,18 @@ independently before marking a case resolved.
 | 14 | UNKNOWN | 58.68 | `966255555e965ca8d2832950025f305e96839551111e0460e1df80886b3c17e5` |
 | 15 | UNKNOWN | 58.02 | `2658683f689cb983c370a360654b2e0fbdc2f8cc66dc40a43e72fdecb7a9be8f` |
 | 16 | UNKNOWN | 58.95 | `80a3974fa95930a0ca5aac09237d576d5288c4b5f1d7d7392e2224ca67cc23f8` |
+
+Case 1, the empty shared-neighbor pattern, finished in 54.30 wall seconds.
+It has 11,122 variables and 248,174 clauses. CaDiCaL exited 20 and emitted
+a complete binary LRAT trace with SHA-256
+`4abdfc93d8de33cbd13d096d2c9168bf30dacef5d45106230ae7739e0f6ecbf7`.
+Running `lake env lean --run ../../scripts/check_dimacs_lrat.lean FORMULA TRACE`
+from a built `conjectures/implications` checkout verified all 1,984,168 actions
+in 31.81 wall seconds. This checks the concrete DIMACS formula. A Lean proof
+that every empty-pattern graph gives a satisfying assignment to this exact
+formula is still needed for an end-to-end graph theorem. Cases 2–16 returned
+UNKNOWN and their partial traces certify no result.
+
+The mathematical weighted count is independently formalized as
+`C4RootWitnessCountIdentity.four_root_witness_weighted_count`. Lean reports
+the standard axioms `propext`, `Classical.choice`, and `Quot.sound`.
