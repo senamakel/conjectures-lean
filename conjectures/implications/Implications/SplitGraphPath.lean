@@ -601,7 +601,7 @@ theorem hamiltonian_of_split_partition_two_outsiders_of_rows
         · exact hciRev y hyC c hcI (hvc.symm.trans hvy)
       · rcases hvq with hvx | hvz | hvy
         · exact htx (hvt.symm.trans hvx)
-        · exact hciRev t ht z hzI (hvt.symm.trans hvz)
+        · exact hci t ht z hzI (hvt.symm.trans hvz)
         · exact hty (hvt.symm.trans hvy)
       · rcases hvq with hvx | hvz | hvy
         · exact hciRev x hxC a haI (hva.symm.trans hvx)
@@ -636,7 +636,7 @@ theorem hamiltonian_of_split_partition_two_outsiders_of_rows
         · exact hci x hxC w hwI (hvx.symm.trans hvw)
         · exact hxs (hvx.symm.trans hvs)
       · rcases hvr with hvb | hvr | hvw | hvs
-        · exact hbz (hvz.symm.trans hvb)
+        · exact hbz (hvb.symm.trans hvz)
         · exact hciRev r hrC z hzI (hvz.symm.trans hvr)
         · exact hzw (hvz.symm.trans hvw)
         · exact hciRev s hsC z hzI (hvz.symm.trans hvs)
