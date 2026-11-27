@@ -201,8 +201,10 @@ theorem cutoffHitCount (N B j : ℕ) (hB : 0 < B) :
       _ ≤ _ := mul_le_mul_of_nonneg_left hSbound (by positivity)
   rw [hcard]
   calc
-    (B : ℝ) * j * (↑(L.card + S.card) : ℝ) =
-        (B : ℝ) * j * (L.card : ℝ) + (B : ℝ) * j * (S.card : ℝ) := by ring
+    (B : ℝ) * (j : ℝ) * (L.card + S.card : ℝ) =
+        (B : ℝ) * (j : ℝ) * (L.card : ℝ) + (B : ℝ) * (j : ℝ) * (S.card : ℝ) := by
+      rw [Nat.cast_add]
+      ring
     _ ≤ (j : ℝ) * primeAt N + (B : ℝ) * (U.card : ℝ) := add_le_add hLscaled hSscaled
 
 end Implications.SmoothGapCounting

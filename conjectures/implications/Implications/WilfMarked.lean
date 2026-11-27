@@ -14,7 +14,7 @@ namespace WilfMarked
 def sigma : Fin 8 → Fin 8 := ![0, 5, 1, 2, 6, 3, 7, 4]
 def tau : Fin 8 → Fin 8 := ![0, 5, 1, 3, 6, 2, 7, 4]
 
-def sigmaList : List Nat := [0, 5, 1, 2, 6, 3, 7, 4]
+def sigmaList : List Nat := List.ofFn sigma
 
 /-- The shared suffix/prefix of two windows has to have the same relative order. -/
 def overlapCompatible (p : List Nat) (shift : Nat) : Bool :=
@@ -47,8 +47,9 @@ theorem sigma_overlap_compatible_only_at_5_or_7 (shift : Nat)
 theorem sigma_overlap_compatible_5 : overlapCompatible sigmaList 5 = true := by decide
 theorem sigma_overlap_compatible_7 : overlapCompatible sigmaList 7 = true := by decide
 
-theorem sigmaList_get (i : Fin 8) : sigmaList[i.val]! = (sigma i).val := by
-  fin_cases i <;> rfl
+theorem sigmaList_get (i : Nat) (hi : i < 8) :
+    sigmaList[i]! = (sigma ⟨i, hi⟩).val := by
+  simp [sigmaList]
 
 /-- The adjacent transposition of the fourth and sixth positions. -/
 def windowSwap (i : Fin 8) : Fin 8 :=
@@ -125,8 +126,12 @@ theorem same_pattern_overlap_compatible {n : Nat} (π : Equiv.Perm (Fin n))
         omega⟩) := by
     rw [hidxi, hidxj]
   have hrel : (sigma bi < sigma bj) ↔ (sigma ai < sigma aj) :=
-    hsi.trans (hsame.trans htj.symm)
-  simpa [sigmaList_get, ai, aj, bi, bj] using hrel
+    hsi.symm.trans (hsame.trans htj)
+  have hlefti := sigmaList_get (t - s + i) (by omega)
+  have hleftj := sigmaList_get (t - s + j) (by omega)
+  have hrighti := sigmaList_get i (by omega)
+  have hrightj := sigmaList_get j (by omega)
+  simpa [ai, aj, bi, bj, hlefti, hleftj, hrighti, hrightj] using hrel
 
 end WilfMarked
 
