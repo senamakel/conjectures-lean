@@ -164,4 +164,44 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
             · exact (List.nodup_cons.mp hnd).2
       exact hp others.toList (fun k hk => Finset.mem_toList.mp hk) others.nodup_toList
 
+  have hrestChain : rest.IsChain G.Adj := by
+    have hchain : ∀ l : List V, l.Nodup → (∀ k ∈ l, k ∈ others) →
+        (l.flatMap block).IsChain G.Adj := by
+      intro l
+      induction l with
+      | nil => simp
+      | cons k ks ih =>
+        intro hnd hmem
+        have hkO := hmem k (by simp)
+        rw [List.flatMap_cons, List.isChain_append]
+        refine ⟨hblockChain k hkO,
+          ih (List.nodup_cons.mp hnd).2 (by
+            intro x hx
+            exact hmem x (by simp [hx])), ?_⟩
+        cases ks with
+        | nil => simp
+        | cons l ls =>
+          have hlO := hmem l (by simp)
+          have hkl : k ≠ l := by
+            intro h
+            subst l
+            exact (List.nodup_cons.mp hnd).1 (by simp)
+          intro x hx y hy
+          have hxEq : right k = x := by simpa [block] using hx
+          have hyEq : left l = y := by simpa [List.flatMap_cons, block] using hy
+          have hxe : right k ≠ c := by
+            intro h
+            exact hnotC k hkO (Or.inr h)
+          have hkl' := hunique (right k) (hrightC k (Finset.mem_sdiff.mp hkO).1)
+            hxe k (Finset.mem_sdiff.mp hkO).1 l (Finset.mem_sdiff.mp hlO).1
+            (Or.inr rfl) (Or.inl (hxEq.trans hyEq))
+          have hxy : right k ≠ left l := by
+            intro h
+            exact hkl (by simpa [h] using hkl')
+          exact hxEq ▸ hyEq ▸ hC (hrightC k (Finset.mem_sdiff.mp hkO).1)
+            (hleftC l (Finset.mem_sdiff.mp hlO).1) hxy
+    change (others.toList.flatMap block).IsChain G.Adj
+    exact hchain others.toList others.nodup_toList
+      (fun k hk => Finset.mem_toList.mp hk)
+
 end SplitGraphSmallRowsOneShared
