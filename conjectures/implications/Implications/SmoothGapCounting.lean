@@ -113,7 +113,7 @@ private theorem logLogCutoff_tendsto_atTop :
       Real.log (primeAt n : ℝ) * Real.log (Real.log (primeAt n : ℝ)) / 16)
       atTop atTop := by
     convert (hlog.atTop_mul_atTop₀ hloglog).atTop_div_const (by norm_num : (0 : ℝ) < 16)
-      using 1 <;> ext n <;> simp
+      using 1
   exact tendsto_natCast_atTop_atTop.comp (tendsto_nat_floor_atTop.comp hprod)
 
 private theorem eventually_logLogCutoff_log_lower :
@@ -183,7 +183,6 @@ private theorem eventually_logLogCutoff_primeCount_le :
         gcongr
       _ = Real.log (primeAt n : ℝ) / 4 := by
         field_simp
-        <;> ring
   exact hpi.trans hbound
 
 private theorem primeAt_strictMono : StrictMono primeAt := by
