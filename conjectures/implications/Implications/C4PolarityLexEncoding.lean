@@ -125,7 +125,8 @@ theorem lexFreshIds_nodup (next : Nat) (left right : List Nat) :
       | cons y ys =>
           by_cases hxy : x = y
           · simpa [lexFreshIds, hxy] using ih next ys
-          · apply List.nodup_cons.mpr
+          · simp only [lexFreshIds, hxy, if_false]
+            apply List.nodup_cons.mpr
             constructor
             · intro h
               have hge := lexFreshIds_ge (next + 1) xs ys next h
