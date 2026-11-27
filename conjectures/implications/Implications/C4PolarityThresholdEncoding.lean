@@ -97,18 +97,21 @@ theorem thresholdVar_mem_fresh {nextVar limit inputCount row k : Nat}
   unfold thresholdFreshVariables
   apply List.mem_map.mpr
   refine ⟨row * limit + k - 1, List.mem_range.mpr ?_, ?_⟩
-  · omega
-  · simp [thresholdVar]
-    congr 1
-    omega
+  · have hrowMul : row * limit < inputCount * limit :=
+      Nat.mul_lt_mul_of_pos_right hrow (by omega)
+    have hk' : k - 1 < limit := by omega
+    have hidx : row * limit + k - 1 < inputCount * limit := by omega
+    exact hidx
+  · have hassoc : row * limit + k - 1 = row * limit + (k - 1) := by omega
+    simp [thresholdVar, hassoc]
 
 theorem thresholdVar_fresh_from_input {nextVar limit row k : Nat}
     (hk : 0 < k) (input : Int) (hinput : input.natAbs ≤ nextVar) :
     input.natAbs ≠ (thresholdVar nextVar limit row k).natAbs := by
-  have hnext : nextVar < nextVar + row * limit + k := by omega
+  have hnat : nextVar < nextVar + row * limit + k :=
+    Nat.lt_add_of_pos_right _ hk
   have hvar : nextVar < (thresholdVar nextVar limit row k).natAbs := by
-    simp [thresholdVar]
-    omega
+    simpa [thresholdVar] using hnat
   omega
 
 /-- The four-clause DIMACS gate agrees with the Boolean recurrence when all
