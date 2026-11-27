@@ -21,3 +21,6 @@ import Implications.McEachenDensity
 import Implications.McEachenStock
 import Implications.SplitGraphComponents
 import Implications.WilfEquivalence
+import Implications.C4Extremal42
+import Implications.SmoothGapCounting
+import Implications.SplitGraphPath
