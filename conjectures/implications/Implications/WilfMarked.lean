@@ -174,6 +174,23 @@ theorem same_pattern_starts_separated {n : Nat} (π : Equiv.Perm (Fin n))
   · rcases same_pattern_start_distance π p hp s t hs ht hst hsmall with h | h <;> omega
   · omega
 
+/-- The two positions exchanged by the local marked-window operation. -/
+def swapSupport (s : Nat) : Finset Nat := {s + 3, s + 5}
+
+theorem swap_supports_disjoint {n : Nat} (π : Equiv.Perm (Fin n))
+    (p : Fin 8 → Fin 8) (hp : p = sigma ∨ p = tau) (s t : Nat)
+    (hs : ContainsAt π s p) (ht : ContainsAt π t p) (hne : s ≠ t) :
+    Disjoint (swapSupport s) (swapSupport t) := by
+  have hgap : 5 ≤ t - s ∨ 5 ≤ s - t := by
+    by_cases hst : s < t
+    · exact Or.inl (same_pattern_starts_separated π p hp s t hs ht hst)
+    · have hts : t < s := by omega
+      exact Or.inr (same_pattern_starts_separated π p hp t s ht hs hts)
+  rw [Finset.disjoint_left]
+  intro x hx hy
+  simp [swapSupport] at hx hy
+  rcases hx with hxs | hxs <;> rcases hy with hyt | hyt <;> omega
+
 end WilfMarked
 
 namespace WilfMarked
