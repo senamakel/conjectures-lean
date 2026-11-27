@@ -16,82 +16,11 @@ import argparse
 from itertools import combinations
 from pathlib import Path
 
+from encode_c4_42_rooted_138 import Cnf
 
-class Cnf:
-    def __init__(self) -> None:
-        self.nvars = 0
-        self.clauses: list[list[int]] = []
 
-    def var(self) -> int:
-        self.nvars += 1
-        return self.nvars
-
-    @staticmethod
-    def negate(lit: int | bool) -> int | bool:
-        return not lit if isinstance(lit, bool) else -lit
-
-    def clause(self, *lits: int | bool) -> None:
-        result: list[int] = []
-        for lit in lits:
-            if isinstance(lit, bool):
-                if lit:
-                    return
-                continue
-            if -lit in result:
-                return
-            result.append(lit)
-        self.clauses.append(result)
-
-    def atleast(self, inputs: list[int], threshold: int) -> list[int | bool]:
-        """Exact unary threshold predicates, result[k] iff sum(inputs) >= k."""
-
-        def or_gate(a: int | bool, b: int | bool) -> int | bool:
-            if a is True or b is True:
-                return True
-            if a is False:
-                return b
-            if b is False:
-                return a
-            y = self.var()
-            self.clause(-a, y)
-            self.clause(-b, y)
-            self.clause(-y, a, b)
-            return y
-
-        previous: list[int | bool] = [True] + [False] * threshold
-        for x in inputs:
-            current: list[int | bool] = [True]
-            for k in range(1, threshold + 1):
-                a, b = previous[k], previous[k - 1]
-                if a is True or (x is True and b is True):
-                    y: int | bool = True
-                elif x is False or b is False:
-                    y = a
-                elif x is True:
-                    y = or_gate(a, b)
-                elif b is True:
-                    y = or_gate(a, x)
-                elif a is False:
-                    y = self.var()
-                    self.clause(-y, x)
-                    self.clause(-y, b)
-                    self.clause(y, -x, -b)
-                else:
-                    y = self.var()
-                    self.clause(-y, a, x)
-                    self.clause(-y, a, b)
-                    self.clause(-a, y)
-                    self.clause(-x, -b, y)
-                current.append(y)
-            previous = current
-        return previous
-
-    def emit(self, path: Path) -> None:
-        with path.open("w", newline="\n") as output:
-            output.write(f"p cnf {self.nvars} {len(self.clauses)}\n")
-            for clause in self.clauses:
-                output.write(" ".join(map(str, clause)))
-                output.write(" 0\n")
+def negate(lit: int | bool) -> int | bool:
+    return not lit if isinstance(lit, bool) else -lit
 
 
 def pair_labels() -> dict[tuple[int, int], int]:
@@ -160,7 +89,7 @@ def build() -> Cnf:
     for a, b, c, d in combinations(range(42), 4):
         cycles = ((a, b, c, d, a), (a, b, d, c, a), (a, c, b, d, a))
         for cycle in cycles:
-            cnf.clause(*(Cnf.negate(edge(x, y))
+            cnf.clause(*(negate(edge(x, y))
                          for x, y in zip(cycle, cycle[1:])))
 
     # Every x != h has a common neighbor with each D8 vertex h. Four-cycle
@@ -181,9 +110,9 @@ def build() -> Cnf:
         required = target - fixed_degree
         inputs = [edge(v, w) for w in range(4, 42) if w != v]
         assert all(isinstance(lit, int) for lit in inputs)
-        count = cnf.atleast([int(lit) for lit in inputs], required + 1)
+        count = cnf.equivalent_atleast([int(lit) for lit in inputs], required + 1)
         cnf.clause(count[required])
-        cnf.clause(Cnf.negate(count[required + 1]))
+        cnf.clause(negate(count[required + 1]))
     return cnf
 
 
