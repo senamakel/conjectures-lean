@@ -118,9 +118,7 @@ theorem thresholdVar_fresh_from_input {nextVar limit row k : Nat}
     input.natAbs ≠ (thresholdVar nextVar limit row k).natAbs := by
   have hnat : nextVar < nextVar + row * limit + k := by omega
   have hvar : nextVar < (thresholdVar nextVar limit row k).natAbs := by
-    change nextVar < (Int.ofNat (nextVar + row * limit + k)).natAbs
-    rw [Int.natAbs_of_nonneg (Int.natCast_nonneg _)]
-    exact hnat
+    simpa [thresholdVar, Int.natAbs_natCast] using hnat
   omega
 
 /-- The four-clause DIMACS gate agrees with the Boolean recurrence when all
