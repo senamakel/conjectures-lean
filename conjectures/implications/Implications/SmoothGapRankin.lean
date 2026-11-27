@@ -32,13 +32,20 @@ theorem smoothNumbersUpTo_card_le_rankin (X Y : ℕ) (s : ℝ) (hX : 0 < X)
   have hf_nonneg (m : Y.smoothNumbers) : 0 ≤ f m := by
     dsimp [f, rankinWeight]
     exact Real.rpow_nonneg (by positivity) _
-  let e : S.attach ↪ Y.smoothNumbers :=
-    ⟨fun n => ⟨(n : ℕ), (Nat.mem_smoothNumbersUpTo.mp n.property).2⟩,
-      fun a b h => Finset.ext_iff.mp (congrArg Subtype.val h) ▸ Subtype.ext (congrArg Subtype.val h)⟩
+  let e : S.attach ↪ Y.smoothNumbers where
+    toFun n := ⟨(n : ℕ), (Nat.mem_smoothNumbersUpTo.mp
+      (show (n : ℕ) ∈ X.smoothNumbersUpTo Y from n.property)).2⟩
+    inj' := by
+      intro a b h
+      exact Subtype.ext (congrArg Subtype.val h)
   let T := S.attach.map e
   have hsum_map : (∑ m ∈ T, f m) =
-      ∑ n ∈ S, f ⟨n, (Nat.mem_smoothNumbersUpTo.mp (show n ∈ S from n.2)).2⟩ := by
-    simp [T, e, Finset.sum_map, Finset.sum_attach]
+      ∑ n ∈ S, f ⟨n, (Nat.mem_smoothNumbersUpTo.mp n.2).2⟩ := by
+    calc
+      (∑ m ∈ T, f m) = ∑ a ∈ S.attach, f (e a) := by simp [T, Finset.sum_map]
+      _ = ∑ n ∈ S, f ⟨n, (Nat.mem_smoothNumbersUpTo.mp n.2).2⟩ := by
+        rw [Finset.sum_attach]
+        rfl
   have hsum_le : (∑ m ∈ T, f m) ≤ ∏ p ∈ Y.primesBelow, (1 - f p)⁻¹ := by
     calc
       (∑ m ∈ T, f m) ≤ ∑' m : Y.smoothNumbers, f m := hf.sum_le_tsum T (by intro m hm; exact hf_nonneg m)
