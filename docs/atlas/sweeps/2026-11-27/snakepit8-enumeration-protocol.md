@@ -320,3 +320,16 @@ therefore redo an unknown amount of work; that artifact is not an exact
 continuation checkpoint. Keep it partial and do not append to it. A genuine
 Q6 continuation requires either a new checkpointed run from the root or a
 separately logged prefix partition whose completed subtrees are known.
+
+The synthetic check passed with 46 normalized Q4 masks after 17 capped
+invocations. The resumed set equaled both uninterrupted DFS and the independent
+2^13-mask exhaustive scan. Every intermediate frontier passed the prefix-free
+check; every resumed output was record-aligned and duplicate-free. The test
+also confirmed empty-frontier repeated resume is idempotent and that truncated
+output, malformed checkpoint data, misaligned offsets, an offset/count
+mismatch, and a checkpoint path equal to the output path are rejected. The
+enumerator compiled with `-std=c++20 -O3 -Wall -Wextra -Werror`. This provides
+small-instance evidence for checkpoint correctness only. No Q6 run was made,
+so there is no Q6 continuation timing result and no evidence yet that the
+checkpointed traversal improves Q7 census feasibility or makes Q8 pair
+compatibility practical.
