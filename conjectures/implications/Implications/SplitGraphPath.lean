@@ -153,6 +153,128 @@ theorem independent_card_le_two_of_row_bounds
         exact hmem
       exact (Finset.card_le_card hI).trans (by omega)
 
+/-- If an ordering of the clique has distinct adjacent endpoints for the two independent
+vertices, it gives a Hamiltonian path. The ordering can be filled by `C.toList` with the
+two endpoint vertices moved to the ends. -/
+theorem hamiltonian_of_clique_order_with_two_endpoints
+    (G : SimpleGraph V) (C : Finset V) (i j a b : V) (l : List V)
+    (hC : G.IsClique (C : Set V))
+    (hpartition : (Finset.univ : Finset V) = C ∪ {i, j})
+    (hi : i ∉ C) (hj : j ∉ C) (hij : i ≠ j)
+    (hl_nodup : l.Nodup) (hl_finset : l.toFinset = C)
+    (hl_head : l.head? = some a) (hl_last : l.getLast? = some b)
+    (hia : G.Adj i a) (hbj : G.Adj b j) :
+    ∃ (u v : V) (p : G.Walk u v), p.IsHamiltonian := by
+  classical
+  let q := i :: (l ++ [j])
+  have hne : q ≠ [] := by simp [q]
+  have hchain_l : l.IsChain G.Adj := by
+    rw [List.isChain_iff_forall_rel_of_append_cons_cons]
+    intro x y l₁ l₂ heq
+    have hx : x ∈ l := by rw [heq]; simp
+    have hy : y ∈ l := by rw [heq]; simp
+    have hxy : x ≠ y := by
+      intro h
+      subst y
+      have hcount := (List.nodup_iff_count_le_one.mp hl_nodup) x
+      rw [heq] at hcount
+      simp [List.count_append, List.count_cons] at hcount
+      omega
+    apply hC
+    · exact (by simpa [hl_finset] using (List.mem_toFinset.mpr hx))
+    · exact (by simpa [hl_finset] using (List.mem_toFinset.mpr hy))
+    · exact hxy
+  have hchain : q.IsChain G.Adj := by
+    dsimp [q]
+    rw [List.isChain_cons, List.isChain_append]
+    refine ⟨?_, hchain_l, ?_⟩
+    · simp [hl_head, hia]
+    · simp [hl_last, hbj]
+  let p := SimpleGraph.Walk.ofSupport q hne hchain
+  have hlj : (l ++ [j]).Nodup := by
+    rw [List.nodup_append']
+    refine ⟨hl_nodup, by simp, ?_⟩
+    intro x hx hy
+    simp at hy
+    subst x
+    apply hj
+    exact (by simpa [hl_finset] using (List.mem_toFinset.mpr hx))
+  have hnodup : q.Nodup := by
+    dsimp [q]
+    rw [List.nodup_cons]
+    refine ⟨?_, hlj⟩
+    intro h
+    rcases List.mem_append.mp h with hlmem | hjmem
+    · exact hi (by simpa [hl_finset] using (List.mem_toFinset.mpr hlmem))
+    · simp at hjmem
+      exact hij hjmem
+  have hpath : p.IsPath := by
+    apply (SimpleGraph.Walk.isPath_def p).2
+    simpa [p, SimpleGraph.Walk.support_ofSupport hne hchain] using hnodup
+  have hcover : ∀ v : V, v ∈ p.support := by
+    intro v
+    rw [SimpleGraph.Walk.support_ofSupport hne hchain]
+    dsimp [q]
+    have hv : v ∈ C ∪ {i, j} := by
+      have : v ∈ (Finset.univ : Finset V) := Finset.mem_univ v
+      rw [hpartition] at this
+      exact this
+    rcases Finset.mem_union.mp hv with hvC | hvij
+    · have hvl : v ∈ l := by
+        exact List.mem_toFinset.mp (by simpa [hl_finset] using hvC)
+      simp [hvl]
+    · simp only [Finset.mem_insert, Finset.mem_singleton] at hvij
+      rcases hvij with rfl | rfl <;> simp
+  exact ⟨_, _, p, hpath.isHamiltonian_of_mem hcover⟩
+
+/-- In a split partition, distinct clique neighbours of the two independent vertices
+are enough: erase them from the clique and put them at opposite ends of its ordering. -/
+theorem hamiltonian_of_split_partition_two_endpoints
+    (G : SimpleGraph V) (C : Finset V) (i j a b : V)
+    (hC : G.IsClique (C : Set V))
+    (hpartition : (Finset.univ : Finset V) = C ∪ {i, j})
+    (hi : i ∉ C) (hj : j ∉ C) (hij : i ≠ j)
+    (ha : a ∈ C) (hb : b ∈ C) (hab : a ≠ b)
+    (hia : G.Adj i a) (hbj : G.Adj b j) :
+    ∃ (u v : V) (p : G.Walk u v), p.IsHamiltonian := by
+  classical
+  let M := (C.erase a).erase b
+  let l := a :: (M.toList ++ [b])
+  have haM : a ∉ M := by simp [M]
+  have hbM : b ∉ M := by simp [M, hab]
+  have htail_nodup : (M.toList ++ [b]).Nodup := by
+    rw [List.nodup_append']
+    refine ⟨M.nodup_toList, by simp, ?_⟩
+    intro x hx hy
+    simp at hy
+    subst x
+    exact hbM (by simpa using (List.mem_toFinset.mpr hx))
+  have hl_nodup : l.Nodup := by
+    simp [l, haM, htail_nodup, hab]
+  have hl_finset : l.toFinset = C := by
+    ext x
+    simp [l, M, ha, hb, Finset.mem_erase]
+    constructor
+    · rintro (hxa | hxb | ⟨_, hx⟩)
+      · exact hxa ▸ ha
+      · exact hxb ▸ hb
+      · exact hx
+    · intro hx
+      by_cases hxa : x = a
+      · exact Or.inl hxa
+      · by_cases hxb : x = b
+        · exact Or.inr (Or.inl hxb)
+        · exact Or.inr (Or.inr ⟨hxa, hx⟩)
+  have hl_head : l.head? = some a := by simp [l]
+  have hl_last : l.getLast? = some b := by
+    change ((a :: M.toList) ++ [b]).getLast? = some b
+    rw [List.getLast?_append_of_ne_nil _ (by simp)]
+    simp
+  exact hamiltonian_of_clique_order_with_two_endpoints G C i j a b l
+    hC hpartition hi hj hij hl_nodup hl_finset hl_head hl_last hia hbj
+
 end SplitGraphPath
 
 #print axioms SplitGraphPath.independent_card_le_two_of_row_bounds
+#print axioms SplitGraphPath.hamiltonian_of_clique_order_with_two_endpoints
+#print axioms SplitGraphPath.hamiltonian_of_split_partition_two_endpoints
