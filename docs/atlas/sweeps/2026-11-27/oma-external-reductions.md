@@ -105,6 +105,8 @@ The relative-homology route for the exact circle calculation was rechecked and s
 
 The [circle cover proof](https://github.com/senamakel/open-math-agents/tree/oma/pcare-circle-cover) at `eeb6d9a` and [zero-sphere kernel proof](https://github.com/senamakel/open-math-agents/tree/oma/pcare-zero-sphere-kernel) at `008c349` both passed the exact pinned OMA checker with the three standard axioms. They close H1 and H4 respectively against the submitted R2 interface and are staged for one-file submission after #5006 is merged and registers its leaves.
 
+The [augmentation-kernel transport proof](https://github.com/senamakel/open-math-agents/tree/oma/pcare-augmentation-transport) at `95850ba` passed the exact pinned OMA checker with the three standard axioms. It proves naturality of the Mathlib degree-zero augmentation on the canonical vertex generators, then transports the kernel across the homotopy equivalence with the zero-sphere. Submit after #5006 registers H3.
+
 ### Sphere-cover registration and the degree-one pair sequence
 
 [Three-sphere connectivity #4818](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4818) merged and the registry marks its obligation solved. [Three-sphere cover #4833](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4833) merged and its leaves registered. The exact geometry already has [#5043](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/5043), so the staged equivalent stays on the fork. The strict Mayer–Vietoris reduction passed again against the merged interface and was submitted as [#5064](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/5064).
