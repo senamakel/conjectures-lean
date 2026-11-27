@@ -193,6 +193,11 @@ def extendThresholdGates (assignment : Nat → Bool) : List ThresholdGate → Na
   | [] => assignment
   | gate :: gates => extendThresholdGates (extendThresholdGate assignment gate) gates
 
+/-- Concatenate the clauses for an ordered list of threshold gates. -/
+def thresholdGateListClauses (gates : List ThresholdGate) : List (List Int) :=
+  gates.flatMap (fun gate => thresholdGateDimacs gate.above gate.input gate.below
+    (Int.ofNat gate.output))
+
 /-- Gates are ordered when each output is fresh from its inputs and every
 later output is allocated after the current one. -/
 def ThresholdGate.Ordered : List ThresholdGate → Prop
@@ -302,6 +307,16 @@ theorem thresholdGateList_satisfies (assignment : Nat → Bool)
         rfl
       | tail _ hmem =>
         exact ih afterGate hTail current hmem
+
+theorem thresholdGateList_cnf_satisfies (assignment : Nat → Bool)
+    (gates : List ThresholdGate) (hordered : ThresholdGate.Ordered gates) :
+    cnfValue (extendThresholdGates assignment gates) (thresholdGateListClauses gates) = true := by
+  simp only [cnfValue, List.all_eq_true, thresholdGateListClauses, List.mem_flatMap]
+  intro clause hclause
+  rcases hclause with ⟨gate, hgate, clause, hgateClause, rfl⟩
+  have hsat := thresholdGateList_satisfies assignment gates hordered gate hgate
+  simp only [cnfValue, List.all_eq_true] at hsat
+  exact hsat clause hgateClause
 
 /-- Build the clauses for one row, zipping `previous[k]`,
 `previous[k - 1]`, and the newly allocated output. -/
