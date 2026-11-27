@@ -552,7 +552,8 @@ theorem hamiltonian_of_split_partition_three_double_rows
       (left k = q ∨ right k = q) → (left l = q ∨ right l = q) → k = l := by
     intro q hq k hk l hl hqk hql
     by_cases hqS : q ∈ ({x,y,z} : Finset V)
-    · have hkr := Finset.mem_filter.mpr ⟨(Finset.mem_sdiff.mp hk).1, hqk⟩
+    · have hkr : k ∈ I.filter (fun i => left i = q ∨ right i = q) :=
+        Finset.mem_filter.mpr ⟨(Finset.mem_sdiff.mp hk).1, hqk⟩
       have hksub := hselectedAtSpecial q hqS hkr
       have hknot := (Finset.mem_sdiff.mp hk).2
       exact False.elim (hknot hksub)
@@ -560,7 +561,9 @@ theorem hamiltonian_of_split_partition_three_double_rows
         have hle := hselectedBound q hq
         have hneTwo : (I.filter (fun i => left i = q ∨ right i = q)).card ≠ 2 := by
           intro heq
-          exact hqS (Finset.mem_filter.mpr ⟨hq, heq⟩)
+          exact hqS (by
+            rw [← hS]
+            exact Finset.mem_filter.mpr ⟨hq, heq⟩)
         omega
       have hpairs : ({k,l} : Finset V) ⊆ I.filter (fun i => left i = q ∨ right i = q) := by
         intro t ht
