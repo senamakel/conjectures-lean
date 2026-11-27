@@ -769,7 +769,7 @@ theorem eventually_twoHitGapCount_bound_65 :
       omega
     exact tendsto_natCast_atTop_atTop.comp hnat
   have hR : Tendsto R atTop (nhds 0) := by
-    have hlo := (isLittleO_log_rpow_rpow_atTop (2 : ℝ) (1 / 4 : ℝ)
+    have hlo := (isLittleO_log_rpow_rpow_atTop (2 : ℝ)
       (by norm_num : (0 : ℝ) < 1 / 4)).tendsto_div_nhds_zero
     simpa [R, L, P, Function.comp_def] using hlo.comp hp
   have hLL : Tendsto LL atTop atTop := by
@@ -798,7 +798,7 @@ theorem eventually_twoHitGapCount_bound_65 :
   have hroot : 0 < root := by dsimp [root]; exact Real.rpow_pos_of_pos hp0 _
   have hrootle : root ≤ p := by
     dsimp [root]
-    exact Real.rpow_le_rpow_of_exponent_le (by dsimp [p, P]; linarith)
+    exact Real.rpow_le_rpow_of_exponent_le hp1
       (by norm_num : (1 / 4 : ℝ) ≤ 1)
   have hidx : p / (n + 1 : ℝ) ≤ 2 * l := by
     simpa [p, P, l, L, Nat.cast_add] using hindex
@@ -807,9 +807,7 @@ theorem eventually_twoHitGapCount_bound_65 :
     rw [Real.rpow_def_of_pos hp0]
     rw [← Real.exp_add]
     have he : 3 * l / 4 + l * (1 / 4 : ℝ) = l := by ring
-    rw [he, Real.exp_log (by
-      have : 0 < p := hp0
-      exact ne_of_gt this)]
+    rw [he, Real.exp_log hp0]
   have hExpDiv : Real.exp (3 * l / 4) / (2 * (n + 1 : ℝ)) * ll =
       (p / (n + 1 : ℝ)) / (2 * root) * ll := by
     have hmul : Real.exp (3 * l / 4) * root = p := hExp
@@ -826,8 +824,7 @@ theorem eventually_twoHitGapCount_bound_65 :
         have : p ≤ 2 * l * (n + 1 : ℝ) := (div_le_iff₀ (by positivity)).mp hidx
         nlinarith [mul_le_mul_of_nonneg_left this (le_of_lt hl)]
       _ ≤ l ^ 2 / root := by
-        rw [div_le_div_iff₀ hroot hp0]
-        exact mul_le_mul_of_nonneg_left hrootle (sq_nonneg l)
+        exact div_le_div_of_nonneg_left (sq_nonneg l) hroot hp0
   have hsecond :
       Real.exp (3 * l / 4) / (2 * (n + 1 : ℝ)) * ll ≤ l ^ 2 / root := by
     rw [hExpDiv]
@@ -837,14 +834,16 @@ theorem eventually_twoHitGapCount_bound_65 :
         gcongr
       _ = l * ll / root := by field_simp <;> ring
       _ ≤ l ^ 2 / root := by
-        gcongr
+        apply div_le_div_of_nonneg_right _ (le_of_lt hroot)
+        exact mul_le_mul_of_nonneg_left hllle (le_of_lt hl)
   have htailWeighted :
       (1 + Real.exp (3 * l / 4)) / (2 * (n + 1 : ℝ)) * ll ≤ 2 * R n := by
-    rw [add_div, one_div]
-    have h := add_le_add hfirst hsecond
-    dsimp [R, l, L, P]
-    have hpow : (P n) ^ (1 / 4 : ℝ) = root := rfl
-    simpa [div_eq_mul_inv, mul_add, mul_comm, mul_left_comm, mul_assoc, hpow] using h
+    calc
+      (1 + Real.exp (3 * l / 4)) / (2 * (n + 1 : ℝ)) * ll =
+          ll / (2 * (n + 1 : ℝ)) +
+            Real.exp (3 * l / 4) / (2 * (n + 1 : ℝ)) * ll := by ring
+      _ ≤ l ^ 2 / root + l ^ 2 / root := add_le_add hfirst hsecond
+      _ = 2 * R n := by dsimp [R, l, L, P]; ring
   have htailSmall :
       (1 + Real.exp (3 * l / 4)) / (2 * (n + 1 : ℝ)) ≤ 1 / ll := by
     apply (le_div_iff₀ hll).2
@@ -860,7 +859,7 @@ theorem eventually_twoHitGapCount_bound_65 :
     simpa [l, L, P, ll, LL] using hbound
   calc
     _ ≤ 64 / ll + (1 + Real.exp (3 * l / 4)) / (2 * (n + 1 : ℝ)) := hbound'
-    _ ≤ 64 / ll + 1 / ll := add_le_add_left htailSmall _
+    _ ≤ 64 / ll + 1 / ll := add_le_add_left htailSmall (64 / ll)
     _ = 65 / Real.log (Real.log (primeAt n : ℝ)) := by
       dsimp [ll, LL]
       ring
