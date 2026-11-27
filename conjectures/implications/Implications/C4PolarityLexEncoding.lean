@@ -170,14 +170,25 @@ theorem lexAssignment_cons_neq (a : Nat → Bool) (base : Nat)
       by_cases hinside : n < base + (lexPrefixScan a initialPref (x :: xs) (y :: ys)).length
       · have hinside' : n < (base + 1) + (lexPrefixScan a nextPref xs ys).length :=
           hthreshold.mp hinside
+        have hscanExt' : lexPrefixScan (extendVariable a base
+            (initialPref && (a x == a y))) (initialPref && (a x == a y)) xs ys =
+            lexPrefixScan a nextPref xs ys := by simpa [nextPref] using hscanExt
+        have htailBound : n < base + 1 + (lexPrefixScan a nextPref xs ys).length := by
+          simpa [hscanExt'] using hinside'
         simp [lexAssignment, hbelow, hbelow', hnotLe, hinside, hinside', hscan,
-          hscanExt, hlen', hthresholdEq, hidx, extendVariable, Nat.ne_of_gt habove]
+          hscanExt', hlen', hthresholdEq, hidx, extendVariable, Nat.ne_of_gt habove]
+        simp [htailBound]
       · have hinside' : ¬ n < (base + 1) + (lexPrefixScan a nextPref xs ys).length :=
           fun hh => hinside (hthreshold.mpr hh)
+        have hscanExt' : lexPrefixScan (extendVariable a base
+            (initialPref && (a x == a y))) (initialPref && (a x == a y)) xs ys =
+            lexPrefixScan a nextPref xs ys := by simpa [nextPref] using hscanExt
+        have htailNotBound : ¬ n < base + 1 +
+            (lexPrefixScan (extendVariable a base
+              (initialPref && (a x == a y))) (initialPref && (a x == a y)) xs ys).length := by
+          simpa [hscanExt'] using hinside'
         simp [lexAssignment, hbelow, hbelow', hnotLe, hinside, hinside', hscan,
-          hscanExt, hlen', hthresholdEq, extendVariable, Nat.ne_of_gt habove]
-        intro hlt
-        exact (hinside' hlt).elim
+          hscanExt', hlen', hthresholdEq, htailNotBound, extendVariable, Nat.ne_of_gt habove]
 
 /-- Each unequal variable pair allocates exactly one fresh prefix variable;
 identical variables are skipped. -/
