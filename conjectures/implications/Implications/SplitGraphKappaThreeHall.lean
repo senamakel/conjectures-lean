@@ -27,20 +27,21 @@ theorem sum_row_card_eq_sum_degree (C S : Finset V) (inc : V → V → Prop)
   classical
   calc
     (∑ c ∈ C, (row S inc c).card) =
-        ∑ c ∈ C, ∑ x ∈ S, if inc c x then 1 else 0 := by
+        ∑ c ∈ C, ∑ x ∈ S, (if inc c x then (1 : ℕ) else 0) := by
           apply Finset.sum_congr rfl
           intro c hc
           calc
             (row S inc c).card = ∑ x ∈ row S inc c, (1 : ℕ) := by simp
             _ = ∑ x ∈ S, if inc c x then 1 else 0 := by
+              change (∑ x ∈ S.filter (fun x => inc c x), (1 : ℕ)) = _
               exact Finset.sum_filter (s := S) (fun x => inc c x) (fun _ => (1 : ℕ))
-    _ = ∑ x ∈ S, ∑ c ∈ C, if inc c x then 1 else 0 := by
+    _ = ∑ x ∈ S, ∑ c ∈ C, (if inc c x then (1 : ℕ) else 0) := by
           rw [Finset.sum_comm]
     _ = ∑ x ∈ S, (C.filter (fun c => inc c x)).card := by
           apply Finset.sum_congr rfl
           intro x hx
           calc
-            ∑ c ∈ C, if inc c x then 1 else 0 =
+            ∑ c ∈ C, (if inc c x then (1 : ℕ) else 0) =
                 ∑ c ∈ C.filter (fun c => inc c x), (1 : ℕ) := by
                   exact (Finset.sum_filter (s := C) (fun c => inc c x)
                     (fun _ => (1 : ℕ))).symm
