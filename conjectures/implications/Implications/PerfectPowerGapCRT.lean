@@ -62,21 +62,24 @@ private def squareOffsets : List ℕ := [1, 4, 9, 16, 25, 36, 49]
 
 private def cubeOffsets : List ℕ := [3, 24]
 
+private def singletonExponentPrimes : List ℕ :=
+  (exponentClasses.filter (fun (offset, _) =>
+    !(squareOffsets.contains offset || cubeOffsets.contains offset))).map Prod.snd
+
 private def classAssignmentValid : Bool :=
   exponentClasses.map Prod.fst == (List.range 49).map (fun n => n + 1) &&
     exponentClasses.all (fun (offset, q) =>
       if squareOffsets.contains offset then q == 2
       else if cubeOffsets.contains offset then q == 3
-      else exponentPrimes.contains q) &&
-    ((exponentClasses.filter (fun (offset, _) =>
-      !(squareOffsets.contains offset || cubeOffsets.contains offset))).map Prod.snd).Nodup
+      else exponentPrimes.contains q && q != 2 && q != 3) &&
+    singletonExponentPrimes == exponentPrimes.drop 2 && singletonExponentPrimes.Nodup
 
 private def congruencesHold : Bool :=
   exponentClasses.all fun (offset, q) =>
     basePrimes.zip crtExponent |>.all fun (p, a) =>
       (Nat.factorization (offset * W) p + a) % q == 0
 
-/-- The explicit 42 congruence classes all hold for each of the 15 prime
+/-- The 42 exponent classes assigned across all 49 offsets hold for each of the 15 prime
 valuations in `W`. This is the finite arithmetic certificate in Gyarmati's
 construction. -/
 theorem exponentCongruenceCertificate : congruencesHold = true := by
