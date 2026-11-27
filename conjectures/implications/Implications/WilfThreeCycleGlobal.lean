@@ -18,7 +18,7 @@ private noncomputable def component {n : ℕ} (m : Equiv.Perm (Fin 8)) (s : ℕ)
 private theorem component_apply {n : ℕ} (m : Equiv.Perm (Fin 8)) {s : ℕ}
     (hs : s + 7 < n) (i : Fin 8) :
     component m s (windowEmbedding s hs i) = windowEmbedding s hs (m i) := by
-  rw [component, dif_pos hs, WilfDisjointPermutations.liftWindow_apply]
+  rw [component, dite_eq_left hs, WilfDisjointPermutations.liftWindow_apply]
 
 private theorem mem_component_support {n : ℕ} (m : Equiv.Perm (Fin 8)) {s : ℕ}
     (hs : s + 7 < n) (x : Fin n) :
@@ -31,7 +31,7 @@ private theorem mem_component_support {n : ℕ} (m : Equiv.Perm (Fin 8)) {s : �
     · obtain ⟨i, rfl⟩ := hx
       rw [component_apply m hs] at h
       exact ⟨i, fun e => h (congrArg (windowEmbedding s hs) e), rfl⟩
-    · rw [component, dif_pos hs] at h
+    · rw [component, dite_eq_left hs] at h
       exact (h (Equiv.Perm.viaEmbedding_apply_of_notMem _ _ _ hx)).elim
   · rintro ⟨i, h, rfl⟩
     rw [component_apply m hs]
@@ -108,17 +108,18 @@ private theorem assembled_on_window {n : ℕ} (m : Equiv.Perm (Fin 8))
         windowEmbedding (s + 5) (hb _ h.2) (m 1)
       else windowEmbedding s (hb s hs) (m i) := by
   by_cases hnext : i = 6 ∧ s + 5 ∈ marks
-  · rw [dif_pos hnext]
+  · rw [dite_eq_left hnext]
     have he : windowEmbedding (s + 5) (hb _ hnext.2) (1 : Fin 8) =
         windowEmbedding s (hb s hs) i := by
       apply Fin.ext
       change s + 5 + 1 = s + i.val
       rw [hnext.1]
+      rfl
     rw [← he]
     rw [WilfDisjointPermutations.assemble_apply_of_mem_support _ _ _ hnext.2]
     · exact component_apply m (hb _ hnext.2) 1
     · exact (mem_component_support m (hb _ hnext.2) _).mpr ⟨1, (hm 1).mpr (Or.inl rfl), rfl⟩
-  · rw [dif_neg hnext]
+  · rw [dite_eq_right hnext]
     by_cases hmove : m i ≠ i
     · rw [WilfDisjointPermutations.assemble_apply_of_mem_support _ _ _ hs]
       · exact component_apply m (hb _ hs) i
@@ -178,21 +179,22 @@ private noncomputable def moveMarked {n : ℕ} (marks : Finset ℕ) (p q : Fin 8
         (components_disjoint m hm marks hb hsep) (windowEmbedding s (hb s hs) k)) = _
       rw [assembled_on_window m hm marks hb hsep hs]
       by_cases hk : k = 6
-      · rw [dif_pos ⟨hk, hnext⟩]
+      · rw [dite_eq_left ⟨hk, hnext⟩]
         congr 1
         apply Fin.ext
-        simp [overlapImage, hk, f, WilfDisjointPermutations.windowEmbedding, position, Nat.add_assoc]
-      · rw [dif_neg (fun h => hk h.1)]
+        simp [overlapImage, hk, WilfDisjointPermutations.windowEmbedding, position, Nat.add_assoc]
+      · rw [dite_eq_right (fun h => hk h.1)]
         congr 1
         apply Fin.ext
-        simp [overlapImage, hk, f, WilfDisjointPermutations.windowEmbedding, position]
+        simp [overlapImage, hk, WilfDisjointPermutations.windowEmbedding, position]
+        rfl
     rw [himage i, himage j]
     exact hlocal f h0 h5 i j
   · have hfix (k : Fin 8) : g (windowEmbedding s (hb s hs) k) =
         windowEmbedding s (hb s hs) (m k) := by
       change WilfDisjointPermutations.assemble marks (component m)
         (components_disjoint m hm marks hb hsep) (windowEmbedding s (hb s hs) k) = _
-      rw [assembled_on_window m hm marks hb hsep hs, dif_neg (fun h => hnext h.2)]
+      rw [assembled_on_window m hm marks hb hsep hs, dite_eq_right (fun h => hnext h.2)]
     rw [hfix i, hfix j, ← hq]
     obtain ⟨_, hpat⟩ := hfirst
     exact hpat (m i) (m j)
