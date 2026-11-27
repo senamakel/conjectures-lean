@@ -1,4 +1,4 @@
-import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+import Mathlib.Algebra.Order.BigOperators.Group.Finset.Basic
 import Mathlib.Combinatorics.SimpleGraph.Finite
 import Implications.C4VertexExtension
 
@@ -26,30 +26,33 @@ theorem outerNeighbors_disjoint {v u w : V}
     Disjoint (outerNeighbors G u v) (outerNeighbors G w v) := by
   rw [Finset.disjoint_left]
   intro z hzu hzw
-  have hzu' : z ∈ G.neighborFinset u ∧ z ≠ v := by
-    simpa [outerNeighbors] using hzu
-  have hzw' : z ∈ G.neighborFinset w ∧ z ≠ v := by
-    simpa [outerNeighbors] using hzw
-  have huv : G.Adj u v := G.mem_neighborFinset.mp hu
-  have hwv : G.Adj w v := G.mem_neighborFinset.mp hw
-  have hnot := hC4 huw hzw'.2.symm huv hwv
-  exact hnot ⟨G.mem_neighborFinset.mp hzu'.1, G.mem_neighborFinset.mp hzw'.1⟩
+  have hzu' : z ≠ v ∧ G.Adj u z := by
+    change z ∈ (G.neighborFinset u).erase v at hzu
+    rcases Finset.mem_erase.mp hzu with ⟨hzv, hzu⟩
+    exact ⟨hzv, by simpa using hzu⟩
+  have hzw' : z ≠ v ∧ G.Adj w z := by
+    change z ∈ (G.neighborFinset w).erase v at hzw
+    rcases Finset.mem_erase.mp hzw with ⟨hzv, hzw⟩
+    exact ⟨hzv, by simpa using hzw⟩
+  have huv : G.Adj u v := by simpa using hu
+  have hwv : G.Adj w v := by simpa using hw
+  have hnot := hC4 (x := u) (y := w) (z := v) (w := z) huw hzw'.1.symm huv hwv
+  exact hnot ⟨hzu'.2, hzw'.2⟩
 
 theorem sum_outerNeighbors_card_le (v : V)
     (hC4 : C4VertexExtension.C4Free G) :
     (∑ u ∈ G.neighborFinset v, (outerNeighbors G u v).card) ≤ Fintype.card V - 1 := by
   classical
   let S := G.neighborFinset v
-  let T := outerNeighbors G · v
+  let T := fun u => outerNeighbors G u v
   have hdisj : (S : Set V).PairwiseDisjoint T := by
     intro u hu w hw huw
     exact outerNeighbors_disjoint G hC4 hu hw huw
   have hsubset : S.biUnion T ⊆ Finset.univ.erase v := by
     intro z hz
     rcases Finset.mem_biUnion.mp hz with ⟨u, hu, huz⟩
-    have hz' : z ∈ G.neighborFinset u ∧ z ≠ v := by
-      simpa [T, outerNeighbors] using huz
-    simp [hz'.2]
+    have hzv : z ≠ v := (Finset.mem_erase.mp (by simpa [T, outerNeighbors] using huz)).1
+    exact Finset.mem_erase.mpr ⟨hzv, Finset.mem_univ z⟩
   calc
     (∑ u ∈ G.neighborFinset v, (outerNeighbors G u v).card) = #(S.biUnion T) := by
       simp only [S, T]
@@ -66,10 +69,11 @@ theorem degree_window_bound (v : V) (m : ℕ) (hm : 2 ≤ m)
   have hlower : ∀ u ∈ G.neighborFinset v, m - 1 ≤ (outerNeighbors G u v).card := by
     intro u hu
     have huv : v ∈ G.neighborFinset u := by
-      rw [G.mem_neighborFinset]
-      exact G.symm (G.mem_neighborFinset.mp hu)
+      have huv' : G.Adj v u := by simpa using hu
+      simpa using G.symm.symm v u huv' 
     have hcard : (outerNeighbors G u v).card = G.degree u - 1 := by
-      simp [outerNeighbors, G.card_neighborFinset_eq_degree, huv]
+      change #((G.neighborFinset u).erase v) = G.degree u - 1
+      rw [Finset.card_erase_of_mem huv, G.card_neighborFinset_eq_degree]
     rw [hcard]
     omega
   calc
@@ -100,27 +104,30 @@ theorem neighbor_degree_excess_le_one_of_degree_eight (v : V)
     have hcards : ∀ u ∈ S, (outerNeighbors G u v).card = G.degree u - 1 := by
       intro u hu
       have huv : v ∈ G.neighborFinset u := by
-        rw [G.mem_neighborFinset]
-        exact G.symm (G.mem_neighborFinset.mp hu)
-      simp [outerNeighbors, G.card_neighborFinset_eq_degree, huv]
+        have huv' : G.Adj v u := by simpa using hu
+        simpa using G.symm.symm v u huv' 
+      change #((G.neighborFinset u).erase v) = G.degree u - 1
+      rw [Finset.card_erase_of_mem huv, G.card_neighborFinset_eq_degree]
     simpa [S, hcard, hcards] using houter
   have hdegreeSum : (∑ u ∈ S, G.degree u) ≤ 49 := by
     have hidentity :
         (∑ u ∈ S, G.degree u) = (∑ u ∈ S, (G.degree u - 1)) + S.card := by
-      rw [← Finset.sum_add_distrib]
-      congr 1
-      apply Finset.sum_congr rfl
-      intro u hu
-      omega
+      calc
+        (∑ u ∈ S, G.degree u) = ∑ u ∈ S, ((G.degree u - 1) + 1) := by
+          apply Finset.sum_congr rfl
+          intro u hu
+          omega
+        _ = (∑ u ∈ S, (G.degree u - 1)) + S.card := by simp [Finset.sum_add_distrib]
     rw [hidentity, G.card_neighborFinset_eq_degree, hv] at houterDegree
     omega
   have hexcessIdentity :
       (∑ u ∈ S, G.degree u) = (∑ u ∈ S, (G.degree u - 6)) + S.card * 6 := by
-    rw [← Finset.sum_add_distrib]
-    congr 1
-    apply Finset.sum_congr rfl
-    intro u hu
-    omega
+    calc
+      (∑ u ∈ S, G.degree u) = ∑ u ∈ S, ((G.degree u - 6) + 6) := by
+        apply Finset.sum_congr rfl
+        intro u hu
+        omega
+      _ = (∑ u ∈ S, (G.degree u - 6)) + S.card * 6 := by simp [Finset.sum_add_distrib, Nat.mul_comm]
   rw [hexcessIdentity, G.card_neighborFinset_eq_degree, hv] at hdegreeSum
   omega
 
