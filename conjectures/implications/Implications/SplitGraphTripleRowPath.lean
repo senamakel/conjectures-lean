@@ -73,15 +73,17 @@ private theorem path_of_distinct_attachments
   let path : List V := prefList ++ middle ++ [j]
   have hxM : x ∉ M := by simp [M, hxy]
   have hyM : y ∉ M := by simp [M, hxy]
-  have hmiddleNodup : middle.Nodup := by simp [middle, hxM, hyM]
+  have hmiddleNodup : middle.Nodup := by
+    rw [List.nodup_cons, List.nodup_append']
+    exact ⟨hxM, M.nodup_toList, by simp [hyM]⟩
   have hmiddleFin : middle.toFinset = D := by
     ext v
     by_cases hvx : v = x
     · subst v
-      simp [middle, D, hxy]
+      simp [middle, D, hxt, hxC]
     by_cases hvy : v = y
     · subst v
-      simp [middle, M, D, hxy]
+      simp [middle, M, D, hyt, hyC, hxy]
     simp [middle, M, D, hvx, hvy]
   have hmiddleSub : ∀ v ∈ middle, v ∈ C := by
     intro v hv
@@ -89,7 +91,10 @@ private theorem path_of_distinct_attachments
     exact (Finset.mem_erase.mp hvD).2
   have hmiddleChain := clique_list_chain G C hC middle hmiddleNodup hmiddleSub
   have hmiddleHead : middle.head? = some x := by simp [middle]
-  have hmiddleLast : middle.getLast? = some y := by simp [middle, List.getLast?_append]
+  have hmiddleLast : middle.getLast? = some y := by
+    change ((x :: M.toList) ++ [y]).getLast? = some y
+    rw [List.getLast?_append_of_ne_nil _ (by simp)]
+    simp
   have hiC : i ∉ C := fun h => (Finset.disjoint_left.mp hdisj) h hi
   have hjC : j ∉ C := fun h => (Finset.disjoint_left.mp hdisj) h hj
   have hkC : k ∉ C := fun h => (Finset.disjoint_left.mp hdisj) h hk
@@ -97,33 +102,35 @@ private theorem path_of_distinct_attachments
   have htk' : t ≠ k := by intro he; subst k; exact hkC ht
   have hprefListChain : prefList.IsChain G.Adj := by simp [prefList, hti, htk.symm]
   have hprefListNodup : prefList.Nodup := by
-    simp [prefList, hij, hik, hjk, hti', htk']
+    simp [prefList, hik, hti', htk'.symm]
   have hprefListMiddle : (prefList ++ middle).Nodup := by
     rw [List.nodup_append']
     refine ⟨hprefListNodup, hmiddleNodup, ?_⟩
-    intro v hv w hw he
-    subst w
+    intro v hv hvmiddle
     have hv' : v = k ∨ v = t ∨ v = i := by simpa [prefList] using hv
     rcases hv' with rfl | rfl | rfl
-    · exact hkC ((hmiddleSub v hw).trans he)
+    · exact hkC (hmiddleSub k hvmiddle)
     · have htD : t ∉ D := by simp [D]
-      have htm : t ∈ middle.toFinset := List.mem_toFinset.mpr hw
+      have htm : t ∈ middle.toFinset := List.mem_toFinset.mpr hvmiddle
       rw [hmiddleFin] at htm
       exact htD htm
-    · exact hiC ((hmiddleSub v hw).trans he)
+    · exact hiC (hmiddleSub i hvmiddle)
   have hpathNodup : path.Nodup := by
     dsimp [path]
     rw [List.nodup_append']
     refine ⟨hprefListMiddle, by simp [hjC], ?_⟩
-    intro v hv w hw he
-    subst w
+    intro v hv hvsuffix
     rcases List.mem_append.mp hv with hvprefList | hvmiddle
     · have hv' : v = k ∨ v = t ∨ v = i := by simpa [prefList] using hvprefList
       rcases hv' with rfl | rfl | rfl
-      · exact hjk
-      · exact hjC ht
-      · exact hij
-    · exact hjC (hmiddleSub v hvmiddle)
+      · simp at hvsuffix
+        exact hjk hvsuffix
+      · simp at hvsuffix
+        exact hjC (hvsuffix ▸ ht)
+      · simp at hvsuffix
+        exact hij hvsuffix
+    · simp at hvsuffix
+      exact hjC (hvsuffix ▸ hmiddleSub v hvmiddle)
   have hfirst : (prefList ++ middle).IsChain G.Adj :=
     chain_join hprefListChain hmiddleChain (by simp [prefList]) hmiddleHead hxi.symm
   have hpathChain : path.IsChain G.Adj := by
