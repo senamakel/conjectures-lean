@@ -195,14 +195,87 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
             have hxR : x ∈ block l := by
               have hlx : left l = x := hyEq.trans h.symm
               simp [block, hlx]
-            exact (List.disjoint_left.mp
+            have hxNot := List.disjoint_left.mp
               (hblocksDisjoint k (Finset.mem_toList.mpr hkO) l
-                (Finset.mem_toList.mpr hlO) hkl)) x hxL hxR
+                (Finset.mem_toList.mpr hlO) hkl) hxL
+            exact hxNot hxR
+          have hEnds : right k ≠ left l := by
+            intro h
+            apply hxy
+            exact hxEq.symm.trans (h.trans hyEq)
           exact hxEq.symm ▸ hyEq.symm ▸ hC
             (hrightC k (Finset.mem_sdiff.mp hkO).1)
-            (hleftC l (Finset.mem_sdiff.mp hlO).1) hxy
+            (hleftC l (Finset.mem_sdiff.mp hlO).1) hEnds
     change (others.toList.flatMap block).IsChain G.Adj
     exact hchain others.toList others.nodup_toList
       (fun k hk => Finset.mem_toList.mp hk)
+
+  have hrestLastC : ∀ x, x ∈ rest.getLast? → x ∈ C := by
+    have hlast : ∀ l : List V, (∀ k ∈ l, k ∈ others) →
+        ∀ x, x ∈ (l.flatMap block).getLast? → x ∈ C := by
+      intro l
+      induction l with
+      | nil => simp
+      | cons k ks ih =>
+        intro hmem x hx
+        have hkO := hmem k (by simp)
+        by_cases htail : ks.flatMap block = []
+        · have hx' : x ∈ (block k).getLast? := by
+            simpa [List.flatMap_cons, htail] using hx
+          have hxEq : right k = x := by simpa [block] using hx'
+          exact hxEq.symm ▸ hrightC k (Finset.mem_sdiff.mp hkO).1
+        · have hx' : x ∈ (ks.flatMap block).getLast? := by
+            change x ∈ (block k ++ ks.flatMap block).getLast? at hx
+            rw [List.getLast?_append_of_ne_nil _ htail] at hx
+            simpa [List.flatMap_cons] using hx
+          exact ih (by
+            intro q hq
+            exact hmem q (by simp [hq])) x hx'
+    exact hlast others.toList (fun k hk => Finset.mem_toList.mp hk)
+
+  have hspecialDisjoint : ∀ x, x ∈ ([a, i, c, j, b] : List V) → x ∉ rest := by
+    intro x hx hxRest
+    obtain ⟨k, hkList, hxBlock⟩ := List.mem_flatMap.mp hxRest
+    have hkO := Finset.mem_toList.mp hkList
+    have hkI := (Finset.mem_sdiff.mp hkO).1
+    simp only [List.mem_cons, List.not_mem_nil] at hx
+    simp only [block, List.mem_cons, List.not_mem_nil] at hxBlock
+    simp only [or_false] at hxBlock
+    rcases hx with haX | hiX | hcX | hjX | hbX
+    · have hxC : x ∈ C := haX.symm ▸ hCabc.1
+      rcases hxBlock with hL | hK | hR
+      · have hxe : x ≠ c := by simpa [haX] using hneqac
+        have hki := hunique x hxC hxe k hkI i hi (Or.inl hL.symm) (Or.inl hlefti)
+        exact (other_labels_ne I i j k hij hkO).1 hki
+      · exact (Finset.disjoint_left.mp hdisj) hxC (hK.symm ▸ hkI)
+      · have hxe : x ≠ c := by simpa [haX] using hneqac
+        have hki := hunique x hxC hxe k hkI i hi (Or.inr hR.symm) (Or.inl hlefti)
+        exact (other_labels_ne I i j k hij hkO).1 hki
+    · rcases hxBlock with hL | hK | hR
+      · have hiC : x ∈ C := hL.symm ▸ hleftC k hkI
+        exact (Finset.disjoint_left.mp hdisj) hiC (hiX.symm ▸ hi)
+      · exact (other_labels_ne I i j k hij hkO).1 (hiX.symm.trans hK)
+      · have hiC : x ∈ C := hR.symm ▸ hrightC k hkI
+        exact (Finset.disjoint_left.mp hdisj) hiC (hiX.symm ▸ hi)
+    · have hxC : x ∈ C := hcX.symm ▸ hCabc.2.1
+      rcases hxBlock with hL | hK | hR
+      · exact hnotC k hkO (Or.inl (hL.symm.trans hcX))
+      · exact (Finset.disjoint_left.mp hdisj) hxC (hK.symm ▸ hkI)
+      · exact hnotC k hkO (Or.inr (hR.symm.trans hcX))
+    · rcases hxBlock with hL | hK | hR
+      · have hjC : x ∈ C := hL.symm ▸ hleftC k hkI
+        exact (Finset.disjoint_left.mp hdisj) hjC (hjX.symm ▸ hj)
+      · exact (other_labels_ne I i j k hij hkO).2 (hjX.symm.trans hK)
+      · have hjC : x ∈ C := hR.symm ▸ hrightC k hkI
+        exact (Finset.disjoint_left.mp hdisj) hjC (hjX.symm ▸ hj)
+    · have hxC : x ∈ C := hbX.symm ▸ hCabc.2.2
+      rcases hxBlock with hL | hK | hR
+      · have hxe : x ≠ c := by simpa [hbX] using hneqcb.symm
+        have hkj := hunique x hxC hxe k hkI j hj (Or.inl hL.symm) (Or.inr hrightj)
+        exact (other_labels_ne I i j k hij hkO).2 hkj
+      · exact (Finset.disjoint_left.mp hdisj) hxC (hK.symm ▸ hkI)
+      · have hxe : x ≠ c := by simpa [hbX] using hneqcb.symm
+        have hkj := hunique x hxC hxe k hkI j hj (Or.inr hR.symm) (Or.inr hrightj)
+        exact (other_labels_ne I i j k hij hkO).2 hkj
 
 end SplitGraphSmallRowsOneShared
