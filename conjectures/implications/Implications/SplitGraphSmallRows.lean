@@ -239,7 +239,7 @@ theorem card_le_three_of_no_common_center
 theorem clique_rows_two_set_structure
     {V : Type*} [Fintype V] [DecidableEq V]
     (G : SimpleGraph V) (C I : Finset V)
-    (hrow : ∀ c ∈ C, (row G I c).card ≤ 2)
+    (_hrow : ∀ c ∈ C, (row G I c).card ≤ 2)
     (hdiff : ∀ c ∈ C, ∀ d ∈ C, c ≠ d → (rowDiff G I c d).card ≤ 2)
     (hRows : ∃ c ∈ C, (row G I c).card = 2) :
     (∃ x, ∀ c ∈ C, (row G I c).card = 2 → x ∈ row G I c) ∨
@@ -282,4 +282,5 @@ theorem clique_rows_two_set_structure
 end SplitGraphSmallRows
 
 #print axioms SplitGraphSmallRows.pairwise_intersecting_two_sets
+#print axioms SplitGraphSmallRows.card_le_three_of_no_common_center
 #print axioms SplitGraphSmallRows.clique_rows_two_set_structure
