@@ -16,3 +16,13 @@ import Implications.Wieferich.Rotkiewicz
 import Implications.Dickson.Main
 import Implications.Dickson.ConsecutiveAll
 import Implications.PrimeGaps.Granville
+import Implications.ErdosStrausOptimal
+import Implications.McEachenDensity
+import Implications.McEachenStock
+import Implications.SplitGraphComponents
+import Implications.WilfEquivalence
+import Implications.C4Extremal42
+import Implications.SmoothGapCounting
+import Implications.SplitGraphPath
+import Implications.C4VertexExtension
+import Implications.WilfPatternSwap
