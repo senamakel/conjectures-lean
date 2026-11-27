@@ -212,22 +212,22 @@ def seed1Graph : SimpleGraph (Fin 41) := maskGraph seed1 seed1_graph_symm seed1_
 def seed2Graph : SimpleGraph (Fin 41) := maskGraph seed2 seed2_graph_symm seed2_graph_loop
 def seed3Graph : SimpleGraph (Fin 41) := maskGraph seed3 seed3_graph_symm seed3_graph_loop
 
-private theorem seed1_neighbor_disjoint_iff (u v : Fin 41) :
-    Disjoint (seed1Graph.neighborSet u) (seed1Graph.neighborSet v) ↔
+private theorem seed1_neighbor_disjoint_iff : ∀ u v : Fin 41,
+    Disjoint (seed1Graph.neighborFinset u) (seed1Graph.neighborFinset v) ↔
       compatible seed1 u.val v.val = true := by
-  classical
+  intro u v
   decide +kernel
 
-private theorem seed2_neighbor_disjoint_iff (u v : Fin 41) :
-    Disjoint (seed2Graph.neighborSet u) (seed2Graph.neighborSet v) ↔
+private theorem seed2_neighbor_disjoint_iff : ∀ u v : Fin 41,
+    Disjoint (seed2Graph.neighborFinset u) (seed2Graph.neighborFinset v) ↔
       compatible seed2 u.val v.val = true := by
-  classical
+  intro u v
   decide +kernel
 
-private theorem seed3_neighbor_disjoint_iff (u v : Fin 41) :
-    Disjoint (seed3Graph.neighborSet u) (seed3Graph.neighborSet v) ↔
+private theorem seed3_neighbor_disjoint_iff : ∀ u v : Fin 41,
+    Disjoint (seed3Graph.neighborFinset u) (seed3Graph.neighborFinset v) ↔
       compatible seed3 u.val v.val = true := by
-  classical
+  intro u v
   decide +kernel
 
 private theorem compatible_of_nodup_pairwise {g : Array Nat} (l : List (Fin 41))
@@ -239,14 +239,16 @@ private theorem compatible_of_nodup_pairwise {g : Array Nat} (l : List (Fin 41))
   have hperm : l.Perm sorted := by
     apply List.perm_of_nodup_nodup_toFinset_eq hnd
     · exact (List.nodup_finRange 41).filter _
-    · rw [List.toFinset_filter]
-      simp [sorted, s, List.toFinset_finRange]
+    · change l.toFinset = (List.finRange 41).filter (· ∈ s) |>.toFinset
+      ext x
+      simp [s]
   have hsorted : sorted.Pairwise (fun u v => compatible g u.val v.val = true) :=
     (hperm.pairwise_iff (by intro u v; simp [compatible, Nat.land_comm])).mp hp
   refine ⟨sorted.map Fin.val, ?_, ?_, ?_⟩
-  · rw [← hperm.length_eq]
-  · simpa using (List.filter_sublist (p := fun u : Fin 41 => u ∈ s)).map Fin.val
-  · exact (List.pairwise_map.mpr hsorted)
+  · simpa using hperm.length_eq.symm
+  · simpa [sorted, List.map_finRange] using
+      (List.filter_sublist (p := fun u : Fin 41 => u ∈ s)).map Fin.val
+  · exact List.pairwise_map.mpr hsorted
 
 /-- Six distinct vertices cannot have pairwise disjoint open neighborhoods in
 any graph isomorphic to one of the masks.
@@ -267,12 +269,12 @@ theorem no_disjoint_six_of_seed_iso (G : SimpleGraph (Fin 41))
     have hmappedPairs : mapped.Pairwise (fun u v =>
         Disjoint (seed1Graph.neighborSet u) (seed1Graph.neighborSet v)) := by
       apply List.pairwise_map.mpr
-      exact hpairs.imp fun u v huv => by
-        rw [Set.disjoint_left] at huv ⊢
+      exact hpairs.imp (fun {u v} huv => by
+        apply Set.disjoint_left.mpr
         intro x hx₁ hx₂
-        exact huv (hIso.symm x)
-          ((SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₁))
-          ((SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₂))
+        apply (Set.disjoint_left.mp huv) (hIso.symm x)
+        · exact (SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₁)
+        · exact (SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₂))
     have hcompat : mapped.Pairwise (fun u v => compatible seed1 u.val v.val = true) := by
       exact hmappedPairs.imp fun u v huv => (seed1_neighbor_disjoint_iff u v).1 huv
     have hc := compatible_of_nodup_pairwise mapped hmappedNodup hcompat
@@ -287,12 +289,12 @@ theorem no_disjoint_six_of_seed_iso (G : SimpleGraph (Fin 41))
       have hmappedPairs : mapped.Pairwise (fun u v =>
           Disjoint (seed2Graph.neighborSet u) (seed2Graph.neighborSet v)) := by
         apply List.pairwise_map.mpr
-        exact hpairs.imp fun u v huv => by
-          rw [Set.disjoint_left] at huv ⊢
+        exact hpairs.imp (fun {u v} huv => by
+          apply Set.disjoint_left.mpr
           intro x hx₁ hx₂
-          exact huv (hIso.symm x)
-            ((SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₁))
-            ((SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₂))
+          apply (Set.disjoint_left.mp huv) (hIso.symm x)
+          · exact (SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₁)
+          · exact (SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₂))
       have hcompat : mapped.Pairwise (fun u v => compatible seed2 u.val v.val = true) := by
         exact hmappedPairs.imp fun u v huv => (seed2_neighbor_disjoint_iff u v).1 huv
       have hc := compatible_of_nodup_pairwise mapped hmappedNodup hcompat
@@ -306,12 +308,12 @@ theorem no_disjoint_six_of_seed_iso (G : SimpleGraph (Fin 41))
       have hmappedPairs : mapped.Pairwise (fun u v =>
           Disjoint (seed3Graph.neighborSet u) (seed3Graph.neighborSet v)) := by
         apply List.pairwise_map.mpr
-        exact hpairs.imp fun u v huv => by
-          rw [Set.disjoint_left] at huv ⊢
+        exact hpairs.imp (fun {u v} huv => by
+          apply Set.disjoint_left.mpr
           intro x hx₁ hx₂
-          exact huv (hIso.symm x)
-            ((SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₁))
-            ((SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₂))
+          apply (Set.disjoint_left.mp huv) (hIso.symm x)
+          · exact (SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₁)
+          · exact (SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₂))
       have hcompat : mapped.Pairwise (fun u v => compatible seed3 u.val v.val = true) := by
         exact hmappedPairs.imp fun u v huv => (seed3_neighbor_disjoint_iff u v).1 huv
       have hc := compatible_of_nodup_pairwise mapped hmappedNodup hcompat
