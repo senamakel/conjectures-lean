@@ -50,6 +50,7 @@ theorem hamiltonian_of_one_outsider_shared_pair_path
     (hpartition : (Finset.univ : Finset V) = C ∪ I)
     (hI : I = {a, b, c, z})
     (hpathNodup : (([z, x, a, t, c, u] ++ spare ++ [y, b]) : List V).Nodup)
+    (hsegmentNodup : ([u] ++ spare ++ [y]).Nodup)
     (hspareC : ∀ v ∈ spare, v ∈ C)
     (hcoverC : ∀ v ∈ C, v ∈ ([u] ++ spare ++ [y]))
     (hzx : G.Adj z x) (hxa : G.Adj x a) (hat : G.Adj a t)
@@ -65,51 +66,36 @@ theorem hamiltonian_of_one_outsider_shared_pair_path
   have hsegmentC : ∀ v ∈ segment, v ∈ C := by
     intro v hv
     simp only [segment, List.mem_append, List.mem_singleton] at hv
-    rcases hv with rfl | hv
-    · exact hu
+    rcases hv with hvu | hv
+    · subst v
+      exact hu
     · rcases List.mem_append.mp hv with hv | hv
       · exact hspareC v hv
       · simp only [List.mem_singleton] at hv
         exact hv ▸ hy
-  have hsegmentNodup : segment.Nodup := by
-    have h := hpathNodup
-    simp only [List.nodup_append, List.nodup_cons, List.not_mem_nil] at h
-    exact h.2.1.2.1
   have hsegmentChain : segment.IsChain G.Adj :=
     clique_list_chain G C hC segment hsegmentNodup hsegmentC
   have htailChain : tail.IsChain G.Adj := by
-    rw [List.isChain_append]
-    refine ⟨hsegmentChain, by simp, ?_⟩
+    refine List.IsChain.append hsegmentChain (by simp) ?_
     intro v hv w hw
-    simp only [segment, List.mem_append, List.mem_singleton] at hv
-    simp only [List.mem_singleton] at hw
-    rcases List.mem_append.mp hv with hv | hv
-    · simp at hv
-      subst v
-      exact hby
-    · simp only [List.mem_singleton] at hv
-      subst v
-      exact hby
+    simp only [segment, List.getLast?_append_of_ne_nil, List.getLast?_cons,
+      List.getLast?_singleton, Option.mem_def, Option.some.injEq] at hv
+    simp only [List.head?_append_of_ne_nil, List.head?_cons, Option.mem_def,
+      Option.some.injEq] at hw
+    subst v
+    subst w
+    exact hby
   have hchain : path.IsChain G.Adj := by
-    rw [List.isChain_append]
-    refine ⟨?_, htailChain, ?_⟩
+    refine List.IsChain.append ?_ htailChain ?_
     · simpa [core] using hcoreChain
     · intro v hv w hw
-      simp only [core, List.mem_cons, List.not_mem_nil, or_false] at hv
-      simp only [tail, List.mem_append, List.mem_singleton] at hw
-      rcases hv with hvz | hvx | hva | hvt | hvc
-      · simp at hvz
-      · simp at hvx
-      · simp at hva
-      · simp at hvt
-      · subst v
-        rcases hw with hwu | hw
-        · subst w
-          exact hcu
-        · rcases List.mem_append.mp hw with hw | hw
-          · simp at hw
-          · simp at hw
-            exact hcu
+      simp only [core, List.getLast?_cons, List.getLast?_singleton,
+        Option.mem_def, Option.some.injEq] at hv
+      simp only [tail, List.head?_append_of_ne_nil, List.head?_cons,
+        Option.mem_def, Option.some.injEq] at hw
+      subst v
+      subst w
+      exact hcu
   have hcover : ∀ v : V, v ∈ path := by
     intro v
     have hv : v ∈ C ∨ v ∈ I := by
@@ -117,7 +103,7 @@ theorem hamiltonian_of_one_outsider_shared_pair_path
       rw [hpartition] at hmem
       exact Finset.mem_union.mp hmem
     rcases hv with hvC | hvI
-    · exact List.mem_append_right _ (hcoverC v hvC)
+    · exact List.mem_append_right _ (List.mem_append_left _ (hcoverC v hvC))
     · have hvI' : v = a ∨ v = b ∨ v = c ∨ v = z := by
         simpa [hI, Finset.mem_insert, Finset.mem_singleton, or_comm, or_left_comm, or_assoc] using hvI
       rcases hvI' with rfl | rfl | rfl | rfl
@@ -125,6 +111,7 @@ theorem hamiltonian_of_one_outsider_shared_pair_path
       · exact List.mem_append_right _ (by simp [tail])
       · exact List.mem_append_left _ (by simp [core])
       · exact List.mem_append_left _ (by simp [core])
-  exact hamiltonian_of_list G path (by simp [path, core, tail, segment]) hpathNodup hchain hcover
+  exact hamiltonian_of_list G path (by simp [path, core, tail, segment])
+    (by simpa [path, core, tail, segment] using hpathNodup) hchain hcover
 
 end SplitGraphOneOutsider
