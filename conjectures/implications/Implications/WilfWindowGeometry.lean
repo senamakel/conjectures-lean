@@ -55,9 +55,15 @@ theorem unique_overlapping_successor (marks shifts : Finset ℕ)
     · omega
     · exact hgap (u - s) hd
   rcases lt_trichotomy t u with h | h | h
-  · omega
+  · rcases hsep t ht u hu h with hfar | hd
+    · omega
+    · have htuGap := hgap (u - t) hd
+      omega
   · exact h
-  · omega
+  · rcases hsep u hu t ht h with hfar | hd
+    · omega
+    · have hutGap := hgap (t - u) hd
+      omega
 
 /-- If local moved offsets never meet their translates at an allowed gap, the lifted
 permutations at all marked windows have pairwise-disjoint supports. -/
