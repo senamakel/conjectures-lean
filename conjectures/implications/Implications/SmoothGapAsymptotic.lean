@@ -17,6 +17,11 @@ open scoped Topology
 /-- The stretched-exponential scale `sqrt (L log L)`. -/
 noncomputable def rootScale (L : ℝ) : ℝ := Real.sqrt (L * Real.log L)
 
+/-- The Rankin exponent paired with `rootScale`. -/
+noncomputable def rankinDelta (L : ℝ) : ℝ := Real.log L / (2 * rootScale L)
+
+/-- The smoothness cutoff at half the stretched-exponential scale. -/
+noncomputable def smoothCutoff (L : ℝ) : ℝ := Real.exp (rootScale L / 2)
 /-- Integer cutoff obtained by rounding the real cutoff down. -/
 noncomputable def smoothCutoffNat (L : ℝ) : ℕ := ⌊smoothCutoff L⌋₊
 
@@ -24,15 +29,12 @@ noncomputable def smoothCutoffNat (L : ℝ) : ℕ := ⌊smoothCutoff L⌋₊
 theorem smoothCutoff_tendsto_atTop : Tendsto smoothCutoff atTop atTop := by
   have hroot : Tendsto rootScale atTop atTop := by
     rw [tendsto_atTop_atTop]
-    intro b
-    filter_upwards [Real.tendsto_sqrt_atTop.eventually_gt_atTop b,
-      Real.tendsto_log_atTop.eventually_ge_atTop 1, eventually_gt_atTop (1 : ℝ)]
-      with L hb hlog hL
-    have hcompare : Real.sqrt L ≤ rootScale L := by
-      apply Real.sqrt_le_sqrt
-      dsimp [rootScale]
-      nlinarith [Real.log_le_self (by linarith : 0 ≤ L)]
-    exact lt_of_lt_of_le hb hcompare
+    refine tendsto_atTop_mono' atTop ?_ Real.tendsto_sqrt_atTop
+    filter_upwards [Real.tendsto_log_atTop.eventually_ge_atTop 1,
+      eventually_gt_atTop (1 : ℝ)] with L hlog hL
+    apply Real.sqrt_le_sqrt
+    dsimp [rootScale]
+    nlinarith [Real.log_le_self (by linarith : 0 ≤ L)]
   have hhalf : Tendsto (fun L : ℝ => rootScale L / 2) atTop atTop := by
     simpa [div_eq_mul_inv] using hroot.const_mul_atTop (by norm_num : 0 < (1 / 2 : ℝ))
   simpa [smoothCutoff] using Real.tendsto_exp_atTop.comp hhalf
@@ -56,11 +58,6 @@ theorem smoothCutoffNat_cast_le (L : ℝ) :
     (smoothCutoffNat L : ℝ) ≤ smoothCutoff L := by
   exact Nat.floor_le (by positivity)
 
-/-- The Rankin exponent paired with `rootScale`. -/
-noncomputable def rankinDelta (L : ℝ) : ℝ := Real.log L / (2 * rootScale L)
-
-/-- The smoothness cutoff at half the stretched-exponential scale. -/
-noncomputable def smoothCutoff (L : ℝ) : ℝ := Real.exp (rootScale L / 2)
 
 /-- The square of the scale, for positive `L` with `log L ≥ 0`. -/
 theorem rootScale_sq {L : ℝ} (hL : 0 < L) (hlog : 0 ≤ Real.log L) :
