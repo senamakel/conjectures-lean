@@ -125,8 +125,10 @@ theorem lexPrefixScan_extendVariable (a : Nat → Bool) (base : Nat)
           have hvaly : extendVariable a base value y = a y := by
             simp [extendVariable, Nat.ne_of_lt hy]
           by_cases hxy : x = y
-          · simp [lexPrefixScan, hxy, hvalx, hvaly, ih htailL htailR]
-          · simp [lexPrefixScan, hxy, hvalx, hvaly, ih htailL htailR]
+          · have htail := ih initialPref ys htailL htailR
+            simp [lexPrefixScan, hxy, hvalx, hvaly, htail]
+          · have htail := ih (initialPref && (a x == a y)) ys htailL htailR
+            simp [lexPrefixScan, hxy, hvalx, hvaly, htail]
 
 /-- Each unequal variable pair allocates exactly one fresh prefix variable;
 identical variables are skipped. -/
