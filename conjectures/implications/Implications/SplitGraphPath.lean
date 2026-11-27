@@ -566,15 +566,14 @@ theorem hamiltonian_of_split_partition_two_outsiders_of_rows
   have hys : y ≠ s := by intro h; subst s; exact hnoShared y hyC (Finset.mem_filter.mpr ⟨hzI, hyzG⟩) (Finset.mem_filter.mpr ⟨hwI, hswG⟩)
   have hcenterNodup : ([t, x, y, r, s] : List V).Nodup := by
     simp [htx, hty, htr, hts, hxy, hxr, hxs, hyr, hys, hrs]
-  have hrowNodup : ([a, b, c, z, w] : List V).Nodup := by
-    simp [hab, hac, hbc, hzw, hzA, hwA, haA, hbA, hcA]
-  simp only [List.nodup_cons, List.mem_cons, List.not_mem_nil, or_false] at hcenterNodup hrowNodup
   have haz : a ≠ z := by intro h; exact hzA (h ▸ haA)
   have haw : a ≠ w := by intro h; exact hwA (h ▸ haA)
   have hbz : b ≠ z := by intro h; exact hzA (h ▸ hbA)
   have hbw : b ≠ w := by intro h; exact hwA (h ▸ hbA)
   have hcz : c ≠ z := by intro h; exact hzA (h ▸ hcA)
   have hcw : c ≠ w := by intro h; exact hwA (h ▸ hcA)
+  have hrowNodup : ([a, b, c, z, w] : List V).Nodup := by
+    simp [hab, hac, hbc, hzw, haz, haw, hbz, hbw, hcz, hcw]
   let D := C \ {t, x, y, r, s}
   let rest := D.toList
   have hrestNodup : rest.Nodup := D.nodup_toList
@@ -584,8 +583,37 @@ theorem hamiltonian_of_split_partition_two_outsiders_of_rows
     have hqD : q ∈ D := by simpa [rest] using hm
     exact (Finset.mem_sdiff.mp hqD).1
   have hbaseNodup : ([c, t, a, x, z, y, b, r, w, s] : List V).Nodup := by
-    simp only [List.nodup_cons, List.mem_cons, List.not_mem_nil, or_false]
-    aesop
+    let p := [c, t, a]
+    let q := [x, z, y]
+    let rblock := [b, r, w, s]
+    have hp : p.Nodup := by simp [p, hac.symm, hciRev t ht c hcI, hciRev t ht a haI]
+    have hq : q.Nodup := by simp [q, hxy, hci x hxC z hzI, hci y hyC z hzI]
+    have hr : rblock.Nodup := by
+      simp [rblock, hciRev r hrC b hbI, hciRev s hsC b hbI,
+        hci r hrC w hwI, hci s hsC w hwI, hbw, hrs]
+    have hpq : ∀ v ∈ p, v ∉ q := by
+      intro v hv hvq
+      simp only [p, q, List.mem_cons, List.not_mem_nil, or_false] at hv hvq
+      rcases hv with hvc | hvt | hva <;> rcases hvq with hvx | hvz | hvy <;> aesop
+    have hpr : ∀ v ∈ p, v ∉ rblock := by
+      intro v hv hvr
+      simp only [p, rblock, List.mem_cons, List.not_mem_nil, or_false] at hv hvr
+      rcases hv with hvc | hvt | hva <;> rcases hvr with hvb | hvr | hvw | hvs <;> aesop
+    have hqr : ∀ v ∈ q, v ∉ rblock := by
+      intro v hv hvr
+      simp only [q, rblock, List.mem_cons, List.not_mem_nil, or_false] at hv hvr
+      rcases hv with hvx | hvz | hvy <;> rcases hvr with hvb | hvr | hvw | hvs <;> aesop
+    have hqrNodup : (q ++ rblock).Nodup := by
+      rw [List.nodup_append']
+      exact ⟨hq, hr, hqr⟩
+    have hpqrNodup : (p ++ (q ++ rblock)).Nodup := by
+      rw [List.nodup_append']
+      refine ⟨hp, hqrNodup, ?_⟩
+      intro v hv hvrest
+      rcases List.mem_append.mp hvrest with hvq | hvr
+      · exact hpq v hv hvq
+      · exact hpr v hv hvr
+    simpa [p, q, rblock, List.append_assoc] using hpqrNodup
   have hbaseRest : ∀ q ∈ ([c, t, a, x, z, y, b, r, w, s] : List V), q ∉ rest := by
     intro q hq hrest
     have hqD : q ∈ D := by
@@ -593,26 +621,21 @@ theorem hamiltonian_of_split_partition_two_outsiders_of_rows
       simpa [rest] using hm
     simp only [List.mem_cons, List.not_mem_nil, or_false] at hq
     rcases hq with hqc | hqt | hqa | hqx | hqz | hqy | hqb | hqr | hqw | hqs
-    · subst q
-      exact hci c (Finset.mem_sdiff.mp hqD).1 c hcI rfl
-    · subst q
-      exact (Finset.mem_sdiff.mp hqD).2 (by simp [D])
-    · subst q
-      exact hci a (Finset.mem_sdiff.mp hqD).1 a haI rfl
-    · subst q
-      exact (Finset.mem_sdiff.mp hqD).2 (by simp [D])
-    · subst q
-      exact hci z (Finset.mem_sdiff.mp hqD).1 z hzI rfl
-    · subst q
-      exact (Finset.mem_sdiff.mp hqD).2 (by simp [D])
-    · subst q
-      exact hci b (Finset.mem_sdiff.mp hqD).1 b hbI rfl
-    · subst q
-      exact (Finset.mem_sdiff.mp hqD).2 (by simp [D])
-    · subst q
-      exact hci w (Finset.mem_sdiff.mp hqD).1 w hwI rfl
-    · subst q
-      exact (Finset.mem_sdiff.mp hqD).2 (by simp [D])
+    · have hqC : c ∈ C := by simpa [hqc] using (Finset.mem_sdiff.mp hqD).1
+      exact hci c hqC c hcI rfl
+    · exact (Finset.mem_sdiff.mp hqD).2 (by simp [hqt])
+    · have hqC : a ∈ C := by simpa [hqa] using (Finset.mem_sdiff.mp hqD).1
+      exact hci a hqC a haI rfl
+    · exact (Finset.mem_sdiff.mp hqD).2 (by simp [hqx])
+    · have hqC : z ∈ C := by simpa [hqz] using (Finset.mem_sdiff.mp hqD).1
+      exact hci z hqC z hzI rfl
+    · exact (Finset.mem_sdiff.mp hqD).2 (by simp [hqy])
+    · have hqC : b ∈ C := by simpa [hqb] using (Finset.mem_sdiff.mp hqD).1
+      exact hci b hqC b hbI rfl
+    · exact (Finset.mem_sdiff.mp hqD).2 (by simp [hqr])
+    · have hqC : w ∈ C := by simpa [hqw] using (Finset.mem_sdiff.mp hqD).1
+      exact hci w hqC w hwI rfl
+    · exact (Finset.mem_sdiff.mp hqD).2 (by simp [hqs])
   have hcoverC : ∀ q ∈ C, q = t ∨ q = x ∨ q = y ∨ q = r ∨ q = s ∨ q ∈ rest := by
     intro q hq
     by_cases hqt : q = t
@@ -627,8 +650,8 @@ theorem hamiltonian_of_split_partition_two_outsiders_of_rows
             · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hqs))))
             · right; right; right; right; right
               have hm : q ∈ rest.toFinset := by
-                simpa [rest] using
-                  (Finset.mem_sdiff.mpr ⟨hq, by simp [hqt, hqx, hqy, hqr, hqs]⟩)
+                have hqD : q ∈ D := Finset.mem_sdiff.mpr ⟨hq, by simp [hqt, hqx, hqy, hqr, hqs]⟩
+                simpa [rest] using hqD
               exact List.mem_toFinset.mp hm
   exact hamiltonian_of_split_partition_two_outsiders G C I a b c z w t x y r s rest
     hC hpartition hIeq hct hta hax hxz hzy hyb hbr hrw hws hsC
