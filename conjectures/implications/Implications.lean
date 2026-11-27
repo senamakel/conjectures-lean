@@ -31,6 +31,7 @@ import Implications.SmoothGapInfinitude
 import Implications.SplitGraphPath
 import Implications.SplitGraphSmallRowsPath
 import Implications.SplitGraphSmallRowsThree
+import Implications.SplitGraphSmallRowsCompletion
 import Implications.SplitGraphSmallRows
 import Implications.C4VertexExtension
 import Implications.WilfPatternSwap
