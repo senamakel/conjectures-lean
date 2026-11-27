@@ -103,6 +103,10 @@ theorem degree_eight_neighborhood_union_card_eq_26
     norm_num at hUnionBound
     omega
   have hJlower : 12 ≤ (E \ U).card := by omega
+  have hUupper : U.card ≤ 26 := by
+    rw [hDcard] at hUnionBound
+    norm_num at hUnionBound
+    omega
   omega
 
 /-- Every pair of degree-eight vertices has exactly one common neighbor. -/
@@ -116,7 +120,7 @@ theorem degree_eight_pair_has_one_common_neighbor
     (G.neighborFinset u ∩ G.neighborFinset v).card = 1 := by
   have hmem : u ∈ Finset.univ.filter (fun x => G.degree x = 8) := by simp [hu]
   exact extremal_degree_eight_vertices_have_unique_common_neighbor
-    G hDel he hC4 h8 u hmem v huv
+    G hDel he hC4 h8 u hmem v huv.symm
 
 /-- In the equality case, every degree-six vertex belongs to the union of
 degree-eight neighborhoods. -/
@@ -190,10 +194,20 @@ theorem degree_six_vertex_in_degree_eight_union
       _ ≤ (Finset.univ \ U).card := Finset.card_le_card hout
       _ = 42 - U.card := by rw [Finset.card_sdiff_of_subset (Finset.subset_univ U)]; simp
   have hEoutside12 : (E \ U).card = 12 := by omega
+  have hdisj : Disjoint D (E \ U) := by
+    apply Finset.disjoint_left.mpr
+    intro y hyD hyE
+    have hy8 := (Finset.mem_filter.mp hyD).2
+    have hy7 := (Finset.mem_filter.mp (Finset.mem_sdiff.mp hyE).1).2
+    omega
+  have hUnionOutsideCard : (D ∪ (E \ U)).card = 16 := by
+    rw [Finset.card_union_of_disjoint hdisj, hDcard, hEoutside12]
+  have hcomplementCard : (Finset.univ \ U).card = 16 := by
+    rw [Finset.card_sdiff_of_subset (Finset.subset_univ U)]
+    simp [hUcard]
   have hcomplement : D ∪ (E \ U) = Finset.univ \ U := by
     apply Finset.eq_of_subset_of_card_le hout
-    rw [Finset.card_sdiff_of_subset (Finset.subset_univ U)]
-    simp [hUcard, hDcard, hEoutside12]
+    rw [hcomplementCard, hUnionOutsideCard]
   have hxnotD : x ∉ D := by simp [D, hx]
   have hxnotE : x ∉ E := by simp [E, hx]
   by_contra hxU
