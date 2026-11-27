@@ -654,7 +654,68 @@ theorem hamiltonian_of_split_partition_three_double_rows
     · subst v; exact specialCliqueNotRest y (by simp) hyC hvr
     · subst v; exact specialIndependentNotRest c (by simp [special]) hcI hvr
     · subst v; exact specialCliqueNotRest z (by simp) hzC hvr
-  sorry
+  let usedClique : Finset V := {x,y,z} ∪ O.biUnion (fun k => {left k, right k})
+  let tailFin : Finset V := C \ usedClique
+  let tail : List V := tailFin.toList
+  have htailNodup : tail.Nodup := by simp [tail]
+  have htailC : ∀ v ∈ tail, v ∈ C := by
+    intro v hv
+    exact (Finset.mem_sdiff.mp (Finset.mem_toList.mp hv)).1
+  have hbaseTailDisjoint : ∀ v ∈ ([a,x,b,y,c,z] ++ rest), v ∉ tail := by
+    intro v hv hvtail
+    have hvC : v ∈ C := htailC v hvtail
+    have hvNotUsed : v ∉ usedClique := (Finset.mem_sdiff.mp (Finset.mem_toList.mp hvtail)).2
+    have hvUsed : v ∈ usedClique := by
+      rcases List.mem_append.mp hv with hvprefix | hvrest
+      · simp only [List.mem_cons, List.not_mem_nil, or_false] at hvprefix
+        rcases hvprefix with h | h | h | h | h | h
+        · subst v; simp [usedClique]
+        · subst v; exact Finset.mem_union.mpr (Or.inl (by simp))
+        · subst v; simp [usedClique]
+        · subst v; exact Finset.mem_union.mpr (Or.inl (by simp))
+        · subst v; simp [usedClique]
+        · subst v; exact Finset.mem_union.mpr (Or.inl (by simp))
+      · obtain ⟨k, hk, hcase⟩ := (hrestMem v).mp hvrest
+        rcases hcase with h | h | h
+        · exact Finset.mem_union.mpr (Or.inr (Finset.mem_biUnion.mpr ⟨k, hk, by simp [h]⟩))
+        · have hvI : v ∈ I := h.symm ▸ hOSub hk
+          exact False.elim ((Finset.disjoint_left.mp hdisj) hvC hvI)
+        · exact Finset.mem_union.mpr (Or.inr (Finset.mem_biUnion.mpr ⟨k, hk, by simp [h]⟩))
+    exact hvNotUsed hvUsed
+  have hcover : ∀ v : V, v ∈ ([a,x,b,y,c,z] ++ rest) ∨ v ∈ tail := by
+    intro v
+    have hv : v ∈ (Finset.univ : Finset V) := Finset.mem_univ v
+    rw [hpartition] at hv
+    rcases Finset.mem_union.mp hv with hvC | hvI
+    · by_cases hvUsed : v ∈ usedClique
+      · rcases Finset.mem_union.mp hvUsed with hvSpecial | hvRestEnds
+        · left
+          have hv' : v = x ∨ v = y ∨ v = z := by simpa using hvSpecial
+          simp only [List.mem_cons, List.not_mem_nil, or_false]
+          rcases hv' with h | h | h <;> simp [h]
+        · obtain ⟨k, hk, hvEnds⟩ := Finset.mem_biUnion.mp hvRestEnds
+          have hvEnds' : v = left k ∨ v = right k := by
+            simpa using hvEnds
+          left
+          apply List.mem_append_right
+          exact (hrestMem v).2 ⟨k, hk, by rcases hvEnds' with h | h
+            · exact Or.inl h
+            · exact Or.inr (Or.inr h)⟩
+      · right
+        exact Finset.mem_toList.mpr (Finset.mem_sdiff.mpr ⟨hvC, hvUsed⟩)
+    · by_cases hvSpecial : v ∈ special
+      · left
+        simp only [List.mem_cons, List.not_mem_nil, or_false]
+        simp only [special, Finset.mem_insert, Finset.mem_singleton] at hvSpecial
+        rcases hvSpecial with h | h | h <;> simp [h]
+      · have hvO : v ∈ O := Finset.mem_sdiff.mpr ⟨hvI, hvSpecial⟩
+        left
+        apply List.mem_append_right
+        exact (hrestMem v).2 ⟨v, hvO, Or.inr (Or.inl rfl)⟩
+  exact hamiltonian_of_triangle_block_and_remaining_chain G C I hC hdisj
+    a b c x y z haI hbI hcI hxC hyC hzC hab hac hbc hxy hxz hyz
+    hax hxb hby hyc hcz rest tail hrestNodup hrestChain hrestHeadC hrestLastC
+    hprefixRestDisjoint htailNodup htailC hbaseTailDisjoint hcover (by simp [tail])
 
 end SplitGraphSmallRowsThree
 
