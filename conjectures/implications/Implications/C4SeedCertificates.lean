@@ -215,17 +215,37 @@ def seed3Graph : SimpleGraph (Fin 41) := maskGraph seed3 seed3_graph_symm seed3_
 private theorem seed1_neighbor_disjoint_iff (u v : Fin 41) :
     Disjoint (seed1Graph.neighborSet u) (seed1Graph.neighborSet v) ↔
       compatible seed1 u.val v.val = true := by
+  classical
   decide +kernel
 
 private theorem seed2_neighbor_disjoint_iff (u v : Fin 41) :
     Disjoint (seed2Graph.neighborSet u) (seed2Graph.neighborSet v) ↔
       compatible seed2 u.val v.val = true := by
+  classical
   decide +kernel
 
 private theorem seed3_neighbor_disjoint_iff (u v : Fin 41) :
     Disjoint (seed3Graph.neighborSet u) (seed3Graph.neighborSet v) ↔
       compatible seed3 u.val v.val = true := by
+  classical
   decide +kernel
+
+private theorem compatible_of_nodup_pairwise {g : Array Nat} (l : List (Fin 41))
+    (hnd : l.Nodup)
+    (hp : l.Pairwise (fun u v => compatible g u.val v.val = true)) :
+    ExistsCompatibleClique g (List.range 41) l.length := by
+  let s : Finset (Fin 41) := l.toFinset
+  let sorted : List (Fin 41) := (List.finRange 41).filter (· ∈ s)
+  have hperm : l.Perm sorted := by
+    apply List.perm_of_nodup_nodup_toFinset_eq hnd
+    · exact (List.nodup_finRange 41).filter _
+    · simp [sorted, s, List.toFinset_filter]
+  have hsorted : sorted.Pairwise (fun u v => compatible g u.val v.val = true) :=
+    hperm.pairwise_iff.mp hp
+  refine ⟨sorted.map Fin.val, ?_, ?_, ?_⟩
+  · simp [sorted, List.length_filter, ← List.toFinset_card_of_nodup hnd]
+  · simpa [sorted] using (List.filter_sublist (p := fun u : Fin 41 => u ∈ s)).map Fin.val
+  · simpa using hsorted
 
 /-- Six vertices in an ordered sublist of `Fin 41` cannot have pairwise
 disjoint open neighborhoods in any graph isomorphic to one of the masks.
@@ -239,8 +259,9 @@ theorem no_disjoint_six_of_seed_iso (G : SimpleGraph (Fin 41))
       chosen.Pairwise (fun u v => Disjoint (G.neighborSet u) (G.neighborSet v)) := by
   intro h
   obtain ⟨chosen, hlen, hsub, hpairs⟩ := h
-  rcases hseed with ⟨hIso⟩ | hseed
-  · let mapped := chosen.map hIso
+  rcases hseed with hseed1 | hseed
+  · obtain ⟨hIso⟩ := hseed1
+    let mapped := chosen.map hIso
     have hmappedLen : mapped.length = 6 := by simp [mapped, hlen]
     have hmappedSub : mapped.map Fin.val |>.Sublist (List.range 41) := by
       simpa [mapped] using hsub.map hIso
@@ -257,8 +278,9 @@ theorem no_disjoint_six_of_seed_iso (G : SimpleGraph (Fin 41))
       · simpa [hmappedLen]
       · simpa using hcompat
     exact seed1_no_compatible_six hc
-  · rcases hseed with ⟨hIso⟩ | ⟨hIso⟩
-    · let mapped := chosen.map hIso
+  · rcases hseed with hseed2 | hseed3
+    · obtain ⟨hIso⟩ := hseed2
+      let mapped := chosen.map hIso
       have hmappedLen : mapped.length = 6 := by simp [mapped, hlen]
       have hmappedSub : mapped.map Fin.val |>.Sublist (List.range 41) := by
         simpa [mapped] using hsub.map hIso
@@ -275,7 +297,8 @@ theorem no_disjoint_six_of_seed_iso (G : SimpleGraph (Fin 41))
         · simpa [hmappedLen]
         · simpa using hcompat
       exact seed2_no_compatible_six hc
-    · let mapped := chosen.map hIso
+    · obtain ⟨hIso⟩ := hseed3
+      let mapped := chosen.map hIso
       have hmappedLen : mapped.length = 6 := by simp [mapped, hlen]
       have hmappedSub : mapped.map Fin.val |>.Sublist (List.range 41) := by
         simpa [mapped] using hsub.map hIso
