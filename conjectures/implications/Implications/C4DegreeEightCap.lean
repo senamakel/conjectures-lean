@@ -26,11 +26,11 @@ theorem count_le_seven_of_codegree_moments
     (k n : ℕ) (a : Fin n → ℝ)
     (hk : 0 < k)
     (hsize : n + k = 42)
-    (hfirst : (∑ x : Fin n, a x) = 8 * (k : ℝ))
-    (hsecond : (∑ x : Fin n, (a x ^ 2 - a x)) ≤
+    (hfirst : (∑ x ∈ Finset.univ, a x) = 8 * (k : ℝ))
+    (hsecond : (∑ x ∈ Finset.univ, (a x ^ 2 - a x)) ≤
       (k : ℝ) * ((k : ℝ) - 1)) :
     k ≤ 7 := by
-  have hsumSq : (∑ x : Fin n, a x ^ 2) ≤ (k : ℝ) * ((k : ℝ) + 7) := by
+  have hsumSq : (∑ x ∈ Finset.univ, a x ^ 2) ≤ (k : ℝ) * ((k : ℝ) + 7) := by
     have hsecond' := hsecond
     rw [← Finset.sum_sub_distrib] at hsecond'
     linarith
@@ -43,8 +43,11 @@ theorem count_le_seven_of_codegree_moments
       (k : ℝ) * ((n : ℝ) * ((k : ℝ) + 7)) := by
     nlinarith [hcs']
   have hkpos : (0 : ℝ) < (k : ℝ) := Nat.cast_pos.mpr hk
-  have hlinear : 64 * (k : ℝ) ≤ (n : ℝ) * ((k : ℝ) + 7) :=
-    (mul_le_mul_left hkpos).mp hcancel
+  have hlinear : 64 * (k : ℝ) ≤ (n : ℝ) * ((k : ℝ) + 7) := by
+    by_contra hnot
+    have hpos : 0 < (n : ℝ) * ((k : ℝ) + 7) - 64 * (k : ℝ) := by linarith
+    have hmul := mul_pos hkpos hpos
+    nlinarith
   have hkn : (n : ℝ) + (k : ℝ) = 42 := by exact_mod_cast hsize
   have hk8 : ¬ 8 ≤ k := by
     intro hk8
