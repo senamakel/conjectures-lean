@@ -38,6 +38,23 @@ theorem odd_block (n k i : Nat) (hi : i < n) :
     orbit (1 + 2 ^ n * k) i % 2 = 1 := by
   rw [prefix_parity_shift 1 k n i hi, orbit_one]
 
+/-- The rounded-up Hydra orbit starting at 7. -/
+def ceilOrbit (n : Nat) : Nat := Nat.rec 7 (fun _ d => (3 * d + 1) / 2) n
+
+/-- Shifting by one conjugates the rounded-up Hydra orbit to Antihydra. -/
+theorem orbit_eight_eq_ceil_succ (n : Nat) : orbit 8 n = ceilOrbit n + 1 := by
+  induction n with
+  | zero => rfl
+  | succ n ih =>
+    change 3 * orbit 8 n / 2 = (3 * ceilOrbit n + 1) / 2 + 1
+    rw [ih]
+    omega
+
+theorem orbit_eight_parity_complement (n : Nat) :
+    orbit 8 n % 2 = 0 ↔ ceilOrbit n % 2 = 1 := by
+  rw [orbit_eight_eq_ceil_succ]
+  omega
+
 def evenCount (n : Nat) : Nat :=
   ((Finset.range n).filter fun i => Even (orbit 8 i)).card
 
@@ -75,3 +92,5 @@ end AntihydraParity
 #print axioms AntihydraParity.odd_block
 
 #print axioms AntihydraParity.target_iff_even_count
+
+#print axioms AntihydraParity.orbit_eight_parity_complement
