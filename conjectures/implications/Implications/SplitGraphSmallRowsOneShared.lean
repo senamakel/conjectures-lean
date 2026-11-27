@@ -286,4 +286,104 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
           (Or.inr (hrightj.trans hbX.symm))
         exact (other_labels_ne I i j k hij hkO).2 hkj
 
+  have husedC : used ⊆ C := by
+    intro x hx
+    simp only [used, Finset.mem_union, Finset.mem_insert, Finset.mem_singleton] at hx
+    rcases hx with h | h | h | hxRows
+    · exact h ▸ hCabc.1
+    · exact h ▸ hCabc.2.2
+    · exact h ▸ hCabc.2.1
+    · obtain ⟨k, hk, hxPair⟩ := Finset.mem_biUnion.mp hxRows
+      simp only [Finset.mem_insert, Finset.mem_singleton] at hxPair
+      rcases hxPair with h | h
+      · exact h ▸ hleftC k (Finset.mem_sdiff.mp hk).1
+      · exact h ▸ hrightC k (Finset.mem_sdiff.mp hk).1
+
+  have htailNodup : tail.Nodup := by simp [tail]
+  have htailC : ∀ x ∈ tail, x ∈ C := by
+    intro x hx
+    exact (Finset.mem_sdiff.mp (Finset.mem_toList.mp hx)).1
+
+  have hdisjointTail : ∀ x ∈ base, x ∉ tail := by
+    intro x hx hxTail
+    have hxC : x ∈ C := htailC x hxTail
+    have hxBase : x ∈ [a, i, c, j, b] ∨ x ∈ rest := by
+      exact List.mem_append.mp hx
+    rcases hxBase with hxSpecial | hxRest
+    · simp only [List.mem_cons, List.not_mem_nil, or_false] at hxSpecial
+      rcases hxSpecial with haX | hiX | hcX | hjX | hbX
+      · have hxUsed : x ∈ used := by simp [used, haX]
+        exact (Finset.mem_sdiff.mp (Finset.mem_toList.mp hxTail)).2 hxUsed
+      · exact (Finset.disjoint_left.mp hdisj) hxC (hiX.symm ▸ hi)
+      · have hxUsed : x ∈ used := by simp [used, hcX]
+        exact (Finset.mem_sdiff.mp (Finset.mem_toList.mp hxTail)).2 hxUsed
+      · exact (Finset.disjoint_left.mp hdisj) hxC (hjX.symm ▸ hj)
+      · have hxUsed : x ∈ used := by simp [used, hbX]
+        exact (Finset.mem_sdiff.mp (Finset.mem_toList.mp hxTail)).2 hxUsed
+    · obtain ⟨k, hk, hxBlock⟩ := List.mem_flatMap.mp hxRest
+      have hkO := Finset.mem_toList.mp hk
+      have hkI := (Finset.mem_sdiff.mp hkO).1
+      simp only [block, List.mem_cons, List.not_mem_nil, or_false] at hxBlock
+      rcases hxBlock with hL | hK | hR
+      · have hxUsed : x ∈ used := by
+          apply Finset.mem_union.mpr
+          exact Or.inr (Finset.mem_biUnion.mpr ⟨k, hkI, by simp [hL]⟩)
+        exact (Finset.mem_sdiff.mp (Finset.mem_toList.mp hxTail)).2 hxUsed
+      · exact (Finset.disjoint_left.mp hdisj) hxC (hK.symm ▸ hkI)
+      · have hxUsed : x ∈ used := by
+          apply Finset.mem_union.mpr
+          exact Or.inr (Finset.mem_biUnion.mpr ⟨k, hkI, by simp [hR]⟩)
+        exact (Finset.mem_sdiff.mp (Finset.mem_toList.mp hxTail)).2 hxUsed
+
+  have hcover : ∀ x : V, x ∈ [a, i, c, j, b] ++ rest ∨ x ∈ tail := by
+    intro x
+    have hx : x ∈ C ∨ x ∈ I := by
+      have hxU : x ∈ (Finset.univ : Finset V) := Finset.mem_univ x
+      rw [hpartition] at hxU
+      exact Finset.mem_union.mp hxU
+    rcases hx with hxC | hxI
+    · by_cases hxUsed : x ∈ used
+      · have hxBase : x ∈ [a, i, c, j, b] ++ rest := by
+          simp only [used, Finset.mem_union] at hxUsed
+          rcases hxUsed with hxSpec | hxRows
+          · simp only [Finset.mem_insert, Finset.mem_singleton] at hxSpec
+            rcases hxSpec with h | h | h
+            · exact List.mem_append_left _ (by simp [h])
+            · exact List.mem_append_left _ (by simp [h])
+            · exact List.mem_append_left _ (by simp [h])
+          · obtain ⟨k, hk, hxPair⟩ := Finset.mem_biUnion.mp hxRows
+            have hkList : k ∈ others.toList := Finset.mem_toList.mpr hk
+            simp only [Finset.mem_insert, Finset.mem_singleton] at hxPair
+            rcases hxPair with h | h
+            · exact List.mem_append_right _ (List.mem_flatMap.mpr
+                ⟨k, hkList, by simp [block, h]⟩)
+            · exact List.mem_append_right _ (List.mem_flatMap.mpr
+                ⟨k, hkList, by simp [block, h]⟩)
+        exact Or.inl hxBase
+      · exact Or.inr (Finset.mem_toList.mpr (Finset.mem_sdiff.mpr ⟨hxC, hxUsed⟩))
+    · by_cases hxi : x = i
+      · subst x
+        exact Or.inl (List.mem_append_left _ (by simp))
+      by_cases hxj : x = j
+      · subst x
+        exact Or.inl (List.mem_append_left _ (by simp))
+      · have hxOther : x ∈ others := by
+          simp [others, hxI, hxi, hxj]
+        exact Or.inl (List.mem_append_right _ (List.mem_flatMap.mpr
+          ⟨x, Finset.mem_toList.mpr hxOther, by simp [block]⟩))
+
+  exact SplitGraphSmallRowsAssembly.hamiltonian_of_shared_block_and_remaining_chain
+    G C I hC hdisj a c b i j hCabc.1 hCabc.2.1 hCabc.2.2 hi hj hij
+    hneqac hneqcb hneqab (by simpa [hlefti] using hleftAdj i hi)
+    (by simpa [hrighti] using hrightAdj i hi)
+    (by simpa [hleftj] using hleftAdj j hj)
+    (by simpa [hrightj] using hrightAdj j hj)
+    rest tail hrestNodup hrestChain hrestHeadC hrestLastC hspecialDisjoint
+    htailNodup htailC hdisjointTail hcover (by
+      obtain ⟨x⟩ := huniv
+      intro hnil
+      have hxCover := hcover x
+      rw [hnil] at hxCover
+      simp at hxCover)
+
 end SplitGraphSmallRowsOneShared
