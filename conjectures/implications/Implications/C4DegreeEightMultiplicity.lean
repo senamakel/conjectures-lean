@@ -307,11 +307,9 @@ theorem degree_six_vertex_has_at_most_two_degree_eight_neighbors
   obtain ⟨u, huS⟩ := Finset.card_pos.mp (by omega : 0 < S.card)
   have hvCard : (S.erase u).card = 2 := by
     rw [Finset.card_erase_of_mem huS, hScard]
-    norm_num
   obtain ⟨v, hvErase⟩ := Finset.card_pos.mp (by omega : 0 < (S.erase u).card)
   have hwCard : ((S.erase u).erase v).card = 1 := by
     rw [Finset.card_erase_of_mem hvErase, hvCard]
-    norm_num
   obtain ⟨w, hwErase⟩ := Finset.card_pos.mp (by omega : 0 < ((S.erase u).erase v).card)
   have huS' : u ∈ S := huS
   have hvS' : v ∈ S := (Finset.mem_erase.mp hvErase).2
@@ -348,13 +346,13 @@ theorem degree_six_vertex_has_at_most_two_degree_eight_neighbors
         have hxCommon : x ∈ N u ∩ N w := Finset.mem_inter.mpr
           ⟨hxN u huS', hxN w hwS'⟩
         have hle : (N u ∩ N w).card ≤ 1 := by omega
-        have hEq := Finset.card_le_one.mp hle y x hyCommon hxCommon
+        have hEq := Finset.card_le_one.mp hle hyCommon hxCommon
         simpa using hEq.symm
       · have hyCommon : y ∈ N v ∩ N w := Finset.mem_inter.mpr ⟨hyv, hyw⟩
         have hxCommon : x ∈ N v ∩ N w := Finset.mem_inter.mpr
           ⟨hxN v hvS', hxN w hwS'⟩
         have hle : (N v ∩ N w).card ≤ 1 := by omega
-        have hEq := Finset.card_le_one.mp hle y x hyCommon hxCommon
+        have hEq := Finset.card_le_one.mp hle hyCommon hxCommon
         simpa using hEq.symm
     · intro hy
       have hyx : y = x := Finset.mem_singleton.mp hy
@@ -369,7 +367,6 @@ theorem degree_six_vertex_has_at_most_two_degree_eight_neighbors
       exact hWinterUnion
     rw [hinter, hUvUnion, hwCardN] at hcard
     simp [U3]
-    omega
   have hz : ∃ z ∈ D, z ∉ S := by
     by_contra hnone
     have hDsub : D ⊆ S := by
@@ -400,10 +397,10 @@ theorem degree_six_vertex_has_at_most_two_degree_eight_neighbors
     have hle : ((N z ∩ N u) ∪ (N z ∩ N v) ∪ (N z ∩ N w)).card ≤ 3 := by
       calc
         _ ≤ ((N z ∩ N u) ∪ (N z ∩ N v)).card + (N z ∩ N w).card :=
-          Finset.card_union_le
+          Finset.card_union_le _ _
         _ ≤ (N z ∩ N u).card + (N z ∩ N v).card + (N z ∩ N w).card := by
           have h := Finset.card_union_le (N z ∩ N u) (N z ∩ N v)
-          omega
+          simpa [Nat.add_assoc] using Nat.add_le_add_right h (N z ∩ N w).card
         _ = 3 := by
           rw [hPair z hzD u huD hzNotU.1, hPair z hzD v hvD hzNotU.2.1,
             hPair z hzD w hwD hzNotU.2.2]
@@ -412,6 +409,8 @@ theorem degree_six_vertex_has_at_most_two_degree_eight_neighbors
   have hU4lower : 27 ≤ (U3 ∪ N z).card := by
     have hcard := Finset.card_union_add_card_inter U3 (N z)
     rw [hU3card, hzCard] at hcard
+    have hinter : (U3 ∩ N z).card ≤ 3 := by
+      simpa [Finset.inter_comm] using hintersection
     omega
   have hsubU : U3 ∪ N z ⊆ U := by
     intro y hy
