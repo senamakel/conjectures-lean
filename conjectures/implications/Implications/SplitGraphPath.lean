@@ -394,7 +394,7 @@ theorem hamiltonian_of_split_partition_row_bounds
         intro hmem
         exact (Finset.disjoint_left.mp hdisj) hmem hj
       have hIeq : I = {i, j} := by
-        apply Finset.eq_of_subset_of_card_le
+        apply (Finset.eq_of_subset_of_card_le (s := {i, j}) (t := I) ?_ ?_).symm
         · intro x hx
           simp only [Finset.mem_insert, Finset.mem_singleton] at hx
           rcases hx with rfl | rfl
@@ -405,7 +405,8 @@ theorem hamiltonian_of_split_partition_row_bounds
         simpa [hIeq, Finset.union_assoc, Finset.union_left_comm, Finset.union_comm] using hpartition
       exact hamiltonian_of_split_partition_two_endpoints G C i j a b hC
         hpart hiC hjC hij ha hb hab hia.symm hbj
-    · have hCone : C.card = 1 := by omega
+    · have hCpos : 0 < C.card := Finset.card_pos.mpr hCne
+      have hCone : C.card = 1 := by omega
       obtain ⟨c, hCeq⟩ := Finset.card_eq_one.mp hCone
       have hc : c ∈ C := by simpa [hCeq]
       obtain ⟨i, j, hij, hIeq⟩ := Finset.card_eq_two.mp htwo
