@@ -53,7 +53,8 @@ theorem pairwise_intersecting_two_sets
           subst u
           exact huv h
         · subst v
-          simpa [Finset.insert_comm] using hBeq
+          have hpair : ({u, b} : Finset α) = {b, u} := by ext q; simp [or_comm]
+          exact hBeq.trans hpair
     obtain ⟨c, hbc, hBeq'⟩ := hchoose
     have hca : c ≠ a := by
       intro h
@@ -98,21 +99,23 @@ theorem pairwise_intersecting_two_sets
         · exact haD
         · exact hcD
         · exact hq
-      have hcardThree : ({a, c, q} : Finset α).card = 3 := by simp [hca.symm, hqa, hqc]
+      have hcardThree : ({a, c, q} : Finset α).card = 3 := by
+        rw [Finset.card_insert_of_notMem (by simpa using hqa.symm)]
+        rw [Finset.card_insert_of_notMem (by simpa using hca.symm)]
+        simp
       have := Finset.card_le_card hthree
       rw [hcard D hD] at this
       omega
     have hDeq : D = {a, c} := by
       apply Finset.eq_of_subset_of_card_le hDsub
-      simp only [Finset.card_insert_of_notMem, Finset.card_singleton]
-      · rw [hcard D hD]
-      · exact hca.symm
+      rw [hcard D hD]
+      simp [hca.symm]
     have htriple : ({a, b, c} : Finset α).card = 3 := by simp [hab, hca.symm, hbc]
     have hnotTriple : ∀ q, ¬ (q ∈ A ∧ q ∈ B ∧ q ∈ D) := by
       intro q hq
       rw [hAeq, hBeq', hDeq] at hq
       simp only [Finset.mem_insert, Finset.mem_singleton] at hq
-      simp [hab, hca.symm, hbc] at hq
+      simp_all [hab, hca.symm, hbc]
     refine Or.inr ⟨a, b, c, hab, hca.symm, hbc, ?_⟩
     intro T hT
     by_contra hsub
@@ -143,47 +146,52 @@ theorem pairwise_intersecting_two_sets
     obtain ⟨xD, hxDT, hxDD⟩ := hint T hT D hD hTDne
     rcases Finset.card_eq_two.mp (hcard T hT) with ⟨x, y, hxy, hTeq⟩
     have hzy : z = x ∨ z = y := by rw [hTeq] at hzT; simpa using hzT
-    have hyMem (q : α) (hqT : q ∈ T) (hqz : q ≠ z) : q = (if z = x then y else x) := by
-      rw [hTeq] at hqT
-      simp only [Finset.mem_insert, Finset.mem_singleton] at hqT
-      rcases hqT with h | h
-      · exact (hqz h).elim
-      · exact h
-    have hother : z = x → xA = y := by
-      intro hzX
-      have hxAnz : xA ≠ z := by intro h; subst xA; exact hzA hxAA
-      have : xA = x ∨ xA = y := by rw [hTeq] at hxAT; simpa using hxAT
-      rcases this with h | h
-      · exact (hxAnz (h.trans hzX)).elim
-      · exact h
-    have hother' : z = y → xA = x := by
-      intro hzY
-      have hxAnz : xA ≠ z := by intro h; subst xA; exact hzA hxAA
-      have : xA = x ∨ xA = y := by rw [hTeq] at hxAT; simpa using hxAT
-      rcases this with h | h
-      · exact h
-      · exact (hxAnz (h.trans hzY)).elim
-    have hxA' : xA = y ∨ xA = x := by rcases hzy with h | h; exact Or.inl (hother h); exact Or.inr (hother' h)
-    have hyA : (if z = x then y else x) ∈ A := by
-      rcases hzy with h | h
-      · simpa [h] using (hxA' ▸ hxAA)
-      · simpa [h] using (hxA' ▸ hxAA)
-    have hyB : (if z = x then y else x) ∈ B := by
-      have hxBnz : xB ≠ z := by intro h; subst xB; exact hzB hxBB
-      have hxBmem : xB = x ∨ xB = y := by rw [hTeq] at hxBT; simpa using hxBT
-      rcases hzy with h | h
-      · have hxy' : xB = y := by rcases hxBmem with h' | h' <;> [exact (hxBnz (h'.trans h)).elim; exact h']
-        simpa [h] using hxy' ▸ hxBB
-      · have hxy' : xB = x := by rcases hxBmem with h' | h' <;> [exact h'; exact (hxBnz (h'.trans h)).elim]
-        simpa [h] using hxy' ▸ hxBB
-    have hyD : (if z = x then y else x) ∈ D := by
-      have hxDnz : xD ≠ z := by intro h; subst xD; exact hzD hxDD
-      have hxDmem : xD = x ∨ xD = y := by rw [hTeq] at hxDT; simpa using hxDT
-      rcases hzy with h | h
-      · have hxy' : xD = y := by rcases hxDmem with h' | h' <;> [exact (hxDnz (h'.trans h)).elim; exact h']
-        simpa [h] using hxy' ▸ hxDD
-      · have hxy' : xD = x := by rcases hxDmem with h' | h' <;> [exact h'; exact (hxDnz (h'.trans h)).elim]
-        simpa [h] using hxy' ▸ hxDD
-    exact hnotTriple _ ⟨hyA, hyB, hyD⟩
+    rcases hzy with hzX | hzY
+    · subst z
+      have hwA : y ∈ A := by
+        rcases hint T hT A hA hTAne with ⟨q, hqT, hqA⟩
+        rw [hTeq] at hqT
+        simp only [Finset.mem_insert, Finset.mem_singleton] at hqT
+        rcases hqT with hq | hq
+        · subst q; exact (hzA hqA).elim
+        · exact hq ▸ hqA
+      have hwB : y ∈ B := by
+        rcases hint T hT B hB hTBne with ⟨q, hqT, hqB⟩
+        rw [hTeq] at hqT
+        simp only [Finset.mem_insert, Finset.mem_singleton] at hqT
+        rcases hqT with hq | hq
+        · subst q; exact (hzB hqB).elim
+        · exact hq ▸ hqB
+      have hwD : y ∈ D := by
+        rcases hint T hT D hD hTDne with ⟨q, hqT, hqD⟩
+        rw [hTeq] at hqT
+        simp only [Finset.mem_insert, Finset.mem_singleton] at hqT
+        rcases hqT with hq | hq
+        · subst q; exact (hzD hqD).elim
+        · exact hq ▸ hqD
+      exact hnotTriple y ⟨hwA, hwB, hwD⟩
+    · subst z
+      have hwA : x ∈ A := by
+        rcases hint T hT A hA hTAne with ⟨q, hqT, hqA⟩
+        rw [hTeq] at hqT
+        simp only [Finset.mem_insert, Finset.mem_singleton] at hqT
+        rcases hqT with hq | hq
+        · exact hq ▸ hqA
+        · subst q; exact (hzA hqA).elim
+      have hwB : x ∈ B := by
+        rcases hint T hT B hB hTBne with ⟨q, hqT, hqB⟩
+        rw [hTeq] at hqT
+        simp only [Finset.mem_insert, Finset.mem_singleton] at hqT
+        rcases hqT with hq | hq
+        · exact hq ▸ hqB
+        · subst q; exact (hzB hqB).elim
+      have hwD : x ∈ D := by
+        rcases hint T hT D hD hTDne with ⟨q, hqT, hqD⟩
+        rw [hTeq] at hqT
+        simp only [Finset.mem_insert, Finset.mem_singleton] at hqT
+        rcases hqT with hq | hq
+        · exact hq ▸ hqD
+        · subst q; exact (hzD hqD).elim
+      exact hnotTriple x ⟨hwA, hwB, hwD⟩
 
 end SplitGraphSmallRows
