@@ -250,10 +250,11 @@ theorem hamiltonian_of_split_partition_two_endpoints
     subst x
     exact hbM (by simpa using (List.mem_toFinset.mpr hx))
   have hl_nodup : l.Nodup := by
-    simp [l, haM, htail_nodup]
+    simp [l, haM, htail_nodup, hab]
   have hl_finset : l.toFinset = C := by
     ext x
-    simp [l, M, ha, hb, hab]
+    simp [l, M, ha, hb, Finset.mem_erase]
+    tauto
   have hl_head : l.head? = some a := by simp [l]
   have hl_last : l.getLast? = some b := by
     change ((a :: M.toList) ++ [b]).getLast? = some b
