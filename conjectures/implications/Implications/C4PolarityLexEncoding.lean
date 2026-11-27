@@ -66,7 +66,8 @@ def lexPrefixScan (a : Nat → Bool) (pref : Bool) : List Nat → List Nat → L
 
 theorem lexPrefixScan_length (a : Nat → Bool) (pref : Bool)
     (left right : List Nat) :
-    (lexPrefixScan a pref left right).length = (lexFreshIds 0 left right).length := by
+    (lexPrefixScan a pref left right).length =
+      (List.zip left right).countP (fun p => p.1 != p.2) := by
   induction left generalizing right pref with
   | nil => cases right <;> rfl
   | cons x xs ih =>
@@ -74,8 +75,8 @@ theorem lexPrefixScan_length (a : Nat → Bool) (pref : Bool)
       | nil => rfl
       | cons y ys =>
           by_cases hxy : x = y
-          · simp [lexPrefixScan, lexFreshIds, hxy, ih, lexFreshIds_length]
-          · simp [lexPrefixScan, lexFreshIds, hxy, ih, lexFreshIds_length]
+          · simp [lexPrefixScan, hxy, ih]
+          · simp [lexPrefixScan, List.zip_cons_cons, List.countP_cons, hxy, ih]
 
 /-- The lex auxiliary assignment uses the scan values at the consecutive DIMACS
 IDs beginning at `base`; IDs outside that block retain their original value. -/
