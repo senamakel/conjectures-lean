@@ -205,3 +205,59 @@ the Q7 completion exclusions, certify any CP-SAT result, or establish
 `Λ(8)≤104`. The Q8 route still needs a complete compatible-pair search for Q7
 layers with total internal edge count at least 92 and cross count at most 13,
 plus a checkable certificate for every rejected pair.
+
+## Optimized E23 benchmark (pre-recorded)
+
+This benchmark tests two search-order optimizations on the exact `E=23` Q6
+slice. It uses the prior useful upper bound `edges + 2*remaining_count`; the
+redundant degree-capacity expression remains available as `--capacity-bound`
+for reproducing that earlier variant. The default branch and previous commits
+retain the earlier implementation and measurements.
+
+### Eligible-set preservation
+
+The normalized target family is all vertex masks in Q6 that contain `0,1,2`,
+have at least 27 vertices, induce exactly 23 edges, have maximum induced degree
+at most two, and are acyclic. The optimized traversal must emit this same set
+when it finishes; traversal order and bounded prefixes may differ.
+
+**Forced degree-two exclusions.** The `blocked` mask is the union of the
+neighborhoods of selected vertices whose current induced degree is two. If a
+blocked undecided vertex `u` were later selected, its selected neighbor `v`
+would gain a third induced edge. Since selected vertices are never removed,
+every completion containing `u` would violate the degree bound. Removing
+`blocked` bits from `remaining` therefore discards no eligible completion. On
+an include branch, the code adds `N(v)` to `blocked` when an existing selected
+neighbor transitions from degree one to two, and adds `N(x)` when the new
+vertex `x` has degree two. Exclude branches preserve the previous blocked mask.
+
+**Early cycle rejection.** The fixed initial set `{0,1,2}` induces the path
+`1—0—2`. Maintain its selected-graph components with rollback union-find.
+Adding a vertex with zero or one selected neighbor cannot create a cycle. If a
+new vertex `x` has two selected neighbors `y,z` in the same current component,
+then the existing path from `y` to `z` together with `y—x—z` is a cycle, so no
+acyclic completion can contain `x`. If they are in distinct components, adding
+`x` only joins those components. The recursion rollback restores the prior
+component partition. Every prefix of an eligible final forest is itself
+acyclic, so early cycle rejection removes no eligible final set. The terminal
+acyclicity check remains as an invariant check; with early rejection enabled,
+`cyclic_leaves` should remain zero.
+
+Together, these rules preserve exactly the normalized target set on a complete
+traversal. The independent validator checks every emitted record's uniqueness,
+fixed pattern, vertex count, induced edge count, degree bound and acyclicity;
+the proofs above address omitted-set soundness.
+
+### Bounded benchmark
+
+Create a new mask file under ignored `.lake/snakepit8/` storage and run only
+`E=23` with both flags enabled. The prior unchanged baseline was 6 billion
+nodes, 1,444,364 masks and 137.47 CPU seconds; do not rerun it. Use one thread,
+a 2 GiB virtual-address-space cap, a 140-second internal wall cap, a 150-second
+external timeout, and the existing 6-billion-node cap. Record CPU/wall time,
+maximum RSS, node count, emitted mask count, forced-exclusion count, early-cycle
+prune count, cycle leaves, completion status, byte length and SHA-256. Run the
+independent validator on the resulting file. A cap or invariant failure means
+the file is partial; do not merge it with any earlier partial traversal. If
+complete, it gives the exact normalized `E=23` slice only. No other edge slice,
+Q8 pair search, push, or external post is part of this benchmark.
