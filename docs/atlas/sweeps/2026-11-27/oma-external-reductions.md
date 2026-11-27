@@ -151,7 +151,7 @@ PoincareLib also has a separate Hamilton–Cairns endpoint, `m76CompatibleSmooth
 
 ### Smooth Poincaré endpoint
 
-The exact smooth leaf from [#4609](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4609) matches the public smooth Poincaré statement for compact, second-countable, simply connected smooth 3-manifolds. The source proves finite extinction of a calibrated Ricci flow and reconstructs the starting manifold by reversing surgeries on that same flow. These steps use Ricci flow and surgery interfaces absent from the pinned Mathlib. A faithful OMA reduction of this leaf requires porting those interfaces. [Public Lean statement](https://github.com/frenzymath/PoincareConjecture/blob/62db01af9388dc1d9b56b66d6674f4c09b2318a2/PoincareLib/Topology/Manifold/Poincare/Statement.lean)
+The exact smooth leaf from [#4609](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4609) matches the public smooth Poincaré statement for compact, second-countable, simply connected smooth 3-manifolds. The source proves finite extinction of a calibrated Ricci flow and reconstructs the starting manifold by reversing surgeries on that same flow. These steps use Ricci flow and surgery interfaces absent from the pinned Mathlib. A faithful OMA reduction of this leaf requires porting those interfaces. Pinned Lean verified that the measurable, Borel, and T3 structures required by the public flow-input provider can be supplied from the topology of a compact Hausdorff manifold. These auxiliary typeclasses require no extra assumptions on the OMA target. [Public Lean statement](https://github.com/frenzymath/PoincareConjecture/blob/62db01af9388dc1d9b56b66d6674f4c09b2318a2/PoincareLib/Topology/Manifold/Poincare/Statement.lean)
 
 ### Green 100(i) closure
 
