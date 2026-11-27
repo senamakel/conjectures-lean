@@ -293,3 +293,22 @@ under `.lake/c4-k4-matching-slices/`. Stop each case at a complete SAT or
 UNSAT result, its limit, or an error. The total solver budget is 375 CPU
 seconds. Independently check any model or proof and report capped cases
 as unresolved.
+
+All three runs reached the wall cap with `UNKNOWN` and exit 0. Each CNF has
+8,643 variables and 229,626 clauses. None of the partial traces is a proof.
+
+| Case | Wall seconds | CPU seconds | Conflicts | Propagations | Peak KiB | Partial LRAT bytes |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 2 | 120.01 | 119.70 | 2,628,131 | 365,079,720 | 85,120 | 520,099,615 |
+| 3 | 120.01 | 119.63 | 2,890,075 | 350,219,766 | 81,548 | 489,198,667 |
+| 4 | 120.01 | 119.45 | 2,591,280 | 296,409,507 | 94,580 | 444,078,633 |
+
+The DIMACS SHA-256 digests were:
+
+- Case 2: `08206977c1239f1276f78bf9182ee268e6338296f67e4b3e1e9c2f6de4d2828d`
+- Case 3: `2cc858da1c6788b4f0474b2e0e1f86526a5de6b1ae771bd159e57633b13b63b5`
+- Case 4: `a937cc073a2f4328be9c8771b994b9d8ebe90916b29246e5de0ecb70058dd197`
+
+The total CPU usage was 358.78 seconds. Together with the earlier case-1
+benchmark, all four fixed-matching cases remain unresolved at their caps.
+No model was emitted and no complete LRAT replay was available.
