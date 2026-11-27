@@ -15,9 +15,8 @@ namespace SplitGraphKappaThreeHall
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
 /-- The incidence row, restricted to a selected set of left vertices. -/
-noncomputable def row (S : Finset V) (inc : V → V → Prop) (c : V) : Finset V := by
-  classical
-  exact S.filter (fun x => inc c x)
+def row (S : Finset V) (inc : V → V → Prop) (c : V)
+    [DecidableRel inc] : Finset V := S.filter (fun x => inc c x)
 
 /-- Count incidences by rows or by left vertices. -/
 theorem sum_row_card_eq_sum_degree (C S : Finset V) (inc : V → V → Prop)
