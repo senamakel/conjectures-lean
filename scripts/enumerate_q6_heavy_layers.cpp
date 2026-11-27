@@ -71,27 +71,29 @@ struct Search {
       return;
     }
 
-    // Excluding the next vertex.
-    visit(next + 1, selected, vertices, edges);
-    if (stopped) return;
-
     // Including it is legal exactly when the new induced degree is at most 2
     // at this vertex and does not push an already-selected neighbor over 2.
     std::uint64_t adjacent_selected = neighbors[next] & selected;
     int new_degree = std::popcount(adjacent_selected);
-    if (new_degree > 2) return;
+    bool can_include = new_degree <= 2;
     for (std::uint64_t todo = adjacent_selected; todo != 0; todo &= todo - 1) {
       int u = std::countr_zero(todo);
-      if (degree[u] >= 2) return;
+      if (degree[u] >= 2) can_include = false;
     }
-    for (std::uint64_t todo = adjacent_selected; todo != 0; todo &= todo - 1)
-      ++degree[std::countr_zero(todo)];
-    degree[next] = static_cast<std::uint8_t>(new_degree);
-    visit(next + 1, selected | (std::uint64_t{1} << next), vertices + 1,
-          edges + new_degree);
-    degree[next] = 0;
-    for (std::uint64_t todo = adjacent_selected; todo != 0; todo &= todo - 1)
-      --degree[std::countr_zero(todo)];
+    if (can_include) {
+      for (std::uint64_t todo = adjacent_selected; todo != 0; todo &= todo - 1)
+        ++degree[std::countr_zero(todo)];
+      degree[next] = static_cast<std::uint8_t>(new_degree);
+      visit(next + 1, selected | (std::uint64_t{1} << next), vertices + 1,
+            edges + new_degree);
+      degree[next] = 0;
+      for (std::uint64_t todo = adjacent_selected; todo != 0; todo &= todo - 1)
+        --degree[std::countr_zero(todo)];
+    }
+    if (stopped) return;
+
+    // Excluding the next vertex.
+    visit(next + 1, selected, vertices, edges);
   }
 
   void run() {

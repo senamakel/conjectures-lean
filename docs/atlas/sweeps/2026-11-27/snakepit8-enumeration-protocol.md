@@ -42,6 +42,17 @@ not evidence against the published result. No Q8 candidate is searched here.
   census does not finish within these caps.
 - No external PR, issue, or submission is part of this experiment.
 
+## First bounded run
+
+The initial exclude-before-include DFS reached the 10,000,000-node cap in
+0.235 seconds, counted no complete assignments, and used 7,132 KiB maximum RSS.
+This is a traversal-order diagnostic: it spent the node budget in sparse
+prefix branches before reaching depth 64. It does not estimate the full census
+cost. A second bounded diagnostic changes only the branch order to include
+before exclude, keeping the same node, wall, CPU, and memory limits; its goal is
+to measure whether eligible leaves are reached promptly. No symmetry reduction
+or Q8 search is included.
+
 ## Interpretation
 
 Finishing the count reproduces only the Q7 enumeration stage; it does not prove
