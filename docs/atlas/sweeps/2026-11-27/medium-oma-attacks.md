@@ -36,3 +36,7 @@ Exa searches for the floor recurrence and parity-prefix bound found the machine 
 ## Verification
 
 The two research artifacts use `lake env lean` in the pinned formal-conjectures checkout. Their axiom reports contain only `propext`, `Classical.choice` and `Quot.sound`, or a subset. No submission or desk lease was created.
+
+## Follow-up after submission
+
+The Maxwell reduction passed upstream CI in [PR #4126](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4126). A follow-up Exa search found [Kintali's August 1 preprint](https://shivakintali.github.io/papers/Maxwell3.pdf), which claims at most four critical points when the critical set is finite and at most two for collinear sites. Remark 1.1 explains how nondegeneracy gives finiteness via semialgebraicity. The PR now cites this claim. Further work on the same count was stopped on prior-art grounds. The preprint's noncollinear proof has not been independently verified here.
