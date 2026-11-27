@@ -110,6 +110,7 @@ def build(
     deduplicate_c4: bool = False,
     compact_degree_count: bool = False,
     compact_common_neighbor: bool = False,
+    degree_eight_count: int | None = None,
 ) -> tuple[Cnf, dict[tuple[int, int], int]]:
     cnf = Cnf()
     edges: dict[tuple[int, int], int] = {}
@@ -196,8 +197,13 @@ def build(
     # Existing checked extremal degree-cap lemma: no more than four 8-degree
     # vertices occur in a 42-vertex, 138-edge C4-free graph under the deletion
     # bound. The fixed root has degree six, so it is absent from this list.
-    at_most_five = cnf.equivalent_atleast(degree_eight, 5)
-    cnf.clause(-at_most_five[5])
+    if degree_eight_count is not None:
+        exact_count = cnf.equivalent_atleast(degree_eight, degree_eight_count + 1)
+        cnf.clause(exact_count[degree_eight_count])
+        cnf.clause(-exact_count[degree_eight_count + 1])
+    else:
+        at_most_five = cnf.equivalent_atleast(degree_eight, 5)
+        cnf.clause(-at_most_five[5])
     return cnf, edges
 
 
@@ -211,6 +217,8 @@ def main() -> None:
                         help="derive the 138-edge count from degree flags via handshake")
     parser.add_argument("--compact-common-neighbor", action="store_true",
                         help="use implication indicators and sequential AMO for C4-freeness")
+    parser.add_argument("--degree-eight-count", type=int, choices=range(5),
+                        help="optionally fix the number of degree-eight vertices to 0..4")
     parser.add_argument("--check-common-neighbor", action="store_true",
                         help="exhaustively check the projected AMO encoding for up to four candidates")
     args = parser.parse_args()
@@ -220,7 +228,7 @@ def main() -> None:
     if args.output is None:
         parser.error("output is required unless --check-common-neighbor is used")
     cnf, _ = build(args.deduplicate_c4, args.compact_degree_count,
-                   args.compact_common_neighbor)
+                   args.compact_common_neighbor, args.degree_eight_count)
     cnf.emit(args.output)
     print(f"wrote {args.output}: {cnf.nvars} variables, {len(cnf.clauses)} clauses")
 

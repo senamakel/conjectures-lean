@@ -92,3 +92,32 @@ two graph-level clause families characterize four-cycle-freeness.
 count condition. Both use only the standard axioms. The link from the exact
 DIMACS variable allocation and threshold gates to these predicates remains
 a separate proof obligation.
+
+## Common-neighbor AMO benchmark protocol (written before the run)
+
+For every unordered endpoint pair among labels 1..41, create 39 indicator
+variables, one for each possible common neighbor. Add only the implication
+`edge(u,x) ∧ edge(v,x) → indicator(u,v,x)`, then a sequential at-most-one
+counter over the 39 indicators. The implication direction is deliberate: for
+any valid edge assignment, choose each indicator to equal the actual
+conjunction; conversely, two actual common neighbors force two true indicators
+and violate AMO. Thus the projected edge assignments are equivalent to the
+direct four-literal clauses, with 39 implication clauses plus 113 sequential
+counter clauses per pair (versus 741 direct clauses per pair before duplicate
+pair normalization, or 303,810 unique clauses overall).
+
+Before SAT, exhaustively compare the direct relation and existential AMO
+extension for all edge assignments with up to four possible common neighbors.
+Then generate one formula with `--compact-degree-count
+--compact-common-neighbor`; keep the old default and its hashes unchanged. Use
+the installed CaDiCaL 2.1.2 with a 120-second limit and LRAT output, and stop at
+SAT, complete UNSAT, or UNKNOWN. Do not rerun or extend the limit. Preserve the
+formula, log, model or trace under `.lake/c4-42-rooted-sat/`. Any SAT model needs
+an independent graph check. An UNSAT result requires Lean LRAT replay and an
+encoding-to-graph proof.
+
+The handshake identity and existing cap imply that the degree-eight count is
+one of 0..4, with corresponding non-root `(n6,n7,n8)` profiles
+`(17,24,0)`, `(18,22,1)`, `(19,20,2)`, `(20,18,3)`, `(21,16,4)`. Separate exact
+`--degree-eight-count k` instances for k=0..4 are a possible proof split, but
+this benchmark uses the combined cap and does not run those five cases.
