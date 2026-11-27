@@ -241,7 +241,7 @@ theorem selected_two_rows_card_le_three
     {C I : Type*} [Fintype C] [Fintype I] [DecidableEq C] [DecidableEq I]
     (clique : Finset C) (indep : Finset I) (r : C → Finset I)
     (hsub : ∀ c ∈ clique, r c ⊆ indep)
-    (hrow : ∀ c ∈ clique, (r c).card ≤ 2)
+    (_hrow : ∀ c ∈ clique, (r c).card ≤ 2)
     (hdiff : ∀ c ∈ clique, ∀ d ∈ clique, c ≠ d →
       (r c \ r d ∪ r d \ r c).card ≤ 2)
     (hdegree : ∀ i ∈ indep, (clique.filter (fun c => i ∈ r c)).card = 2) :
@@ -259,11 +259,11 @@ theorem selected_two_rows_card_le_three
   · obtain ⟨c, hc, d, hd, hcd, hrows⟩ := hdup
     have hFsub : F ⊆ {c, d} := by
       intro e he
-      by_cases hce : e = c
+      by_cases hce : c = e
       · simp [hce]
       by_cases hde : e = d
       · simp [hde]
-      obtain ⟨i, hic, hie⟩ := hinter c hc e he hce.symm
+      obtain ⟨i, hic, hie⟩ := hinter c hc e he (Ne.symm hce)
       have hiI : i ∈ indep := hsub c (Finset.mem_filter.mp hc).1 hic
       have htriple : ({c, d, e} : Finset C) ⊆ clique.filter (fun q => i ∈ r q) := by
         intro q hq
@@ -272,12 +272,16 @@ theorem selected_two_rows_card_le_three
         · exact Finset.mem_filter.mpr ⟨(Finset.mem_filter.mp hc).1, hic⟩
         · exact Finset.mem_filter.mpr ⟨(Finset.mem_filter.mp hd).1, by simpa [hrows] using hic⟩
         · exact Finset.mem_filter.mpr ⟨(Finset.mem_filter.mp he).1, hie⟩
-      have hthree : ({c, d, e} : Finset C).card = 3 := by simp [hcd, hce, hde]
+      have hthree : ({c, d, e} : Finset C).card = 3 := by
+        simp [hcd, hce, hde]
       have hle := Finset.card_le_card htriple
       rw [hdegree i hiI, hthree] at hle
+      have htwo : ({c, d} : Finset C).card ≤ 3 := by simp
+      have hbound : ({c, d, e} : Finset C).card ≤ 2 := hle
       omega
     have hle := Finset.card_le_card hFsub
-    simpa [F] using hle
+    have : ({c, d} : Finset C).card ≤ 3 := by simp
+    simpa [F] using (hle.trans this)
   · have hinj : Set.InjOn r F := by
       intro c hc d hd hrows
       by_contra hcd
@@ -317,7 +321,8 @@ theorem selected_two_rows_card_le_three
           exact Finset.mem_filter.mpr ⟨(Finset.mem_filter.mp hc).1, hcenter c hc⟩
         have hle := Finset.card_le_card hFsub
         rw [hdegree i hiI] at hle
-        simpa [F] using hle
+        have : 2 ≤ 3 := by omega
+        simpa [F] using (hle.trans this)
       · obtain ⟨a, b, c, hab, hac, hbc, hsubset⟩ := htriangle
         have hRsub : R ⊆ ({a, b, c} : Finset I).powersetCard 2 := by
           intro A hA
@@ -327,7 +332,7 @@ theorem selected_two_rows_card_le_three
           rw [Finset.card_powersetCard,
             show ({a, b, c} : Finset I).card = 3 by simp [hab, hac, hbc]] at hle
           exact hle
-        have hcardEq : R.card = F.card := Finset.card_image_of_injOn r hinj
+        have hcardEq : R.card = F.card := Finset.card_image_of_injOn hinj
         rw [← hcardEq]
         simpa [F] using hRle
 
