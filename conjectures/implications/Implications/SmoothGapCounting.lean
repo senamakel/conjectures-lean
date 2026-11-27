@@ -680,7 +680,8 @@ private theorem eventually_twoHitGapCount_tail_tendsto_zero :
             Real.log (primeAt n : ℝ) := by ring
         rw [this, Real.exp_log hpn]
       rw [div_eq_div_iff (by positivity) (by positivity)]
-      nlinarith [hidentity]
+      field_simp
+      exact hidentity
     have hfactor : Tendsto (fun n : ℕ =>
         ((primeAt n : ℝ) / (n + 1 : ℝ)) /
           ((primeAt n : ℝ) ^ (1 / 4 : ℝ))) atTop (nhds 0) := by
@@ -710,7 +711,7 @@ private theorem eventually_twoHitGapCount_tail_tendsto_zero :
                 (primeAt n : ℝ) ^ (1 / 4 : ℝ)) := by ring
       exact squeeze_zero' (by
         filter_upwards [hp.eventually (eventually_gt_atTop (0 : ℝ))] with n hn
-        positivity) (hbound.mono fun n hn => hn.2) (hratio.const_mul 2)
+        positivity) (hbound.mono fun n hn => hn.2) (by simpa using hratio.const_mul 2)
     exact hfactor.congr' (hrewrite.mono fun _ h => h.symm)
   have hsum := (hbase.add htail).const_mul (1 / 2 : ℝ)
   convert hsum using 1 <;> field_simp <;> ring
@@ -736,10 +737,10 @@ theorem twoHitGapCount_proportion_tendsto_zero :
           change b ≤ Nat.nth Nat.Prime n
           omega)))
     convert (tendsto_const_nhds.div_atTop hll).const_mul 64 using 1 <;>
-      simp [div_eq_mul_inv, mul_comm]
+      field_simp <;> ring
   have hsum := hfirst.add eventually_twoHitGapCount_tail_tendsto_zero
   apply squeeze_zero' (Eventually.of_forall (fun n => by positivity)) (by
     filter_upwards [eventually_twoHitGapCount_bound] with n hn
-    exact hn) (by simpa using hsum)
+    exact hn) (by convert hsum using 1 <;> simp)
 
 end Implications.SmoothGapCounting
