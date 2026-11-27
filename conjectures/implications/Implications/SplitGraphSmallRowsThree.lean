@@ -178,6 +178,129 @@ theorem hamiltonian_of_triangle_block_and_remaining_chain
 
 variable {α : Type*} [DecidableEq α]
 
+private theorem intersecting_pair_rows
+    (s t : Finset α) (hs : s.card = 2) (ht : t.card = 2)
+    (hdiff : (s \ t ∪ t \ s).card ≤ 2) :
+    ∃ x, x ∈ s ∧ x ∈ t := by
+  classical
+  by_contra hn
+  have hdisj : Disjoint s t := by
+    rw [Finset.disjoint_iff_inter_eq_empty]
+    ext x
+    constructor
+    · intro hx
+      exact False.elim (hn ⟨x, (Finset.mem_inter.mp hx).1, (Finset.mem_inter.mp hx).2⟩)
+    · simp
+  have hEq : s ∪ t = s \ t ∪ t \ s := by
+    rw [← Finset.symmDiff_eq_union hdisj, Finset.symmDiff_def]
+  have hst : (s ∪ t).card = 4 := by
+    rw [Finset.card_union_of_disjoint hdisj, hs, ht]
+  rw [hEq] at hst
+  omega
+
+/-- For three selected double rows, the exact-degree-two condition makes the
+rows distinct and rules out a common label. The original row bounds and
+symmetric-difference bounds then force the triangle pattern. -/
+theorem selected_three_double_rows_form_triangle
+    (G : SimpleGraph V) (C I : Finset V) (left right : V → V)
+    (hleftC : ∀ i ∈ I, left i ∈ C) (hrightC : ∀ i ∈ I, right i ∈ C)
+    (hleftAdj : ∀ i ∈ I, G.Adj (left i) i)
+    (hrightAdj : ∀ i ∈ I, G.Adj (right i) i)
+    (hneq : ∀ i ∈ I, left i ≠ right i)
+    (hrow : ∀ q ∈ C, (row G I q).card ≤ 2)
+    (hdiff : ∀ q ∈ C, ∀ d ∈ C, q ≠ d → (rowDiff G I q d).card ≤ 2)
+    (hcount : (C.filter (fun q => (I.filter (fun i => left i = q ∨ right i = q)).card = 2)).card = 3) :
+    ∃ x y z a b c, x ∈ C ∧ y ∈ C ∧ z ∈ C ∧ x ≠ y ∧ x ≠ z ∧ y ≠ z ∧
+      a ≠ b ∧ a ≠ c ∧ b ≠ c ∧
+      I.filter (fun i => left i = x ∨ right i = x) = {a,b} ∧
+      I.filter (fun i => left i = y ∨ right i = y) = {b,c} ∧
+      I.filter (fun i => left i = z ∨ right i = z) = {a,c} := by
+  classical
+  let selected : V → Finset V := fun q => I.filter (fun i => left i = q ∨ right i = q)
+  let S : Finset V := C.filter (fun q => (selected q).card = 2)
+  let F : Finset (Finset V) := S.image selected
+  have hdeg : ∀ i ∈ I, (C.filter (fun q => i ∈ selected q)).card = 2 := by
+    intro i hi
+    have hEq : C.filter (fun q => i ∈ selected q) = {left i, right i} := by
+      ext q
+      constructor
+      · intro hq
+        have hq' := Finset.mem_filter.mp hq
+        have hi' := Finset.mem_filter.mp hq'.2
+        rcases hi'.2 with heq | heq
+        · exact Finset.mem_insert.mpr (Or.inl heq.symm)
+        · simp [heq.symm]
+      · intro hq
+        simp only [Finset.mem_insert, Finset.mem_singleton] at hq
+        rcases hq with hq | hq
+        · subst q
+          exact Finset.mem_filter.mpr ⟨hleftC i hi,
+            Finset.mem_filter.mpr ⟨hi, Or.inl rfl⟩⟩
+        · subst q
+          exact Finset.mem_filter.mpr ⟨hrightC i hi,
+            Finset.mem_filter.mpr ⟨hi, Or.inr rfl⟩⟩
+    rw [hEq]
+    simp [hneq i hi]
+  have hselectedSub : ∀ q ∈ C, selected q ⊆ row G I q := by
+    intro q hq i hi
+    have hi' := Finset.mem_filter.mp hi
+    rcases hi'.2 with heq | heq
+    · exact Finset.mem_row.mp (by
+        rw [row]; exact Finset.mem_filter.mpr ⟨hi'.1, heq ▸ hleftAdj i hi'.1⟩)
+    · exact Finset.mem_row.mp (by
+        rw [row]; exact Finset.mem_filter.mpr ⟨hi'.1, heq ▸ hrightAdj i hi'.1⟩)
+  have hselectedCard : ∀ q ∈ S, (selected q).card = 2 := fun q hq =>
+    (Finset.mem_filter.mp hq).2
+  have hselectedEq : ∀ q ∈ S, selected q = row G I q := by
+    intro q hq
+    apply Finset.eq_of_subset_of_card_le (hselectedSub q (Finset.mem_filter.mp hq).1)
+    rw [hselectedCard q hq]
+    exact hrow q (Finset.mem_filter.mp hq).1
+  have hrowsMeet : ∀ q ∈ S, ∀ d ∈ S, q ≠ d → ∃ i, i ∈ selected q ∧ i ∈ selected d := by
+    intro q hq d hd hqd
+    rw [hselectedEq q hq, hselectedEq d hd]
+    apply intersecting_pair_rows
+    · exact hrow q (Finset.mem_filter.mp hq).1
+    · exact hrow d (Finset.mem_filter.mp hd).1
+    · simpa [rowDiff] using hdiff q (Finset.mem_filter.mp hq).1 d (Finset.mem_filter.mp hd).1 hqd
+  have hSCard : S.card = 3 := hcount
+  have hSnonempty : S.Nonempty := Finset.card_pos.mp (by omega)
+  have hnoCenter : ¬ ∃ i, ∀ q ∈ S, i ∈ selected q := by
+    rintro ⟨i, hi⟩
+    have hiI : i ∈ I := by
+      obtain ⟨q, hq, hiq⟩ := hSnonempty
+      exact (Finset.mem_filter.mp hiq).1 ▸ (Finset.mem_filter.mp hiq).1 ▸ ?_
+    have hSsub : S ⊆ C.filter (fun q => i ∈ selected q) := by
+      intro q hq
+      exact Finset.mem_filter.mpr ⟨(Finset.mem_filter.mp hq).1, hi q hq⟩
+    have hle := Finset.card_le_card hSsub
+    rw [hdeg i hiI] at hle
+    omega
+  have hinj : Set.InjOn selected S := by
+    intro q hq d hd hEq
+    by_contra hqd
+    obtain ⟨i, hiq, hid⟩ := hrowsMeet q hq d hd hqd
+    have hiI : i ∈ I := (Finset.mem_filter.mp hiq).1
+    have hiq' : i ∈ selected d := by simpa [hEq] using hiq
+    obtain ⟨e, he⟩ := Finset.card_eq_three.mp hSCard
+    have hthird : ∃ e ∈ S, e ≠ q ∧ e ≠ d := by
+      have hqd' : q ≠ d := hqd
+      have hpair : ({q,d} : Finset V).card = 2 := by simp [hqd']
+      have hnot : S ≠ {q,d} := by intro heq; rw [heq, hpair] at hSCard; omega
+      obtain ⟨e, heS, heq⟩ := Finset.exists_mem_not_mem_of_ne_empty (by
+        classical
+        exact ?_)
+      exact ?_
+    obtain ⟨e, heS, heq, hed⟩ := hthird
+    obtain ⟨j, hjq, hje⟩ := hrowsMeet q hq e heS heq
+    have hjI : j ∈ I := (Finset.mem_filter.mp hjq).1
+    have hthirdLabel : j = i := by
+      have hselectedq : selected q = {i,j} := by
+        sorry
+      sorry
+    sorry
+  sorry
+
 /-- Three distinct, pairwise-intersecting two-element rows with no common
 element are exactly the three edges of a triangle. -/
 theorem three_pair_rows_are_triangle
