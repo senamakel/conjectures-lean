@@ -326,8 +326,10 @@ invocations. The resumed set equaled both uninterrupted DFS and the independent
 2^13-mask exhaustive scan. Every intermediate frontier passed the prefix-free
 check; every resumed output was record-aligned and duplicate-free. The test
 also confirmed empty-frontier repeated resume is idempotent and that truncated
-output, malformed checkpoint data, misaligned offsets, an offset/count
-mismatch, and a checkpoint path equal to the output path are rejected. The
+output, malformed or overlong prefixes, duplicate frontier entries, misaligned
+offsets, an offset/count mismatch, and path aliases through `.` components,
+symlinks or hardlinks are rejected before damaging the mask output. The test
+also covers a checkpoint temporary symlink to the output. The
 enumerator compiled with `-std=c++20 -O3 -Wall -Wextra -Werror`. This provides
 small-instance evidence for checkpoint correctness only. No Q6 run was made,
 so there is no Q6 continuation timing result and no evidence yet that the
