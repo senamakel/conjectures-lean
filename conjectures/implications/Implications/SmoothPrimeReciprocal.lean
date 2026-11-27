@@ -17,7 +17,7 @@ private theorem card_primes_Icc_eq_primeCounting (n : ℕ) :
     ((Finset.Icc 1 n).filter Nat.Prime).card = Nat.primeCounting n := by
   have hset : (Finset.Icc 1 n).filter Nat.Prime = Nat.primesLE n := by
     ext p
-    simp [Nat.mem_primesLE]
+    simp [Nat.mem_primesLE, Nat.Prime.one_le]
   rw [hset, Nat.primesLE_card_eq_primeCounting]
 
 /-- The reciprocal-prime mass in one dyadic block is `O(1/k)`. -/
@@ -27,7 +27,7 @@ private theorem reciprocalPrimeDyadic_eventually :
         (1 : ℝ) / p) ≤ D / (k + 1 : ℝ) := by
   let B : ℝ := Real.log 4 + 1
   have hB : 0 < B := by dsimp [B]; positivity
-  have hpi := Chebyshev.eventually_primeCounting_le (εpos := by norm_num : (0 : ℝ) < 1)
+  have hpi := Chebyshev.eventually_primeCounting_le (εpos := by norm_num)
   have hpow : Tendsto (fun k : ℕ => (2 : ℝ) ^ (k + 1)) atTop atTop := by
     exact (tendsto_pow_atTop_atTop_of_one_lt (by norm_num : (1 : ℝ) < 2)).comp
       (tendsto_add_atTop_nat 1)
