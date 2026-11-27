@@ -31,39 +31,39 @@ private theorem hamiltonian_of_list
 vertices to a prefix whose final vertex lies in the clique. -/
 theorem hamiltonian_of_prefix_and_remaining_chain
     (G : SimpleGraph V) (C : Finset V) (hC : G.IsClique (C : Set V))
-    (prefix rest tail : List V)
-    (hprefixNodup : prefix.Nodup) (hprefixChain : prefix.IsChain G.Adj)
-    (hprefixLastC : ∀ x, x ∈ prefix.getLast? → x ∈ C)
+    (pref rest tail : List V)
+    (hprefNodup : pref.Nodup) (hprefChain : pref.IsChain G.Adj)
+    (hprefLastC : ∀ x, x ∈ pref.getLast? → x ∈ C)
     (hrestNodup : rest.Nodup) (hrestChain : rest.IsChain G.Adj)
     (hrestHeadC : ∀ x, x ∈ rest.head? → x ∈ C)
     (hrestLastC : ∀ x, x ∈ rest.getLast? → x ∈ C)
-    (hprefixRestDisjoint : ∀ x ∈ prefix, x ∉ rest)
+    (hprefRestDisjoint : ∀ x ∈ pref, x ∉ rest)
     (htailNodup : tail.Nodup) (htailC : ∀ x ∈ tail, x ∈ C)
-    (hbaseTailDisjoint : ∀ x ∈ prefix ++ rest, x ∉ tail)
-    (hcover : ∀ x : V, x ∈ prefix ++ rest ∨ x ∈ tail)
-    (hne : prefix ++ rest ++ tail ≠ []) :
+    (hbaseTailDisjoint : ∀ x ∈ pref ++ rest, x ∉ tail)
+    (hcover : ∀ x : V, x ∈ pref ++ rest ∨ x ∈ tail)
+    (hne : pref ++ rest ++ tail ≠ []) :
     ∃ u v : V, ∃ p : G.Walk u v, p.IsHamiltonian := by
   classical
-  let base := prefix ++ rest
+  let base := pref ++ rest
   have hbaseNodup : base.Nodup := by
     simp only [base]
     rw [List.nodup_append']
-    exact ⟨hprefixNodup, hrestNodup, hprefixRestDisjoint⟩
+    exact ⟨hprefNodup, hrestNodup, hprefRestDisjoint⟩
   have hbaseChain : base.IsChain G.Adj := by
     simp only [base]
     rw [List.isChain_append]
-    refine ⟨hprefixChain, hrestChain, ?_⟩
+    refine ⟨hprefChain, hrestChain, ?_⟩
     intro x hx y hy
-    exact hC (hprefixLastC x hx) (hrestHeadC y hy) (by
+    exact hC (hprefLastC x hx) (hrestHeadC y hy) (by
       intro heq
       subst y
-      exact hprefixRestDisjoint x (List.mem_of_mem_getLast? hx)
+      exact hprefRestDisjoint x (List.mem_of_mem_getLast? hx)
         (List.mem_of_mem_head? hy))
   have hbaseLastC : ∀ x, x ∈ base.getLast? → x ∈ C := by
     intro x hx
     by_cases hrest : rest = []
     · subst rest
-      simpa [base] using hprefixLastC x hx
+      simpa [base] using hprefLastC x hx
     · have hlast : base.getLast? = rest.getLast? := by
         simp [base, hrest]
       rw [hlast] at hx
