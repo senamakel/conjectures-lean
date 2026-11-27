@@ -166,8 +166,87 @@ theorem hall_deficit_one_of_five_set
     (hsmall : ∀ c ∈ C, (row S inc c).card ≤ 3 →
       ((row S inc c) \ U).card ≤ 1) :
     S.card ≤ C.card + 1 := by
-  -- TODO: finish the double-counting bound for the five-set alternative.
-  sorry
+  classical
+  let F := C.filter (fun c => (row S inc c).card = 4)
+  let f := F.card
+  let m := C.card
+  have hsum : 3 * S.card ≤ ∑ c ∈ C, (row S inc c).card := by
+    calc
+      3 * S.card = ∑ x ∈ S, 3 := by simp
+      _ ≤ ∑ x ∈ S, (C.filter (fun c => inc c x)).card := by
+        apply Finset.sum_le_sum
+        intro x hx
+        exact hdegree x hx
+      _ = ∑ c ∈ C, (row S inc c).card :=
+        (sum_row_card_eq_sum_degree C S inc).symm
+  have hupper : (∑ c ∈ C, (row S inc c).card) ≤ 3 * m + f := by
+    calc
+      (∑ c ∈ C, (row S inc c).card) ≤
+          ∑ c ∈ C, (3 + if c ∈ F then 1 else 0) := by
+        apply Finset.sum_le_sum
+        intro c hc
+        by_cases hcf : c ∈ F
+        · simp only [F, Finset.mem_filter] at hcf
+          simp [hcf.2]
+        · have hcne : (row S inc c).card ≠ 4 := by
+            intro h
+            exact hcf (Finset.mem_filter.mpr ⟨hc, h⟩)
+          have hle := hrow c hc
+          omega
+      _ = 3 * m + f := by
+        simp [F, m, f, Finset.sum_add_distrib, Finset.sum_ite]
+  by_contra hnot
+  have hlarge : C.card + 2 ≤ S.card := by omega
+  have hf : 6 ≤ f := by
+    have : 3 * (m + 2) ≤ 3 * m + f := hsum.trans hupper
+    dsimp [m] at this
+    omega
+  have houtside : 3 * (S \ U).card ≤ m := by
+    have hcnt :
+        (∑ c ∈ C, ((row S inc c) \ U).card) ≤ m := by
+      calc
+        (∑ c ∈ C, ((row S inc c) \ U).card) ≤
+            ∑ c ∈ C, (if c ∈ F then 0 else 1) := by
+          apply Finset.sum_le_sum
+          intro c hc
+          by_cases hcf : c ∈ F
+          · have hfullc := hfull c hc ((Finset.mem_filter.mp hcf).2)
+            have hempty : (row S inc c) \ U = ∅ := Finset.sdiff_eq_empty.mpr hfullc
+            simp [hcf, hempty]
+          · have hsmallc : (row S inc c).card ≤ 3 := by
+              have := hrow c hc
+              have hne : (row S inc c).card ≠ 4 := by
+                intro h
+                exact hcf (Finset.mem_filter.mpr ⟨hc, h⟩)
+              omega
+            simpa [hcf] using hsmall c hc hsmallc
+        _ = m - f := by
+          simp [F, m, f, Finset.sum_ite]
+    have hout :
+        (∑ c ∈ C, ((row S inc c) \ U).card) =
+          ∑ x ∈ S \ U, (C.filter (fun c => x ∈ row S inc c)).card := by
+      simpa [row, Finset.mem_sdiff, Finset.filter_filter, and_comm, and_left_comm,
+        and_assoc] using
+        (sum_row_card_eq_sum_degree C (S \ U) (fun c x => x ∈ row S inc c))
+    rw [hout] at hcnt
+    calc
+      3 * (S \ U).card = ∑ x ∈ S \ U, 3 := by simp
+      _ ≤ ∑ x ∈ S \ U, (C.filter (fun c => x ∈ row S inc c)).card := by
+        apply Finset.sum_le_sum
+        intro x hx
+        have hxS : x ∈ S := (Finset.mem_sdiff.mp hx).1
+        simpa [row] using hdegree x hxS
+      _ ≤ m := hcnt.trans (by omega)
+  have hSdecomp : S.card = (S ∩ U).card + (S \ U).card := by
+    have := Finset.card_sdiff_add_card_inter S U
+    simpa [Finset.inter_comm] using this.symm
+  have hSU : (S ∩ U).card ≤ 5 :=
+    (Finset.card_le_card Finset.inter_subset_right).trans hU
+  have houter : m - 3 ≤ (S \ U).card := by
+    dsimp [m] at *
+    omega
+  have hfinal : 3 * (m - 3) ≤ m := by omega
+  omega
 
 end SplitGraphKappaThreeHall
 
