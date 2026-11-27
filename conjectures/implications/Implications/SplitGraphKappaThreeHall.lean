@@ -62,7 +62,6 @@ theorem outside_anchor_le_one_of_rowDiff
     omega
 
 /-- Count incidences by rows or by left vertices. -/
-omit [Fintype V] [DecidableEq V] in
 theorem sum_row_card_eq_sum_degree (C S : Finset V) (inc : V → V → Prop)
     [DecidableRel inc] :
     (∑ c ∈ C, (row S inc c).card) =
