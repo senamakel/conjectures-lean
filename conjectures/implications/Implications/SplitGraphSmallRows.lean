@@ -1,10 +1,29 @@
-import Mathlib
+import Implications.SplitGraphTrees
 
 /-!
 Finite set-family lemmas for the connectivity-two, small-row split-graph case.
 -/
 
 namespace SplitGraphSmallRows
+
+private theorem twoRows_intersect_of_symmDiff_card_le_two
+    {α : Type*} [DecidableEq α] (s t : Finset α)
+    (hs : s.card = 2) (ht : t.card = 2)
+    (hd : (s \\ t ∪ t \\ s).card ≤ 2) :
+    ∃ x, x ∈ s ∧ x ∈ t := by
+  classical
+  by_contra hn
+  have hdis : Disjoint s t := by
+    rw [Finset.disjoint_iff_inter_eq_empty]
+    apply Finset.eq_empty_iff_forall_not_mem.mpr
+    intro x hx
+    exact hn ⟨x, (Finset.mem_inter.mp hx).1, (Finset.mem_inter.mp hx).2⟩
+  have hEq : s ∪ t = s \\ t ∪ t \\ s := by
+    rw [← Finset.symmDiff_eq_union hdis, Finset.symmDiff_def]
+  have hunion : (s ∪ t).card = 4 := by
+    rw [Finset.card_union_of_disjoint hdis, hs, ht]
+  have : (s \\ t ∪ t \\ s).card = 4 := by rw [← hEq]; exact hunion
+  omega
 
 /-- A pairwise-intersecting family of two-element rows either has a common
 vertex or is supported on at most three vertices. -/
