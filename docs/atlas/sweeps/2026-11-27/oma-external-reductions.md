@@ -123,7 +123,7 @@ For the separate point-detection obligation, pinned Lean checked the finite comp
 
 ### Open-cover excision comparison
 
-Pinned Lean checked the relative cokernel comparison with `propext`, `Classical.choice`, and `Quot.sound`. For two monomorphisms from the same subcomplex and a compatible quasi-isomorphism of their ambient complexes, the induced map on cokernels is a quasi-isomorphism. The proof applies the homology sequence to the morphism of the two short exact cokernel sequences. This supplies the algebraic step of the proposed excision reduction. The topological step still needs the comparison from the small-chain complex to all singular chains to induce an isomorphism in every degree.
+Pinned Lean checked the relative cokernel comparison with `propext`, `Classical.choice`, and `Quot.sound`. For two monomorphisms from the same subcomplex and a compatible quasi-isomorphism of their ambient complexes, the induced map on cokernels is a quasi-isomorphism. The proof applies the homology sequence to the morphism of the two short exact cokernel sequences. A second pinned Lean check verified the degreewise form used by the draft excision reduction, converting the family of ambient homology isomorphisms to a quasi-isomorphism and extracting the family of relative isomorphisms. The draft can therefore discharge this algebraic step within the reduction. The topological step still needs the comparison from the small-chain complex to all singular chains to induce an isomorphism in every degree.
 
 ### Green 100(i) closure
 
