@@ -20,9 +20,9 @@ private theorem card_primes_Icc_eq_primeCounting (n : ℕ) :
     simp only [Finset.mem_filter, Finset.mem_Icc, Nat.mem_primesLE]
     constructor
     · rintro ⟨⟨h1, hn⟩, hp⟩
-      exact ⟨hp, hn⟩
+      exact ⟨hn, hp⟩
     · rintro ⟨hp, hn⟩
-      exact ⟨⟨Nat.Prime.one_le hp, hn⟩, hp⟩
+      exact ⟨⟨Nat.Prime.one_le hn, hp⟩, hn⟩
   rw [hset, Nat.primesLE_card_eq_primeCounting]
 
 /-- The reciprocal-prime mass in one dyadic block is `O(1/k)`. -/
@@ -41,7 +41,10 @@ private theorem reciprocalPrimeDyadic_eventually :
   have hkcast :
       (Nat.primeCounting (2 ^ (k + 1)) : ℝ) ≤
         B * (2 : ℝ) ^ (k + 1) / Real.log ((2 : ℝ) ^ (k + 1)) := by
-    simpa [B, Nat.floor_natCast, Real.log_pow] using hk
+    have hfloor : ⌊(2 : ℝ) ^ (k + 1)⌋₊ = 2 ^ (k + 1) := by
+      rw [← Nat.cast_pow, Nat.floor_natCast]
+    rw [hfloor] at hk
+    simpa [B, Real.log_pow] using hk
   have hlog2 : 0 < Real.log 2 := Real.log_pos (by norm_num)
   have hkpos : 0 < (k + 1 : ℝ) := by positivity
   have hblock :
@@ -75,6 +78,7 @@ private theorem reciprocalPrimeDyadic_eventually :
     rw [pow_succ]; ring
   have hlog_pow : Real.log ((2 : ℝ) ^ (k + 1)) = (k + 1 : ℝ) * Real.log 2 := by
     rw [Real.log_pow]
+    push_cast
   calc
     _ ≤ (Nat.primeCounting (2 ^ (k + 1)) : ℝ) / (2 : ℝ) ^ k := hblock
     _ ≤ (B * (2 : ℝ) ^ (k + 1) / Real.log ((2 : ℝ) ^ (k + 1))) /
