@@ -22,7 +22,7 @@ open Implications.C4PolarityEncoderInputs
 This is an explicit tier-H input until Yan's supplementary LRAT certificate is
 formalized or imported into Lean. -/
 def Ex41C4Bound : Prop :=
-  ∀ {α : Type*} [Fintype α] [DecidableEq α] (G : SimpleGraph α)
+  ∀ {α : Type} [Fintype α] [DecidableEq α] (G : SimpleGraph α)
       [DecidableRel G.Adj],
     Fintype.card α = 41 →
       C4VertexExtension.C4Free G → G.edgeSet.ncard ≤ 132
