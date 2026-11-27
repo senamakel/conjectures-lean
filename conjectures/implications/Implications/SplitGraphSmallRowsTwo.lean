@@ -11,6 +11,29 @@ open SplitGraphTrees
 
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
+private def selectedRow (I : Finset V) (left right : V → V) (q : V) : Finset V :=
+  I.filter (fun i => left i = q ∨ right i = q)
+
+/-- A clique vertex with two selected incidences has exactly those two
+independent neighbors in its original row, when original rows have size at
+most two. -/
+theorem selected_row_eq_original_of_card_two
+    (G : SimpleGraph V) (I : Finset V) (left right : V → V) (q : V)
+    (hleftAdj : ∀ i ∈ I, G.Adj (left i) i)
+    (hrightAdj : ∀ i ∈ I, G.Adj (right i) i)
+    (hselected : (selectedRow I left right q).card = 2)
+    (hrow : (row G I q).card ≤ 2) :
+    selectedRow I left right q = row G I q := by
+  classical
+  apply Finset.eq_of_subset_of_card_le
+  · intro i hi
+    have hi' := Finset.mem_filter.mp hi
+    rcases hi'.2 with heq | heq
+    · exact Finset.mem_filter.mpr ⟨hi'.1, heq ▸ hleftAdj i hi'.1⟩
+    · exact Finset.mem_filter.mpr ⟨hi'.1, heq ▸ hrightAdj i hi'.1⟩
+  · rw [hselected]
+    exact hrow
+
 private theorem two_rows_intersect_of_symmDiff_card_le_two
     (s t : Finset V) (hs : s.card = 2) (ht : t.card = 2)
     (hd : (s \ t ∪ t \ s).card ≤ 2) : ∃ x, x ∈ s ∧ x ∈ t := by
@@ -171,3 +194,7 @@ theorem one_overlap_path_block
 end SplitGraphSmallRowsTwo
 
 #print axioms SplitGraphSmallRowsTwo.two_original_rows_intersect
+#print axioms SplitGraphSmallRowsTwo.selected_row_eq_original_of_card_two
+#print axioms SplitGraphSmallRowsTwo.two_original_rows_shape
+#print axioms SplitGraphSmallRowsTwo.four_cycle_path_block
+#print axioms SplitGraphSmallRowsTwo.one_overlap_path_block
