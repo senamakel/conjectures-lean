@@ -198,7 +198,7 @@ theorem deletionCounterFreshCount :
   norm_num [thresholdFreshVariables]
 
 theorem scoreCounterFreshCount :
-    (thresholdFreshVariables 970 34 232).length = 7888 := by
+    (thresholdFreshVariables 1194 34 232).length = 7888 := by
   norm_num [thresholdFreshVariables]
 
 theorem deletionCounterLastThresholds :
@@ -206,7 +206,7 @@ theorem deletionCounterLastThresholds :
   norm_num [thresholdVar]
 
 theorem scoreCounterLastThreshold :
-    thresholdVar 970 34 231 34 = 8858 := by
+    thresholdVar 1194 34 231 34 = 9082 := by
   norm_num [thresholdVar]
 
 theorem deletionCounterUnits_are_encoder_units :
@@ -214,7 +214,7 @@ theorem deletionCounterUnits_are_encoder_units :
   norm_num [deletionCounterBoundClauses, thresholdFinalRow, thresholdVar]
 
 theorem scoreCounterUnit_is_encoder_unit :
-    scoreCounterBoundClause (thresholdFinalRow 1 970 34 231) = [[8858]] := by
+    scoreCounterBoundClause (thresholdFinalRow 1 1194 34 231) = [[9082]] := by
   norm_num [scoreCounterBoundClause, thresholdFinalRow, thresholdVar]
 
 end Implications.C4PolarityThresholdEncoding
