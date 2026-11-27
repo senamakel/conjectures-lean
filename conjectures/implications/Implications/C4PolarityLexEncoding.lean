@@ -80,25 +80,53 @@ theorem lexPrefixScan_length (a : Nat → Bool) (pref : Bool)
 
 /-- The lex auxiliary assignment uses the scan values at the consecutive DIMACS
 IDs beginning at `base`; IDs outside that block retain their original value. -/
-def lexAssignment (a : Nat → Bool) (base : Nat) (left right : List Nat) : Nat → Bool :=
+def lexAssignment (a : Nat → Bool) (base : Nat) (initialPref : Bool)
+    (left right : List Nat) : Nat → Bool :=
   fun n => if n < base then a n else
-    if n < base + (lexPrefixScan a true left right).length then
-      (lexPrefixScan a true left right).getD (n - base) false
+    if n < base + (lexPrefixScan a initialPref left right).length then
+      (lexPrefixScan a initialPref left right).getD (n - base) false
     else a n
 
-theorem lexAssignment_preserves_below_base (a : Nat → Bool) (base : Nat)
+theorem lexAssignment_preserves_below_base (a : Nat → Bool) (base : Nat) (initialPref : Bool)
     (left right : List Nat) {n : Nat} (hn : n < base) :
-    lexAssignment a base left right n = a n := by
+    lexAssignment a base initialPref left right n = a n := by
   simp [lexAssignment, hn]
 
-theorem lexAssignment_fresh_id (a : Nat → Bool) (base : Nat)
+theorem lexAssignment_fresh_id (a : Nat → Bool) (base : Nat) (initialPref : Bool)
     (left right : List Nat) {k : Nat}
-    (hk : k < (lexPrefixScan a true left right).length) :
-    lexAssignment a base left right (base + k) =
-      (lexPrefixScan a true left right).getD k false := by
+    (hk : k < (lexPrefixScan a initialPref left right).length) :
+    lexAssignment a base initialPref left right (base + k) =
+      (lexPrefixScan a initialPref left right).getD k false := by
   have hbelow : ¬ base + k < base := by omega
-  have habove : base + k < base + (lexPrefixScan a true left right).length := by omega
+  have habove : base + k < base + (lexPrefixScan a initialPref left right).length := by omega
   simp [lexAssignment, hbelow, habove]
+
+theorem lexPrefixScan_extendVariable (a : Nat → Bool) (base : Nat)
+    (value initialPref : Bool) (left right : List Nat)
+    (hleft : ∀ x ∈ left, x < base) (hright : ∀ y ∈ right, y < base) :
+    lexPrefixScan (extendVariable a base value) initialPref left right =
+      lexPrefixScan a initialPref left right := by
+  induction left generalizing right initialPref with
+  | nil => cases right <;> rfl
+  | cons x xs ih =>
+      cases right with
+      | nil => rfl
+      | cons y ys =>
+          have hx : x < base := hleft x (by simp)
+          have hy : y < base := hright y (by simp)
+          have htailL : ∀ z ∈ xs, z < base := by
+            intro z hz
+            exact hleft z (by simp [hz])
+          have htailR : ∀ z ∈ ys, z < base := by
+            intro z hz
+            exact hright z (by simp [hz])
+          have hvalx : extendVariable a base value x = a x := by
+            simp [extendVariable, Nat.ne_of_lt hx]
+          have hvaly : extendVariable a base value y = a y := by
+            simp [extendVariable, Nat.ne_of_lt hy]
+          by_cases hxy : x = y
+          · simp [lexPrefixScan, hxy, hvalx, hvaly, ih htailL htailR]
+          · simp [lexPrefixScan, hxy, hvalx, hvaly, ih htailL htailR]
 
 /-- Each unequal variable pair allocates exactly one fresh prefix variable;
 identical variables are skipped. -/
