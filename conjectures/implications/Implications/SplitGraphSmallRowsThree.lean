@@ -316,7 +316,7 @@ theorem three_selected_rows_form_triangle
       exact heNot (by simp)
     have hthird : ∃ e ∈ S, e ≠ q ∧ e ≠ d := ⟨e, heS, hqe, hde⟩
     obtain ⟨e, he, hqe, hde⟩ := hthird
-    obtain ⟨i, hiq, hie⟩ := hmeet q hq e he hqe
+    obtain ⟨i, hiq, hie⟩ := hmeet q hq e he hqe.symm
     have hid : i ∈ selected d := by simpa [heq] using hiq
     have hiI : i ∈ indep := hselectedSub q hq hiq
     have hthree : ({q,d,e} : Finset C) ⊆ clique.filter (fun c => i ∈ selected c) := by
@@ -326,7 +326,8 @@ theorem three_selected_rows_form_triangle
       · exact Finset.mem_filter.mpr ⟨hSsub hq, hiq⟩
       · exact Finset.mem_filter.mpr ⟨hSsub hd, hid⟩
       · exact Finset.mem_filter.mpr ⟨hSsub he, hie⟩
-    have hthreeCard : ({q,d,e} : Finset C).card = 3 := by simp [hqd, hqe, hde]
+    have hthreeCard : ({q,d,e} : Finset C).card = 3 := by
+      simp [hqd, hqe, hde, hqd.symm, hqe.symm, hde.symm]
     have hle := Finset.card_le_card hthree
     rw [hdegree i hiI, hthreeCard] at hle
     omega
