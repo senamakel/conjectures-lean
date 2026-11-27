@@ -101,10 +101,13 @@ theorem thresholdVar_mem_fresh {nextVar limit inputCount row k : Nat}
       Nat.mul_lt_mul_of_pos_right hrow (by omega)
     have hk' : k - 1 < limit := by omega
     have hassoc : row * limit + k - 1 = row * limit + (k - 1) := by omega
-    have hstep : row * limit + (k - 1) < row * limit + limit :=
-      Nat.add_lt_add_left hk' (row * limit)
+    have hbound : (row + 1) * limit ≤ inputCount * limit := by
+      exact Nat.mul_le_mul_right limit (Nat.succ_le_of_lt hrow)
+    have hstep : row * limit + (k - 1) < (row + 1) * limit := by
+      rw [Nat.succ_mul]
+      exact Nat.add_lt_add_left hk' (row * limit)
     rw [hassoc]
-    exact lt_trans hstep hrowMul
+    exact lt_of_lt_of_le hstep hbound
   · have hassoc : row * limit + k - 1 = row * limit + (k - 1) := by omega
     have hNat : nextVar + (row * limit + (k - 1)) + 1 =
         nextVar + row * limit + k := by omega
@@ -115,10 +118,9 @@ theorem thresholdVar_fresh_from_input {nextVar limit row k : Nat}
     input.natAbs ≠ (thresholdVar nextVar limit row k).natAbs := by
   have hnat : nextVar < nextVar + row * limit + k := by omega
   have hvar : nextVar < (thresholdVar nextVar limit row k).natAbs := by
-    have hnonneg : (0 : Int) ≤ thresholdVar nextVar limit row k := by
-      simp [thresholdVar]
-    rw [Int.natAbs_of_nonneg hnonneg]
-    simpa [thresholdVar] using hnat
+    change nextVar < (Int.ofNat (nextVar + row * limit + k)).natAbs
+    rw [Int.natAbs_of_nonneg (Int.natCast_nonneg _)]
+    exact hnat
   omega
 
 /-- The four-clause DIMACS gate agrees with the Boolean recurrence when all
