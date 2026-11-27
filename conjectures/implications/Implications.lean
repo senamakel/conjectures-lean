@@ -29,6 +29,7 @@ import Implications.C4SeedCertificates
 import Implications.SmoothGapCounting
 import Implications.SmoothGapInfinitude
 import Implications.SplitGraphPath
+import Implications.SplitGraphSmallRows
 import Implications.C4VertexExtension
 import Implications.WilfPatternSwap
 import Implications.WilfTwoWindowOrder
