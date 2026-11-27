@@ -736,8 +736,10 @@ theorem twoHitGapCount_proportion_tendsto_zero :
           have hp := Nat.add_two_le_nth_prime n
           change b ≤ Nat.nth Nat.Prime n
           omega)))
-    convert (tendsto_const_nhds.div_atTop hll).const_mul 64 using 1 <;>
-      field_simp <;> ring
+    have hinv : Tendsto (fun n : ℕ =>
+        (Real.log (Real.log (primeAt n : ℝ)))⁻¹) atTop (nhds 0) :=
+      tendsto_inv_atTop_zero.comp hll
+    simpa [div_eq_mul_inv, mul_comm] using hinv.const_mul 64
   have hsum := hfirst.add eventually_twoHitGapCount_tail_tendsto_zero
   apply squeeze_zero' (Eventually.of_forall (fun n => by positivity)) (by
     filter_upwards [eventually_twoHitGapCount_bound] with n hn
