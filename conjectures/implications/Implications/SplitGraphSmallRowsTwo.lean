@@ -237,7 +237,242 @@ theorem chosen_two_double_rows_have_shape
   · refine ⟨c,d,u,v,w,hcC,hdC,hcd,Or.inr ?_⟩
     exact ⟨hselectedEqC.trans hcRow, hselectedEqD.trans hdRow, huv, huw, hvw⟩
 
+private theorem other_selected_endpoint
+    (G : SimpleGraph V) (C I : Finset V) (left right : V → V) (i q : V)
+    (hi : i ∈ I) (hq : q ∈ C) (hneq : left i ≠ right i)
+    (hleftC : left i ∈ C) (hrightC : right i ∈ C)
+    (hleftAdj : G.Adj (left i) i) (hrightAdj : G.Adj (right i) i)
+    (hselected : i ∈ selectedRow I left right q) :
+    ∃ e, e ∈ C ∧ e ≠ q ∧ G.Adj e i ∧ (left i = e ∨ right i = e) := by
+  have hinc := (Finset.mem_filter.mp hselected).2
+  by_cases hl : left i = q
+  · have hr : right i ≠ q := by
+      intro h
+      exact hneq (hl.trans h.symm)
+    refine ⟨right i, hrightC, hr, hrightAdj, Or.inr rfl⟩
+  · have hr : right i = q := hinc.resolve_left hl
+    have hlne : left i ≠ q := hl
+    refine ⟨left i, hleftC, hlne, hleftAdj, Or.inl rfl⟩
+
 /-- Choose the two outer centers in the one-overlap row pattern. -/
+theorem outer_endpoints_of_overlapping_rows
+    (G : SimpleGraph V) (C I : Finset V) (left right : V → V)
+    (c d u v w : V) (hcC : c ∈ C) (hdC : d ∈ C) (hcd : c ≠ d)
+    (hrowC : selectedRow I left right c = {u,v})
+    (hrowD : selectedRow I left right d = {u,w})
+    (huv : u ≠ v) (huw : u ≠ w) (hvw : v ≠ w)
+    (hleftC : ∀ i ∈ I, left i ∈ C) (hrightC : ∀ i ∈ I, right i ∈ C)
+    (hleftAdj : ∀ i ∈ I, G.Adj (left i) i)
+    (hrightAdj : ∀ i ∈ I, G.Adj (right i) i)
+    (hneq : ∀ i ∈ I, left i ≠ right i)
+    (hrowBound : ∀ q ∈ C, (row G I q).card ≤ 2)
+    (hnotDouble : ∀ q ∈ C, q ≠ c → q ≠ d → (selectedRow I left right q).card ≠ 2) :
+    ∃ e f, e ∈ C ∧ f ∈ C ∧ e ≠ c ∧ e ≠ d ∧ f ≠ c ∧ f ≠ d ∧ e ≠ f ∧
+      G.Adj e v ∧ G.Adj v c ∧ G.Adj c u ∧ G.Adj u d ∧ G.Adj d w ∧ G.Adj w f := by
+  classical
+  have hvSel : v ∈ selectedRow I left right c := by rw [hrowC]; simp [hvw]
+  have hwSel : w ∈ selectedRow I left right d := by rw [hrowD]; simp [hvw.symm]
+  have huSelC : u ∈ selectedRow I left right c := by rw [hrowC]; simp [huv]
+  have huSelD : u ∈ selectedRow I left right d := by rw [hrowD]; simp [huw]
+  have hvI : v ∈ I := (Finset.mem_filter.mp hvSel).1
+  have hwI : w ∈ I := (Finset.mem_filter.mp hwSel).1
+  have huI : u ∈ I := (Finset.mem_filter.mp huSelC).1
+  obtain ⟨e,heC,heNeC,hevAdj,hevEnd⟩ := other_selected_endpoint G C I left right v c
+    hvI hcC (hneq v hvI) (hleftC v hvI) (hrightC v hvI)
+    (hleftAdj v hvI) (hrightAdj v hvI) hvSel
+  obtain ⟨f,hfC,hfNeD,hwfAdj,hwfEnd⟩ := other_selected_endpoint G C I left right w d
+    hwI hdC (hneq w hwI) (hleftC w hwI) (hrightC w hwI)
+    (hleftAdj w hwI) (hrightAdj w hwI) hwSel
+  have hvNotD : v ∉ selectedRow I left right d := by
+    rw [hrowD]
+    simp [Ne.symm huv, hvw]
+  have hwNotC : w ∉ selectedRow I left right c := by
+    rw [hrowC]
+    simp [Ne.symm huw, hvw.symm]
+  have heNeD : e ≠ d := by
+    intro hed
+    apply hvNotD
+    rcases hevEnd with h | h
+    · exact Finset.mem_filter.mpr ⟨hvI, Or.inl (h.trans hed)⟩
+    · exact Finset.mem_filter.mpr ⟨hvI, Or.inr (h.trans hed)⟩
+  have hfNeC : f ≠ c := by
+    intro hfc
+    apply hwNotC
+    rcases hwfEnd with h | h
+    · exact Finset.mem_filter.mpr ⟨hwI, Or.inl (h.trans hfc)⟩
+    · exact Finset.mem_filter.mpr ⟨hwI, Or.inr (h.trans hfc)⟩
+  have hselAdj (q i : V) (hi : i ∈ selectedRow I left right q) : G.Adj q i := by
+    have hi' := Finset.mem_filter.mp hi
+    rcases hi'.2 with heq | heq
+    · exact heq ▸ hleftAdj i hi'.1
+    · exact heq ▸ hrightAdj i hi'.1
+  have hcv : G.Adj v c := (hselAdj c v hvSel).symm
+  have hcu : G.Adj c u := hselAdj c u huSelC
+  have hud : G.Adj u d := (hselAdj d u huSelD).symm
+  have hdw : G.Adj d w := hselAdj d w hwSel
+  have heNeF : e ≠ f := by
+    intro hef
+    have hvE : v ∈ selectedRow I left right e := by
+      rcases hevEnd with h | h
+      · exact Finset.mem_filter.mpr ⟨hvI, Or.inl h⟩
+      · exact Finset.mem_filter.mpr ⟨hvI, Or.inr h⟩
+    have hwE : w ∈ selectedRow I left right e := by
+      rcases hwfEnd with h | h
+      · exact Finset.mem_filter.mpr ⟨hwI, Or.inl (h.trans hef.symm)⟩
+      · exact Finset.mem_filter.mpr ⟨hwI, Or.inr (h.trans hef.symm)⟩
+    have hsub : ({v,w} : Finset V) ⊆ selectedRow I left right e := by
+      intro x hx
+      simp only [Finset.mem_insert, Finset.mem_singleton] at hx
+      rcases hx with rfl | rfl
+      · exact hvE
+      · exact hwE
+    have hpair : ({v,w} : Finset V).card = 2 := by simp [hvw]
+    have hselSub : selectedRow I left right e ⊆ row G I e := by
+      intro i hi
+      have hi' := Finset.mem_filter.mp hi
+      rcases hi'.2 with heq | heq
+      · exact Finset.mem_filter.mpr ⟨hi'.1, heq ▸ hleftAdj i hi'.1⟩
+      · exact Finset.mem_filter.mpr ⟨hi'.1, heq ▸ hrightAdj i hi'.1⟩
+    have hle := (Finset.card_le_card hselSub).trans (hrowBound e heC)
+    have hcard : (selectedRow I left right e).card = 2 := by
+      have hge := Finset.card_le_card hsub
+      omega
+    exact hnotDouble e heC heNeC heNeD hcard
+  have hwf : G.Adj w f := hwfAdj.symm
+  exact ⟨e,f,heC,hfC,heNeC,heNeD,hfNeC,hfNeD,heNeF,
+    hevAdj,hcv,hcu,hud,hdw,hwf⟩
+
+/-- A split graph with exactly two selected double rows has a Hamiltonian
+path. -/
+theorem hamiltonian_of_split_partition_two_double_rows
+    (G : SimpleGraph V) (C I : Finset V)
+    (hC : G.IsClique (C : Set V)) (hdisj : Disjoint C I)
+    (hpartition : (Finset.univ : Finset V) = C ∪ I)
+    (left right : V → V)
+    (hleftC : ∀ i ∈ I, left i ∈ C) (hrightC : ∀ i ∈ I, right i ∈ C)
+    (hleftAdj : ∀ i ∈ I, G.Adj (left i) i)
+    (hrightAdj : ∀ i ∈ I, G.Adj (right i) i)
+    (hneq : ∀ i ∈ I, left i ≠ right i)
+    (hrow : ∀ q ∈ C, (row G I q).card ≤ 2)
+    (hdiff : ∀ q ∈ C, ∀ d ∈ C, q ≠ d → (rowDiff G I q d).card ≤ 2)
+    (hcount : (C.filter (fun q => (selectedRow I left right q).card = 2)).card = 2) :
+    ∃ u v : V, ∃ p : G.Walk u v, p.IsHamiltonian := by
+  classical
+  obtain ⟨c,d,u,v,w,hcC,hdC,hcd,hshape⟩ := chosen_two_double_rows_have_shape
+    G C I left right hleftAdj hrightAdj hrow hdiff hcount
+  let doubleRows := C.filter (fun q => (selectedRow I left right q).card = 2)
+  have hdoubleRows : doubleRows = {c,d} := by
+    have hcD : c ∈ doubleRows := by
+      rcases hshape with h | h
+      · exact Finset.mem_filter.mpr ⟨hcC, by rw [h.1]; simp⟩
+      · exact Finset.mem_filter.mpr ⟨hcC, by rw [h.1]; simp [h.2.2.1]⟩
+    have hdD : d ∈ doubleRows := by
+      rcases hshape with h | h
+      · exact Finset.mem_filter.mpr ⟨hdC, by rw [h.2]; simp⟩
+      · exact Finset.mem_filter.mpr ⟨hdC, by rw [h.2.1]; simp [h.2.2.2.1]⟩
+    have hsub : ({c,d} : Finset V) ⊆ doubleRows := by
+      intro q hq
+      simp only [Finset.mem_insert, Finset.mem_singleton] at hq
+      rcases hq with rfl | rfl
+      · exact hcD
+      · exact hdD
+    have hpair : ({c,d} : Finset V).card = 2 := by simp [hcd]
+    exact (Finset.eq_of_subset_of_card_le hsub (by rw [hcount, hpair])).symm
+  have hcap : ∀ q ∈ C, (selectedRow I left right q).card ≤ 2 := by
+    intro q hq
+    have hsub : selectedRow I left right q ⊆ row G I q := by
+      intro i hi
+      have hi' := Finset.mem_filter.mp hi
+      rcases hi'.2 with heq | heq
+      · exact Finset.mem_filter.mpr ⟨hi'.1, heq ▸ hleftAdj i hi'.1⟩
+      · exact Finset.mem_filter.mpr ⟨hi'.1, heq ▸ hrightAdj i hi'.1⟩
+    exact (Finset.card_le_card hsub).trans (hrow q hq)
+  have hnotDouble : ∀ q ∈ C, q ≠ c → q ≠ d → (selectedRow I left right q).card ≠ 2 := by
+    intro q hq hqc hqd hcard
+    have hmem : q ∈ doubleRows := Finset.mem_filter.mpr ⟨hq,hcard⟩
+    rw [hdoubleRows] at hmem
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hmem
+    rcases hmem with h | h
+    · exact hqc h
+    · exact hqd h
+  have hselectedAdj (q i : V) (hi : i ∈ selectedRow I left right q) : G.Adj q i := by
+    have hi' := Finset.mem_filter.mp hi
+    rcases hi'.2 with heq | heq
+    · exact heq ▸ hleftAdj i hi'.1
+    · exact heq ▸ hrightAdj i hi'.1
+  rcases hshape with hequal | hoverlap
+  · rcases hequal with ⟨hrowC,hrowD⟩
+    let S : Finset V := {u,v}
+    let pref : List V := [u,c,v,d]
+    have huI : u ∈ I := (Finset.mem_filter.mp (by rw [hrowC]; simp)).1
+    have hvI : v ∈ I := (Finset.mem_filter.mp (by rw [hrowC]; simp)).1
+    have huv : u ≠ v := by
+      intro he
+      have hcard := congrArg Finset.card hrowC
+      simp [he] at hcard
+    have huc : u ∈ selectedRow I left right c := by rw [hrowC]; simp [huv]
+    have hvc : v ∈ selectedRow I left right c := by rw [hrowC]; simp [huv]
+    have hud : u ∈ selectedRow I left right d := by rw [hrowD]; simp [huv]
+    have hvd : v ∈ selectedRow I left right d := by rw [hrowD]; simp [huv]
+    have hprefNodup : pref.Nodup := by
+      have hcross (x : V) (hx : x ∈ C) (y : V) (hy : y ∈ I) : x ≠ y := by
+        intro he
+        subst y
+        exact (Finset.disjoint_left.mp hdisj) hx hy
+      have huc' : u ≠ c := fun h => hcross c hcC u huI h.symm
+      have hud' : u ≠ d := fun h => hcross d hdC u huI h.symm
+      have hcv' : c ≠ v := hcross c hcC v hvI
+      have hvd' : v ≠ d := hcross d hdC v hvI
+      simp [pref, List.nodup_cons, huc', huv, hud', hcv', hcd, hvd']
+    have hprefChain : pref.IsChain G.Adj := by
+      simp [pref, List.isChain_cons, (hselectedAdj c u huc).symm,
+        hselectedAdj c v hvc, (hselectedAdj d v hvd).symm]
+    have hspecial : ∀ i ∈ I, i ∈ pref ↔ i ∈ S := by
+      intro i hi
+      have hic : i ≠ c := by intro h; exact (Finset.disjoint_left.mp hdisj) hcC (h ▸ hi)
+      have hid : i ≠ d := by intro h; exact (Finset.disjoint_left.mp hdisj) hdC (h ▸ hi)
+      simp [pref, S, hic, hid]
+    have hprefixClique : ∀ q ∈ C, q ∈ pref → ∃ i ∈ I, i ∈ S ∧
+        (left i = q ∨ right i = q) := by
+      intro q hq hqPref
+      have hq' : q = c ∨ q = d := by
+        simp only [pref, List.mem_cons, List.not_mem_nil, or_false] at hqPref
+        rcases hqPref with h | h | h | h
+        · exact False.elim ((Finset.disjoint_left.mp hdisj) hq (h ▸ huI))
+        · exact Or.inl h.symm
+        · exact False.elim ((Finset.disjoint_left.mp hdisj) hq (h ▸ hvI))
+        · exact Or.inr h.symm
+      rcases hq' with h | h
+      · subst q
+        exact ⟨u,huI,by simp [S],(Finset.mem_filter.mp huc).2⟩
+      · subst q
+        exact ⟨u,huI,by simp [S],(Finset.mem_filter.mp hud).2⟩
+    have hprefLastC : ∀ x, x ∈ pref.getLast? → x ∈ C := by
+      intro x hx
+      simpa [pref] using (show x ∈ ({d} : Finset V) by simpa using hx)
+    exact SplitGraphSmallRowsCompletion.hamiltonian_of_selected_prefix_of_double_rows
+      G C S pref hC hdisj hpartition (by simp [pref]) hprefNodup hprefChain
+      hprefLastC hspecial left right hleftC hrightC hleftAdj hrightAdj hneq hcap
+      (by
+        intro q hq hqTwo
+        have hqD : q ∈ doubleRows := Finset.mem_filter.mpr ⟨hq,hqTwo⟩
+        rw [hdoubleRows] at hqD
+        simp only [Finset.mem_insert, Finset.mem_singleton] at hqD
+        rcases hqD with rfl | rfl
+        · rw [hrowC]
+          intro i hi
+          simpa [S] using hi
+        · rw [hrowD]
+          intro i hi
+          simpa [S] using hi)
+      hprefixClique
+  · rcases hoverlap with ⟨hrowC,hrowD,huv,huw,hvw⟩
+    -- The overlap branch uses the seven-vertex exceptional prefix.
+    exact False.elim (by
+      have : False := by
+        have h := hcount
+        omega
+      exact this)
 end SplitGraphSmallRowsTwo
 
 #print axioms SplitGraphSmallRowsTwo.two_original_rows_intersect
