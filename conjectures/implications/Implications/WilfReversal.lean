@@ -48,18 +48,15 @@ noncomputable def reversePermEquiv (n : ℕ) :
     ext i
     simp
 
+private def windowIndex {n : ℕ} (s : ℕ) (hs : s + 7 < n) (i : Fin 8) : Fin n :=
+  ⟨s + i.val, Nat.lt_of_le_of_lt (Nat.add_le_add_left (Nat.le_of_lt_succ i.isLt) s) hs⟩
+
 private theorem reverseIndex_eq {n : ℕ} (s : ℕ) (hs : s + 7 < n)
     (i : Fin 8) :
-    Fin.revPerm ⟨s + (Fin.rev i).val, by
-        have hi : (Fin.rev i).val ≤ 7 := Nat.le_of_lt_succ (Fin.rev i).isLt
-        omega⟩ =
-      ⟨n - 8 - s + i.val, by have hi := i.isLt; omega⟩ := by
+    Fin.revPerm (windowIndex s hs (Fin.rev i)) =
+      windowIndex (n - 8 - s) (by omega) i := by
   have hi : (Fin.rev i).val = 7 - i.val := by
     simp [Fin.rev]
-    omega
-  have hbound : s + (Fin.rev i).val < n := by
-    have hiv : (Fin.rev i).val < 8 := (Fin.rev i).isLt
-    omega
   have hn : n - 1 - (s + (Fin.rev i).val) = n - 8 - s + i.val := by
     rw [hi]
     omega
@@ -68,8 +65,8 @@ private theorem reverseIndex_eq {n : ℕ} (s : ℕ) (hs : s + 7 < n)
 
 private theorem reverseIndex_rev_eq {n : ℕ} (s : ℕ) (hs : s + 7 < n)
     (i : Fin 8) :
-    Fin.revPerm ⟨s + i.val, by have hi : i.val ≤ 7 := Nat.le_of_lt_succ i.isLt; omega⟩ =
-      ⟨n - 8 - s + (Fin.rev i).val, by have hi := (Fin.rev i).isLt; omega⟩ := by
+    Fin.revPerm (windowIndex s hs i) =
+      windowIndex (n - 8 - s) (by omega) (Fin.rev i) := by
   have h := reverseIndex_eq s hs (Fin.rev i)
   simpa using h
 
@@ -87,12 +84,8 @@ private theorem containsAt_reverse_iff {n : ℕ} (π : Equiv.Perm (Fin n))
     have h := hrev (Fin.rev i) (Fin.rev j)
     have hi := reverseIndex_eq s.val hs i
     have hj := reverseIndex_eq s.val hs j
-    change (π (Fin.revPerm ⟨s.val + (Fin.rev i).val, by
-        have hk := (Fin.rev i).isLt
-        omega⟩) <
-      π (Fin.revPerm ⟨s.val + (Fin.rev j).val, by
-        have hk := (Fin.rev j).isLt
-        omega⟩)) ↔
+    change (π (Fin.revPerm (windowIndex s.val hs (Fin.rev i)) <
+      π (Fin.revPerm (windowIndex s.val hs (Fin.rev j)))) ↔
       reversePattern p (Fin.rev i) < reversePattern p (Fin.rev j) at h
     rw [hi, hj] at h
     simpa [reversePattern, Fin.revPerm_apply] using h
@@ -104,12 +97,8 @@ private theorem containsAt_reverse_iff {n : ℕ} (π : Equiv.Perm (Fin n))
     have hj := reverseIndex_eq s.val hs j
     have hir := reverseIndex_rev_eq s.val hs i
     have hjr := reverseIndex_rev_eq s.val hs j
-    have hcmp : (π (Fin.revPerm ⟨s.val + i.val, by
-        have hk := i.isLt
-        omega⟩) <
-      π (Fin.revPerm ⟨s.val + j.val, by
-        have hk := j.isLt
-        omega⟩)) ↔ p (Fin.rev i) < p (Fin.rev j) := by
+    have hcmp : (π (Fin.revPerm (windowIndex s.val hs i)) <
+      π (Fin.revPerm (windowIndex s.val hs j))) ↔ p (Fin.rev i) < p (Fin.rev j) := by
       simpa [hir, hjr, Fin.rev, Fin.revPerm_apply] using h'
     simpa [reversePattern, Fin.revPerm_apply] using hcmp
 
@@ -127,7 +116,9 @@ theorem occurrenceSet_reverse {n : ℕ} (p : Fin 8 → Fin 8)
     have hsource := (containsAt_reverse_iff π p s hv).mp hc
     refine Finset.mem_map.mpr ⟨reverseStartEquiv n s, ?_, ?_⟩
     · have hstart : (reverseStartEquiv n s).val = n - 8 - s.val := by
-        simp [reverseStartEquiv, reverseStartFun, hv]
+        change (reverseStartFun s).val = n - 8 - s.val
+        rw [reverseStartFun, dif_pos hv]
+        rfl
       exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, by simpa [hstart] using hsource⟩
     · exact reverseStartFun_involutive s
   · intro hs
