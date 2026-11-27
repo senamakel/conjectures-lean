@@ -893,5 +893,6 @@ end SplitGraphPath
 #print axioms SplitGraphPath.hamiltonian_of_split_partition_two_endpoints
 #print axioms SplitGraphPath.exists_distinct_row_attachments
 #print axioms SplitGraphPath.hamiltonian_of_split_partition_two_outsiders
+#print axioms SplitGraphPath.hamiltonian_of_split_partition_two_outsiders_of_rows
 #print axioms SplitGraphPath.hamiltonian_of_split_partition_row_bounds
 #print axioms SplitGraphPath.hamiltonian_of_split_partition_of_inducedTreeBound
