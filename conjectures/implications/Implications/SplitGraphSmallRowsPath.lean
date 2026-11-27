@@ -1,4 +1,4 @@
-import Implications.SplitGraphSmallRows
+import Implications.SplitGraphTrees
 
 namespace SplitGraphSmallRowsPath
 
@@ -6,6 +6,7 @@ open SplitGraphTrees
 
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
+omit [Fintype V] in
 private theorem hamiltonian_of_list
     (G : SimpleGraph V) (l : List V) (hne : l ≠ []) (hnodup : l.Nodup)
     (hchain : l.IsChain G.Adj) (hcover : ∀ v : V, v ∈ l) :
@@ -21,6 +22,7 @@ private theorem hamiltonian_of_list
     exact hcover v
   exact ⟨_, _, p, hpath.isHamiltonian_of_mem hvertices⟩
 
+omit [Fintype V] in
 private theorem clique_list_chain
     (G : SimpleGraph V) (C : Finset V) (hC : G.IsClique (C : Set V))
     (l : List V) (hnodup : l.Nodup) (hsub : ∀ x ∈ l, x ∈ C) : l.IsChain G.Adj := by
@@ -33,7 +35,7 @@ private theorem clique_list_chain
     subst y
     have hcount := (List.nodup_iff_count_le_one.mp hnodup) x
     rw [heq] at hcount
-    simp [List.count_append, List.count_cons] at hcount
+    simp [List.count_append] at hcount
     omega
   exact hC (hsub x hx) (hsub y hy) hxy
 
@@ -303,5 +305,38 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
     rw [hnil] at hvPath
     simp at hvPath
   exact hamiltonian_of_list G pathList hne hpath_nodup hpath_chain hcover
+
+/-- If every clique vertex has at most one independent neighbor, the two
+neighbors of each independent vertex can be chosen without any shared endpoint. -/
+theorem hamiltonian_of_split_partition_rows_le_one
+    (G : SimpleGraph V) (C I : Finset V)
+    (hC : G.IsClique (C : Set V)) (hdisj : Disjoint C I)
+    (hpartition : (Finset.univ : Finset V) = C ∪ I)
+    (hrows : ∀ c ∈ C, (row G I c).card ≤ 1)
+    (hdeg : ∀ i ∈ I, ∃ c ∈ C, ∃ d ∈ C, c ≠ d ∧ G.Adj c i ∧ G.Adj d i)
+    (huniv : (Finset.univ : Finset V).Nonempty) :
+    ∃ u v : V, ∃ p : G.Walk u v, p.IsHamiltonian := by
+  classical
+  obtain ⟨v, hv⟩ := huniv
+  have hchoice (i : V) : ∃ c d, i ∈ I →
+      c ∈ C ∧ d ∈ C ∧ c ≠ d ∧ G.Adj c i ∧ G.Adj d i := by
+    by_cases hi : i ∈ I
+    · obtain ⟨c, hc, d, hd, hne, hci, hdi⟩ := hdeg i hi
+      exact ⟨c, d, fun _ => ⟨hc, hd, hne, hci, hdi⟩⟩
+    · exact ⟨v, v, fun h => (hi h).elim⟩
+  choose left right hselected using hchoice
+  apply hamiltonian_of_split_partition_selected_rows_le_one G C I hC hdisj hpartition
+    left right (fun i hi => (hselected i hi).1) (fun i hi => (hselected i hi).2.1)
+    (fun i hi => (hselected i hi).2.2.2.1) (fun i hi => (hselected i hi).2.2.2.2)
+    (fun i hi => (hselected i hi).2.2.1) _ ⟨v, hv⟩
+  intro c hc
+  apply le_trans (Finset.card_le_card (t := row G I c) ?_) (hrows c hc)
+  intro i hi
+  obtain ⟨hi, hleft | hright⟩ := Finset.mem_filter.mp hi
+  · exact Finset.mem_filter.mpr ⟨hi, hleft ▸ (hselected i hi).2.2.2.1⟩
+  · exact Finset.mem_filter.mpr ⟨hi, hright ▸ (hselected i hi).2.2.2.2⟩
+
+#print axioms hamiltonian_of_split_partition_selected_rows_le_one
+#print axioms hamiltonian_of_split_partition_rows_le_one
 
 end SplitGraphSmallRowsPath
