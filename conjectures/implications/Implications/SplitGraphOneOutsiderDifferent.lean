@@ -134,26 +134,27 @@ theorem core_path_ending_at_each_independent
   have hya : G.Adj y a := (Finset.mem_filter.mp (show a ∈ row G I y by rw [hyrow]; simp [hI])).2
   have hyc : G.Adj y c := (Finset.mem_filter.mp (show c ∈ row G I y by rw [hyrow]; simp [hI])).2
   have hyz : G.Adj y z := (Finset.mem_filter.mp (show z ∈ row G I y by rw [hyrow]; simp [hI])).2
-  have hcoverA (l : List V) :
+  have hcoverA (l : List V) (ha : a ∈ l) (hb : b ∈ l)
+      (hc : c ∈ l) (hz : z ∈ l) :
       ∀ q ∈ I, q ∈ l := by
     intro q hq
     have hq' : q = a ∨ q = b ∨ q = c ∨ q = z := by
       simpa [hI, Finset.mem_insert, Finset.mem_singleton, or_comm, or_left_comm, or_assoc] using hq
     rcases hq' with hqa | hqb | hqc | hqz
     · subst q
-      simp
+      exact ha
     · subst q
-      simp
+      exact hb
     · subst q
-      simp
+      exact hc
     · subst q
-      simp
+      exact hz
   rcases hit with hia | hib | hic | hiz
   · subst i
     refine ⟨[b, x, z, y, c, t, a], hcoreNodup.1, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · simp [List.isChain_cons, hxb.symm, hxz, hyz.symm, hyc, hct.symm, hat]
     · simp
-    · exact hcoverA _
+    · exact hcoverA _ (by simp) (by simp) (by simp) (by simp)
     · simp
     · simp
     · simp
@@ -161,7 +162,7 @@ theorem core_path_ending_at_each_independent
     refine ⟨[a, t, c, y, z, x, b], hcoreNodup.2.1, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · simp [List.isChain_cons, hat.symm, hct, hyc.symm, hyz, hxz.symm, hxb]
     · simp
-    · exact hcoverA _
+    · exact hcoverA _ (by simp) (by simp) (by simp) (by simp)
     · simp
     · simp
     · simp
@@ -169,7 +170,7 @@ theorem core_path_ending_at_each_independent
     refine ⟨[b, t, a, x, z, y, c], hcoreNodup.2.2.1, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · simp [List.isChain_cons, hbt.symm, hat, hxa.symm, hxz, hyz.symm, hyc]
     · simp
-    · exact hcoverA _
+    · exact hcoverA _ (by simp) (by simp) (by simp) (by simp)
     · simp
     · simp
     · simp
@@ -177,7 +178,7 @@ theorem core_path_ending_at_each_independent
     refine ⟨[b, x, a, t, c, y, z], hcoreNodup.2.2.2, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · simp [List.isChain_cons, hxb.symm, hxa, hat.symm, hct, hyc.symm, hyz]
     · simp
-    · exact hcoverA _
+    · exact hcoverA _ (by simp) (by simp) (by simp) (by simp)
     · simp
     · simp
     · simp
