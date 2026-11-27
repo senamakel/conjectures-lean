@@ -23,8 +23,14 @@ def addVertex {V : Type*} (G : SimpleGraph V) (s : Set V) : SimpleGraph (Option 
       | none, some x => x ∈ s
       | some x, none => x ∈ s
       | none, none => False
-    symm := by aesop_graph
-    loopless := by aesop_graph }
+    symm := by
+      constructor
+      intro a b hab
+      cases a <;> cases b <;> simp_all [G.symm]
+    loopless := by
+      constructor
+      intro a ha
+      cases a <;> simp_all [G.loopless] }
 
 @[simp] theorem addVertex_adj_some_some {V : Type*} (G : SimpleGraph V) (s : Set V)
     (x y : V) : (addVertex G s).Adj (some x) (some y) ↔ G.Adj x y := Iff.rfl
@@ -43,7 +49,7 @@ theorem addVertex_c4Free_iff {V : Type*} (G : SimpleGraph V) (s : Set V) :
     · intro x y z w hxy hzw hxz hyz
       exact h (x := some x) (y := some y) (z := some z) (w := some w)
         (by simpa using hxy) (by simpa using hzw) hxz hyz
-    · intro x y z hxy hx hsx hsy hcommon
+    · intro x y z hxy hsx hsy hcommon
       have hnew : (addVertex G s).Adj none (some x) := by simp [hsx]
       have hnew' : (addVertex G s).Adj none (some y) := by simp [hsy]
       have hold : (addVertex G s).Adj (some x) (some z) := by simpa using hcommon.1
@@ -53,7 +59,7 @@ theorem addVertex_c4Free_iff {V : Type*} (G : SimpleGraph V) (s : Set V) :
       exact hnot ⟨hold, hold'⟩
   · rintro ⟨hG, hS⟩ x y z w hxy hzw hxz hyz htwo
     cases x <;> cases y <;> cases z <;> cases w <;>
-      simp_all [addVertex, C4Free] <;> aesop
+      simp_all [addVertex] <;> aesop
 
 #print axioms addVertex_c4Free_iff
 

@@ -23,7 +23,7 @@ theorem sum_deletionEdgeCount (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
     (∑ v : Fin 42, deletionEdgeCount G v) = 40 * G.edgeFinset.card := by
   classical
   unfold deletionEdgeCount
-  rw [Finset.sum_sub_distrib]
+  simp only [Finset.sum_sub_distrib]
   have hdeg := G.sum_degrees_eq_twice_card_edges
   have hconst : (∑ _v : Fin 42, G.edgeFinset.card) = 42 * G.edgeFinset.card := by simp
   omega
