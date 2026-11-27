@@ -53,8 +53,7 @@ theorem pairwise_intersecting_two_sets
           subst u
           exact huv h
         · subst v
-          have hpair : ({u, b} : Finset α) = {b, u} := by ext q; simp [or_comm]
-          exact hBeq.trans hpair
+          simpa [Finset.pair_comm] using hBeq
     obtain ⟨c, hbc, hBeq'⟩ := hchoose
     have hca : c ≠ a := by
       intro h
@@ -99,10 +98,9 @@ theorem pairwise_intersecting_two_sets
         · exact haD
         · exact hcD
         · exact hq
+      have haq : a ≠ q := by intro h; exact hqa h.symm
       have hcardThree : ({a, c, q} : Finset α).card = 3 := by
-        rw [Finset.card_insert_of_notMem (by simpa using hqa.symm)]
-        rw [Finset.card_insert_of_notMem (by simpa using hca.symm)]
-        simp
+        simp [hca.symm, hqc, haq]
       have := Finset.card_le_card hthree
       rw [hcard D hD] at this
       omega
@@ -115,7 +113,8 @@ theorem pairwise_intersecting_two_sets
       intro q hq
       rw [hAeq, hBeq', hDeq] at hq
       simp only [Finset.mem_insert, Finset.mem_singleton] at hq
-      simp_all [hab, hca.symm, hbc]
+      rcases hq with ⟨ha | hb, hb' | hc, ha' | hc'⟩ <;>
+        simp_all [hab, hca.symm, hbc]
     refine Or.inr ⟨a, b, c, hab, hca.symm, hbc, ?_⟩
     intro T hT
     by_contra hsub
