@@ -167,3 +167,46 @@ theorem four_root_witness_weighted_count
 end C4RootWitnessCountIdentity
 
 #print axioms C4RootWitnessCountIdentity.four_root_witness_weighted_count
+
+/-- The local incidence identities imply the global outer-edge count. This
+form is independent of how the structural classes were constructed, so the
+graph-specific lemmas can feed it directly. -/
+theorem outer_edge_count_from_local_counts
+    {V : Type*} [Fintype V] [DecidableEq V]
+    (G : SimpleGraph V) [DecidableRel G.Adj] (S O : Finset V)
+    (hOcard : O.card = 12)
+    (hSlocal : ∀ x ∈ S,
+      (G.neighborFinset x ∩ O).card = (G.neighborFinset x ∩ S).card)
+    (hOlocal : ∀ x ∈ O,
+      (G.neighborFinset x ∩ O).card = 3 + (G.neighborFinset x ∩ S).card) :
+    Implications.C4PolarityDeletion.inducedEdgeCount G O =
+      18 + Implications.C4PolarityDeletion.inducedEdgeCount G S := by
+  have hcross := cross_neighbor_sum_comm G S O
+  have hsumS : (∑ x ∈ S, (G.neighborFinset x ∩ O).card) =
+      2 * Implications.C4PolarityDeletion.inducedEdgeCount G S := by
+    calc
+      _ = ∑ x ∈ S, (G.neighborFinset x ∩ S).card := by
+        apply Finset.sum_congr rfl
+        intro x hx
+        exact hSlocal x hx
+      _ = 2 * Implications.C4PolarityDeletion.inducedEdgeCount G S :=
+        within_neighbor_sum_eq G S
+  have hsumO : (∑ x ∈ O, (G.neighborFinset x ∩ O).card) =
+      36 + 2 * Implications.C4PolarityDeletion.inducedEdgeCount G S := by
+    calc
+      _ = ∑ x ∈ O, (3 + (G.neighborFinset x ∩ S).card) := by
+        apply Finset.sum_congr rfl
+        intro x hx
+        exact hOlocal x hx
+      _ = 3 * O.card + ∑ x ∈ O, (G.neighborFinset x ∩ S).card := by
+        simp [Finset.sum_add_distrib, Nat.mul_comm]
+      _ = 36 + ∑ x ∈ S, (G.neighborFinset x ∩ O).card := by
+        rw [hOcard, cross_neighbor_sum_comm]
+        norm_num
+      _ = 36 + 2 * Implications.C4PolarityDeletion.inducedEdgeCount G S := by
+        rw [hsumS]
+  have hfinal := within_neighbor_sum_eq G O
+  rw [hsumO] at hfinal
+  omega
+
+#print axioms outer_edge_count_from_local_counts
