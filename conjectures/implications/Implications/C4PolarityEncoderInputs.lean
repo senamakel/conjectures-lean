@@ -47,7 +47,8 @@ private theorem countP_map_indicator {α : Type*} (l : List α) (P : α → Prop
     (l.map fun x => decide (P x)).countP id =
       (l.filter fun x => decide (P x)).length := by
   rw [List.countP_map]
-  simp only [Function.comp_apply, Bool.decide_eq_true_eq]
+  change List.countP (fun x => decide (P x)) l = _
+  rw [List.countP_eq_length_filter]
   rfl
 
 /-- The pair indicators count exactly the edges induced by the deletion set. -/
@@ -56,14 +57,13 @@ theorem orthogonal_pair_score_count (D : Finset (Fin 57)) :
       inducedEdgeCount graph D := by
   classical
   rw [List.countP_map]
-  have hlist := List.countP_eq_length_filter
-    (p := fun p : Fin 57 × Fin 57 => decide (p.1 ∈ D ∧ p.2 ∈ D))
-    orthogonalPairs
-  rw [hlist]
-  have hcardList := List.toFinset_card_of_nodup
-    ((orthogonalPairs.filter fun p => decide (p.1 ∈ D ∧ p.2 ∈ D)).Nodup)
-  rw [List.toFinset_filter, orthogonalPairs_toFinset] at hcardList
-  rw [← hcardList]
+  change List.countP (fun p : Fin 57 × Fin 57 => decide (p.1 ∈ D ∧ p.2 ∈ D))
+    orthogonalPairs = _
+  rw [List.countP_eq_length_filter]
+  have hnodup := orthogonalPairs_nodup.filter
+    (fun p : Fin 57 × Fin 57 => decide (p.1 ∈ D ∧ p.2 ∈ D))
+  rw [← List.toFinset_card_of_nodup hnodup]
+  rw [List.toFinset_filter, orthogonalPairs_toFinset]
   let H := graph.induce (D : Set (Fin 57))
   let T := orthogonalPairFinset.filter fun p => p.1 ∈ D ∧ p.2 ∈ D
   change T.card = H.edgeFinset.card
@@ -109,14 +109,13 @@ theorem absolute_score_count (D : Finset (Fin 57)) :
       (D ∩ absolute).card := by
   classical
   rw [countP_map_indicator]
-  rw [List.countP_eq_length_filter]
-  have hn := List.toFinset_card_of_nodup
-    ((absoluteIndices.filter fun i => decide (i ∈ D)).Nodup)
-  rw [List.toFinset_filter] at hn
-  rw [← hn]
-  ext i
-  simp [absoluteIndices, absolute, List.toFinset_filter, List.toFinset_finRange,
-    Finset.mem_filter]
+  have hnodup := (List.nodup_finRange 57).filter
+    (fun i : Fin 57 => decide (orthogonal i i))
+  have hfset : (absoluteIndices.filter fun i => decide (i ∈ D)).toFinset =
+      D ∩ absolute := by
+    ext i
+    simp [absoluteIndices, absolute, List.toFinset_filter, List.toFinset_finRange]
+  rw [← List.toFinset_card_of_nodup (hnodup.filter fun i => decide (i ∈ D)), hfset]
 
 /-- The Boolean score list has exactly the deletion score used in the edge
 count reduction: induced deleted edges plus deleted absolute points. -/
