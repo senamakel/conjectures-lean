@@ -18,6 +18,75 @@ private theorem other_labels_ne
   simp only [Finset.mem_insert, Finset.mem_singleton, not_or] at hk'
   exact ⟨hk'.1, hk'.2⟩
 
+/-- Translate the selected-row cardinalities for the one-overlap case into the
+exact incidence statements used by the path construction. -/
+private theorem selected_incidence_properties
+    (I : Finset V) (left right : V → V) (c i j : V)
+    (hi : i ∈ I) (hj : j ∈ I) (hij : i ≠ j)
+    (hci : left i = c ∨ right i = c) (hcj : left j = c ∨ right j = c)
+    (hcenterCard : (I.filter (fun k => left k = c ∨ right k = c)).card = 2)
+    (hrows : ∀ x ∈ Finset.univ, x ≠ c →
+      (I.filter (fun k => left k = x ∨ right k = x)).card ≤ 1) :
+    (∀ k ∈ I, (left k = c ∨ right k = c) ↔ k = i ∨ k = j) ∧
+    (∀ x ∈ Finset.univ, x ≠ c → ∀ k ∈ I, ∀ l ∈ I,
+      (left k = x ∨ right k = x) → (left l = x ∨ right l = x) → k = l) := by
+  classical
+  let row := I.filter (fun k => left k = c ∨ right k = c)
+  have hiRow : i ∈ row := Finset.mem_filter.mpr ⟨hi, hci⟩
+  have hjRow : j ∈ row := Finset.mem_filter.mpr ⟨hj, hcj⟩
+  have hrowEq : row = {i, j} := by
+    apply Finset.eq_of_subset_of_card_le
+    · intro k hk
+      by_contra hnot
+      have hkI := (Finset.mem_filter.mp hk).1
+      have hiNe : i ≠ k := by intro h; exact hnot (Or.inl h.symm)
+      have hjNe : j ≠ k := by intro h; exact hnot (Or.inr h.symm)
+      have htriple : ({i, j, k} : Finset V) ⊆ row := by
+        intro z hz
+        simp only [Finset.mem_insert, Finset.mem_singleton] at hz
+        rcases hz with rfl | rfl | rfl
+        · exact hiRow
+        · exact hjRow
+        · exact hk
+      have hcardTriple : ({i, j, k} : Finset V).card = 3 := by
+        simp [hij, hiNe, hjNe]
+      have hle := Finset.card_le_card htriple
+      rw [show row.card = 2 by simpa [row] using hcenterCard] at hle
+      omega
+    · rw [show row.card = 2 by simpa [row] using hcenterCard]
+      simp [hij]
+  have hcenter : ∀ k ∈ I, (left k = c ∨ right k = c) ↔ k = i ∨ k = j := by
+    intro k hk
+    constructor
+    · intro hkC
+      have : k ∈ row := Finset.mem_filter.mpr ⟨hk, hkC⟩
+      rw [hrowEq] at this
+      simpa using this
+    · intro hkC
+      rcases hkC with rfl | rfl
+      · exact hci
+      · exact hcj
+  have hunique : ∀ x ∈ Finset.univ, x ≠ c → ∀ k ∈ I, ∀ l ∈ I,
+      (left k = x ∨ right k = x) → (left l = x ∨ right l = x) → k = l := by
+    intro x hx hxne k hk l hl hki hli
+    by_contra hkl
+    let rowx := I.filter (fun q => left q = x ∨ right q = x)
+    have hkx : k ∈ rowx := Finset.mem_filter.mpr ⟨hk, hki⟩
+    have hlx : l ∈ rowx := Finset.mem_filter.mpr ⟨hl, hli⟩
+    have hpair : ({k, l} : Finset V) ⊆ rowx := by
+      intro q hq
+      simp only [Finset.mem_insert, Finset.mem_singleton] at hq
+      rcases hq with rfl | rfl
+      · exact hkx
+      · exact hlx
+    have htwo : ({k, l} : Finset V).card = 2 := by simp [hkl]
+    have hle := Finset.card_le_card hpair
+    have hrowsx := hrows x hx hxne
+    change rowx.card ≤ 1 at hrowsx
+    rw [htwo] at hle
+    omega
+  exact ⟨hcenter, hunique⟩
+
 /-- One repeated selected clique vertex can be absorbed into a single block.
 The other selected incidences are unique, so the ordinary three-vertex blocks
 remain pairwise disjoint and can be concatenated between clique vertices. -/
