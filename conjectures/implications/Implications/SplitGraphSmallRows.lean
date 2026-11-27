@@ -99,8 +99,9 @@ theorem pairwise_intersecting_two_sets
         · exact hcD
         · exact hq
       have haq : a ≠ q := by intro h; exact hqa h.symm
+      have hcq : c ≠ q := by intro h; exact hqc h.symm
       have hcardThree : ({a, c, q} : Finset α).card = 3 := by
-        simp [hca.symm, hqc, haq]
+        simp [hca.symm, hcq, haq]
       have := Finset.card_le_card hthree
       rw [hcard D hD] at this
       omega
