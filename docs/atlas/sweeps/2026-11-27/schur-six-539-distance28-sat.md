@@ -1,7 +1,7 @@
 # Fixed-support Schur (S(6)\ge539) SAT screen
 
 **Protocol recorded:** 27 November 2026, before SAT generation. **Status:**
-fixed support and resource caps below; SAT result to be appended after the run.
+fixed-support search completed and the UNSAT proof verified on 27 November 2026.
 
 ## Prior art
 
@@ -91,4 +91,27 @@ outputs stay under the worktree's ignored `target/solvers/` directory.
 
 ## Result
 
-Pending the bounded SAT run and independent witness/proof check.
+The exact preflight found 18,004 old triples touching one changed pair and
+2,268 touching two, for 406,840 local option tuples (cap: 20,000,000). Formula
+generation emitted 2,486 distinct conflict clauses plus 1,288 exactly-one
+clauses: 3,774 clauses over 280 variables, 41,846 DIMACS bytes. The deterministic
+CNF SHA-256 is
+`3275681b36b6dfcfecdee96cdf19d45e5eb0aa1d93a32c672a12a52ace875669`.
+
+Pinned CaDiCaL returned UNSAT at root propagation (0.00 s reported, 28.40 MB
+maximum RSS). Its 12,231-byte DRAT proof has SHA-256
+`dd4aafae4573a7efbb672c0dff20da0d434e02f5a2695bbc0bc9a8198fda235e`.
+Pinned DRAT-trim independently returned `s VERIFIED` in 0.026 s; it reports
+that the input instance is UNSAT by unit propagation and reduces verification
+to 11 of 3,774 clauses. Therefore no coloring is possible within this exact
+fixed-support family: each of these 28 endpoint pairs changes exactly one
+endpoint to a non-append color, and every other old position remains fixed.
+This excludes the specified 28-recolor neighborhood of McKenna's main word;
+it does not exclude extensions with other supports or a different 538-word.
+
+The script is reproducible with the pinned sources and outputs the CNF, proof,
+and logs under the ignored worktree `target/` directory. CaDiCaL builds from
+its pinned source with its checked-in configure/make flow. DRAT-trim's pinned
+C source required `-D_GNU_SOURCE` for `getc_unlocked` to be declared on this
+Linux/glibc build; the checker source itself was unchanged. The solver's exit
+code 20 is CaDiCaL's documented UNSAT status.
