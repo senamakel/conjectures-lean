@@ -393,6 +393,9 @@ theorem hamiltonian_of_split_partition_row_bounds
       have hjC : j ∉ C := by
         intro hmem
         exact (Finset.disjoint_left.mp hdisj) hmem hj
+      have hIeq : I = {i, j} := by
+        apply Finset.eq_of_subset_of_card_le (by simp [hi, hj])
+        simp [hij, htwo]
       have hpart : (Finset.univ : Finset V) = C ∪ {i, j} := by
         simpa [hIeq, Finset.union_assoc, Finset.union_left_comm, Finset.union_comm] using hpartition
       exact hamiltonian_of_split_partition_two_endpoints G C i j a b hC
