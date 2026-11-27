@@ -153,7 +153,8 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
           · intro l hl
             have hkO : k ∈ others := hmem k (by simp)
             have hlO : l ∈ others := hmem l (by simp [hl])
-            exact hblocksDisjoint k (by simp) l (by simp [hl]) (by
+            exact hblocksDisjoint k (Finset.mem_toList.mpr hkO)
+              l (Finset.mem_toList.mpr hlO) (by
               intro heq
               subst l
               exact (List.nodup_cons.mp hnd).1 hl)
