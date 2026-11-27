@@ -273,6 +273,66 @@ theorem hamiltonian_of_split_partition_two_endpoints
   exact hamiltonian_of_clique_order_with_two_endpoints G C i j a b l
     hC hpartition hi hj hij hl_nodup hl_finset hl_head hl_last hia hbj
 
+/-- If each independent vertex is covered by a clique row, a row of size two
+and pairwise row differences of size at most one provide distinct attachments. -/
+theorem exists_distinct_row_attachments
+    (G : SimpleGraph V) (C I : Finset V)
+    (hrow : ∀ c ∈ C, (row G I c).card ≤ 2)
+    (hdiff : ∀ c ∈ C, ∀ d ∈ C, c ≠ d → (rowDiff G I c d).card ≤ 1)
+    (hcover : ∀ i ∈ I, ∃ c ∈ C, G.Adj c i)
+    (hI : I.card = 2) (hC : 2 ≤ C.card) :
+    ∃ i j a b, i ∈ I ∧ j ∈ I ∧ i ≠ j ∧ a ∈ C ∧ b ∈ C ∧ a ≠ b ∧
+      G.Adj a i ∧ G.Adj b j := by
+  classical
+  obtain ⟨i, j, hij, hIeq⟩ := Finset.card_eq_two.mp hI
+  obtain ⟨a, ha, hai⟩ := hcover i (by simp [hIeq])
+  obtain ⟨b, hb, hbj⟩ := hcover j (by simp [hIeq])
+  by_cases hab : a ≠ b
+  · exact ⟨i, j, a, b, by simp [hIeq], by simp [hIeq], hij, ha, hb, hab, hai, hbj⟩
+  · have hab' : a = b := by simpa using hab
+    subst b
+    have hthird : ∃ d ∈ C, d ≠ a := by
+      by_contra hn
+      push_neg at hn
+      have hsub : C ⊆ {a} := by
+        intro x hx
+        simp only [Finset.mem_singleton]
+        exact hn x hx
+      have := Finset.card_le_card hsub
+      simp at this
+      omega
+    obtain ⟨d, hd, hda⟩ := hthird
+    have hia : i ∈ row G I a := Finset.mem_filter.mpr ⟨by simp [hIeq], hai⟩
+    have hja : j ∈ row G I a := Finset.mem_filter.mpr ⟨by simp [hIeq], hbj⟩
+    have hrowd : (row G I d).Nonempty := by
+      by_contra hn
+      have hempty : row G I d = ∅ := Finset.not_nonempty_iff_eq_empty.mp hn
+      have hiDiff : i ∈ rowDiff G I a d := by
+        apply Finset.mem_union_left
+        exact Finset.mem_sdiff.mpr ⟨hia, by simp [hempty]⟩
+      have hjDiff : j ∈ rowDiff G I a d := by
+        apply Finset.mem_union_left
+        exact Finset.mem_sdiff.mpr ⟨hja, by simp [hempty]⟩
+      have hsub : ({i, j} : Finset V) ⊆ rowDiff G I a d := by
+        intro x hx
+        simp only [Finset.mem_insert, Finset.mem_singleton] at hx
+        rcases hx with rfl | rfl
+        · exact hiDiff
+        · exact hjDiff
+      have := Finset.card_le_card hsub
+      have := hdiff a ha d hd hda.symm
+      simp [hij] at this ⊢
+      omega
+    obtain ⟨x, hx⟩ := hrowd
+    have hxI : x = i ∨ x = j := by
+      have hx' := (Finset.mem_filter.mp hx).1
+      simpa [hIeq, Finset.mem_insert, Finset.mem_singleton] using hx'
+    rcases hxI with rfl | rfl
+    · exact ⟨i, j, d, a, by simp [hIeq], by simp [hIeq], hij, hd, ha, hda.symm,
+        (Finset.mem_filter.mp hx).2, hai⟩
+    · exact ⟨j, i, d, a, by simp [hIeq], by simp [hIeq], hij.symm, hd, ha, hda.symm,
+        (Finset.mem_filter.mp hx).2, hai⟩
+
 end SplitGraphPath
 
 #print axioms SplitGraphPath.independent_card_le_two_of_row_bounds
