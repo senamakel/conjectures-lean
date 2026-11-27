@@ -68,3 +68,26 @@ The DIMACS SHA-256 digests were:
 
 The partial traces provide no certificate and no model was emitted. Cases
 1–14 were outside the screen, and cases 15–16 remain unresolved at this cap.
+
+## Shared and outside neighbor balance
+
+For a nonroot vertex (v), write (r(v)) for its count of root neighbors,
+(s(v)) for its count of shared-witness neighbors, (p(v)) for its count of
+private degree-six and root-owned degree-seven neighbors, and (o(v)) for
+its count of remaining degree-seven neighbors. Every root has a unique
+common neighbor with (v). Counting these four witnesses with multiplicity
+gives (2s(v)+p(v)=4), since a shared neighbor serves two roots. Counting
+all neighbors gives (r(v)+s(v)+p(v)+o(v)=deg(v)). Therefore (s(v)le 2)
+and
+[
+o(v)=deg(v)-r(v)-4+s(v).
+]
+The constant term is 0 for shared witnesses, 1 for private degree-six
+vertices, 2 for the root-owned degree-seven vertices, and 3 for the
+remaining degree-seven vertices.
+
+Pass `--shared-outside-balance` to add these redundant clauses using exact
+unary counters. It works with either symmetry split or the unrestricted
+formula. The option is off by default, preserving earlier input hashes.
+The gate encoding was exhaustively checked on 1,024 small input assignments
+covering all four constant terms and both fixed Boolean values.
