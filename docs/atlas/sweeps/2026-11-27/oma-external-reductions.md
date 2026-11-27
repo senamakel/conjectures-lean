@@ -16,6 +16,18 @@ This sweep covers public Lean developments and recovered local attempts with an 
 - Green 100(i) R1 passed the pinned checker with the three standard axioms. The two leaves are the injective nonsurjective finite-field linear cellular automaton and Gromov–Weiss surjunctivity specialized to those automata. Submitted as [upstream PR #4467](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4467). The desk returned HTTP 500 and issued no lease.
 - Hironaka R1 has a checked geometric assembly at an explicitly shared universe. The registry linter requires a bare chain of hypothesis names and the bare target, which Lean generalizes at independent universe levels. The exact registry submission fails on that mismatch. A checker interface for explicitly shared universe arguments, or a suitable universe-independent descent argument, would let this route proceed.
 
+## Follow-up after the parent merges
+
+GitHub merged both parent reductions. The Left to Solve parent API still returned an empty step list for each, and the new leaf briefs returned HTTP 404. Replaying the merged PR numbers through the site's verdict endpoint returned HTTP 500 for both. An older Idoneal leaf still loaded, so the missing entries could be reproduced specifically on the new reductions.
+
+Poincaré `R1.H4.R1` passed the pinned checker with the three standard axioms and is [pushed to the fork](https://github.com/senamakel/open-math-agents/tree/oma/poincare-smooth-r1). It uses homotopy invariance of simple connectivity to reduce the exact smooth obligation to simple connectivity of the standard three-sphere and the published smooth endpoint. Upstream submission awaits registration of the parent leaf. The [sphere connectivity source](https://github.com/frenzymath/PoincareConjecture/blob/main/PoincareLib/Topology/Homotopy/Sphere/SphereConnectivity.lean) supplies a blueprint for the first new obligation.
+
+Poincaré `R1.H1.R1` also [passed the pinned checker and was pushed](https://github.com/senamakel/open-math-agents/tree/oma/poincare-sphere-homology-r1). It reduces nonzero top homology of the three-sphere to the two consecutive sphere homology isomorphisms and the integral circle calculation.
+
+The [stacked sphere-connectivity proof](https://github.com/senamakel/open-math-agents/tree/oma/poincare-sphere-simple) closes `R1.H4.R1.H1` against the proposed smooth reduction interface and passed the pinned checker with the three standard axioms. It adapts the published source at its Apache-2.0 revision, preserving the license and NOTICE. The registry requires the intermediate H4 reduction to merge before it can accept the single-file proof.
+
+Green 100(i) `R1.H1.R1` [passed the pinned checker and was pushed](https://github.com/senamakel/open-math-agents/tree/oma/green100-group-algebra-r1). It separates OpenAI's finite-field group-algebra counterexample to direct finiteness from the transfer of a one-sided inverse to an injective nonsurjective cellular map.
+
 ## Earlier attempts and follow-up candidates
 
 | Target | Recovered public evidence | Remaining work |
