@@ -152,13 +152,8 @@ theorem cutoffHitCount (N B j : ℕ) (hB : 0 < B) :
   let U := (Finset.range (primeAt N + 1)).filter (fun m => m.maxPrimeFac < B)
   have hpart : H = L ∪ S := by
     ext r
-    simp only [H, L, S, Finset.mem_filter, Finset.mem_union]
-    constructor
-    · rintro ⟨hr, hh⟩
-      rcases le_total B (primeGap r) with h | h
-      · exact Or.inl ⟨hr, h⟩
-      · exact Or.inr ⟨hr, Nat.lt_of_not_ge h⟩
-    · rintro (⟨hr, hb⟩ | ⟨hr, hb⟩) <;> exact ⟨hr, by assumption⟩
+    simp [H, L, S]
+    omega
   have hdisj : Disjoint L S := by
     apply Finset.disjoint_left.mpr
     intro r hr hs
@@ -173,7 +168,11 @@ theorem cutoffHitCount (N B j : ℕ) (hB : 0 < B) :
   have hLnat := Finset.card_le_card hLsub
   have hLbound := largeGapCount N B
   have hLB : (B : ℝ) * (L.card : ℝ) ≤ primeAt N := by
-    exact (Nat.cast_le.mpr hLnat).trans hLbound
+    calc
+      (B : ℝ) * (L.card : ℝ) ≤
+          (B : ℝ) * (((Finset.range N).filter (fun r => B ≤ primeGap r)).card : ℝ) :=
+        mul_le_mul_of_nonneg_left (Nat.cast_le.mpr hLnat) (by positivity)
+      _ ≤ _ := hLbound
   have hSsub : S ⊆ Finset.range N := by
     intro r hr
     exact (Finset.mem_filter.mp (Finset.mem_filter.mp hr).1).1
@@ -198,6 +197,9 @@ theorem cutoffHitCount (N B j : ℕ) (hB : 0 < B) :
       _ = (B : ℝ) * ((j : ℝ) * (S.card : ℝ)) := by ring
       _ ≤ _ := mul_le_mul_of_nonneg_left hSbound (by positivity)
   rw [hcard]
-  nlinarith
+  calc
+    (B : ℝ) * j * ((L.card : ℝ) + S.card) =
+        (B : ℝ) * j * (L.card : ℝ) + (B : ℝ) * j * (S.card : ℝ) := by ring
+    _ ≤ (j : ℝ) * primeAt N + (B : ℝ) * (U.card : ℝ) := add_le_add hLscaled hSscaled
 
 end Implications.SmoothGapCounting
