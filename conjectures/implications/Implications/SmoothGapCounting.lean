@@ -683,7 +683,7 @@ private theorem eventually_twoHitGapCount_tail_tendsto_zero :
       nlinarith [hidentity]
     have hfactor : Tendsto (fun n : ℕ =>
         ((primeAt n : ℝ) / (n + 1 : ℝ)) /
-          (2 * (primeAt n : ℝ) ^ (1 / 4 : ℝ))) atTop (nhds 0) := by
+          ((primeAt n : ℝ) ^ (1 / 4 : ℝ))) atTop (nhds 0) := by
       have hratio := hlogsmall'
       have hevent : ∀ᶠ n : ℕ in atTop,
           (primeAt n : ℝ) / (n + 1 : ℝ) ≤ 2 * Real.log (primeAt n : ℝ) :=
@@ -691,7 +691,7 @@ private theorem eventually_twoHitGapCount_tail_tendsto_zero :
           simpa [Nat.cast_add] using hn)
       have hbound : ∀ᶠ n : ℕ in atTop,
           0 ≤ ((primeAt n : ℝ) / (n + 1 : ℝ)) /
-            (2 * (primeAt n : ℝ) ^ (1 / 4 : ℝ)) ∧
+            ((primeAt n : ℝ) ^ (1 / 4 : ℝ)) ∧
           ((primeAt n : ℝ) / (n + 1 : ℝ)) /
             ((primeAt n : ℝ) ^ (1 / 4 : ℝ)) ≤
               2 * (Real.log (primeAt n : ℝ) /
