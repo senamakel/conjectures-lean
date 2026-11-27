@@ -41,7 +41,8 @@ struct Search {
 
   std::array<std::uint8_t, 64> degree{};
   std::array<std::uint64_t, 64> neighbors{};
-  int dimension, target_edges, minimum_vertices, max_nodes;
+  int dimension, target_edges, minimum_vertices;
+  std::uint64_t max_nodes;
   std::uint64_t nodes = 0, total_nodes = 0, labeled = 0, cyclic_leaves = 0;
   std::uint64_t forced_exclusions = 0, early_cycle_prunes = 0;
   bool stopped = false, force_saturated_neighbors, early_cycle_check, use_capacity_bound;
