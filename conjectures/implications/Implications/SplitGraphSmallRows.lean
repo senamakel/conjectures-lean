@@ -233,7 +233,7 @@ theorem card_le_three_of_no_common_center
       exact Finset.mem_powersetCard.mpr ⟨by simpa [S] using hsub A hA, hcard A hA⟩
     have hle := Finset.card_le_card hsubset
     rw [Finset.card_powersetCard, show S.card = 3 by simp [S, hab, hac, hbc]] at hle
-    norm_num at hle ⊢
+    exact hle
 
 /-! The exact family statement applied to clique rows. -/
 theorem clique_rows_two_set_structure
