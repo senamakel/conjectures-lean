@@ -78,6 +78,56 @@ def ContainsAt {n : Nat} (π : Equiv.Perm (Fin n)) (s : Nat)
       have hj : j.val ≤ 7 := Nat.le_of_lt_succ j.isLt
       omega⟩) ↔ p i < p j
 
+/-- The common part of two same-pattern windows must itself have the same
+relative order when read from either window. -/
+theorem same_pattern_overlap_compatible {n : Nat} (π : Equiv.Perm (Fin n))
+    (s t : Nat) (hs : ContainsAt π s sigma) (ht : ContainsAt π t sigma)
+    (hst : s < t) (hts : t - s < 8) :
+    overlapCompatible sigmaList (t - s) = true := by
+  rcases hs with ⟨hbs, hs⟩
+  rcases ht with ⟨hbt, ht⟩
+  apply of_decide_eq_true
+  simp only [overlapCompatible, List.all_eq_true, List.mem_range,
+    decide_eq_true_eq]
+  intro i hi j hj
+  let ai : Fin 8 := ⟨i, by omega⟩
+  let aj : Fin 8 := ⟨j, by omega⟩
+  let bi : Fin 8 := ⟨(t - s) + i, by omega⟩
+  let bj : Fin 8 := ⟨(t - s) + j, by omega⟩
+  have hsi := hs bi bj
+  have htj := ht ai aj
+  have hidxi : (⟨s + bi.val, by
+      have hb : bi.val ≤ 7 := Nat.le_of_lt_succ bi.isLt
+      omega⟩ : Fin n) = ⟨t + ai.val, by
+      have ha : ai.val ≤ 7 := Nat.le_of_lt_succ ai.isLt
+      omega⟩ := by
+    apply Fin.ext
+    simp [ai, bi]
+    omega
+  have hidxj : (⟨s + bj.val, by
+      have hb : bj.val ≤ 7 := Nat.le_of_lt_succ bj.isLt
+      omega⟩ : Fin n) = ⟨t + aj.val, by
+      have ha : aj.val ≤ 7 := Nat.le_of_lt_succ aj.isLt
+      omega⟩ := by
+    apply Fin.ext
+    simp [aj, bj]
+    omega
+  have hsame :
+      (π ⟨s + bi.val, by
+        have hb : bi.val ≤ 7 := Nat.le_of_lt_succ bi.isLt
+        omega⟩ < π ⟨s + bj.val, by
+        have hb : bj.val ≤ 7 := Nat.le_of_lt_succ bj.isLt
+        omega⟩) ↔
+      (π ⟨t + ai.val, by
+        have ha : ai.val ≤ 7 := Nat.le_of_lt_succ ai.isLt
+        omega⟩ < π ⟨t + aj.val, by
+        have ha : aj.val ≤ 7 := Nat.le_of_lt_succ aj.isLt
+        omega⟩) := by
+    rw [hidxi, hidxj]
+  have hrel : (sigma bi < sigma bj) ↔ (sigma ai < sigma aj) :=
+    hsi.trans (hsame.trans htj.symm)
+  simpa [sigmaList_get, ai, aj, bi, bj] using hrel
+
 end WilfMarked
 
 namespace WilfMarked
