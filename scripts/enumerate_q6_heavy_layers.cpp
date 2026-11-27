@@ -209,30 +209,50 @@ struct Search {
     if (ec) { std::cerr << "failed replacing checkpoint: " << ec.message() << '\n'; fatal = true; }
   }
   bool load_checkpoint(std::uint64_t &offset) {
-    std::ifstream in(checkpoint_path); std::string magic; int dim, target, minv, force, cycle, capacity;
-    if (!(in >> magic >> dim >> target >> minv >> force >> cycle >> capacity >> offset >> total_nodes >> labeled >> cyclic_leaves) ||
-        magic != "SNAKECP1" || dim != dimension || target != target_edges || minv != minimum_vertices ||
-        force != force_saturated_neighbors || cycle != early_cycle_check || capacity != use_capacity_bound) return false;
-    std::size_t n; if (!(in >> n)) return false; frontier.clear();
-    for (std::size_t i=0;i<n;++i) {
-      std::size_t len; if (!(in>>len)) return false; Prefix p;
-      for (std::size_t j=0;j<len;++j) {
-        int v,b; if (!(in>>v>>b) || v<0 || v>=(1<<dimension) || (b!=0 && b!=1)) return false;
-        p.push_back({v,b!=0});
+    std::ifstream in(checkpoint_path);
+    std::string magic;
+    int dim, target, minv, force, cycle, capacity;
+    if (!(in >> magic >> dim >> target >> minv >> force >> cycle >> capacity >> offset
+          >> total_nodes >> labeled >> cyclic_leaves)) return false;
+    if (magic != "SNAKECP1" || dim != dimension || target != target_edges ||
+        minv != minimum_vertices || force != force_saturated_neighbors ||
+        cycle != early_cycle_check || capacity != use_capacity_bound) return false;
+
+    std::size_t count;
+    if (!(in >> count)) return false;
+    frontier.clear();
+    for (std::size_t i = 0; i < count; ++i) {
+      std::size_t length;
+      if (!(in >> length)) return false;
+      Prefix prefix;
+      for (std::size_t j = 0; j < length; ++j) {
+        int vertex, include;
+        if (!(in >> vertex >> include) || vertex < 0 || vertex >= (1 << dimension) ||
+            (include != 0 && include != 1)) return false;
+        prefix.push_back({vertex, include != 0});
       }
-      frontier.push_back(std::move(p));
+      frontier.push_back(std::move(prefix));
     }
-    for (std::size_t i=0;i<frontier.size();++i)
-      for (std::size_t j=0;j<frontier.size();++j) {
-        if (i==j || frontier[i].size()>frontier[j].size()) continue;
-        bool prefix=true;
-        for (std::size_t k=0;k<frontier[i].size();++k)
-          if (frontier[i][k].vertex!=frontier[j][k].vertex || frontier[i][k].include!=frontier[j][k].include) { prefix=false; break; }
-        if (prefix) return false;
+
+    for (std::size_t i = 0; i < frontier.size(); ++i) {
+      for (std::size_t j = 0; j < frontier.size(); ++j) {
+        if (i == j || frontier[i].size() > frontier[j].size()) continue;
+        bool is_prefix = true;
+        for (std::size_t k = 0; k < frontier[i].size(); ++k) {
+          if (frontier[i][k].vertex != frontier[j][k].vertex ||
+              frontier[i][k].include != frontier[j][k].include) {
+            is_prefix = false;
+            break;
+          }
+        }
+        if (is_prefix) return false;
       }
+    }
+
     if (offset % sizeof(std::uint64_t) != 0 || labeled != offset / sizeof(std::uint64_t)) return false;
-    std::error_code ec; auto size = std::filesystem::file_size(output_path, ec);
-    return !ec && size >= offset;
+    std::error_code error;
+    const auto output_size = std::filesystem::file_size(output_path, error);
+    return !error && output_size >= offset;
   }
 };
 
