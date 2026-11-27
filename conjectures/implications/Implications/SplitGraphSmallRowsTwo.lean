@@ -447,21 +447,24 @@ theorem hamiltonian_of_split_partition_two_double_rows
         exact ⟨u,huI,by simp [S],(Finset.mem_filter.mp hud).2⟩
     have hprefLastC : ∀ x, x ∈ pref.getLast? → x ∈ C := by
       intro x hx
-      have hxd : x = d := by simpa [pref] using hx
+      have hxd : d = x := by simpa [pref] using hx
       simpa [hxd] using hdC
     exact SplitGraphSmallRowsCompletion.hamiltonian_of_selected_prefix_of_double_rows
-      G C S pref hC hdisj hpartition (by simp [pref]) hprefNodup hprefChain
-      hprefLastC hspecial left right hleftC hrightC hleftAdj hrightAdj hneq hcap
+      G C I S pref hC hdisj hpartition (by simp [pref]) hprefNodup hprefChain
+      hprefLastC hspecial left right hleftC hrightC hleftAdj hrightAdj hneq
+      (by intro q hq; simpa [selectedRow] using hcap q hq)
       (by
         intro q hq hqTwo
         have hqD : q ∈ doubleRows := Finset.mem_filter.mpr ⟨hq,hqTwo⟩
         rw [hdoubleRows] at hqD
         simp only [Finset.mem_insert, Finset.mem_singleton] at hqD
         rcases hqD with rfl | rfl
-        · change ({u,v} : Finset V) ⊆ S
+        · change selectedRow I left right c ⊆ S
+          rw [hrowC]
           intro i hi
           simpa [S] using hi
-        · change ({u,v} : Finset V) ⊆ S
+        · change selectedRow I left right d ⊆ S
+          rw [hrowD]
           intro i hi
           simpa [S] using hi)
       hprefixClique
