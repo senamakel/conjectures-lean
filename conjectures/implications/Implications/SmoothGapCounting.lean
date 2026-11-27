@@ -185,6 +185,51 @@ private theorem eventually_logLogCutoff_primeCount_le :
         field_simp
   exact hpi.trans hbound
 
+private theorem log_two_lt_one : Real.log 2 < 1 := by
+  rw [Real.log_lt_iff_lt_exp (by norm_num)]
+  have h := Real.add_one_lt_exp (by norm_num : (0 : ℝ) < 1)
+  norm_num at h ⊢
+  linarith
+
+private theorem eventually_logLogCutoff_smoothFactor_le :
+    ∀ᶠ n : ℕ in atTop,
+      (2 ^ (logLogCutoff n).primesBelow.card : ℝ) *
+        Real.sqrt (primeAt n : ℝ) ≤
+          Real.exp (3 * Real.log (primeAt n : ℝ) / 4) := by
+  filter_upwards [eventually_logLogCutoff_primeCount_le] with n hpi
+  let k := (logLogCutoff n).primesBelow.card
+  have hL : 0 < Real.log (primeAt n : ℝ) := by
+    have hp : 1 < (primeAt n : ℝ) := by
+      exact_mod_cast (show 1 < Nat.nth Nat.Prime n from
+        Nat.Prime.one_lt (Nat.prime_nth_prime n))
+    exact Real.log_pos hp
+  have hx : 0 < (primeAt n : ℝ) := by positivity
+  have hk : (k : ℝ) ≤ Real.log (primeAt n : ℝ) / 4 := by
+    dsimp [k]
+    exact hpi
+  have hpow : (2 ^ k : ℝ) = Real.exp ((k : ℝ) * Real.log 2) := by
+    rw [← Real.exp_nat_mul (Real.log 2) k, Real.exp_log (by norm_num)]
+    ring_nf
+  have hexp : Real.exp ((k : ℝ) * Real.log 2) ≤
+      Real.exp (Real.log (primeAt n : ℝ) / 4) := by
+    apply Real.exp_le_exp.mpr
+    exact (mul_le_mul_of_nonneg_left log_two_lt_one.le (Nat.cast_nonneg _)).trans hk
+  have hsqrt : Real.sqrt (primeAt n : ℝ) =
+      Real.exp (Real.log (primeAt n : ℝ) / 2) := by
+    rw [Real.sqrt_eq_rpow, Real.rpow_def_of_pos hx]
+    congr 1
+    ring
+  rw [hpow, hsqrt]
+  calc
+    Real.exp ((k : ℝ) * Real.log 2) * Real.exp (Real.log (primeAt n : ℝ) / 2) ≤
+        Real.exp (Real.log (primeAt n : ℝ) / 4) *
+          Real.exp (Real.log (primeAt n : ℝ) / 2) :=
+      mul_le_mul_of_nonneg_right hexp (by positivity)
+    _ = Real.exp (3 * Real.log (primeAt n : ℝ) / 4) := by
+      rw [← Real.exp_add]
+      congr 1
+      ring
+
 private theorem primeAt_strictMono : StrictMono primeAt := by
   intro a b hab
   exact Nat.nth_strictMono Nat.infinite_setOfPred_prime hab
