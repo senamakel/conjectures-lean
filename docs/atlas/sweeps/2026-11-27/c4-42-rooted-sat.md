@@ -261,3 +261,17 @@ under `.lake/c4-42-k4-matching-cases/`. Do not rerun case 1 or run cases 2..4
 in this screen. This one result cannot rule out the graph: a full UNSAT claim
 requires all four disjoint cases to have complete LRAT proofs and Lean replay,
 plus the canonical encoder bridge. A SAT model must be checked independently.
+
+### Case 1 result
+
+The matching orbit checker passed: 105 matchings split into the four distinct
+orbits of sizes 9, 36, 24, and 36. The unbranched canonical CNF retained its
+prior hash `3e25c572d4ae8b08925b518a87dc0402b46878e7c4994d89665bd3559ce83051`.
+Case 1 has 8,643 variables and 229,626 clauses, SHA-256
+`871b1b5cd59bed4485331926c986340e19f41308f7fbc040c2404d8ed0d65573`.
+CaDiCaL 2.1.2 returned `UNKNOWN` at 120.01 seconds real time (118.82 seconds
+process CPU), after 2,684,873 conflicts and 259,554,075 propagations; peak RSS
+was 515.10 MB. Its partial binary LRAT trace is 425,834,000 bytes, SHA-256
+`fc54ba38582c13f86baff5680c752500f07563806258538ab3a601d7ecbc4372`.
+There is no model or complete proof. Only case 1 was run; cases 2..4 remain
+untouched, so this screen says nothing conclusive about the full graph claim.
