@@ -114,6 +114,116 @@ theorem degree_eight_vertices_cover_four_degree_seven_neighbors
         G hDel he hC4 h8 u hu
     _ = 4 := by simp [D, h8]
 
+/-- Each degree-eight vertex has three shared and four private
+degree-six neighbors in the four-degree-eight profile. -/
+theorem degree_eight_shared_private_degree_six_counts
+    (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    (hDel : ∀ v, C4Extremal42.inducedDeletionCount G v ≤ 132)
+    (he : G.edgeFinset.card = 138) (hC4 : C4VertexExtension.C4Free G)
+    (h8 : (Finset.univ.filter fun v => G.degree v = 8).card = 4)
+    {u : Fin 42} (hu : G.degree u = 8) :
+    let D := Finset.univ.filter fun v => G.degree v = 8
+    let A := G.neighborFinset u ∩ Finset.univ.filter fun v => G.degree v = 6
+    (A.filter fun x => (G.neighborFinset x ∩ D).card = 2).card = 3 ∧
+      (A.filter fun x => (G.neighborFinset x ∩ D).card = 1).card = 4 := by
+  classical
+  dsimp only
+  let D := Finset.univ.filter fun v => G.degree v = 8
+  let A := G.neighborFinset u ∩ Finset.univ.filter fun v => G.degree v = 6
+  let P := fun x => G.neighborFinset x ∩ D
+  let T := D.erase u
+  let B := A.filter fun x => (P x).card = 2
+  have huD : u ∈ D := by simp [D, hu]
+  have hT : T.card = 3 := by
+    change (D.erase u).card = 3
+    rw [Finset.card_erase_of_mem huD]
+    exact congrArg (· - 1) h8
+  have hA : A.card = 7 :=
+    degree_eight_vertex_has_seven_degree_six_neighbors G hDel he hC4 h8 hu
+  have hpartner (v : T) : ∃ x, G.degree x = 6 ∧ G.Adj u x ∧ G.Adj v.val x := by
+    have hv := Finset.mem_erase.mp v.property
+    exact (degree_eight_pair_has_unique_degree_six_neighbor G hDel he hC4 h8 hu
+      (Finset.mem_filter.mp hv.2).2 hv.1.symm).exists
+  choose f hf using hpartner
+  have hm {x v : Fin 42} (hadj : G.Adj v x) (hv : v ∈ D) : v ∈ P x :=
+    Finset.mem_inter.mpr ⟨(G.mem_neighborFinset x v).mpr hadj.symm, hv⟩
+  have hinj : Function.Injective f := by
+    intro v w hvw
+    by_contra! hne
+    have hv := Finset.mem_erase.mp v.property
+    have hw := Finset.mem_erase.mp w.property
+    have hval : v.val ≠ w.val := fun eq => hne (Subtype.ext eq)
+    have hsub : ({u, v.val, w.val} : Finset (Fin 42)) ⊆ P (f v) := by
+      intro y hy
+      simp only [Finset.mem_insert, Finset.mem_singleton] at hy
+      rcases hy with rfl | rfl | rfl
+      · exact hm (hf v).2.1 huD
+      · exact hm (hf v).2.2 hv.2
+      · rw [hvw]
+        exact hm (hf w).2.2 hw.2
+    have hlarge := Finset.card_le_card hsub
+    have hcard : ({u, v.val, w.val} : Finset (Fin 42)).card = 3 := by
+      simp [hv.1.symm, hw.1.symm, hval]
+    rw [hcard] at hlarge
+    have hsmall := degree_six_vertex_has_at_most_two_degree_eight_neighbors G hDel he hC4 h8 (hf v).1
+    change (P (f v)).card ≤ 2 at hsmall
+    omega
+  have himage : T.attach.image f = B := by
+    ext x
+    constructor
+    · intro hx
+      obtain ⟨v, _, rfl⟩ := Finset.mem_image.mp hx
+      have hv := Finset.mem_erase.mp v.property
+      have hsub : ({u, v.val} : Finset (Fin 42)) ⊆ P (f v) := by
+        intro y hy
+        simp only [Finset.mem_insert, Finset.mem_singleton] at hy
+        rcases hy with rfl | rfl
+        · exact hm (hf v).2.1 huD
+        · exact hm (hf v).2.2 hv.2
+      have hlarge := Finset.card_le_card hsub
+      have hcard : ({u, v.val} : Finset (Fin 42)).card = 2 := by simp [hv.1.symm]
+      rw [hcard] at hlarge
+      have hsmall := degree_six_vertex_has_at_most_two_degree_eight_neighbors G hDel he hC4 h8 (hf v).1
+      change (P (f v)).card ≤ 2 at hsmall
+      apply Finset.mem_filter.mpr
+      refine ⟨Finset.mem_inter.mpr ⟨(G.mem_neighborFinset u _).mpr (hf v).2.1, ?_⟩, by omega⟩
+      simp [(hf v).1]
+    · intro hx
+      have ⟨hxA, hxP⟩ := Finset.mem_filter.mp hx
+      have ⟨hux, hx6⟩ := Finset.mem_inter.mp hxA
+      have hadj := (G.mem_neighborFinset u x).mp hux
+      have hxP' : ((P x).erase u).Nonempty := by
+        apply Finset.card_pos.mp
+        rw [Finset.card_erase_of_mem (hm hadj huD), hxP]
+        decide
+      obtain ⟨v, hv⟩ := hxP'
+      obtain ⟨hvu, hvP⟩ := Finset.mem_erase.mp hv
+      have hvD := (Finset.mem_inter.mp hvP).2
+      let vT : T := ⟨v, Finset.mem_erase.mpr ⟨hvu, hvD⟩⟩
+      have hvx := ((G.mem_neighborFinset x v).mp (Finset.mem_inter.mp hvP).1).symm
+      have hfx : f vT = x := by
+        by_contra! hne
+        exact hC4 hvu.symm hne (hf vT).2.1 (hf vT).2.2 ⟨hadj, hvx⟩
+      exact Finset.mem_image.mpr ⟨vT, Finset.mem_attach _ _, hfx⟩
+  have hB : B.card = 3 := by
+    rw [← himage, Finset.card_image_of_injOn hinj.injOn, Finset.card_attach, hT]
+  have hsplit : A.filter (fun x => ¬ (P x).card = 2) = A.filter (fun x => (P x).card = 1) := by
+    ext x
+    simp only [Finset.mem_filter]
+    refine and_congr_right fun hx => ?_
+    have hx6 := (Finset.mem_filter.mp (Finset.mem_inter.mp hx).2).2
+    have hxhi := degree_six_vertex_has_at_most_two_degree_eight_neighbors G hDel he hC4 h8 hx6
+    change (P x).card ≤ 2 at hxhi
+    have hxlo : 0 < (P x).card :=
+      Finset.card_pos.mpr ⟨u, hm ((G.mem_neighborFinset u x).mp (Finset.mem_inter.mp hx).1) huD⟩
+    omega
+  have hcount := A.card_filter_add_card_filter_not (fun x => (P x).card = 2)
+  rw [hsplit, hA] at hcount
+  change B.card + (A.filter fun x => (P x).card = 1).card = 7 at hcount
+  change B.card = 3 ∧ (A.filter fun x => (P x).card = 1).card = 4
+  exact ⟨hB, by omega⟩
+
+#print axioms degree_eight_shared_private_degree_six_counts
 #print axioms degree_eight_pair_has_unique_degree_six_neighbor
 #print axioms degree_eight_vertices_cover_four_degree_seven_neighbors
 #print axioms degree_seven_vertex_has_at_most_one_degree_eight_neighbor
