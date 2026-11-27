@@ -13,6 +13,13 @@ namespace Implications.SmoothPrimeReciprocal
 
 open Filter
 
+private theorem card_primes_Icc_eq_primeCounting (n : ℕ) :
+    ((Finset.Icc 1 n).filter Nat.Prime).card = Nat.primeCounting n := by
+  have hset : (Finset.Icc 1 n).filter Nat.Prime = Nat.primesLE n := by
+    ext p
+    simp [Nat.mem_primesLE]
+  rw [hset, Nat.primesLE_card_eq_primeCounting]
+
 /-- The reciprocal-prime mass in one dyadic block is `O(1/k)`. -/
 private theorem reciprocalPrimeDyadic_eventually :
     ∃ D : ℝ, 0 < D ∧ ∀ᶠ k : ℕ in atTop,
@@ -44,7 +51,7 @@ private theorem reciprocalPrimeDyadic_eventually :
       exact one_div_le_one_div_of_le hden hlow
     have hcard : ((Finset.Ico (2 ^ k) (2 ^ (k + 1))).filter Nat.Prime).card ≤
         Nat.primeCounting (2 ^ (k + 1)) := by
-      rw [← Nat.primeCounting_eq_card_Icc_filter_prime]
+      rw [← card_primes_Icc_eq_primeCounting]
       apply Finset.card_le_card
       intro p hp
       have hp' := Finset.mem_filter.mp hp
