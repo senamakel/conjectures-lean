@@ -13,7 +13,7 @@ open SplitGraphTrees
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
 omit [Fintype V] in
-private theorem hamiltonian_of_list
+theorem hamiltonian_of_list
     (G : SimpleGraph V) (l : List V) (hne : l ≠ []) (hnodup : l.Nodup)
     (hchain : l.IsChain G.Adj) (hcover : ∀ v : V, v ∈ l) :
     ∃ u v : V, ∃ p : G.Walk u v, p.IsHamiltonian := by
