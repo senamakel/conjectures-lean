@@ -129,7 +129,7 @@ theorem search_complete (g : Array Nat) (candidates : List Nat) (size : Nat)
               ⟨tail, hlenTail, htailFiltered, hpairsTail⟩
             rw [compatibleCliqueSearchBool, Bool.or_eq_true]
             exact Or.inr (search_complete g (vs.filter (compatible g v)) size htake)
-termination_by candidates => candidates.length
+termination_by candidates.length
 decreasing_by
   · simp_wf
     omega
