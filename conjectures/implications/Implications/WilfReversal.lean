@@ -196,3 +196,5 @@ theorem exactOccurrenceCount_eq_reverse (n : ℕ) (p : Fin 8 → Fin 8)
     (occurrenceSet_reverse p) marks
 
 end Implications.WilfReversal
+
+#print axioms Implications.WilfReversal.exactOccurrenceCount_eq_reverse
