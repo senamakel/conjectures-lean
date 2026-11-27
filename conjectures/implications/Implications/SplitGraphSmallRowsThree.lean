@@ -327,7 +327,7 @@ theorem three_selected_rows_form_triangle
       · exact Finset.mem_filter.mpr ⟨hSsub hd, hid⟩
       · exact Finset.mem_filter.mpr ⟨hSsub he, hie⟩
     have hthreeCard : ({q,d,e} : Finset C).card = 3 := by
-      simp [hqd, hqe, hde, hqd.symm, hqe.symm, hde.symm]
+      simp [hqd, hqe, hde, Ne.symm hqd, Ne.symm hqe, Ne.symm hde]
     have hle := Finset.card_le_card hthree
     rw [hdegree i hiI, hthreeCard] at hle
     omega
