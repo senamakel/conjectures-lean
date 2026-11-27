@@ -1,4 +1,4 @@
-import Lean
+import FormalConjectures.Other.BeaverMathOlympiad
 
 namespace AntihydraParity
 
@@ -36,7 +36,40 @@ theorem odd_block (n k i : Nat) (hi : i < n) :
     orbit (1 + 2 ^ n * k) i % 2 = 1 := by
   rw [prefix_parity_shift 1 k n i hi, orbit_one]
 
+def evenCount (n : Nat) : Nat :=
+  ((Finset.range n).filter fun i => Even (orbit 8 i)).card
+
+/-- Every prefix needs at least a third of its entries to be even. -/
+theorem target_iff_even_count :
+    (type_of% @BeaverMathOlympiad.beaver_math_olympiad_problem_2_antihydra.variants.set) ↔
+      ∀ n, n ≤ 3 * evenCount n := by
+  have hcard (n : Nat) :
+      ((Finset.range n).filter fun i => Odd (orbit 8 i)).card + evenCount n = n := by
+    rw [evenCount, ← Finset.filter_card_add_filter_neg_card_eq_card
+      (p := fun i => Odd (orbit 8 i)) (s := Finset.range n)] at *
+    rw [Finset.card_range]
+  have hcount (n : Nat) :
+      ((Finset.range n).filter fun i => Odd (orbit 8 i)).card ≤ 2 * evenCount n ↔
+        n ≤ 3 * evenCount n := by
+    have := hcard n
+    omega
+  constructor
+  · intro h n
+    apply (hcount n).mp
+    simpa [evenCount, Nat.Ico_zero_eq_range] using
+      h (orbit 8) rfl (fun _ => rfl) n
+  · intro h a h0 hs n
+    have ha : a = orbit 8 := by
+      funext i
+      induction i with
+      | zero => exact h0
+      | succ i ih => rw [hs, ih, orbit]
+    subst a
+    simpa [evenCount, Nat.Ico_zero_eq_range] using (hcount n).mpr (h n)
+
 end AntihydraParity
 
 #print axioms AntihydraParity.prefix_parity_shift
 #print axioms AntihydraParity.odd_block
+
+#print axioms AntihydraParity.target_iff_even_count
