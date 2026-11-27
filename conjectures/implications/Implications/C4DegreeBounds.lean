@@ -1,4 +1,4 @@
-import Mathlib.Algebra.Order.BigOperators.Group.Finset.Basic
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Combinatorics.SimpleGraph.Finite
 import Implications.C4VertexExtension
 
