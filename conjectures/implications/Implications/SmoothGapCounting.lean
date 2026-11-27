@@ -204,7 +204,8 @@ private theorem eventually_logLogCutoff_smoothFactor_le :
       exact_mod_cast (show 1 < Nat.nth Nat.Prime n from
         Nat.Prime.one_lt (Nat.prime_nth_prime n))
     exact Real.log_pos hp
-  have hx : 0 < (primeAt n : ℝ) := by positivity
+  have hx : 0 < (primeAt n : ℝ) := by
+    exact_mod_cast (Nat.prime_nth_prime n).pos
   have hk : (k : ℝ) ≤ Real.log (primeAt n : ℝ) / 4 := by
     dsimp [k]
     exact hpi
