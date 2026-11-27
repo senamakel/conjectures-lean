@@ -54,7 +54,11 @@ theorem exists_outsider_attachments
   have hij : i = j := Subtype.ext (Finset.card_le_one_iff.mp hone.le hi hj)
   subst j
   have hbd : b = d := by
-    cases b <;> cases d <;> simp_all [f, Ne.symm (hxy i)]
+    cases b <;> cases d
+    · rfl
+    · exact (hxy i (show x i = y i from heV)).elim
+    · exact (hxy i (show y i = x i from heV).symm).elim
+    · rfl
   rw [hbd]
 
 #print axioms exists_outsider_attachments
