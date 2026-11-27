@@ -47,7 +47,7 @@ theorem three_pair_rows_are_triangle
           subst x <;> subst y <;> simp_all [Finset.pair_comm]
       rcases hpair with h | h | h <;> simp [h]
     have htargetCard : ({({a,b} : Finset α), {b,c}, {a,c}} : Finset (Finset α)).card = 3 := by
-      simp [hab, hac, hbc]
+      simp [hab, hac, hbc, hab.symm, hac.symm, hbc.symm]
     have hEq := Finset.eq_of_subset_of_card_le hFsub
       (by rw [hcardF, htargetCard])
     exact ⟨a,b,c,hab,hac,hbc,hEq⟩
