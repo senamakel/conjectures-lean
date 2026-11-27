@@ -63,10 +63,10 @@ theorem star_isTree (G : SimpleGraph V) (I : Finset V) (c : V)
           · exact h
         simpa [hxval] using (Finset.mem_filter.mp hyrow).2
       · have hxrow : x.val ∈ row G I c := by
+          have hyval : y.val = c := congrArg Subtype.val hy
           rcases Finset.mem_insert.mp x.property with h | h
           · exact (hxy (h.trans hyval.symm)).elim
           · exact h
-        have hyval : y.val = c := congrArg Subtype.val hy
         simpa [hyval] using ((Finset.mem_filter.mp hxrow).2).symm
   rw [hEq]
   exact SimpleGraph.isTree_starGraph center
