@@ -10,6 +10,7 @@ directly, and requires DRAT-trim to certify any UNSAT result.
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import gzip
 import hashlib
 import itertools
