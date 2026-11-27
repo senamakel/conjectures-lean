@@ -26,11 +26,11 @@ def addVertex {V : Type*} (G : SimpleGraph V) (s : Set V) : SimpleGraph (Option 
     symm := by
       constructor
       intro a b hab
-      cases a <;> cases b <;> simp_all [G.symm]
+      cases a <;> cases b <;> simp_all <;> try exact G.symm.symm hab
     loopless := by
       constructor
       intro a ha
-      cases a <;> simp_all [G.loopless] }
+      cases a <;> simp_all <;> try exact G.loopless.irrefl ha }
 
 @[simp] theorem addVertex_adj_some_some {V : Type*} (G : SimpleGraph V) (s : Set V)
     (x y : V) : (addVertex G s).Adj (some x) (some y) ↔ G.Adj x y := Iff.rfl
@@ -58,8 +58,11 @@ theorem addVertex_c4Free_iff {V : Type*} (G : SimpleGraph V) (s : Set V) :
         (by simpa using hxy) (by simp) hnew hnew'
       exact hnot ⟨hold, hold'⟩
   · rintro ⟨hG, hS⟩ x y z w hxy hzw hxz hyz htwo
+    change ∀ ⦃x y z w⦄, x ≠ y → z ≠ w →
+      (addVertex G s).Adj x z → (addVertex G s).Adj y z →
+      ¬ ((addVertex G s).Adj x w ∧ (addVertex G s).Adj y w)
     cases x <;> cases y <;> cases z <;> cases w <;>
-      simp_all [addVertex] <;> aesop
+      simp only [addVertex] at * <;> aesop (maxRuleApplications := 1000)
 
 #print axioms addVertex_c4Free_iff
 
