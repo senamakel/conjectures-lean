@@ -222,6 +222,56 @@ private theorem moveMarked_injective {n : ℕ} (marks : Finset ℕ) (p q : Fin 8
   have hx := congrArg (fun e : Equiv.Perm (Fin n) => e (g.symm x)) he
   simpa only [Equiv.trans_apply, Equiv.apply_symm_apply] using hx
 
+/-- A marked-window bijection turns a local overlap certificate into exact count equality.
+
+The moved points of `m` only need to lie among offsets `1`, `3`, and `4`; the separate
+condition on offset `1` ensures that a later marked window supplies a nontrivial component
+at the critical crossing point. -/
+theorem exactOccurrenceCount_eq_of_markedSwap (n : ℕ) (marks : Finset (Fin n))
+    (p q : Fin 8 → Fin 8) (m : Equiv.Perm (Fin 8))
+    (hm : ∀ i : Fin 8, m i ≠ i → i = 1 ∨ i = 3 ∨ i = 4) (hm1 : m 1 ≠ 1)
+    (hoverP : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
+    (hoverQ : ∀ d, 1 ≤ d → d < 8 → overlapCompatible q d = true → d = 5 ∨ d = 7)
+    (hpq : p ∘ m = q) (hqp : q ∘ m.symm = p)
+    (hlocal : ∀ f : Fin 13 → Fin n, WindowOrder p f 0 → WindowOrder p f 5 →
+      ∀ i j, f (overlapImage m i) < f (overlapImage m j) ↔ q i < q j)
+    (hlocalInv : ∀ f : Fin 13 → Fin n, WindowOrder q f 0 → WindowOrder q f 5 →
+      ∀ i j, f (overlapImage m.symm i) < f (overlapImage m.symm j) ↔ p i < p j) :
+    WilfCounts.exactCount (WilfPatternSwap.occurrenceSet p) marks =
+      WilfCounts.exactCount (WilfPatternSwap.occurrenceSet q) marks := by
+  classical
+  apply WilfEquivalence.exactCount_eq_of_markedEquiv
+  intro chosen
+  let chosenNat := chosen.image Fin.val
+  have hmInv : ∀ i : Fin 8, m.symm i ≠ i → i = 1 ∨ i = 3 ∨ i = 4 := by
+    intro i hi
+    apply hm i
+    intro hfix
+    apply hi
+    have h := congrArg m.symm hfix
+    simpa using h.symm
+  have hm1Inv : m.symm 1 ≠ 1 := by
+    intro hfix
+    apply hm1
+    have h := congrArg m hfix
+    simpa using h.symm
+  have hcount : Fintype.card {π : Equiv.Perm (Fin n) // Marked chosenNat p π} =
+      Fintype.card {π : Equiv.Perm (Fin n) // Marked chosenNat q π} := by
+    apply le_antisymm
+    · apply Fintype.card_le_of_injective _
+        (moveMarked_injective chosenNat p q m hm hm1 hoverP hpq hlocal)
+      apply overlap_compatible_only_at_5_or_7_of_decide
+      intro d hd hsmall
+      exact hoverP d hd hsmall
+    · apply Fintype.card_le_of_injective _
+        (moveMarked_injective chosenNat q p m.symm hmInv hm1Inv hoverQ hqp hlocalInv)
+      apply overlap_compatible_only_at_5_or_7_of_decide
+      intro d hd hsmall
+      exact hoverQ d hd hsmall
+  exact (Equiv.subtypeEquivRight (marked_iff_subset p chosen)).trans
+    ((Fintype.equivOfCardEq hcount).trans
+      (Equiv.subtypeEquivRight (marked_iff_subset q chosen)).symm)
+
 private theorem marked_iff_subset {n : ℕ} (p : Fin 8 → Fin 8)
     (chosen : Finset (Fin n)) (π : Equiv.Perm (Fin n)) :
     chosen ⊆ WilfPatternSwap.occurrenceSet p π ↔ Marked (chosen.image Fin.val) p π := by
