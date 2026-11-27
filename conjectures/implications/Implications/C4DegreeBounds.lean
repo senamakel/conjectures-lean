@@ -9,7 +9,8 @@ import Implications.C4Extremal42
 In a C4-free graph, the neighborhoods of the neighbors of a vertex, with that
 vertex removed, are pairwise disjoint.  This gives a general degree window
 from any lower bound on all degrees.  At order 42, a degree-eight vertex has
-neighbor degree excess at most one above the all-six baseline.
+neighbor degree excess at most one above the all-six baseline.  Also, the
+subgraph induced on any vertex neighborhood has maximum degree at most one.
 -/
 
 namespace C4DegreeBounds
@@ -229,6 +230,7 @@ theorem degree_window_of_extremal_42 (G : SimpleGraph (Fin 42))
   exact ⟨hminAll v, hmax⟩
 
 #print axioms degree_window_bound
+#print axioms innerNeighbors_card_le_one
 #print axioms neighbor_degree_excess_le_one_of_degree_eight
 #print axioms neighbor_degree_le_seven_of_degree_eight
 #print axioms degree_window_of_extremal_42
