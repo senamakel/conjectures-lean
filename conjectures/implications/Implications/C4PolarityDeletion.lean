@@ -131,7 +131,6 @@ theorem retained_edge_count_eq_104_add_deleted_score
           have hsub : D ∩ A ⊆ D := Finset.inter_subset_left
           exact (Finset.card_le_card hsub).trans (by omega)
         rw [Nat.sub_add_cancel hle, hD]
-        norm_num
   have hcountRelation :
       inducedEdgeCount G R + (∑ v ∈ D, G.degree v) =
         G.edgeFinset.card + inducedEdgeCount G D := by
