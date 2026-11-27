@@ -59,11 +59,6 @@ def pattern36125784 : Fin 8 → Fin 8 := ![2, 5, 0, 1, 4, 6, 7, 3]
 def pattern36215784 : Fin 8 → Fin 8 := ![2, 5, 1, 0, 4, 6, 7, 3]
 def pattern35216784 : Fin 8 → Fin 8 := ![2, 4, 1, 0, 5, 6, 7, 3]
 
-private theorem checkOverlap (p : Fin 8 → Fin 8) :
-    ∀ d, 1 ≤ d → d < 8 → (overlapCompatible p d = true ↔ d = 5 ∨ d = 7) := by
-  intro d hd hsmall
-  interval_cases d <;> decide
-
 private theorem swap14_26134785 : pattern26134785 ∘ swap14 = pattern24136785 := by
   funext i; fin_cases i <;> rfl
 private theorem swap14_24136785 : pattern24136785 ∘ swap14 = pattern26134785 := by
@@ -99,7 +94,8 @@ theorem exactOccurrenceCount_eq_26134785_24136785 (n : ℕ) (marks : Finset (Fin
   exact exactOccurrenceCount_eq_swap14 n marks pattern26134785 pattern24136785
     swap14_26134785 swap14_24136785 (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide) (by decide)
-    (checkOverlap _) (checkOverlap _)
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by intro d hd hs; interval_cases d <;> decide)
 
 theorem exactOccurrenceCount_eq_26135784_25136784 (n : ℕ) (marks : Finset (Fin n)) :
     WilfCounts.exactCount (occurrenceSet pattern26135784) marks =
@@ -107,7 +103,8 @@ theorem exactOccurrenceCount_eq_26135784_25136784 (n : ℕ) (marks : Finset (Fin
   exact exactOccurrenceCount_eq_swap14 n marks pattern26135784 pattern25136784
     swap14_26135784 swap14_25136784 (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide) (by decide)
-    (checkOverlap _) (checkOverlap _)
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by intro d hd hs; interval_cases d <;> decide)
 
 theorem exactOccurrenceCount_eq_26145783_25146783 (n : ℕ) (marks : Finset (Fin n)) :
     WilfCounts.exactCount (occurrenceSet pattern26145783) marks =
@@ -115,7 +112,8 @@ theorem exactOccurrenceCount_eq_26145783_25146783 (n : ℕ) (marks : Finset (Fin
   exact exactOccurrenceCount_eq_swap14 n marks pattern26145783 pattern25146783
     swap14_26145783 swap14_25146783 (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide) (by decide)
-    (checkOverlap _) (checkOverlap _)
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by intro d hd hs; interval_cases d <;> decide)
 
 theorem exactOccurrenceCount_eq_36124785_34126785 (n : ℕ) (marks : Finset (Fin n)) :
     WilfCounts.exactCount (occurrenceSet pattern36124785) marks =
@@ -123,7 +121,8 @@ theorem exactOccurrenceCount_eq_36124785_34126785 (n : ℕ) (marks : Finset (Fin
   exact exactOccurrenceCount_eq_swap14 n marks pattern36124785 pattern34126785
     swap14_36124785 swap14_34126785 (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide) (by decide)
-    (checkOverlap _) (checkOverlap _)
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by intro d hd hs; interval_cases d <;> decide)
 
 theorem exactOccurrenceCount_eq_36214785_34216785 (n : ℕ) (marks : Finset (Fin n)) :
     WilfCounts.exactCount (occurrenceSet pattern36214785) marks =
@@ -131,7 +130,8 @@ theorem exactOccurrenceCount_eq_36214785_34216785 (n : ℕ) (marks : Finset (Fin
   exact exactOccurrenceCount_eq_swap14 n marks pattern36214785 pattern34216785
     swap14_36214785 swap14_34216785 (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide) (by decide)
-    (checkOverlap _) (checkOverlap _)
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by intro d hd hs; interval_cases d <;> decide)
 
 theorem exactOccurrenceCount_eq_35126784_36125784 (n : ℕ) (marks : Finset (Fin n)) :
     WilfCounts.exactCount (occurrenceSet pattern35126784) marks =
@@ -139,7 +139,8 @@ theorem exactOccurrenceCount_eq_35126784_36125784 (n : ℕ) (marks : Finset (Fin
   exact exactOccurrenceCount_eq_swap14 n marks pattern35126784 pattern36125784
     swap14_35126784 swap14_36125784 (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide) (by decide)
-    (checkOverlap _) (checkOverlap _)
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by intro d hd hs; interval_cases d <;> decide)
 
 theorem exactOccurrenceCount_eq_36215784_35216784 (n : ℕ) (marks : Finset (Fin n)) :
     WilfCounts.exactCount (occurrenceSet pattern36215784) marks =
@@ -147,6 +148,7 @@ theorem exactOccurrenceCount_eq_36215784_35216784 (n : ℕ) (marks : Finset (Fin
   exact exactOccurrenceCount_eq_swap14 n marks pattern36215784 pattern35216784
     swap14_36215784 swap14_35216784 (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide) (by decide)
-    (checkOverlap _) (checkOverlap _)
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by intro d hd hs; interval_cases d <;> decide)
 
 end Implications.WilfArchiveClosure
