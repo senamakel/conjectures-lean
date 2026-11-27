@@ -56,6 +56,8 @@ Marcusbuffett combines direct formalization with reduction trees. All 94 merged 
 
 ## Rank targets by the missing argument
 
+Use the [batch runbook](OMA_AT_SCALE.md) to coordinate LemmaGraph, Exa, and GitHub checks across multiple target families.
+
 1. **Start with families.** Search neighbouring variants and existing reduction leaves in an area where we already have lemmas. Take up to three exact IDs. For each, write down the paper or Lean lemma that gets closest and the smallest missing bridge. Use the catalogue score for discovery. Its formula rewards known status and applies a discount for variants, so it cannot estimate the Lean work remaining. [Scoring code](https://github.com/GuillaumeBAUD-coder/open-math-agents/blob/8f760b97f64ba59384435c5f5d5814c941328bb2/scripts/ingest.py#L268)
 2. **Rank by what a proof would finish.** Prefer an open target with a concrete proof route or bounded witness search, then a feasible leaf that closes an open parent or supplies a reusable missing lemma. A leaf's value depends on its outstanding siblings. A published solution can supply a premise for this workspace. Work whose full deduction is already published belongs in a separately authorized formalization effort.
 3. **Time-box the first test.** As a starting budget, spend 20 minutes on status and prior art, then 60 minutes checking the key import, bridge, construction or obstruction at the OMA pin. Continue when that test establishes a proof route or exposes a tractable remaining obligation. Apply the workspace's separate budget and stop conditions to computational searches.
