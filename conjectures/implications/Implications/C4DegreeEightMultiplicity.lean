@@ -175,7 +175,9 @@ theorem degree_eight_vertex_has_seven_degree_six_neighbors
       · exact (Finset.mem_inter.mp hvA).1
       · exact (Finset.mem_inter.mp hvE).1
   have hcard : N.card = (N ∩ A).card + (N ∩ E).card := by
-    rw [hpartition, Finset.card_union_of_disjoint hdisj]
+    calc
+      N.card = (N ∩ A ∪ N ∩ E).card := by rw [← hpartition]
+      _ = (N ∩ A).card + (N ∩ E).card := Finset.card_union_of_disjoint hdisj
   rw [hNcard, hseven] at hcard
   omega
 
