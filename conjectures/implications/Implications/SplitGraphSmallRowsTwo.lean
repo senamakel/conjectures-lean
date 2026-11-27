@@ -455,18 +455,14 @@ theorem hamiltonian_of_split_partition_two_double_rows
       (by intro q hq; simpa [selectedRow] using hcap q hq)
       (by
         intro q hq hqTwo
+        change selectedRow I left right q ⊆ S
         have hqD : q ∈ doubleRows := Finset.mem_filter.mpr ⟨hq,hqTwo⟩
         rw [hdoubleRows] at hqD
         simp only [Finset.mem_insert, Finset.mem_singleton] at hqD
-        rcases hqD with rfl | rfl
-        · change selectedRow I left right c ⊆ S
-          rw [hrowC]
-          intro i hi
-          simpa [S] using hi
-        · change selectedRow I left right d ⊆ S
-          rw [hrowD]
-          intro i hi
-          simpa [S] using hi)
+        rcases hqD with hqc | hqd
+        · rw [hqc, hrowC]
+        · rw [hqd, hrowD]
+          )
       hprefixClique
   · rcases hoverlap with ⟨hrowC,hrowD,huv,huw,hvw⟩
     -- The overlap branch uses the seven-vertex exceptional prefix.
