@@ -91,7 +91,7 @@ theorem lexNext_eq (next : Nat) (left right : List Nat) :
 /-- DIMACS clauses for an equality-prefix gate are satisfied when `same` is
 assigned the exact prefix conjunction. -/
 theorem lexStep_extension (a : Nat → Bool) (pref x y same : Nat)
-    (hp : a pref = true) (hx : a x = true) (hy : a y = false)
+    (hguard : (!a pref || a x || !a y) = true)
     (hp0 : 0 < pref) (hx0 : 0 < x) (hy0 : 0 < y) (hs0 : 0 < same)
     (hps : pref ≠ same) (hxs : x ≠ same) (hys : y ≠ same) :
     ∃ b : Nat → Bool, (∀ n, n ≠ same → b n = a n) ∧
@@ -101,8 +101,9 @@ theorem lexStep_extension (a : Nat → Bool) (pref x y same : Nat)
   · intro n hns
     simp [Function.update, hns]
   · simp [Function.update]
-  · simp [cnfValue, clauseValue, literalValue, lexStepClauses, pos, neg,
-      Function.update, hps, hxs, hys, hp, hx, hy, hp0, hx0, hy0, hs0]
+  · cases hp : a pref <;> cases hx : a x <;> cases hy : a y <;>
+      simp_all [cnfValue, clauseValue, literalValue, lexStepClauses, pos, neg,
+        Function.update, hps, hxs, hys, hp0, hx0, hy0, hs0]
 
 end Implications.C4PolarityLexEncoding
 
