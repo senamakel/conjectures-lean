@@ -22,12 +22,11 @@ theorem three_pair_rows_are_triangle
     ∃ a b c, a ≠ b ∧ a ≠ c ∧ b ≠ c ∧
       F = {({a,b} : Finset α), {b,c}, {a,c}} := by
   classical
-  obtain ⟨a,b,c,hab,hac,hbc,hsub⟩ :=
-    SplitGraphSmallRows.pairwise_intersecting_two_sets F
-      (by
-        have : F.Nonempty := Finset.card_pos.mp (by omega)
-        exact this)
-      hcard hint
+  have hne : F.Nonempty := Finset.card_pos.mp (by omega)
+  obtain hcenter | htriangle :=
+    SplitGraphSmallRows.pairwise_intersecting_two_sets F hne hcard hint
+  · exact (hnocenter hcenter).elim
+  · obtain ⟨a,b,c,hab,hac,hbc,hsub⟩ := htriangle
   have hFsub : F ⊆ ({({a,b} : Finset α), {b,c}, {a,c}} : Finset (Finset α)) := by
     intro s hs
     have hs' := hsub s hs
@@ -47,9 +46,6 @@ theorem three_pair_rows_are_triangle
     rcases hpair with h | h | h <;> simp [h]
   have htargetCard : ({({a,b} : Finset α), {b,c}, {a,c}} : Finset (Finset α)).card = 3 := by
     simp [hab, hac, hbc]
-  have htargetSub : ({({a,b} : Finset α), {b,c}, {a,c}} : Finset (Finset α)) ⊆ F := by
-    apply Finset.eq_of_subset_of_card_le hFsub
-    rw [hcardF, htargetCard]
   have hEq := Finset.eq_of_subset_of_card_le hFsub
     (by rw [hcardF, htargetCard])
   exact ⟨a,b,c,hab,hac,hbc,hEq.symm⟩
