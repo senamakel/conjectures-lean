@@ -150,3 +150,33 @@ handshake condition, fixing n8=k also forces n7=24−2k and n6=17+k among the
 41 non-root vertices. This gives five exhaustive proof cases, but none was run
 in this screen. A future proof must check all five cases and replay every proof;
 the present combined-cap result remains only `UNKNOWN`.
+
+## k=4 incidence benchmark protocol (written before the run)
+
+The parent proof now establishes the k=4 incidence profile in Lean
+(`C4DegreeEightMultiplicity`): each of four degree-eight vertices has seven
+degree-six neighbors; each of 22 degree-six vertices has one or two degree-eight
+neighbors; exactly six have two and the other 16 have one. These incidences
+total 28. Use the existing degree-six root and labels 1..6 for its neighbors,
+preserving the previously justified complete labeling symmetry. The additional
+CNF constraints are exact degree-class conjunctions and exact threshold counts:
+degree-eight vertices have exactly seven degree-six neighbors, degree-six
+vertices have one or two degree-eight neighbors, and exactly six degree-six
+vertices have multiplicity two. Also forbid degree-eight/degree-eight edges,
+as follows from the checked degree cap lemma. These are necessary conditions,
+so they retain every graph in the k=4 case. The auxiliary incidence flags are
+constrained to equal their edge and degree-class conjunctions; the degree
+threshold circuits are exact. Therefore an edge projection satisfying this
+strengthened formula is still a graph satisfying the base formula.
+
+Generate only the distinct k=4 strengthened formula with
+`--deduplicate-c4 --compact-degree-count --compact-common-neighbor
+--degree-eight-count 4 --k4-incidence`. Preserve the output under
+`.lake/c4-42-rooted-sat/`. Run the existing CaDiCaL 2.1.2 binary once with a
+120-second real-time limit and LRAT output. Stop on a model, complete UNSAT, or
+UNKNOWN at the cap; do not rerun this instance or the earlier combined AMO
+instance. Independently validate any model. A solver UNSAT result remains
+incomplete until Lean checks its LRAT trace and a formal bridge connects this
+exact encoder to the graph clauses. The checkable k=4 theorem replaces solver
+work to reconstruct the incidence structure; it does not establish that this
+SAT instance is UNSAT.
