@@ -95,8 +95,9 @@ theorem unique_overlapping_predecessor (marks shifts : Finset ℕ)
 its start is an allowed overlap shift immediately before or after the central start. -/
 theorem moved_position_has_overlapping_neighbor (marks shifts : Finset ℕ)
     (hsep : SeparatedBy marks shifts)
+    (m : Equiv.Perm (Fin 8))
     {s t : ℕ} (hs : s ∈ marks) (ht : t ∈ marks) (hst : s ≠ t)
-    (i j : Fin 8)
+    (i j : Fin 8) (_hj : j ∈ m.support)
     (hcoord : s + i.val = t + j.val) :
     (t < s ∧ s - t ∈ shifts ∧ s - t < 8) ∨
       (s < t ∧ t - s ∈ shifts ∧ t - s < 8) := by
@@ -109,6 +110,22 @@ theorem moved_position_has_overlapping_neighbor (marks shifts : Finset ℕ)
   · rcases hsep t ht s hs hts with hfar | hd
     · omega
     · exact Or.inl ⟨hts, hd, by omega⟩
+
+/-- A lifted summand that moves a point of a central length-eight window is based at
+the unique overlapping predecessor or successor permitted by the shift set. -/
+theorem lifted_mover_overlaps {n : ℕ} (marks shifts : Finset ℕ)
+    (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n)
+    (hsep : SeparatedBy marks shifts)
+    {s t : ℕ} (hs : s ∈ marks) (ht : t ∈ marks) (hst : s ≠ t)
+    (i : Fin 8) (hx : windowEmbedding s (hb s hs) i ∈
+      (liftWindow t (hb t ht) m).support) :
+    (t < s ∧ s - t ∈ shifts ∧ s - t < 8) ∨
+      (s < t ∧ t - s ∈ shifts ∧ t - s < 8) := by
+  rw [liftWindow_support_image] at hx
+  obtain ⟨j, hj, heq⟩ := Finset.mem_image.mp hx
+  have hcoord := congrArg Fin.val heq
+  change t + j.val = s + i.val at hcoord
+  exact moved_position_has_overlapping_neighbor marks shifts hsep m hs ht hst i j hj (by omega)
 
 private abbrev MarkedStart (marks : Finset ℕ) := {t : ℕ // t ∈ marks}
 
@@ -217,6 +234,7 @@ theorem assemble_apply_of_no_lifted_support {n : ℕ} (marks shifts : Finset ℕ
 #print axioms unique_overlapping_successor
 #print axioms unique_overlapping_predecessor
 #print axioms moved_position_has_overlapping_neighbor
+#print axioms lifted_mover_overlaps
 #print axioms lifted_windows_pairwise_disjoint
 #print axioms lifted_support_mover_unique
 #print axioms assemble_apply_of_lifted_support
