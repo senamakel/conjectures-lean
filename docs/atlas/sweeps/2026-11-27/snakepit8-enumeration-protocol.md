@@ -148,17 +148,46 @@ maximum RSS. It is incomplete. The four exact-edge partial outputs currently
 sum to 2,124,428 masks, far below the reported 4,576,964. The measured budget
 remaining is about 144 CPU seconds under the 840-second aggregate stop.
 
-Use this final budget for one optimization attempt on `E=23`: track the
-remaining degree capacity of selected vertices. If `r` vertices remain and
-their maximum degree is 2, then at most
-`floor((capacity + 2*r)/2)` additional edges can be added, since every new edge
-uses two degree slots. Prune when current edges plus this bound is below 23.
-This is stronger than the previous `2*r` bound when many selected vertices
-are saturated. Run from the root into a separate `.lake` artifact, with a
-140-second internal wall cap, 145-second timeout, 6-billion-node cap and 2 GiB
-limit. This intentionally repeats the incomplete E23 prefix with a sound
-branch bound; do not merge its masks with the earlier prefix. Stop all compute
-after this one run, regardless of completion.
+Use this final budget for one diagnostic run on `E=23` tracking the remaining
+degree capacity of selected vertices. If `r` vertices remain and their maximum
+degree is 2, at most `floor((capacity + 2*r)/2)` additional edges can be added.
+However, the tracked capacity is exactly `2*(vertices - edges)`, so this upper
+bound simplifies to `vertices + r`. The existing minimum-size filter already
+requires `vertices + r ≥ 27`, making the proposed edge bound redundant for
+target 23. In replacing the previous `edges + 2*r` bound, it actually removes a
+valid pruning in some branches. Run from the root into a separate `.lake`
+artifact, with a 140-second internal wall cap, 145-second timeout,
+6-billion-node cap and 2 GiB limit. This intentionally repeats the incomplete
+E23 prefix to measure the changed bounded traversal; do not merge its masks
+with the earlier prefix. Stop all compute after this one run, regardless of
+completion.
+
+The capacity-bound retry hit 6 billion nodes after 122.95 CPU seconds, emitting
+1,422,003 masks and rejecting 1,223,129 cyclic leaves at 7,100 KiB maximum RSS.
+It is partial. The two E23 files are alternate bounded traversals and must not
+be merged. The mask file for each run contains exactly eight bytes per emitted
+mask. Hashes and outcomes:
+
+| Slice / run | CPU seconds | Nodes | Forest masks | Cyclic leaves | Max RSS | Outcome | Mask SHA-256 |
+| --- | ---: | ---: | ---: | ---: | ---: | --- | --- |
+| E26, initial | 118.50 | 6,000,000,000 | 5,860 | 59,632 | 7,180 KiB | partial | `562cf9b0d6b932862cd3a3ca88d273d407debf57d0ad5818b02382382ea58195` |
+| E26, vertex bound | 125.43 | 6,000,000,000 | 5,860 | 32,214 | 7,092 KiB | partial, identical mask file | `562cf9b0d6b932862cd3a3ca88d273d407debf57d0ad5818b02382382ea58195` |
+| E25 | 124.16 | 6,000,000,000 | 81,326 | 186,240 | 7,100 KiB | partial | `4ff1eb97d65f56ca9dc4aa0ed9aa3ababae120c71a02a036f3b2a6e9251dcbc5` |
+| E24 | 122.89 | 6,000,000,000 | 592,878 | 732,873 | 7,140 KiB | partial | `7e29fc650bea39900e9d9d71f63341e3b7cf3c600af74a8c41ff0d2ffd004895` |
+| E23, basic bound | 137.47 | 6,000,000,000 | 1,444,364 | 1,240,642 | 7,100 KiB | partial | `0bbe748d774b84682b0739502884ca2f09feccb72b505f8a5a8a1575491bfb3b` |
+| E23, degree-capacity bound | 122.95 | 6,000,000,000 | 1,422,003 | 1,223,129 | 7,100 KiB | partial, alternate traversal | `641b37136e5247e759378b2a9aba675b1413a676443c0a7a54b2cddbe69b4dbc` |
+
+Aggregate measured CPU was about 819.5 seconds (13.7 minutes), under the
+840-second stop. No slice completed. The four target-specific partial files
+using the latest run for each target contain 2,102,067 masks, not a complete
+census. The E23 count differs between bounded traversals because the second
+traversal replaced `edges + 2*r` with the weaker, redundant `vertices + r`
+prune, so its node cap covered a different part of the search tree. This says
+nothing about the complete counts, which should agree. The capacity expression
+was not an optimization. The complete labeled census was not reproduced. Raw
+Q6 layer generation consumed nearly the full budget and does not support
+starting the much larger Q8 compatible-pair search without a more efficient
+generator or the authors' implementation.
 
 ## Interpretation
 
