@@ -37,7 +37,7 @@ form a clique-ended core. The row bounds and minimum attachment degree force
 there to be no other independent vertices, so the four-row prefix extends by
 appending the unused clique vertices. -/
 theorem hamiltonian_of_all_four_triple_rows
-    (G : SimpleGraph V) (C I : Finset V)
+    (G : SimpleGraph V) [DecidableRel G.Adj] (C I : Finset V)
     (a b c d : V) (r : V → V)
     (hC : G.IsClique (C : Set V)) (hCI : Disjoint C I)
     (hpartition : (Finset.univ : Finset V) = C ∪ I)
@@ -64,9 +64,8 @@ theorem hamiltonian_of_all_four_triple_rows
     · exact hd
   have hAeraseCard (i : V) (hi : i ∈ A) : (A.erase i).card = 3 := by
     rw [Finset.card_erase_of_mem hi, hAcard]
-    omega
   have hrowCard (i : V) (hi : i ∈ A) : (row G I (r i)).card = 3 := by
-    rw [hrows i hi]
+    rw [(hrows i hi).2]
     exact hAeraseCard i hi
 
   have hnoOutsideNeighbor (x : V) (hxI : x ∈ I \ A) (q : V) (hq : q ∈ C) :
@@ -95,12 +94,15 @@ theorem hamiltonian_of_all_four_triple_rows
       have hriC : r i ∈ C := hri.1
       have hqne : q ≠ r i := by
         intro heq
-        have hxi : x ∈ row G I (r i) := by simpa [heq] using hxS
+        have hxi : x ∈ row G I (r i) := by
+          change x ∈ row G I q at hxS
+          rw [heq] at hxS
+          exact hxS
         rw [hri.2] at hxi
         exact hxA ((Finset.mem_erase.mp hxi).2)
       have hrowDiff := hdiff q hq (r i) hriC hqne
       have hdiff' : (S \ (A.erase i) ∪ (A.erase i) \ S).card ≤ 3 := by
-        simpa [S, rowDiff, hri.2] using hrowDiff
+        simpa [S, A, rowDiff, hri.2] using hrowDiff
       have hinter := card_le_twice_intersection_of_diff S (A.erase i)
         (hAeraseCard i hiA) hdiff'
       have hsubset : S ∩ (A.erase i) ⊆ B.erase i := by
@@ -126,20 +128,27 @@ theorem hamiltonian_of_all_four_triple_rows
             ⟨(Finset.mem_inter.mp hy).1,
               (Finset.mem_erase.mp (Finset.mem_inter.mp hy).2).2⟩
         have hempty : S ∩ (A.erase a) = ∅ := by
-          apply Finset.eq_empty_iff_forall_not_mem.mpr
-          intro y hy
-          have : y ∈ B := hsubset hy
-          rw [hBempty] at this
-          exact Finset.notMem_empty y this
+          ext y
+          simp only [Finset.mem_inter, Finset.mem_erase, Finset.notMem_empty]
+          constructor
+          · rintro ⟨hyS, hyNe, hyA⟩
+            have hyB : y ∈ B := Finset.mem_inter.mpr ⟨hyS, hyA⟩
+            rw [hBempty] at hyB
+            exact hyB
+          · intro hy
+            exact False.elim hy
         simp [hempty]
       have hdiffA : (S \ (A.erase a) ∪ (A.erase a) \ S).card ≤ 3 := by
         have hqa : q ≠ r a := by
           intro heq
-          have hxa : x ∈ row G I (r a) := by simpa [heq] using hxS
+          have hxa : x ∈ row G I (r a) := by
+            change x ∈ row G I q at hxS
+            rw [heq] at hxS
+            exact hxS
           rw [hra.2] at hxa
           exact hxA ((Finset.mem_erase.mp hxa).2)
         have hd := hdiff q hq (r a) hra.1 hqa
-        simpa [S, rowDiff, hra.2] using hd
+        simpa [S, A, rowDiff, hra.2] using hd
       have hinter := card_le_twice_intersection_of_diff S (A.erase a)
         (hAeraseCard a hia) hdiffA
       rw [hiaT] at hinter
@@ -152,10 +161,13 @@ theorem hamiltonian_of_all_four_triple_rows
     have hxDiff : x ∈ I \ A := Finset.mem_sdiff.mpr ⟨hx, hxA⟩
     have hdegreeX := hdegree x hx
     have hempty : C.filter (fun q => G.Adj q x) = ∅ := by
-      apply Finset.eq_empty_iff_forall_not_mem.mpr
-      intro q hq
-      exact hnoOutsideNeighbor x hxDiff q (Finset.mem_filter.mp hq).1
-        (Finset.mem_filter.mp hq).2
+      ext q
+      simp only [Finset.mem_filter, Finset.notMem_empty]
+      constructor
+      · intro hq
+        exact hnoOutsideNeighbor x hxDiff q hq.1 hq.2
+      · intro hq
+        exact False.elim hq
     rw [hempty] at hdegreeX
     simp at hdegreeX
 
@@ -176,9 +188,9 @@ theorem hamiltonian_of_all_four_triple_rows
     subst q
     exact (Finset.disjoint_left.mp hCI) hq hi
 
-  let prefix : List V := [a, r d, b, r a, c, r b, d, r c]
-  have hprefNodup : prefix.Nodup := by
-    simp [prefix, hab, hac, had, hbc, hbd, hcd, hrowInj, hcross, A,
+  let pref : List V := [a, r d, b, r a, c, r b, d, r c]
+  have hprefNodup : pref.Nodup := by
+    simp [pref, hab, hac, had, hbc, hbd, hcd, hrowInj, hcross, A,
       ha, hb, hc, hd, hrows]
   have hAdjRow (i j : V) (hi : i ∈ A) (hj : j ∈ A) (hne : i ≠ j) :
       G.Adj (r i) j := by
@@ -192,48 +204,36 @@ theorem hamiltonian_of_all_four_triple_rows
   have hrbC : G.Adj c (r b) := (hAdjRow b (by simp [A]) (by simp [A]) hbc.symm).symm
   have hrbD : G.Adj (r b) d := hAdjRow b (by simp [A]) (by simp [A]) hbd
   have hrcD : G.Adj d (r c) := (hAdjRow c (by simp [A]) (by simp [A]) hcd.symm).symm
-  have hrdra : r d ≠ r a := fun h => (hcd) (hrowInj d a (by simp [A]) (by simp [A]) h)
-  have hra_rb : r a ≠ r b := fun h => (hab) (hrowInj a b (by simp [A]) (by simp [A]) h)
-  have hrb_rc : r b ≠ r c := fun h => (hbc) (hrowInj b c (by simp [A]) (by simp [A]) h)
-  have hcliqueAdj (x y : V) (hx : x ∈ C) (hy : y ∈ C) (hne : x ≠ y) : G.Adj x y :=
-    hC hx hy hne
-  have hrdraAdj := hcliqueAdj (r d) (r a) (hrows d (by simp [A])).1
-    (hrows a (by simp [A])).1 hrdra
-  have hra_rbAdj := hcliqueAdj (r a) (r b) (hrows a (by simp [A])).1
-    (hrows b (by simp [A])).1 hra_rb
-  have hrb_rcAdj := hcliqueAdj (r b) (r c) (hrows b (by simp [A])).1
-    (hrows c (by simp [A])).1 hrb_rc
-  have hprefChain : prefix.IsChain G.Adj := by
-    simp [prefix, hrdA, hrdB, hraB, hraC, hrbC, hrbD, hrcD,
-      hrdraAdj, hra_rbAdj, hrb_rcAdj]
+  have hprefChain : pref.IsChain G.Adj := by
+    simp [pref, hrdA, hrdB, hraB, hraC, hrbC, hrbD, hrcD]
   have hprefLastC : ∀ x, x ∈ prefix.getLast? → x ∈ C := by
     intro x hx
-    simp [prefix] at hx
+    simp [pref] at hx
     subst x
     exact (hrows c (by simp [A])).1
-  let tail : List V := (C.filter fun x => x ∉ prefix).toList
+  let tail : List V := (C.filter fun x => x ∉ pref).toList
   have htailNodup : tail.Nodup := by simp [tail]
   have htailC : ∀ x ∈ tail, x ∈ C := by
     intro x hx
     exact (Finset.mem_filter.mp (Finset.mem_toList.mp hx)).1
-  have hbaseTailDisjoint : ∀ x ∈ prefix, x ∉ tail := by
+  have hbaseTailDisjoint : ∀ x ∈ pref ++ [], x ∉ tail := by
     intro x hx htail
     exact (Finset.mem_filter.mp (Finset.mem_toList.mp htail)).2 hx
-  have hcover : ∀ x : V, x ∈ prefix ++ [] ∨ x ∈ tail := by
+  have hcover : ∀ x : V, x ∈ pref ++ [] ∨ x ∈ tail := by
     intro x
-    by_cases hp : x ∈ prefix
+    by_cases hp : x ∈ pref
     · exact Or.inl (List.mem_append_left [] hp)
     · have hx := Finset.mem_univ x
       rw [hpartition] at hx
       rcases Finset.mem_union.mp hx with hxC | hxI
       · exact Or.inr (Finset.mem_toList.mpr (Finset.mem_filter.mpr ⟨hxC, hp⟩))
       · have hxA : x ∈ A := hIeq ▸ hxI
-        simp [prefix, A] at hp
-        rcases hxA with rfl | rfl | rfl | rfl <;> simp [prefix] at hp
-  have hprefNonempty : prefix ++ [] ++ tail ≠ [] := by simp [prefix]
+        have hxA' : x = a ∨ x = b ∨ x = c ∨ x = d := by simpa [A] using hxA
+        rcases hxA' with rfl | rfl | rfl | rfl <;> simp [pref] at hp
+  have hprefNonempty : pref ++ [] ++ tail ≠ [] := by simp [pref]
   exact SplitGraphSmallRowsThree.hamiltonian_of_prefix_and_remaining_chain
-    G C hC prefix [] tail hprefNodup hprefChain hprefLastC
-    (by simp) (by simp) (by simp) (by simp) hbaseTailDisjoint
+    G C hC pref [] tail hprefNodup hprefChain hprefLastC
+    (by simp) (by simp) (by simp) (by simp) (by simp)
     htailNodup htailC hbaseTailDisjoint hcover hprefNonempty
 
 end SplitGraphKappaThreeFourTriples
