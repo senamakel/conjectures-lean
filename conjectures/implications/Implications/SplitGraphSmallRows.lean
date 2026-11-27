@@ -402,8 +402,8 @@ theorem chosen_neighbor_rows_card_le_three
         have hc' := Finset.mem_filter.mp hc
         have hi' := Finset.mem_filter.mp hc'.2
         rcases hi'.2 with h | h
-        · exact Or.inl h.symm
-        · exact Or.inr h.symm
+        · exact Finset.mem_insert.mpr (Or.inl h.symm)
+        · exact Finset.mem_insert.mpr (Or.inr h.symm)
       · intro hc
         simp only [Finset.mem_insert, Finset.mem_singleton] at hc
         rcases hc with h | h
