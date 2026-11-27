@@ -657,7 +657,7 @@ theorem hamiltonian_of_split_partition_three_double_rows
   let usedClique : Finset V := {x,y,z} ∪ O.biUnion (fun k => {left k, right k})
   let tailFin : Finset V := C \ usedClique
   let tail : List V := tailFin.toList
-  have htailNodup : tail.Nodup := by simp [tail]
+  have htailNodup : tail.Nodup := by simp [tail, tailFin]
   have htailC : ∀ v ∈ tail, v ∈ C := by
     intro v hv
     exact (Finset.mem_sdiff.mp (Finset.mem_toList.mp hv)).1
@@ -669,11 +669,11 @@ theorem hamiltonian_of_split_partition_three_double_rows
       rcases List.mem_append.mp hv with hvprefix | hvrest
       · simp only [List.mem_cons, List.not_mem_nil, or_false] at hvprefix
         rcases hvprefix with h | h | h | h | h | h
-        · subst v; simp [usedClique]
+        · subst v; exact False.elim ((Finset.disjoint_left.mp hdisj) hvC haI)
         · subst v; exact Finset.mem_union.mpr (Or.inl (by simp))
-        · subst v; simp [usedClique]
+        · subst v; exact False.elim ((Finset.disjoint_left.mp hdisj) hvC hbI)
         · subst v; exact Finset.mem_union.mpr (Or.inl (by simp))
-        · subst v; simp [usedClique]
+        · subst v; exact False.elim ((Finset.disjoint_left.mp hdisj) hvC hcI)
         · subst v; exact Finset.mem_union.mpr (Or.inl (by simp))
       · obtain ⟨k, hk, hcase⟩ := (hrestMem v).mp hvrest
         rcases hcase with h | h | h
@@ -698,13 +698,16 @@ theorem hamiltonian_of_split_partition_three_double_rows
             simpa using hvEnds
           left
           apply List.mem_append_right
-          exact (hrestMem v).2 ⟨k, hk, by rcases hvEnds' with h | h
+          have hcase : v = left k ∨ v = k ∨ v = right k := by
+            rcases hvEnds' with h | h
             · exact Or.inl h
-            · exact Or.inr (Or.inr h)⟩
+            · exact Or.inr (Or.inr h)
+          exact (hrestMem v).2 ⟨k, hk, hcase⟩
       · right
         exact Finset.mem_toList.mpr (Finset.mem_sdiff.mpr ⟨hvC, hvUsed⟩)
     · by_cases hvSpecial : v ∈ special
       · left
+        apply List.mem_append_left
         simp only [List.mem_cons, List.not_mem_nil, or_false]
         simp only [special, Finset.mem_insert, Finset.mem_singleton] at hvSpecial
         rcases hvSpecial with h | h | h <;> simp [h]
