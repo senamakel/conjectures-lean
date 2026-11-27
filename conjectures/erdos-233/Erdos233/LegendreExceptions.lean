@@ -18,6 +18,23 @@ def squareInterval (n : ℕ) : Finset ℕ := Finset.Ico (n ^ 2) ((n + 1) ^ 2)
 def legendreFailure (n : ℕ) : Prop :=
   ∀ p : ℕ, p.Prime → ¬ (n ^ 2 < p ∧ p < (n + 1) ^ 2)
 
+/-- Failed square intervals with left endpoint index in `[a, 2a)`. -/
+noncomputable def legendreBadBlock (a : ℕ) : Finset ℕ := by
+  classical
+  exact (Finset.Ico a (2 * a)).filter legendreFailure
+
+/-- The index of the prime gap containing the square interval's left endpoint. -/
+def squareGapIndex (n : ℕ) : ℕ := idx (n ^ 2) - 1
+
+/-- The integer points in the half-open interval spanning a consecutive-prime gap. -/
+def primeGapInterval (k : ℕ) : Finset ℕ :=
+  Finset.Ico (k.nth Nat.Prime) ((k + 1).nth Nat.Prime)
+
+/-- Indices of prime gaps containing failed square intervals in one dyadic block. -/
+noncomputable def legendreBadGapIndices (a : ℕ) : Finset ℕ := by
+  classical
+  exact (legendreBadBlock a).image squareGapIndex
+
 lemma squareInterval_card (n : ℕ) : (squareInterval n).card = 2 * n + 1 := by
   simp [squareInterval]
   have h : (n + 1) ^ 2 = n ^ 2 + (2 * n + 1) := by ring
@@ -89,5 +106,57 @@ lemma squareInterval_subset_gap {n k : ℕ}
   intro x hx
   simp only [squareInterval, Finset.mem_Ico] at hx ⊢
   exact ⟨hleft.trans hx.1, lt_of_lt_of_le hx.2 hright⟩
+
+lemma legendreFailure_squareInterval_subset_gap {n : ℕ} (hn : 2 ≤ n)
+    (hbad : legendreFailure n) :
+    squareInterval n ⊆ primeGapInterval (squareGapIndex n) := by
+  obtain ⟨hnext, hprev, _⟩ := legendreFailure_gap hn hbad
+  simpa [primeGapInterval, squareGapIndex] using
+    squareInterval_subset_gap (Nat.le_of_lt hprev) hnext
+
+/-- The total square-interval length in one block is bounded by the total length of
+the prime gaps which contain those intervals. -/
+theorem legendreBadBlock_length_le_gapSum (a : ℕ) (ha : 2 ≤ a) :
+    ((legendreBadBlock a).card : ℝ) * (2 * a : ℝ) ≤
+      ∑ k ∈ legendreBadGapIndices a, (primeGap k : ℝ) := by
+  classical
+  let B := legendreBadBlock a
+  let G := legendreBadGapIndices a
+  let S := B.biUnion squareInterval
+  let T := G.biUnion primeGapInterval
+  have hdis : (B : Set ℕ).PairwiseDisjoint squareInterval := by
+    intro m hm n hn hmn
+    exact squareInterval_disjoint hmn
+  have hlower : (B.card : ℝ) * (2 * a : ℝ) ≤ (S.card : ℝ) := by
+    rw [Finset.card_biUnion hdis]
+    have hterms : ∀ n ∈ B, (2 * a : ℝ) ≤ (squareInterval n).card := by
+      intro n hn
+      rw [squareInterval_card]
+      have hmem := (Finset.mem_filter.mp hn).1
+      have hnlo : a ≤ n := (Finset.mem_Ico.mp hmem).1
+      exact_mod_cast (show 2 * a ≤ 2 * n + 1 by omega)
+    calc
+      (B.card : ℝ) * (2 * a : ℝ) = ∑ n ∈ B, (2 * a : ℝ) := by simp
+      _ ≤ ∑ n ∈ B, (squareInterval n).card := Finset.sum_le_sum fun n hn => hterms n hn
+      _ = (S.card : ℝ) := by norm_cast
+  have hsubset : S ⊆ T := by
+    intro x hx
+    rcases Finset.mem_biUnion.mp hx with ⟨n, hn, hx⟩
+    have hnmem := (Finset.mem_filter.mp hn).1
+    have hnlo : a ≤ n := (Finset.mem_Ico.mp hnmem).1
+    have hbad := (Finset.mem_filter.mp hn).2
+    have hinc : squareInterval n ⊆ primeGapInterval (squareGapIndex n) :=
+      legendreFailure_squareInterval_subset (le_trans ha hnlo) hbad
+    have hk : squareGapIndex n ∈ G := by
+      exact Finset.mem_image.mpr ⟨n, hn, rfl⟩
+    exact Finset.mem_biUnion.mpr ⟨squareGapIndex n, hk, hinc hx⟩
+  have hupper : (S.card : ℝ) ≤ ∑ k ∈ G, (primeGap k : ℝ) := by
+    calc
+      (S.card : ℝ) ≤ (T.card : ℝ) := by exact_mod_cast Finset.card_le_card hsubset
+      _ ≤ ∑ k ∈ G, (primeGap k : ℝ) := by
+        rw [Finset.card_biUnion_le]
+        norm_cast
+        simp [primeGapInterval, primeGap]
+  exact hlower.trans hupper
 
 end Erdos233
