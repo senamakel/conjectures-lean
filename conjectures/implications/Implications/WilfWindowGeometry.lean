@@ -46,16 +46,18 @@ theorem unique_overlapping_successor (marks shifts : Finset ℕ)
     {s t u : ℕ} (hs : s ∈ marks) (ht : t ∈ marks) (hu : u ∈ marks)
     (hst : s < t) (hsu : s < u) (htt : t - s < 8) (htu : u - s < 8) :
     t = u := by
+  have hstGap : 4 ≤ t - s := by
+    rcases hsep s hs t ht hst with hfar | hd
+    · omega
+    · exact hgap (t - s) hd
+  have hsuGap : 4 ≤ u - s := by
+    rcases hsep s hs u hu hsu with hfar | hd
+    · omega
+    · exact hgap (u - s) hd
   rcases lt_trichotomy t u with h | h | h
-  · rcases hsep t ht u hu h with hfar | hd
-    · omega
-    · have := hgap (u - t) hd
-      omega
+  · omega
   · exact h
-  · rcases hsep u hu t ht h with hfar | hd
-    · omega
-    · have := hgap (t - u) hd
-      omega
+  · omega
 
 /-- If local moved offsets never meet their translates at an allowed gap, the lifted
 permutations at all marked windows have pairwise-disjoint supports. -/
