@@ -104,8 +104,7 @@ theorem degree_eight_neighborhood_union_card_eq_26
     omega
   have hJlower : 12 ≤ (E \ U).card := by omega
   have hUupper : U.card ≤ 26 := by
-    rw [hDcard] at hUnionBound
-    norm_num at hUnionBound
+    rw [hDcard] at hcap
     omega
   omega
 
@@ -116,7 +115,7 @@ theorem degree_eight_pair_has_one_common_neighbor
     (he : G.edgeFinset.card = 138)
     (hC4 : C4VertexExtension.C4Free G)
     (h8 : (Finset.univ.filter fun v => G.degree v = 8).card = 4)
-    {u v : Fin 42} (hu : G.degree u = 8) (hv : G.degree v = 8) (huv : u ≠ v) :
+    {u v : Fin 42} (hu : G.degree u = 8) (_hv : G.degree v = 8) (huv : u ≠ v) :
     (G.neighborFinset u ∩ G.neighborFinset v).card = 1 := by
   have hmem : u ∈ Finset.univ.filter (fun x => G.degree x = 8) := by simp [hu]
   exact extremal_degree_eight_vertices_have_unique_common_neighbor
