@@ -135,8 +135,10 @@ theorem four_root_witness_weighted_count
       have hone := (Finset.mem_filter.mp (Finset.mem_inter.mp hyP).2).2
       omega
     calc
-      _ = (∑ y ∈ W ∩ S, m y) + ∑ y ∈ W ∩ P, m y := by
-        rw [hWsplit, Finset.sum_union hWdisjoint]
+      _ = ∑ y ∈ (W ∩ S) ∪ (W ∩ P), m y :=
+        congrArg (fun t => ∑ y ∈ t, m y) hWsplit
+      _ = (∑ y ∈ W ∩ S, m y) + ∑ y ∈ W ∩ P, m y :=
+        Finset.sum_union hWdisjoint
       _ = 2 * (W ∩ S).card + (W ∩ P).card := by
         have hsumS : (∑ y ∈ W ∩ S, m y) = 2 * (W ∩ S).card := by
           calc
@@ -160,7 +162,7 @@ theorem four_root_witness_weighted_count
     ext y
     simp [W, P]
   rw [hsplit, hWSp, hWPp] at hsum
-  exact hsum.symm
+  exact hsum
 
 end C4RootWitnessCountIdentity
 
