@@ -36,3 +36,4 @@ import Implications.WilfChainCertificate
 import Implications.WilfArchiveOrientation
 import Implications.WilfThreeCycleOrder
 import Implications.WilfThreeCycleGlobal
+import Implications.WilfWindowGeometry
