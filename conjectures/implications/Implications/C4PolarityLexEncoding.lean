@@ -27,6 +27,16 @@ def cnfValue (a : Nat → Bool) (clauses : List (List Int)) : Bool :=
 private def pos (v : Nat) : Int := Int.ofNat v
 private def neg (v : Nat) : Int := -(Int.ofNat v)
 
+@[simp] private theorem literalValue_pos (a : Nat → Bool) (v : Nat) (hv : 0 < v) :
+    literalValue a (pos v) = a v := by
+  simp [literalValue, pos]
+
+@[simp] private theorem literalValue_neg (a : Nat → Bool) (v : Nat) (hv : 0 < v) :
+    literalValue a (neg v) = !a v := by
+  cases v with
+  | zero => omega
+  | succ n => simp [literalValue, neg, pos]
+
 /-- One nontrivial iteration of the Python lex loop: its guard clause followed
 by the five clauses defining the next equality-prefix variable. -/
 def lexStepClauses (pref x y same : Nat) : List (List Int) :=
