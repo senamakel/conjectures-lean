@@ -28,24 +28,30 @@ noncomputable def smoothCutoffNat (L : ℝ) : ℕ := ⌊smoothCutoff L⌋₊
 /-- The real cutoff tends to infinity. -/
 theorem smoothCutoff_tendsto_atTop : Tendsto smoothCutoff atTop atTop := by
   have hroot : Tendsto rootScale atTop atTop := by
-    rw [tendsto_atTop_atTop]
     refine tendsto_atTop_mono' atTop ?_ Real.tendsto_sqrt_atTop
     filter_upwards [Real.tendsto_log_atTop.eventually_ge_atTop 1,
       eventually_gt_atTop (1 : ℝ)] with L hlog hL
+    change Real.sqrt L ≤ Real.sqrt (L * Real.log L)
     apply Real.sqrt_le_sqrt
-    dsimp [rootScale]
-    nlinarith [Real.log_le_self (by linarith : 0 ≤ L)]
+    have hLnonneg : 0 ≤ L := by linarith
+    nlinarith [mul_nonneg hLnonneg (sub_nonneg.mpr hlog)]
   have hhalf : Tendsto (fun L : ℝ => rootScale L / 2) atTop atTop := by
-    simpa [div_eq_mul_inv] using hroot.const_mul_atTop (by norm_num : 0 < (1 / 2 : ℝ))
-  simpa [smoothCutoff] using Real.tendsto_exp_atTop.comp hhalf
+    simpa [div_eq_mul_inv, mul_comm] using hroot.const_mul_atTop (by norm_num : 0 < (1 / 2 : ℝ))
+  change Tendsto (fun L : ℝ => Real.exp (rootScale L / 2)) atTop atTop
+  exact Real.tendsto_exp_atTop.comp hhalf
 
 /-- The natural cutoff eventually exceeds any fixed integer. -/
 theorem smoothCutoffNat_tendsto_atTop : Tendsto smoothCutoffNat atTop atTop := by
   rw [tendsto_atTop_atTop]
   intro b
-  filter_upwards [smoothCutoff_tendsto_atTop.eventually_ge_atTop (b + 1)] with L hL
+  have hYlarge := smoothCutoff_tendsto_atTop.eventually_ge_atTop ((b : ℝ) + 1)
+  rw [Filter.eventually_atTop] at hYlarge
+  obtain ⟨c, hc⟩ := hYlarge
+  refine ⟨max c (b : ℝ), ?_⟩
+  intro L hL
+  have hy := hc L (le_trans (le_max_left _ _) hL)
   apply Nat.le_floor
-  exact_mod_cast hL
+  exact_mod_cast (by linarith : (b : ℝ) ≤ smoothCutoff L)
 
 /-- The floor cutoff is at least two eventually, so the dyadic logarithm is
 in its nondegenerate range. -/
@@ -56,7 +62,7 @@ theorem eventually_smoothCutoffNat_ge_two :
 /-- Rounding down never increases the real cutoff. -/
 theorem smoothCutoffNat_cast_le (L : ℝ) :
     (smoothCutoffNat L : ℝ) ≤ smoothCutoff L := by
-  exact Nat.floor_le (by positivity)
+  exact Nat.floor_le (by exact Real.exp_nonneg _)
 
 
 /-- The square of the scale, for positive `L` with `log L ≥ 0`. -/
