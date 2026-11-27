@@ -30,6 +30,8 @@ Green 100(i) `R1.H1.R1` [passed the pinned checker and was pushed](https://githu
 
 For the noncompact top-homology leaf `R1.H2`, the public Poincaré development supplies `PoincareMT.Proofs.M59.integralNoncompactSimplyConnectedThreeHomology_isZero` under simple connectivity, with additional local-homology and compact-support infrastructure. The checked case split left a non-simply-connected leaf with the main vanishing difficulty, so it stayed local. The checked proof of simple connectivity of the sphere gives a route to a more economical compactness hypothesis in a future parent reduction.
 
+The [stacked Green 100 transfer proof](https://github.com/senamakel/open-math-agents/tree/oma/green100-cellular-transfer) passed the pinned checker with the three standard axioms. It closes `R1.H1.R1.H2` against the proposed group-algebra reduction by showing the action on all configurations is faithful and that surjectivity would make the left inverse two-sided. It adapts the Apache-2.0 OpenAI cellular action helpers and retains the license. Submission requires the intermediate reduction to merge and register.
+
 ## Earlier attempts and follow-up candidates
 
 | Target | Recovered public evidence | Remaining work |
