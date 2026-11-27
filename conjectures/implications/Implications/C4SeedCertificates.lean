@@ -11,15 +11,16 @@ by their 41 neighbourhood bitmasks.  Their SHA-256 digests, in order, are
 `4033a0cc2e1e8f6d7cb05009d2ed0b0cfcec9ce969d76c6ed2faec68b3405927`,
 `7b21f509d31f8002aba9c00d5a21a1db422177bd6a832cee6b4e80dad460db60`, and
 `8282afa2558555cbdad70ff78767b188cd328b83626e8b59c0f11ad31e000042`.
-Each record decodes to 41 vertices and 132 edges.  For vertices `u` and `v`, having no common
+Each record decodes to 41 vertices and 132 edges. For vertices `u` and `v`, having no common
 neighbour is the bitwise condition `land (N u) (N v) = 0`.
 
 `compatibleCliqueSearch` is a depth-pruned search.  It either skips the next
 candidate, or takes it and restricts later candidates to vertices compatible
-with it.  The proposition-valued recursion is itself the search's
-specification, proved equivalent to the Boolean checker by `search_correct`.
-The three closed Boolean results below are checked by `native_decide`, and
-`checker_false` converts each Boolean result back to its proposition.
+with it. `search_correct` proves equivalence with the proposition that an
+actual pairwise-compatible list of the requested size is a sublist of the
+candidates. The three closed Boolean results below are checked by
+`native_decide`, and `checker_false` converts each Boolean result to that
+proposition. Each finite check completed in under one second in Lean.
 
 This certifies only that the three supplied seeds have no compatible
 six-element set.  It makes no claim that the list of seeds is exhaustive.
@@ -55,7 +56,7 @@ def ExistsCompatibleClique (g : Array Nat) (candidates : List Nat) (size : Nat) 
     chosen.Pairwise (fun u v => compatible g u v = true)
 
 /-- A true checker result produces an actual compatible sublist witness. -/
-def search_sound (g : Array Nat) : (candidates : List Nat) → (size : Nat) →
+theorem search_sound (g : Array Nat) : (candidates : List Nat) → (size : Nat) →
     compatibleCliqueSearchBool g candidates size = true →
       ExistsCompatibleClique g candidates size
   | _, 0, _ => ⟨[], by simp, List.nil_sublist _, List.Pairwise.nil⟩
@@ -85,7 +86,7 @@ decreasing_by
     omega
 
 /-- A genuine compatible sublist is found by the depth-pruned checker. -/
-def search_complete (g : Array Nat) : (candidates : List Nat) → (size : Nat) →
+theorem search_complete (g : Array Nat) : (candidates : List Nat) → (size : Nat) →
     ExistsCompatibleClique g candidates size →
       compatibleCliqueSearchBool g candidates size = true
   | _, 0, _ => by simp [compatibleCliqueSearchBool]
