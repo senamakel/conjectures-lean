@@ -358,5 +358,10 @@ theorem exactOccurrenceCount_eq_18236475_18246375 (n : ℕ) (marks : Finset (Fin
     (by funext i; fin_cases i <;> rfl)
 
 #print axioms exactOccurrenceCount_eq
+#print axioms exactOccurrenceCount_eq_16238475_16248375
+#print axioms exactOccurrenceCount_eq_17236485_17246385
+#print axioms exactOccurrenceCount_eq_17238465_17248365
+#print axioms exactOccurrenceCount_eq_18237465_18247365
+#print axioms exactOccurrenceCount_eq_18236475_18246375
 
 end Implications.WilfPatternSwap
