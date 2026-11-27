@@ -254,7 +254,17 @@ theorem hamiltonian_of_split_partition_two_endpoints
   have hl_finset : l.toFinset = C := by
     ext x
     simp [l, M, ha, hb, Finset.mem_erase]
-    tauto
+    constructor
+    · rintro (hxa | hxb | ⟨_, hx⟩)
+      · exact hxa ▸ ha
+      · exact hxb ▸ hb
+      · exact hx
+    · intro hx
+      by_cases hxa : x = a
+      · exact Or.inl hxa
+      · by_cases hxb : x = b
+        · exact Or.inr (Or.inl hxb)
+        · exact Or.inr (Or.inr ⟨hxa, hx⟩)
   have hl_head : l.head? = some a := by simp [l]
   have hl_last : l.getLast? = some b := by
     change ((a :: M.toList) ++ [b]).getLast? = some b
