@@ -139,7 +139,7 @@ theorem every_other_vertex_has_unique_common_neighbor
     exact C4DegreeBounds.outerNeighbors_disjoint G hC4 hu hw huw
   have hUcard : U.card = 41 := by
     calc
-      _ = ∑ u ∈ S, (O u).card := by simpa [U] using (Finset.card_biUnion hdisj).symm
+      _ = ∑ u ∈ S, (O u).card := by simpa [U] using Finset.card_biUnion hdisj
       _ = 41 := houterSum
   have hUsubset : U ⊆ Finset.univ.erase v := by
     intro w hw
