@@ -26,10 +26,11 @@ theorem liftWindow_support_image {n : ℕ} (s : ℕ) (hs : s + 8 ≤ n)
     rw [liftWindow_apply]
     exact congrArg (windowEmbedding s hs) hfix
   · rintro ⟨i, hi, rfl⟩
-    rw [Equiv.Perm.mem_support] at hi ⊢
     intro hfix
     apply hi
-    exact (windowEmbedding s hs).injective (by simpa only [liftWindow_apply] using hfix)
+    apply (windowEmbedding s hs).injective
+    rw [liftWindow_apply] at hfix
+    exact hfix
 
 /-- A family of length-eight starts is separated according to its allowed overlap shifts.
 Every pair is either disjoint as windows or has a gap listed in `shifts`. -/
@@ -44,9 +45,9 @@ theorem lifted_windows_pairwise_disjoint {n : ℕ} (marks shifts : Finset ℕ)
     (hsep : SeparatedBy marks shifts)
     (htranslate : ∀ d ∈ shifts, ∀ i j : Fin 8,
       i ∈ m.support → j ∈ m.support → i.val ≠ d + j.val) :
-    ∀ s ∈ marks, ∀ t ∈ marks, s ≠ t →
-      Equiv.Perm.Disjoint (liftWindow s (hb s ‹s ∈ marks›) m)
-        (liftWindow t (hb t ‹t ∈ marks›) m) := by
+    ∀ s (hs : s ∈ marks), ∀ t (ht : t ∈ marks), s ≠ t →
+      Equiv.Perm.Disjoint (liftWindow s (hb s hs) m)
+        (liftWindow t (hb t ht) m) := by
   have hordered {s t : ℕ} (hs : s ∈ marks) (ht : t ∈ marks) (hst : s < t) :
       Equiv.Perm.Disjoint (liftWindow s (hb s hs) m) (liftWindow t (hb t ht) m) := by
     rw [Equiv.Perm.disjoint_iff_disjoint_support]
