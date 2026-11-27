@@ -122,6 +122,63 @@ theorem degree_eight_pair_has_one_common_neighbor
   exact extremal_degree_eight_vertices_have_unique_common_neighbor
     G hDel he hC4 h8 u hmem v huv.symm
 
+/-- Each degree-eight vertex has exactly seven degree-six neighbors in the
+four-vertex equality case. -/
+theorem degree_eight_vertex_has_seven_degree_six_neighbors
+    (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    (hDel : ∀ v, C4Extremal42.inducedDeletionCount G v ≤ 132)
+    (he : G.edgeFinset.card = 138)
+    (hC4 : C4VertexExtension.C4Free G)
+    (h8 : (Finset.univ.filter fun v => G.degree v = 8).card = 4)
+    {u : Fin 42} (hu : G.degree u = 8) :
+    (G.neighborFinset u ∩ Finset.univ.filter fun v => G.degree v = 6).card = 7 := by
+  classical
+  let N := G.neighborFinset u
+  let A := Finset.univ.filter fun v : Fin 42 => G.degree v = 6
+  let E := Finset.univ.filter fun v : Fin 42 => G.degree v = 7
+  have hmin : ∀ v, 6 ≤ G.degree v := fun v =>
+    (C4DegreeBounds.degree_window_of_extremal_42 G hDel he hC4 v).1
+  have hmax : ∀ v, G.degree v ≤ 8 := fun v =>
+    (C4DegreeBounds.degree_window_of_extremal_42 G hDel he hC4 v).2
+  have hNcard : N.card = 8 := by
+    simpa [N, G.card_neighborFinset_eq_degree] using hu
+  have hseven : (N ∩ E).card = 1 := by
+    exact each_degree_eight_vertex_has_one_degree_seven_neighbor G hDel he hC4 h8
+      u (by simp [hu])
+  have hNsubset : N ⊆ A ∪ E := by
+    intro v hv
+    have hvAdj : G.Adj u v := (G.mem_neighborFinset u v).mp hv
+    have hvle7 := C4DegreeBounds.neighbor_degree_le_seven_of_degree_eight
+      G u (by simp) hmin hC4 hu hv
+    have hvmin := hmin v
+    simp only [A, E, Finset.mem_union, Finset.mem_filter, Finset.mem_univ, true_and]
+    by_cases hv6 : G.degree v = 6
+    · exact Or.inl hv6
+    · right
+      omega
+  have hdisj : Disjoint (N ∩ A) (N ∩ E) := by
+    apply Finset.disjoint_left.mpr
+    intro v hvA hvE
+    have hv6 := (Finset.mem_filter.mp (Finset.mem_inter.mp hvA).2).2
+    have hv7 := (Finset.mem_filter.mp (Finset.mem_inter.mp hvE).2).2
+    omega
+  have hpartition : N = (N ∩ A) ∪ (N ∩ E) := by
+    ext v
+    constructor
+    · intro hvN
+      have hvAE := hNsubset hvN
+      rcases Finset.mem_union.mp hvAE with hvA | hvE
+      · exact Finset.mem_union.mpr (Or.inl (Finset.mem_inter.mpr ⟨hvN, hvA⟩))
+      · exact Finset.mem_union.mpr (Or.inr (Finset.mem_inter.mpr ⟨hvN, hvE⟩))
+    · intro hv
+      rcases Finset.mem_union.mp hv with hvA | hvE
+      · exact (Finset.mem_inter.mp hvA).1
+      · exact (Finset.mem_inter.mp hvE).1
+  have hcard : N.card = (N ∩ A).card + (N ∩ E).card := by
+    rw [hpartition, Finset.card_union_of_disjoint hdisj]
+  rw [hNcard, hseven] at hcard
+  omega
+
 /-- In the equality case, every degree-six vertex belongs to the union of
 degree-eight neighborhoods. -/
 theorem degree_six_vertex_in_degree_eight_union
@@ -221,4 +278,5 @@ end C4DegreeEightMultiplicity
 
 #print axioms C4DegreeEightMultiplicity.degree_eight_neighborhood_union_card_eq_26
 #print axioms C4DegreeEightMultiplicity.degree_eight_pair_has_one_common_neighbor
+#print axioms C4DegreeEightMultiplicity.degree_eight_vertex_has_seven_degree_six_neighbors
 #print axioms C4DegreeEightMultiplicity.degree_six_vertex_in_degree_eight_union
