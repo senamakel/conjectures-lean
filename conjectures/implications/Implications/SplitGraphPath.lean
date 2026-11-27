@@ -27,7 +27,7 @@ private lemma subset_of_card_eq_two_of_symmDiff_le_one {s t : Finset V}
     have hxnot : x ∉ t := hxt'
     have hcard : (insert x t).card = 3 := by
       rw [Finset.card_insert_of_notMem hxnot, ht]
-    have hsub : insert x t ⊆ s := Finset.insert_subset.mpr ⟨hx, hts⟩
+    have hsub : insert x t ⊆ s := Finset.insert_subset_iff.mpr ⟨hx, hts⟩
     have : (insert x t).card ≤ s.card := Finset.card_le_card hsub
     omega
   · obtain ⟨y, hyt, hys⟩ := Finset.not_subset.mp hts
@@ -141,6 +141,7 @@ theorem independent_card_le_two_of_row_bounds
         · simpa [hcc]
         · have hone : (row G I c).card = 1 := by
             have hpos : 0 < (row G I c).card := Finset.card_pos.mpr hnonempty
+            have hle := hsmall c hc
             omega
           exact eq_of_card_eq_one_of_symmDiff_le_one hone hc₀row (by
             simpa [rowDiff, hcc, Finset.union_comm] using hdiff c hc c₀ hc₀ hcc)
@@ -148,7 +149,7 @@ theorem independent_card_le_two_of_row_bounds
         intro j hj
         obtain ⟨c, hc, hcj⟩ := hcover j hj
         have hmem : j ∈ row G I c := Finset.mem_filter.mpr ⟨hj, hcj⟩
-        rw [hsame c hc ⟨j, hmem⟩]
+        rw [← hsame c hc ⟨j, hmem⟩]
         exact hmem
       exact (Finset.card_le_card hI).trans (by omega)
 
