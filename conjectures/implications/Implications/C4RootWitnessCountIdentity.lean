@@ -344,7 +344,8 @@ theorem four_root_outer_edge_count
       exact Finset.disjoint_of_subset_left Finset.inter_subset_right
         (Finset.disjoint_of_subset_right Finset.inter_subset_right hAB)
     have hsum : N.card = (N ∩ U).card + (N ∩ (Finset.univ \ U)).card := by
-      have hdis : Disjoint U (Finset.univ \ U) := by simp
+      have hdis : Disjoint U (Finset.univ \ U) := by
+        exact Finset.disjoint_left.mpr fun y hy hnot => (Finset.mem_sdiff.mp hnot).2 hy
       have hcompl : U ∪ (Finset.univ \ U) = Finset.univ := by simp
       simpa [hcompl] using hcountUnion U (Finset.univ \ U) hdis
     rw [hpart, hcountUnion D O hDO, ← hU, hcountUnion S P hSP] at hsum
@@ -369,7 +370,7 @@ theorem four_root_outer_edge_count
     omega
   · intro x hx
     have ⟨hout, hx7⟩ := Finset.mem_filter.mp hx
-    have hnD : x ∉ D := (Finset.disjoint_left.mp hDO).2 hx
+    have hnD : x ∉ D := (Finset.disjoint_left.mp hDO.symm) hx
     have hzero : m x = 0 := by
       apply Finset.card_eq_zero.mpr
       apply Finset.eq_empty_iff_forall_notMem.mpr
@@ -381,6 +382,25 @@ theorem four_root_outer_edge_count
     have hh := hbalance x hnD
     omega
 
+/-- The 12-vertex bound of 21 edges excludes every shared pattern with
+at least four edges. The bound is supplied for the outside induced graph. -/
+theorem four_root_shared_edge_count_le_three
+    (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    (hDel : ∀ v, C4Extremal42.inducedDeletionCount G v ≤ 132)
+    (he : G.edgeFinset.card = 138) (hC4 : C4VertexExtension.C4Free G)
+    (h8 : (Finset.univ.filter fun v => G.degree v = 8).card = 4) :
+    let D := Finset.univ.filter fun v => G.degree v = 8
+    let U := D.biUnion fun u => G.neighborFinset u
+    let S := U.filter fun y => (G.neighborFinset y ∩ D).card = 2
+    let O := (Finset.univ \ U).filter fun v => G.degree v = 7
+    inducedEdgeCount G O ≤ 21 → inducedEdgeCount G S ≤ 3 := by
+  dsimp only
+  intro hOuter
+  have hcount := four_root_outer_edge_count G hDel he hC4 h8
+  dsimp only at hcount
+  omega
+
 #print axioms four_root_outer_edge_count
+#print axioms four_root_shared_edge_count_le_three
 
 end C4RootWitnessCountIdentity
