@@ -39,8 +39,14 @@ private theorem selected_incidence_properties
     · intro k hk
       by_contra hnot
       have hkI := (Finset.mem_filter.mp hk).1
-      have hiNe : i ≠ k := by intro h; exact hnot (Or.inl h.symm)
-      have hjNe : j ≠ k := by intro h; exact hnot (Or.inr h.symm)
+      have hiNe : i ≠ k := by
+        intro h
+        apply hnot
+        simp [h.symm]
+      have hjNe : j ≠ k := by
+        intro h
+        apply hnot
+        simp [h.symm]
       have htriple : ({i, j, k} : Finset V) ⊆ row := by
         intro z hz
         simp only [Finset.mem_insert, Finset.mem_singleton] at hz
