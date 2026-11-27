@@ -92,7 +92,10 @@ theorem eulerCost_div_rootScale_tendsto_zero :
       _ = (L ^ (1 / 4 : ℝ) / Real.sqrt L) *
           (Real.log L / Real.sqrt (Real.log L)) := by ring
       _ = _ := by rw [hLratio, hlogratio]; ring
-  exact Filter.Tendsto.congr' heq.symm hratio
+  have heq' : (fun L : ℝ => Real.log L ^ (1 / 2 : ℝ) / L ^ (1 / 4 : ℝ)) =ᶠ[atTop]
+      (fun L => L ^ (1 / 4 : ℝ) * Real.log L / rootScale L) :=
+    heq.mono fun _ h => h.symm
+  exact Filter.Tendsto.congr' heq' hratio
 
 /-- Eventually the logarithmic Euler-product cost is at most one eighth of
 `R`, a convenient single bound for combining with Rankin and the reciprocal
