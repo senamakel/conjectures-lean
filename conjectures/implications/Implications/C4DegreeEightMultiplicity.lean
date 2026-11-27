@@ -106,6 +106,7 @@ theorem degree_eight_neighborhood_union_card_eq_26
   have hUupper : U.card ≤ 26 := by
     rw [hDcard] at hcap
     omega
+  change U.card = 26
   omega
 
 /-- Every pair of degree-eight vertices has exactly one common neighbor. -/
