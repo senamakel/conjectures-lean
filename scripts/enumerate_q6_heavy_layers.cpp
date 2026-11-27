@@ -29,7 +29,7 @@ struct Search {
   bool within_limits() {
     if (nodes >= 6'000'000'000ULL ||
         ((nodes & 0xffff) == 0 &&
-        std::chrono::steady_clock::now() - start >= std::chrono::seconds(170))) {
+         std::chrono::steady_clock::now() - start >= std::chrono::seconds(140))) {
       stopped = true;
       return false;
     }
@@ -37,12 +37,13 @@ struct Search {
   }
 
   void visit(std::uint64_t remaining, std::uint64_t selected, int vertices,
-             int edges) {
+             int edges, int capacity) {
     if (!within_limits()) return;
     ++nodes;
     int remaining_count = std::popcount(remaining);
     int max_vertices = target_edges >= 25 ? 28 : 32;
-    if (edges > target_edges || edges + 2 * remaining_count < target_edges ||
+    if (edges > target_edges ||
+        edges + (capacity + 2 * remaining_count) / 2 < target_edges ||
         vertices > max_vertices || vertices + remaining_count < 27)
       return;
     if (remaining == 0) {
@@ -126,7 +127,7 @@ struct Search {
         ++degree[std::countr_zero(todo)];
       degree[next] = static_cast<std::uint8_t>(new_degree);
       visit(next_remaining, selected | (std::uint64_t{1} << next), vertices + 1,
-            edges + new_degree);
+            edges + new_degree, capacity + 2 - 2 * new_degree);
       degree[next] = 0;
       for (std::uint64_t todo = adjacent_selected; todo != 0; todo &= todo - 1)
         --degree[std::countr_zero(todo)];
@@ -134,7 +135,7 @@ struct Search {
     if (stopped) return;
 
     // Excluding the next vertex.
-    visit(next_remaining, selected, vertices, edges);
+    visit(next_remaining, selected, vertices, edges, capacity);
   }
 
   void run() {
@@ -144,7 +145,7 @@ struct Search {
     // Canonical degree-two pattern: origin 0 and neighbors 1 and 2.
     degree[0] = 2;
     degree[1] = degree[2] = 1;
-    visit(~std::uint64_t{0} & ~std::uint64_t{0b111}, 0b111, 3, 2);
+    visit(~std::uint64_t{0} & ~std::uint64_t{0b111}, 0b111, 3, 2, 2);
   }
 };
 

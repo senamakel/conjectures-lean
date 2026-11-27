@@ -142,6 +142,24 @@ emitting 592,878 eligible masks and rejecting 732,873 cyclic leaves at 7,140
 KiB maximum RSS. It is incomplete; no retry is planned. Run `E=23` once under
 the same caps, provided the aggregate CPU budget remains available.
 
+The single `E=23` run hit 6 billion nodes after 137.47 CPU seconds, emitting
+1,444,364 eligible masks and rejecting 1,240,642 cyclic leaves at 7,100 KiB
+maximum RSS. It is incomplete. The four exact-edge partial outputs currently
+sum to 2,124,428 masks, far below the reported 4,576,964. The measured budget
+remaining is about 144 CPU seconds under the 840-second aggregate stop.
+
+Use this final budget for one optimization attempt on `E=23`: track the
+remaining degree capacity of selected vertices. If `r` vertices remain and
+their maximum degree is 2, then at most
+`floor((capacity + 2*r)/2)` additional edges can be added, since every new edge
+uses two degree slots. Prune when current edges plus this bound is below 23.
+This is stronger than the previous `2*r` bound when many selected vertices
+are saturated. Run from the root into a separate `.lake` artifact, with a
+140-second internal wall cap, 145-second timeout, 6-billion-node cap and 2 GiB
+limit. This intentionally repeats the incomplete E23 prefix with a sound
+branch bound; do not merge its masks with the earlier prefix. Stop all compute
+after this one run, regardless of completion.
+
 ## Interpretation
 
 Finishing the count reproduces only the Q7 enumeration stage; it does not prove
