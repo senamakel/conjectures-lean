@@ -30,6 +30,7 @@ import Implications.SmoothGapCounting
 import Implications.SmoothGapInfinitude
 import Implications.SplitGraphPath
 import Implications.SplitGraphOneOutsider
+import Implications.SplitGraphOneOutsiderRows
 import Implications.C4VertexExtension
 import Implications.WilfPatternSwap
 import Implications.WilfTwoWindowOrder

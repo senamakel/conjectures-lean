@@ -1,5 +1,6 @@
 import Implications.SplitGraphComponents
 import Implications.SplitGraphOneOutsider
+import Implications.SplitGraphOneOutsiderDifferent
 
 /-!
 Classify the two clique rows incident to a single outsider of a central triple.
@@ -116,40 +117,6 @@ theorem classify (I A B D : Finset V) (z : V)
 
 open SplitGraphTrees
 
-/-- In the one-outsider case, the only remaining incidence pattern is the
-different-pair case. Two attachments of the outsider supply the two rows. -/
-theorem hamiltonian_of_one_outsider_of_different_pair
-    [Fintype V] (G : SimpleGraph V) (C I : Finset V) (t z : V)
-    (hC : G.IsClique (C : Set V)) (hdisj : Disjoint C I)
-    (hpartition : (Finset.univ : Finset V) = C ∪ I)
-    (ht : t ∈ C) (htriple : (row G I t).card = 3)
-    (hI : I = insert z (row G I t)) (hz : z ∉ row G I t)
-    (hsize : ∀ q ∈ C, (row G I q).card ≤ 3)
-    (hdiff : ∀ q ∈ C, (rowDiff G I t q).card ≤ 2)
-    (hdeg : ∀ i ∈ I, ∃ q ∈ C, ∃ d ∈ C, q ≠ d ∧ G.Adj q i ∧ G.Adj d i)
-    (hdifferent : ∀ (a b c x y : V), a ≠ b → a ≠ c → b ≠ c →
-      a ≠ z → b ≠ z → c ≠ z → x ∈ C → y ∈ C →
-      t ≠ x → t ≠ y → x ≠ y →
-      I = {a,b,c,z} → row G I t = {a,b,c} →
-      row G I x = {a,b,z} → row G I y = {a,c,z} →
-      ∃ (v w : V) (p : G.Walk v w), p.IsHamiltonian) :
-    ∃ (v w : V) (p : G.Walk v w), p.IsHamiltonian := by
-  classical
-  have hzI : z ∈ I := by rw [hI]; simp
-  obtain ⟨x, hx, y, hy, hxy, hxa, hya⟩ := hdeg z hzI
-  have hzX : z ∈ row G I x := Finset.mem_filter.mpr ⟨hzI, hxa⟩
-  have hzY : z ∈ row G I y := Finset.mem_filter.mpr ⟨hzI, hya⟩
-  have htx : t ≠ x := fun h => hz (h.symm ▸ hzX)
-  have hty : t ≠ y := fun h => hz (h.symm ▸ hzY)
-  have hsub (q : V) : row G I q ⊆ I := Finset.filter_subset _ _
-  obtain ⟨a,b,c,hab,hac,hbc,haz,hbz,hcz,hA,hI',hX,hY|hY⟩ :=
-    classify I (row G I t) (row G I x) (row G I y) z htriple hI hz
-      (hsub x) (hsub y) (hsize x hx) (hsize y hy) (hdiff x hx) (hdiff y hy) hzX hzY
-  · exact SplitGraphOneOutsider.hamiltonian_of_one_outsider_shared_pair_rows
-      G C I a b c z t x y hC hdisj hpartition hI' hab hac haz hbc hbz hcz
-      ht hx hy htx hty hxy hA hX hY hdeg
-  · exact hdifferent a b c x y hab hac hbc haz hbz hcz hx hy htx hty hxy hI' hA hX hY
-
 /-- Having exactly one vertex outside a central row provides the canonical
 insertion representation used by the row classification. -/
 theorem exists_single_outsider (I A : Finset V) (hAI : A ⊆ I)
@@ -171,8 +138,41 @@ theorem exists_single_outsider (I A : Finset V) (hAI : A ⊆ I)
     · exact (Finset.mem_sdiff.mp hzIA).1
     · exact hAI hqA
 
+/-- A central triple with exactly one outsider forces a Hamiltonian path
+when all rows have size at most three and differ from the central row
+in at most two entries, and each independent vertex has two attachments. -/
+theorem hamiltonian_of_one_outsider
+    [Fintype V] (G : SimpleGraph V) (C I : Finset V) (t : V)
+    (hC : G.IsClique (C : Set V)) (hdisj : Disjoint C I)
+    (hpartition : (Finset.univ : Finset V) = C ∪ I)
+    (ht : t ∈ C) (htriple : (row G I t).card = 3)
+    (houtsider : (I \ row G I t).card = 1)
+    (hsize : ∀ q ∈ C, (row G I q).card ≤ 3)
+    (hdiff : ∀ q ∈ C, (rowDiff G I t q).card ≤ 2)
+    (hdeg : ∀ i ∈ I, ∃ q ∈ C, ∃ d ∈ C, q ≠ d ∧ G.Adj q i ∧ G.Adj d i) :
+    ∃ (v w : V) (p : G.Walk v w), p.IsHamiltonian := by
+  classical
+  obtain ⟨z, hI, hz⟩ :=
+    exists_single_outsider I (row G I t) (Finset.filter_subset _ _) houtsider
+  have hzI : z ∈ I := by rw [hI]; simp
+  obtain ⟨x, hx, y, hy, hxy, hxa, hya⟩ := hdeg z hzI
+  have hzX : z ∈ row G I x := Finset.mem_filter.mpr ⟨hzI, hxa⟩
+  have hzY : z ∈ row G I y := Finset.mem_filter.mpr ⟨hzI, hya⟩
+  have htx : t ≠ x := fun h => hz (h.symm ▸ hzX)
+  have hty : t ≠ y := fun h => hz (h.symm ▸ hzY)
+  have hsub (q : V) : row G I q ⊆ I := Finset.filter_subset _ _
+  obtain ⟨a,b,c,hab,hac,hbc,haz,hbz,hcz,hA,hI',hX,hY|hY⟩ :=
+    classify I (row G I t) (row G I x) (row G I y) z htriple hI hz
+      (hsub x) (hsub y) (hsize x hx) (hsize y hy) (hdiff x hx) (hdiff y hy) hzX hzY
+  · exact SplitGraphOneOutsider.hamiltonian_of_one_outsider_shared_pair_rows
+      G C I a b c z t x y hC hdisj hpartition hI' hab hac haz hbc hbz hcz
+      ht hx hy htx hty hxy hA hX hY hdeg
+  · exact SplitGraphOneOutsiderDifferent.hamiltonian_of_different_pair_rows
+      G C I a b c z t x y hC hdisj hpartition hI' hab hac haz hbc hbz hcz
+      ht hx hy htx hty hxy hA hX hY hdiff
+
 end SplitGraphOneOutsiderRows
 
 #print axioms SplitGraphOneOutsiderRows.classify
-#print axioms SplitGraphOneOutsiderRows.hamiltonian_of_one_outsider_of_different_pair
+#print axioms SplitGraphOneOutsiderRows.hamiltonian_of_one_outsider
 #print axioms SplitGraphOneOutsiderRows.exists_single_outsider
