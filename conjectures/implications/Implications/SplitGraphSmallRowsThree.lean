@@ -53,17 +53,23 @@ theorem three_pair_rows_are_triangle
     have hp13 : ({a,b} : Finset α) ≠ {a,c} := by
       intro he
       have hb : b ∈ ({a,c} : Finset α) := he.symm ▸ (by simp)
-      simp [hab, hbc] at hb
+      simp only [Finset.mem_insert, Finset.mem_singleton] at hb
+      rcases hb with hb | hb
+      · exact hab hb.symm
+      · exact hbc hb
     have hp23 : ({b,c} : Finset α) ≠ {a,c} := by
       intro he
-      have hb : b ∈ ({a,c} : Finset α) := he.symm ▸ (by simp)
-      simp [hab, hbc] at hb
+      have hb : b ∈ ({a,c} : Finset α) := he ▸ (by simp)
+      simp only [Finset.mem_insert, Finset.mem_singleton] at hb
+      rcases hb with hb | hb
+      · exact hab hb.symm
+      · exact hbc hb
     have hp1 : ({a,b} : Finset α) ∉ ({({b,c} : Finset α), {a,c}} : Finset (Finset α)) := by
       simp [hp12, hp13]
     have htargetCard : ({({a,b} : Finset α), {b,c}, {a,c}} : Finset (Finset α)).card = 3 := by
-      simp only [Finset.card_insert_of_not_mem hp1, Finset.card_insert_of_not_mem]
-      · simp [hp23]
-      · simp [hp23]
+      rw [Finset.card_insert_of_notMem hp1,
+        Finset.card_insert_of_notMem (by simpa using hp23)]
+      simp
     have hEq := Finset.eq_of_subset_of_card_le hFsub
       (by rw [hcardF, htargetCard])
     exact ⟨a,b,c,hab,hac,hbc,hEq⟩
