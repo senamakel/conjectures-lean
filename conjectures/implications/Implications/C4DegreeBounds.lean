@@ -124,6 +124,7 @@ theorem neighbor_degree_excess_le_one_of_degree_eight (v : V)
         (∑ u ∈ S, G.degree u) = ∑ u ∈ S, ((G.degree u - 1) + 1) := by
           apply Finset.sum_congr rfl
           intro u hu
+          have hmu := hmin u
           omega
         _ = (∑ u ∈ S, (G.degree u - 1)) + S.card := by simp [Finset.sum_add_distrib]
     have hScard : S.card = 8 := by simpa [S, G.card_neighborFinset_eq_degree] using hv
@@ -138,6 +139,7 @@ theorem neighbor_degree_excess_le_one_of_degree_eight (v : V)
       (∑ u ∈ S, G.degree u) = ∑ u ∈ S, ((G.degree u - 6) + 6) := by
         apply Finset.sum_congr rfl
         intro u hu
+        have hmu := hmin u
         omega
       _ = (∑ u ∈ S, (G.degree u - 6)) + S.card * 6 := by simp [Finset.sum_add_distrib, Nat.mul_comm]
   have hScard : S.card = 8 := by simpa [S, G.card_neighborFinset_eq_degree] using hv
@@ -145,7 +147,9 @@ theorem neighbor_degree_excess_le_one_of_degree_eight (v : V)
     (∑ u ∈ S, (G.degree u - 6)) ≤ 1 := by
       have hrew : (∑ u ∈ S, G.degree u) = (∑ u ∈ S, (G.degree u - 6)) + 8 * 6 := by
         rw [hexcessIdentity, hScard]
-      rw [← hrew]
+      have hbound : (∑ u ∈ S, (G.degree u - 6)) + 8 * 6 ≤ 49 := by
+        rw [← hrew]
+        exact hdegreeSum
       omega
 
 theorem neighbor_degree_le_seven_of_degree_eight (v : V)
