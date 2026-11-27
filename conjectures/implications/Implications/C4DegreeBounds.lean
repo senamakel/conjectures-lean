@@ -1,6 +1,7 @@
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Combinatorics.SimpleGraph.Finite
 import Implications.C4VertexExtension
+import Implications.C4Extremal42
 
 /-!
 # Degree constraints in finite C4-free graphs
@@ -178,8 +179,29 @@ theorem neighbor_degree_eq_six_or_seven_of_degree_eight (v : V)
   have hhigh := neighbor_degree_le_seven_of_degree_eight G v hcard hmin hC4 hv hu
   omega
 
+/-- Under the 41-vertex deletion bound, a 42-vertex graph with 138 edges has
+minimum degree six. If it is C4-free, the generic degree window also gives
+maximum degree eight. -/
+theorem degree_window_of_extremal_42 (G : SimpleGraph (Fin 42))
+    [DecidableRel G.Adj]
+    (hDel : ∀ v, C4Extremal42.inducedDeletionCount G v ≤ 132)
+    (he : G.edgeFinset.card = 138)
+    (hC4 : C4VertexExtension.C4Free G) :
+    ∀ v, 6 ≤ G.degree v ∧ G.degree v ≤ 8 := by
+  intro v
+  have hminAll : ∀ u, 6 ≤ G.degree u := by
+    intro u
+    have hd := C4Extremal42.inducedDeletionCount_eq G u
+    have h := hDel u
+    rw [hd] at h
+    rw [he] at h
+    omega
+  have hmax := degree_le_eight_of_card_eq_42 G v (by simp) hminAll hC4
+  exact ⟨hminAll v, hmax⟩
+
 #print axioms degree_window_bound
 #print axioms neighbor_degree_excess_le_one_of_degree_eight
 #print axioms neighbor_degree_le_seven_of_degree_eight
+#print axioms degree_window_of_extremal_42
 
 end C4DegreeBounds
