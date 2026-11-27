@@ -22,7 +22,7 @@ private theorem card_primes_Icc_eq_primeCounting (n : ℕ) :
     · rintro ⟨⟨h1, hn⟩, hp⟩
       exact ⟨hp, hn⟩
     · rintro ⟨hp, hn⟩
-      exact ⟨⟨hp.one_le, hn⟩, hp⟩
+      exact ⟨⟨Nat.Prime.one_le hp, hn⟩, hp⟩
   rw [hset, Nat.primesLE_card_eq_primeCounting]
 
 /-- The reciprocal-prime mass in one dyadic block is `O(1/k)`. -/
@@ -36,6 +36,7 @@ private theorem reciprocalPrimeDyadic_eventually :
   have hpow : Tendsto (fun k : ℕ => (2 : ℝ) ^ (k + 1)) atTop atTop := by
     exact (tendsto_pow_atTop_atTop_of_one_lt (by norm_num : (1 : ℝ) < 2)).comp
       (tendsto_add_atTop_nat 1)
+  refine ⟨2 * B / Real.log 2, by positivity, ?_⟩
   filter_upwards [hpow.eventually hpi] with k hk
   have hkcast :
       (Nat.primeCounting (2 ^ (k + 1)) : ℝ) ≤
@@ -74,7 +75,6 @@ private theorem reciprocalPrimeDyadic_eventually :
     rw [pow_succ]; ring
   have hlog_pow : Real.log ((2 : ℝ) ^ (k + 1)) = (k + 1 : ℝ) * Real.log 2 := by
     rw [Real.log_pow]
-  refine ⟨(2 * B / Real.log 2), by positivity, ?_⟩
   calc
     _ ≤ (Nat.primeCounting (2 ^ (k + 1)) : ℝ) / (2 : ℝ) ^ k := hblock
     _ ≤ (B * (2 : ℝ) ^ (k + 1) / Real.log ((2 : ℝ) ^ (k + 1))) /
