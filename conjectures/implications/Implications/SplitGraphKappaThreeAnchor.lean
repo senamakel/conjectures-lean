@@ -376,3 +376,120 @@ end SplitGraphKappaThreeAnchor
 
 #print axioms SplitGraphKappaThreeAnchor.hamiltonian_of_enlarged_anchor_prefix
 #print axioms SplitGraphKappaThreeAnchor.hamiltonian_of_at_most_two_independent_neighbors
+
+namespace SplitGraphKappaThreeAnchor
+
+variable {V : Type*} [DecidableEq V]
+
+open SplitGraphTrees
+
+/-- With at most three independent neighbors per clique vertex, a common
+pair of independent neighbors can serve as the endpoints of a Hamiltonian
+path. All other independent vertices occupy disjoint clique-ended blocks. -/
+theorem hamiltonian_of_common_pair [Fintype V]
+    (G : SimpleGraph V) [DecidableRel G.Adj] (C I : Finset V) (a b : V)
+    (ha : a ∈ I) (hb : b ∈ I) (hab : a ≠ b) (hCne : C.Nonempty)
+    (hpartition : (Finset.univ : Finset V) = C ∪ I)
+    (hCI : Disjoint C I) (hC : G.IsClique (C : Set V))
+    (hrow : ∀ c ∈ C, (row G I c).card ≤ 3)
+    (hcommon : ∀ c ∈ C, G.Adj c a ∧ G.Adj c b)
+    (hdegree : ∀ k ∈ I \ {a, b}, 2 ≤ (C.filter fun c => G.Adj c k).card) :
+    ∃ u v : V, ∃ p : G.Walk u v, p.IsHamiltonian := by
+  let K : Finset V := {a, b}
+  let O := I \ K
+  have hdis : (O : Set V).PairwiseDisjoint (fun k => C.filter fun c => G.Adj c k) := by
+    intro k hk l hl hkl
+    apply Finset.disjoint_left.mpr
+    intro c hck hcl
+    have ⟨hc, hck'⟩ := Finset.mem_filter.mp hck
+    have hcl' := (Finset.mem_filter.mp hcl).2
+    have hKsub : K ⊆ row G I c := by
+      intro x hx
+      rcases Finset.mem_insert.mp hx with rfl | hx
+      · simp [row, ha, (hcommon c hc).1]
+      · have hxb := Finset.mem_singleton.mp hx
+        subst x
+        simp [row, hb, (hcommon c hc).2]
+    have hcap : ((row G I c) \ K).card ≤ 1 := by
+      have hc' := Finset.card_sdiff_add_card_inter (row G I c) K
+      rw [Finset.inter_eq_right.mpr hKsub, show K.card = 2 by simp [K, hab]] at hc'
+      have := hrow c hc
+      omega
+    have hmem (x : V) (hx : x ∈ O) (hadj : G.Adj c x) :
+        x ∈ row G I c \ K := by
+      obtain ⟨hxI, hxK⟩ := Finset.mem_sdiff.mp hx
+      exact Finset.mem_sdiff.mpr ⟨by simp [row, hxI, hadj], hxK⟩
+    exact hkl (Finset.card_le_one.mp hcap k (hmem k hk hck') l (hmem l hl hcl'))
+  obtain ⟨blocks, hbn, hbc, hbh, hbl, hbm, _⟩ :=
+    outside_path_of_disjoint_attachments G C I O ∅ Finset.sdiff_subset hCI hC hdis (by
+      intro k hk
+      simpa using hdegree k hk)
+  let tail := (C.filter fun x => x ∉ blocks).toList
+  let core := blocks ++ tail
+  have htailN : tail.Nodup := Finset.nodup_toList _
+  have htail (x : V) : x ∈ tail ↔ x ∈ C ∧ x ∉ blocks := by simp [tail]
+  have hcoreN : core.Nodup := by
+    exact List.nodup_append'.mpr ⟨hbn, htailN, fun x hx ht => ((htail x).mp ht).2 hx⟩
+  have hcoreC : core.IsChain G.Adj := by
+    apply List.isChain_append.mpr
+    refine ⟨hbc, (htailN.pairwise_of_forall_ne fun x hx y hy hn =>
+      hC ((htail x).mp hx).1 ((htail y).mp hy).1 hn).isChain, ?_⟩
+    intro x hx y hy
+    obtain ⟨hyC, hyn⟩ := (htail y).mp (List.mem_of_mem_head? hy)
+    exact hC (hbl x hx) hyC (fun hxy => hyn (hxy ▸ List.mem_of_mem_getLast? hx))
+  have hhead (x : V) (hx : x ∈ core.head?) : x ∈ C := by
+    change x ∈ (blocks ++ tail).head? at hx
+    by_cases h : blocks = []
+    · exact ((htail x).mp (List.mem_of_mem_head? (by simpa [h] using hx))).1
+    · rw [List.head?_append_of_ne_nil blocks h] at hx
+      exact hbh x hx
+  have hlast (x : V) (hx : x ∈ core.getLast?) : x ∈ C := by
+    change x ∈ (blocks ++ tail).getLast? at hx
+    by_cases h : tail = []
+    · exact hbl x (by simpa [h] using hx)
+    · rw [List.getLast?_append_of_ne_nil blocks h] at hx
+      exact ((htail x).mp (List.mem_of_mem_getLast? hx)).1
+  have hcoreCover (x : V) (hx : x ∈ C ∨ x ∈ O) : x ∈ core := by
+    apply List.mem_append.mpr
+    rcases hx with hx | hx
+    · by_cases h : x ∈ blocks
+      · exact Or.inl h
+      · exact Or.inr ((htail x).mpr ⟨hx, h⟩)
+    · exact Or.inl ((hbm x (Finset.mem_sdiff.mp hx).1).mpr hx)
+  have hcoreNe : core ≠ [] := by
+    obtain ⟨c, hc⟩ := hCne
+    intro h
+    simpa [h] using hcoreCover c (Or.inl hc)
+  have hnotCore (x : V) (hx : x ∈ I) (hxK : x ∈ K) : x ∉ core := by
+    intro hm
+    rcases List.mem_append.mp hm with hm | hm
+    · exact (Finset.mem_sdiff.mp ((hbm x hx).mp hm)).2 hxK
+    · exact (Finset.disjoint_left.mp hCI) ((htail x).mp hm).1 hx
+  have hna : a ∉ core := hnotCore a ha (by simp [K])
+  have hnb : b ∉ core := hnotCore b hb (by simp [K])
+  apply SplitGraphSmallRowsThree.hamiltonian_of_list G (a :: (core ++ [b])) (by simp)
+  · simp only [List.nodup_cons, List.mem_append, List.mem_singleton, not_or, hab, not_false_eq_true,
+      hna, and_self, true_and]
+    exact List.nodup_append'.mpr ⟨hcoreN, by simp, fun x hx hbmem =>
+      hnb ((List.mem_singleton.mp hbmem) ▸ hx)⟩
+  · rw [List.isChain_cons, List.head?_append_of_ne_nil core hcoreNe]
+    refine ⟨fun x hx => (hcommon x (hhead x hx)).1.symm, List.isChain_append.mpr ⟨hcoreC, by simp, ?_⟩⟩
+    intro x hx y hy
+    have hyb : b = y := by simpa using hy
+    exact hyb ▸ (hcommon x (hlast x hx)).2
+  · intro x
+    by_cases hxa : x = a
+    · simp [hxa]
+    by_cases hxb : x = b
+    · simp [hxb]
+    have hx := Finset.mem_univ x
+    rw [hpartition] at hx
+    have hCore := hcoreCover x (by
+      rcases Finset.mem_union.mp hx with hxC | hxI
+      · exact Or.inl hxC
+      · exact Or.inr (Finset.mem_sdiff.mpr ⟨hxI, by simp [K, hxa, hxb]⟩))
+    exact List.mem_cons_of_mem _ (List.mem_append_left _ hCore)
+
+#print axioms hamiltonian_of_common_pair
+
+end SplitGraphKappaThreeAnchor
