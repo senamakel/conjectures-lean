@@ -134,7 +134,7 @@ theorem hamiltonian_of_all_four_triple_rows
           · rintro ⟨hyS, hyNe, hyA⟩
             have hyB : y ∈ B := Finset.mem_inter.mpr ⟨hyS, hyA⟩
             rw [hBempty] at hyB
-            exact hyB
+            simpa [hBempty] using hyB
           · intro hy
             exact False.elim hy
         simp [hempty]
@@ -180,7 +180,7 @@ theorem hamiltonian_of_all_four_triple_rows
         A.erase i = row G I (r i) := (hrows i hi).2.symm
         _ = row G I (r j) := by rw [heq]
         _ = A.erase j := (hrows j hj).2
-    have hmem : i ∈ A.erase j := Finset.mem_erase.mpr ⟨hne, hi⟩
+    have hmem : i ∈ A.erase j := Finset.mem_erase.mpr ⟨hne.symm, hi⟩
     have hmem' : i ∈ A.erase i := hsets ▸ hmem
     exact (Finset.mem_erase.mp hmem').1 rfl
   have hcross (i : V) (hi : i ∈ I) (q : V) (hq : q ∈ C) : i ≠ q := by
@@ -195,7 +195,7 @@ theorem hamiltonian_of_all_four_triple_rows
   have hAdjRow (i j : V) (hi : i ∈ A) (hj : j ∈ A) (hne : i ≠ j) :
       G.Adj (r i) j := by
     have hjErase : j ∈ A.erase i := Finset.mem_erase.mpr ⟨hne, hj⟩
-    have hjRow : j ∈ row G I (r i) := by rw [hrows i hi]; exact hjErase
+    have hjRow : j ∈ row G I (r i) := by rw [(hrows i hi).2]; exact hjErase
     exact (Finset.mem_filter.mp hjRow).2
   have hrdA : G.Adj a (r d) := (hAdjRow d (by simp [A]) (by simp [A]) had.symm).symm
   have hrdB : G.Adj (r d) b := hAdjRow d (by simp [A]) (by simp [A]) hbd
