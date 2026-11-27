@@ -680,14 +680,16 @@ private theorem eventually_twoHitGapCount_tail_tendsto_zero :
             Real.log (primeAt n : ℝ) := by ring
         rw [this, Real.exp_log hpn]
       rw [div_eq_div_iff (by positivity) (by positivity)]
-      nlinarith [hidentity]
+      field_simp
+      rw [hidentity]
     have hfactor : Tendsto (fun n : ℕ =>
         ((primeAt n : ℝ) / (n + 1 : ℝ)) /
           (2 * (primeAt n : ℝ) ^ (1 / 4 : ℝ))) atTop (nhds 0) := by
       have hratio := hlogsmall'
       have hevent : ∀ᶠ n : ℕ in atTop,
           (primeAt n : ℝ) / (n + 1 : ℝ) ≤ 2 * Real.log (primeAt n : ℝ) :=
-        eventually_primeAt_over_index_le
+        (eventually_primeAt_over_index_le.mono fun n hn => by
+          simpa [Nat.cast_add] using hn)
       have hbound : ∀ᶠ n : ℕ in atTop,
           0 ≤ ((primeAt n : ℝ) / (n + 1 : ℝ)) /
             (2 * (primeAt n : ℝ) ^ (1 / 4 : ℝ)) ∧
@@ -702,13 +704,15 @@ private theorem eventually_twoHitGapCount_tail_tendsto_zero :
         constructor
         · positivity
         · rw [div_le_div_iff₀ hden]
-          nlinarith [Real.rpow_pos_of_pos hp0 (1 / 4 : ℝ)]
+          have hpow : 0 < (primeAt n : ℝ) ^ (1 / 4 : ℝ) :=
+            Real.rpow_pos_of_pos hp0 _
+          nlinarith
       exact squeeze_zero' (by
         filter_upwards [hp.eventually (eventually_gt_atTop (0 : ℝ))] with n hn
         positivity) (hbound.mono fun n hn => hn.2) hratio
-    exact hfactor.congr' hrewrite.symm
-  have hsum := hbase.add (by simpa [div_eq_mul_inv, mul_assoc] using htail)
-  convert hsum.const_mul (1 / 2 : ℝ) using 1 <;> field_simp <;> ring
+    exact hfactor.congr' (hrewrite.mono fun _ h => h.symm)
+  have hsum := (hbase.add htail).const_mul (1 / 2 : ℝ)
+  convert hsum using 1 <;> field_simp <;> ring
 
 /-- The proportion of the first `N` prime gaps containing at least two
 qualifying smooth integers tends to zero. -/
@@ -733,10 +737,8 @@ theorem twoHitGapCount_proportion_tendsto_zero :
     convert (tendsto_const_nhds.div_atTop hll).const_mul 64 using 1 <;>
       simp [div_eq_mul_inv, mul_comm]
   have hsum := hfirst.add eventually_twoHitGapCount_tail_tendsto_zero
-  apply squeeze_zero' (by
-    filter_upwards [] with n
-    positivity) (by
+  apply squeeze_zero' (Eventually.of_forall (fun n => by positivity)) (by
     filter_upwards [eventually_twoHitGapCount_bound] with n hn
-    exact hn) hsum
+    exact hn) (by simpa using hsum)
 
 end Implications.SmoothGapCounting
