@@ -261,3 +261,26 @@ independent validator on the resulting file. A cap or invariant failure means
 the file is partial; do not merge it with any earlier partial traversal. If
 complete, it gives the exact normalized `E=23` slice only. No other edge slice,
 Q8 pair search, push, or external post is part of this benchmark.
+
+### Benchmark result
+
+Command: `enumerate_q6_heavy_layers 23 .lake/snakepit8/q6-e23-forced-cycle.bin
+--force-saturated --early-cycle`, under `ulimit -v 2097152` and
+`/usr/bin/time -v timeout -k 2s 150s`. It stopped at the 6-billion-node cap,
+after 126.40 CPU seconds and 126.43 wall seconds, at 7,176 KiB maximum RSS.
+It emitted 3,094,237 masks, recorded 1,648,287,490 forced exclusions,
+87,187,141 early-cycle prunes, and zero cyclic terminal leaves. The file is
+24,753,896 bytes with SHA-256
+`b344573ab83fc21c79582639c2f363ccf0ccf423023060fd4aa8ec07e2280cf3`.
+
+The independent Python validator checked all 3,094,237 records for uniqueness,
+normalized vertices, at least 27 vertices, exactly 23 induced edges, maximum
+degree two, and acyclicity. It passed in 49.95 wall seconds (49.72 CPU seconds,
+404,652 KiB maximum RSS). At the same 6-billion-node cap, the prior baseline
+emitted 1,444,364 masks in 137.47 CPU seconds; this combined variant emitted
+about 2.14 times as many masks and had zero cyclic terminal leaves. These are
+bounded-prefix throughput figures, not complete slice counts or a comparison
+of equal mask prefixes. The output is partial, so the masks were not merged
+with prior artifacts. The two soundness arguments above establish that a
+completed traversal retains exactly the same eligible normalized set; the
+independent validator confirms every emitted record is a member of that set.
