@@ -24,6 +24,7 @@ import Implications.SplitGraphAttachments
 import Implications.WilfEquivalence
 import Implications.C4Extremal42
 import Implications.C4DegreeBounds
+import Implications.C4DegreeEightCap
 import Implications.C4SeedCertificates
 import Implications.SmoothGapCounting
 import Implications.SmoothGapInfinitude
