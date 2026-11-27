@@ -277,3 +277,13 @@ divisors of the second component constant after parity and order
 filters. No candidate also met the first component divisor bound.
 The screen stopped at its preset cutoff within a 45-second wall
 limit. This screen has no Lean certificate.
+
+[CrystalQ4Delta.lean](CrystalQ4Delta.lean) gives a kernel certificate
+for even `10 ≤ d ≤ 64` and all `y ≥ 33` in the quotient-four
+branch with `x = 1`. It factors the nonzero `(d−3)²−8` to
+enumerate `y`, then factors the second component constant to
+enumerate `g*y+1`. The verified parity and order filters
+leave 82 states, all excluded by the first component divisor
+bound. Combined with the lower bound 10, this forces `d ≥ 66`
+in the remaining quotient-four branch. The certificate checks at
+the pinned OMA revision with only the three standard axioms.
