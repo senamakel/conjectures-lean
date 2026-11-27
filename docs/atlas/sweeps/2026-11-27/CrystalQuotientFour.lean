@@ -61,4 +61,41 @@ theorem coprime_of_quotient_four {c b : ℕ} (hc : Odd c)
 
 #print axioms coprime_of_quotient_four
 
+theorem prime_mod_eight_of_twice_square {p n t : ℕ}
+    (hp : p.Prime) (hp2 : p ≠ 2) (hpd : p ∣ n) (ht : n+1 = 2*t^2) :
+    p % 8 = 1 ∨ p % 8 = 7 := by
+  have : Fact p.Prime := ⟨hp⟩
+  have hn : (n : ZMod p) = 0 := by
+    obtain ⟨k,rfl⟩ := hpd
+    simp
+  have htz : (n : ZMod p)+1 = 2*(t : ZMod p)^2 := by
+    simpa only [Nat.cast_add, Nat.cast_mul, Nat.cast_pow, Nat.cast_one, Nat.cast_ofNat] using
+      congrArg (fun k : ℕ => (k : ZMod p)) ht
+  rw [hn,zero_add] at htz
+  apply (ZMod.exists_sq_eq_two_iff hp2).mp
+  refine ⟨2*(t : ZMod p), ?_⟩
+  linear_combination 2*htz
+
+theorem prime_mod_eight_of_quotient_four {a b p : ℕ}
+    (ha : Odd a) (hb : Odd b) (hab : a ≤ b)
+    (hq : (a+b)^2 = 4*((a+1)*(b+1)))
+    (hp : p.Prime) (hpd : p ∣ a ∨ p ∣ b) :
+    p % 8 = 1 ∨ p % 8 = 7 := by
+  obtain ⟨t,hta,htb⟩ := consecutive_squares ha hb hab hq
+  have hp2 : p ≠ 2 := by
+    intro he
+    subst p
+    rcases hpd with hd | hd
+    · obtain ⟨j,hj⟩ := hd
+      obtain ⟨k,hk⟩ := ha
+      omega
+    · obtain ⟨j,hj⟩ := hd
+      obtain ⟨k,hk⟩ := hb
+      omega
+  rcases hpd with hpd | hpd
+  · exact prime_mod_eight_of_twice_square hp hp2 hpd hta
+  · exact prime_mod_eight_of_twice_square hp hp2 hpd htb
+
+#print axioms prime_mod_eight_of_quotient_four
+
 end CrystalQuotientFour

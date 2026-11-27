@@ -250,3 +250,9 @@ evaluating the discriminant. The parity and order filters leave
 None has a square discriminant. The verified theorem excludes all
 odd `3 ≤ y ≤ 31` in the `x = 1` branch for every `g,z`.
 Its axiom closure is `propext`, `Classical.choice`, and `Quot.sound`.
+
+The quotient-four proof also determines prime support. If a prime
+divides either component, its shifted-square equation makes 2 a
+square modulo that prime. Quadratic reciprocity in Mathlib then
+forces residue 1 or 7 modulo 8. The pinned Lean proof is in
+[CrystalQuotientFour.lean](CrystalQuotientFour.lean).
