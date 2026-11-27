@@ -270,7 +270,94 @@ theorem weighted_geometric_product_le_exp {s : Finset ℕ} {Y : ℝ} {σ : ℝ}
       have hpow : 0 ≤ Y ^ (1 - σ) := Real.rpow_nonneg hY.le _
       nlinarith
 
+/-- The prime Euler product at exponent `σ` is controlled by the reciprocal-prime
+mass, with the expected Rankin weight `Y^(1-σ)`. -/
+theorem primeEulerProduct_rankin_bound (Y : ℕ) (σ : ℝ)
+    (hσlo : 1 / 2 ≤ σ) (hσhi : σ ≤ 1) :
+    ∃ D : ℝ, 0 < D ∧
+      (∏ p ∈ Y.primesBelow, (1 - ((p : ℝ) ^ σ)⁻¹)⁻¹) ≤
+        Real.exp (4 * (Y : ℝ) ^ (1 - σ) * D *
+          (1 + Real.log (((Nat.log 2 Y + 1 : ℕ) : ℝ)))) := by
+  obtain ⟨D, hD, hrecip⟩ := reciprocalPrimeSum_le_dyadic_harmonic
+  refine ⟨D, hD, ?_⟩
+  let u : ℕ → ℝ := fun p => ((p : ℝ) ^ σ)⁻¹
+  have hYpos : 0 < (Y : ℝ) := by
+    by_contra hy
+    have hYzero : Y = 0 := by omega
+    subst Y
+    simp
+  have hlocal0 : ∀ p ∈ Y.primesBelow, 0 ≤ u p := by
+    intro p hp
+    dsimp [u]
+    positivity
+  have hlocal3 : ∀ p ∈ Y.primesBelow, u p ≤ 3 / 4 := by
+    intro p hp
+    have hp' : p.Prime := by simpa [Nat.primesBelow] using hp
+    have hp2 : 2 ≤ p := hp'.two_le
+    have hpcast : (2 : ℝ) ≤ p := by exact_mod_cast hp2
+    have hp1 : (1 : ℝ) ≤ p := by linarith
+    have hbase : (2 : ℝ) ^ (1 / 2 : ℝ) ≤ (p : ℝ) ^ σ := by
+      exact (Real.rpow_le_rpow (by norm_num) hpcast (by norm_num : 0 ≤ (1 / 2 : ℝ))).trans
+        (Real.rpow_le_rpow_of_exponent_le hp1 hσlo)
+    have hsqrt : (4 / 3 : ℝ) ≤ (2 : ℝ) ^ (1 / 2 : ℝ) := by
+      rw [← Real.sqrt_eq_rpow]
+      have hsqr := Real.sq_sqrt (show (0 : ℝ) ≤ 2 by norm_num)
+      nlinarith [Real.sqrt_nonneg (2 : ℝ)]
+    have hfactor : (4 / 3 : ℝ) ≤ (p : ℝ) ^ σ := hsqrt.trans hbase
+    dsimp [u]
+    rw [inv_le_comm₀ (by positivity) (by norm_num : (0 : ℝ) < 4 / 3)]
+    linarith
+  have hlocal : ∀ p ∈ Y.primesBelow,
+      u p ≤ (Y : ℝ) ^ (1 - σ) / p := by
+    intro p hp
+    have hp' : p.Prime := by simpa [Nat.primesBelow] using hp
+    have hpY : p < Y := by
+      have hmem := Finset.mem_filter.mp hp
+      exact Finset.mem_range.mp hmem.1
+    have hpcast : (p : ℝ) ≤ Y := by exact_mod_cast hpY.le
+    have hpPos : 0 < (p : ℝ) := by exact_mod_cast hp'.pos
+    have hexp : 0 ≤ 1 - σ := by linarith
+    have hpower : (p : ℝ) ^ (1 - σ) ≤ (Y : ℝ) ^ (1 - σ) :=
+      Real.rpow_le_rpow (by positivity) hpcast hexp
+    have hident : u p = (p : ℝ) ^ (1 - σ) / p := by
+      dsimp [u]
+      rw [Real.rpow_sub hpPos 1 σ, Real.rpow_one]
+      field_simp
+    rw [hident]
+    exact div_le_div_of_nonneg_right hpower (by positivity)
+  let s := Y.primesBelow
+  have hrecip_subset :
+      (∑ p ∈ s, (1 : ℝ) / p) ≤
+        ∑ p ∈ (Finset.Icc 1 Y).filter Nat.Prime, (1 : ℝ) / p := by
+    apply Finset.sum_le_sum_of_subset_of_nonneg
+    · intro p hp
+      have hp' : p.Prime := by simpa [s, Nat.primesBelow] using hp
+      have hmem := Finset.mem_filter.mp hp
+      exact Finset.mem_filter.mpr ⟨Finset.mem_Icc.mpr
+        ⟨hp'.one_le, (Finset.mem_range.mp hmem.1).le⟩, hp'⟩
+    · intro p hp hnot
+      have hp' := (Finset.mem_filter.mp hp).2
+      exact div_nonneg (by positivity) (by exact_mod_cast hp'.pos.le)
+  have hrecip := hrecip Y
+  have hsumBound : (∑ p ∈ s, (1 : ℝ) / p) ≤
+      D * (1 + Real.log (((Nat.log 2 Y + 1 : ℕ) : ℝ))) := hrecip_subset.trans hrecip
+  have hprod := weighted_geometric_product_le_exp u hYpos hlocal0 hlocal3 hlocal
+  have hprod' : (∏ p ∈ s, (1 - u p)⁻¹) ≤
+      Real.exp (4 * (Y : ℝ) ^ (1 - σ) *
+        (∑ p ∈ s, (1 : ℝ) / p)) := hprod
+  have hfactor : 0 ≤ 4 * (Y : ℝ) ^ (1 - σ) := by positivity
+  have hexp := Real.exp_le_exp.mpr (mul_le_mul_of_nonneg_left hsumBound hfactor)
+  calc
+    (∏ p ∈ Y.primesBelow, (1 - ((p : ℝ) ^ σ)⁻¹)⁻¹) =
+        ∏ p ∈ s, (1 - u p)⁻¹ := by simp [s, u]
+    _ ≤ Real.exp (4 * (Y : ℝ) ^ (1 - σ) *
+        (∑ p ∈ s, (1 : ℝ) / p)) := hprod'
+    _ ≤ Real.exp (4 * (Y : ℝ) ^ (1 - σ) * D *
+        (1 + Real.log (((Nat.log 2 Y + 1 : ℕ) : ℝ)))) := by
+      convert hexp using 1 <;> ring
+
 end Implications.SmoothPrimeReciprocal
 
 #print axioms Implications.SmoothPrimeReciprocal.reciprocalPrimeSum_le_dyadic_harmonic
 #print axioms Implications.SmoothPrimeReciprocal.weighted_geometric_product_le_exp
+#print axioms Implications.SmoothPrimeReciprocal.primeEulerProduct_rankin_bound
