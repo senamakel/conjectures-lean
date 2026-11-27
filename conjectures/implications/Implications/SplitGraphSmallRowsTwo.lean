@@ -1,5 +1,7 @@
 import Implications.SplitGraphSmallRows
 import Implications.SplitGraphSmallRowsPath
+import Implications.SplitGraphSmallRowsBlocks
+import Implications.SplitGraphSmallRowsThree
 
 /-!
 The case with exactly two selected clique rows of size two.
@@ -190,6 +192,48 @@ theorem one_overlap_path_block
     apply (SimpleGraph.Walk.isPath_def p).2
     simpa [p, SimpleGraph.Walk.support_ofSupport (by simp) hchain] using hnodup
   exact ⟨p, hp, SimpleGraph.Walk.support_ofSupport (by simp) hchain⟩
+
+/-- Under the original row and row-difference bounds, the two selected double
+rows are either equal or share exactly one independent vertex. -/
+theorem chosen_two_double_rows_have_shape
+    (G : SimpleGraph V) (C I : Finset V) (left right : V → V)
+    (hleftAdj : ∀ i ∈ I, G.Adj (left i) i)
+    (hrightAdj : ∀ i ∈ I, G.Adj (right i) i)
+    (hrow : ∀ q ∈ C, (row G I q).card ≤ 2)
+    (hdiff : ∀ q ∈ C, ∀ d ∈ C, q ≠ d → (rowDiff G I q d).card ≤ 2)
+    (hcount : (C.filter (fun q => (selectedRow I left right q).card = 2)).card = 2) :
+    ∃ c d u v w, c ∈ C ∧ d ∈ C ∧ c ≠ d ∧
+      ((selectedRow I left right c = {u,v} ∧ selectedRow I left right d = {u,v}) ∨
+       (selectedRow I left right c = {u,v} ∧ selectedRow I left right d = {u,w} ∧
+        u ≠ v ∧ u ≠ w ∧ v ≠ w)) := by
+  classical
+  let S := C.filter (fun q => (selectedRow I left right q).card = 2)
+  have hSCard : S.card = 2 := hcount
+  obtain ⟨c,d,hcd,hS⟩ := Finset.card_eq_two.mp hSCard
+  have hcC : c ∈ C := by rw [hS] at *; simp
+  have hdC : d ∈ C := by rw [hS] at *; simp [hcd]
+  have hcCard : (selectedRow I left right c).card = 2 := by
+    have := (Finset.mem_filter.mp hcC).2
+    exact this
+  have hdCard : (selectedRow I left right d).card = 2 := by
+    have := (Finset.mem_filter.mp hdC).2
+    exact this
+  have hselectedEqC : selectedRow I left right c = row G I c :=
+    selected_row_eq_original_of_card_two G I left right c hleftAdj hrightAdj hcCard (hrow c hcC)
+  have hselectedEqD : selectedRow I left right d = row G I d :=
+    selected_row_eq_original_of_card_two G I left right d hleftAdj hrightAdj hdCard (hrow d hdC)
+  obtain hsame | ⟨u,v,w,huv,huw,hvw,hcRow,hdRow⟩ :=
+    two_original_rows_shape G I c d (by rw [← hselectedEqC]; exact hcCard)
+      (by rw [← hselectedEqD]; exact hdCard)
+      (hdiff c hcC d hdC hcd)
+  · obtain ⟨u,v,huv,hrowPair⟩ := Finset.card_eq_two.mp (by rw [← hselectedEqC]; exact hcCard)
+    refine ⟨c,d,u,v,v,hcC,hdC,hcd,?_⟩
+    constructor
+    · rw [hselectedEqC, hselectedEqD, hsame, hrowPair]
+    · rw [hselectedEqC, hselectedEqD, hsame, hrowPair]
+  · refine ⟨c,d,u,v,w,hcC,hdC,hcd,Or.inr ?_⟩
+    rw [← hselectedEqC, ← hselectedEqD]
+    exact ⟨hcRow, hdRow, huv, huw, hvw⟩
 
 end SplitGraphSmallRowsTwo
 
