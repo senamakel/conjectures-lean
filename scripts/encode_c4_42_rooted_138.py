@@ -90,7 +90,10 @@ class Cnf:
                 f.write(" 0\n")
 
 
-def build(deduplicate_c4: bool = False) -> tuple[Cnf, dict[tuple[int, int], int]]:
+def build(
+    deduplicate_c4: bool = False,
+    compact_degree_count: bool = False,
+) -> tuple[Cnf, dict[tuple[int, int], int]]:
     cnf = Cnf()
     edges: dict[tuple[int, int], int] = {}
     vertices = range(1, 42)
@@ -119,12 +122,20 @@ def build(deduplicate_c4: bool = False) -> tuple[Cnf, dict[tuple[int, int], int]
                 cnf.clause(-edge(u, x), -edge(v, x))
 
     # The non-root graph has 132 edges; with the root's six edges this is 138.
-    edge_count = cnf.equivalent_atleast(list(edges.values()), 133)
-    cnf.clause(edge_count[132])
-    cnf.clause(-edge_count[133])
+    # Compact mode derives this from the handshake lemma: each of the 42 full
+    # degrees lies in {6,7,8}, and sum(degree - 6) = 24 iff the graph has 138
+    # edges. Since root 0 has degree six, its contribution is zero. The two
+    # exact threshold flags for each remaining vertex are (degree >= 7) and
+    # (degree >= 8); their total is precisely sum(degree - 6).
+    edge_count: list[int | bool] | None = None
+    if not compact_degree_count:
+        edge_count = cnf.equivalent_atleast(list(edges.values()), 133)
+        cnf.clause(edge_count[132])
+        cnf.clause(-edge_count[133])
 
     degree_thresholds: dict[int, list[int | bool]] = {}
     degree_eight: list[int | bool] = []
+    degree_excess_flags: list[int | bool] = []
     for v in vertices:
         incident: list[int | bool] = [edge(u, v) for u in vertices if u != v]
         incident.append(v <= 6)  # fixed edge (0,v)
@@ -135,6 +146,15 @@ def build(deduplicate_c4: bool = False) -> tuple[Cnf, dict[tuple[int, int], int]
         cnf.clause(thresholds[6])
         cnf.clause(-thresholds[high_plus_one])
         degree_eight.append(thresholds[8])
+        degree_excess_flags.extend((thresholds[7], thresholds[8]))
+
+    if compact_degree_count:
+        # Exactly 24 true flags means total degree 252 + 24 = 276, hence 138
+        # edges by the handshake lemma. This is equivalent to the 132-edge
+        # induced graph condition because root 0 contributes six edges.
+        excess_count = cnf.equivalent_atleast(degree_excess_flags, 25)
+        cnf.clause(excess_count[24])
+        cnf.clause(-excess_count[25])
 
     # The root itself has degree six. Degree sorting is valid under label
     # permutations that preserve the six root-neighbors as a block.
@@ -157,8 +177,10 @@ def main() -> None:
     parser.add_argument("output", type=Path, help="DIMACS path (keep generated data under .lake/)")
     parser.add_argument("--deduplicate-c4", action="store_true",
                         help="emit one copy of each opposite-pair C4 clause")
+    parser.add_argument("--compact-degree-count", action="store_true",
+                        help="derive the 138-edge count from degree flags via handshake")
     args = parser.parse_args()
-    cnf, _ = build(args.deduplicate_c4)
+    cnf, _ = build(args.deduplicate_c4, args.compact_degree_count)
     cnf.emit(args.output)
     print(f"wrote {args.output}: {cnf.nvars} variables, {len(cnf.clauses)} clauses")
 

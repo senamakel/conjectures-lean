@@ -60,3 +60,35 @@ The resulting instance had 756,652 clauses and the same normalized clause
 set as the original. Its SHA-256 was
 `96a0a88fe8c3570bdb0953d4616c4e10fe7fbb3566c3a7896f8863419ef31200`.
 The solver measurement above is from the original instance.
+
+## Compact handshake benchmark protocol (written before this run)
+
+Generate one refined instance with both `--deduplicate-c4` and
+`--compact-degree-count`. Keep the original default output untouched. Run the
+already-installed CaDiCaL 2.1.2 once with a 120-second solver limit, enabling
+LRAT output. Stop on a checked SAT model, a complete UNSAT trace, or UNKNOWN at
+the cap; do not extend the limit or run parameter variants. Keep all generated
+files in `.lake/c4-42-rooted-sat/`. Before solving, run the separate arithmetic
+checker `scripts/check_c4_42_degree_handshake.py`; it exhausts the allowed degree
+multiplicity profiles independently of the CNF generator. A SAT model must be
+independently parsed and checked for edge count, degree window, degree-eight cap
+and C4-freeness. An UNKNOWN result is only a bounded screen. An UNSAT result
+counts only after Lean LRAT replay and a proof that the CNF faithfully encodes
+the graph constraints.
+
+## Compact benchmark result
+
+The compact DIMACS had 16,054 variables and 363,370 clauses. Its SHA-256 was
+`66b84c521e0d6a0eb5dd7fe7749bb0e9da3415314d81e3c620f880503ebecbc4`.
+Independent regeneration matched this digest, and the arithmetic check covered
+all 903 non-root degree multiplicity profiles. CaDiCaL returned `UNKNOWN`
+after 120.02 seconds elapsed and 116.98 seconds user CPU, with 1,274,094
+conflicts and 763,443,748 propagations. The partial trace contains
+554,295,732 bytes. The solver returned neither a model nor a complete proof.
+
+Lean's `C4Extremal42.c4Free_iff_rooted_cycle_clauses` proves that the
+two graph-level clause families characterize four-cycle-freeness.
+`C4Extremal42.edge_count_eq_138_iff_rooted_degree_flags` proves the compact
+count condition. Both use only the standard axioms. The link from the exact
+DIMACS variable allocation and threshold gates to these predicates remains
+a separate proof obligation.
