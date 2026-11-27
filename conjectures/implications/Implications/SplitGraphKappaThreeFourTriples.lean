@@ -206,7 +206,7 @@ theorem hamiltonian_of_all_four_triple_rows
   have hrcD : G.Adj d (r c) := (hAdjRow c (by simp [A]) (by simp [A]) hcd.symm).symm
   have hprefChain : pref.IsChain G.Adj := by
     simp [pref, hrdA, hrdB, hraB, hraC, hrbC, hrbD, hrcD]
-  have hprefLastC : ∀ x, x ∈ prefix.getLast? → x ∈ C := by
+  have hprefLastC : ∀ x, x ∈ pref.getLast? → x ∈ C := by
     intro x hx
     simp [pref] at hx
     subst x
