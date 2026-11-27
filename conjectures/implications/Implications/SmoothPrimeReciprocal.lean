@@ -93,7 +93,8 @@ theorem reciprocalPrimeSum_le_dyadic_harmonic :
   let block (k : ℕ) : ℝ :=
     ∑ p ∈ (Finset.Ico (2 ^ k) (2 ^ (k + 1))).filter Nat.Prime, (1 : ℝ) / p
   let extra : ℝ := ∑ k ∈ Finset.Icc 0 K, (k + 1 : ℝ) * block k
-  refine ⟨D₀ + extra + 1, ?_, ?_⟩
+  let D : ℝ := D₀ + extra + 1
+  refine ⟨D, ?_, ?_⟩
   · have hextra : 0 ≤ extra := by
       dsimp [extra]
       apply Finset.sum_nonneg
@@ -101,7 +102,8 @@ theorem reciprocalPrimeSum_le_dyadic_harmonic :
       apply mul_nonneg (by positivity)
       apply Finset.sum_nonneg
       intro p hp
-      exact div_nonneg (by positivity) (by positivity)
+      have hp' := (Finset.mem_filter.mp hp).2
+      exact div_nonneg (by positivity) (by exact_mod_cast hp'.pos.le)
     linarith
   · intro N
     classical
@@ -129,29 +131,38 @@ theorem reciprocalPrimeSum_le_dyadic_harmonic :
           ∑ p ∈ S, (1 : ℝ) / p :=
       Finset.sum_fiberwise_of_maps_to hmaps _
     have hblocks :
-        (∑ k ∈ T, block k) ≤ ∑ k ∈ T, D₀ / (k + 1 : ℝ) := by
+        (∑ k ∈ T, block k) ≤ ∑ k ∈ T, D / (k + 1 : ℝ) := by
       apply Finset.sum_le_sum
       intro k hk
       by_cases hlarge : K ≤ k
-      · exact hK k hlarge
+      · exact (hK k hlarge).trans (div_le_div_of_nonneg_right
+          (by dsimp [D]; linarith) (by positivity))
       · have hkK : k ∈ Finset.Icc 0 K := Finset.mem_Icc.mpr ⟨Nat.zero_le _, Nat.le_of_not_ge hlarge⟩
         have hsingle : (k + 1 : ℝ) * block k ≤ extra := by
-          exact Finset.single_le_sum
-            (s := Finset.Icc 0 K) (fun i hi => by
-              dsimp [block]
-              apply mul_nonneg (by positivity)
-              apply Finset.sum_nonneg
-              intro p hp
-              exact div_nonneg (by positivity) (by positivity)) hkK
+          change (k + 1 : ℝ) * block k ≤
+            ∑ i ∈ Finset.Icc 0 K, (i + 1 : ℝ) * block i
+          apply Finset.single_le_sum
+          · intro i hi
+            apply mul_nonneg (by positivity)
+            dsimp [block]
+            apply Finset.sum_nonneg
+            intro p hp
+            have hp' := (Finset.mem_filter.mp hp).2
+            exact div_nonneg (by positivity) (by exact_mod_cast hp'.pos.le)
+          · exact hkK
         have hblock_nonneg : 0 ≤ block k := by
           dsimp [block]
           apply Finset.sum_nonneg
           intro p hp
-          exact div_nonneg (by positivity) (by positivity)
+          have hp' := (Finset.mem_filter.mp hp).2
+          exact div_nonneg (by positivity) (by exact_mod_cast hp'.pos.le)
         have hkpos : 0 < (k + 1 : ℝ) := by positivity
         apply (le_div_iff₀ hkpos).2
-        dsimp [extra] at hsingle ⊢
-        nlinarith
+        apply (le_div_iff₀ hkpos).2
+        calc
+          block k * (k + 1 : ℝ) = (k + 1 : ℝ) * block k := by ring
+          _ ≤ extra := hsingle
+          _ ≤ D := by dsimp [D]; linarith
     have hsum_shift :
         (∑ k ∈ T, (1 : ℝ) / (k + 1 : ℝ)) =
           ∑ j ∈ Finset.Icc 1 (Nat.log 2 N + 1), (1 : ℝ) / j := by
