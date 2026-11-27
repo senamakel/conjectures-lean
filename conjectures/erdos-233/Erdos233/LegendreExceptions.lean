@@ -164,23 +164,28 @@ theorem legendreBadGapIndices_subset_three_blocks (a : ℕ) (ha : 2 ≤ a)
     omega
   have hnlt : n ^ 2 < (2 * a) ^ 2 := Nat.pow_lt_pow_left hnhi (by decide)
   have hupperScale : (2 * a) ^ 2 = 4 * a ^ 2 := by ring
+  have hscale : 4 * a ^ 2 = 2 * (2 * a ^ 2) := by ring
   have hlastUpper : (squareGapIndex n).nth Nat.Prime < 2 * (2 * a ^ 2) := by
     rw [hupperScale] at hnlt
+    rw [hscale]
     exact lt_trans hgap.2.1 hnlt
   have hlong : 2 * a ≤ primeGap (squareGapIndex n) := by omega
   by_cases hfirst : (squareGapIndex n).nth Nat.Prime < a ^ 2
-  · have hmem := mem_block_of_nth_prime_bounds hfirstLower hfirst
-    simp only [longGapBlock, Finset.mem_filter, hmem, true_and]
-    exact Or.inl hlong
+  · have hfirst' : (squareGapIndex n).nth Nat.Prime < 2 * (a ^ 2 / 2) := by
+      rw [hfirst]
+      exact hfirst
+    have hmem := mem_block_of_nth_prime_bounds hfirstLower hfirst'
+    change squareGapIndex n ∈ _
+    exact Or.inl ⟨hmem, hlong⟩
   · have hsecondLower : a ^ 2 ≤ (squareGapIndex n).nth Nat.Prime := le_of_not_gt hfirst
     by_cases hsecond : (squareGapIndex n).nth Nat.Prime < 2 * a ^ 2
     · have hmem := mem_block_of_nth_prime_bounds hsecondLower hsecond
-      simp only [longGapBlock, Finset.mem_filter, hmem, true_and]
-      exact Or.inr (Or.inl hlong)
+      change squareGapIndex n ∈ _
+      exact Or.inr (Or.inl ⟨hmem, hlong⟩)
     · have hthirdLower : 2 * a ^ 2 ≤ (squareGapIndex n).nth Nat.Prime := le_of_not_gt hsecond
       have hmem := mem_block_of_nth_prime_bounds hthirdLower hlastUpper
-      simp only [longGapBlock, Finset.mem_filter, hmem, true_and]
-      exact Or.inr (Or.inr hlong)
+      change squareGapIndex n ∈ _
+      exact Or.inr (Or.inr ⟨hmem, hlong⟩)
 
 /-- The total square-interval length in one block is bounded by the total length of
 the prime gaps which contain those intervals. -/
