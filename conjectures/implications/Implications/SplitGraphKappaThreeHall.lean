@@ -21,7 +21,7 @@ def row (S : Finset V) (inc : V → V → Prop) (c : V)
 /-- Symmetric difference between two rows. -/
 def rowDiff (S : Finset V) (inc : V → V → Prop) (c d : V)
     [DecidableRel inc] : Finset V :=
-  row S inc c \\ row S inc d ∪ row S inc d \\ row S inc c
+  row S inc c \ row S inc d ∪ row S inc d \ row S inc c
 
 /-- A full anchor row and pairwise symmetric difference at most three force
 every row to have at most one element outside the anchor. -/
@@ -31,7 +31,7 @@ theorem outside_anchor_le_one_of_rowDiff
     (hanchor : (row S inc a).card = 4)
     (hrow : ∀ c ∈ C, (row S inc c).card ≤ 4)
     (hdiff : ∀ c ∈ C, c ≠ a → (rowDiff S inc c a).card ≤ 3) :
-    ∀ c ∈ C, ((row S inc c) \\ row S inc a).card ≤ 1 := by
+    ∀ c ∈ C, ((row S inc c) \ row S inc a).card ≤ 1 := by
   classical
   intro c hc
   by_cases hca : c = a
