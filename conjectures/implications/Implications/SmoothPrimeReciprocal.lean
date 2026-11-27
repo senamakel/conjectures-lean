@@ -249,7 +249,7 @@ theorem finite_geometric_product_le_exp_four_sum {ι : Type*} [DecidableEq ι]
 `u p ≤ Y^(1-σ)/p` is the elementary comparison used for prime powers in Rankin's
 method. -/
 theorem weighted_geometric_product_le_exp {s : Finset ℕ} {Y : ℝ} {σ : ℝ}
-    (u : ℕ → ℝ) (hY : 0 < Y) (hσ : σ ≤ 1)
+    (u : ℕ → ℝ) (hY : 0 < Y)
     (hu0 : ∀ p ∈ s, 0 ≤ u p) (hu3 : ∀ p ∈ s, u p ≤ 3 / 4)
     (hu : ∀ p ∈ s, u p ≤ Y ^ (1 - σ) / p) :
     (∏ p ∈ s, (1 - u p)⁻¹) ≤
