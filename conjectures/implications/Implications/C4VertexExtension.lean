@@ -39,6 +39,7 @@ def addVertex {V : Type*} (G : SimpleGraph V) (s : Set V) : SimpleGraph (Option 
     (x : V) : (addVertex G s).Adj none (some x) ↔ x ∈ s := Iff.rfl
 
 /-- Exact criterion for the one-vertex extension to remain C4-free. -/
+set_option maxHeartbeats 2000000 in
 theorem addVertex_c4Free_iff {V : Type*} (G : SimpleGraph V) (s : Set V) :
     C4Free (addVertex G s) ↔
       C4Free G ∧ ∀ ⦃x y z : V⦄, x ≠ y → x ∈ s → y ∈ s →
