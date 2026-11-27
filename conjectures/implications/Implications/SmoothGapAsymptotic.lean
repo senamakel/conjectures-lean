@@ -72,22 +72,21 @@ theorem eulerCost_div_rootScale_tendsto_zero :
         Real.log L ^ (1 / 2 : ℝ) / L ^ (1 / 4 : ℝ) := by
     filter_upwards [hL, hlog] with L hL hlog
     have hLpos : 0 < L := by linarith
-  have hlogpos : 0 < Real.log L := by linarith
-  have hroot : 0 < rootScale L := by
-    apply Real.sqrt_pos.2
-    exact mul_pos hLpos hlogpos
-  have hsqrt : rootScale L = Real.sqrt L * Real.sqrt (Real.log L) := by
-    rw [rootScale, Real.sqrt_mul hLpos.le]
-  have hscale : L ^ (1 / 4 : ℝ) * Real.log L / rootScale L =
-      (Real.log L ^ (1 / 2 : ℝ)) / (L ^ (1 / 4 : ℝ)) := by
-    rw [hsqrt, Real.sqrt_eq_rpow, Real.sqrt_eq_rpow]
-    rw [← Real.rpow_sub hLpos, ← Real.rpow_sub hlogpos]
-    rw [show (1 / 4 : ℝ) - 1 / 2 = -(1 / 4 : ℝ) by ring]
-    rw [show (1 : ℝ) - 1 / 2 = 1 / 2 by ring]
-    rw [Real.rpow_neg hLpos, Real.rpow_neg hlogpos]
-    field_simp
-    ring
-  exact hratio.congr' heq
+    have hlogpos : 0 < Real.log L := by linarith
+    have hsqrt : rootScale L = Real.sqrt L * Real.sqrt (Real.log L) := by
+      rw [rootScale, Real.sqrt_mul hLpos.le]
+    calc
+      L ^ (1 / 4 : ℝ) * Real.log L / rootScale L =
+          (L ^ (1 / 4 : ℝ) / Real.sqrt L) *
+            (Real.log L / Real.sqrt (Real.log L)) := by rw [hsqrt]; ring
+      _ = Real.log L ^ (1 / 2 : ℝ) / L ^ (1 / 4 : ℝ) := by
+        rw [Real.sqrt_eq_rpow, Real.sqrt_eq_rpow]
+        rw [← Real.rpow_sub hLpos, ← Real.rpow_sub hlogpos]
+        rw [show (1 / 4 : ℝ) - 1 / 2 = -(1 / 4 : ℝ) by ring]
+        rw [show (1 : ℝ) - 1 / 2 = 1 / 2 by ring]
+        rw [Real.rpow_neg hLpos, Real.rpow_neg hlogpos]
+        field_simp
+        ring
 
 /-- Eventually the logarithmic Euler-product cost is at most one eighth of
 `R`, a convenient single bound for combining with Rankin and the reciprocal
@@ -101,7 +100,8 @@ theorem eventually_eulerCost_le_eighth_rootScale :
   have hroot : 0 < rootScale L := by
     apply Real.sqrt_pos.2
     exact mul_pos (by linarith) (Real.log_pos hL)
-  exact (div_lt_iff₀ hroot).mp hcost
+  have h := (div_lt_iff₀ hroot).mp hcost
+  nlinarith
 
 end Implications.SmoothGapAsymptotic
 
