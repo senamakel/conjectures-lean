@@ -222,19 +222,20 @@ theorem hamiltonian_of_all_four_triple_rows
       G.Adj (r i) j := by
     have hjErase : j ∈ A.erase i := Finset.mem_erase.mpr ⟨(by intro h; exact hne h.symm), hj⟩
     have hjRow : j ∈ row G I (r i) := by rw [(hrows i hi).2]; exact hjErase
-    change j ∈ I ∧ G.Adj (r i) j at hjRow
-    exact hjRow.2
+    have hjRow' : j ∈ I.filter (fun v => G.Adj (r i) v) := by simpa [row] using hjRow
+    have hjRow'' : j ∈ I ∧ G.Adj (r i) j := Finset.mem_filter.mp hjRow'
+    exact hjRow''.2
   have hAa : a ∈ A := by simp [A]
   have hAb : b ∈ A := by simp [A]
   have hAc : c ∈ A := by simp [A]
   have hAd : d ∈ A := by simp [A]
-  have hrdA : G.Adj a (r d) := (hAdjRow d hAd hAa (by intro heq; exact had heq.symm)).symm
-  have hrdB : G.Adj (r d) b := hAdjRow d hAd hAb (by intro h; exact hbd h.symm)
-  have hraB : G.Adj b (r a) := (hAdjRow a hAa hAb (by intro heq; exact hab heq.symm)).symm
-  have hraC : G.Adj (r a) c := hAdjRow a hAa hAc hac
-  have hrbC : G.Adj c (r b) := (hAdjRow b hAb hAc (by intro heq; exact hbc heq.symm)).symm
-  have hrbD : G.Adj (r b) d := hAdjRow b hAb hAd hbd
-  have hrcD : G.Adj d (r c) := (hAdjRow c hAc hAd (by intro heq; exact hcd heq.symm)).symm
+  have hrdA : G.Adj a (r d) := (hAdjRow d a hAd hAa (by intro heq; exact had heq.symm)).symm
+  have hrdB : G.Adj (r d) b := hAdjRow d b hAd hAb (by intro h; exact hbd h.symm)
+  have hraB : G.Adj b (r a) := (hAdjRow a b hAa hAb (by intro heq; exact hab heq.symm)).symm
+  have hraC : G.Adj (r a) c := hAdjRow a c hAa hAc hac
+  have hrbC : G.Adj c (r b) := (hAdjRow b c hAb hAc (by intro heq; exact hbc heq.symm)).symm
+  have hrbD : G.Adj (r b) d := hAdjRow b d hAb hAd hbd
+  have hrcD : G.Adj d (r c) := (hAdjRow c d hAc hAd (by intro heq; exact hcd heq.symm)).symm
   have hprefChain : pref.IsChain G.Adj := by
     simp [pref, hrdA, hrdB, hraB, hraC, hrbC, hrbD, hrcD]
   have hprefLastC : ∀ x, x ∈ pref.getLast? → x ∈ C := by
@@ -243,7 +244,7 @@ theorem hamiltonian_of_all_four_triple_rows
     subst x
     exact (hrows c (by simp [A])).1
   let tail : List V := (C.filter fun x => x ∉ pref).toList
-  have htailNodup : tail.Nodup := by simp [tail]
+  have htailNodup : tail.Nodup := by simp [tail, Finset.nodup_toList]
   have htailC : ∀ x ∈ tail, x ∈ C := by
     intro x hx
     exact (Finset.mem_filter.mp (Finset.mem_toList.mp hx)).1
