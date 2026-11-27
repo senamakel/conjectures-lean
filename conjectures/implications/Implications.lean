@@ -39,3 +39,5 @@ import Implications.WilfThreeCycleOrder
 import Implications.WilfThreeCycleGlobal
 import Implications.WilfWindowGeometry
 import Implications.WilfArchiveClosure
+
+import Implications.C4PolarityCnfGates
