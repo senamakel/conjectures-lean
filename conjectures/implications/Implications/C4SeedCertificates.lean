@@ -1,6 +1,7 @@
 import Mathlib.Data.Nat.Bitwise
 import Mathlib.Data.List.Basic
 import Mathlib.Data.List.Pairwise
+import Mathlib.Combinatorics.SimpleGraph.Maps
 
 /-!
 # Finite certificates for the three published 41-vertex `C₄` extremal seeds
@@ -166,6 +167,136 @@ theorem seed3_no_compatible_six :
     ¬ ExistsCompatibleClique seed3 (List.range 41) 6 := by
   apply checker_false
   decide +kernel
+
+/-! ## Connecting the masks to simple graphs
+
+The row at index `u` is the open neighborhood of `u`: bit `v` records the
+edge `u--v`.  The three concrete arrays are symmetric and loopless, so they
+define actual simple graphs.  Their kernel-checked mask certificates then
+rule out six pairwise disjoint open neighborhoods in any graph isomorphic to
+one of them.
+-/
+
+private def maskGraph (g : Array Nat)
+    (hsym : ∀ u v : Fin 41,
+      Nat.testBit g[u.val]! v.val = Nat.testBit g[v.val]! u.val)
+    (hloop : ∀ u : Fin 41, Nat.testBit g[u.val]! u.val = false) :
+    SimpleGraph (Fin 41) :=
+  { Adj := fun u v => Nat.testBit g[u.val]! v.val = true
+    symm := by
+      intro u v huv
+      rw [hsym]
+      exact huv
+    loopless := by
+      intro u hu
+      rw [hloop u] at hu
+      contradiction }
+
+private theorem seed1_graph_symm : ∀ u v : Fin 41,
+    Nat.testBit seed1[u.val]! v.val = Nat.testBit seed1[v.val]! u.val := by
+  decide +kernel
+
+private theorem seed2_graph_symm : ∀ u v : Fin 41,
+    Nat.testBit seed2[u.val]! v.val = Nat.testBit seed2[v.val]! u.val := by
+  decide +kernel
+
+private theorem seed3_graph_symm : ∀ u v : Fin 41,
+    Nat.testBit seed3[u.val]! v.val = Nat.testBit seed3[v.val]! u.val := by
+  decide +kernel
+
+private theorem seed1_graph_loop : ∀ u : Fin 41,
+    Nat.testBit seed1[u.val]! u.val = false := by decide +kernel
+
+private theorem seed2_graph_loop : ∀ u : Fin 41,
+    Nat.testBit seed2[u.val]! u.val = false := by decide +kernel
+
+private theorem seed3_graph_loop : ∀ u : Fin 41,
+    Nat.testBit seed3[u.val]! u.val = false := by decide +kernel
+
+/-- The three McKay mask records, interpreted as simple graphs on 41 vertices. -/
+def seed1Graph : SimpleGraph (Fin 41) := maskGraph seed1 seed1_graph_symm seed1_graph_loop
+def seed2Graph : SimpleGraph (Fin 41) := maskGraph seed2 seed2_graph_symm seed2_graph_loop
+def seed3Graph : SimpleGraph (Fin 41) := maskGraph seed3 seed3_graph_symm seed3_graph_loop
+
+private theorem seed1_neighbor_disjoint_iff (u v : Fin 41) :
+    Disjoint (seed1Graph.neighborSet u) (seed1Graph.neighborSet v) ↔
+      compatible seed1 u.val v.val = true := by
+  decide +kernel
+
+private theorem seed2_neighbor_disjoint_iff (u v : Fin 41) :
+    Disjoint (seed2Graph.neighborSet u) (seed2Graph.neighborSet v) ↔
+      compatible seed2 u.val v.val = true := by
+  decide +kernel
+
+private theorem seed3_neighbor_disjoint_iff (u v : Fin 41) :
+    Disjoint (seed3Graph.neighborSet u) (seed3Graph.neighborSet v) ↔
+      compatible seed3 u.val v.val = true := by
+  decide +kernel
+
+/-- Six vertices in an ordered sublist of `Fin 41` cannot have pairwise
+disjoint open neighborhoods in any graph isomorphic to one of the masks.
+The statement is intentionally conditional on the supplied seed; it does not
+assert that the three records exhaust the extremal 41-vertex graphs. -/
+theorem no_disjoint_six_of_seed_iso (G : SimpleGraph (Fin 41))
+    (hseed : G ≃g seed1Graph ∨ G ≃g seed2Graph ∨ G ≃g seed3Graph) :
+    ¬ ∃ chosen : List (Fin 41), chosen.length = 6 ∧
+      chosen.Sublist (List.finRange 41) ∧
+      chosen.Pairwise (fun u v => Disjoint (G.neighborSet u) (G.neighborSet v)) := by
+  intro h
+  obtain ⟨chosen, hlen, hsub, hpairs⟩ := h
+  rcases hseed with hiso | hseed
+  · let mapped := chosen.map hIso
+    have hmappedLen : mapped.length = 6 := by simp [mapped, hlen]
+    have hmappedSub : mapped.map Fin.val |>.Sublist (List.range 41) := by
+      simpa [mapped] using hsub.map hIso
+    have hmappedPairs : mapped.Pairwise (fun u v =>
+        Disjoint (seed1Graph.neighborSet u) (seed1Graph.neighborSet v)) := by
+      apply List.pairwise_map.mpr
+      exact hpairs.imp fun u v huv => by
+        rw [← SimpleGraph.Iso.image_neighborSet hIso]
+        exact Set.disjoint_image_iff.mpr (by simpa using huv)
+    have hcompat : mapped.Pairwise (fun u v => compatible seed1 u.val v.val = true) := by
+      exact hmappedPairs.imp fun u v huv => (seed1_neighbor_disjoint_iff u v).1 huv
+    have hc : ExistsCompatibleClique seed1 (List.range 41) 6 := by
+      refine ⟨mapped.map Fin.val, ?_, hmappedSub, ?_⟩
+      · simpa [hmappedLen]
+      · simpa using hcompat
+    exact seed1_no_compatible_six hc
+  · rcases hseed with hIso | hIso
+    · let mapped := chosen.map hIso
+      have hmappedLen : mapped.length = 6 := by simp [mapped, hlen]
+      have hmappedSub : mapped.map Fin.val |>.Sublist (List.range 41) := by
+        simpa [mapped] using hsub.map hIso
+      have hmappedPairs : mapped.Pairwise (fun u v =>
+          Disjoint (seed2Graph.neighborSet u) (seed2Graph.neighborSet v)) := by
+        apply List.pairwise_map.mpr
+        exact hpairs.imp fun u v huv => by
+          rw [← SimpleGraph.Iso.image_neighborSet hIso]
+          exact Set.disjoint_image_iff.mpr (by simpa using huv)
+      have hcompat : mapped.Pairwise (fun u v => compatible seed2 u.val v.val = true) := by
+        exact hmappedPairs.imp fun u v huv => (seed2_neighbor_disjoint_iff u v).1 huv
+      have hc : ExistsCompatibleClique seed2 (List.range 41) 6 := by
+        refine ⟨mapped.map Fin.val, ?_, hmappedSub, ?_⟩
+        · simpa [hmappedLen]
+        · simpa using hcompat
+      exact seed2_no_compatible_six hc
+    · let mapped := chosen.map hIso
+      have hmappedLen : mapped.length = 6 := by simp [mapped, hlen]
+      have hmappedSub : mapped.map Fin.val |>.Sublist (List.range 41) := by
+        simpa [mapped] using hsub.map hIso
+      have hmappedPairs : mapped.Pairwise (fun u v =>
+          Disjoint (seed3Graph.neighborSet u) (seed3Graph.neighborSet v)) := by
+        apply List.pairwise_map.mpr
+        exact hpairs.imp fun u v huv => by
+          rw [← SimpleGraph.Iso.image_neighborSet hIso]
+          exact Set.disjoint_image_iff.mpr (by simpa using huv)
+      have hcompat : mapped.Pairwise (fun u v => compatible seed3 u.val v.val = true) := by
+        exact hmappedPairs.imp fun u v huv => (seed3_neighbor_disjoint_iff u v).1 huv
+      have hc : ExistsCompatibleClique seed3 (List.range 41) 6 := by
+        refine ⟨mapped.map Fin.val, ?_, hmappedSub, ?_⟩
+        · simpa [hmappedLen]
+        · simpa using hcompat
+      exact seed3_no_compatible_six hc
 
 #print axioms seed1_no_compatible_six
 #print axioms seed2_no_compatible_six
