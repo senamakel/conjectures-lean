@@ -67,6 +67,12 @@ The [stacked antipodal-cover proof](https://github.com/senamakel/open-math-agent
 
 Upstream merged independent Green 100 reductions at both previously staged filenames. [#4525](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4525) replaces the staged group-algebra split with a matrix obstruction and the transfer to a larger group algebra, proving the cellular bridge inline. [#4535](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4535) replaces the staged surjunctivity split with permutation-model amplification and a finite rank obstruction, proving the duality bridge inline. The Green 100 fork commits in the table are historical artifacts. Their hypothesis types differ from canonical upstream, including the target of the stacked cellular proof. Follow the merged interfaces and avoid duplicate PRs. The matrix transfer already has [proof PR #4557](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4557), and the parent surjunctivity step has [proof PR #4573](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4573), both of which subsequently returned an accepted verdict in their checker jobs. Their trusted merge jobs were still pending at the follow-up check.
 
+### Two-sphere recurrence and Green matrix transfer
+
+The second sphere recurrence now has its own [checked reduction](https://github.com/senamakel/open-math-agents/tree/oma/poincare-two-sphere-cover) at `8e7bc4e` and a [checked antipodal geometry proof](https://github.com/senamakel/open-math-agents/tree/oma/poincare-two-sphere-geometry) at `676408d`. Both pass the pinned checker with standard axioms. The reduction uses the same general Mayer–Vietoris proposition as the three-sphere recurrence. The proof reuses the dimension-parametric stereographic and radial arguments at dimension two. Submit the reduction after #4599 registers its H2, then submit the geometry proof once the new cover leaf is registered.
+
+Green 100 matrix transfer [#4557](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4557) merged at `3f8ebac0858c`. The public replay returned HTTP 200 and the exact `R1.H1.R1.H2` API reported `solved: true`. Its sibling matrix obstruction and the direct sofic surjunctivity verdict still determine closure of the parent.
+
 ## Earlier attempts and follow-up candidates
 
 | Target | Recovered public evidence | Remaining work |
