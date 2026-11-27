@@ -68,8 +68,8 @@ private theorem path_of_distinct_attachments
   let D := C.erase t
   let M := D.erase x |>.erase y
   let middle : List V := x :: (M.toList ++ [y])
-  let prefix : List V := [k,t,i]
-  let path : List V := prefix ++ middle ++ [j]
+  let prefList : List V := [k,t,i]
+  let path : List V := prefList ++ middle ++ [j]
   have hmiddleNodup : middle.Nodup := by simp [middle, M, D, hxy]
   have hmiddleFin : middle.toFinset = D := by
     ext v
@@ -86,15 +86,15 @@ private theorem path_of_distinct_attachments
   have hkC : k ∉ C := fun h => (Finset.disjoint_left.mp hdisj) h hk
   have hti' : t ≠ i := by intro he; subst i; exact hiC ht
   have htk' : t ≠ k := by intro he; subst k; exact hkC ht
-  have hprefixChain : prefix.IsChain G.Adj := by simp [prefix, hti, htk]
-  have hprefixNodup : prefix.Nodup := by
-    simp [prefix, hij, hik, hjk, hti', htk']
-  have hprefixMiddle : (prefix ++ middle).Nodup := by
+  have hprefListChain : prefList.IsChain G.Adj := by simp [prefList, hti, htk]
+  have hprefListNodup : prefList.Nodup := by
+    simp [prefList, hij, hik, hjk, hti', htk']
+  have hprefListMiddle : (prefList ++ middle).Nodup := by
     rw [List.nodup_append']
-    refine ⟨hprefixNodup, hmiddleNodup, ?_⟩
+    refine ⟨hprefListNodup, hmiddleNodup, ?_⟩
     intro v hv w hw he
     subst w
-    have hv' : v = k ∨ v = t ∨ v = i := by simpa [prefix] using hv
+    have hv' : v = k ∨ v = t ∨ v = i := by simpa [prefList] using hv
     rcases hv' with rfl | rfl | rfl
     · exact hkC ((hmiddleSub v hw).trans he)
     · have htD : t ∉ D := by simp [D]
@@ -105,18 +105,18 @@ private theorem path_of_distinct_attachments
   have hpathNodup : path.Nodup := by
     dsimp [path]
     rw [List.nodup_append']
-    refine ⟨hprefixMiddle, by simp [hjC], ?_⟩
+    refine ⟨hprefListMiddle, by simp [hjC], ?_⟩
     intro v hv w hw he
     subst w
-    rcases List.mem_append.mp hv with hvprefix | hvmiddle
-    · have hv' : v = k ∨ v = t ∨ v = i := by simpa [prefix] using hvprefix
+    rcases List.mem_append.mp hv with hvprefList | hvmiddle
+    · have hv' : v = k ∨ v = t ∨ v = i := by simpa [prefList] using hvprefList
       rcases hv' with rfl | rfl | rfl
       · exact hjk
       · exact hjC ht
       · exact hij
     · exact hjC (hmiddleSub v hvmiddle)
-  have hfirst : (prefix ++ middle).IsChain G.Adj :=
-    chain_join hprefixChain hmiddleChain (by simp [prefix]) hmiddleHead hxi.symm
+  have hfirst : (prefList ++ middle).IsChain G.Adj :=
+    chain_join hprefListChain hmiddleChain (by simp [prefList]) hmiddleHead hxi.symm
   have hpathChain : path.IsChain G.Adj := by
     have h := chain_join hfirst (List.IsChain.singleton j) hmiddleLast (by simp) hyj
     simpa [path] using h
@@ -126,14 +126,14 @@ private theorem path_of_distinct_attachments
     rcases Finset.mem_union.mp hv with hvC | hvI
     · by_cases hvt : v = t
       · subst v
-        simp [path, prefix]
+        simp [path, prefList]
       · have hvD : v ∈ D := Finset.mem_erase.mpr ⟨hvt, hvC⟩
         have hvm : v ∈ middle := List.mem_toFinset.mp (by rw [hmiddleFin]; exact hvD)
-        simp [path, prefix, hvm]
+        simp [path, prefList, hvm]
     · rw [hI] at hvI
       simp only [Finset.mem_insert, Finset.mem_singleton] at hvI
-      rcases hvI with rfl | rfl | rfl <;> simp [path, prefix]
-  exact hamiltonian_of_list G path (by simp [path, prefix]) hpathNodup hpathChain hcover
+      rcases hvI with rfl | rfl | rfl <;> simp [path, prefList]
+  exact hamiltonian_of_list G path (by simp [path, prefList]) hpathNodup hpathChain hcover
 
 /-- A full triple row plus the connectivity-two row bounds forces a Hamiltonian
 path through the clique and all three independent vertices. -/
