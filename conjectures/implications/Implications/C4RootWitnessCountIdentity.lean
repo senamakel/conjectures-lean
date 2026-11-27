@@ -3,6 +3,10 @@ import Mathlib.Tactic
 
 namespace C4RootWitnessCountIdentity
 
+noncomputable def inducedEdgeCount {V : Type*} [Fintype V] [DecidableEq V]
+    (G : SimpleGraph V) [DecidableRel G.Adj] (A : Finset V) : ℕ :=
+  (G.induce (A : Set V)).edgeFinset.card
+
 open C4DegreeEightCap C4DegreeEightEquality C4DegreeEightMultiplicity
 
 /-- For a non-root vertex, the four degree-eight roots are witnessed by
@@ -191,7 +195,7 @@ private theorem within_neighbor_sum_eq
     {V : Type*} [Fintype V] [DecidableEq V]
     (G : SimpleGraph V) [DecidableRel G.Adj] (A : Finset V) :
     (∑ x ∈ A, (G.neighborFinset x ∩ A).card) =
-      2 * Implications.C4PolarityDeletion.inducedEdgeCount G A := by
+      2 * inducedEdgeCount G A := by
   classical
   change (∑ x ∈ A, (G.neighborFinset x ∩ A).card) =
     2 * (G.induce (A : Set V)).edgeFinset.card
@@ -221,20 +225,19 @@ theorem outer_edge_count_from_local_counts
       (G.neighborFinset x ∩ O).card = (G.neighborFinset x ∩ S).card)
     (hOlocal : ∀ x ∈ O,
       (G.neighborFinset x ∩ O).card = 3 + (G.neighborFinset x ∩ S).card) :
-    Implications.C4PolarityDeletion.inducedEdgeCount G O =
-      18 + Implications.C4PolarityDeletion.inducedEdgeCount G S := by
+    inducedEdgeCount G O = 18 + inducedEdgeCount G S := by
   have hcross := cross_neighbor_sum_comm G S O
   have hsumS : (∑ x ∈ S, (G.neighborFinset x ∩ O).card) =
-      2 * Implications.C4PolarityDeletion.inducedEdgeCount G S := by
+      2 * inducedEdgeCount G S := by
     calc
       _ = ∑ x ∈ S, (G.neighborFinset x ∩ S).card := by
         apply Finset.sum_congr rfl
         intro x hx
         exact hSlocal x hx
-      _ = 2 * Implications.C4PolarityDeletion.inducedEdgeCount G S :=
+      _ = 2 * inducedEdgeCount G S :=
         within_neighbor_sum_eq G S
   have hsumO : (∑ x ∈ O, (G.neighborFinset x ∩ O).card) =
-      36 + 2 * Implications.C4PolarityDeletion.inducedEdgeCount G S := by
+      36 + 2 * inducedEdgeCount G S := by
     calc
       _ = ∑ x ∈ O, (3 + (G.neighborFinset x ∩ S).card) := by
         apply Finset.sum_congr rfl
@@ -245,7 +248,7 @@ theorem outer_edge_count_from_local_counts
       _ = 36 + ∑ x ∈ S, (G.neighborFinset x ∩ O).card := by
         rw [hOcard, cross_neighbor_sum_comm]
         norm_num
-      _ = 36 + 2 * Implications.C4PolarityDeletion.inducedEdgeCount G S := by
+      _ = 36 + 2 * inducedEdgeCount G S := by
         rw [hsumS]
   have hfinal := within_neighbor_sum_eq G O
   rw [hsumO] at hfinal
