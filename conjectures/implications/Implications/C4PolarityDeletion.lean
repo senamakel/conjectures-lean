@@ -115,6 +115,8 @@ theorem retained_edge_count_eq_104_add_deleted_score
     have hcount : (∑ v ∈ D, if v ∈ A then 1 else 0) = (D ∩ A).card := by
       rw [← Finset.card_filter]
       congr 1
+    have hsum8 : (∑ _v ∈ D, (8 : ℕ)) = 8 * D.card := by
+      simp [mul_comm]
     calc
       (∑ v ∈ D, G.degree v) + (D ∩ A).card =
           (∑ v ∈ D, (8 - (if v ∈ A then 1 else 0))) + (D ∩ A).card := by
@@ -123,8 +125,7 @@ theorem retained_edge_count_eq_104_add_deleted_score
       _ = (∑ _v ∈ D, (8 : ℕ)) -
           (∑ v ∈ D, if v ∈ A then 1 else 0) + (D ∩ A).card := by rw [hsum]
       _ = 8 * D.card - (D ∩ A).card + (D ∩ A).card := by
-        simp only [Finset.sum_const, nsmul_eq_mul]
-        rw [hcount]
+        rw [hsum8, hcount]
         omega
       _ = 120 := by rw [hD]; omega
   have hcountRelation :
