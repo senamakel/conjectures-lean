@@ -75,20 +75,23 @@ theorem eulerCost_div_rootScale_tendsto_zero :
     have hlogpos : 0 < Real.log L := by linarith
     have hsqrt : rootScale L = Real.sqrt L * Real.sqrt (Real.log L) := by
       rw [rootScale, Real.sqrt_mul hLpos.le]
+    have hLratio : L ^ (1 / 4 : ℝ) / Real.sqrt L =
+        1 / L ^ (1 / 4 : ℝ) := by
+      rw [Real.sqrt_eq_rpow]
+      field_simp
+      rw [← Real.rpow_add hLpos]
+      norm_num
+    have hlogratio : Real.log L / Real.sqrt (Real.log L) =
+        Real.log L ^ (1 / 2 : ℝ) := by
+      rw [Real.sqrt_eq_rpow]
+      have hsq := Real.sq_sqrt hlogpos.le
+      field_simp
+      rw [Real.sq_sqrt hlogpos.le]
+    rw [hsqrt]
     calc
-      L ^ (1 / 4 : ℝ) * Real.log L / rootScale L =
-          (L ^ (1 / 4 : ℝ) / Real.sqrt L) *
-            (Real.log L / Real.sqrt (Real.log L)) := by rw [hsqrt]; ring
-      _ = Real.log L ^ (1 / 2 : ℝ) / L ^ (1 / 4 : ℝ) := by
-        rw [Real.sqrt_eq_rpow, Real.sqrt_eq_rpow]
-        rw [← Real.rpow_sub hLpos]
-        rw [← Real.rpow_one (Real.log L)]
-        rw [← Real.rpow_sub hlogpos]
-        rw [show (1 / 4 : ℝ) - 1 / 2 = -(1 / 4 : ℝ) by ring]
-        rw [show (1 : ℝ) - 1 / 2 = 1 / 2 by ring]
-        rw [Real.rpow_neg hLpos, Real.rpow_neg hlogpos]
-        field_simp
-        ring
+      _ = (L ^ (1 / 4 : ℝ) / Real.sqrt L) *
+          (Real.log L / Real.sqrt (Real.log L)) := by ring
+      _ = _ := by rw [hLratio, hlogratio]; ring
 
 /-- Eventually the logarithmic Euler-product cost is at most one eighth of
 `R`, a convenient single bound for combining with Rankin and the reciprocal
