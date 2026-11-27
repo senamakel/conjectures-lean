@@ -22,6 +22,7 @@ import Implications.McEachenStock
 import Implications.SplitGraphComponents
 import Implications.SplitGraphAttachments
 import Implications.SplitGraphManyOutsiders
+import Implications.SplitGraphTwoConnected
 import Implications.WilfEquivalence
 import Implications.C4Extremal42
 import Implications.C4DegreeBounds
