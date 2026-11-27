@@ -387,6 +387,81 @@ theorem three_selected_rows_form_triangle
     · exact hbc h
   exact ⟨x,y,z,a,b,c,hx,hy,hz,hxy,hxz,hyz,hab,hac,hbc,hxEq,hyEq,hzEq⟩
 
+/-- Specialize the finite-family result to selected endpoint incidences in a
+split graph. The original row bounds force any selected double row to equal
+the full graph row, so the symmetric-difference bound makes those rows
+pairwise intersecting. -/
+theorem chosen_three_double_rows_form_triangle
+    (G : SimpleGraph V) (C I : Finset V) (left right : V → V)
+    (hleftC : ∀ i ∈ I, left i ∈ C) (hrightC : ∀ i ∈ I, right i ∈ C)
+    (hleftAdj : ∀ i ∈ I, G.Adj (left i) i)
+    (hrightAdj : ∀ i ∈ I, G.Adj (right i) i)
+    (hneq : ∀ i ∈ I, left i ≠ right i)
+    (hrow : ∀ q ∈ C, (row G I q).card ≤ 2)
+    (hdiff : ∀ q ∈ C, ∀ d ∈ C, q ≠ d → (rowDiff G I q d).card ≤ 2)
+    (hcount : (C.filter (fun q => (I.filter (fun i => left i = q ∨ right i = q)).card = 2)).card = 3) :
+    ∃ x y z a b c, x ∈ C ∧ y ∈ C ∧ z ∈ C ∧ x ≠ y ∧ x ≠ z ∧ y ≠ z ∧
+      a ≠ b ∧ a ≠ c ∧ b ≠ c ∧
+      I.filter (fun i => left i = x ∨ right i = x) = {a,b} ∧
+      I.filter (fun i => left i = y ∨ right i = y) = {b,c} ∧
+      I.filter (fun i => left i = z ∨ right i = z) = {a,c} := by
+  classical
+  let selected : V → Finset V := fun q => I.filter (fun i => left i = q ∨ right i = q)
+  let S : Finset V := C.filter (fun q => (selected q).card = 2)
+  have hSsub : S ⊆ C := fun q hq => (Finset.mem_filter.mp hq).1
+  have hSCard : S.card = 3 := hcount
+  have hrowCard : ∀ q ∈ S, (selected q).card = 2 := fun q hq =>
+    (Finset.mem_filter.mp hq).2
+  have hselectedSub : ∀ q ∈ S, selected q ⊆ I := by
+    intro q hq i hi
+    exact (Finset.mem_filter.mp hi).1
+  have hdegree : ∀ i ∈ I, (C.filter (fun q => i ∈ selected q)).card = 2 := by
+    intro i hi
+    have hEq : C.filter (fun q => i ∈ selected q) = {left i, right i} := by
+      ext q
+      constructor
+      · intro hq
+        have hq' := Finset.mem_filter.mp hq
+        have hi' := Finset.mem_filter.mp hq'.2
+        rcases hi'.2 with heq | heq
+        · exact Finset.mem_insert.mpr (Or.inl heq.symm)
+        · simp [heq.symm]
+      · intro hq
+        simp only [Finset.mem_insert, Finset.mem_singleton] at hq
+        rcases hq with hq | hq
+        · subst q
+          exact Finset.mem_filter.mpr ⟨hleftC i hi,
+            Finset.mem_filter.mpr ⟨hi, Or.inl rfl⟩⟩
+        · subst q
+          exact Finset.mem_filter.mpr ⟨hrightC i hi,
+            Finset.mem_filter.mpr ⟨hi, Or.inr rfl⟩⟩
+    rw [hEq]
+    simp [hneq i hi]
+  have hselectedSubRow : ∀ q ∈ C, selected q ⊆ row G I q := by
+    intro q hq i hi
+    have hi' := Finset.mem_filter.mp hi
+    rcases hi'.2 with heq | heq
+    · exact Finset.mem_row.mp (by
+        rw [row]; exact Finset.mem_filter.mpr ⟨hi'.1, heq ▸ hleftAdj i hi'.1⟩)
+    · exact Finset.mem_row.mp (by
+        rw [row]; exact Finset.mem_filter.mpr ⟨hi'.1, heq ▸ hrightAdj i hi'.1⟩)
+  have hselectedEq : ∀ q ∈ S, selected q = row G I q := by
+    intro q hq
+    apply Finset.eq_of_subset_of_card_le (hselectedSubRow q (hSsub hq))
+    rw [hrowCard q hq]
+    exact hrow q (hSsub hq)
+  have hmeet : ∀ q ∈ S, ∀ d ∈ S, q ≠ d → ∃ i, i ∈ selected q ∧ i ∈ selected d := by
+    intro q hq d hd hqd
+    rw [hselectedEq q hq, hselectedEq d hd]
+    apply intersecting_pair_rows
+    · exact hrow q (hSsub hq)
+    · exact hrow d (hSsub hd)
+    · simpa [rowDiff] using hdiff q (hSsub hq) d (hSsub hd) hqd
+  obtain ⟨x,y,z,a,b,c,hx,hy,hz,hxy,hxz,hyz,hab,hac,hbc,hxEq,hyEq,hzEq⟩ :=
+    three_selected_rows_form_triangle C I S selected hSsub hSCard hrowCard
+      hselectedSub hdegree hmeet
+  exact ⟨x,y,z,a,b,c,hx,hy,hz,hxy,hxz,hyz,hab,hac,hbc,hxEq,hyEq,hzEq⟩
+
 end SplitGraphSmallRowsThree
 
 #print axioms SplitGraphSmallRowsThree.three_pair_rows_are_triangle
