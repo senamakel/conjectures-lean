@@ -1,5 +1,6 @@
 import Mathlib
 import Implications.C4PolarityCnfGates
+import Implications.C4PolarityThresholdEncoding
 
 /-!
 # DIMACS encoding of polarity lexicographic constraints
@@ -12,17 +13,7 @@ are skipped without allocating a prefix variable, as in the Python encoder.
 namespace Implications.C4PolarityLexEncoding
 
 open Implications.C4PolarityCnfGates
-
-def literalValue (a : Nat → Bool) (lit : Int) : Bool :=
-  match lit with
-  | .ofNat n => a n
-  | .negSucc n => !a (n + 1)
-
-def clauseValue (a : Nat → Bool) (clause : List Int) : Bool :=
-  clause.any (literalValue a)
-
-def cnfValue (a : Nat → Bool) (clauses : List (List Int)) : Bool :=
-  clauses.all (clauseValue a)
+open Implications.C4PolarityThresholdEncoding
 
 private def pos (v : Nat) : Int := Int.ofNat v
 private def neg (v : Nat) : Int := Int.negOfNat v
