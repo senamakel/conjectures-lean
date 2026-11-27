@@ -33,11 +33,14 @@ noncomputable def swapIndex (marks : Finset Nat)
   classical
   intro i
   by_cases hleft : IsLeft marks i
-  · obtain ⟨s, hs, hsi⟩ := hleft
-    exact ⟨i.val + 2, by have := hbounded s hs; omega⟩
+  · have hout : i.val + 2 < n := by
+      rcases hleft with ⟨s, hs, hsi⟩
+      have := hbounded s hs
+      omega
+    exact ⟨i.val + 2, hout⟩
   · by_cases hright : IsRight marks i
-    · obtain ⟨s, hs, hsi⟩ := hright
-      exact ⟨i.val - 2, by have := hbounded s hs; omega⟩
+    · have hout : i.val - 2 < n := by omega
+      exact ⟨i.val - 2, hout⟩
     · exact i
 
 private theorem left_to_right (marks : Finset Nat)
@@ -47,7 +50,6 @@ private theorem left_to_right (marks : Finset Nat)
     IsRight marks (swapIndex marks hbounded hsep i) := by
   obtain ⟨s, hs, hsi⟩ := hi
   refine ⟨s, hs, ?_⟩
-  apply Fin.ext_iff.mp
   simp only [swapIndex, dif_pos hi]
   omega
 
