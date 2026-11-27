@@ -73,11 +73,11 @@ theorem hamiltonian_of_prefix_and_remaining_chain
       exact hrestLastC x hx
   apply hamiltonian_of_list G (base ++ tail) (by simpa [base] using hne)
   · rw [List.nodup_append']
-    exact List.disjoint_left.mpr (by
+    refine ⟨hbaseNodup, htailNodup, List.disjoint_left.mpr (by
       intro x hx hy
       rcases List.mem_append.mp hx with hx | hx
       · exact hbaseTailDisjoint x (List.mem_append_left _ hx) hy
-      · exact hbaseTailDisjoint x (List.mem_append_right _ hx) hy)
+      · exact hbaseTailDisjoint x (List.mem_append_right _ hx) hy)⟩
   · rw [List.isChain_append]
     refine ⟨hbaseChain, ?_, ?_⟩
     · rw [List.isChain_iff_forall_rel_of_append_cons_cons]
@@ -103,6 +103,7 @@ theorem hamiltonian_of_prefix_and_remaining_chain
     · exact List.mem_append_left _ (by simpa [base] using hx)
     · exact List.mem_append_right _ hx
 
+omit [Fintype V] [DecidableEq V] in
 /-- The six-vertex path through the three pair rows, starting at an independent
 vertex and ending at a clique vertex. -/
 theorem triangle_prefix_is_nodup_chain
