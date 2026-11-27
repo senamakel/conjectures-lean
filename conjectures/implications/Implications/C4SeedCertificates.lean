@@ -155,17 +155,17 @@ private def seed3 : Array Nat := #[21541946382, 4325701, 2181050499, 27488839377
 theorem seed1_no_compatible_six :
     ¬ ExistsCompatibleClique seed1 (List.range 41) 6 := by
   apply checker_false
-  native_decide
+  decide +kernel
 
 theorem seed2_no_compatible_six :
     ¬ ExistsCompatibleClique seed2 (List.range 41) 6 := by
   apply checker_false
-  native_decide
+  decide +kernel
 
 theorem seed3_no_compatible_six :
     ¬ ExistsCompatibleClique seed3 (List.range 41) 6 := by
   apply checker_false
-  native_decide
+  decide +kernel
 
 #print axioms seed1_no_compatible_six
 #print axioms seed2_no_compatible_six
