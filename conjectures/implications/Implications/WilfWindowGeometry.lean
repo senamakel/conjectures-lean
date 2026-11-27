@@ -95,9 +95,8 @@ theorem unique_overlapping_predecessor (marks shifts : Finset ℕ)
 its start is an allowed overlap shift immediately before or after the central start. -/
 theorem moved_position_has_overlapping_neighbor (marks shifts : Finset ℕ)
     (hsep : SeparatedBy marks shifts)
-    (m : Equiv.Perm (Fin 8))
     {s t : ℕ} (hs : s ∈ marks) (ht : t ∈ marks) (hst : s ≠ t)
-    (i j : Fin 8) (hj : j ∈ m.support)
+    (i j : Fin 8)
     (hcoord : s + i.val = t + j.val) :
     (t < s ∧ s - t ∈ shifts ∧ s - t < 8) ∨
       (s < t ∧ t - s ∈ shifts ∧ t - s < 8) := by
@@ -157,7 +156,8 @@ private theorem markedComponents_disjoint {n : ℕ} (marks shifts : Finset ℕ)
         (markedComponent marks m hb s) (markedComponent marks m hb t)) := by
   have hpair := lifted_windows_pairwise_disjoint marks shifts m hb hsep htranslate
   intro s hs t ht hst
-  simpa only [markedComponent, dif_pos hs, dif_pos ht] using hpair s hs t ht hst
+  rw [markedComponent, dif_pos hs, markedComponent, dif_pos ht]
+  exact hpair s hs t ht hst
 
 /-- Two distinct marked starts cannot both move the same point under their lifted
 local permutations, under the translated-support separation hypothesis. -/
@@ -176,6 +176,7 @@ theorem lifted_support_mover_unique {n : ℕ} (marks shifts : Finset ℕ)
 
 /-- At a point moved by one marked-window summand, the global assembled permutation
 acts exactly as that summand. -/
+set_option maxHeartbeats 600000 in
 theorem assemble_apply_of_lifted_support {n : ℕ} (marks shifts : Finset ℕ)
     (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n)
     (hsep : SeparatedBy marks shifts)
@@ -192,6 +193,7 @@ theorem assemble_apply_of_lifted_support {n : ℕ} (marks shifts : Finset ℕ)
       (markedComponents_disjoint marks shifts m hb hsep htranslate) ht hx
 
 /-- If no marked-window summand moves a point, the assembled permutation fixes it. -/
+set_option maxHeartbeats 600000 in
 theorem assemble_apply_of_no_lifted_support {n : ℕ} (marks shifts : Finset ℕ)
     (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n)
     (hsep : SeparatedBy marks shifts)
