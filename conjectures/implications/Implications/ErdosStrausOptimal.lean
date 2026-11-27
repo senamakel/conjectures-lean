@@ -162,7 +162,7 @@ theorem optimal_triple_of_le (t p x y z : ℕ) (ht : 0 < t)
   have hg := familyPrime_gt t ht
   rw [← hp] at hg
   have hfam : t*(t+1) < p*t := by
-    rw [mul_comm t (t+1), mul_comm p t]
+    rw [mul_comm p t]
     exact (Nat.mul_lt_mul_left ht).mpr hg
   have hxmax : x ≤ p*(t+1) := by omega
   have hymax : y ≤ p*(t+1) := by omega
@@ -240,7 +240,7 @@ theorem family_optimal (t : ℕ) (ht : 0 < t) (hp : (familyPrime t).Prime) :
         c ≤ z ∧ (z ≤ c → x = a ∧ y = b ∧ z = c) := by
   dsimp
   have hab : t*(t+1) < familyPrime t*t := by
-    rw [mul_comm t (t+1), mul_comm (familyPrime t) t]
+    rw [mul_comm (familyPrime t) t]
     exact (Nat.mul_lt_mul_left ht).mpr (familyPrime_gt t ht)
   refine ⟨⟨by positivity, hab, Nat.mul_lt_mul_of_pos_left (by omega) hp.pos, family_rep t ht⟩, ?_⟩
   intro x y z hx hxy hyz hrep

@@ -26,6 +26,47 @@ noncomputable def rowDiff (G : SimpleGraph V) (I : Finset V) (c d : V) : Finset 
 def inducedTreeBound (G : SimpleGraph V) (k : ℕ) : Prop :=
   ∀ s : Finset V, (G.induce (s : Set V)).IsTree → s.card ≤ k + 2
 
+/-- A clique vertex together with its row induces a star. -/
+theorem star_isTree (G : SimpleGraph V) (I : Finset V) (c : V)
+    (hI : G.IsIndepSet (I : Set V)) :
+    (G.induce ((insert c (row G I c) : Finset V) : Set V)).IsTree := by
+  classical
+  let S := insert c (row G I c)
+  have hcRow : c ∉ row G I c := by
+    intro h
+    exact G.irrefl (Finset.mem_filter.mp h).2
+  let center : {v // v ∈ (S : Finset V)} := ⟨c, by simp [S]⟩
+  have hEq : G.induce (S : Set V) = SimpleGraph.starGraph center := by
+    ext x y
+    simp only [SimpleGraph.induce_adj, SimpleGraph.starGraph, SimpleGraph.fromRel_adj]
+    constructor
+    · intro hadj
+      refine ⟨?_, ?_⟩
+      · intro hxy
+        exact G.loopless _ (hxy ▸ hadj)
+      · rcases Finset.mem_insert.mp x.property with hx | hx
+        · left
+          apply Subtype.ext
+          exact hx
+        · rcases Finset.mem_insert.mp y.property with hy | hy
+          · right
+            apply Subtype.ext
+            exact hy
+          · exact False.elim (hI hx hy (fun h => hxy (Subtype.ext h)) hadj)
+    · rintro ⟨hxy, (hx | hy)⟩
+      · have hyrow : y.val ∈ row G I c := by
+          rcases Finset.mem_insert.mp y.property with h | h
+          · exact (hxy (Subtype.ext h)).elim
+          · exact h
+        exact (Finset.mem_filter.mp hyrow).2
+      · have hxrow : x.val ∈ row G I c := by
+          rcases Finset.mem_insert.mp x.property with h | h
+          · exact (hxy.symm (Subtype.ext h)).elim
+          · exact h
+        exact ((Finset.mem_filter.mp hxrow).2).symm
+  rw [hEq]
+  exact SimpleGraph.isTree_starGraph center
+
 /-- The induced star bound gives the size bound on each row. -/
 theorem row_card_le (G : SimpleGraph V) (C I : Finset V) (k : ℕ)
     (hdisj : Disjoint C I)
