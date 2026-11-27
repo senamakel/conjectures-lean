@@ -1,5 +1,7 @@
 import FormalConjectures.Other.BeaverMathOlympiad
 
+/-! Prefix parity and a counting reformulation of the pinned Antihydra target. -/
+
 namespace AntihydraParity
 
 def orbit (seed : Nat) : Nat → Nat
@@ -45,9 +47,9 @@ theorem target_iff_even_count :
       ∀ n, n ≤ 3 * evenCount n := by
   have hcard (n : Nat) :
       ((Finset.range n).filter fun i => Odd (orbit 8 i)).card + evenCount n = n := by
-    rw [evenCount, ← Finset.filter_card_add_filter_neg_card_eq_card
-      (p := fun i => Odd (orbit 8 i)) (s := Finset.range n)] at *
-    rw [Finset.card_range]
+    simpa [evenCount, Nat.not_odd_iff_even] using
+      (Finset.card_filter_add_card_filter_not
+        (p := fun i => Odd (orbit 8 i)) (s := Finset.range n))
   have hcount (n : Nat) :
       ((Finset.range n).filter fun i => Odd (orbit 8 i)).card ≤ 2 * evenCount n ↔
         n ≤ 3 * evenCount n := by

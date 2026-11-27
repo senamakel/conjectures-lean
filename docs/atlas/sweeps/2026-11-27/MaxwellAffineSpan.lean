@@ -1,6 +1,8 @@
 import Mathlib.LinearAlgebra.AffineSpace.Independent
 import FormalConjectures.Arxiv.«2607.27197».MaxwellConjecture
 
+/-! Affine-span restriction for equilibria of noncollinear Maxwell configurations. -/
+
 open scoped BigOperators
 
 namespace MaxwellAffineSpan
@@ -44,7 +46,9 @@ private theorem coulomb_hasGradient (q : ℝ) {a x : E3} (hne : x ≠ a) :
     HasGradientAt (fun y : E3 => q / dist y a)
       ((-q / ‖x - a‖ ^ 3) • (x - a)) x := by
   have hn : ‖x - a‖ ≠ 0 := norm_ne_zero_iff.mpr (sub_ne_zero.mpr hne)
-  have hs := ((hasFDerivAt_id x).sub_const a).norm_sq
+  have hs : HasFDerivAt (fun y : E3 => ‖y - a‖ ^ 2)
+      (2 • innerSL ℝ (x - a)) x := by
+    simpa using ((hasFDerivAt_id x).sub_const a).norm_sq
   have hd : HasFDerivAt (fun y : E3 => ‖y - a‖)
       (‖x - a‖⁻¹ • innerSL ℝ (x - a)) x := by
     convert! hs.sqrt (pow_ne_zero 2 hn) using 1
@@ -52,18 +56,13 @@ private theorem coulomb_hasGradient (q : ℝ) {a x : E3} (hne : x ≠ a) :
       exact (Real.sqrt_sq (norm_nonneg _)).symm
     · simp only [Real.sqrt_sq (norm_nonneg _), ← Nat.cast_smul_eq_nsmul ℝ, smul_smul]
       congr 1
-      field_simp
+      field_simp [hn]
       <;> norm_num
   have hderiv := ((hasDerivAt_inv hn).comp_hasFDerivAt x hd).const_mul q
   apply hasGradientAt_iff_hasFDerivAt.mpr
-  convert! hderiv using 1
-  · funext y
-    simp [dist_eq_norm, div_eq_mul_inv]
-  · ext v
-    simp [toDual_apply_apply, inner_smul_left, div_eq_mul_inv, smul_smul]
-    field_simp [hn]
-    <;> simp
-    <;> ring
+  convert! hderiv using 1 <;> ext v <;>
+    simp [toDual_apply_apply, div_eq_mul_inv, smul_smul] <;>
+    field_simp [hn] <;> simp
 
 /-- Every equilibrium of three noncollinear charges lies in their plane.
 The theorem uses the registry's exact equilibrium definition. -/
