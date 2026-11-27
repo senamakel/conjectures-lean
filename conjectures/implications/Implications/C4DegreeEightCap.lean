@@ -144,7 +144,9 @@ private theorem degree_seven_neighbors_card_le_one (G : SimpleGraph (Fin 42))
       intro z hz
       rcases Finset.mem_insert.mp hz with rfl | hz
       · exact hxN
-      · simpa using hyN
+      · simp at hz
+        subst z
+        exact hyN
     have hsumSubset := Finset.sum_le_sum_of_subset_of_nonneg hsubset
       (fun w hw hwo => Nat.zero_le _)
     simpa [hxy] using hsumSubset
@@ -266,7 +268,7 @@ theorem degree_eight_count_le_four_of_extremal_42
           have height : (∑ v : Fin 42, if G.degree v = 8 then 2 else 0) = 2 * D.card := by
             calc
               _ = ∑ v ∈ D, (2 : ℕ) := by simp [D, Finset.sum_ite_mem_eq]
-              _ = 2 * D.card := by simp
+              _ = 2 * D.card := by omega
           rw [hseven, height]
     omega
   have htarget : D.card ≤ 4 := by
