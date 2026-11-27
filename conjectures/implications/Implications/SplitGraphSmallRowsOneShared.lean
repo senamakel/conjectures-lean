@@ -238,7 +238,7 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
     obtain ⟨k, hkList, hxBlock⟩ := List.mem_flatMap.mp hxRest
     have hkO := Finset.mem_toList.mp hkList
     have hkI := (Finset.mem_sdiff.mp hkO).1
-    simp only [List.mem_cons, List.not_mem_nil] at hx
+    simp only [List.mem_cons, List.not_mem_nil, or_false] at hx
     simp only [block, List.mem_cons, List.not_mem_nil] at hxBlock
     simp only [or_false] at hxBlock
     rcases hx with haX | hiX | hcX | hjX | hbX
