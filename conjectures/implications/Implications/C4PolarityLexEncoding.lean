@@ -92,6 +92,7 @@ theorem lexNext_eq (next : Nat) (left right : List Nat) :
 assigned the exact prefix conjunction. -/
 theorem lexStep_extension (a : Nat → Bool) (pref x y same : Nat)
     (hp : a pref = true) (hx : a x = true) (hy : a y = false)
+    (hp0 : 0 < pref) (hx0 : 0 < x) (hy0 : 0 < y) (hs0 : 0 < same)
     (hps : pref ≠ same) (hxs : x ≠ same) (hys : y ≠ same) :
     ∃ b : Nat → Bool, (∀ n, n ≠ same → b n = a n) ∧
       b same = (a pref && (a x == a y)) ∧
@@ -100,11 +101,8 @@ theorem lexStep_extension (a : Nat → Bool) (pref x y same : Nat)
   · intro n hns
     simp [Function.update, hns]
   · simp [Function.update]
-  · have hguard : (!a pref || a x || !a y) = true := by simp [hp, hx, hy]
-    have hgate : prefixEqualityClauses (a pref) (a x) (a y)
-        (a pref && (a x == a y)) = true := prefix_equality_iff.mpr rfl
-    simp [cnfValue, clauseValue, literalValue, lexStepClauses, pos, neg,
-      hguard, hgate, Function.update, hps, hxs, hys]
+  · simp [cnfValue, clauseValue, literalValue, lexStepClauses, pos, neg,
+      Function.update, hps, hxs, hys, hp, hx, hy, hp0, hx0, hy0, hs0]
 
 end Implications.C4PolarityLexEncoding
 
