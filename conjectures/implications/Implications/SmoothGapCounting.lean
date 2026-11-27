@@ -135,7 +135,7 @@ theorem smallGapMultiHitBound {N Y j : ℕ} (S : Finset ℕ)
 allowed by the `maxPrimeFac` predicate, is bounded by Mathlib's square-root
 estimate for smooth numbers. The extra `1` accounts for zero, which is not a
 member of `Nat.smoothNumbers B`. -/
-theorem smoothGapUniverseCardBound (N B : ℕ) (hB : 0 < B) :
+theorem smoothGapUniverseCardBound (N B : ℕ) :
     ((Finset.range (primeAt N + 1)).filter (fun m => m.maxPrimeFac < B)).card ≤
       1 + 2 ^ B.primesBelow.card * (primeAt N).sqrt := by
   let U := (Finset.range (primeAt N + 1)).filter (fun m => m.maxPrimeFac < B)
@@ -250,7 +250,7 @@ theorem cutoffHitCount_smoothNumbers (N B j : ℕ) (hB : 0 < B) :
       (j : ℝ) * primeAt N + (B : ℝ) *
         ((1 + 2 ^ B.primesBelow.card * (primeAt N).sqrt : ℕ) : ℝ) := by
   have hcut := cutoffHitCount N B j hB
-  have hsmooth := smoothGapUniverseCardBound N B hB
+  have hsmooth := smoothGapUniverseCardBound N B
   have hsmoothCast :
       ((((Finset.range (primeAt N + 1)).filter
         (fun m => m.maxPrimeFac < B)).card : ℕ) : ℝ) ≤
