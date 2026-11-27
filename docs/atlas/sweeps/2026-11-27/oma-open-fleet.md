@@ -149,3 +149,9 @@ The combined quotient equality theorem checks at the pinned
 formal-conjectures revision with only the standard axioms. OMA PR
 #4741 covers multipliers through 15 and remains the upstream
 submission for the parent step.
+
+[CrystalM19.lean](CrystalM19.lean) verifies all 6,309 ordered quotient
+pairs at multiplier 19. Moduli through 97 suffice and the direct
+residue test covers every pair. The pinned Lean theorem uses only
+the three standard axioms. Together the checks through multiplier
+19 leave odd cross multipliers at least 21 in the coprime branch.
