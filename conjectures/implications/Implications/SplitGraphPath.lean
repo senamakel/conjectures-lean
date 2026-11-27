@@ -242,13 +242,23 @@ theorem hamiltonian_of_split_partition_two_endpoints
   let l := a :: (M.toList ++ [b])
   have haM : a ∉ M := by simp [M]
   have hbM : b ∉ M := by simp [M, hab]
+  have htail_nodup : (M.toList ++ [b]).Nodup := by
+    rw [List.nodup_append']
+    refine ⟨M.nodup_toList, by simp, ?_⟩
+    intro x hx hy
+    simp at hy
+    subst x
+    exact hbM (by simpa using (List.mem_toFinset.mpr hx))
   have hl_nodup : l.Nodup := by
-    simp [l, haM, hbM, hab, Finset.nodup_toList]
+    simp [l, haM, htail_nodup]
   have hl_finset : l.toFinset = C := by
     ext x
-    simp [l, M, and_left_comm, and_assoc]
+    simp [l, M, ha, hb, hab]
   have hl_head : l.head? = some a := by simp [l]
-  have hl_last : l.getLast? = some b := by simp [l, M]
+  have hl_last : l.getLast? = some b := by
+    dsimp [l]
+    rw [List.getLast?_append_of_ne_nil _ (by simp)]
+    simp
   exact hamiltonian_of_clique_order_with_two_endpoints G C i j a b l
     hC hpartition hi hj hij hl_nodup hl_finset hl_head hl_last hia hbj
 
