@@ -309,6 +309,21 @@ def thresholdRowClauses (x : Int) (previous outputs : List Int) : List (List Int
   ((previous.drop 1).zip (previous.take outputs.length)).zip outputs |>.flatMap
     (fun (ab, out) => thresholdGateDimacs ab.1 x ab.2 out)
 
+/-- Ordered gate records for one threshold row's exact zipped inputs and fresh
+positive output literals. -/
+def thresholdRowGates (x : Int) (previous outputs : List Int) : List ThresholdGate :=
+  ((previous.drop 1).zip (previous.take outputs.length)).zip outputs |>.map
+    (fun (ab, out) => ⟨out.natAbs, ab.1, x, ab.2⟩)
+
+theorem thresholdRowClauses_eq_gateClauses_of_positive_outputs
+    (x : Int) (previous : List Int) (nextVar limit : Nat) :
+    thresholdRowClauses x previous (thresholdRowVars nextVar limit) =
+      (thresholdRowGates x previous (thresholdRowVars nextVar limit)).flatMap
+        (fun gate => thresholdGateDimacs gate.above gate.input gate.below
+          (Int.ofNat gate.output)) := by
+  simp [thresholdRowClauses, thresholdRowGates, thresholdRowVars,
+    thresholdGateDimacs, Int.natAbs_natCast]
+
 theorem thresholdRowClauses_length (x : Int) (previous outputs : List Int)
     (hprev : previous.length = outputs.length + 1) :
     (thresholdRowClauses x previous outputs).length = 4 * outputs.length := by
