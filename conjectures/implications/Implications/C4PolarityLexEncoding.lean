@@ -157,4 +157,5 @@ end Implications.C4PolarityLexEncoding
 
 #print axioms Implications.C4PolarityLexEncoding.lexFreshIds_length
 #print axioms Implications.C4PolarityLexEncoding.lexNext_eq
+#print axioms Implications.C4PolarityLexEncoding.orbitLexNext_eq
 #print axioms Implications.C4PolarityLexEncoding.lexStep_auxiliary_assignment_satisfies
