@@ -48,19 +48,24 @@ theorem lifted_windows_pairwise_disjoint {n : ℕ} (marks shifts : Finset ℕ)
       (fun s t => Equiv.Perm.Disjoint
         (liftWindow s (hb s (by assumption)) m)
         (liftWindow t (hb t (by assumption)) m)) := by
+  have hordered {s t : ℕ} (hs : s ∈ marks) (ht : t ∈ marks) (hst : s < t) :
+      Equiv.Perm.Disjoint (liftWindow s (hb s hs) m) (liftWindow t (hb t ht) m) := by
+    rw [Equiv.Perm.disjoint_iff_disjoint_support]
+    apply Finset.disjoint_left.mpr
+    intro x hx hx'
+    rw [liftWindow_support_image] at hx hx'
+    obtain ⟨i, hi, hix⟩ := Finset.mem_image.mp hx
+    obtain ⟨j, hj, hjx⟩ := Finset.mem_image.mp hx'
+    have hindex := congrArg Fin.val (hix.trans hjx.symm)
+    change s + i.val = t + j.val at hindex
+    rcases hsep s hs t ht hst with hfar | hd
+    · have hi8 := i.isLt
+      have hj8 := j.isLt
+      omega
+    · exact htranslate (t - s) hd i j hi hj (by omega)
   intro s hs t ht hst
-  rw [Equiv.Perm.disjoint_iff_disjoint_support]
-  apply Finset.disjoint_left.mpr
-  intro x hx hx'
-  rw [liftWindow_support_image] at hx hx'
-  obtain ⟨i, hi, hix⟩ := Finset.mem_image.mp hx
-  obtain ⟨j, hj, hjx⟩ := Finset.mem_image.mp hx'
-  have hindex := congrArg Fin.val (hix.trans hjx.symm)
-  change s + i.val = t + j.val at hindex
-  rcases hsep s hs t ht hst with hfar | hd
-  · have hi8 := i.isLt
-    have hj8 := j.isLt
-    omega
-  · exact htranslate (t - s) hd i j hi hj (by omega)
+  rcases lt_or_gt_of_ne hst with h | h
+  · exact hordered hs ht h
+  · exact (hordered ht hs h).symm
 
 end Implications.WilfWindowGeometry
