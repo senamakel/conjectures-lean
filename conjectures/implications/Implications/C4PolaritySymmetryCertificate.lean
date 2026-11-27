@@ -360,10 +360,48 @@ def rowValid (p : List Nat) : Prop :=
   (∀ i j : Fin 57,
     graph.Adj (rowFunction p i) (rowFunction p j) ↔ graph.Adj i j)
 
-/-- Every certified row is a graph automorphism. The proof checks every value,
-permutation property, and adjacency pair in the concrete finite certificate. -/
-theorem symmetryRows_valid : ∀ p ∈ symmetryRows, rowValid p := by
+def rowCheck (p : List Nat) : Bool :=
+  decide (p.length = 57) &&
+  (List.finRange 57).all (fun i => decide (p[i.val]! < 57)) &&
+  (List.finRange 57).all (fun i =>
+    (List.finRange 57).all (fun j =>
+      decide (rowFunction p i = rowFunction p j → i = j))) &&
+  (List.finRange 57).all (fun j =>
+    (List.finRange 57).any (fun i => decide (rowFunction p i = j))) &&
+  (List.finRange 57).all (fun i =>
+    (List.finRange 57).all (fun j =>
+      decide (graph.Adj (rowFunction p i) (rowFunction p j) ↔ graph.Adj i j)))
+
+theorem rowCheck_sound (p : List Nat) (hc : rowCheck p = true) : rowValid p := by
+  simp only [rowCheck, Bool.and_eq_true] at hc
+  rcases hc with ⟨hlen, hbounds, hinjective, hsurjective, hadj⟩
+  have hlen' : p.length = 57 := of_decide_eq_true hlen
+  have hb : ∀ i : Fin 57, p[i.val]! < 57 := by
+    intro i
+    exact of_decide_eq_true ((List.all_eq_true.mp hbounds) i (List.mem_finRange i))
+  have hinj : Function.Injective (rowFunction p) := by
+    intro i j hij
+    have hpair := (List.all_eq_true.mp hinjective) i (List.mem_finRange i)
+    have hpair' := (List.all_eq_true.mp hpair) j (List.mem_finRange j)
+    exact of_decide_eq_true hpair' hij
+  have hsurj : Function.Surjective (rowFunction p) := by
+    intro j
+    have hrow := (List.all_eq_true.mp hsurjective) j (List.mem_finRange j)
+    obtain ⟨i, hi, hv⟩ := List.any_eq_true.mp hrow
+    exact ⟨i, of_decide_eq_true hv⟩
+  have hgraph : ∀ i j : Fin 57,
+      graph.Adj (rowFunction p i) (rowFunction p j) ↔ graph.Adj i j := by
+    intro i j
+    have hrow := (List.all_eq_true.mp hadj) i (List.mem_finRange i)
+    exact of_decide_eq_true ((List.all_eq_true.mp hrow) j (List.mem_finRange j))
+  exact ⟨hlen', hb, ⟨hinj, hsurj⟩, hgraph⟩
+
+theorem symmetryRows_checks : symmetryRows.all rowCheck = true := by
   native_decide
+
+theorem symmetryRows_valid : ∀ p ∈ symmetryRows, rowValid p := by
+  intro p hp
+  exact rowCheck_sound p ((List.all_eq_true.mp symmetryRows_checks) p hp)
 
 noncomputable def rowIso (p : List Nat) (h : rowValid p) : graph ≃g graph := by
   let e := Equiv.ofBijective (rowFunction p) h.2.2.1
@@ -382,7 +420,7 @@ theorem rowFunction_list (p : List Nat) (h : rowValid p) :
   simp [rowFunction, List.getElem!_eq_getElem?_getD,
     List.getElem?_eq_getElem hnp]
   have hb := h.2.1 ⟨n, hn⟩
-  omega
+  rw [Nat.mod_eq_of_lt hb]
 
 /-- Concrete Lean interface for `no_candidate_of_checked_trace.hperms`. -/
 theorem hperms (p : List Nat) (hp : p ∈ symmetryRows) :
