@@ -1,6 +1,6 @@
 # Open Math Agents sweep
 
-The 27 November 2026 sweep used the Open Math Agents catalogue for targets, LemmaGraph for Lean statements and premises, Exa for prior art, and GitHub CLI for open and merged PRs. The statements indexed under `oma/` were elaborated at the registry's pin, which differs from this workspace's. The arguments below are at the paper-proof stage.
+The 27 November 2026 sweep used the Open Math Agents catalogue for targets, LemmaGraph for Lean statements and premises, Exa for prior art, and GitHub CLI for open and merged PRs. The statements indexed under `oma/` were elaborated at the registry's pin, which differs from this workspace's. The notes mark which arguments have been checked in Lean.
 
 ## Split graphs of connectivity at most two
 
@@ -24,11 +24,13 @@ The displayed solution follows by clearing denominators. In any solution at leas
 
 In the two-multiple case write the denominators as $x,pu,pv$ with $u<v$ and $p\nmid x$. Then $x(4uv-u-v)=puv$, so the positive quantity $4uv-u-v$ is divisible by $p$. Since $u\le v-1$, it is at most $4v^2-6v+1$. The last expression increases for integer $v\ge2$, and equals $p$ at $v=t+1$. Thus $v\ge t+1$, with equality forcing $u=t$ and $x=t(t+1)$. The existence identity is a special case of the previously published Type II parameterization. The optimality question is a refinement and leaves the general Erdős–Straus conjecture open. [Erdős #242](https://www.erdosproblems.com/242) · [Type II parametrization](https://arxiv.org/html/2511.16817)
 
+Lean 4.36.0 verifies existence, the lower bound on the largest denominator, and the uniqueness of the minimizing increasing triple in `Implications.ErdosStrausOptimal.family_optimal`. The theorem `isRep_iff_unitFractions` identifies the denominator-cleared equation with the equality over the rationals when all denominators are positive. Both declarations print `[propext, Classical.choice, Quot.sound]`. [Lean source](../../../../conjectures/implications/Implications/ErdosStrausOptimal.lean)
+
 ## A length-eight consecutive-pattern equivalence
 
 The patterns 16237485 and 16247385 are super-strongly c-Wilf equivalent. Fix any permutation length and any set of marked starts. On permutations containing the first pattern at every marked start, swap the fourth and sixth entries of every marked window. Two overlapping windows can start only five or seven positions apart, so the swaps are disjoint. The only effect of a swap on a second window is that a start five positions later receives a new first entry. Its new value has rank at most four in the earlier window and is still below the later window's second-smallest entry, which has rank five in the earlier window. Thus each marked window becomes the second pattern. The same argument in reverse gives an involutive bijection. Inclusion–exclusion over sets containing the marked starts gives equality for permutations with exactly the prescribed start set.
 
-Lean 4.36.0 checked the finite facts that both patterns have overlap shifts exactly 5 and 7 and that swapping positions four and six interchanges the patterns. Each check used kernel `decide`, with `propext` as its only printed axiom. [Lean check](WilfOverlap.lean) The arbitrary-length bijection remains a paper proof. The exact pair is among the unresolved classes in the published length-eight audit, and targeted GitHub PR searches surfaced no matching proof. [Chuang's paper and reproducibility archive](https://doi.org/10.5281/zenodo.24052489)
+Lean 4.36.0 checked the finite facts that both patterns have overlap shifts exactly 5 and 7 and that swapping positions four and six interchanges the patterns. Each check used kernel `decide`, with `propext` as its only printed axiom. [Lean check](WilfOverlap.lean) The arbitrary-length bijection and equality of all exact occurrence counts now compile in Lean. [Full proof](../../../../conjectures/implications/Implications/WilfPatternSwap.lean) The exact pair is among the unresolved classes in the published length-eight audit, and targeted GitHub PR searches surfaced no matching proof. [Chuang's paper and reproducibility archive](https://doi.org/10.5281/zenodo.24052489)
 
 ## Further reductions and PR status
 
@@ -45,3 +47,10 @@ Lean 4.36.0 checked the finite facts that both patterns have overlap shifts exac
 The 42-vertex extension search exhausted the three published 41-vertex seeds. The compatibility graph joins vertices having no common neighbour in the seed. Each search stopped after finding every clique of size at most six, with no six-clique found. Counts by clique size zero through six were [1, 41, 94, 45, 16, 3, 0] for the first two seeds and [1, 41, 94, 47, 16, 3, 0] for the third. Parsing and enumeration took 0.0009 CPU seconds. The seed file SHA-256 is 900da21cbbb59d10c30f26feb35ebab4f0e3ef65f21429939584bda497768989. The catalogue does not establish completeness of the seed list. [Seed file](https://users.cecs.anu.edu.au/~bdm/data/extremal/c4_n41e132.maybe.s6)
 
 Directly listing open PRs also found ten McEachen PRs named R1.H1, including #3570, #3454 and #2747. They concern divisibility by three, a different branch from the finite witness check. Text search alone missed these entries. [Example open PR](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/3570)
+
+## Lean follow-up
+
+- Erdős #932 now has [a finite cutoff theorem](../../../../conjectures/implications/Implications/SmoothGapCounting.lean) combining telescoped gap lengths with disjoint smooth interiors. It bounds the count up to prime index N. The smooth-number estimate is a separate input to the asymptotic rate.
+- The [42-vertex deletion reduction](../../../../conjectures/implications/Implications/C4Extremal42.lean) connects the counts to actual induced subgraphs. It proves the 138-edge upper bound given the 132-edge bound on all 41-vertex deletions, and gives a degree-six deletion attaining 132 when the original has 138 edges.
+- The [Wilf counting reduction](../../../../conjectures/implications/Implications/WilfEquivalence.lean) turns bijections for all prescribed sets of starts into equality of counts for each exact occurrence set. The [full proof](../../../../conjectures/implications/Implications/WilfPatternSwap.lean) verifies that the simultaneous swap changes every marked occurrence to the other pattern. The exact count theorem prints `[propext, Classical.choice, Quot.sound]`.
+- The split-graph development verifies the [induced star](../../../../conjectures/implications/Implications/SplitGraphTrees.lean) and the [two-vertex bound](../../../../conjectures/implications/Implications/SplitGraphPath.lean) on the independent side at connectivity one. The double-star construction and Hamiltonian path remain to be formalized.

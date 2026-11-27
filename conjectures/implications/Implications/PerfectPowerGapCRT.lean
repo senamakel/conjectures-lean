@@ -1,0 +1,141 @@
+import Mathlib
+
+/-!
+# Gyarmati's finite CRT certificate for perfect-power gaps
+
+This file verifies the finite arithmetic input to Lemma 6 in Katalin Gyarmati,
+"Bounded gaps and perfect power gaps in sequences of consecutive primes"
+(arXiv:2602.07558, §4). For the offsets through 49, the square offsets follow
+from `W*a` being a square, and offsets 3 and 24 follow from `3*W*a` being a
+cube. The remaining 40 offsets are assigned distinct prime exponents.
+
+For each of the 15 primes dividing `W`, `crtExponent` is the explicit CRT
+solution modulo the product of the 42 distinct exponent primes through 181.
+`exponentCongruenceCertificate` checks every assigned valuation congruence.
+The power and prime-gap arguments using this finite input are separate.
+-/
+
+namespace Implications.PerfectPowerGapCRT
+
+def basePrimes : List ℕ :=
+  [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
+
+def exponentPrimes : List ℕ :=
+  [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73,
+   79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163,
+   167, 173, 179, 181]
+
+def W : ℕ := 614889782588491410
+
+def E : ℕ :=
+  5397346292805549782720214077673687806275517530364350655459511599582614290
+
+def crtExponent : List ℕ :=
+  [946866288615739509321066849959644752832899644419237537322679246829569143,
+   2343225385769350445363922254029248522876362434355196192526458056824627189,
+   4382393917830765912594306907315318967620807984906167589972529030107083359,
+   3119580035028280150009580042773650233841550197083129029445241331032287159,
+   144066027483025960728622973925973950903353128179067178102754179425745099,
+   39344461107890960932770219157253740568467893915845294442615403669493399,
+   5044969940000237592937328328203205948216992169943720977505466250857997269,
+   2046063004848654332150310161664575299743217937479327513347174784689822959,
+   4636717258135973402854652686445717962372324430546660271628166278498391759,
+   5276057612068346416816389042220346507258090170131443899157050664760533069,
+   4435442993097630019463146222246693939810573812081595093100390720449079069,
+   4844862026612855710473263030352759133192196838279810824585703325609590779,
+   398461806851416426912230569492688361537118743852401726241977366412139309,
+   481292026110049025210719726671539040050046149204464389658809951555137579,
+   1477485856689787370688773686067098896689946139596945151494503175304737989]
+
+/- The square offsets use exponent 2; 3 and 24 use exponent 3; all other offsets
+are matched in order to the 40 primes from 5 through 181. -/
+def exponentClasses : List (ℕ × ℕ) :=
+  [(1, 2), (2, 5), (3, 3), (4, 2), (5, 7), (6, 11), (7, 13), (8, 17), (9, 2),
+   (10, 19), (11, 23), (12, 29), (13, 31), (14, 37), (15, 41), (16, 2), (17, 43),
+   (18, 47), (19, 53), (20, 59), (21, 61), (22, 67), (23, 71), (24, 3), (25, 2),
+   (26, 73), (27, 79), (28, 83), (29, 89), (30, 97), (31, 101), (32, 103),
+   (33, 107), (34, 109), (35, 113), (36, 2), (37, 127), (38, 131), (39, 137),
+   (40, 139), (41, 149), (42, 151), (43, 157), (44, 163), (45, 167), (46, 173),
+   (47, 179), (48, 181), (49, 2)]
+
+private def squareOffsets : List ℕ := [1, 4, 9, 16, 25, 36, 49]
+
+private def cubeOffsets : List ℕ := [3, 24]
+
+private def singletonExponentPrimes : List ℕ :=
+  (exponentClasses.filter (fun (offset, _) =>
+    !(squareOffsets.contains offset || cubeOffsets.contains offset))).map Prod.snd
+
+private def classAssignmentValid : Bool :=
+  exponentClasses.map Prod.fst == (List.range 49).map (fun n => n + 1) &&
+    exponentClasses.all (fun (offset, q) =>
+      if squareOffsets.contains offset then q == 2
+      else if cubeOffsets.contains offset then q == 3
+      else exponentPrimes.contains q && q != 2 && q != 3) &&
+    singletonExponentPrimes == exponentPrimes.drop 2 && singletonExponentPrimes.Nodup
+
+private def congruencesHold : Bool :=
+  exponentClasses.all fun (offset, q) =>
+    basePrimes.zip crtExponent |>.all fun (p, a) =>
+      (Nat.factorization (offset * W) p + a) % q == 0
+
+/-- The 42 exponent classes assigned across all 49 offsets hold for each of the 15 prime
+valuations in `W`. This is the finite arithmetic certificate in Gyarmati's
+construction. -/
+theorem exponentCongruenceCertificate : congruencesHold = true := by
+  native_decide
+
+/-- Each table entry carries the claimed valuation congruence. This exposes the
+finite Boolean certificate as ordinary Lean propositions for later arithmetic
+lemmas to consume. -/
+theorem valuationCongruence {offset q : ℕ} (hoff : (offset, q) ∈ exponentClasses)
+    {p a : ℕ} (hpa : (p, a) ∈ basePrimes.zip crtExponent) :
+    (Nat.factorization (offset * W) p + a) % q = 0 := by
+  have hcheck : exponentClasses.all (fun (i, r) =>
+      (basePrimes.zip crtExponent).all (fun (s, b) =>
+        (Nat.factorization (i * W) s + b) % r == 0)) = true := by
+    simpa [congruencesHold] using exponentCongruenceCertificate
+  have hinner := (List.all_eq_true.mp hcheck) (offset, q) hoff
+  have hval := (List.all_eq_true.mp hinner) (p, a) hpa
+  exact of_decide_eq_true hval
+
+private def coordinatesBounded : Bool :=
+  crtExponent.all (fun a => a < E) &&
+    exponentPrimes.length == 42 && basePrimes.length == 15 &&
+    crtExponent.length == basePrimes.length &&
+    exponentClasses.length == 49 &&
+    exponentPrimes.all Nat.Prime &&
+    exponentPrimes.prod == E && basePrimes.prod == W && classAssignmentValid
+
+/-- The CRT coordinates lie in the canonical interval below the product of
+the 42 pairwise distinct exponent primes. -/
+theorem crtCoordinatesBounded : coordinatesBounded = true := by
+  native_decide
+
+/-- The exponent product is small enough for the published decimal bound after
+using `W < 10^18`. This comparison is kernel-reduced. -/
+theorem exponentDecimalBound : 18 * E + 2 < 10 ^ 74 := by
+  norm_num [E]
+
+/-- For any exponent bound `k`, the size estimate follows from `18 * e + 2 < k`
+without expanding `W^e`. -/
+theorem productBoundOfExponentBound {e k : ℕ} (he : 18 * e + 2 < k) :
+    49 * W ^ e < 10 ^ k := by
+  have hW : W ≤ 10 ^ 18 := by norm_num [W]
+  have hWE : W ^ e ≤ 10 ^ (18 * e) := by
+    calc
+      W ^ e ≤ (10 ^ 18) ^ e := Nat.pow_le_pow_left hW e
+      _ = 10 ^ (18 * e) := by rw [← Nat.pow_mul]
+  calc
+    49 * W ^ e ≤ 49 * 10 ^ (18 * e) := Nat.mul_le_mul_left 49 hWE
+    _ < 100 * 10 ^ (18 * e) := by
+      exact Nat.mul_lt_mul_of_pos_right (by omega) (by positivity)
+    _ = 10 ^ (18 * e + 2) := by rw [Nat.pow_add]; norm_num [Nat.mul_comm]
+    _ < 10 ^ k := Nat.pow_lt_pow_right (by norm_num) he
+
+/-- Gyarmati's published decimal bound, stated with the enormous numeral in
+the exponent. The generic estimate above keeps Lean from evaluating this power. -/
+theorem publishedNumericalBound : 49 * W ^ E < 10 ^ (10 ^ 74) :=
+  productBoundOfExponentBound (e := E) (k := 10 ^ 74) exponentDecimalBound
+
+end Implications.PerfectPowerGapCRT
