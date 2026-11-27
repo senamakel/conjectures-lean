@@ -30,8 +30,12 @@ the sum of reciprocal primes and `1 - x ≤ exp (-x)`. -/
 theorem tendsto_reciprocalPrimeProduct_zero :
     Tendsto reciprocalPrimeProduct atTop (𝓝 0) := by
   have hnot : ¬ Summable primeReciprocalTerm := by
-    convert not_summable_one_div_on_primes using 1 <;>
-      ext n <;> simp [primeReciprocalTerm, Set.indicator_apply]
+    have hEq : primeReciprocalTerm =
+        Set.indicator {p : ℕ | p.Prime} (fun n => (1 : ℝ) / n) := by
+      funext n
+      simp [primeReciprocalTerm, Set.indicator_apply]
+    rw [hEq]
+    exact not_summable_one_div_on_primes
   have hnonneg : ∀ n, 0 ≤ primeReciprocalTerm n := by
     intro n
     simp only [primeReciprocalTerm]
@@ -47,24 +51,20 @@ theorem tendsto_reciprocalPrimeProduct_zero :
         Real.exp (-∑ p ∈ range n, primeReciprocalTerm p))
   · exact tendsto_const_nhds
   · exact hexp
-  · intro n
+  · filter_upwards with n
     unfold reciprocalPrimeProduct
-    calc
-      (0 : ℝ) ≤ ∏ p ∈ range n, (1 - primeReciprocalTerm p) := by
-        apply Finset.prod_nonneg
-        intro p hp
-        apply Finset.prod_nonneg
-        intro p hp
-        have hp1 : primeReciprocalTerm p ≤ 1 := by
-          simp only [primeReciprocalTerm]
-          split_ifs with hprime
-          · have hp2 : (2 : ℝ) ≤ p := by exact_mod_cast hprime.two_le
-            have hp0 : (0 : ℝ) < p := by linarith
-            rw [one_div]
-            exact (inv_le_one₀ hp0).2 (by linarith)
-          · simp
-        linarith
-  · intro n
+    apply Finset.prod_nonneg
+    intro p hp
+    have hp1 : primeReciprocalTerm p ≤ 1 := by
+      simp only [primeReciprocalTerm]
+      split_ifs with hprime
+      · have hp2 : (2 : ℝ) ≤ p := by exact_mod_cast hprime.two_le
+        have hp0 : (0 : ℝ) < p := by linarith
+        rw [one_div]
+        exact (inv_le_one₀ hp0).2 (by linarith)
+      · simp
+    linarith
+  · filter_upwards with n
     unfold reciprocalPrimeProduct
     calc
       ∏ p ∈ range n, (1 - primeReciprocalTerm p) ≤

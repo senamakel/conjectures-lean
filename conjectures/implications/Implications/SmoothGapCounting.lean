@@ -35,7 +35,7 @@ theorem largeGapCount (N B : ℕ) :
     _ ≤ ∑ r ∈ L, (primeGap r : ℝ) :=
       Finset.sum_le_sum fun r hr => Nat.cast_le.mpr (Finset.mem_filter.mp hr).2
     _ ≤ ∑ r ∈ Finset.range N, (primeGap r : ℝ) :=
-      Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _) 
+      Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _)
         fun r _ _ => Nat.cast_nonneg _
     _ = (primeAt N : ℝ) - (primeAt 0 : ℝ) := by
       have hcast (r : ℕ) : (primeGap r : ℝ) =

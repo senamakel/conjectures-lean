@@ -276,4 +276,3 @@ theorem isRep_iff_unitFractions {p x y z : ℕ} (hp : 0 < p) (hx : 0 < x)
 #print axioms isRep_iff_unitFractions
 
 end Implications.ErdosStrausOptimal
-
