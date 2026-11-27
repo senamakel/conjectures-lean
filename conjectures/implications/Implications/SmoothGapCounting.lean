@@ -44,6 +44,6 @@ theorem largeGapCount (N B : ℕ) :
       simp_rw [hcast]
       exact Finset.sum_range_sub (fun i => (primeAt i : ℝ)) N
     _ ≤ (primeAt N : ℝ) := by
-      linarith [Nat.cast_nonneg (primeAt 0)]
+      exact sub_le_self _ (Nat.cast_nonneg (primeAt 0 : ℝ))
 
 end Implications.SmoothGapCounting

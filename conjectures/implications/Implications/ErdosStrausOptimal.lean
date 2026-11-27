@@ -23,7 +23,7 @@ theorem family_rep (t : ℕ) (ht : 0 < t) :
       (familyPrime t * (t + 1)) := by
   unfold IsRep familyPrime
   have ht' : 1 ≤ 4 * t ^ 2 + 2 * t := by omega
-  simp only [Nat.sub_add_cancel ht']
+  rw [Nat.sub_add_cancel ht']
   ring
 
 /-- In a Type II representation the non-multiple denominator is `x`, and the other
@@ -32,27 +32,29 @@ sharp lower bound and the equality case directly from the cleared equation. -/
 theorem typeII_sharp (t p x u v : ℕ)
     (ht : 0 < t)
     (hp : p = familyPrime t)
+    (hpp : p.Prime) (hpx : ¬ p ∣ x)
     (hu : 0 < u) (huv : u < v)
     (heq : 4 * x * u * v = x * (u + v) + p * u * v) :
     p * (t + 1) ≤ p * v ∧
       (p * v = p * (t + 1) → u = t ∧ x = t * (t + 1)) := by
   have hpform : p = 4 * t ^ 2 + 2 * t - 1 := by simpa [familyPrime] using hp
   have hv2 : 2 ≤ v := by omega
-  have hDpos : 0 < 4 * u * v - u - v := by
-    have : 4 * u * v - u - v ≥ 2 * u * v := by nlinarith
-    omega
+  have hraw : u + v ≤ 4 * u * v := by nlinarith
+  have hDpos : 0 < 4 * u * v - u - v := by omega
+  have hDnorm : 4 * u * v - u - v + u + v = 4 * u * v := by omega
   have hmul : x * (4 * u * v - u - v) = p * u * v := by
-    omega
-  have hDle : 4 * u * v - u - v ≤ p := by
-    by_contra hn
-    have hpv : 0 < p := by rw [hpform]; nlinarith
-    have hu' : 0 < u := hu
-    have hv' : 0 < v := by omega
-    nlinarith [hmul]
+    nlinarith [heq, hDnorm]
+  have hpdiv : p ∣ 4 * u * v - u - v := by
+    have hpd : p ∣ x * (4 * u * v - u - v) := by rw [hmul]; exact dvd_mul_right p (u * v)
+    rcases hpp.dvd_mul.mp hpd with hpx' | hD
+    · exact (hpx hpx').elim
+    · exact hD
+  have hple : p ≤ 4 * u * v - u - v := Nat.le_of_dvd hDpos hpdiv
   have hbound : p ≤ 4 * v ^ 2 - 6 * v + 1 := by
-    rw [hpform]
     have huv' : u ≤ v - 1 := by omega
-    nlinarith
+    calc
+      p ≤ 4 * u * v - u - v := hple
+      _ ≤ 4 * v ^ 2 - 6 * v + 1 := by nlinarith
   have hv : t + 1 ≤ v := by
     by_contra hn
     have hvsmall : v ≤ t := by omega
@@ -72,9 +74,11 @@ theorem typeII_sharp (t p x u v : ℕ)
   subst u
   have hx : x = t * (t + 1) := by
     rw [hpform] at hmul
-    have hp' : 4 * t ^ 2 + 2 * t - 1 = 4 * t * (t + 1) - t - (t + 1) := by ring
+  have hp' : 4 * t ^ 2 + 2 * t - 1 = 4 * t * (t + 1) - t - (t + 1) := by omega
     rw [hp'] at hmul
-    nlinarith
+    have hn : t + (t + 1) ≤ 4 * t * (t + 1) := by nlinarith
+    have hDn : 4 * t * (t + 1) - t - (t + 1) + t + (t + 1) = 4 * t * (t + 1) := by omega
+    nlinarith [hmul, hDn]
   exact ⟨huEq, hx⟩
 
 end Implications.ErdosStrausOptimal
