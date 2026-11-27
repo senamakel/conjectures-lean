@@ -82,6 +82,22 @@ class Cnf:
             prev = nxt
         return prev
 
+    def at_most_one(self, inputs: list[int]) -> None:
+        """Add Sinz's sequential AMO encoding using n-1 auxiliary variables."""
+        if len(inputs) <= 1:
+            return
+        prefix: list[int] = []
+        previous: int | None = None
+        for x in inputs[:-1]:
+            state = self.var()
+            self.clause(-x, state)
+            if previous is not None:
+                self.clause(-previous, state)
+            prefix.append(state)
+            previous = state
+        for x, state in zip(inputs[1:], prefix):
+            self.clause(-x, -state)
+
     def emit(self, path: Path) -> None:
         with path.open("w", newline="\n") as f:
             f.write(f"p cnf {self.nvars} {len(self.clauses)}\n")
@@ -93,6 +109,8 @@ class Cnf:
 def build(
     deduplicate_c4: bool = False,
     compact_degree_count: bool = False,
+    compact_common_neighbor: bool = False,
+    degree_eight_count: int | None = None,
 ) -> tuple[Cnf, dict[tuple[int, int], int]]:
     cnf = Cnf()
     edges: dict[tuple[int, int], int] = {}
@@ -104,15 +122,27 @@ def build(
         return edges[min(u, v), max(u, v)]
 
     # C4-freeness in the graph remaining after root 0 is deleted: two vertices
-    # cannot have two distinct common neighbors.
+    # cannot have two distinct common neighbors. The compact mode uses one
+    # implication per common-neighbor indicator and a sequential AMO counter.
     for u, v in combinations(vertices, 2):
         others = [w for w in vertices if w != u and w != v]
-        for x, y in combinations(others, 2):
-            # The same four-cycle clause is also generated with {x,y} as the
-            # distinguished pair. Exactly one orientation has u < x.
-            if deduplicate_c4 and u > x:
-                continue
-            cnf.clause(-edge(u, x), -edge(v, x), -edge(u, y), -edge(v, y))
+        if compact_common_neighbor:
+            indicators: list[int] = []
+            for x in others:
+                indicator = cnf.var()
+                # If x is a common neighbor, its indicator must be true. It
+                # may be true spuriously; existentially choose false when the
+                # two incident edges are not both present.
+                cnf.clause(-edge(u, x), -edge(v, x), indicator)
+                indicators.append(indicator)
+            cnf.at_most_one(indicators)
+        else:
+            for x, y in combinations(others, 2):
+                # The same four-cycle clause is also generated with {x,y} as
+                # the distinguished pair. Exactly one orientation has u < x.
+                if deduplicate_c4 and u > x:
+                    continue
+                cnf.clause(-edge(u, x), -edge(v, x), -edge(u, y), -edge(v, y))
 
     # C4s through root 0: two root-neighbors cannot share any other neighbor.
     root_neighbors = range(1, 7)
@@ -167,22 +197,79 @@ def build(
     # Existing checked extremal degree-cap lemma: no more than four 8-degree
     # vertices occur in a 42-vertex, 138-edge C4-free graph under the deletion
     # bound. The fixed root has degree six, so it is absent from this list.
-    at_most_five = cnf.equivalent_atleast(degree_eight, 5)
-    cnf.clause(-at_most_five[5])
+    if degree_eight_count is not None:
+        exact_count = cnf.equivalent_atleast(degree_eight, degree_eight_count + 1)
+        cnf.clause(exact_count[degree_eight_count])
+        cnf.clause(-exact_count[degree_eight_count + 1])
+    else:
+        at_most_five = cnf.equivalent_atleast(degree_eight, 5)
+        cnf.clause(-at_most_five[5])
     return cnf, edges
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("output", type=Path, help="DIMACS path (keep generated data under .lake/)")
+    parser.add_argument("output", type=Path, nargs="?",
+                        help="DIMACS path (keep generated data under .lake/)")
     parser.add_argument("--deduplicate-c4", action="store_true",
                         help="emit one copy of each opposite-pair C4 clause")
     parser.add_argument("--compact-degree-count", action="store_true",
                         help="derive the 138-edge count from degree flags via handshake")
+    parser.add_argument("--compact-common-neighbor", action="store_true",
+                        help="use implication indicators and sequential AMO for C4-freeness")
+    parser.add_argument("--degree-eight-count", type=int, choices=range(5),
+                        help="optionally fix the number of degree-eight vertices to 0..4")
+    parser.add_argument("--check-common-neighbor", action="store_true",
+                        help="exhaustively check the projected AMO encoding for up to four candidates")
     args = parser.parse_args()
-    cnf, _ = build(args.deduplicate_c4, args.compact_degree_count)
+    if args.check_common_neighbor:
+        check_common_neighbor_projection()
+        return
+    if args.output is None:
+        parser.error("output is required unless --check-common-neighbor is used")
+    cnf, _ = build(args.deduplicate_c4, args.compact_degree_count,
+                   args.compact_common_neighbor, args.degree_eight_count)
     cnf.emit(args.output)
     print(f"wrote {args.output}: {cnf.nvars} variables, {len(cnf.clauses)} clauses")
+
+
+def check_common_neighbor_projection() -> None:
+    """Check projection equivalence with the direct clauses for n≤4 candidates."""
+    for n in range(5):
+        cnf = Cnf()
+        edge_pairs = [(cnf.var(), cnf.var()) for _ in range(n)]
+        indicators: list[int] = []
+        for left, right in edge_pairs:
+            indicator = cnf.var()
+            cnf.clause(-left, -right, indicator)
+            indicators.append(indicator)
+        cnf.at_most_one(indicators)
+        auxiliary_count = cnf.nvars - 2 * n
+
+        for edge_mask in range(1 << (2 * n)):
+            actual_common = []
+            for i, (left, right) in enumerate(edge_pairs):
+                actual_common.append(bool(edge_mask & (1 << (2 * i))) and
+                                     bool(edge_mask & (1 << (2 * i + 1))))
+            direct_accepts = sum(actual_common) <= 1
+            projected_accepts = False
+            for aux_mask in range(1 << auxiliary_count):
+                assignment = [False] * (cnf.nvars + 1)
+                for bit in range(2 * n):
+                    assignment[bit + 1] = bool(edge_mask & (1 << bit))
+                for bit in range(auxiliary_count):
+                    assignment[2 * n + bit + 1] = bool(aux_mask & (1 << bit))
+
+                def literal_value(lit: int) -> bool:
+                    value = assignment[abs(lit)]
+                    return value if lit > 0 else not value
+
+                if all(any(literal_value(lit) for lit in clause)
+                       for clause in cnf.clauses):
+                    projected_accepts = True
+                    break
+            assert direct_accepts == projected_accepts, (n, edge_mask)
+    print("projected AMO encoding matches direct common-neighbor clauses for n=0..4")
 
 
 if __name__ == "__main__":

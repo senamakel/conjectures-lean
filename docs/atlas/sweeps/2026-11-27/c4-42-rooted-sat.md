@@ -92,3 +92,61 @@ two graph-level clause families characterize four-cycle-freeness.
 count condition. Both use only the standard axioms. The link from the exact
 DIMACS variable allocation and threshold gates to these predicates remains
 a separate proof obligation.
+
+## Common-neighbor AMO benchmark protocol (written before the run)
+
+For every unordered endpoint pair among labels 1..41, create 39 indicator
+variables, one for each possible common neighbor. Add only the implication
+`edge(u,x) ∧ edge(v,x) → indicator(u,v,x)`, then a sequential at-most-one
+counter over the 39 indicators. The implication direction is deliberate: for
+any valid edge assignment, choose each indicator to equal the actual
+conjunction; conversely, two actual common neighbors force two true indicators
+and violate AMO. Thus the projected edge assignments are equivalent to the
+direct four-literal clauses, with 39 implication clauses plus 113 sequential
+counter clauses per pair (versus 741 direct clauses per pair before duplicate
+pair normalization, or 303,810 unique clauses overall).
+
+Before SAT, exhaustively compare the direct relation and existential AMO
+extension for all edge assignments with up to four possible common neighbors.
+Then generate one formula with `--compact-degree-count
+--compact-common-neighbor`; keep the old default and its hashes unchanged. Use
+the installed CaDiCaL 2.1.2 with a 120-second limit and LRAT output, and stop at
+SAT, complete UNSAT, or UNKNOWN. Do not rerun or extend the limit. Preserve the
+formula, log, model or trace under `.lake/c4-42-rooted-sat/`. Any SAT model needs
+an independent graph check. An UNSAT result requires Lean LRAT replay and an
+encoding-to-graph proof.
+
+The handshake identity and existing cap imply that the degree-eight count is
+one of 0..4, with corresponding non-root `(n6,n7,n8)` profiles
+`(17,24,0)`, `(18,22,1)`, `(19,20,2)`, `(20,18,3)`, `(21,16,4)`. Separate exact
+`--degree-eight-count k` instances for k=0..4 are a possible proof split, but
+this benchmark uses the combined cap and does not run those five cases.
+
+## Common-neighbor AMO benchmark result
+
+The exhaustive projection check passed for every edge assignment with zero to
+four possible common neighbors. The old default formula still hashes to
+`72fd863a9e29ca2422c129f2e885bba2a7343c9fb2a47dc482764aeae8b985a5`; the prior
+compact direct-clause formula still hashes to
+`66b84c521e0d6a0eb5dd7fe7749bb0e9da3415314d81e3c620f880503ebecbc4`.
+
+The combined handshake and common-neighbor AMO formula has 79,194 variables,
+184,200 clauses, 3,053,323 bytes and SHA-256
+`3579071c047015ea7ec371fdb884682e27f0bf2d45e757f16b172115dd88d7bb`. The AMO
+block contributes 124,640 clauses across 820 endpoint pairs: 39 implication
+clauses and 113 sequential-counter clauses per pair. Relative to the previous
+compact direct-clause formula, this adds 63,140 auxiliary variables while
+removing 179,170 clauses and 4,486,428 bytes. The default options and both
+previous formula hashes are unchanged.
+
+The single CaDiCaL 2.1.2 run hit its 120 s real-time limit after 117.88 s
+process CPU, with 922,757 conflicts, 1,133,616,237 propagations and 101.34 MB
+peak RSS. It returned `UNKNOWN`, exit 0, and left a 738 MB partial LRAT trace;
+there is no model and no complete proof. The smaller clause count did not settle
+the case within this budget.
+
+The script now supports `--degree-eight-count k` for k=0..4. Under the compact
+handshake condition, fixing n8=k also forces n7=24−2k and n6=17+k among the
+41 non-root vertices. This gives five exhaustive proof cases, but none was run
+in this screen. A future proof must check all five cases and replay every proof;
+the present combined-cap result remains only `UNKNOWN`.
