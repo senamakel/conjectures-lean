@@ -45,6 +45,10 @@ theorem odd_block (n k i : Nat) (hk : 0 < k) (hi : i < n) :
       generalize 2 ^ (n - (j + 1)) * (3 ^ j * k) = t at hpos ⊢
       rw [Nat.mul_sub_left_distrib, Nat.mul_one, ← Nat.mul_assoc]
       change (6 * t - 3) / 2 = 3 * t - 1
+      clear ih h hj hi hk
+      have he : 6 * t - 3 = 1 + 2 * (3 * t - 1) := by omega
+      rw [he]
+      rw [Nat.add_mul_div_left _ _ (by decide)]
       omega
   rw [hexact i (by omega), show n - i = n - i - 1 + 1 by omega, Nat.pow_succ]
   have hpos : 0 < 2 ^ (n - i - 1) * (3 ^ i * k) :=
