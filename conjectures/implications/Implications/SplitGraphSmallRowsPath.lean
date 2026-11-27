@@ -246,7 +246,7 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
         by_cases htail : l.flatMap block = []
         · have hc' : c ∈ (block i).getLast? := by
             simpa [List.flatMap_cons, htail] using hc
-          have hcEq : c = right i := by simpa [block] using hc'
+          have hcEq : c = right i := by simpa [block] using hc'.symm
           exact hcEq ▸ hrightC i hiI
         · have hc' : c ∈ (l.flatMap block).getLast? := by
             change c ∈ ((block i) ++ l.flatMap block).getLast? at hc
