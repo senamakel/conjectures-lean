@@ -377,8 +377,28 @@ theorem every_other_vertex_has_unique_common_neighbor
     Finset.card_pos.mpr ⟨u, huCommon⟩
   omega
 
+
+/-- In the four-vertex equality case, every degree-eight vertex shares exactly
+one common neighbor with every other vertex. -/
+theorem extremal_degree_eight_vertices_have_unique_common_neighbor
+    (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    (hDel : ∀ v, C4Extremal42.inducedDeletionCount G v ≤ 132)
+    (he : G.edgeFinset.card = 138)
+    (hC4 : C4VertexExtension.C4Free G)
+    (h8 : (Finset.univ.filter fun v => G.degree v = 8).card = 4) :
+    ∀ v ∈ Finset.univ.filter (fun v => G.degree v = 8),
+      ∀ w, w ≠ v → (G.neighborFinset v ∩ G.neighborFinset w).card = 1 := by
+  classical
+  have hmin : ∀ v, 6 ≤ G.degree v := fun v =>
+    (C4DegreeBounds.degree_window_of_extremal_42 G hDel he hC4 v).1
+  have hone := each_degree_eight_vertex_has_one_degree_seven_neighbor G hDel he hC4 h8
+  intro v hv w hw
+  exact every_other_vertex_has_unique_common_neighbor G hmin hC4
+    (Finset.mem_filter.mp hv).2 (hone v hv) w hw
+
 end C4DegreeEightEquality
 
+#print axioms C4DegreeEightEquality.extremal_degree_eight_vertices_have_unique_common_neighbor
 #print axioms C4DegreeEightEquality.each_degree_eight_vertex_has_one_degree_seven_neighbor
 #print axioms C4DegreeEightEquality.degree_seven_count_eq_sixteen
 #print axioms C4DegreeEightEquality.every_other_vertex_has_unique_common_neighbor
