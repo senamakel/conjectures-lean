@@ -242,3 +242,6 @@ theorem three_pair_rows_are_triangle
     exact ⟨a,b,c,hab,hac,hbc,hEq⟩
 
 end SplitGraphSmallRowsThree
+
+#print axioms SplitGraphSmallRowsThree.three_pair_rows_are_triangle
+#print axioms SplitGraphSmallRowsThree.hamiltonian_of_triangle_block_and_remaining_chain
