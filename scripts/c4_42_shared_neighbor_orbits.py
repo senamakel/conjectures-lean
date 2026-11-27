@@ -28,20 +28,26 @@ def rename(edges, image):
     return tuple(sorted(tuple(sorted((image[u], image[v]))) for u, v in edges))
 
 
-def main():
+def shared_neighbor_orbits():
+    """Return representatives and orbit sizes, ordered by edge count and labels."""
     root_actions = [
         tuple(PAIRS.index(tuple(sorted((p[u], p[v])))) for u, v in PAIRS)
         for p in permutations(ROOTS)
     ]
     orbits = Counter()
-    counts = Counter()
     for mask in range(1 << len(EDGES)):
         edges = tuple(edge for i, edge in enumerate(EDGES) if mask & (1 << i))
         if allowed(edges):
-            counts[len(edges)] += 1
             orbits[min(rename(edges, image) for image in root_actions)] += 1
 
-    for edges, size in sorted(orbits.items(), key=lambda item: (len(item[0]), item[0])):
+    return tuple(sorted(orbits.items(), key=lambda item: (len(item[0]), item[0])))
+
+
+def main():
+    orbits = shared_neighbor_orbits()
+    counts = Counter()
+    for edges, size in orbits:
+        counts[len(edges)] += size
         text = " ".join(
             f"{a}{b}-{c}{d}" for u, v in edges
             for (a, b), (c, d) in [(PAIRS[u], PAIRS[v])]
