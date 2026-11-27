@@ -80,7 +80,10 @@ theorem thresholdGateDimacs_iff (assignment : Nat → Bool)
         | succ n => rfl
     | negSucc n =>
         have hcast : (Int.ofNat n : Int) + 1 = Int.ofNat (n + 1) := by omega
-        simp [literalValue, hcast]
+        change literalValue assignment (Int.ofNat n + 1) =
+          !literalValue assignment (Int.negSucc n)
+        rw [hcast]
+        simp [literalValue]
   have hgate := Implications.C4PolarityCnfGates.threshold_gate_iff
     (literalValue assignment above) (literalValue assignment x)
     (literalValue assignment below) (literalValue assignment out)
