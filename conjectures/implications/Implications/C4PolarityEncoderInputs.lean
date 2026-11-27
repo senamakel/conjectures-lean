@@ -157,6 +157,12 @@ indicators followed by 224 lexicographically ordered edge indicators. -/
 theorem scoreInputs_length (D : Finset (Fin 57)) : (scoreInputs D).length = 232 := by
   simp [scoreInputs, absoluteIndices_length, orthogonalPairs_length]
 
+/-- The lexicographic pair sequence follows the nested `i`, then `j`, scan
+used by `itertools.combinations`. -/
+theorem orthogonalPairs_lex_ordered :
+    orthogonalPairs.Pairwise (fun p q => p.1 < q.1 ∨ p.1 = q.1 ∧ p.2 < q.2) := by
+  decide
+
 /-- The Boolean score list has exactly the deletion score used in the edge
 count reduction: induced deleted edges plus deleted absolute points. -/
 theorem scoreInputs_count_true (D : Finset (Fin 57)) :
@@ -223,17 +229,24 @@ theorem neighbor_survivor_clauses_of_min_degree (D : Finset (Fin 57))
     rw [List.mem_map]
     exact ⟨j, Finset.mem_toList.mpr hjS, by simp [hjD]⟩
 
-/-- The canonical candidate score condition together with minimum degree six
-on the retained graph implies every one of the encoder's neighbor clauses. -/
+/-- A canonical deletion candidate with minimum degree six on the retained
+vertices. -/
+def CandidateWithMinDegreeSix (D : Finset (Fin 57)) : Prop :=
+  C4PolarityCanonical.Candidate D ∧
+    ∀ i, i ∉ D → 6 ≤ (graph.neighborFinset i \ D).card
+
+/-- Every neighbor-survivor clause emitted for a canonical candidate with
+minimum degree six is true. -/
 theorem candidate_neighbor_survivor_clauses (D : Finset (Fin 57))
-    (_hCand : C4PolarityCanonical.Candidate D)
-    (hmin : ∀ i, i ∉ D → 6 ≤ (graph.neighborFinset i \ D).card) :
+    (hCand : CandidateWithMinDegreeSix D) :
     ∀ i, ∀ S ∈ neighborExcesses i,
       Implications.C4PolarityCnfGates.clauseSat (neighborSurvivorClause D i S) = true :=
-  neighbor_survivor_clauses_of_min_degree D hmin
+  neighbor_survivor_clauses_of_min_degree D hCand.2
 
 end Implications.C4PolarityEncoderInputs
 
 #print axioms Implications.C4PolarityEncoderInputs.scoreInputs_count_true
+#print axioms Implications.C4PolarityEncoderInputs.scoreInputs_length
+#print axioms Implications.C4PolarityEncoderInputs.orthogonalPairs_lex_ordered
 #print axioms Implications.C4PolarityEncoderInputs.neighbor_survivor_clauses_of_min_degree
 #print axioms Implications.C4PolarityEncoderInputs.candidate_neighbor_survivor_clauses
