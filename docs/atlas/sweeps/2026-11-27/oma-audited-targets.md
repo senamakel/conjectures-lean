@@ -2,8 +2,9 @@
 
 27 November 2026. The live registry pinned Formal Conjectures at
 `9097e2f90e66d2f6244209cb1c07f7120d17ec53`, Lean `v4.33.1` and Mathlib
-`0df444a`. The separate OMA checkout used upstream revision
-`734b11132537c54ea4052b09dad34a56f89bb4c0`.
+`0df444a`. The separate OMA checkout started at upstream revision
+`734b11132537c54ea4052b09dad34a56f89bb4c0` and advanced to
+`211acb6208960ed20e0d56bbfc8a2ef3ff7e39fb` for the final check.
 
 | Candidate | Discovery decision |
 | --- | --- |
@@ -20,6 +21,27 @@ primitive-root lemmas for the finite-check approach.
 Cookson and Flint Hills also have checked H2 submissions in human review.
 Their H1 is the same eventual Diophantine lower bound for π, which remains
 an import and portability problem at the OMA pin. [Cookson H2 #2853](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/2853) · [Flint H2 #2839](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/2839)
+
+## Checked Erdős 770(iii) reduction
+
+The draft `reductions/Erdos770.erdos_770.parts.iii.R2.lean` on the local OMA
+branch `attack-erdos770-h2` proves the exact pinned statement from two inputs.
+
+- Dirichlet L-function nonvanishing on `Re s > 1/2`, with the stated
+  exclusion for the trivial character at `s = 1`.
+- The implication from that same nonvanishing statement to subgroup escape
+  below `(21/5) log² q` for prime `q ≥ 2^17`.
+
+For each `ε > 0`, the condition `P(n) > n^ε` eventually gives
+`P(n) ≥ 2^17`. In the merged R1 argument the putative bad prime exceeds
+`P(n)`, so the analytic input covers every such prime. The finite subgroup
+check was needed for the all-`n) explicit estimate in R1. Part (iii) only
+uses its eventual consequence.
+
+`tools/oma.sh check Erdos770.erdos_770.parts.iii.R2` accepted the reduction
+and reported only `propext`, `Classical.choice`, and `Quot.sound`. The two
+analytic inputs remain open obligations on this pin. The draft is local and
+has no desk lease or PR. [Merged R1](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/1280)
 
 ## Sun catalogue intake
 
