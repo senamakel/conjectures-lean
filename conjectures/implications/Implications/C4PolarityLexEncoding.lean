@@ -177,7 +177,6 @@ theorem lexAssignment_cons_neq (a : Nat → Bool) (base : Nat)
           simpa [hscanExt'] using hinside'
         simp [lexAssignment, hbelow, hbelow', hnotLe, hinside, hinside', hscan,
           hscanExt', hlen', hthresholdEq, hidx, extendVariable, Nat.ne_of_gt habove]
-        simp [htailBound]
       · have hinside' : ¬ n < (base + 1) + (lexPrefixScan a nextPref xs ys).length :=
           fun hh => hinside (hthreshold.mpr hh)
         have hscanExt' : lexPrefixScan (extendVariable a base
