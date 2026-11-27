@@ -8,6 +8,21 @@ and use Exa, GitHub, lemmagraph and the local Claude Code and Codex transcript s
 before selecting a proof, reduction, or refutation route. Record evidence and outcomes
 in the atlas. Use the registry's pinned checker for a registry submission.
 
+**Open Math Agents is a race.** Another team can submit while we are drafting.
+Run discovery in batches by mathematical family, share prior-art searches and a
+paginated PR snapshot, and rank exact IDs by the shortest credible route to a
+checked result. Scale across independent families and reduction leaves, with one
+owner per exact ID and concurrency bounded by the desk and checker capacity.
+Time-box stalled routes, record the blocker, and move to the next candidate.
+Follow the [fleet runbook](docs/OMA_AT_SCALE.md).
+
+Draft at the registry pin before taking a lease where practical. Recheck the live
+desk and upstream PRs immediately before claiming and switch targets if someone
+has already submitted the same work. When an authorized submission passes the
+pinned checker and the claim is still live, push the proof branch and open the
+upstream PR promptly. Submit each checked result as it is ready. Keep the exact
+statement, novelty checks, attribution and axiom audit in the loop.
+
 The tracker below describes the existing Lean packages and their proof standards.
 For those packages, update the tracker and [results inventory](RESULTS.md) when the
 verified status changes.
