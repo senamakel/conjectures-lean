@@ -24,7 +24,7 @@ theorem smoothNumbersUpTo_card_le_rankin (X Y : ℕ) (s : ℝ) (hX : 0 < X)
     (X.smoothNumbersUpTo Y).card ≤
       X ^ s * ∏ p ∈ Y.primesBelow, (1 - rankinWeight s p)⁻¹ := by
   classical
-  let S := X.smoothNumbersUpTo Y
+  let S : Finset ℕ := X.smoothNumbersUpTo Y
   let f := rankinWeight s
   have hEuler := EulerProduct.summable_and_hasSum_smoothNumbers_prod_primesBelow_geometric
     (f := f) (rankinWeight_prime_norm_lt_one hs) Y
@@ -33,11 +33,13 @@ theorem smoothNumbersUpTo_card_le_rankin (X Y : ℕ) (s : ℝ) (hX : 0 < X)
     dsimp [f, rankinWeight]
     exact Real.rpow_nonneg (by positivity) _
   let e : S.attach ↪ Y.smoothNumbers where
-    toFun n := ⟨(n : ℕ), (Nat.mem_smoothNumbersUpTo.mp
-      (show (n : ℕ) ∈ X.smoothNumbersUpTo Y from n.property)).2⟩
+    toFun n := (⟨(n : ℕ), (Nat.mem_smoothNumbersUpTo.mp
+      (show (n : ℕ) ∈ X.smoothNumbersUpTo Y from n.property)).2⟩ : Y.smoothNumbers)
     inj' := by
       intro a b h
-      exact Subtype.ext (congrArg Subtype.val h)
+      apply Subtype.ext
+      apply Subtype.ext
+      exact congrArg Subtype.val h
   let T := S.attach.map e
   have hsum_map : (∑ m ∈ T, f m) =
       ∑ n ∈ S, f ⟨n, (Nat.mem_smoothNumbersUpTo.mp n.2).2⟩ := by
