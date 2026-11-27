@@ -346,13 +346,13 @@ theorem degree_six_vertex_has_at_most_two_degree_eight_neighbors
         have hxCommon : x ∈ N u ∩ N w := Finset.mem_inter.mpr
           ⟨hxN u huS', hxN w hwS'⟩
         have hle : (N u ∩ N w).card ≤ 1 := by omega
-        have hEq := Finset.card_le_one.mp hle hyCommon hxCommon
+        have hEq := Finset.card_le_one.mp hle y x hyCommon hxCommon
         simpa using hEq.symm
       · have hyCommon : y ∈ N v ∩ N w := Finset.mem_inter.mpr ⟨hyv, hyw⟩
         have hxCommon : x ∈ N v ∩ N w := Finset.mem_inter.mpr
           ⟨hxN v hvS', hxN w hwS'⟩
         have hle : (N v ∩ N w).card ≤ 1 := by omega
-        have hEq := Finset.card_le_one.mp hle hyCommon hxCommon
+        have hEq := Finset.card_le_one.mp hle y x hyCommon hxCommon
         simpa using hEq.symm
     · intro hy
       have hyx : y = x := Finset.mem_singleton.mp hy
@@ -366,7 +366,10 @@ theorem degree_six_vertex_has_at_most_two_degree_eight_neighbors
       rw [Finset.inter_comm]
       exact hWinterUnion
     rw [hinter, hUvUnion, hwCardN] at hcard
-    simp [U3]
+    have hU3val : (N u ∪ N v ∪ N w).card = 22 := by
+      simp at hcard
+      omega
+    simpa [U3, Finset.union_assoc] using hU3val
   have hz : ∃ z ∈ D, z ∉ S := by
     by_contra hnone
     have hDsub : D ⊆ S := by
@@ -404,7 +407,6 @@ theorem degree_six_vertex_has_at_most_two_degree_eight_neighbors
         _ = 3 := by
           rw [hPair z hzD u huD hzNotU.1, hPair z hzD v hvD hzNotU.2.1,
             hPair z hzD w hwD hzNotU.2.2]
-          norm_num
     exact (Finset.card_le_card hsubset).trans hle
   have hU4lower : 27 ≤ (U3 ∪ N z).card := by
     have hcard := Finset.card_union_add_card_inter U3 (N z)
