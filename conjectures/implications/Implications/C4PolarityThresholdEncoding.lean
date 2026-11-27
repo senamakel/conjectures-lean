@@ -151,6 +151,11 @@ def thresholdRowClauses (x : Int) (previous outputs : List Int) : List (List Int
   ((previous.drop 1).zip (previous.take outputs.length)).zip outputs |>.flatMap
     (fun (ab, out) => thresholdGateDimacs ab.1 x ab.2 out)
 
+theorem thresholdRowClauses_length (x : Int) (previous outputs : List Int)
+    (hprev : previous.length = outputs.length + 1) :
+    (thresholdRowClauses x previous outputs).length = 4 * outputs.length := by
+  simp [thresholdRowClauses, List.length_flatMap, hprev]
+
 /-- Recursively append one row of threshold gates per input. The state list
 contains the literal for thresholds `0` through `limit`; threshold zero is
 the distinguished true literal. -/
@@ -199,5 +204,6 @@ end Implications.C4PolarityThresholdEncoding
 
 #print axioms Implications.C4PolarityThresholdEncoding.thresholdGateDimacs_iff
 #print axioms Implications.C4PolarityThresholdEncoding.thresholdGateDimacs_extend
+#print axioms Implications.C4PolarityThresholdEncoding.thresholdRowClauses_length
 #print axioms Implications.C4PolarityThresholdEncoding.deletionCounterFreshCount
 #print axioms Implications.C4PolarityThresholdEncoding.scoreCounterFreshCount
