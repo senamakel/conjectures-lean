@@ -150,7 +150,29 @@ theorem hamiltonian_of_one_outsider_of_different_pair
       ht hx hy htx hty hxy hA hX hY hdeg
   · exact hdifferent a b c x y hab hac hbc haz hbz hcz hx hy htx hty hxy hI' hA hX hY
 
+/-- Having exactly one vertex outside a central row provides the canonical
+insertion representation used by the row classification. -/
+theorem exists_single_outsider (I A : Finset V) (hAI : A ⊆ I)
+    (hcard : (I \ A).card = 1) :
+    ∃ z, I = insert z A ∧ z ∉ A := by
+  obtain ⟨z, hz⟩ := Finset.card_eq_one.mp hcard
+  have hzIA : z ∈ I \ A := by rw [hz]; simp
+  refine ⟨z, ?_, (Finset.mem_sdiff.mp hzIA).2⟩
+  ext q
+  constructor
+  · intro hq
+    by_cases hqA : q ∈ A
+    · exact Finset.mem_insert_of_mem hqA
+    · have hqDiff : q ∈ I \ A := Finset.mem_sdiff.mpr ⟨hq, hqA⟩
+      rw [hz, Finset.mem_singleton] at hqDiff
+      simp [hqDiff]
+  · rintro hq
+    rcases Finset.mem_insert.mp hq with rfl | hqA
+    · exact (Finset.mem_sdiff.mp hzIA).1
+    · exact hAI hqA
+
 end SplitGraphOneOutsiderRows
 
 #print axioms SplitGraphOneOutsiderRows.classify
 #print axioms SplitGraphOneOutsiderRows.hamiltonian_of_one_outsider_of_different_pair
+#print axioms SplitGraphOneOutsiderRows.exists_single_outsider
