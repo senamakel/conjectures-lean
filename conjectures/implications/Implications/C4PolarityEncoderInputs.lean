@@ -8,6 +8,9 @@ import Implications.C4DegreeBounds
 set_option maxRecDepth 10000
 set_option maxHeartbeats 0
 
+noncomputable section
+local instance {α : Type*} [Fintype α] (s : Set α) : Fintype s := Fintype.ofFinite s
+
 /-! Exact Boolean inputs emitted by `scripts/encode_c4_polarity_42_cnf.py`. -/
 
 namespace Implications.C4PolarityEncoderInputs
@@ -315,12 +318,13 @@ theorem candidate_neighbor_survivor_clauses (D : Finset (Fin 57))
       Implications.C4PolarityCnfGates.clauseSat (neighborSurvivorClause D i S) = true := by
   classical
   have hcard : Fintype.card {x // x ∈ survivorVertices D} = 42 := by
-    rw [Fintype.card_coe]
-    simp [survivorVertices, hCand.1]
+    rw [Fintype.card_coe, survivorVertices]
+    rw [Finset.card_sdiff_of_subset (Finset.subset_univ D)]
+    simp [hCand.1.1]
   have hEupper := edge_le_138_of_deletion_bound (survivorGraph D) hcard hDel
   have hElower : 138 ≤ (survivorGraph D).edgeFinset.card := by
-    change 138 ≤ inducedEdgeCount graph (survivorVertices D)
-    simpa [survivorVertices] using hCand.2
+    simpa [C4PolarityDeletion.inducedEdgeCount, survivorGraph,
+      survivorVertices] using hCand.2
   have hE : (survivorGraph D).edgeFinset.card = 138 := by omega
   have hmin := C4PolarityDeletion.min_degree_six_of_delete_bound
     (survivorGraph D) hcard hE hDel
