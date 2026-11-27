@@ -35,6 +35,8 @@ import Implications.SplitGraphSmallRowsCompletion
 import Implications.SplitGraphSmallRows
 import Implications.SplitGraphSmallRowsOneShared
 import Implications.SplitGraphTripleRowPath
+import Implications.SplitGraphOneOutsider
+import Implications.SplitGraphOneOutsiderRows
 import Implications.C4VertexExtension
 import Implications.WilfPatternSwap
 import Implications.WilfTwoWindowOrder
