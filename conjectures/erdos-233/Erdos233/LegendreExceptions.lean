@@ -27,7 +27,7 @@ noncomputable def legendreBadBlock (a : ℕ) : Finset ℕ := by
 def squareGapIndex (n : ℕ) : ℕ := idx (n ^ 2) - 1
 
 /-- The integer points in the half-open interval spanning a consecutive-prime gap. -/
-def primeGapInterval (k : ℕ) : Finset ℕ :=
+noncomputable def primeGapInterval (k : ℕ) : Finset ℕ :=
   Finset.Ico (k.nth Nat.Prime) ((k + 1).nth Nat.Prime)
 
 /-- Indices of prime gaps containing failed square intervals in one dyadic block. -/
@@ -128,7 +128,7 @@ theorem legendreBadBlock_length_le_gapSum (a : ℕ) (ha : 2 ≤ a) :
     intro m hm n hn hmn
     exact squareInterval_disjoint hmn
   have hlower : (B.card : ℝ) * (2 * a : ℝ) ≤ (S.card : ℝ) := by
-    rw [Finset.card_biUnion hdis]
+    have hcard : S.card = ∑ n ∈ B, (squareInterval n).card := Finset.card_biUnion hdis
     have hterms : ∀ n ∈ B, (2 * a : ℝ) ≤ (squareInterval n).card := by
       intro n hn
       rw [squareInterval_card]
@@ -137,8 +137,8 @@ theorem legendreBadBlock_length_le_gapSum (a : ℕ) (ha : 2 ≤ a) :
       exact_mod_cast (show 2 * a ≤ 2 * n + 1 by omega)
     calc
       (B.card : ℝ) * (2 * a : ℝ) = ∑ n ∈ B, (2 * a : ℝ) := by simp
-      _ ≤ ∑ n ∈ B, (squareInterval n).card := Finset.sum_le_sum fun n hn => hterms n hn
-      _ = (S.card : ℝ) := by norm_cast
+      _ ≤ ∑ n ∈ B, ((squareInterval n).card : ℝ) := Finset.sum_le_sum fun n hn => hterms n hn
+      _ = (S.card : ℝ) := by exact_mod_cast hcard.symm
   have hsubset : S ⊆ T := by
     intro x hx
     rcases Finset.mem_biUnion.mp hx with ⟨n, hn, hx⟩
@@ -151,12 +151,13 @@ theorem legendreBadBlock_length_le_gapSum (a : ℕ) (ha : 2 ≤ a) :
       exact Finset.mem_image.mpr ⟨n, hn, rfl⟩
     exact Finset.mem_biUnion.mpr ⟨squareGapIndex n, hk, hinc hx⟩
   have hupper : (S.card : ℝ) ≤ ∑ k ∈ G, (primeGap k : ℝ) := by
+    have hcardT : T.card ≤ ∑ k ∈ G, (primeGapInterval k).card := Finset.card_biUnion_le
     calc
       (S.card : ℝ) ≤ (T.card : ℝ) := by exact_mod_cast Finset.card_le_card hsubset
       _ ≤ ∑ k ∈ G, (primeGap k : ℝ) := by
-        rw [Finset.card_biUnion_le]
-        norm_cast
-        simp [primeGapInterval, primeGap]
+        calc
+          (T.card : ℝ) ≤ (∑ k ∈ G, (primeGapInterval k).card : ℕ) := by exact_mod_cast hcardT
+          _ = ∑ k ∈ G, (primeGap k : ℝ) := by simp [primeGapInterval, primeGap]
   exact hlower.trans hupper
 
 end Erdos233
