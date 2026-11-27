@@ -798,7 +798,7 @@ theorem eventually_twoHitGapCount_bound_65 :
   have hroot : 0 < root := by dsimp [root]; exact Real.rpow_pos_of_pos hp0 _
   have hrootle : root ≤ p := by
     dsimp [root]
-    exact Real.rpow_le_rpow_of_exponent_le hp1
+    simpa [p] using Real.rpow_le_rpow_of_exponent_le hp1
       (by norm_num : (1 / 4 : ℝ) ≤ 1)
   have hidx : p / (n + 1 : ℝ) ≤ 2 * l := by
     simpa [p, P, l, L, Nat.cast_add] using hindex
@@ -824,7 +824,8 @@ theorem eventually_twoHitGapCount_bound_65 :
         have : p ≤ 2 * l * (n + 1 : ℝ) := (div_le_iff₀ (by positivity)).mp hidx
         nlinarith [mul_le_mul_of_nonneg_left this (le_of_lt hl)]
       _ ≤ l ^ 2 / root := by
-        exact div_le_div_of_nonneg_left (sq_nonneg l) hroot hp0
+        apply (div_le_div_iff₀ hp0 hroot).2
+        exact mul_le_mul_of_nonneg_left hrootle (sq_nonneg l)
   have hsecond :
       Real.exp (3 * l / 4) / (2 * (n + 1 : ℝ)) * ll ≤ l ^ 2 / root := by
     rw [hExpDiv]
@@ -835,7 +836,7 @@ theorem eventually_twoHitGapCount_bound_65 :
       _ = l * ll / root := by field_simp <;> ring
       _ ≤ l ^ 2 / root := by
         apply div_le_div_of_nonneg_right _ (le_of_lt hroot)
-        exact mul_le_mul_of_nonneg_left hllle (le_of_lt hl)
+        simpa [pow_two] using mul_le_mul_of_nonneg_left hllle (le_of_lt hl)
   have htailWeighted :
       (1 + Real.exp (3 * l / 4)) / (2 * (n + 1 : ℝ)) * ll ≤ 2 * R n := by
     calc
@@ -859,7 +860,8 @@ theorem eventually_twoHitGapCount_bound_65 :
     simpa [l, L, P, ll, LL] using hbound
   calc
     _ ≤ 64 / ll + (1 + Real.exp (3 * l / 4)) / (2 * (n + 1 : ℝ)) := hbound'
-    _ ≤ 64 / ll + 1 / ll := add_le_add_left htailSmall (64 / ll)
+    _ ≤ 64 / ll + 1 / ll := by
+      simpa [add_comm] using add_le_add_right htailSmall (64 / ll)
     _ = 65 / Real.log (Real.log (primeAt n : ℝ)) := by
       dsimp [ll, LL]
       ring
