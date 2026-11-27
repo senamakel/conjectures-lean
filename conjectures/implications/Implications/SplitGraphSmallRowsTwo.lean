@@ -2,6 +2,7 @@ import Implications.SplitGraphSmallRows
 import Implications.SplitGraphSmallRowsPath
 import Implications.SplitGraphSmallRowsBlocks
 import Implications.SplitGraphSmallRowsThree
+import Implications.SplitGraphSmallRowsCompletion
 
 /-!
 The case with exactly two selected clique rows of size two.
@@ -235,6 +236,144 @@ theorem chosen_two_double_rows_have_shape
       hselectedEqD.trans (hsame.symm.trans hrowPair)⟩
   · refine ⟨c,d,u,v,w,hcC,hdC,hcd,Or.inr ?_⟩
     exact ⟨hselectedEqC.trans hcRow, hselectedEqD.trans hdRow, huv, huw, hvw⟩
+
+/-- Choose the two outer centers in the one-overlap row pattern. -/
+theorem outer_endpoints_of_overlapping_rows
+    (G : SimpleGraph V) (C I : Finset V) (left right : V → V)
+    (c d u v w : V) (hcd : c ≠ d)
+    (hrowC : selectedRow I left right c = {u,v})
+    (hrowD : selectedRow I left right d = {u,w})
+    (huv : u ≠ v) (huw : u ≠ w) (hvw : v ≠ w)
+    (hleftC : ∀ i ∈ I, left i ∈ C) (hrightC : ∀ i ∈ I, right i ∈ C)
+    (hleftAdj : ∀ i ∈ I, G.Adj (left i) i)
+    (hrightAdj : ∀ i ∈ I, G.Adj (right i) i)
+    (hneq : ∀ i ∈ I, left i ≠ right i)
+    (hrowBound : ∀ q ∈ C, (row G I q).card ≤ 2)
+    (hnotDouble : ∀ q ∈ C, q ≠ c → q ≠ d → (selectedRow I left right q).card ≠ 2) :
+    ∃ e f, e ∈ C ∧ f ∈ C ∧ e ≠ c ∧ e ≠ d ∧ f ≠ c ∧ f ≠ d ∧ e ≠ f ∧
+      G.Adj e v ∧ G.Adj v c ∧ G.Adj c u ∧ G.Adj u d ∧ G.Adj d w ∧ G.Adj w f := by
+  classical
+  have hvC : v ∈ I := (Finset.mem_filter.mp (by rw [hrowC]; simp)).1
+  have hwI : w ∈ I := (Finset.mem_filter.mp (by rw [hrowD]; simp)).1
+  have huI : u ∈ I := (Finset.mem_filter.mp (by rw [hrowC]; simp)).1
+  have hvAtC : left v = c ∨ right v = c := by
+    have hv : v ∈ selectedRow I left right c := by rw [hrowC]; simp [hvw]
+    exact (Finset.mem_filter.mp hv).2
+  have hwAtD : left w = d ∨ right w = d := by
+    have hw : w ∈ selectedRow I left right d := by rw [hrowD]; simp [hvw.symm]
+    exact (Finset.mem_filter.mp hw).2
+  let e := if left v = c then right v else left v
+  let f := if left w = d then right w else left w
+  have hev : (left v = c ∧ e = right v) ∨ (right v = c ∧ e = left v) := by
+    dsimp [e]
+    split
+    · intro h
+      exact Or.inl ⟨h, rfl⟩
+    · intro h
+      exact Or.inr ⟨hvAtC.resolve_left h, rfl⟩
+  have hfw : (left w = d ∧ f = right w) ∨ (right w = d ∧ f = left w) := by
+    dsimp [f]
+    split
+    · intro h
+      exact Or.inl ⟨h, rfl⟩
+    · intro h
+      exact Or.inr ⟨hwAtD.resolve_left h, rfl⟩
+  have heC : e ∈ C := by
+    rcases hev with ⟨_, rfl⟩ | ⟨_, rfl⟩
+    · exact hrightC v hvC
+    · exact hleftC v hvC
+  have hfC : f ∈ C := by
+    rcases hfw with ⟨_, rfl⟩ | ⟨_, rfl⟩
+    · exact hrightC w hwI
+    · exact hleftC w hwI
+  have heNeC : e ≠ c := by
+    rcases hev with ⟨hl, he⟩ | ⟨hr, he⟩
+    · intro h
+      subst e
+      exact hneq v hvC (hl.trans he.symm)
+    · intro h
+      subst e
+      exact hneq v hvC (he.trans hr)
+  have hfNeD : f ≠ d := by
+    rcases hfw with ⟨hl, hf⟩ | ⟨hr, hf⟩
+    · intro h
+      subst f
+      exact hneq w hwI (hl.trans hf.symm)
+    · intro h
+      subst f
+      exact hneq w hwI (hf.trans hr)
+  have heNeD : e ≠ d := by
+    intro h
+    have hvD : v ∈ selectedRow I left right d := by
+      rcases hev with ⟨hl, he⟩ | ⟨hr, he⟩
+      · exact Finset.mem_filter.mpr ⟨hvC, Or.inr (by simpa [e, hl] using h)⟩
+      · exact Finset.mem_filter.mpr ⟨hvC, Or.inl (by simpa [e, hr] using h)⟩
+    rw [hrowD] at hvD
+    simp [huv, hvw, hvD] at hvD
+  have hfNeC : f ≠ c := by
+    intro h
+    have hwC : w ∈ selectedRow I left right c := by
+      rcases hfw with ⟨hl, hf⟩ | ⟨hr, hf⟩
+      · exact Finset.mem_filter.mpr ⟨hwI, Or.inr (by simpa [f, hl] using h)⟩
+      · exact Finset.mem_filter.mpr ⟨hwI, Or.inl (by simpa [f, hr] using h)⟩
+    rw [hrowC] at hwC
+    simp [huv, hvw.symm, hwC] at hwC
+  have hselAt (q i : V) (hi : i ∈ selectedRow I left right q) : G.Adj q i := by
+    have hi' := Finset.mem_filter.mp hi
+    rcases hi'.2 with heq | heq
+    · exact heq ▸ hleftAdj i hi'.1
+    · exact heq ▸ hrightAdj i hi'.1
+  have hcu : G.Adj c u := hselAt c u (by rw [hrowC]; simp [huv])
+  have hud : G.Adj u d := (hselAt d u (by rw [hrowD]; simp [huw])).symm
+  have hcv : G.Adj v c := (hselAt c v (by rw [hrowC]; simp [hvw])).symm
+  have hdw : G.Adj d w := hselAt d w (by rw [hrowD]; simp [hvw.symm])
+  have hevAdj : G.Adj e v := by
+    rcases hev with ⟨_, he⟩ | ⟨_, he⟩
+    · rw [he]
+      exact (hselAt c v (by rw [hrowC]; simp [hvw])).symm
+    · rw [he]
+      exact hleftAdj v hvC
+  have hwfAdj : G.Adj w f := by
+    rcases hfw with ⟨_, hf⟩ | ⟨_, hf⟩
+    · rw [hf]
+      exact (hselAt d w (by rw [hrowD]; simp [hvw.symm])).symm
+    · rw [hf]
+      exact hleftAdj w hwI
+  have heNeF : e ≠ f := by
+    intro hef
+    have hvE : v ∈ selectedRow I left right e := by
+      rcases hev with ⟨_, he⟩ | ⟨_, he⟩
+      · rw [he, ← hef]
+        exact Finset.mem_filter.mpr ⟨hvC, Or.inr rfl⟩
+      · rw [he, ← hef]
+        exact Finset.mem_filter.mpr ⟨hvC, Or.inl rfl⟩
+    have hwE : w ∈ selectedRow I left right e := by
+      rcases hfw with ⟨_, hf⟩ | ⟨_, hf⟩
+      · rw [hf, ← hef]
+        exact Finset.mem_filter.mpr ⟨hwI, Or.inr rfl⟩
+      · rw [hf, ← hef]
+        exact Finset.mem_filter.mpr ⟨hwI, Or.inl rfl⟩
+    have hpair : ({v,w} : Finset V) ⊆ selectedRow I left right e := by
+      intro x hx
+      simp only [Finset.mem_insert, Finset.mem_singleton] at hx
+      rcases hx with rfl | rfl
+      · exact hvE
+      · exact hwE
+    have hpairCard : ({v,w} : Finset V).card = 2 := by simp [hvw]
+    have hle : (selectedRow I left right e).card ≤ 2 := by
+      apply Finset.card_le_card
+      intro i hi
+      have hi' := Finset.mem_filter.mp hi
+      rcases hi'.2 with heq | heq
+      · exact Finset.mem_filter.mpr ⟨hi'.1, heq ▸ hleftAdj i hi'.1⟩
+      · exact Finset.mem_filter.mpr ⟨hi'.1, heq ▸ hrightAdj i hi'.1⟩
+      exact hrowBound e heC
+    have hcard : (selectedRow I left right e).card = 2 := by
+      have := Finset.card_le_card hpair
+      omega
+    exact hnotDouble e heC heNeC heNeD hcard
+  exact ⟨e,f,heC,hfC,heNeC,heNeD,hfNeC,hfNeD,heNeF,
+    hevAdj,hcv,hcu,hud,hdw,hwfAdj⟩
 
 
 end SplitGraphSmallRowsTwo
