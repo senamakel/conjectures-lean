@@ -256,7 +256,7 @@ theorem hamiltonian_of_split_partition_two_endpoints
     simp [l, M, ha, hb, hab]
   have hl_head : l.head? = some a := by simp [l]
   have hl_last : l.getLast? = some b := by
-    dsimp [l]
+    change ((a :: M.toList) ++ [b]).getLast? = some b
     rw [List.getLast?_append_of_ne_nil _ (by simp)]
     simp
   exact hamiltonian_of_clique_order_with_two_endpoints G C i j a b l
