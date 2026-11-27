@@ -51,6 +51,7 @@ theorem hamiltonian_of_one_outsider_shared_pair_path
     (hI : I = {a, b, c, z})
     (hpathNodup : (([z, x, a, t, c, u] ++ spare ++ [y, b]) : List V).Nodup)
     (hsegmentNodup : ([u] ++ spare ++ [y]).Nodup)
+    (hu : u ∈ C) (hy : y ∈ C)
     (hspareC : ∀ v ∈ spare, v ∈ C)
     (hcoverC : ∀ v ∈ C, v ∈ ([u] ++ spare ++ [y]))
     (hzx : G.Adj z x) (hxa : G.Adj x a) (hat : G.Adj a t)
@@ -74,19 +75,29 @@ theorem hamiltonian_of_one_outsider_shared_pair_path
       exact hv ▸ hy
   have hsegmentChain : segment.IsChain G.Adj :=
     clique_list_chain G C hC segment hsegmentNodup hsegmentC
+  have hsegmentHead : segment.head? = some u := by simp [segment]
+  have hsegmentLast : segment.getLast? = some y := by simp [segment]
   have htailChain : tail.IsChain G.Adj := by
     refine List.IsChain.append hsegmentChain (by simp) ?_
     intro v hv w hw
-    simp [segment] at hv
-    simp [tail, segment] at hw
-    simpa [hv, hw] using hby
+    rw [hsegmentLast] at hv
+    simp only [Option.mem_def, Option.some.injEq] at hv
+    subst v
+    simp only [List.head?_append_of_ne_nil, hsegmentHead] at hw
+    simp only [Option.mem_def, Option.some.injEq] at hw
+    subst w
+    exact hby
   have hchain : path.IsChain G.Adj := by
     refine List.IsChain.append ?_ htailChain ?_
     · simpa [core] using hcoreChain
     · intro v hv w hw
       simp [core] at hv
-      simp [tail, segment] at hw
-      simpa [hv, hw] using hcu
+      have htailHead : tail.head? = some u := by simp [tail, segment]
+      rw [htailHead] at hw
+      simp only [Option.mem_def, Option.some.injEq] at hw
+      subst v
+      subst w
+      exact hcu
   have hcover : ∀ v : V, v ∈ path := by
     intro v
     have hv : v ∈ C ∨ v ∈ I := by
