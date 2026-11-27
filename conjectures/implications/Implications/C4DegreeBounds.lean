@@ -89,7 +89,7 @@ theorem sum_innerNeighbors_card_ge_seven (v : V)
     simpa [S, G.card_neighborFinset_eq_degree] using hv
   have hSsub : S ⊆ Finset.univ.erase v := by
     intro z hz
-    have hzv : z ≠ v := G.ne_of_adj (by simpa using hz)
+    have hzv : z ≠ v := G.ne_of_adj (G.symm.symm v z (by simpa using hz))
     exact Finset.mem_erase.mpr ⟨hzv, Finset.mem_univ _⟩
   have hdisj : (S : Set V).PairwiseDisjoint T := by
     intro u hu w hw huw
@@ -97,7 +97,7 @@ theorem sum_innerNeighbors_card_ge_seven (v : V)
     intro z hzu hzw
     have hzu' : z ∈ outerNeighbors G u v := (Finset.mem_sdiff.mp hzu).1
     have hzw' : z ∈ outerNeighbors G w v := (Finset.mem_sdiff.mp hzw).1
-    exact (Finset.disjoint_left.mp (outerNeighbors_disjoint G hC4 hu hw huw)) z hzu' hzw'
+    exact (Finset.disjoint_left.mp (outerNeighbors_disjoint G hC4 hu hw huw)) hzu' hzw'
   let U := S.biUnion T
   have hUsub : U ⊆ Finset.univ.erase v \ S := by
     intro z hz
@@ -157,8 +157,7 @@ theorem sum_innerNeighbors_card_ge_seven (v : V)
         have : G.Adj v v := by simpa using hzv
         exact G.loopless.irrefl v this
       exact Finset.mem_erase.mpr ⟨hz_ne_v, by simpa using hzu⟩
-    simpa [Finset.union_eq_left.mpr hsub] using
-      (Finset.card_sdiff_add_card_eq_card (innerNeighbors G u v) (outerNeighbors G u v)).symm
+    exact (Finset.card_sdiff_add_card_eq_card hsub).symm
   omega
 
 theorem sum_outerNeighbors_card_le (v : V)
