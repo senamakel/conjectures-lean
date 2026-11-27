@@ -1,4 +1,5 @@
 import Mathlib.Data.Nat.Bitwise
+import Mathlib.Data.List.Basic
 
 /-!
 # Finite certificates for the three published 41-vertex `C₄` extremal seeds
@@ -35,7 +36,7 @@ def compatibleCliqueSearchBool (g : Array Nat) : List Nat → Nat → Bool
   | v :: vs, k + 1 =>
       compatibleCliqueSearchBool g vs (k + 1) ||
         compatibleCliqueSearchBool g (vs.filter (compatible g v)) k
-termination_by candidates => candidates.length
+termination_by candidates.length
 decreasing_by
   · simp_wf
   · simp_wf
@@ -78,7 +79,7 @@ theorem search_sound (g : Array Nat) (candidates : List Nat) (size : Nat)
           · intro w hw
             exact (List.mem_filter.mp (hsub.subset hw)).2
           · exact hpairs
-termination_by candidates => candidates.length
+termination_by candidates.length
 decreasing_by
   · simp_wf
     omega
