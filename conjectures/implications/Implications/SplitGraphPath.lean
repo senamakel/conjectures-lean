@@ -492,17 +492,46 @@ theorem hamiltonian_of_split_partition_row_bounds
         · simpa [hempty] using hvI
       exact List.mem_toFinset.mp (by simpa [l, hfin] using hvC)
 
-/-- A split graph with induced-tree bound three has a Hamiltonian path when
-every independent vertex has a clique neighbour. -/
+/-- In a connected split graph, the first step of a path from an independent
+vertex to the nonempty clique lies in the clique. -/
+private theorem clique_neighbor_of_connected
+    (G : SimpleGraph V) (C I : Finset V)
+    (hI : G.IsIndepSet (I : Set V)) (hdisj : Disjoint C I)
+    (hpartition : (Finset.univ : Finset V) = C ∪ I)
+    (hconn : G.Connected) (hCne : C.Nonempty) :
+    ∀ i ∈ I, ∃ c ∈ C, G.Adj c i := by
+  classical
+  intro i hi
+  obtain ⟨c, hc⟩ := hCne
+  have hic : i ≠ c := by
+    intro heq
+    subst c
+    exact (Finset.disjoint_left.mp hdisj) hc hi
+  obtain ⟨p, hp⟩ := (hconn.preconnected i c).exists_isPath
+  have hnil : ¬ p.Nil := p.not_nil_of_ne hic
+  have hadj := p.adj_snd hnil
+  have hsndI : p.snd ∉ I := by
+    intro hsnd
+    by_cases hsame : p.snd = i
+    · subst p.snd
+      exact G.irrefl hadj
+    · exact (hI hi hsnd (fun h => hsame h.symm) hadj).elim
+  have hsndUniv : p.snd ∈ (Finset.univ : Finset V) := Finset.mem_univ _
+  rw [hpartition] at hsndUniv
+  have hsndC : p.snd ∈ C := (Finset.mem_union.mp hsndUniv).resolve_right hsndI
+  exact ⟨p.snd, hsndC, hadj.symm⟩
+
+/-- A connected split graph with induced-tree bound three has a Hamiltonian path. -/
 theorem hamiltonian_of_split_partition_of_inducedTreeBound
     (G : SimpleGraph V) (C I : Finset V)
     (hC : G.IsClique (C : Set V)) (hI : G.IsIndepSet (I : Set V))
     (hdisj : Disjoint C I)
     (hpartition : (Finset.univ : Finset V) = C ∪ I)
     (hTreeBound : inducedTreeBound G 1)
-    (hcover : ∀ i ∈ I, ∃ c ∈ C, G.Adj c i)
+    (hconn : G.Connected)
     (hCne : C.Nonempty) :
     ∃ (u v : V) (p : G.Walk u v), p.IsHamiltonian := by
+  have hcover := clique_neighbor_of_connected G C I hI hdisj hpartition hconn hCne
   obtain ⟨hrow, hdiff⟩ := rows_bounded_of_inducedTreeBound G C I 1 hTreeBound hC hI hdisj
   exact hamiltonian_of_split_partition_row_bounds G C I hC hI hdisj hpartition
     (by simpa using hrow) (by simpa using hdiff) hcover hCne
