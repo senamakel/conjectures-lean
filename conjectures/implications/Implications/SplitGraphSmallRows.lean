@@ -6,6 +6,8 @@ Finite set-family lemmas for the connectivity-two, small-row split-graph case.
 
 namespace SplitGraphSmallRows
 
+open SplitGraphTrees
+
 private theorem twoRows_intersect_of_symmDiff_card_le_two
     {α : Type*} [DecidableEq α] (s t : Finset α)
     (hs : s.card = 2) (ht : t.card = 2)
@@ -15,9 +17,11 @@ private theorem twoRows_intersect_of_symmDiff_card_le_two
   by_contra hn
   have hdis : Disjoint s t := by
     rw [Finset.disjoint_iff_inter_eq_empty]
-    apply Finset.eq_empty_iff_forall_not_mem.mpr
-    intro x hx
-    exact hn ⟨x, (Finset.mem_inter.mp hx).1, (Finset.mem_inter.mp hx).2⟩
+    ext x
+    constructor
+    · intro hx
+      exact False.elim (hn ⟨x, (Finset.mem_inter.mp hx).1, (Finset.mem_inter.mp hx).2⟩)
+    · simp
   have hEq : s ∪ t = s \ t ∪ t \ s := by
     rw [← Finset.symmDiff_eq_union hdis, Finset.symmDiff_def]
   have hunion : (s ∪ t).card = 4 := by
