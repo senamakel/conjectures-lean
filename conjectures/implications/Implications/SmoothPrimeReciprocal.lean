@@ -17,7 +17,12 @@ private theorem card_primes_Icc_eq_primeCounting (n : ℕ) :
     ((Finset.Icc 1 n).filter Nat.Prime).card = Nat.primeCounting n := by
   have hset : (Finset.Icc 1 n).filter Nat.Prime = Nat.primesLE n := by
     ext p
-    simp [Nat.mem_primesLE, Nat.Prime.one_le]
+    simp only [Finset.mem_filter, Finset.mem_Icc, Nat.mem_primesLE]
+    constructor
+    · rintro ⟨⟨h1, hn⟩, hp⟩
+      exact ⟨hp, hn⟩
+    · rintro ⟨hp, hn⟩
+      exact ⟨⟨hp.one_le, hn⟩, hp⟩
   rw [hset, Nat.primesLE_card_eq_primeCounting]
 
 /-- The reciprocal-prime mass in one dyadic block is `O(1/k)`. -/
@@ -27,7 +32,7 @@ private theorem reciprocalPrimeDyadic_eventually :
         (1 : ℝ) / p) ≤ D / (k + 1 : ℝ) := by
   let B : ℝ := Real.log 4 + 1
   have hB : 0 < B := by dsimp [B]; positivity
-  have hpi := Chebyshev.eventually_primeCounting_le (εpos := by norm_num)
+  have hpi := Chebyshev.eventually_primeCounting_le (ε := 1) (by norm_num)
   have hpow : Tendsto (fun k : ℕ => (2 : ℝ) ^ (k + 1)) atTop atTop := by
     exact (tendsto_pow_atTop_atTop_of_one_lt (by norm_num : (1 : ℝ) < 2)).comp
       (tendsto_add_atTop_nat 1)
@@ -135,13 +140,23 @@ theorem reciprocalPrimeSum_le_dyadic_harmonic :
       apply Finset.sum_le_sum
       intro k hk
       by_cases hlarge : K ≤ k
-      · exact (hK k hlarge).trans (div_le_div_of_nonneg_right
-          (by dsimp [D]; linarith) (by positivity))
+      · have hextra : 0 ≤ extra := by
+          dsimp [extra]
+          apply Finset.sum_nonneg
+          intro i hi
+          apply mul_nonneg (by positivity)
+          dsimp [block]
+          apply Finset.sum_nonneg
+          intro p hp
+          have hprime := (Finset.mem_filter.mp hp).2
+          exact div_nonneg (by positivity) (by exact_mod_cast hprime.pos.le)
+        have hD : D₀ ≤ D := by dsimp [D]; linarith
+        exact (hK k hlarge).trans (div_le_div_of_nonneg_right hD (by positivity))
       · have hkK : k ∈ Finset.Icc 0 K := Finset.mem_Icc.mpr ⟨Nat.zero_le _, Nat.le_of_not_ge hlarge⟩
         have hsingle : (k + 1 : ℝ) * block k ≤ extra := by
           change (k + 1 : ℝ) * block k ≤
             ∑ i ∈ Finset.Icc 0 K, (i + 1 : ℝ) * block i
-          apply Finset.single_le_sum
+          apply (Finset.single_le_sum (f := fun i : ℕ => (i + 1 : ℝ) * block i))
           · intro i hi
             apply mul_nonneg (by positivity)
             dsimp [block]
@@ -170,7 +185,7 @@ theorem reciprocalPrimeSum_le_dyadic_harmonic :
         simp [T]
       have hinj : Set.InjOn (fun k : ℕ => k + 1) T := by
         intro a ha b hb hab
-        exact Nat.add_left_cancel hab
+        exact Nat.add_right_cancel hab
       rw [← himage, Finset.sum_image hinj]
       simp
     calc
@@ -187,26 +202,14 @@ theorem reciprocalPrimeSum_le_dyadic_harmonic :
       _ ≤ D * (1 + Real.log ((Nat.log 2 N + 1 : ℕ) : ℝ)) := by
         have hh : (∑ j ∈ Finset.Icc 1 (Nat.log 2 N + 1), (1 : ℝ) / j) ≤
             1 + Real.log ((Nat.log 2 N + 1 : ℕ) : ℝ) := by
-          have h := harmonic_le_one_add_log (Nat.log 2 N + 1)
+        have h := harmonic_le_one_add_log (Nat.log 2 N + 1)
+        simpa [harmonic_eq_sum_Icc, Rat.cast_sum, Rat.cast_inv, Rat.cast_natCast] using h
+        exact mul_le_mul_of_nonneg_left hh (by dsimp [D]; positivity)
+      _ ≤ D * (1 + Real.log ((Nat.log 2 N + 1 : ℕ) : ℝ)) := by
+        have h := harmonic_le_one_add_log (Nat.log 2 N + 1)
+        have hh : (∑ j ∈ Finset.Icc 1 (Nat.log 2 N + 1), (1 : ℝ) / j) ≤
+            1 + Real.log ((Nat.log 2 N + 1 : ℕ) : ℝ) := by
           simpa [harmonic_eq_sum_Icc, Rat.cast_sum, Rat.cast_inv, Rat.cast_natCast] using h
         exact mul_le_mul_of_nonneg_left hh (by dsimp [D]; positivity)
-      _ ≤ D * (1 + Real.log ((Nat.log 2 N + 1 : ℕ) : ℝ)) := le_rfl
-    _ ≤ D * (1 + Real.log ((Nat.log 2 N + 1 : ℕ) : ℝ)) := by
-        have hfactor : 0 ≤ 1 + Real.log ((Nat.log 2 N + 1 : ℕ) : ℝ) := by
-          have : (1 : ℝ) ≤ ((Nat.log 2 N + 1 : ℕ) : ℝ) := by positivity
-          have hl := Real.log_nonneg this
-          linarith
-        have hextra : 0 ≤ extra := by
-          dsimp [extra]
-          apply Finset.sum_nonneg
-          intro k hk
-          apply mul_nonneg (by positivity)
-          dsimp [block]
-          apply Finset.sum_nonneg
-          intro p hp
-          exact div_nonneg (by positivity) (by positivity)
-        apply mul_le_mul_of_nonneg_right _ hfactor
-        dsimp [D]
-        linarith
 
 end Implications.SmoothPrimeReciprocal
