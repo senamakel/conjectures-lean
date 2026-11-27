@@ -657,7 +657,9 @@ theorem hamiltonian_of_split_partition_three_double_rows
   let usedClique : Finset V := {x,y,z} ∪ O.biUnion (fun k => {left k, right k})
   let tailFin : Finset V := C \ usedClique
   let tail : List V := tailFin.toList
-  have htailNodup : tail.Nodup := by simp [tail, tailFin]
+  have htailNodup : tail.Nodup := by
+    change tailFin.toList.Nodup
+    exact tailFin.nodup_toList
   have htailC : ∀ v ∈ tail, v ∈ C := by
     intro v hv
     exact (Finset.mem_sdiff.mp (Finset.mem_toList.mp hv)).1
@@ -691,6 +693,7 @@ theorem hamiltonian_of_split_partition_three_double_rows
       · rcases Finset.mem_union.mp hvUsed with hvSpecial | hvRestEnds
         · left
           have hv' : v = x ∨ v = y ∨ v = z := by simpa using hvSpecial
+          apply List.mem_append_left
           simp only [List.mem_cons, List.not_mem_nil, or_false]
           rcases hv' with h | h | h <;> simp [h]
         · obtain ⟨k, hk, hvEnds⟩ := Finset.mem_biUnion.mp hvRestEnds
