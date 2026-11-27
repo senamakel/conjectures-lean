@@ -284,3 +284,54 @@ of equal mask prefixes. The output is partial, so the masks were not merged
 with prior artifacts. The two soundness arguments above establish that a
 completed traversal retains exactly the same eligible normalized set; the
 independent validator confirms every emitted record is a member of that set.
+
+## Deterministic checkpoint/resume implementation and synthetic validation
+
+The enumerator accepts `--checkpoint FILE`, `--resume`, and `--node-cap N`.
+The checkpoint records the search parameters, output byte offset, cumulative
+counters, and a frontier of branch-decision prefixes. At a node cap, the
+current unvisited subtree and each not-yet-entered sibling are stored as an
+antichain: no frontier prefix is an ancestor of another. Decisions are pairs
+`(vertex, include/exclude)` under the deterministic dynamic variable order.
+Resume replays each prefix from the normalized root, recomputes forced
+exclusions and degrees, and rejects a prefix if its next recorded vertex no
+longer matches the search configuration. It truncates the output to the
+checkpoint's flushed byte offset before appending. This makes interrupted
+search continuation disjoint from completed subtrees, assuming the checkpoint
+and mask file belong to the same run and are not modified externally.
+
+The bounded validation fixture is deliberately separate from all Q6 artifacts:
+dimension Q4, seed `{0,1,2}`, target 3 edges, minimum 3 vertices, both sound
+pruning flags enabled, and at most 13 newly processed search nodes per process
+invocation. A test repeatedly resumes until the frontier empties, with a hard
+limit of 1,000 invocations. It checks frontier prefix-freeness after every
+checkpoint, output record alignment and uniqueness after every resume, then
+compares the final set against both an uninterrupted Q4 traversal and an
+independent exhaustive scan of all 2^13 masks containing the seed. This is a
+correctness test of checkpoint semantics, not a Q6 performance measurement.
+No E23, E24, E25 or E26 search is authorized by this fixture.
+
+The previous E23 optimized output has no checkpoint/frontier record. Its last
+emitted mask only locates a tentative point in the deterministic DFS: the
+bit-5 include subtree appears complete and the bit-5 exclude subtree is partial.
+The unreported no-output tail after that last mask cannot be recovered from
+the mask file or aggregate counters. Resuming from a reconstructed path could
+therefore redo an unknown amount of work; that artifact is not an exact
+continuation checkpoint. Keep it partial and do not append to it. A genuine
+Q6 continuation requires either a new checkpointed run from the root or a
+separately logged prefix partition whose completed subtrees are known.
+
+The synthetic check passed with 46 normalized Q4 masks after 17 capped
+invocations. The resumed set equaled both uninterrupted DFS and the independent
+2^13-mask exhaustive scan. Every intermediate frontier passed the prefix-free
+check; every resumed output was record-aligned and duplicate-free. The test
+also confirmed empty-frontier repeated resume is idempotent and that truncated
+output, malformed or overlong prefixes, duplicate frontier entries, misaligned
+offsets, an offset/count mismatch, and path aliases through `.` components,
+symlinks or hardlinks are rejected before damaging the mask output. The test
+also covers a checkpoint temporary symlink to the output. The
+enumerator compiled with `-std=c++20 -O3 -Wall -Wextra -Werror`. This provides
+small-instance evidence for checkpoint correctness only. No Q6 run was made,
+so there is no Q6 continuation timing result and no evidence yet that the
+checkpointed traversal improves Q7 census feasibility or makes Q8 pair
+compatibility practical.
