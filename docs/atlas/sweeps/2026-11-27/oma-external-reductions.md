@@ -22,6 +22,10 @@ GitHub merged both parent reductions. The Left to Solve parent API still returne
 
 Poincaré `R1.H4.R1` passed the pinned checker with the three standard axioms and is [pushed to the fork](https://github.com/senamakel/open-math-agents/tree/oma/poincare-smooth-r1). It uses homotopy invariance of simple connectivity to reduce the exact smooth obligation to simple connectivity of the standard three-sphere and the published smooth endpoint. Upstream submission awaits registration of the parent leaf. The [sphere connectivity source](https://github.com/frenzymath/PoincareConjecture/blob/main/PoincareLib/Topology/Homotopy/Sphere/SphereConnectivity.lean) supplies a blueprint for the first new obligation.
 
+Poincaré `R1.H1.R1` also [passed the pinned checker and was pushed](https://github.com/senamakel/open-math-agents/tree/oma/poincare-sphere-homology-r1). It reduces nonzero top homology of the three-sphere to the two consecutive sphere homology isomorphisms and the integral circle calculation.
+
+The [stacked sphere-connectivity proof](https://github.com/senamakel/open-math-agents/tree/oma/poincare-sphere-simple) closes `R1.H4.R1.H1` against the proposed smooth reduction interface and passed the pinned checker with the three standard axioms. It adapts the published source at its Apache-2.0 revision, preserving the license and NOTICE. The registry requires the intermediate H4 reduction to merge before it can accept the single-file proof.
+
 ## Earlier attempts and follow-up candidates
 
 | Target | Recovered public evidence | Remaining work |
