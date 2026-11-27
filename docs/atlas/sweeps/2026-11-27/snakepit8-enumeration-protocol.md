@@ -61,6 +61,16 @@ candidate rejection, not an invariant failure. The next run corrects this by
 counting and rejecting cyclic leaves while retaining the degree-sum invariant;
 all resource caps remain unchanged.
 
+The corrected include-first run hit 10,000,000 nodes in 0.414 seconds, found
+55,895 cyclic full assignments and no eligible forest leaves, using 7,072 KiB
+maximum RSS. Because this arbitrary node cap again prevented a useful timing
+sample, the final feasibility phase uses dynamic branching: choose an undecided
+vertex with the most already-selected neighbors, breaking ties by smallest
+vertex label; include first, then exclude. The only search-size cap is 2.5
+billion nodes, with the existing 110-second internal wall cap and 2 GiB address
+space cap. This phase measures whether constraint-aware ordering reaches the
+reported forest census at a useful rate. It still stops before orbit reduction.
+
 ## Interpretation
 
 Finishing the count reproduces only the Q7 enumeration stage; it does not prove
