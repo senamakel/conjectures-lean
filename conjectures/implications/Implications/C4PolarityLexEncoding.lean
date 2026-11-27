@@ -33,9 +33,11 @@ private def neg (v : Nat) : Int := -(Int.ofNat v)
 
 @[simp] private theorem literalValue_neg (a : Nat → Bool) (v : Nat) (hv : 0 < v) :
     literalValue a (neg v) = !a v := by
+  have hneg : neg v = Int.negOfNat v := by simp [neg, Int.negOfNat_eq]
+  rw [hneg]
   cases v with
   | zero => omega
-  | succ n => simp [literalValue, neg, Int.negOfNat]
+  | succ n => simp [literalValue, Int.negOfNat]
 
 /-- One nontrivial iteration of the Python lex loop: its guard clause followed
 by the five clauses defining the next equality-prefix variable. -/
@@ -109,7 +111,8 @@ theorem lexFreshIds_ge (next : Nat) (left right : List Nat) :
           by_cases hxy : x = y
           · simpa [lexFreshIds, hxy] using ih next ys
           · have hbeq : (x == y) = false := by simp [hxy]
-            simp only [lexFreshIds, hbeq, if_false, List.mem_cons]
+            rw [lexFreshIds, hbeq, if_false]
+            simp only [List.mem_cons]
             intro v hv
             rcases hv with rfl | hv
             · exact Nat.le_refl _
