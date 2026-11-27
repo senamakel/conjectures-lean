@@ -1,5 +1,6 @@
 import Mathlib
 import Implications.C4PolarityCnfGates
+import Implications.C4PolarityThresholdEncoding
 
 /-!
 # DIMACS encoding of polarity lexicographic constraints
@@ -12,18 +13,7 @@ are skipped without allocating a prefix variable, as in the Python encoder.
 namespace Implications.C4PolarityLexEncoding
 
 open Implications.C4PolarityCnfGates
-
-/-- Value of a signed DIMACS literal under a Boolean variable assignment. -/
-def literalValue (a : Nat → Bool) (lit : Int) : Bool :=
-  if 0 < lit then a lit.natAbs else !(a lit.natAbs)
-
-/-- Value of a DIMACS clause (a disjunction of signed literals). -/
-def clauseValue (a : Nat → Bool) (clause : List Int) : Bool :=
-  clause.any (literalValue a)
-
-/-- Value of a DIMACS formula (a conjunction of clauses). -/
-def cnfValue (a : Nat → Bool) (clauses : List (List Int)) : Bool :=
-  clauses.all (clauseValue a)
+open Implications.C4PolarityThresholdEncoding
 
 private def pos (v : Nat) : Int := Int.ofNat v
 private def neg (v : Nat) : Int := -(Int.ofNat v)
@@ -87,6 +77,48 @@ theorem lexNext_eq (next : Nat) (left right : List Nat) :
           by_cases hxy : x = y
           · simp [lexNext, lexFreshIds, hxy, ih]
           · simp [lexNext, lexFreshIds, hxy, ih, Nat.add_assoc, Nat.add_comm]
+
+/-- Every auxiliary ID is at least the allocator's initial next variable. -/
+theorem lexFreshIds_ge (next : Nat) (left right : List Nat) :
+    ∀ v ∈ lexFreshIds next left right, next ≤ v := by
+  induction left generalizing right next with
+  | nil => cases right <;> simp [lexFreshIds]
+  | cons x xs ih =>
+      cases right with
+      | nil => simp [lexFreshIds]
+      | cons y ys =>
+          by_cases hxy : x = y
+          · simpa [lexFreshIds, hxy] using ih next ys
+          · simp only [lexFreshIds, hxy, if_false, List.mem_cons]
+            intro v hv
+            rcases hv with rfl | hv
+            · exact Nat.le_refl _
+            · exact le_trans (Nat.le_succ _) (ih (next + 1) ys v hv)
+
+/-- The lex allocator never reuses an auxiliary DIMACS variable. -/
+theorem lexFreshIds_nodup (next : Nat) (left right : List Nat) :
+    (lexFreshIds next left right).Nodup := by
+  induction left generalizing right next with
+  | nil => cases right <;> simp [lexFreshIds]
+  | cons x xs ih =>
+      cases right with
+      | nil => simp [lexFreshIds]
+      | cons y ys =>
+          by_cases hxy : x = y
+          · simpa [lexFreshIds, hxy] using ih next ys
+          · apply List.nodup_cons.mpr
+            constructor
+            · intro h
+              have hge := lexFreshIds_ge (next + 1) xs ys next h
+              omega
+            · exact ih (next + 1) ys
+
+/-- Identical DIMACS variables have the same assigned bit, which justifies
+skipping that position without an auxiliary equality gate. -/
+theorem identical_variables_same_value (a : Nat → Bool) {x y : Nat}
+    (hxy : x = y) : a x = a y := by
+  subst y
+  rfl
 
 /-- DIMACS clauses for an equality-prefix gate are satisfied when `same` is
 assigned the exact prefix conjunction. -/
