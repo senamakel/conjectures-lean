@@ -57,11 +57,11 @@ private theorem reverseIndex_eq {n : ℕ} (s : ℕ) (hs : s + 7 < n)
       windowIndex (n - 8 - s) (by omega) i := by
   have hi : (Fin.rev i).val = 7 - i.val := by
     simp [Fin.rev]
-  have hn : n - 1 - (s + (Fin.rev i).val) = n - 8 - s + i.val := by
+  have hn : n - (s + (Fin.rev i).val + 1) = n - 8 - s + i.val := by
     rw [hi]
     omega
   apply Fin.ext
-  simpa [Fin.revPerm_apply] using hn
+  simpa [Fin.revPerm_apply, windowIndex] using hn
 
 private theorem reverseIndex_rev_eq {n : ℕ} (s : ℕ) (hs : s + 7 < n)
     (i : Fin 8) :
@@ -84,7 +84,7 @@ private theorem containsAt_reverse_iff {n : ℕ} (π : Equiv.Perm (Fin n))
     have h := hrev (Fin.rev i) (Fin.rev j)
     have hi := reverseIndex_eq s.val hs i
     have hj := reverseIndex_eq s.val hs j
-    change (π (Fin.revPerm (windowIndex s.val hs (Fin.rev i)) <
+    change ((π (Fin.revPerm (windowIndex s.val hs (Fin.rev i))) <
       π (Fin.revPerm (windowIndex s.val hs (Fin.rev j)))) ↔
       reversePattern p (Fin.rev i) < reversePattern p (Fin.rev j) at h
     rw [hi, hj] at h
@@ -118,7 +118,6 @@ theorem occurrenceSet_reverse {n : ℕ} (p : Fin 8 → Fin 8)
     · have hstart : (reverseStartEquiv n s).val = n - 8 - s.val := by
         change (reverseStartFun s).val = n - 8 - s.val
         rw [reverseStartFun, dif_pos hv]
-        rfl
       exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, by simpa [hstart] using hsource⟩
     · exact reverseStartFun_involutive s
   · intro hs
@@ -126,7 +125,7 @@ theorem occurrenceSet_reverse {n : ℕ} (p : Fin 8 → Fin 8)
     change reverseStartFun t = s at hts
     have hc := (Finset.mem_filter.mp ht).2
     have hvt := hc.1
-    have hts0 : reverseStartFun t = s := by simpa [reverseStartEquiv] using hts
+    have hts0 : reverseStartFun t = s := hts
     have hts' : t = reverseStartFun s := by
       calc
         t = reverseStartFun (reverseStartFun t) := (reverseStartFun_involutive t).symm
