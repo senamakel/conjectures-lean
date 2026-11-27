@@ -35,6 +35,11 @@ noncomputable def legendreBadGapIndices (a : ℕ) : Finset ℕ := by
   classical
   exact (legendreBadBlock a).image squareGapIndex
 
+/-- Long prime gaps with left endpoint in one dyadic prime block. -/
+noncomputable def longGapBlock (x h : ℕ) : Finset ℕ := by
+  classical
+  exact (block x).filter (fun k => h ≤ primeGap k)
+
 lemma squareInterval_card (n : ℕ) : (squareInterval n).card = 2 * n + 1 := by
   simp [squareInterval]
   have h : (n + 1) ^ 2 = n ^ 2 + (2 * n + 1) := by ring
@@ -113,6 +118,69 @@ lemma legendreFailure_squareInterval_subset_gap {n : ℕ} (hn : 2 ≤ n)
   obtain ⟨hnext, hprev, _⟩ := legendreFailure_gap hn hbad
   simpa [primeGapInterval, squareGapIndex] using
     squareInterval_subset_gap (Nat.le_of_lt hprev) hnext
+
+lemma mem_block_of_nth_prime_bounds {k x : ℕ}
+    (hlo : x ≤ k.nth Nat.Prime) (hhi : k.nth Nat.Prime < 2 * x) : k ∈ block x := by
+  simp only [block, Finset.mem_Ico]
+  constructor
+  · by_contra h
+    have hk : k < idx x := by omega
+    have hp : k.nth Nat.Prime < x := nth_lt_of_lt_idx hk
+    omega
+  · by_contra h
+    have hk : idx (2 * x) ≤ k := by omega
+    have hp : 2 * x ≤ k.nth Nat.Prime := le_nth_of_idx_le hk
+    omega
+
+/-- The gap indices of failed square intervals in `[a,2a)` lie in three consecutive
+prime-index blocks, and all these gaps have length at least `2a`. The hypothesis that `a`
+is even makes the first prime scale exactly `a^2 / 2`. -/
+theorem legendreBadGapIndices_subset_three_blocks (a : ℕ) (ha : 2 ≤ a)
+    (haEven : 2 ∣ a) :
+    legendreBadGapIndices a ⊆
+      longGapBlock (a ^ 2 / 2) (2 * a) ∪
+        longGapBlock (a ^ 2) (2 * a) ∪ longGapBlock (2 * a ^ 2) (2 * a) := by
+  classical
+  intro k hk
+  rcases Finset.mem_image.mp hk with ⟨n, hn, rfl⟩
+  have hnmem := (Finset.mem_filter.mp hn).1
+  have hnlo : a ≤ n := (Finset.mem_Ico.mp hnmem).1
+  have hnhi : n < 2 * a := (Finset.mem_Ico.mp hnmem).2
+  have hbad := (Finset.mem_filter.mp hn).2
+  have hgap := legendreFailure_gap (le_trans ha hnlo) hbad
+  have hpnext_le : (squareGapIndex n + 1).nth Nat.Prime ≤
+      2 * (squareGapIndex n).nth Nat.Prime := nth_succ_le_two_mul _
+  have hn2 : a ^ 2 ≤ n ^ 2 := Nat.pow_le_pow_left hnlo 2
+  have hnn : n ^ 2 ≤ (n + 1) ^ 2 := Nat.pow_le_pow_left (Nat.le_succ n) 2
+  have hnextLower : a ^ 2 ≤ (squareGapIndex n + 1).nth Nat.Prime :=
+    hn2.trans (hnn.trans hgap.1)
+  have hdiv : 2 ∣ a ^ 2 := by
+    rw [pow_two]
+    exact dvd_mul_of_dvd_left haEven a
+  have hfirst : 2 * (a ^ 2 / 2) = a ^ 2 := Nat.mul_div_cancel' hdiv
+  have hfirstLower : a ^ 2 / 2 ≤ (squareGapIndex n).nth Nat.Prime := by
+    have := hnextLower.trans hpnext_le
+    rw [← hfirst] at this
+    omega
+  have hnlt : n ^ 2 < (2 * a) ^ 2 := Nat.pow_lt_pow_left hnhi (by decide)
+  have hupperScale : (2 * a) ^ 2 = 4 * a ^ 2 := by ring
+  have hlastUpper : (squareGapIndex n).nth Nat.Prime < 2 * (2 * a ^ 2) := by
+    rw [hupperScale] at hnlt
+    exact lt_trans hgap.2.1 hnlt
+  have hlong : 2 * a ≤ primeGap (squareGapIndex n) := by omega
+  by_cases hfirst : (squareGapIndex n).nth Nat.Prime < a ^ 2
+  · have hmem := mem_block_of_nth_prime_bounds hfirstLower hfirst
+    simp only [longGapBlock, Finset.mem_filter, hmem, true_and]
+    exact Or.inl hlong
+  · have hsecondLower : a ^ 2 ≤ (squareGapIndex n).nth Nat.Prime := le_of_not_gt hfirst
+    by_cases hsecond : (squareGapIndex n).nth Nat.Prime < 2 * a ^ 2
+    · have hmem := mem_block_of_nth_prime_bounds hsecondLower hsecond
+      simp only [longGapBlock, Finset.mem_filter, hmem, true_and]
+      exact Or.inr (Or.inl hlong)
+    · have hthirdLower : 2 * a ^ 2 ≤ (squareGapIndex n).nth Nat.Prime := le_of_not_gt hsecond
+      have hmem := mem_block_of_nth_prime_bounds hthirdLower hlastUpper
+      simp only [longGapBlock, Finset.mem_filter, hmem, true_and]
+      exact Or.inr (Or.inr hlong)
 
 /-- The total square-interval length in one block is bounded by the total length of
 the prime gaps which contain those intervals. -/
