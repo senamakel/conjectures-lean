@@ -8,6 +8,14 @@ namespace SplitGraphOneOutsider
 
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
+private theorem sublist_append_self (l r : List V) : l.Sublist (l ++ r) := by
+  induction l with
+  | nil =>
+    induction r with
+    | nil => exact List.Sublist.refl []
+    | cons a r ih => exact List.Sublist.cons a ih
+  | cons a l ih => exact List.Sublist.cons_cons a ih
+
 private theorem clique_list_chain (G : SimpleGraph V) (C : Finset V)
     (hC : G.IsClique (C : Set V)) (l : List V) (hnodup : l.Nodup)
     (hsub : ∀ x ∈ l, x ∈ C) : l.IsChain G.Adj := by
@@ -50,7 +58,6 @@ theorem hamiltonian_of_one_outsider_shared_pair_path
     (hpartition : (Finset.univ : Finset V) = C ∪ I)
     (hI : I = {a, b, c, z})
     (hpathNodup : (([z, x, a, t, c, u] ++ spare ++ [y, b]) : List V).Nodup)
-    (hsegmentNodup : ([u] ++ spare ++ [y]).Nodup)
     (hu : u ∈ C) (hy : y ∈ C)
     (hspareC : ∀ v ∈ spare, v ∈ C)
     (hcoverC : ∀ v ∈ C, v ∈ ([u] ++ spare ++ [y]))
@@ -62,6 +69,14 @@ theorem hamiltonian_of_one_outsider_shared_pair_path
   let segment : List V := [u] ++ spare ++ [y]
   let tail : List V := segment ++ [b]
   let path := core ++ tail
+  have hsegmentSubPath : segment.Sublist path := by
+    have hsegTail : segment.Sublist tail := by
+      exact sublist_append_self segment [b]
+    dsimp [path, core]
+    exact List.Sublist.cons z (List.Sublist.cons x (List.Sublist.cons a
+      (List.Sublist.cons t (List.Sublist.cons c hsegTail))))
+  have hsegmentNodup : segment.Nodup := hsegmentSubPath.nodup (by
+    simpa [path, core, tail, segment, List.append_assoc] using hpathNodup)
   have hcoreChain : core.IsChain G.Adj := by
     simp [core, List.isChain_cons, hzx, hxa, hat, htc]
   have hsegmentC : ∀ v ∈ segment, v ∈ C := by
