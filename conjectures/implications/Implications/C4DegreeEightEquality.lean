@@ -66,6 +66,8 @@ theorem degree_seven_count_eq_sixteen
             _ = 2 * D8.card := Nat.mul_comm _ _
         rw [h7, h8']
   have h8' : D8.card = 4 := by simpa [D8] using h8
+  rw [hclass, h8'] at hsumExcess
+  change D7.card = 16
   omega
 
 /-- Let `v` have degree eight in a 42-vertex C4-free graph with minimum
@@ -85,8 +87,9 @@ theorem every_other_vertex_has_unique_common_neighbor
   let U := S.biUnion O
   have hScard : S.card = 8 := by
     simpa [S, G.card_neighborFinset_eq_degree] using hv
-  have hsumExcessLe := C4DegreeBounds.neighbor_degree_excess_le_one_of_degree_eight
-    G v (by simp) hmin hC4 hv
+  have hsumExcessLe : (∑ u ∈ S, (G.degree u - 6)) ≤ 1 := by
+    simpa [S] using C4DegreeBounds.neighbor_degree_excess_le_one_of_degree_eight
+      G v (by simp) hmin hC4 hv
   have hseven_nonempty : (S ∩ Finset.univ.filter fun u => G.degree u = 7).Nonempty := by
     apply Finset.card_pos.mp
     rw [hseven]
@@ -108,13 +111,13 @@ theorem every_other_vertex_has_unique_common_neighbor
         exact (Nat.sub_add_cancel (hmin u)).symm
       _ = (∑ u ∈ S, (G.degree u - 6)) + S.card * 6 := by
         simp [Finset.sum_add_distrib]
-      _ = 49 := by rw [hsumExcess, hScard]; norm_num
+      _ = 49 := by norm_num [hsumExcess, hScard]
   have houterTerm : ∀ u ∈ S, (O u).card = G.degree u - 1 := by
     intro u hu
     have hvu : G.Adj v u := (G.mem_neighborFinset v u).mp hu
     have huv : v ∈ G.neighborFinset u :=
       (G.mem_neighborFinset u v).mpr (G.symm.symm v u hvu)
-    change #((G.neighborFinset u).erase v) = G.degree u - 1
+    change ((G.neighborFinset u).erase v).card = G.degree u - 1
     rw [Finset.card_erase_of_mem huv, G.card_neighborFinset_eq_degree]
   have houterSum : (∑ u ∈ S, (O u).card) = 41 := by
     have hsumId : (∑ u ∈ S, G.degree u) =
