@@ -191,7 +191,7 @@ axioms. The unbounded parameter ranges in #4990 remain open.
 
 [CrystalSharedPartners.lean](CrystalSharedPartners.lean) checks a
 second finite range, this time with the reduced components `x < y`
-fixed while the common divisor `g) may vary. Write
+fixed while the common divisor `g` may vary. Write
 `(y*z+1)*r = (g*x−1)²` and `(x*z+1)*s = (g*y−1)²` for the two
 Vieta partners. The scaled difference `d = x³*s−y³*r` satisfies
 `0 < d < min(2*x²,x*y)*(y−x)`. The second upper bound follows
