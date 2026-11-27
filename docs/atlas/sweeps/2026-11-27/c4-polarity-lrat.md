@@ -62,6 +62,6 @@ from that list. The replay artifact is generated locally; the Lean proof
 checks its contents even if a different artifact is supplied.
 
 The replay uses one `native_decide` axiom for the 114,126 LRAT actions
-(10,738,280 bytes) and signed literal validation. The automorphism check
+(11,243,269 bytes) and signed literal validation. The automorphism check
 uses a separate finite `native_decide` certificate. The general
 42-vertex extremal question remains open.
