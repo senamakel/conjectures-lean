@@ -104,8 +104,114 @@ private theorem swap13_45162783 : pattern45162783 ∘ swap13 = pattern46152783 :
 private theorem swap13_46152783 : pattern46152783 ∘ swap13 = pattern45162783 := by
   funext i; fin_cases i <;> rfl
 
-private theorem checks (p : Fin 8 → Fin 8) :
-    ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true ↔ d = 5 ∨ d = 7 := by
-  intro d hd hs
-  interval_cases d <;> decide
+theorem exactOccurrenceCount_eq_34265781_35264781 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern34265781) marks =
+      WilfCounts.exactCount (occurrenceSet pattern35264781) marks := by
+  exact exactCount_eq_of_stationaryMax n marks pattern34265781 pattern35264781 swap14
+    (by decide) (by decide) swap14_34265781 swap14_35264781
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+
+theorem exactOccurrenceCount_eq_34265781_36254781 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern34265781) marks =
+      WilfCounts.exactCount (occurrenceSet pattern36254781) marks := by
+  exact exactCount_eq_of_stationaryMax n marks pattern34265781 pattern36254781 cycle.symm
+    (by decide) (by decide) cycleInv_34265781 cycle_36254781
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+
+theorem exactOccurrenceCount_eq_34165782_36154782 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern34165782) marks =
+      WilfCounts.exactCount (occurrenceSet pattern36154782) marks := by
+  exact exactCount_eq_of_stationaryMax n marks pattern34165782 pattern36154782 cycle.symm
+    (by decide) (by decide) cycleInv_34165782 cycle_36154782
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+
+theorem exactOccurrenceCount_eq_34165782_35164782 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern34165782) marks =
+      WilfCounts.exactCount (occurrenceSet pattern35164782) marks := by
+  exact exactCount_eq_of_stationaryMax n marks pattern34165782 pattern35164782 swap14
+    (by decide) (by decide) swap14_34165782 swap14_35164782
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+
+theorem exactOccurrenceCount_eq_46352781_45362781 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern46352781) marks =
+      WilfCounts.exactCount (occurrenceSet pattern45362781) marks := by
+  exact exactCount_eq_of_stationaryMax n marks pattern46352781 pattern45362781 swap13
+    (by decide) (by decide) swap13_46352781 swap13_45362781
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+
+theorem exactOccurrenceCount_eq_46253781_45263781 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern46253781) marks =
+      WilfCounts.exactCount (occurrenceSet pattern45263781) marks := by
+  exact exactCount_eq_of_stationaryMax n marks pattern46253781 pattern45263781 swap13
+    (by decide) (by decide) swap13_46253781 swap13_45263781
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+
+theorem exactOccurrenceCount_eq_46351782_45361782 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern46351782) marks =
+      WilfCounts.exactCount (occurrenceSet pattern45361782) marks := by
+  exact exactCount_eq_of_stationaryMax n marks pattern46351782 pattern45361782 swap13
+    (by decide) (by decide) swap13_46351782 swap13_45361782
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+
+theorem exactOccurrenceCount_eq_46153782_45163782 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern46153782) marks =
+      WilfCounts.exactCount (occurrenceSet pattern45163782) marks := by
+  exact exactCount_eq_of_stationaryMax n marks pattern46153782 pattern45163782 swap13
+    (by decide) (by decide) swap13_46153782 swap13_45163782
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+
+theorem exactOccurrenceCount_eq_45261783_46251783 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern45261783) marks =
+      WilfCounts.exactCount (occurrenceSet pattern46251783) marks := by
+  exact exactCount_eq_of_stationaryMax n marks pattern45261783 pattern46251783 swap13
+    (by decide) (by decide) swap13_45261783 swap13_46251783
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+
+theorem exactOccurrenceCount_eq_45162783_46152783 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern45162783) marks =
+      WilfCounts.exactCount (occurrenceSet pattern46152783) marks := by
+  exact exactCount_eq_of_stationaryMax n marks pattern45162783 pattern46152783 swap13
+    (by decide) (by decide) swap13_45162783 swap13_46152783
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by intro d hd hs; interval_cases d <;> decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+
+#print axioms exactOccurrenceCount_eq_34265781_35264781
+#print axioms exactOccurrenceCount_eq_34265781_36254781
+#print axioms exactOccurrenceCount_eq_34165782_36154782
+#print axioms exactOccurrenceCount_eq_34165782_35164782
+#print axioms exactOccurrenceCount_eq_46352781_45362781
+#print axioms exactOccurrenceCount_eq_46253781_45263781
+#print axioms exactOccurrenceCount_eq_46351782_45361782
+#print axioms exactOccurrenceCount_eq_46153782_45163782
+#print axioms exactOccurrenceCount_eq_45261783_46251783
+#print axioms exactOccurrenceCount_eq_45162783_46152783
 
