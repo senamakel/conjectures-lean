@@ -38,10 +38,7 @@ private theorem c4Free_induce {α : Type*} (G : SimpleGraph α)
     exact hzw (Subtype.ext hval)
   · simpa only [SimpleGraph.induce_adj] using hxz
   · simpa only [SimpleGraph.induce_adj] using hyz
-  · intro h
-    apply htwo
-    exact ⟨by simpa only [SimpleGraph.induce_adj] using h.1,
-      by simpa only [SimpleGraph.induce_adj] using h.2⟩
+  · simpa only [SimpleGraph.induce_adj] using htwo
 
 /-- Assuming the published general 41-vertex C4-free edge bound, every
 one-vertex deletion from the 42-vertex survivor graph has at most 132 edges.
@@ -57,10 +54,11 @@ theorem survivorDeletionBound_of_ex41C4Bound
   let H := C4PolarityOrderSeven.graph.induce (R : Set (Fin 57))
   let K := H.induce ({v}ᶜ : Set {i // i ∈ R})
   have hRcard : R.card = 42 := by
+    change (Finset.univ \ D).card = 42
     rw [Finset.card_sdiff_of_subset (Finset.subset_univ D)]
     simp [hCand.1]
   have hHcard : Fintype.card {i // i ∈ R} = 42 := by
-    simpa [R] using hRcard
+    simpa only [Fintype.card_coe] using hRcard
   have hKcard : Fintype.card {i : {i // i ∈ R} // i ∈ ({v}ᶜ : Set {i // i ∈ R})} = 41 := by
     change Fintype.card {i : {i // i ∈ R} // i ≠ v} = 41
     have hcard := Fintype.card_subtype_compl (p := fun i : {i // i ∈ R} => i = v)
@@ -68,7 +66,8 @@ theorem survivorDeletionBound_of_ex41C4Bound
   have hHfree := c4Free_induce C4PolarityOrderSeven.graph
     C4PolarityOrderSeven.c4_free (R : Set (Fin 57))
   have hKfree := c4Free_induce H hHfree ({v}ᶜ : Set {i // i ∈ R})
-  exact hEx41 K hKcard hKfree
+  exact hEx41 (α := {i : {i // i ∈ R} // i ∈ ({v}ᶜ : Set {i // i ∈ R})})
+    K hKcard hKfree
 
 #print axioms survivorDeletionBound_of_ex41C4Bound
 
