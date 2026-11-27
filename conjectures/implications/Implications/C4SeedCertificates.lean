@@ -3,16 +3,20 @@ import Mathlib.Data.Nat.Bitwise
 /-!
 # Finite certificates for the three published 41-vertex `C₄` extremal seeds
 
-The sparse6 records in McKay's `c4_n41e132.maybe.s6` are represented here by
-their 41 neighbourhood bitmasks.  For vertices `u` and `v`, having no common
+The three sparse6 records in McKay's `c4_n41e132.maybe.s6` are represented here
+by their 41 neighbourhood bitmasks.  Their SHA-256 digests, in order, are
+`4033a0cc2e1e8f6d7cb05009d2ed0b0cfcec9ce969d76c6ed2faec68b3405927`,
+`7b21f509d31f8002aba9c00d5a21a1db422177bd6a832cee6b4e80dad460db60`, and
+`8282afa2558555cbdad70ff78767b188cd328b83626e8b59c0f11ad31e000042`.
+Each record decodes to 41 vertices and 132 edges.  For vertices `u` and `v`, having no common
 neighbour is the bitwise condition `land (N u) (N v) = 0`.
 
 `compatibleCliqueSearch` is a depth-pruned search.  It either skips the next
 candidate, or takes it and restricts later candidates to vertices compatible
 with it.  The proposition-valued recursion is itself the search's
-specification; `checker` turns that proposition into a Boolean decision.  The
-three closed Boolean results below are checked by `native_decide`, and
-`checker_false` converts each Boolean result back to the proposition.
+specification, proved equivalent to the Boolean checker by `search_correct`.
+The three closed Boolean results below are checked by `native_decide`, and
+`checker_false` converts each Boolean result back to its proposition.
 
 This certifies only that the three supplied seeds have no compatible
 six-element set.  It makes no claim that the list of seeds is exhaustive.
@@ -113,5 +117,9 @@ theorem seed3_no_compatible_six :
     ¬ ExistsCompatibleClique seed3 (List.range 41) 6 := by
   apply checker_false
   native_decide
+
+#print axioms seed1_no_compatible_six
+#print axioms seed2_no_compatible_six
+#print axioms seed3_no_compatible_six
 
 end C4SeedCertificates
