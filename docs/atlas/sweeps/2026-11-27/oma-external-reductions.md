@@ -137,6 +137,12 @@ Marcus Buffett’s [direct three-sphere homology proof #5306](https://github.com
 
 The public finite-triangulation theorem assumes a smooth atlas and provides an abstract finite order complex. The exact topological triangulation leaf of #4604 requires a geometric complex with link and affine-star conditions. Using smoothability as an input to this leaf would return to the parent obligation. The two statements were checked against the source, and no submission was made on this route. [Public triangulation theorem](https://github.com/frenzymath/PoincareConjecture/blob/62db01af9388dc1d9b56b66d6674f4c09b2318a2/PoincareLib/Topology/Manifold/ThreeDimensional/Triangulation/Polyhedral/ThreeManifoldTriangulation.lean)
 
+### Direct top-homology vanishing and the elliptization route
+
+Marcus Buffett’s [direct parent H2 proof #5396](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/5396) proves vanishing of top homology on a connected noncompact 3-manifold. It uses the public PoincareLib chain and compact-support constructions. An independent pinned checker replay accepted the exact proof with the three standard axioms. If it registers, its proof closes the entire parent H2 obligation, so further point-detection submissions are on hold while it proceeds.
+
+[Alternative Poincaré reduction #5428](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/5428) separates compactness of a manifold homotopy equivalent to the three-sphere from spherical elliptization in covering-space form. Its exact reduction also passed an independent pinned replay with the three standard axioms. Both obligations would remain open until supported by registered proofs.
+
 ### Smooth Poincaré endpoint
 
 The exact smooth leaf from [#4609](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4609) matches the public smooth Poincaré statement for compact, second-countable, simply connected smooth 3-manifolds. The source proves finite extinction of a calibrated Ricci flow and reconstructs the starting manifold by reversing surgeries on that same flow. These steps use Ricci flow and surgery interfaces absent from the pinned Mathlib. A faithful OMA reduction of this leaf requires porting those interfaces. [Public Lean statement](https://github.com/frenzymath/PoincareConjecture/blob/62db01af9388dc1d9b56b66d6674f4c09b2318a2/PoincareLib/Topology/Manifold/Poincare/Statement.lean)
