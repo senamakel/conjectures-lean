@@ -110,7 +110,7 @@ assigned the exact prefix conjunction. -/
 theorem lexStep_auxiliary_assignment_satisfies (a : Nat → Bool)
     (pref x y same : Nat) (hp0 : 0 < pref) (hx0 : 0 < x)
     (hy0 : 0 < y) (hs0 : 0 < same)
-    (hp : a pref = true) (hx : a x = true) (hy : a y = false)
+    (hguard : (!a pref || a x || !a y) = true)
     (hs : a same = (a pref && (a x == a y))) :
     cnfValue a (lexStepClauses pref x y same) = true := by
   simp only [cnfValue, List.all_cons, List.all_nil, clauseValue, List.any_cons,
@@ -119,7 +119,8 @@ theorem lexStep_auxiliary_assignment_satisfies (a : Nat → Bool)
     literalValue_neg a y hy0, literalValue_neg a same hs0,
     literalValue_pos a pref hp0, literalValue_pos a x hx0,
     literalValue_pos a y hy0, literalValue_pos a same hs0]
-  simp [pos, hp, hx, hy, hs]
+  cases hp : a pref <;> cases hx : a x <;> cases hy : a y <;>
+    simp_all [pos, hguard, hs]
 
 end Implications.C4PolarityLexEncoding
 
