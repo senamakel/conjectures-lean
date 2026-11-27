@@ -241,4 +241,108 @@ theorem legendreBadBlock_length_le_gapSum (a : ℕ) (ha : 2 ≤ a) :
           _ = ∑ k ∈ G, (primeGap k : ℝ) := by simp [primeGapInterval, primeGap]
   exact hlower.trans hupper
 
+open Filter
+
+/-- Under RH there are eventually at most a constant times `log a ^ 2`
+Legendre failures with index in `[a, 2a)` at even scales. -/
+theorem eventually_legendreBadBlock_le_log_sq_of_RH (hRH : RiemannHypothesis) :
+    ∃ K : ℝ, 0 < K ∧ ∀ᶠ a : ℕ in atTop,
+      2 ∣ a → ((legendreBadBlock a).card : ℝ) ≤ K * Real.log (a : ℝ) ^ 2 := by
+  obtain ⟨C, X₀, hC, hgap⟩ := large_gaps_of_RH hRH
+  let A : ℝ := 256 * 36 / Real.log 2
+  have hlog2 : 0 < Real.log 2 := Real.log_pos (by norm_num)
+  have hA : 0 < A := by dsimp [A]; positivity
+  have hsmallReal := (Real.isLittleO_pow_log_id_atTop (n := 2)).def
+    (show 0 < 2 / A by positivity)
+  have hsmall : ∀ᶠ a : ℕ in atTop, A * Real.log (a : ℝ) ^ 2 ≤ 2 * (a : ℝ) := by
+    filter_upwards [tendsto_natCast_atTop_atTop.eventually hsmallReal] with a ha
+    have hh : Real.log (a : ℝ) ^ 2 ≤ (2 / A) * (a : ℝ) := by
+      simpa [Real.norm_eq_abs, abs_of_nonneg (sq_nonneg (Real.log (a : ℝ))),
+        abs_of_nonneg (show (0 : ℝ) ≤ (a : ℝ) from Nat.cast_nonneg a)] using ha
+    calc
+      _ ≤ A * ((2 / A) * (a : ℝ)) := mul_le_mul_of_nonneg_left hh hA.le
+      _ = _ := by field_simp
+  refine ⟨27 * C / 2, by positivity, ?_⟩
+  filter_upwards [hsmall, Filter.eventually_ge_atTop (2 : ℕ),
+    tendsto_natCast_atTop_atTop.eventually (Filter.eventually_ge_atTop X₀)] with
+    a haSmall ha hXa
+  intro hEven
+  have haR : (2 : ℝ) ≤ a := by exact_mod_cast ha
+  have haPos : (0 : ℝ) < a := by linarith
+  have haLog : 0 ≤ Real.log (a : ℝ) := Real.log_nonneg (by linarith)
+  have haSq : a * 2 ≤ a ^ 2 := by nlinarith [Nat.mul_sub_left_distrib a a 2]
+  have haHalf : a ≤ a ^ 2 / 2 := (Nat.le_div_iff_mul_le (by decide)).mpr haSq
+  have hblock (x : ℕ) (hax : a ≤ x) (hxUpper : x ≤ 2 * a ^ 2) :
+      ∑ k ∈ longGapBlock x (2 * a), (primeGap k : ℝ) ≤
+        9 * C * a * Real.log (a : ℝ) ^ 2 := by
+    have haxR : (a : ℝ) ≤ x := by exact_mod_cast hax
+    have hxUpperR : (x : ℝ) ≤ 2 * (a : ℝ) ^ 2 := by exact_mod_cast hxUpper
+    have hxPos : (0 : ℝ) < x := haPos.trans_le haxR
+    have hxLog : 0 ≤ Real.log (x : ℝ) := Real.log_nonneg (by linarith)
+    have haPow4 : (16 : ℝ) ≤ (a : ℝ) ^ 4 := by
+      have hh := pow_le_pow_left₀ (by norm_num : (0 : ℝ) ≤ 2) haR 4
+      norm_num at hh ⊢
+      exact hh
+    have hscale : 5 * (x : ℝ) ≤ (a : ℝ) ^ 6 := by
+      calc
+        _ ≤ 10 * (a : ℝ) ^ 2 := by linarith
+        _ ≤ (a : ℝ) ^ 4 * (a : ℝ) ^ 2 := by gcongr; linarith
+        _ = _ := by ring
+    have hlogUpper : Real.log (5 * (x : ℝ)) ≤ 6 * Real.log (a : ℝ) := by
+      simpa [Real.log_pow] using Real.log_le_log (by positivity : 0 < 5 * (x : ℝ)) hscale
+    have hxLog5 : 0 ≤ Real.log (5 * (x : ℝ)) := Real.log_nonneg (by linarith)
+    have hthr : 256 * (Real.log (5 * (x : ℝ)) ^ 2 / Real.log 2) ≤ 2 * (a : ℝ) := by
+      calc
+        _ ≤ 256 * ((6 * Real.log (a : ℝ)) ^ 2 / Real.log 2) := by gcongr
+        _ = A * Real.log (a : ℝ) ^ 2 := by dsimp [A]; ring
+        _ ≤ _ := haSmall
+    have hh := hgap x (hXa.trans haxR) (2 * (a : ℝ)) hthr (by linarith)
+    have hFilter : ((block x).filter (fun k => 2 * (a : ℝ) ≤ (primeGap k : ℝ))) =
+        longGapBlock x (2 * a) := by
+      classical
+      ext k
+      simp only [longGapBlock, Finset.mem_filter]
+      exact_mod_cast Iff.rfl
+    rw [hFilter] at hh
+    have hlog : Real.log (x : ℝ) ≤ 3 * Real.log (a : ℝ) := by
+      have hpow : (x : ℝ) ≤ (a : ℝ) ^ 3 := by
+        nlinarith [mul_nonneg (sub_nonneg.mpr haR) (sq_nonneg (a : ℝ))]
+      simpa [Real.log_pow] using Real.log_le_log hxPos hpow
+    calc
+      _ ≤ C * (x : ℝ) * Real.log (x : ℝ) ^ 2 / (2 * (a : ℝ)) := hh
+      _ ≤ C * (2 * (a : ℝ) ^ 2) * (3 * Real.log (a : ℝ)) ^ 2 / (2 * (a : ℝ)) := by
+        gcongr
+      _ = _ := by field_simp; ring
+  classical
+  have hunion (s t : Finset ℕ) : (∑ k ∈ s ∪ t, (primeGap k : ℝ)) ≤
+      (∑ k ∈ s, (primeGap k : ℝ)) + ∑ k ∈ t, (primeGap k : ℝ) := by
+    have h := Finset.sum_union_inter (s₁ := s) (s₂ := t) (f := fun k => (primeGap k : ℝ))
+    have hnonneg : 0 ≤ ∑ k ∈ s ∩ t, (primeGap k : ℝ) := by positivity
+    linarith
+  have hlen := legendreBadBlock_length_le_gapSum a ha
+  have hsub := Finset.sum_le_sum_of_subset_of_nonneg
+    (legendreBadGapIndices_subset_three_blocks a ha hEven)
+      (f := fun k => (primeGap k : ℝ)) (by intros; positivity)
+  let B := longGapBlock (a ^ 2 / 2) (2 * a)
+  let D := longGapBlock (a ^ 2) (2 * a)
+  let E := longGapBlock (2 * a ^ 2) (2 * a)
+  have hsum := hunion (B ∪ D) E
+  have hsum' := hunion B D
+  have hB : (∑ k ∈ B, (primeGap k : ℝ)) ≤ 9 * C * a * Real.log (a : ℝ) ^ 2 :=
+    hblock _ haHalf (by have := Nat.div_le_self (a ^ 2) 2; omega)
+  have hD : (∑ k ∈ D, (primeGap k : ℝ)) ≤ 9 * C * a * Real.log (a : ℝ) ^ 2 :=
+    hblock _ (by omega) (by omega)
+  have hE : (∑ k ∈ E, (primeGap k : ℝ)) ≤ 9 * C * a * Real.log (a : ℝ) ^ 2 :=
+    hblock _ (by omega) le_rfl
+  change (∑ k ∈ legendreBadGapIndices a, (primeGap k : ℝ)) ≤
+    ∑ k ∈ B ∪ D ∪ E, (primeGap k : ℝ) at hsub
+  apply (mul_le_mul_iff_right₀ (show (0 : ℝ) < 2 * (a : ℝ) by positivity)).mp
+  calc
+    _ ≤ 27 * C * a * Real.log (a : ℝ) ^ 2 := by linarith
+    _ = _ := by ring
+
+#print axioms legendreBadGapIndices_subset_three_blocks
+#print axioms legendreBadBlock_length_le_gapSum
+#print axioms eventually_legendreBadBlock_le_log_sq_of_RH
+
 end Erdos233
