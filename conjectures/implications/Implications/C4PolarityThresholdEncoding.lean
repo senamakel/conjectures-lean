@@ -199,6 +199,7 @@ def ThresholdGate.Ordered : List ThresholdGate → Prop
   | [] => True
   | gate :: gates =>
       0 < gate.output ∧
+      gate.above ≠ 0 ∧ gate.input ≠ 0 ∧ gate.below ≠ 0 ∧
       gate.above.natAbs < gate.output ∧
       gate.input.natAbs < gate.output ∧
       gate.below.natAbs < gate.output ∧
@@ -219,6 +220,68 @@ theorem extendThresholdGates_preserves (assignment : Nat → Bool)
           (thresholdGateValue assignment gate) lit (hfresh gate (by simp))
       · intro later hlater
         exact hfresh later (by simp [hlater])
+
+/-- Every gate in an ordered chain is satisfied after the chain assigns all
+fresh output variables in order. -/
+theorem thresholdGateList_satisfies (assignment : Nat → Bool)
+    (gates : List ThresholdGate) (hordered : ThresholdGate.Ordered gates) :
+    ∀ gate ∈ gates,
+      cnfValue (extendThresholdGates assignment gates)
+        (thresholdGateDimacs gate.above gate.input gate.below (Int.ofNat gate.output)) = true := by
+  induction gates generalizing assignment with
+  | nil => simp
+  | cons gate gates ih =>
+      rcases hordered with ⟨hpos, hAboveNe, hInputNe, hBelowNe,
+        hAboveLt, hInputLt, hBelowLt, hLater, hTail⟩
+      intro current hmem
+      cases hmem with
+      | head =>
+        let afterGate := extendThresholdGate assignment gate
+        let finalAssignment := extendThresholdGates afterGate gates
+        have hAbovePres : literalValue finalAssignment gate.above =
+            literalValue assignment gate.above := by
+          change literalValue (extendThresholdGates afterGate gates) gate.above = _
+          apply extendThresholdGates_preserves
+          intro later hlaterMem
+          have hlt := hLater later hlaterMem
+          omega
+        have hInputPres : literalValue finalAssignment gate.input =
+            literalValue assignment gate.input := by
+          change literalValue (extendThresholdGates afterGate gates) gate.input = _
+          apply extendThresholdGates_preserves
+          intro later hlaterMem
+          have hlt := hLater later hlaterMem
+          omega
+        have hBelowPres : literalValue finalAssignment gate.below =
+            literalValue assignment gate.below := by
+          change literalValue (extendThresholdGates afterGate gates) gate.below = _
+          apply extendThresholdGates_preserves
+          intro later hlaterMem
+          have hlt := hLater later hlaterMem
+          omega
+        have hOutputPres : literalValue finalAssignment (Int.ofNat gate.output) =
+            thresholdGateValue assignment gate := by
+          change literalValue (extendThresholdGates afterGate gates)
+            (Int.ofNat gate.output) = _
+          calc
+            _ = literalValue afterGate (Int.ofNat gate.output) := by
+              apply extendThresholdGates_preserves
+              intro later hlaterMem
+              have hlt := hLater later hlaterMem
+              simp only [Int.natAbs_natCast]
+              omega
+            _ = thresholdGateValue assignment gate := by
+              simp [afterGate, extendThresholdGate, literalValue_extendVariable_self]
+        have hOutputNe : Int.ofNat gate.output ≠ 0 := by
+          intro hz
+          have hnat : gate.output = 0 := Int.ofNat.inj (by simpa using hz)
+          omega
+        apply (thresholdGateDimacs_iff finalAssignment gate.above gate.input gate.below
+          (Int.ofNat gate.output) hAboveNe hInputNe hBelowNe hOutputNe).2
+        rw [hOutputPres, hAbovePres, hInputPres, hBelowPres]
+        rfl
+      | tail _ hmem =>
+        exact ih afterGate hTail current hmem
 
 /-- Build the clauses for one row, zipping `previous[k]`,
 `previous[k - 1]`, and the newly allocated output. -/
