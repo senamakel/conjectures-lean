@@ -83,6 +83,12 @@ Upstream [Green 100 matrix obstruction #4716](https://github.com/GuillaumeBAUD-c
 
 The matching-pin smooth Poincaré source uses M74 finite connected-sum recognition and M75 flow-to-endpoint assembly. The geometric types `SmoothFiniteConnectedSumAssembly` and `RepairedGlobalFlowData` are internal to that source and absent from OMA's checker environment. The endpoint keeps the original obligation while a faithful port of its assembly data remains outstanding.
 
+### Registered Poincaré follow-ups
+
+The sphere homology, Moise and smooth endpoint reductions merged as `df696c049b5d` (#4599), `1bd155f42d06` (#4604) and `cf3c71ed0ab6` (#4609). The exact child briefs for all three were present on the registry after those merges. The three-sphere antipodal-cover reduction and circle base reduction now have [PR #4833](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4833) and [PR #4839](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4839), each rechecked against the merged interface. [PR #4818](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4818) already covers exact simple connectivity of the three-sphere, so the equivalent staged proof stays on the fork.
+
+The [local top-homology reduction](https://github.com/senamakel/open-math-agents/tree/oma/poincare-local-homology) at `dc8fc3e` passed with the three standard axioms. It splits noncompact top-homology vanishing into detection by local classes, compact support of each class, and propagation of local vanishing on connected manifolds. Each hypothesis uses an explicit local quotient chain complex. The compact support obligation applies to arbitrary spaces and is assigned for a direct proof.
+
 ## Earlier attempts and follow-up candidates
 
 | Target | Recovered public evidence | Remaining work |
