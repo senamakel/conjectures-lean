@@ -129,3 +129,13 @@ The non-coprime branch has a separate checked submission. For
 `(g*y,x*z)`, with `x,y` coprime. The remaining distinct-component
 obligation forces `g = z` from the two normalized crystal divisibilities
 and the order constraints. [GCD normalization #4633](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4633)
+
+[CrystalQuotientFour.lean](CrystalQuotientFour.lean) checks the structural
+description of the first remaining coprime branch. Whenever odd
+`c ≤ b` satisfies `(c+b)² = 4(c+1)(b+1)`, there is a natural
+`t` with `c+1 = 2t²` and `b+1 = 2(t+1)²`. The proof sets
+`d = (b-c)/2`, derives `d² = b+c+1` and uses its oddness to write
+`d = 2t+1`. More generally `gcd(c,b)` divides the quotient, so for
+quotient four the odd components are coprime. Both checks use only the
+standard axioms. The companion crystal divisibility remains the
+arithmetic obligation after substituting `b = m*a`.
