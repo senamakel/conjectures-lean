@@ -175,7 +175,7 @@ private theorem eventually_logLogCutoff_lower :
       (logLogCutoff n : ℝ) + 1 := Nat.lt_floor_add_one _
   nlinarith
 
-private theorem eventually_primeAt_over_index_le :
+theorem eventually_primeAt_over_index_le :
     ∀ᶠ n : ℕ in atTop,
       (primeAt n : ℝ) / ((n + 1 : ℕ) : ℝ) ≤ 2 * Real.log (primeAt n : ℝ) := by
   have hratio := primeAt_count_asymptotic
