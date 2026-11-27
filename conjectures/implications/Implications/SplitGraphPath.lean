@@ -425,7 +425,7 @@ theorem hamiltonian_of_split_partition_two_outsiders
 /-- The exact-two-outsider triple-row case follows from row size and
 symmetric-difference bounds plus two clique neighbours per outsider. -/
 theorem hamiltonian_of_split_partition_two_outsiders_of_rows
-    (G : SimpleGraph V) (C I : Finset V) (t z w : V)
+    (G : SimpleGraph V) [DecidableRel G.Adj] (C I : Finset V) (t z w : V)
     (hC : G.IsClique (C : Set V)) (hdisj : Disjoint C I)
     (hpartition : (Finset.univ : Finset V) = C ∪ I)
     (ht : t ∈ C) (hA : (row G I t).card = 3)
@@ -456,7 +456,7 @@ theorem hamiltonian_of_split_partition_two_outsiders_of_rows
     obtain ⟨q, hq, rfl⟩ := Finset.mem_image.mp hB
     exact hrow q hq
   have hRdiff : ∀ B ∈ C.image (row G I), ∀ D ∈ C.image (row G I),
-      (B \\ D ∪ D \\ B).card ≤ 2 := by
+      (B \ D ∪ D \ B).card ≤ 2 := by
     intro B hB D hD
     obtain ⟨q, hq, rfl⟩ := Finset.mem_image.mp hB
     obtain ⟨d, hd, rfl⟩ := Finset.mem_image.mp hD
@@ -467,20 +467,20 @@ theorem hamiltonian_of_split_partition_two_outsiders_of_rows
   have hAR : A ∈ C.image (row G I) := Finset.mem_image.mpr ⟨t, ht, rfl⟩
   have hxR : row G I x ∈ C.image (row G I) := Finset.mem_image.mpr ⟨x, hxC, rfl⟩
   have hrR : row G I r ∈ C.image (row G I) := Finset.mem_image.mpr ⟨r, hrC, rfl⟩
-  have hzRow : z ∈ row G I x \\ A := Finset.mem_sdiff.mpr ⟨Finset.mem_filter.mpr ⟨hzI, hxzG⟩, hzA⟩
-  have hwRow : w ∈ row G I r \\ A := Finset.mem_sdiff.mpr ⟨Finset.mem_filter.mpr ⟨hwI, hrwG⟩, hwA⟩
+  have hzRow : z ∈ row G I x \ A := Finset.mem_sdiff.mpr ⟨Finset.mem_filter.mpr ⟨hzI, hxzG⟩, hzA⟩
+  have hwRow : w ∈ row G I r \ A := Finset.mem_sdiff.mpr ⟨Finset.mem_filter.mpr ⟨hwI, hrwG⟩, hwA⟩
   obtain ⟨P, hPA, hPcard, hcommon⟩ :=
     SplitGraphComponents.tripleRow_common_outside_pair A (C.image (row G I))
       hA hAR hRsize hRdiff hxR hrR hzRow hwRow hzw
   obtain ⟨a, b, hab, hPeq⟩ := Finset.card_eq_two.mp hPcard
   have haA : a ∈ A := by rw [hPeq] at hPA; exact hPA (by simp)
   have hbA : b ∈ A := by rw [hPeq] at hPA; exact hPA (by simp)
-  have hdiffCard : (A \\ P).card = 1 := by
+  have hdiffCard : (A \ P).card = 1 := by
     have hcard := Finset.card_sdiff_add_card_inter A P
     rw [Finset.inter_eq_right.mpr hPA, hA, hPcard] at hcard
     omega
   obtain ⟨c, hcDiffEq⟩ := Finset.card_eq_one.mp hdiffCard
-  have hcDiff : c ∈ A \\ P := by rw [hcDiffEq]; simp
+  have hcDiff : c ∈ A \ P := by rw [hcDiffEq]; simp
   have hcA : c ∈ A := (Finset.mem_sdiff.mp hcDiff).1
   have hcP : c ∉ P := (Finset.mem_sdiff.mp hcDiff).2
   have hac : a ≠ c := by intro h; subst c; exact hcP (by rw [hPeq]; simp)
@@ -492,7 +492,7 @@ theorem hamiltonian_of_split_partition_two_outsiders_of_rows
       by_cases hqP : q ∈ P
       · rw [hPeq] at hqP
         simpa [Finset.mem_insert, Finset.mem_singleton, or_comm] using hqP
-      · have hqDiff : q ∈ A \\ P := Finset.mem_sdiff.mpr ⟨hq, hqP⟩
+      · have hqDiff : q ∈ A \ P := Finset.mem_sdiff.mpr ⟨hq, hqP⟩
         rw [hcDiffEq] at hqDiff
         simp only [Finset.mem_singleton] at hqDiff
         simp [hqDiff]
@@ -502,12 +502,12 @@ theorem hamiltonian_of_split_partition_two_outsiders_of_rows
     ext q
     rw [hI, hAeq]
     simp [Finset.mem_insert, Finset.mem_singleton, or_comm, or_left_comm, or_assoc]
-  have hcomm (q : V) (hq : q ∈ C) (hout : (row G I q \\ A).Nonempty) :
+  have hcomm (q : V) (hq : q ∈ C) (hout : (row G I q \ A).Nonempty) :
       A ∩ row G I q = P :=
     hcommon (row G I q) (Finset.mem_image.mpr ⟨q, hq, rfl⟩) hout
-  have hzYRow : z ∈ row G I y \\ A := Finset.mem_sdiff.mpr ⟨Finset.mem_filter.mpr ⟨hzI, hyzG⟩, hzA⟩
-  have hwSRow : w ∈ row G I s \\ A := Finset.mem_sdiff.mpr ⟨Finset.mem_filter.mpr ⟨hwI, hswG⟩, hwA⟩
-  have hpairRow (q : V) (hq : q ∈ C) (hout : (row G I q \\ A).Nonempty) :
+  have hzYRow : z ∈ row G I y \ A := Finset.mem_sdiff.mpr ⟨Finset.mem_filter.mpr ⟨hzI, hyzG⟩, hzA⟩
+  have hwSRow : w ∈ row G I s \ A := Finset.mem_sdiff.mpr ⟨Finset.mem_filter.mpr ⟨hwI, hswG⟩, hwA⟩
+  have hpairRow (q : V) (hq : q ∈ C) (hout : (row G I q \ A).Nonempty) :
       a ∈ row G I q ∧ b ∈ row G I q := by
     have hEq := hcomm q hq hout
     constructor
@@ -561,7 +561,7 @@ theorem hamiltonian_of_split_partition_two_outsiders_of_rows
     simp [htx, hty, htr, hts, hxy, hxr, hxs, hyr, hys, hrs]
   have hrowNodup : ([a, b, c, z, w] : List V).Nodup := by
     simp [hab, hac, hbc, hzw, hzA, hwA, haA, hbA, hcA]
-  let D := C \\ {t, x, y, r, s}
+  let D := C \ {t, x, y, r, s}
   let rest := D.toList
   have hrestNodup : rest.Nodup := D.nodup_toList
   have hrestC : ∀ q ∈ rest, q ∈ C := by
