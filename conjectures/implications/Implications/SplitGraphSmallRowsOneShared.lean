@@ -36,8 +36,6 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
     (hcenter : ∀ k ∈ I, (left k = c ∨ right k = c) ↔ k = i ∨ k = j)
     (hunique : ∀ x ∈ C, x ≠ c → ∀ k ∈ I, ∀ l ∈ I,
       (left k = x ∨ right k = x) → (left l = x ∨ right l = x) → k = l)
-    (hcardC : ∀ x ∈ C, x ≠ c →
-      (I.filter (fun k => left k = x ∨ right k = x)).card ≤ 1)
     (huniv : (Finset.univ : Finset V).Nonempty) :
     ∃ u v : V, ∃ p : G.Walk u v, p.IsHamiltonian := by
   classical
@@ -151,7 +149,7 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
         | cons k ks ih =>
           intro hmem hnd
           rw [List.pairwise_cons]
-          refine ⟨?_, ih ?_ (List.nodup_cons.mp hnd).2⟩
+          constructor
           · intro l hl
             have hkO : k ∈ others := hmem k (by simp)
             have hlO : l ∈ others := hmem l (by simp [hl])
@@ -159,8 +157,10 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
               intro heq
               subst l
               exact (List.nodup_cons.mp hnd).1 hl)
-          · intro l hl
-            exact hmem l (by simp [hl])
+          · apply ih
+            · intro l hl
+              exact hmem l (by simp [hl])
+            · exact (List.nodup_cons.mp hnd).2
       exact hp others.toList (fun k hk => Finset.mem_toList.mp hk) others.nodup_toList
 
 end SplitGraphSmallRowsOneShared
