@@ -226,12 +226,14 @@ def load_words() -> tuple[dict[tuple[int, ...], set[str]], int, int, dict[str, b
 
 def candidate_count(
     words: dict[tuple[int, ...], set[str]],
-) -> tuple[int, Counter[str]]:
+) -> tuple[int, Counter[str], Counter[int]]:
     """Count the additional exactly-two-recolour candidates after radius one."""
     total = 0
     distribution: Counter[str] = Counter()
+    word_minima: Counter[int] = Counter()
     for word in words:
         conflicts = bad_endpoint_pairs(word)
+        word_minima[min(map(len, conflicts))] += 1
         for pairs in conflicts:
             if len(pairs) == 0:
                 distribution["zero-pair-colours"] += 1
@@ -245,7 +247,7 @@ def candidate_count(
                 distribution["two-pair-colours"] += 1
             else:
                 distribution["more-than-two-pair-colours"] += 1
-    return total, distribution
+    return total, distribution, word_minima
 
 
 def search_radius_one(
@@ -391,13 +393,15 @@ def main() -> None:
     assert baseline_unique == len(words)
     assert all(is_sum_free(word) for word in words)
     one_recolour_total = len(words) * K * (1 + N * (K - 1))
-    radius_two_total, distribution = candidate_count(words)
+    radius_two_total, distribution, word_minima = candidate_count(words)
     total = one_recolour_total + radius_two_total
     print("evolved_raw_words", raw_count)
     print("evolved_up_to_renaming", evolved_unique)
     print("unique_words_including_McKenna_baselines", len(words))
     print("McKenna_baseline_already_in_evolved_corpus", baseline_present)
     print("append_colours_by_endpoint_conflict_count", dict(sorted(distribution.items())))
+    print("minimum_old_recolours_required_by_append_conflicts", min(word_minima))
+    print("words_by_minimum_append_conflicts", dict(sorted(word_minima.items())))
     print("candidate_assignments_radius_zero_or_one", one_recolour_total)
     print("additional_candidate_assignments_radius_two", radius_two_total)
     print("total_candidate_assignments_in_search", total)
