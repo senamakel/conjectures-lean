@@ -180,3 +180,20 @@ incomplete until Lean checks its LRAT trace and a formal bridge connects this
 exact encoder to the graph clauses. The checkable k=4 theorem replaces solver
 work to reconstruct the incidence structure; it does not establish that this
 SAT instance is UNSAT.
+
+## k=4 incidence benchmark result
+
+The distinct k=4 DIMACS has 99,290 variables and 258,637 clauses, 3,285,810
+bytes, and SHA-256
+`d6448208afa8948e2a277ad8baba2e4f6b49fbff41f5cc267c48eda9177260ee`.
+The previous combined AMO instance was not rerun. CaDiCaL 2.1.2 returned
+`UNKNOWN` at 120.00 seconds real time (114.34 seconds process CPU), after
+1,002,195 conflicts and 825,225,357 propagations; peak resident memory was
+515.10 MB. The partial binary LRAT trace is 776,499,763 bytes, SHA-256
+`b3785957d0c684a4b78aacdb877e4d83e838750bee684212da527150ef79b8e3`.
+There is no model and no complete proof. The incidence theorem reduces the
+search but did not settle this case under the cap. The next useful strengthening
+is the newly checked layout: six degree-eight pairs have six distinct shared
+degree-six neighbors, while the four degree-seven vertices each meet at most
+one degree-eight vertex. Encode those exact overlap/owner constraints (with
+exact common-neighbor indicators) before considering another bounded run.
