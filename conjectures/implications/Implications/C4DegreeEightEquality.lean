@@ -229,7 +229,10 @@ theorem each_degree_eight_vertex_has_one_degree_seven_neighbor
         simp
   have hUeq : U.card = 26 := by omega
   have hJeq : (E \ U).card = 12 := by rw [hDcard, hUeq] at hcap; omega
-  have hWcard : (E ∩ U).card = 4 := by rw [← hEoutside, hEcard, hJeq]; omega
+  have hWcard : (E ∩ U).card = 4 := by
+    have h := hEoutside
+    rw [hEcard, hJeq] at h
+    omega
   have hWsubset : E ∩ U ⊆ D.biUnion (fun u => G.neighborFinset u ∩ E) := by
     intro x hx
     rcases Finset.mem_inter.mp hx with ⟨hxE, hxU⟩
@@ -251,12 +254,16 @@ theorem each_degree_eight_vertex_has_one_degree_seven_neighbor
   intro u hu
   have huBound := degree_seven_neighbors_card_le_one G hmin hC4 (Finset.mem_filter.mp hu).2
   by_contra hne
-  have huZero : (G.neighborFinset u ∩ E).card = 0 := by omega
+  have huZero : (G.neighborFinset u ∩ E).card = 0 := by
+    simpa [E] using huBound
+    omega
   have hlt : (∑ w ∈ D, (G.neighborFinset w ∩ E).card) < ∑ _w ∈ D, 1 :=
     Finset.sum_lt_sum (fun w hw =>
       degree_seven_neighbors_card_le_one G hmin hC4 (Finset.mem_filter.mp hw).2)
       ⟨u, hu, by simp [huZero]⟩
-  have hfalse : 4 < 4 := by simpa [hDcard] using hlt
+  have hlt4 : (∑ w ∈ D, (G.neighborFinset w ∩ E).card) < 4 := by
+    simpa [hDcard] using hlt
+  rw [hsumCount] at hlt4
   omega
 
 
