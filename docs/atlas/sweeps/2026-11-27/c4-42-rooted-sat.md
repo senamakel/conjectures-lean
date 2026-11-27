@@ -192,8 +192,40 @@ The previous combined AMO instance was not rerun. CaDiCaL 2.1.2 returned
 515.10 MB. The partial binary LRAT trace is 776,499,763 bytes, SHA-256
 `b3785957d0c684a4b78aacdb877e4d83e838750bee684212da527150ef79b8e3`.
 There is no model and no complete proof. The incidence theorem reduces the
-search but did not settle this case under the cap. The next useful strengthening
-is the newly checked layout: six degree-eight pairs have six distinct shared
-degree-six neighbors, while each degree-seven vertex meets at most
-one degree-eight vertex. Encode those exact overlap/owner constraints (with
-exact common-neighbor indicators) before considering another bounded run.
+search but did not settle this case under the cap. The canonical encoding below
+uses the newly checked pair-witness, private-neighbor, and distinct-owner
+structure.
+
+## Canonical k=4 encoding and bounded protocol (written before the run)
+
+The canonical encoder uses labels 0..3 for the four D8 vertices; 4..9 for the
+six unique D6 witnesses indexed by pairs `(01,02,03,12,13,23)`; 10..25 for
+four private D6 neighbors per D8; 26..29 for the four distinct D7 owners; and
+30..41 for the remaining twelve D7 vertices. Every qualifying graph can be
+relabeled into this form: assign its four D8 vertices arbitrarily, then use
+the pair-witness theorem, private-neighbor theorem, and distinct-owner theorem
+to assign the corresponding labels. No sorting or extra symmetry restriction
+is imposed. The four D8 neighborhoods are then fully fixed (three shared D6,
+four private D6, one owner D7 each), eliminating all 158 edge variables
+incident to a D8 and leaving the 703 edges among labels 4..41.
+
+For every 4-set, the formula emits the three distinct C4 clauses and simplifies
+them against the fixed edges. It adds the checked at-least-one common-neighbor
+clause for each D8 `h` and each `x != h`; the four-cycle clauses already imply
+at most one. In particular, when `x` is a neighbor of `h`, this requires an
+edge inside `N(h)`, and C4-freeness makes those edges a perfect matching. The
+encoder does not guess a matching. Exact local low-vertex degrees (6 for the
+22 D6 labels, 7 for the 16 D7 labels) force the edge count by handshake: their
+degree sum is 244, the four fixed D8 vertices add 32, so total degree is 276
+and the graph has 138 edges. The implementation reuses `Cnf` and its exact
+unary threshold circuit from `encode_c4_42_rooted_138.py`.
+
+Generate `.lake/c4-42-k4-canonical/canonical.cnf` from
+`scripts/encode_c4_42_k4_canonical.py`; check the label scheme and confirm the
+previous rooted encoder's default digest remains
+`72fd863a9e29ca2422c129f2e885bba2a7343c9fb2a47dc482764aeae8b985a5`. Run the
+existing CaDiCaL 2.1.2 binary once with `--lrat --checkproof=2 -t 120`, writing
+the log and LRAT only under `.lake/c4-42-k4-canonical/`. Stop at SAT, complete
+UNSAT, or UNKNOWN at the cap; do not repeat or vary parameters. A SAT model
+requires an independent graph check. UNSAT requires Lean LRAT replay and the
+encoder-to-graph bridge; UNKNOWN is only a bounded screen.
