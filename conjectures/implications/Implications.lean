@@ -21,6 +21,8 @@ import Implications.McEachenDensity
 import Implications.McEachenStock
 import Implications.SplitGraphComponents
 import Implications.SplitGraphAttachments
+import Implications.SplitGraphManyOutsiders
+import Implications.SplitGraphTwoConnected
 import Implications.WilfEquivalence
 import Implications.C4Extremal42
 import Implications.C4DegreeBounds
@@ -33,6 +35,10 @@ import Implications.SplitGraphSmallRowsPath
 import Implications.SplitGraphSmallRowsThree
 import Implications.SplitGraphSmallRowsCompletion
 import Implications.SplitGraphSmallRows
+import Implications.SplitGraphSmallRowsOneShared
+import Implications.SplitGraphTripleRowPath
+import Implications.SplitGraphOneOutsider
+import Implications.SplitGraphOneOutsiderRows
 import Implications.C4VertexExtension
 import Implications.WilfPatternSwap
 import Implications.WilfTwoWindowOrder
@@ -43,3 +49,4 @@ import Implications.WilfThreeCycleOrder
 import Implications.WilfThreeCycleGlobal
 import Implications.WilfWindowGeometry
 import Implications.WilfArchiveClosure
+import Implications.SplitGraphHamiltonian
