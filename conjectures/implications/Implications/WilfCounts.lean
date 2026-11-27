@@ -1,5 +1,6 @@
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Powerset
 
 /-!
 # Recovering exact occurrence counts from marked occurrence counts
