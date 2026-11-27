@@ -81,7 +81,9 @@ theorem eulerCost_div_rootScale_tendsto_zero :
             (Real.log L / Real.sqrt (Real.log L)) := by rw [hsqrt]; ring
       _ = Real.log L ^ (1 / 2 : ℝ) / L ^ (1 / 4 : ℝ) := by
         rw [Real.sqrt_eq_rpow, Real.sqrt_eq_rpow]
-        rw [← Real.rpow_sub hLpos, ← Real.rpow_sub hlogpos]
+        rw [← Real.rpow_sub hLpos]
+        rw [← Real.rpow_one (Real.log L)]
+        rw [← Real.rpow_sub hlogpos]
         rw [show (1 / 4 : ℝ) - 1 / 2 = -(1 / 4 : ℝ) by ring]
         rw [show (1 : ℝ) - 1 / 2 = 1 / 2 by ring]
         rw [Real.rpow_neg hLpos, Real.rpow_neg hlogpos]
