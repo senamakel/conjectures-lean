@@ -27,3 +27,20 @@ CaDiCaL uses exit code 20 for UNSAT. The checked files had these SHA-256 digests
 |---|---|
 | `symmetry.cnf` | `27e22fc68ac0734d9e10c6a0e058345bd9aa10ce4e1824bbc18853d6947cd1ea` |
 | `symmetry.lrat` | `27a7d5286ec09732a7af553ea6b6138ae38fc637dc708f034a9e37c19e130dbe` |
+
+## Clause reconstruction in Lean
+
+`python3 scripts/compare_c4_polarity_42_cnf.py` compares the full DIMACS byte
+stream against the Lean reconstruction. Build the `Implications` Lake target
+first. The checker supplies the Python encoder’s ordered list of 336
+permutations to Lean, then compares the header, both numbered counters, edge
+clauses, survivor clauses and every symmetry comparison. All 147,652 clauses
+and all 27,226 variable IDs matched the certificate input hash above. This is
+an executable comparison of the two concrete emitters. The general Lean
+clause-order proof and end-to-end graph implication are tracked separately.
+
+Run `python3 scripts/compare_c4_polarity_42_cnf.py --lrat .lake/polarity-sat/symmetry.lrat`
+to check the same trace directly on the reconstructed Lean formula. The replay
+validates the nonzero literal convention and calls the standard LRAT checker
+on the reconstruction itself. CaDiCaL 2.1.2 regenerated the trace byte for byte.
+Lean accepted all 114,126 actions. [CaDiCaL 2.1.2 release](https://github.com/arminbiere/cadical/releases/tag/rel-2.1.2)
