@@ -101,7 +101,7 @@ theorem primeGapSmoothCountBound {N j : ℕ} (S U : Finset ℕ)
     have hd := primeGapInteriors_pairwiseDisjoint N (hS hr) (hS hs) hrs
     apply Finset.disjoint_left.mpr
     intro m hmr hms
-    exact (Finset.disjoint_left.mp hd) m
+    exact (Finset.disjoint_left.mp hd)
       (Finset.mem_filter.mp hmr).1 (Finset.mem_filter.mp hms).1
   · exact hlarge
   · exact hsub

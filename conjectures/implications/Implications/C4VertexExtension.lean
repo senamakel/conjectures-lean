@@ -58,9 +58,6 @@ theorem addVertex_c4Free_iff {V : Type*} (G : SimpleGraph V) (s : Set V) :
         (by simpa using hxy) (by simp) hnew hnew'
       exact hnot ⟨hold, hold'⟩
   · rintro ⟨hG, hS⟩ x y z w hxy hzw hxz hyz htwo
-    change ∀ ⦃x y z w⦄, x ≠ y → z ≠ w →
-      (addVertex G s).Adj x z → (addVertex G s).Adj y z →
-      ¬ ((addVertex G s).Adj x w ∧ (addVertex G s).Adj y w)
     cases x <;> cases y <;> cases z <;> cases w <;>
       simp only [addVertex] at * <;> aesop (maxRuleApplications := 1000)
 
