@@ -78,6 +78,8 @@ audit set it; the lanes `novel-via-rh` and `novelty-audit` are filling that in.
 | 2026-11-26, second pass | [wave 2: uncovered premises and areas](sweeps/2026-11-26/wave2.md); refutation lanes ([Erdős](sweeps/2026-11-26/disproof-erdos.md), [other formal-conjectures](sweeps/2026-11-26/disproof-fc-other.md), [literature](sweeps/2026-11-26/disproof-literature.md)) | one candidate passes the novelty test so far: Sun's conjecture on `π(n^k)/n^k` (OEIS A038098) for `k ≥ 4`, from RH; a prover is on it |
 | 2026-11-26 | refutation lane: [literature](sweeps/2026-11-26/disproof-literature.md); [Erdős formal-conjectures](sweeps/2026-11-26/disproof-erdos.md); [other formal-conjectures directories](sweeps/2026-11-26/disproof-fc-other.md). The two formal-conjectures lanes found no unclaimed cheap disproof (Erdős: 850 open declarations read; other directories: 1,102), and the literature lane's candidates are tracked in AGENTS.md. | 37 edges |
 
+| 2026-11-27 | [Open Math Agents sweep](sweeps/2026-11-27/open-math-agents.md) | Paper proofs, PR checks and finite Lean checks |
+
 The sweep reports are research notes: nothing in them was built, and claims marked
 *(unverified)* were not checked against a primary source. An edge is confirmed only when its
 Lean proof is merged.
