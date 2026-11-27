@@ -22,6 +22,32 @@ private theorem primeCounting_primeAt (n : ℕ) :
   change Nat.count Nat.Prime (Nat.nth Nat.Prime n + 1) = n + 1
   exact Nat.count_nth_succ_of_infinite Nat.infinite_setOfPred_prime n
 
+private theorem primeAt_count_asymptotic :
+    Tendsto (fun n : ℕ => ((n + 1 : ℕ) : ℝ) *
+      Real.log (primeAt n : ℝ) / (primeAt n : ℝ)) atTop (𝓝 1) := by
+  have hprime : Tendsto (fun n : ℕ => (primeAt n : ℝ)) atTop atTop := by
+    exact tendsto_natCast_atTop_atTop.comp primeAt_strictMono.tendsto_atTop
+  have heq := Nat.isEquivalent_primeCounting.comp_tendsto hprime
+  have hlog : ∀ᶠ n : ℕ in atTop, Real.log (primeAt n : ℝ) ≠ 0 := by
+    filter_upwards [hprime.eventually (eventually_gt_atTop 1)] with n hn
+    exact (Real.log_pos hn).ne'
+  have hratio := (isEquivalent_iff_tendsto_one (by
+    filter_upwards [hprime.eventually (eventually_gt_atTop 1)] with n hn
+    exact (div_ne_zero (by exact_mod_cast (primeAt n).ne_zero)
+      (Real.log_pos hn).ne'))).mp heq
+  have hfloor (n : ℕ) : ⌊(primeAt n : ℝ)⌋₊ = primeAt n := by simp
+  have hratio' : Tendsto (fun n : ℕ =>
+      ((Nat.primeCounting (primeAt n) : ℝ) /
+        ((primeAt n : ℝ) / Real.log (primeAt n : ℝ)))) atTop (𝓝 1) := by
+    convert hratio using 1 <;> simp [Function.comp_apply, hfloor]
+  have hfinal : Tendsto (fun n : ℕ => ((n + 1 : ℕ) : ℝ) *
+      Real.log (primeAt n : ℝ) / (primeAt n : ℝ)) atTop (𝓝 1) := by
+    refine hratio'.congr' ?_
+    filter_upwards [] with n
+    rw [primeCounting_primeAt]
+    field_simp
+  exact hfinal
+
 private theorem primeAt_strictMono : StrictMono primeAt := by
   intro a b hab
   exact Nat.nth_strictMono Nat.infinite_setOfPred_prime hab
