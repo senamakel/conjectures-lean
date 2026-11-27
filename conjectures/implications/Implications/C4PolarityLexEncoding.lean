@@ -113,8 +113,9 @@ theorem lexStep_auxiliary_assignment_satisfies (a : Nat → Bool)
     (hp : a pref = true) (hx : a x = true) (hy : a y = false)
     (hs : a same = (a pref && (a x == a y))) :
     cnfValue a (lexStepClauses pref x y same) = true := by
-  simp [cnfValue, clauseValue, lexStepClauses, literalValue, pos, neg,
-    Int.negOfNat, hp, hx, hy, hs]
+  simp only [cnfValue, List.all_cons, List.all_nil, clauseValue, List.any_cons,
+    List.any_nil, lexStepClauses]
+  simp [pos, hp, hx, hy, hs]
 
 end Implications.C4PolarityLexEncoding
 
