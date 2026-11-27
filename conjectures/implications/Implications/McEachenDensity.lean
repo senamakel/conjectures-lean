@@ -69,7 +69,7 @@ theorem tendsto_reciprocalPrimeProduct_zero :
     calc
       ∏ p ∈ range n, (1 - primeReciprocalTerm p) ≤
           ∏ p ∈ range n, Real.exp (-primeReciprocalTerm p) := by
-        apply Finset.prod_le_prod
+        apply Finset.prod_le_prod₀
         · intro p hp
           have hp1 : primeReciprocalTerm p ≤ 1 := by
             simp only [primeReciprocalTerm]
@@ -83,7 +83,7 @@ theorem tendsto_reciprocalPrimeProduct_zero :
         · intro p hp
           exact Real.one_sub_le_exp_neg _
       _ = Real.exp (-∑ p ∈ range n, primeReciprocalTerm p) := by
-        rw [Finset.prod_exp]
+        rw [← Real.exp_sum]
         congr 1
         simp [Finset.sum_neg_distrib]
 
