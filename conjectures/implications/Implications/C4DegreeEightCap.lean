@@ -33,7 +33,7 @@ theorem count_le_seven_of_codegree_moments
   have hsumSq : Finset.univ.sum (fun x => a x ^ 2) ≤
       (k : ℝ) * ((k : ℝ) + 7) := by
     have hsecond' := hsecond
-    rw [← Finset.sum_sub_distrib] at hsecond'
+    rw [Finset.sum_sub_distrib] at hsecond'
     linarith
   have hcs := sq_sum_le_card_mul_sum_sq (s := Finset.univ) (f := a)
   simp only [Finset.card_univ, Fintype.card_fin] at hcs
