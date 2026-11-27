@@ -156,6 +156,7 @@ private def pattern23156784 : Fin 8 → Fin 8 := ![1, 2, 0, 4, 5, 6, 7, 3]
 private def pattern23157684 : Fin 8 → Fin 8 := ![1, 2, 0, 4, 6, 5, 7, 3]
 private def pattern23167584 : Fin 8 → Fin 8 := ![1, 2, 0, 5, 6, 4, 7, 3]
 private def pattern24156783 : Fin 8 → Fin 8 := ![1, 3, 0, 4, 5, 6, 7, 2]
+private def pattern34217685 : Fin 8 → Fin 8 := ![2, 3, 1, 0, 6, 5, 7, 4]
 
 /-- The three patterns in archived block 42 have a common exact-count representative. -/
 theorem exactOccurrenceCount_eq_block42_common (n : ℕ) (marks : Finset (Fin n)) :
@@ -179,6 +180,13 @@ theorem exactOccurrenceCount_eq_block47_members (n : ℕ) (marks : Finset (Fin n
   exact (WilfThreeCycleGlobal.exactOccurrenceCount_eq_26145783_24156783 n marks).symm.trans
     (exactOccurrenceCount_eq_26145783_25146783 n marks)
 
+/-- The three members of archived block 63 have a common exact-count representative. -/
+theorem exactOccurrenceCount_eq_block63_common (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern36214785) marks =
+      WilfCounts.exactCount (occurrenceSet pattern34217685) marks := by
+  exact (exactOccurrenceCount_eq_36214785_34216785 n marks).trans
+    (WilfChainCertificate.exactOccurrenceCount_eq_34216785_34217685 n marks)
+
 #print axioms exactOccurrenceCount_eq_26134785_24136785
 #print axioms exactOccurrenceCount_eq_26135784_25136784
 #print axioms exactOccurrenceCount_eq_26145783_25146783
@@ -189,5 +197,6 @@ theorem exactOccurrenceCount_eq_block47_members (n : ℕ) (marks : Finset (Fin n
 #print axioms exactOccurrenceCount_eq_block42_common
 #print axioms exactOccurrenceCount_eq_block43_common
 #print axioms exactOccurrenceCount_eq_block47_members
+#print axioms exactOccurrenceCount_eq_block63_common
 
 end Implications.WilfArchiveClosure
