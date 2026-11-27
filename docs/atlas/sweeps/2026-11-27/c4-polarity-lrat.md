@@ -38,3 +38,9 @@ clauses, survivor clauses and every symmetry comparison. All 147,652 clauses
 and all 27,226 variable IDs matched the certificate input hash above. This is
 an executable comparison of the two concrete emitters. The general Lean
 clause-order proof and end-to-end graph implication are tracked separately.
+
+Run `python3 scripts/compare_c4_polarity_42_cnf.py --lrat .lake/polarity-sat/symmetry.lrat`
+to check the same trace directly on the reconstructed Lean formula. The replay
+validates the nonzero literal convention and calls the standard LRAT checker
+on the reconstruction itself. CaDiCaL 2.1.2 regenerated the trace byte for byte.
+Lean accepted all 114,126 actions. [CaDiCaL 2.1.2 release](https://github.com/arminbiere/cadical/releases/tag/rel-2.1.2)

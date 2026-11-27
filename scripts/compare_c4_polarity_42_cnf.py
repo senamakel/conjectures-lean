@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Compare the Python and Lean reconstructions of the certified DIMACS instance."""
 
+import argparse
 import hashlib
 import json
 from itertools import product, zip_longest
@@ -13,6 +14,9 @@ from encode_c4_polarity_42_cnf import orthogonal_permutations
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--lrat", type=Path, help="check an LRAT trace on the Lean formula")
+    args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     script_dir = root / "scripts"
     points = [(1, a, b) for a, b in product(range(7), repeat=2)]
@@ -21,13 +25,14 @@ def main():
     with TemporaryDirectory() as scratch:
         path = Path(scratch) / "permutations.json"
         path.write_text(json.dumps(permutations), encoding="ascii")
-        numbered = subprocess.check_output(
-            [
-                "lake", "env", "lean", "--run",
-                str(script_dir / "emit_c4_polarity_42_lean.lean"), str(path),
-            ],
-            cwd=root / "conjectures" / "implications",
-        )
+        command = [
+            "lake", "env", "lean", "--run",
+            str(script_dir / "emit_c4_polarity_42_lean.lean"), str(path),
+        ]
+        package = root / "conjectures" / "implications"
+        numbered = subprocess.check_output(command, cwd=package)
+        if args.lrat:
+            subprocess.run([*command, str(args.lrat.resolve())], cwd=package, check=True)
     recursive = subprocess.check_output(
         [sys.executable, str(script_dir / "encode_c4_polarity_42_cnf.py"), "--symmetry"]
     )

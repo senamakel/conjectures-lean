@@ -235,7 +235,29 @@ theorem no_candidate_of_checked_trace
   rw [ha] at hfalse
   contradiction
 
+/-- Validate the signed literal convention and replay the trace against the
+reconstructed formula itself. -/
+def replayAccepts (permutations : List (List Nat)) (proof : Array LRAT.IntAction) : Bool :=
+  let clauses := instanceClauses permutations
+  clauses.all (fun c => c.all (· != 0)) &&
+    LRAT.check proof (toCnf (clauses.map List.toArray).toArray)
+
+/-- A successful replay checks both of the certificate premises together. -/
+theorem no_candidate_of_replay
+    (permutations : List (List Nat)) (proof : Array LRAT.IntAction)
+    (hperms : ∀ p ∈ permutations, ∃ e : graph ≃g graph,
+      p = (List.finRange 57).map (fun i => (e i).val))
+    (hDel : ∀ D, C4PolarityCanonical.Candidate D → SurvivorDeletionBound D)
+    (hcheck : replayAccepts permutations proof = true) :
+    ¬ ∃ D, C4PolarityCanonical.Candidate D := by
+  unfold replayAccepts at hcheck
+  obtain ⟨hvalid, hlrat⟩ := Bool.and_eq_true_iff.mp hcheck
+  refine no_candidate_of_checked_trace permutations proof hperms hDel ?_ hlrat
+  intro c hc l hl
+  exact bne_iff_ne.mp (List.all_eq_true.mp (List.all_eq_true.mp hvalid c hc) l hl)
+
 end Implications.C4PolarityFullAssignment
 
 #print axioms Implications.C4PolarityFullAssignment.instance_satisfied
 #print axioms Implications.C4PolarityFullAssignment.no_candidate_of_checked_trace
+#print axioms Implications.C4PolarityFullAssignment.no_candidate_of_replay
