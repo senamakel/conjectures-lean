@@ -75,7 +75,12 @@ private theorem path_of_distinct_attachments
   have hyM : y ∉ M := by simp [M, hxy]
   have hmiddleNodup : middle.Nodup := by
     rw [List.nodup_cons, List.nodup_append']
-    exact ⟨hxM, M.nodup_toList, by simp [hyM]⟩
+    refine ⟨?_, M.nodup_toList, by simp [hyM]⟩
+    intro hx
+    rcases List.mem_append.mp hx with hxM' | hxy'
+    · exact hxM (Finset.mem_toList.mp hxM')
+    · simp at hxy'
+      exact hxy hxy'.symm
   have hmiddleFin : middle.toFinset = D := by
     ext v
     by_cases hvx : v = x
@@ -102,35 +107,36 @@ private theorem path_of_distinct_attachments
   have htk' : t ≠ k := by intro he; subst k; exact hkC ht
   have hprefListChain : prefList.IsChain G.Adj := by simp [prefList, hti, htk.symm]
   have hprefListNodup : prefList.Nodup := by
-    simp [prefList, hik, hti', htk'.symm]
+    simp [prefList, hik.symm, hti', htk'.symm]
   have hprefListMiddle : (prefList ++ middle).Nodup := by
     rw [List.nodup_append']
     refine ⟨hprefListNodup, hmiddleNodup, ?_⟩
     intro v hv hvmiddle
     have hv' : v = k ∨ v = t ∨ v = i := by simpa [prefList] using hv
-    rcases hv' with rfl | rfl | rfl
-    · exact hkC (hmiddleSub k hvmiddle)
-    · have htD : t ∉ D := by simp [D]
-      have htm : t ∈ middle.toFinset := List.mem_toFinset.mpr hvmiddle
+    rcases hv' with hvk | hvt | hvi
+    · have hkm : k ∈ middle := by simpa [hvk] using hvmiddle
+      exact hkC (hmiddleSub k hkm)
+    · have htmid : t ∈ middle := by simpa [hvt] using hvmiddle
+      have htD : t ∉ D := by simp [D]
+      have htm : t ∈ middle.toFinset := List.mem_toFinset.mpr htmid
       rw [hmiddleFin] at htm
       exact htD htm
-    · exact hiC (hmiddleSub i hvmiddle)
+    · have him : i ∈ middle := by simpa [hvi] using hvmiddle
+      exact hiC (hmiddleSub i him)
   have hpathNodup : path.Nodup := by
     dsimp [path]
     rw [List.nodup_append']
     refine ⟨hprefListMiddle, by simp [hjC], ?_⟩
     intro v hv hvsuffix
     rcases List.mem_append.mp hv with hvprefList | hvmiddle
-    · have hv' : v = k ∨ v = t ∨ v = i := by simpa [prefList] using hvprefList
-      rcases hv' with rfl | rfl | rfl
-      · simp at hvsuffix
-        exact hjk hvsuffix
-      · simp at hvsuffix
-        exact hjC (hvsuffix ▸ ht)
-      · simp at hvsuffix
-        exact hij hvsuffix
-    · simp at hvsuffix
-      exact hjC (hvsuffix ▸ hmiddleSub v hvmiddle)
+    · have hvj : v = j := by simpa using hvsuffix
+      have hv' : v = k ∨ v = t ∨ v = i := by simpa [prefList] using hvprefList
+      rcases hv' with hvk | hvt | hvi
+      · exact hjk (hvj.symm.trans hvk)
+      · exact hjC (hvj.symm ▸ hvt ▸ ht)
+      · exact hij (hvi.symm.trans hvj)
+    · have hvj : v = j := by simpa using hvsuffix
+      exact hjC (hvj.symm ▸ hmiddleSub v hvmiddle)
   have hfirst : (prefList ++ middle).IsChain G.Adj :=
     chain_join hprefListChain hmiddleChain (by simp [prefList]) hmiddleHead hxi.symm
   have hpathChain : path.IsChain G.Adj := by
@@ -210,7 +216,7 @@ theorem hamiltonian_of_split_partition_triple_row_of_rows
             (adjT a haI) (adjT c hcI) hui hyb
         · subst i
           exact path_of_distinct_attachments G C I t b a c u x hC hdisj hpartition
-            hbI haI hcI hab.symm hbc hac.symm (by simpa [or_comm, or_left_comm, or_assoc] using labelsABC)
+            hbI haI hcI hab.symm hbc hac (by simpa [or_comm, or_left_comm, or_assoc] using labelsABC)
             ht hu hxC hut hxt hux
             (adjT b hbI) (adjT c hcI) hui hxa
         · subst i
