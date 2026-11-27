@@ -40,7 +40,7 @@ theorem pairwise_intersecting_two_sets
     subst x
     rcases Finset.card_eq_two.mp (hcard B hB) with ⟨u, v, huv, hBeq⟩
     have hbu : b = u ∨ b = v := by rw [hBeq] at hxB; simpa using hxB
-    obtain ⟨c, hbc, hBeq'⟩ := by
+    have hchoose : ∃ c, b ≠ c ∧ B = {b, c} := by
       rcases hbu with h | h
       · refine ⟨v, ?_, ?_⟩
         · intro hcv
@@ -52,6 +52,7 @@ theorem pairwise_intersecting_two_sets
           subst u
           exact huv h
         · simpa [Finset.insert_comm] using hBeq
+    obtain ⟨c, hbc, hBeq'⟩ := hchoose
     have hca : c ≠ a := by
       intro h
       apply haB
