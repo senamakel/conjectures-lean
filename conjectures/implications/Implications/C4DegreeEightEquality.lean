@@ -254,9 +254,8 @@ theorem each_degree_eight_vertex_has_one_degree_seven_neighbor
   intro u hu
   have huBound := degree_seven_neighbors_card_le_one G hmin hC4 (Finset.mem_filter.mp hu).2
   by_contra hne
-  have huZero : (G.neighborFinset u ∩ E).card = 0 := by
-    simpa [E] using huBound
-    omega
+  have huLE : (G.neighborFinset u ∩ E).card ≤ 1 := by simpa [E] using huBound
+  have huZero : (G.neighborFinset u ∩ E).card = 0 := by omega
   have hlt : (∑ w ∈ D, (G.neighborFinset w ∩ E).card) < ∑ _w ∈ D, 1 :=
     Finset.sum_lt_sum (fun w hw =>
       degree_seven_neighbors_card_le_one G hmin hC4 (Finset.mem_filter.mp hw).2)
