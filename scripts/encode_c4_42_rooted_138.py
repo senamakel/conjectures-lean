@@ -111,6 +111,7 @@ def build(
     compact_degree_count: bool = False,
     compact_common_neighbor: bool = False,
     degree_eight_count: int | None = None,
+    k4_incidence: bool = False,
 ) -> tuple[Cnf, dict[tuple[int, int], int]]:
     cnf = Cnf()
     edges: dict[tuple[int, int], int] = {}
@@ -204,6 +205,68 @@ def build(
     else:
         at_most_five = cnf.equivalent_atleast(degree_eight, 5)
         cnf.clause(-at_most_five[5])
+
+    if k4_incidence:
+        if degree_eight_count != 4:
+            raise ValueError("--k4-incidence requires --degree-eight-count 4")
+
+        def exact_and(a: int | bool, b: int | bool) -> int | bool:
+            if a is False or b is False:
+                return False
+            if a is True:
+                return b
+            if b is True:
+                return a
+            y = cnf.var()
+            cnf.clause(-y, a)
+            cnf.clause(-y, b)
+            cnf.clause(y, -a, -b)
+            return y
+
+        def negate(lit: int | bool) -> int | bool:
+            return not lit if isinstance(lit, bool) else -lit
+
+        all_vertices = range(42)
+
+        def is_degree_six(v: int) -> int | bool:
+            return True if v == 0 else -degree_thresholds[v][7]
+
+        def is_degree_eight(v: int) -> int | bool:
+            return False if v == 0 else degree_thresholds[v][8]
+
+        def adjacent(u: int, v: int) -> int | bool:
+            if u == 0 or v == 0:
+                other = v if u == 0 else u
+                return other <= 6
+            return edge(u, v)
+
+        # Every degree-eight vertex has exactly seven degree-six neighbors.
+        # Thresholds are exact, so the implication excludes both <7 and >7.
+        for u in vertices:
+            low_incidence = [exact_and(adjacent(u, v), is_degree_six(v))
+                             for v in all_vertices if v != u]
+            low_count = cnf.equivalent_atleast(low_incidence, 8)
+            cnf.clause(negate(degree_thresholds[u][8]), low_count[7])
+            cnf.clause(negate(degree_thresholds[u][8]), negate(low_count[8]))
+
+        # Every degree-six vertex has one or two degree-eight neighbors.
+        # The separately proved multiplicity theorem fixes exactly six at two.
+        two_neighbor_flags: list[int | bool] = []
+        for v in all_vertices:
+            high_incidence = [exact_and(adjacent(v, u), is_degree_eight(u))
+                              for u in vertices if u != v]
+            high_count = cnf.equivalent_atleast(high_incidence, 3)
+            cnf.clause(negate(is_degree_six(v)), high_count[1])
+            cnf.clause(negate(is_degree_six(v)), negate(high_count[3]))
+            two_neighbor_flags.append(exact_and(is_degree_six(v), high_count[2]))
+        exactly_six_twos = cnf.equivalent_atleast(two_neighbor_flags, 7)
+        cnf.clause(exactly_six_twos[6])
+        cnf.clause(negate(exactly_six_twos[7]))
+
+        # The checked degree cap excludes adjacent degree-eight vertices.
+        for u, v in combinations(vertices, 2):
+            cnf.clause(-edge(u, v), -degree_thresholds[u][8],
+                       -degree_thresholds[v][8])
     return cnf, edges
 
 
@@ -219,6 +282,8 @@ def main() -> None:
                         help="use implication indicators and sequential AMO for C4-freeness")
     parser.add_argument("--degree-eight-count", type=int, choices=range(5),
                         help="optionally fix the number of degree-eight vertices to 0..4")
+    parser.add_argument("--k4-incidence", action="store_true",
+                        help="add checked incidence constraints for exactly four degree-eight vertices")
     parser.add_argument("--check-common-neighbor", action="store_true",
                         help="exhaustively check the projected AMO encoding for up to four candidates")
     args = parser.parse_args()
@@ -228,7 +293,8 @@ def main() -> None:
     if args.output is None:
         parser.error("output is required unless --check-common-neighbor is used")
     cnf, _ = build(args.deduplicate_c4, args.compact_degree_count,
-                   args.compact_common_neighbor, args.degree_eight_count)
+                   args.compact_common_neighbor, args.degree_eight_count,
+                   args.k4_incidence)
     cnf.emit(args.output)
     print(f"wrote {args.output}: {cnf.nvars} variables, {len(cnf.clauses)} clauses")
 
