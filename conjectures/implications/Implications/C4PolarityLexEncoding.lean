@@ -131,6 +131,7 @@ theorem orbitLexNext_eq (next : Nat) (deleted : List Nat) (permutations : List (
       simp only [orbitLexNext, List.foldl_cons]
       rw [ih]
       rw [lexNext_eq]
+      simp_rw [lexFreshIds_length]
       omega
 
 /-- Identical DIMACS variables have the same assigned bit, which justifies
