@@ -195,6 +195,62 @@ theorem exactOccurrenceCount_eq_reverse (n : ℕ) (p : Fin 8 → Fin 8)
     (reversePermEquiv n) (reverseStartEquiv n)
     (occurrenceSet_reverse p) marks
 
+/-- Simultaneous reversal carries any exact consecutive Wilf equivalence to
+the equivalence of the reversed patterns. -/
+theorem exactOccurrenceCount_eq_reverse_of_eq (n : ℕ)
+    (p q : Fin 8 → Fin 8)
+    (h : ∀ marks : Finset (Fin n),
+      WilfCounts.exactCount (occurrenceSet p) marks =
+        WilfCounts.exactCount (occurrenceSet q) marks)
+    (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet (reversePattern p)) marks =
+      WilfCounts.exactCount (occurrenceSet (reversePattern q)) marks := by
+  rw [exactOccurrenceCount_eq_reverse n (reversePattern p) marks,
+    exactOccurrenceCount_eq_reverse n (reversePattern q) marks]
+  simpa [reversePattern] using h (marks.map (reverseStartEquiv n).toEmbedding)
+
+theorem exactOccurrenceCount_eq_reverse_sigma_tau (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet (reversePattern sigma)) marks =
+      WilfCounts.exactCount (occurrenceSet (reversePattern tau)) marks :=
+  exactOccurrenceCount_eq_reverse_of_eq n sigma tau
+    (fun s => exactOccurrenceCount_eq n s) marks
+
+theorem exactOccurrenceCount_eq_reverse_16238475_16248375
+    (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet (reversePattern pair16238475)) marks =
+      WilfCounts.exactCount (occurrenceSet (reversePattern pair16248375)) marks :=
+  exactOccurrenceCount_eq_reverse_of_eq n pair16238475 pair16248375
+    (fun s => exactOccurrenceCount_eq_16238475_16248375 n s) marks
+
+theorem exactOccurrenceCount_eq_reverse_17236485_17246385
+    (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet (reversePattern pair17236485)) marks =
+      WilfCounts.exactCount (occurrenceSet (reversePattern pair17246385)) marks :=
+  exactOccurrenceCount_eq_reverse_of_eq n pair17236485 pair17246385
+    (fun s => exactOccurrenceCount_eq_17236485_17246385 n s) marks
+
+theorem exactOccurrenceCount_eq_reverse_17238465_17248365
+    (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet (reversePattern pair17238465)) marks =
+      WilfCounts.exactCount (occurrenceSet (reversePattern pair17248365)) marks :=
+  exactOccurrenceCount_eq_reverse_of_eq n pair17238465 pair17248365
+    (fun s => exactOccurrenceCount_eq_17238465_17248365 n s) marks
+
+theorem exactOccurrenceCount_eq_reverse_18237465_18247365
+    (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet (reversePattern pair18237465)) marks =
+      WilfCounts.exactCount (occurrenceSet (reversePattern pair18247365)) marks :=
+  exactOccurrenceCount_eq_reverse_of_eq n pair18237465 pair18247365
+    (fun s => exactOccurrenceCount_eq_18237465_18247365 n s) marks
+
+theorem exactOccurrenceCount_eq_reverse_18236475_18246375
+    (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet (reversePattern pair18236475)) marks =
+      WilfCounts.exactCount (occurrenceSet (reversePattern pair18246375)) marks :=
+  exactOccurrenceCount_eq_reverse_of_eq n pair18236475 pair18246375
+    (fun s => exactOccurrenceCount_eq_18236475_18246375 n s) marks
+
 end Implications.WilfReversal
 
 #print axioms Implications.WilfReversal.exactOccurrenceCount_eq_reverse
+#print axioms Implications.WilfReversal.exactOccurrenceCount_eq_reverse_of_eq
