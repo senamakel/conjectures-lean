@@ -16,6 +16,7 @@ import argparse
 from itertools import combinations, permutations
 from pathlib import Path
 
+from c4_42_shared_neighbor_orbits import EDGES as SHARED_EDGE_INDICES, shared_neighbor_orbits
 from encode_c4_42_rooted_138 import Cnf
 
 
@@ -138,22 +139,36 @@ def check_scheme() -> None:
     print("canonical labels partition 42 vertices; each D8 has 3 shared, 4 private D6 and one owner D7")
 
 
-def build(matching_case: int | None = None) -> Cnf:
+def shared_neighbor_fixed(case: int) -> dict[frozenset[int], bool]:
+    """Fix all 15 edges on the shared witnesses for the chosen root orbit."""
+    orbits = shared_neighbor_orbits()
+    if not 1 <= case <= len(orbits):
+        raise ValueError(f"shared_neighbor_case must be 1..{len(orbits)}")
+    selected = set(orbits[case - 1][0])
+    return {
+        frozenset((u + 4, v + 4)): (u, v) in selected
+        for u, v in SHARED_EDGE_INDICES
+    }
+
+
+def build(matching_case: int | None = None, *, shared_neighbor_case: int | None = None) -> Cnf:
+    if matching_case is not None and shared_neighbor_case is not None:
+        raise ValueError("matching cases and shared-neighbor cases use distinct relabelings")
     cnf = Cnf()
     fixed, neighborhoods = fixed_high_edges()
-    matching_fixed: dict[frozenset[int], bool] = {}
     if matching_case is not None:
         if matching_case not in range(1, 5):
             raise ValueError("matching_case must be 1..4")
-        n0 = neighborhoods[0]
         selected = {frozenset(pair) for pair in matching_cases()[matching_case - 1]}
-        matching_fixed = {
+        fixed.update({
             frozenset(pair): frozenset(pair) in selected
-            for pair in combinations(n0, 2)
-        }
+            for pair in combinations(neighborhoods[0], 2)
+        })
+    if shared_neighbor_case is not None:
+        fixed.update(shared_neighbor_fixed(shared_neighbor_case))
     edges: dict[tuple[int, int], int] = {}
     for u, v in combinations(range(4, 42), 2):
-        if frozenset((u, v)) in matching_fixed:
+        if frozenset((u, v)) in fixed:
             continue
         edges[u, v] = cnf.var()
 
@@ -163,8 +178,6 @@ def build(matching_case: int | None = None) -> Cnf:
         pair = frozenset((u, v))
         if pair in fixed:
             return fixed[pair]
-        if pair in matching_fixed:
-            return matching_fixed[pair]
         return edges[min(u, v), max(u, v)]
 
     # The three distinct four-cycle edge sets on each four-vertex set.
@@ -207,8 +220,11 @@ def main() -> None:
                         help="check the fixed label partition and D8 neighborhoods")
     parser.add_argument("--check-matching-orbits", action="store_true",
                         help="enumerate all matchings of N(0) under its S3×S4 relabelings")
-    parser.add_argument("--matching-case", type=int, choices=range(1, 5),
+    cases = parser.add_mutually_exclusive_group()
+    cases.add_argument("--matching-case", type=int, choices=range(1, 5),
                         help="fix one of four complete symmetry cases for the matching on N(0)")
+    cases.add_argument("--shared-neighbor-case", type=int, choices=range(1, 17),
+                       help="fix one of the 16 shared-neighbor orbits, in census output order")
     args = parser.parse_args()
     if args.check_scheme:
         check_scheme()
@@ -218,7 +234,7 @@ def main() -> None:
         return
     if args.output is None:
         parser.error("output is required unless --check-scheme is used")
-    cnf = build(args.matching_case)
+    cnf = build(args.matching_case, shared_neighbor_case=args.shared_neighbor_case)
     cnf.emit(args.output)
     print(f"wrote {args.output}: {cnf.nvars} variables, {len(cnf.clauses)} clauses")
 
