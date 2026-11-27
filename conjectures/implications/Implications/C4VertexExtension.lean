@@ -103,7 +103,7 @@ theorem addVertex_c4Free_iff {V : Type*} (G : SimpleGraph V) (s : Set V) :
           | none =>
             simp only [addVertex] at *
             exact (hS (x := x) (y := y) (z := z)
-              (fun he => hxy (congrArg some he)) hxz hyz) htwo
+              (fun he => hxy (congrArg some he)) htwo.1 htwo.2 ⟨hxz, hyz⟩
           | some w =>
             simp only [addVertex] at *
             exact (hG (x := x) (y := y) (z := z) (w := w)
