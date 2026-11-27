@@ -19,7 +19,7 @@ def overlapCompatible (p : Fin 8 → Fin 8) (shift : Fin 8) : Bool :=
   (List.range (8 - shift.val)).all fun i =>
     (List.range (8 - shift.val)).all fun j =>
       decide ((p ⟨shift.val + i, by have : i < 8 - shift.val := by omega; omega⟩ <
-                p ⟨shift.val + j, by have : j < 8 - shift.val := by omega; omega⟩) =
+                p ⟨shift.val + j, by have : j < 8 - shift.val := by omega; omega⟩) ↔
               (p ⟨i, by have : i < 8 - shift.val := by omega; omega⟩ <
                 p ⟨j, by have : j < 8 - shift.val := by omega; omega⟩))
 
