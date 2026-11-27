@@ -194,6 +194,6 @@ The previous combined AMO instance was not rerun. CaDiCaL 2.1.2 returned
 There is no model and no complete proof. The incidence theorem reduces the
 search but did not settle this case under the cap. The next useful strengthening
 is the newly checked layout: six degree-eight pairs have six distinct shared
-degree-six neighbors, while the four degree-seven vertices each meet at most
+degree-six neighbors, while each degree-seven vertex meets at most
 one degree-eight vertex. Encode those exact overlap/owner constraints (with
 exact common-neighbor indicators) before considering another bounded run.
