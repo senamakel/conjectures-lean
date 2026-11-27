@@ -80,7 +80,9 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
     have htwo : ({i, j} : Finset V).card = 2 := by simp [hij]
     have hle := Finset.card_le_card hpair
     change ({i, j} : Finset V).card ≤ (I.filter (fun k => left k = x ∨ right k = x)).card at hle
-    rw [hrows x hxC, htwo] at hle
+    have hrowsx := hrows x hxC
+    change (I.filter (fun k => left k = x ∨ right k = x)).card ≤ 1 at hrowsx
+    rw [htwo] at hle
     omega
 
   have hcross_endpoints (i j : V) (hi : i ∈ I) (hj : j ∈ I) (hij : i ≠ j) :
@@ -103,6 +105,7 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
     rw [List.disjoint_left]
     intro x hx hy
     simp only [block, List.mem_cons, List.not_mem_nil] at hx hy
+    simp only [or_false] at hx hy
     rcases hx with hxL | hxI | hxR <;> rcases hy with hyL | hyI | hyR
     · exact (hcross_endpoints i j hi hj hij).1 (hxL.symm.trans hyL)
     · have hxC : x ∈ C := hxL.symm ▸ hleftC i hi
@@ -123,7 +126,7 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
     · exact (hcross_endpoints i j hi hj hij).2.2.2 (hxR.symm.trans hyR)
 
   have pairwise_blocks : ∀ l : List V, l.Nodup →
-      (∀ i ∈ l, i ∈ I) → l.Pairwise (List.Disjoint on block) := by
+      (∀ i ∈ l, i ∈ I) → l.Pairwise (fun i j => List.Disjoint (block i) (block j)) := by
     intro l
     induction l with
     | nil => simp
