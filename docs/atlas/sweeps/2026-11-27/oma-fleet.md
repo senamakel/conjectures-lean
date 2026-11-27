@@ -32,4 +32,26 @@ Fleet port reports measured source and investigated statement applicability. The
 | `Erdos768.erdos_768` | About 900 KB after aggressive trimming, with a prime-number-theorem dependency and a real-indexed limit in the source where the target uses natural indices. The source is associated with an unrefereed claim. | Establish the limit bridge and find a small route with the necessary prime-counting input. [Source revision](https://github.com/ericlisg/erdos768-lean/tree/e46ab245f1e5eb2d1f0b184874c4e32e02ad16c9) |
 | `SidorenkoConjecture.sidorenko_conjecture_graphon` | The finite-host counterexample has a roughly 1.15 MB trimmed closure. The target also needs the step-graphon bridge preserving edge and homomorphism densities. | Build the bridge independently and find an admissible checked interface to the finite counterexample. [Source revision](https://github.com/openai/math/tree/3344da59991ed94f9ba711217b29c1d760badfa6/lean/OAI/Combinatorics/Sidorenko) |
 
-Measure reachable UTF-8 bytes and inspect lint-sensitive syntax before porting. For a reduction, estimate each leaf's shared dependencies and identify what the pinned checker actually imports. Keep the primary-source status, statement bridge and checker feasibility in the research record even when a route is parked.
+Measure reachable UTF-8 bytes and inspect lint-sensitive syntax before porting. For a reduction, estimate each leaf's shared dependencies and identify what the pinned checker actually imports.
+
+### Shared code goes in the reduction, not in every leaf
+
+Several blockers above assume that each leaf must carry its own copy of the shared infrastructure. That is false at the reviewed checker. `tools/check.sh` copies every merged `reductions/<id>.R<n>.lean` into the Lean library `OMAReductions` (module `OMAReductions.R_<id with non-alphanumerics as _>`). Step proofs import their parent reduction, and nested reductions import theirs, as in `proofs/Arxiv.0805.3777.isGenericRank_cube.R1.H*.lean` and `reductions/Arxiv.0805.3777.isGenericRank_cube.R1.H3.R1.H3.R1.lean` on upstream `a5f0e67`. A development of 1 to 3.5 MB can therefore be stacked in layers of about 450 KiB. Each reduction holds one layer of definitions and lemmas plus two to four hypotheses for the next big lemmas. Nested reductions add further layers, and the leaves prove the last lemmas against the deepest layer. Each layer is one PR that must merge before the next can be checked. A layered run started on 27 November 2026 for Green 49, Erdős 768, Sidorenko, Constant 6a, Green 92, Mills, Bombieri–Vinogradov, the Borsuk n = 9 leaf, Bondy, Steiner t = 4 and Erdős 1207.
+
+### Other port outcomes on 27 November 2026
+
+External ports that the checker accepted:
+- Erdős 326, 1199, 1133, 999 (Duffin–Schaeffer), 742 and 996, the last as a disproof.
+- Erdős 786 parts i and ii, both as disproofs.
+- Green 41 double-exponential bound, Green 84, and the Green 93 Breuillard–Varjú variant.
+- The class number problem (imaginary), the finite locally free group scheme exponent, and the mean value problem with constant 4.
+- The moving sofa (Romik's sofa), residual finiteness of hyperbolic groups, elliptic curve rank at least 29, and the one-dimensional spectral set product.
+- One leaf, Erdős 408(ii) R1.H1.
+
+PR numbers are in the OMA queue under author `senamakel`. Each file header credits its source repository, commit and licence.
+
+The blockers below were measured by the fleet. They hold at any layering depth unless noted.
+- **Pruned closure is tens of MB:** Kakeya 3D (21.8 MB), Erdős 420 parts ii and iii (28.7 MB), Erdős 408 part i (about 36 MB), Erdős 535's first open case (44 MB, through OpenAI's sunflower theorem), Hironaka and local uniformisation (about 21 MB), and Green 32 in the Szemerédi regime (49.7 MB).
+- **External certificates far beyond the checker:** Green 35's C∞ lower bound (a 321 MB certificate) and Moser's worm upper bound (22 MB gzipped, 59 minutes on 12 jobs).
+- **Source does not prove the target:** elliptic curve rank at least 28 and at least 30, Constant 7a's upper bound, the two-dimensional spectral set product, the hyperbolic finite-index forms, and Kakeya over finite fields (no Lean source).
+- **Rests on assumed hypotheses or axioms:** ternary Goldbach, Kotzig, the empty pentagon, Collatz and Erdős 1135 (samlavery/1135), and Erdős 696. Keep the primary-source status, statement bridge and checker feasibility in the research record even when a route is parked.
