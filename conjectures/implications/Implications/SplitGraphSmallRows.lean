@@ -242,7 +242,7 @@ theorem selected_two_rows_card_le_three
     (clique : Finset C) (indep : Finset I) (r : C → Finset I)
     (hsub : ∀ c ∈ clique, r c ⊆ indep)
     (_hrow : ∀ c ∈ clique, (r c).card ≤ 2)
-    (hdiff : ∀ c ∈ clique, ∀ d ∈ clique, c ≠ d →
+    (hdiff : ∀ c ∈ clique, ∀ d ∈ clique, c ≠ d → (r c).card = 2 → (r d).card = 2 →
       (r c \ r d ∪ r d \ r c).card ≤ 2)
     (hdegree : ∀ i ∈ indep, (clique.filter (fun c => i ∈ r c)).card = 2) :
     (clique.filter (fun c => (r c).card = 2)).card ≤ 3 := by
@@ -254,7 +254,7 @@ theorem selected_two_rows_card_le_three
       ∃ i, i ∈ r c ∧ i ∈ r d :=
     twoRows_intersect_of_symmDiff_card_le_two (r c) (r d)
       (hFcard c hc) (hFcard d hd) (hdiff c (Finset.mem_filter.mp hc).1
-        d (Finset.mem_filter.mp hd).1 hcd)
+        d (Finset.mem_filter.mp hd).1 hcd (hFcard c hc) (hFcard d hd))
   by_cases hdup : ∃ c ∈ F, ∃ d ∈ F, c ≠ d ∧ r c = r d
   · obtain ⟨c, hc, d, hd, hcd, hrows⟩ := hdup
     have hFsub : F ⊆ {c, d} := by
