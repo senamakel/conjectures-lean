@@ -33,8 +33,7 @@ theorem sum_row_card_eq_sum_degree (C S : Finset V) (inc : V → V → Prop)
           calc
             (row S inc c).card = ∑ x ∈ row S inc c, (1 : ℕ) := by simp
             _ = ∑ x ∈ S, if inc c x then 1 else 0 := by
-              simp only [row]
-              rw [Finset.sum_filter]
+              exact Finset.sum_filter (s := S) (fun x => inc c x) (fun _ => (1 : ℕ))
     _ = ∑ x ∈ S, ∑ c ∈ C, if inc c x then 1 else 0 := by
           rw [Finset.sum_comm]
     _ = ∑ x ∈ S, (C.filter (fun c => inc c x)).card := by
@@ -43,7 +42,8 @@ theorem sum_row_card_eq_sum_degree (C S : Finset V) (inc : V → V → Prop)
           calc
             ∑ c ∈ C, if inc c x then 1 else 0 =
                 ∑ c ∈ C.filter (fun c => inc c x), (1 : ℕ) := by
-                  rw [Finset.sum_filter]
+                  exact (Finset.sum_filter (s := C) (fun c => inc c x)
+                    (fun _ => (1 : ℕ))).symm
             _ = _ := by simp
 
 /-- If every left vertex has three incidences, every row has size at most
