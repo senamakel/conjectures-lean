@@ -312,6 +312,112 @@ theorem lexStep_extension (a : Nat → Bool) (pref x y same : Nat)
     · exact hguardB
     · simpa [hbp, hbx, hby] using hsame
 
+/-- A lexicographically admissible input assignment extends to all fresh
+equality-prefix variables in the exact consecutive DIMACS block, satisfying
+the complete comparison CNF. -/
+theorem lexClauses_extend_of_constraint (a : Nat → Bool) (base : Nat)
+    (initialPref : Bool) (prefVar : Nat) (left right : List Nat)
+    (hlen : left.length = right.length)
+    (hpref0 : 0 < prefVar) (hprefBase : prefVar < base)
+    (hprefix : a prefVar = initialPref)
+    (hleftPos : ∀ x ∈ left, 0 < x) (hrightPos : ∀ y ∈ right, 0 < y)
+    (hleftBound : ∀ x ∈ left, x < base) (hrightBound : ∀ y ∈ right, y < base)
+    (hconstraint : lexConstraint initialPref (left.map a) (right.map a) = true) :
+    cnfValue (lexAssignment a base initialPref left right)
+      (lexClauses prefVar base left right) = true := by
+  induction left generalizing right base initialPref prefVar with
+  | nil =>
+      cases right with
+      | nil => simp [lexClauses, cnfValue]
+      | cons y ys => simp at hlen
+  | cons x xs ih =>
+      cases right with
+      | nil => simp at hlen
+      | cons y ys =>
+          simp only [List.length_cons, Nat.succ.injEq] at hlen
+          have hxpos : 0 < x := hleftPos x (by simp)
+          have hypos : 0 < y := hrightPos y (by simp)
+          have hxbound : x < base := hleftBound x (by simp)
+          have hybound : y < base := hrightBound y (by simp)
+          have htailL : ∀ z ∈ xs, z < base := by
+            intro z hz
+            exact hleftBound z (by simp [hz])
+          have htailR : ∀ z ∈ ys, z < base := by
+            intro z hz
+            exact hrightBound z (by simp [hz])
+          have htailLp : ∀ z ∈ xs, 0 < z := by
+            intro z hz
+            exact hleftPos z (by simp [hz])
+          have htailRp : ∀ z ∈ ys, 0 < z := by
+            intro z hz
+            exact hrightPos z (by simp [hz])
+          by_cases hxy : x = y
+          · have hconstraint' :
+                lexConstraint initialPref (xs.map a) (ys.map a) = true := by
+              simpa [lexConstraint, hxy] using hconstraint
+            have hassign : lexAssignment a base initialPref (x :: xs) (y :: ys) =
+                lexAssignment a base initialPref xs ys := by
+              funext n
+              simp [lexAssignment, lexPrefixScan, hxy]
+            simpa [lexClauses, hxy, hassign] using
+              (ih ys base initialPref prefVar rfl hpref0 hprefBase hprefix
+                htailLp htailRp htailL htailR hconstraint')
+          · have hconstraint' :
+                ((!initialPref || a x || !a y) &&
+                  lexConstraint (initialPref && (a x == a y)) (xs.map a) (ys.map a)) = true := by
+              change ((!initialPref || a x || !a y) &&
+                lexConstraint (initialPref && (a x == a y)) (xs.map a) (ys.map a)) = true at hconstraint
+              exact hconstraint
+            rcases Bool.and_eq_true.mp hconstraint' with ⟨hguard, htailConstraint⟩
+            let nextPref := initialPref && (a x == a y)
+            let g := lexAssignment a base initialPref (x :: xs) (y :: ys)
+            have hgpref : g prefVar = initialPref := by
+              dsimp [g]
+              rw [lexAssignment_preserves_below_base a base initialPref (x :: xs) (y :: ys)
+                (Nat.lt_trans hprefBase (by omega))]
+              exact hprefix
+            have hgx : g x = a x := by
+              dsimp [g]
+              exact lexAssignment_preserves_below_base a base initialPref (x :: xs) (y :: ys) hxbound
+            have hgy : g y = a y := by
+              dsimp [g]
+              exact lexAssignment_preserves_below_base a base initialPref (x :: xs) (y :: ys) hybound
+            have hscanPos : 0 < (lexPrefixScan a initialPref (x :: xs) (y :: ys)).length := by
+              simp [lexPrefixScan, hxy]
+            have hgb : g base = nextPref := by
+              dsimp [g, nextPref]
+              rw [lexAssignment_fresh_id a base initialPref (x :: xs) (y :: ys)
+                (k := 0) (by simpa using hscanPos)]
+              simp [lexPrefixScan, hxy]
+            have hstep : cnfValue g (lexStepClauses prefVar x y base) = true := by
+              apply lexStep_auxiliary_assignment_satisfies g prefVar x y base hpref0 hxpos hypos
+              · omega
+              · simpa [hgpref, hgx, hgy] using hguard
+              · simp [hgpref, hgx, hgy, hgb, nextPref]
+            have hassign :
+                lexAssignment a base initialPref (x :: xs) (y :: ys) =
+                  lexAssignment (extendVariable a base nextPref) (base + 1)
+                    nextPref xs ys := by
+              simpa [nextPref] using
+                lexAssignment_cons_neq a base initialPref x y xs ys hxy hxbound hybound htailL htailR
+            have htailSat :
+                cnfValue (lexAssignment (extendVariable a base nextPref) (base + 1)
+                  nextPref xs ys) (lexClauses base (base + 1) xs ys) = true := by
+              apply ih ys (base + 1) nextPref base hlen hpref0 ?_ ?_ htailLp htailRp ?_ ?_ htailConstraint
+              · omega
+              · simp [extendVariable]
+              · intro z hz
+                have := htailL z hz
+                omega
+              · intro z hz
+                have := htailR z hz
+                omega
+            have htailSat' : cnfValue g (lexClauses base (base + 1) xs ys) = true := by
+              simpa [hassign] using htailSat
+            change cnfValue g (lexStepClauses prefVar x y base ++
+              lexClauses base (base + 1) xs ys) = true
+            simp [cnfValue, hstep, htailSat']
+
 end Implications.C4PolarityLexEncoding
 
 #print axioms Implications.C4PolarityLexEncoding.lexFreshIds_length
