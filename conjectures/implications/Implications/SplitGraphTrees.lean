@@ -26,6 +26,71 @@ noncomputable def rowDiff (G : SimpleGraph V) (I : Finset V) (c d : V) : Finset 
 def inducedTreeBound (G : SimpleGraph V) (k : ℕ) : Prop :=
   ∀ s : Finset V, (G.induce (s : Set V)).IsTree → s.card ≤ k + 2
 
+/-- Extending an induced tree by a vertex with a unique neighbor preserves being a tree. -/
+private theorem induce_insert_of_unique_adj (G : SimpleGraph V) (s : Finset V)
+    (z a : V) (hT : (G.induce (s : Set V)).IsTree)
+    (hz : z ∉ s) (ha : a ∈ s) (hza : G.Adj z a)
+    (huniq : ∀ ⦃b⦄, b ∈ s → G.Adj z b → b = a) :
+    (G.induce ((insert z s : Finset V) : Set V)).IsTree := by
+  classical
+  refine ⟨?_, ?_⟩
+  · have hsconn := hT.connected.preconnected
+    have hzconn : (G.induce ({z} : Set V)).Preconnected := .of_subsingleton
+    have hconn := SimpleGraph.connected_induce_union (v := z) (w := a)
+      (s := ({z} : Set V)) (t := (s : Set V)) hzconn hsconn (by simp)
+      (by simpa using ha) hza
+    rw [Finset.coe_insert]
+    simpa only [Set.singleton_union] using hconn
+  · intro v cyc hcyc
+    let e : G.induce ((insert z s : Finset V) : Set V) ↪g G :=
+      SimpleGraph.Embedding.induce _
+    let q : G.Walk (e v) (e v) := cyc.map e.toHom
+    have hq : q.IsCycle := by
+      dsimp [q]
+      exact (Walk.isCycle_map_iff_of_injective e.injective).2 hcyc
+    have hq_mem (w : V) (hw : w ∈ q.support) : w ∈ insert z s := by
+      dsimp [q] at hw
+      rw [Walk.support_map] at hw
+      obtain ⟨w', hw', rfl⟩ := List.mem_map.mp hw
+      exact w'.property
+    by_cases hzq : z ∈ q.support
+    · let r : G.Walk z z := q.rotate z hzq
+      have hr : r.IsCycle := by simpa [r] using hq.rotate hzq
+      have hrsnd : r.snd ∈ q.support := by
+        apply (q.mem_support_rotate_iff z hzq).mp
+        simpa [r] using r.getVert_mem_support 1
+      have hrpen : r.penultimate ∈ q.support := by
+        apply (q.mem_support_rotate_iff z hzq).mp
+        simpa [r] using r.getVert_mem_support (r.length - 1)
+      have hadjSnd : G.Adj z r.snd := r.adj_snd hr.not_nil
+      have hadjPen : G.Adj z r.penultimate := (r.adj_penultimate hr.not_nil).symm
+      have hSnd : r.snd ∈ s := by
+        rcases Finset.mem_insert.mp (hq_mem _ hrsnd) with heq | hmem
+        · exact (hadjSnd.ne heq.symm).elim
+        · exact hmem
+      have hPen : r.penultimate ∈ s := by
+        rcases Finset.mem_insert.mp (hq_mem _ hrpen) with heq | hmem
+        · exact (hadjPen.ne heq.symm).elim
+        · exact hmem
+      exact hr.snd_ne_penultimate
+        ((huniq hSnd hadjSnd).trans (huniq hPen hadjPen).symm)
+    · have hqs : ∀ w ∈ q.support, w ∈ (s : Set V) := by
+        intro w hw
+        rcases Finset.mem_insert.mp (hq_mem w hw) with heq | hmem
+        · subst w
+          exact (hzq hw).elim
+        · simpa using hmem
+      let qi := q.induce (s : Set V) hqs
+      have hqi : qi.IsCycle := by
+        apply (Walk.isCycle_map_iff_of_injective
+          (f := (SimpleGraph.Embedding.induce (G := G) (s : Set V)).toHom)
+          (SimpleGraph.Embedding.induce (G := G) (s : Set V)).injective).mp
+        rw [show qi.map (SimpleGraph.Embedding.induce (G := G) (s : Set V)).toHom = q by
+          dsimp [qi]
+          exact Walk.map_induce q hqs]
+        exact hq
+      exact hT.isAcyclic qi hqi
+
 /-- A clique vertex together with its row induces a star. -/
 theorem star_isTree (G : SimpleGraph V) (I : Finset V) (c : V)
     (hI : G.IsIndepSet (I : Set V)) :
