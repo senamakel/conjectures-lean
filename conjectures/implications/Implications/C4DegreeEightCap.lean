@@ -269,7 +269,8 @@ theorem degree_eight_count_le_four_of_extremal_42
           have height : (∑ v : Fin 42, if G.degree v = 8 then 2 else 0) = 2 * D.card := by
             calc
               _ = ∑ v ∈ D, (2 : ℕ) := by simp [D, Finset.sum_ite_mem_eq]
-              _ = 2 * D.card := by simp [Nat.mul_comm]
+              _ = D.card * 2 := by simp
+              _ = 2 * D.card := Nat.mul_comm _ _
           rw [hseven, height]
     omega
   have htarget : D.card ≤ 4 := by
