@@ -58,6 +58,19 @@ private def exponentClasses : List (ℕ × ℕ) :=
    (40, 139), (41, 149), (42, 151), (43, 157), (44, 163), (45, 167), (46, 173),
    (47, 179), (48, 181), (49, 2)]
 
+private def squareOffsets : List ℕ := [1, 4, 9, 16, 25, 36, 49]
+
+private def cubeOffsets : List ℕ := [3, 24]
+
+private def classAssignmentValid : Bool :=
+  exponentClasses.map Prod.fst == (List.range 49).map (fun n => n + 1) &&
+    exponentClasses.all (fun (offset, q) =>
+      if squareOffsets.contains offset then q == 2
+      else if cubeOffsets.contains offset then q == 3
+      else exponentPrimes.contains q) &&
+    ((exponentClasses.filter (fun (offset, _) =>
+      !(squareOffsets.contains offset || cubeOffsets.contains offset))).map Prod.snd).Nodup
+
 private def congruencesHold : Bool :=
   exponentClasses.all fun (offset, q) =>
     basePrimes.zip crtExponent |>.all fun (p, a) =>
@@ -72,9 +85,10 @@ theorem exponentCongruenceCertificate : congruencesHold = true := by
 private def coordinatesBounded : Bool :=
   crtExponent.all (fun a => a < E) &&
     exponentPrimes.length == 42 && basePrimes.length == 15 &&
+    crtExponent.length == basePrimes.length &&
     exponentClasses.length == 49 &&
     exponentPrimes.all Nat.Prime &&
-    exponentPrimes.prod == E && basePrimes.prod == W
+    exponentPrimes.prod == E && basePrimes.prod == W && classAssignmentValid
 
 /-- The CRT coordinates lie in the canonical interval below the product of
 the 42 pairwise distinct exponent primes. -/
