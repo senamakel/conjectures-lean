@@ -35,7 +35,7 @@ private def neg (v : Nat) : Int := -(Int.ofNat v)
     literalValue a (neg v) = !a v := by
   cases v with
   | zero => omega
-  | succ n => simp [literalValue, neg, pos]
+  | succ n => simp [literalValue, neg, Int.negOfNat]
 
 /-- One nontrivial iteration of the Python lex loop: its guard clause followed
 by the five clauses defining the next equality-prefix variable. -/
@@ -108,7 +108,8 @@ theorem lexFreshIds_ge (next : Nat) (left right : List Nat) :
       | cons y ys =>
           by_cases hxy : x = y
           · simpa [lexFreshIds, hxy] using ih next ys
-          · simp only [lexFreshIds, hxy, if_false, List.mem_cons]
+          · have hbeq : (x == y) = false := by simp [hxy]
+            simp only [lexFreshIds, hbeq, if_false, List.mem_cons]
             intro v hv
             rcases hv with rfl | hv
             · exact Nat.le_refl _
@@ -125,7 +126,8 @@ theorem lexFreshIds_nodup (next : Nat) (left right : List Nat) :
       | cons y ys =>
           by_cases hxy : x = y
           · simpa [lexFreshIds, hxy] using ih next ys
-          · simp only [lexFreshIds, hxy, if_false]
+          · have hbeq : (x == y) = false := by simp [hxy]
+            rw [lexFreshIds, hbeq, if_false]
             apply List.nodup_cons.mpr
             constructor
             · intro h
