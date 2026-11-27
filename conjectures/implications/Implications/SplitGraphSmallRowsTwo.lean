@@ -204,7 +204,7 @@ theorem chosen_two_double_rows_have_shape
     (hdiff : ∀ q ∈ C, ∀ d ∈ C, q ≠ d → (rowDiff G I q d).card ≤ 2)
     (hcount : (C.filter (fun q => (selectedRow I left right q).card = 2)).card = 2) :
     ∃ c d u v w, c ∈ C ∧ d ∈ C ∧ c ≠ d ∧
-      ((selectedRow I left right c = {u,v} ∧ selectedRow I left right d = {u,v}) ∨
+      ((selectedRow I left right c = {u,v} ∧ selectedRow I left right d = {u,v} ∧ u ≠ v) ∨
        (selectedRow I left right c = {u,v} ∧ selectedRow I left right d = {u,w} ∧
         u ≠ v ∧ u ≠ w ∧ v ≠ w)) := by
   classical
@@ -233,7 +233,7 @@ theorem chosen_two_double_rows_have_shape
     obtain ⟨u,v,huv,hrowPair⟩ := Finset.card_eq_two.mp hrowCCard
     refine ⟨c,d,u,v,v,hcC,hdC,hcd,?_⟩
     exact Or.inl ⟨hselectedEqC.trans hrowPair,
-      hselectedEqD.trans (hsame.symm.trans hrowPair)⟩
+      hselectedEqD.trans (hsame.symm.trans hrowPair), huv⟩
   · refine ⟨c,d,u,v,w,hcC,hdC,hcd,Or.inr ?_⟩
     exact ⟨hselectedEqC.trans hcRow, hselectedEqD.trans hdRow, huv, huw, hvw⟩
 
@@ -401,17 +401,15 @@ theorem hamiltonian_of_split_partition_two_double_rows
     · exact heq ▸ hleftAdj i hi'.1
     · exact heq ▸ hrightAdj i hi'.1
   rcases hshape with hequal | hoverlap
-  · rcases hequal with ⟨hrowC,hrowD⟩
+  · rcases hequal with ⟨hrowC,hrowD,huv⟩
     let S : Finset V := {u,v}
     let pref : List V := [u,c,v,d]
-    have huI : u ∈ I := (Finset.mem_filter.mp (by rw [hrowC]; simp)).1
-    have hvI : v ∈ I := (Finset.mem_filter.mp (by rw [hrowC]; simp)).1
-    have huv : u ≠ v := by
-      intro he
-      have hcard := congrArg Finset.card hrowC
-      simp [he] at hcard
-    have huc : u ∈ selectedRow I left right c := by rw [hrowC]; simp [huv]
-    have hvc : v ∈ selectedRow I left right c := by rw [hrowC]; simp [huv]
+    have huSelC : u ∈ selectedRow I left right c := by rw [hrowC]; simp [huv]
+    have hvSelC : v ∈ selectedRow I left right c := by rw [hrowC]; simp [huv]
+    have huI : u ∈ I := (Finset.mem_filter.mp huSelC).1
+    have hvI : v ∈ I := (Finset.mem_filter.mp hvSelC).1
+    have huc := huSelC
+    have hvc := hvSelC
     have hud : u ∈ selectedRow I left right d := by rw [hrowD]; simp [huv]
     have hvd : v ∈ selectedRow I left right d := by rw [hrowD]; simp [huv]
     have hprefNodup : pref.Nodup := by
