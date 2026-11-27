@@ -85,6 +85,20 @@ construction. -/
 theorem exponentCongruenceCertificate : congruencesHold = true := by
   native_decide
 
+/-- Each table entry carries the claimed valuation congruence. This exposes the
+finite Boolean certificate as ordinary Lean propositions for later arithmetic
+lemmas to consume. -/
+theorem valuationCongruence {offset q : ℕ} (hoff : (offset, q) ∈ exponentClasses)
+    {p a : ℕ} (hpa : (p, a) ∈ basePrimes.zip crtExponent) :
+    (Nat.factorization (offset * W) p + a) % q = 0 := by
+  have hcheck : exponentClasses.all (fun (i, r) =>
+      (basePrimes.zip crtExponent).all (fun (s, b) =>
+        (Nat.factorization (i * W) s + b) % r == 0)) = true := by
+    simpa [congruencesHold] using exponentCongruenceCertificate
+  have hinner := (List.all_eq_true.mp hcheck) (offset, q) hoff
+  have hval := (List.all_eq_true.mp hinner) (p, a) hpa
+  exact of_decide_eq_true hval
+
 private def coordinatesBounded : Bool :=
   crtExponent.all (fun a => a < E) &&
     exponentPrimes.length == 42 && basePrimes.length == 15 &&
@@ -97,5 +111,10 @@ private def coordinatesBounded : Bool :=
 the 42 pairwise distinct exponent primes. -/
 theorem crtCoordinatesBounded : coordinatesBounded = true := by
   native_decide
+
+/-- The exponent product is small enough for the published decimal bound after
+using `W < 10^18`. This comparison is kernel-reduced. -/
+theorem exponentDecimalBound : 18 * E + 2 < 10 ^ 74 := by
+  norm_num [E]
 
 end Implications.PerfectPowerGapCRT

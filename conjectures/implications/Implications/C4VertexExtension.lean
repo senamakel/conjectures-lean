@@ -65,10 +65,10 @@ theorem addVertex_c4Free_iff {V : Type*} (G : SimpleGraph V) (s : Set V) :
       simp only [addVertex] at * <;> aesop (config := { maxRuleApplications := 1000 })
     all_goals
       first
-      | exact hS (by simpa using hzw.symm) hxz left (G.symm.symm _ _ hyz)
-          (G.symm.symm _ _ right)
-      | exact hS (by simpa using hzw) hyz right (G.symm.symm _ _ hxz)
-          (G.symm.symm _ _ left)
+      | exact hS (by simpa using hzw.symm) hxz left
+          ⟨G.symm.symm _ _ hyz, G.symm.symm _ _ right⟩
+      | exact hS (by simpa using hzw.symm) right hyz
+          ⟨G.symm.symm _ _ left, G.symm.symm _ _ hxz⟩
 
 #print axioms addVertex_c4Free_iff
 
