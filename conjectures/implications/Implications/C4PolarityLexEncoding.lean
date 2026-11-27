@@ -147,7 +147,7 @@ theorem lexAssignment_cons_neq (a : Nat → Bool) (base : Nat)
       lexPrefixScan a nextPref xs ys :=
     lexPrefixScan_extendVariable a base nextPref nextPref xs ys hxs hys
   have hlen : (lexPrefixScan a initialPref (x :: xs) (y :: ys)).length =
-      1 + (lexPrefixScan a nextPref xs ys).length := by rw [hscan]; simp
+      1 + (lexPrefixScan a nextPref xs ys).length := by rw [hscan]; simp [Nat.add_comm]
   by_cases hbelow : n < base
   · have hbelow' : n < base + 1 := by omega
     simp [lexAssignment, hbelow, hbelow', extendVariable, Nat.ne_of_lt hbelow]
@@ -155,6 +155,7 @@ theorem lexAssignment_cons_neq (a : Nat → Bool) (base : Nat)
     · subst n
       simp [lexAssignment, hbelow, hscan, nextPref, extendVariable]
     · have habove : base < n := by omega
+      have hbelow' : ¬ n < base + 1 := by omega
       have hidx : n - base = (n - (base + 1)) + 1 := by omega
       have hthreshold :
           (n < base + (lexPrefixScan a initialPref (x :: xs) (y :: ys)).length) ↔
