@@ -47,16 +47,16 @@ private def crtExponent : List ℕ :=
    481292026110049025210719726671539040050046149204464389658809951555137579,
    1477485856689787370688773686067098896689946139596945151494503175304737989]
 
-/- The square class is represented by 1; 3 represents the cube class containing
-24; all other offsets in [1,49] occur once, matched in order to primes 5..181. -/
+/- The square offsets use exponent 2; 3 and 24 use exponent 3; all other offsets
+are matched in order to the 40 primes from 5 through 181. -/
 private def exponentClasses : List (ℕ × ℕ) :=
-  [(1, 2), (3, 3),
-   (2, 5), (5, 7), (6, 11), (7, 13), (8, 17), (10, 19), (11, 23), (12, 29),
-   (13, 31), (14, 37), (15, 41), (17, 43), (18, 47), (19, 53), (20, 59),
-   (21, 61), (22, 67), (23, 71), (26, 73), (27, 79), (28, 83), (29, 89),
-   (30, 97), (31, 101), (32, 103), (33, 107), (34, 109), (35, 113), (37, 127),
-   (38, 131), (39, 137), (40, 139), (41, 149), (42, 151), (43, 157), (44, 163),
-   (45, 167), (46, 173), (47, 179), (48, 181)]
+  [(1, 2), (2, 5), (3, 3), (4, 2), (5, 7), (6, 11), (7, 13), (8, 17), (9, 2),
+   (10, 19), (11, 23), (12, 29), (13, 31), (14, 37), (15, 41), (16, 2), (17, 43),
+   (18, 47), (19, 53), (20, 59), (21, 61), (22, 67), (23, 71), (24, 3), (25, 2),
+   (26, 73), (27, 79), (28, 83), (29, 89), (30, 97), (31, 101), (32, 103),
+   (33, 107), (34, 109), (35, 113), (36, 2), (37, 127), (38, 131), (39, 137),
+   (40, 139), (41, 149), (42, 151), (43, 157), (44, 163), (45, 167), (46, 173),
+   (47, 179), (48, 181), (49, 2)]
 
 private def congruencesHold : Bool :=
   exponentClasses.all fun (offset, q) =>
@@ -72,7 +72,9 @@ theorem exponentCongruenceCertificate : congruencesHold = true := by
 private def coordinatesBounded : Bool :=
   crtExponent.all (fun a => a < E) &&
     exponentPrimes.length == 42 && basePrimes.length == 15 &&
-    exponentClasses.length == 42
+    exponentClasses.length == 49 &&
+    exponentPrimes.all Nat.Prime &&
+    exponentPrimes.prod == E && basePrimes.prod == W
 
 /-- The CRT coordinates lie in the canonical interval below the product of
 the 42 pairwise distinct exponent primes. -/

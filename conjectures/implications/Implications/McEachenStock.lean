@@ -19,7 +19,7 @@ def x : ℕ → ℕ
 
 /-- The multiplier in `x (n + 1) = x n * (a n + 2)`. -/
 def a (n : ℕ) : ℕ :=
-  if n = 0 then 0 else (n + 1) / Nat.gcd (x n) (n + 1)
+  if n = 0 then 0 else (x (n + 1) / x n) - 2
 
 lemma x_pos (n : ℕ) (hn : 1 ≤ n) : 0 < x n := by
   cases n with
@@ -45,6 +45,14 @@ lemma a_eq_div_gcd (n : ℕ) (hn : 1 ≤ n) :
   rw [a, if_neg (by omega), x_succ_fact n hn]
   simp [x_pos n hn]
 
+lemma a_dvd (n : ℕ) (hn : 1 ≤ n) : a n ∣ n + 1 := by
+  rw [a_eq_div_gcd n hn]
+  exact Nat.div_dvd_of_dvd (Nat.gcd_dvd_right _ _)
+
+lemma a_le (n : ℕ) (hn : 1 ≤ n) : a n ≤ n + 1 := by
+  rw [a_eq_div_gcd n hn]
+  exact Nat.div_le_self _ _
+
 lemma x_dvd_succ (n : ℕ) (hn : 1 ≤ n) : x n ∣ x (n + 1) := by
   rw [x_succ_fact n hn]
   exact Nat.dvd_mul_right _ _
@@ -55,7 +63,7 @@ lemma x_succ_mul_a (n : ℕ) (hn : 1 ≤ n) : x (n + 1) = x n * (a n + 2) := by
 lemma prime_not_dvd_x_before {p : ℕ} (hp : p.Prime) (n : ℕ) (hn : 1 ≤ n)
     (hsmall : n + 2 < p) : ¬ p ∣ x n := by
   induction n using Nat.strong_induction_on with
-  | h n ih =>
+  | ind n ih =>
     rcases n with _ | _ | k
     · omega
     · simp [x, hp.not_dvd_one]
@@ -75,7 +83,42 @@ lemma prime_mod_three_two {p : ℕ} (hp : p.Prime) (hmod : p % 3 = 2)
     induction n, hn using Nat.le_induction with
     | base => decide
     | succ k hk ih => exact ih.trans (x_dvd_succ k (by omega))
-  have hprev : a (p - 3) ≠ p - 2 := by
+  have hiff : p ∣ x (p - 1) ↔ a (p - 3) = p - 2 := by
+    have he : p - 2 = (p - 3) + 1 := by omega
+    rw [he, x_succ_mul_a _ (by omega), hp.dvd_mul]
+    have hbefore := prime_not_dvd_x_before hp (p - 3) (by omega) (by omega)
+    rw [or_iff_right hbefore]
+    constructor
+    · intro hd
+      have hb := a_le (p - 3) (by omega)
+      have hl := Nat.le_of_dvd (by omega : 0 < a (p - 3) + 2) hd
+      omega
+    · intro ha
+      have heq : a (p - 3) + 2 = p := by omega
+      rw [heq]
+  have htarget : a (p - 1) = p ↔ a (p - 3) ≠ p - 2 := by
+    constructor
+    · intro ha heq
+      have hd := hiff.mpr heq
+      rw [show a (p - 1) = if p ∣ x (p - 1) then 1 else p by
+        rw [a_eq_div_gcd _ (by have := hp.two_le; omega), Nat.sub_add_cancel hp.one_le]
+        split_ifs with hd
+        · rw [Nat.gcd_eq_right hd, Nat.div_self hp.pos]
+        · have hc : Nat.Coprime (x (p - 1)) p := (hp.coprime_iff_not_dvd.mpr hd).symm
+          rw [hc.gcd_eq_one, Nat.div_one]] at ha
+      rw [if_pos hd] at ha
+      omega
+    · intro hne
+      have hd : ¬ p ∣ x (p - 1) := fun hd => hne (hiff.mp hd)
+      rw [show a (p - 1) = if p ∣ x (p - 1) then 1 else p by
+        rw [a_eq_div_gcd _ (by have := hp.two_le; omega), Nat.sub_add_cancel hp.one_le]
+        split_ifs with hd
+        · rw [Nat.gcd_eq_right hd, Nat.div_self hp.pos]
+        · have hc : Nat.Coprime (x (p - 1)) p := (hp.coprime_iff_not_dvd.mpr hd).symm
+          rw [hc.gcd_eq_one, Nat.div_one]]
+      rw [if_neg hd]
+  have hp7 : 7 ≤ p := by omega
+  exact (htarget).mpr (by
     intro ha
     have hd := hthree (p - 3) (by omega)
     have hm : 3 ∣ (p - 3) + 1 := Nat.dvd_of_mod_eq_zero (by omega)
@@ -88,27 +131,7 @@ lemma prime_mod_three_two {p : ℕ} (hp : p.Prime) (hmod : p % 3 = 2)
     rw [ha, hrel] at hmul
     have hb := Nat.mul_le_mul_left ((p - 3) + 1) hgpos
     rw [hmul] at hb
-    omega
-  have hiff : p ∣ x (p - 1) ↔ a (p - 3) = p - 2 := by
-    have he : p - 2 = (p - 3) + 1 := by omega
-    rw [he, x_succ_mul_a _ (by omega), hp.dvd_mul]
-    have hbefore := prime_not_dvd_x_before hp (p - 3) (by omega) (by omega)
-    rw [or_iff_right hbefore]
-    constructor
-    · intro hd
-      have ha := Nat.div_le_self ((p - 3) + 1) (Nat.gcd (x (p - 3)) ((p - 3) + 1))
-      rw [a_eq_div_gcd _ (by omega)] at ha
-      have hl := Nat.le_of_dvd (by omega : 0 < a (p - 3) + 2) hd
-      omega
-    · intro ha
-      have heq : a (p - 3) + 2 = p := by omega
-      rw [heq]
-  have hnot : ¬ p ∣ x (p - 1) := by
-    exact prime_not_dvd_x_before hp (p - 1) (by omega) (by omega)
-  rw [a_eq_div_gcd _ (by have := hp.two_le; omega), Nat.sub_add_cancel hp.one_le]
-  rw [if_neg hnot]
-  have hc : Nat.Coprime (x (p - 1)) p := (hp.coprime_iff_not_dvd.mpr hnot).symm
-  rw [hc.gcd_eq_one, Nat.div_one]
+    omega)
 
 /-- For a prime `r ≥ 11` with `r ≡ 2 (mod 3)`, the recurrence inserts `r + 2`
 into `x r`; divisibility monotonicity keeps it in every later state. -/

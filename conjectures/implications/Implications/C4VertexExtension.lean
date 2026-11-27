@@ -26,7 +26,7 @@ def addVertex {V : Type*} (G : SimpleGraph V) (s : Set V) : SimpleGraph (Option 
     symm := by
       constructor
       intro a b hab
-      cases a <;> cases b <;> simp_all <;> try exact G.symm.symm hab
+      cases a <;> cases b <;> simp_all <;> try exact G.symm.symm _ _ hab
     loopless := by
       constructor
       intro a ha
@@ -59,7 +59,7 @@ theorem addVertex_c4Free_iff {V : Type*} (G : SimpleGraph V) (s : Set V) :
       exact hnot ⟨hold, hold'⟩
   · rintro ⟨hG, hS⟩ x y z w hxy hzw hxz hyz htwo
     cases x <;> cases y <;> cases z <;> cases w <;>
-      simp only [addVertex] at * <;> aesop (maxRuleApplications := 1000)
+      simp only [addVertex] at * <;> aesop (config := { maxRuleApplications := 1000 })
 
 #print axioms addVertex_c4Free_iff
 
