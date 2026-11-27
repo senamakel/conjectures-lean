@@ -132,6 +132,11 @@ count and reduced cyclic leaves but did not reduce nodes. Treat this exact-edge
 slice as incomplete; do not retry it again within this budget. Proceed with one
 run each for `E=25,24,23`, using the already-recorded caps.
 
+The single `E=25` run hit the 6-billion-node cap after 124.16 CPU seconds,
+emitting 81,326 eligible masks and rejecting 186,240 cyclic leaves at 7,100
+KiB maximum RSS. This is also incomplete; no retry is planned. Proceed to `E=24`
+then `E=23` once each.
+
 ## Interpretation
 
 Finishing the count reproduces only the Q7 enumeration stage; it does not prove
