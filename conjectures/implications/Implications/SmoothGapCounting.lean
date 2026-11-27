@@ -131,4 +131,73 @@ theorem smallGapMultiHitBound {N Y j : ℕ} (S : Finset ℕ)
   refine ⟨Finset.mem_range.mpr (by omega), ?_⟩
   exact lt_of_lt_of_le hmi.2 (hgap r hr)
 
+/-- Finite cutoff estimate for prime gaps with at least `j` smooth interior
+integers. Gaps of size at least `B` are bounded by the telescoping prime-gap
+sum, while hits in shorter gaps inject disjointly into the global set of
+`B`-smooth integers below `p_N`:
+
+`B * j * hitCount ≤ j * p_N + B * smoothCount`.
+-/
+theorem cutoffHitCount (N B j : ℕ) (hB : 0 < B) :
+    (B : ℝ) * j * (((Finset.range N).filter (fun r =>
+      j ≤ ((Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
+        (fun m => m.maxPrimeFac < primeGap r)).card)).card : ℝ) ≤
+      (j : ℝ) * primeAt N + (B : ℝ) *
+        (((Finset.range (primeAt N + 1)).filter (fun m => m.maxPrimeFac < B)).card : ℝ) := by
+  let H := (Finset.range N).filter (fun r =>
+    j ≤ ((Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
+      (fun m => m.maxPrimeFac < primeGap r)).card)
+  let L := H.filter (fun r => B ≤ primeGap r)
+  let S := H.filter (fun r => primeGap r < B)
+  let U := (Finset.range (primeAt N + 1)).filter (fun m => m.maxPrimeFac < B)
+  have hpart : H = L ∪ S := by
+    ext r
+    simp only [H, L, S, Finset.mem_filter, Finset.mem_union]
+    constructor
+    · rintro ⟨hr, hh⟩
+      rcases le_total B (primeGap r) with h | h
+      · exact Or.inl ⟨hr, h⟩
+      · exact Or.inr ⟨hr, Nat.lt_of_not_ge h⟩
+    · rintro (⟨hr, hb⟩ | ⟨hr, hb⟩) <;> exact ⟨hr, by assumption⟩
+  have hdisj : Disjoint L S := by
+    apply Finset.disjoint_left.mpr
+    intro r hr hs
+    exact (not_lt_of_ge (Finset.mem_filter.mp hr).2) (Finset.mem_filter.mp hs).2
+  have hcard : H.card = L.card + S.card := by
+    rw [hpart, Finset.card_union_of_disjoint hdisj]
+  have hLsub : L ⊆ (Finset.range N).filter (fun r => B ≤ primeGap r) := by
+    intro r hr
+    have hrH := (Finset.mem_filter.mp hr).1
+    exact Finset.mem_filter.mpr ⟨(Finset.mem_filter.mp hrH).1,
+      (Finset.mem_filter.mp hr).2⟩
+  have hLnat := Finset.card_le_card hLsub
+  have hLbound := largeGapCount N B
+  have hLB : (B : ℝ) * (L.card : ℝ) ≤ primeAt N := by
+    exact (Nat.cast_le.mpr hLnat).trans hLbound
+  have hSsub : S ⊆ Finset.range N := by
+    intro r hr
+    exact (Finset.mem_filter.mp (Finset.mem_filter.mp hr).1).1
+  have hSlarge : ∀ r ∈ S, j ≤
+      ((Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
+        (fun m => m.maxPrimeFac < primeGap r)).card := by
+    intro r hr
+    exact (Finset.mem_filter.mp (Finset.mem_filter.mp hr).1).2
+  have hSgap : ∀ r ∈ S, primeGap r ≤ B := by
+    intro r hr
+    exact (Finset.mem_filter.mp hr).2.le
+  have hSboundNat := smallGapMultiHitBound S hSsub hSgap hSlarge
+  have hSbound : (j : ℝ) * (S.card : ℝ) ≤ U.card := by
+    have := Nat.cast_le.mpr hSboundNat
+    simpa [U, Nat.cast_mul] using this
+  have hLscaled : (B : ℝ) * j * (L.card : ℝ) ≤ (j : ℝ) * primeAt N := by
+    calc
+      _ = (j : ℝ) * ((B : ℝ) * (L.card : ℝ)) := by ring
+      _ ≤ _ := mul_le_mul_of_nonneg_left hLB (by positivity)
+  have hSscaled : (B : ℝ) * j * (S.card : ℝ) ≤ (B : ℝ) * (U.card : ℝ) := by
+    calc
+      _ = (B : ℝ) * ((j : ℝ) * (S.card : ℝ)) := by ring
+      _ ≤ _ := mul_le_mul_of_nonneg_left hSbound (by positivity)
+  rw [hcard]
+  nlinarith
+
 end Implications.SmoothGapCounting

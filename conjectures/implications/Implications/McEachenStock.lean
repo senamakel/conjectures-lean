@@ -117,6 +117,14 @@ lemma prime_dvd_x_iff {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p) :
     have heq : a (p - 3) + 2 = p := by omega
     rw [heq]
 
+lemma a_at_prime (p : ℕ) (hp : p.Prime) :
+    a (p - 1) = if p ∣ x (p - 1) then 1 else p := by
+  rw [a_eq_div_gcd _ (by have := hp.two_le; omega), Nat.sub_add_cancel hp.one_le]
+  split_ifs with hd
+  · rw [Nat.gcd_eq_right hd, Nat.div_self hp.pos]
+  · have hc : Nat.Coprime (x (p - 1)) p := (hp.coprime_iff_not_dvd.mpr hd).symm
+    rw [hc.gcd_eq_one, Nat.div_one]
+
 lemma prime_target_iff {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p) :
     a (p - 1) = p ↔ a (p - 3) ≠ p - 2 := by
   constructor
@@ -127,14 +135,6 @@ lemma prime_target_iff {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p) :
   · intro heq
     have hd : ¬ p ∣ x (p - 1) := fun hd => heq ((prime_dvd_x_iff hp hp5).mp hd)
     rw [a_at_prime p hp, if_neg hd]
-
-lemma a_at_prime (p : ℕ) (hp : p.Prime) :
-    a (p - 1) = if p ∣ x (p - 1) then 1 else p := by
-  rw [a_eq_div_gcd _ (by have := hp.two_le; omega), Nat.sub_add_cancel hp.one_le]
-  split_ifs with hd
-  · rw [Nat.gcd_eq_right hd, Nat.div_self hp.pos]
-  · have hc : Nat.Coprime (x (p - 1)) p := (hp.coprime_iff_not_dvd.mpr hd).symm
-    rw [hc.gcd_eq_one, Nat.div_one]
 
 lemma prime_mod_three_two {p : ℕ} (hp : p.Prime) (hmod : p % 3 = 2)
     (h11 : 11 ≤ p) : a (p - 1) = p := by

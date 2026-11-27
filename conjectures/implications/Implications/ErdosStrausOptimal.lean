@@ -25,7 +25,7 @@ theorem family_rep (t : ℕ) (ht : 0 < t) :
   have hp : familyPrime t + 1 = 4 * t ^ 2 + 2 * t := by
     unfold familyPrime
     omega
-  linear_combination -(familyPrime t)^2 * t * (t+1) * hp
+  linear_combination (familyPrime t)^2 * t * (t+1) * hp.symm
 
 /-- In a Type II representation the non-multiple denominator is x, and the two
 multiples are p*u and p*v, with u < v. -/
@@ -145,7 +145,7 @@ private theorem typeII_at_most (t p a u v : ℕ) (ht : 0 < t)
     a = t*(t+1) ∧ u = t ∧ v = t+1 := by
   have he' : 4*a*u*v = a*(u+v)+p*u*v := by
     unfold IsRep at he
-    apply Nat.eq_of_mul_eq_mul_left (n := p^2) (by positivity)
+    apply Nat.eq_of_mul_eq_mul_left (n := p^2) (pow_pos hpp.pos _)
     nlinarith only [he]
   obtain ⟨hle, huniq⟩ := typeII_sharp t p a u v ht hp hpp ha hu huv he'
   have heq := Nat.le_antisymm hv hle
@@ -163,7 +163,7 @@ theorem optimal_triple_of_le (t p x y z : ℕ) (ht : 0 < t)
   rw [← hp] at hg
   have hfam : t*(t+1) < p*t := by
     rw [mul_comm t (t+1), mul_comm p t]
-    exact Nat.mul_lt_mul_left ht hg
+    exact (Nat.mul_lt_mul_left ht).mpr hg
   have hxmax : x ≤ p*(t+1) := by omega
   have hymax : y ≤ p*(t+1) := by omega
   have hdiv : p ∣ x ∨ p ∣ y ∨ p ∣ z := by
@@ -241,7 +241,7 @@ theorem family_optimal (t : ℕ) (ht : 0 < t) (hp : (familyPrime t).Prime) :
   dsimp
   have hab : t*(t+1) < familyPrime t*t := by
     rw [mul_comm t (t+1), mul_comm (familyPrime t) t]
-    exact Nat.mul_lt_mul_left ht (familyPrime_gt t ht)
+    exact (Nat.mul_lt_mul_left ht).mpr (familyPrime_gt t ht)
   refine ⟨⟨by positivity, hab, Nat.mul_lt_mul_of_pos_left (by omega) hp.pos, family_rep t ht⟩, ?_⟩
   intro x y z hx hxy hyz hrep
   have huniq := optimal_triple_of_le t _ x y z ht rfl hp hx hxy hyz hrep
