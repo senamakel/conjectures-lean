@@ -33,6 +33,127 @@ theorem mem_rowDiff_iff (G : SimpleGraph V) (I : Finset V) (c d x : V) :
     Finset.mem_filter]
   tauto
 
+/-- The induced double star formed by a clique edge and the vertices seeing exactly one
+of its endpoints is a tree. -/
+theorem doubleStar_isTree (G : SimpleGraph V) (C I : Finset V) (c d : V)
+    (hC : G.IsClique (C : Set V)) (hI : G.IsIndepSet (I : Set V))
+    (hCI : Disjoint C I) (hc : c ∈ C) (hd : d ∈ C) (hcd : c ≠ d) :
+    (G.induce
+      ((insert c (insert d (rowDiff G I c d) : Finset V) : Finset V) : Set V)).IsTree := by
+  classical
+  let R := rowDiff G I c d
+  let S := insert c (insert d R)
+  let H := G.induce (S : Set V)
+  let c' : {x // x ∈ (S : Finset V)} := ⟨c, by simp [S]⟩
+  let d' : {x // x ∈ (S : Finset V)} := ⟨d, by simp [S, hcd]⟩
+  have hcdG : G.Adj c d := hC hc hd hcd
+  have hcR : c ∉ R := by
+    intro h
+    exact (Finset.disjoint_left.mp hCI hc) ((mem_rowDiff_iff G I c d c).mp h |>.1)
+  have hdR : d ∉ R := by
+    intro h
+    exact (Finset.disjoint_left.mp hCI hd) ((mem_rowDiff_iff G I c d d).mp h |>.1)
+  have hc'ne : c' ≠ d' := by
+    intro h
+    exact hcd (congrArg Subtype.val h)
+  have hc'd' : H.Adj c' d' := by
+    simp [H, c', d', hcdG]
+  have hleaf (x : {x // x ∈ (S : Finset V)}) (hxC : x ≠ c') (hxD : x ≠ d') :
+      (∀ y, H.Adj x y ↔ y = c') ∨ (∀ y, H.Adj x y ↔ y = d') := by
+    have hxR : x.val ∈ R := by
+      have hxS := x.property
+      simp only [S] at hxS
+      rcases hxS with h | h
+      · exact (hxC (Subtype.ext h)).elim
+      · rcases h with h | h
+        · exact (hxD (Subtype.ext h)).elim
+        · exact h
+    have hxI := (mem_rowDiff_iff G I c d x.val).mp hxR |>.1
+    rcases (mem_rowDiff_iff G I c d x.val).mp hxR |>.2 with hcx | hdx
+    · left
+      intro y
+      constructor
+      · intro hxy
+        have hxyG : G.Adj x.val y.val := by simpa [H] using hxy
+        have hyS := y.property
+        simp only [S] at hyS
+        rcases hyS with hyc | hy
+        · exact Subtype.ext hyc
+        · rcases hy with hyd | hyr
+          · exact (hdx.2 hxyG.symm).elim
+          · have hyI := (mem_rowDiff_iff G I c d y.val).mp hyr |>.1
+            have hne : x.val ≠ y.val := fun h => G.irrefl (h ▸ hxyG)
+            exact (hI hxI hyI hne hxyG).elim
+      · rintro rfl
+        simpa [H, c'] using hcx.1.symm
+    · right
+      intro y
+      constructor
+      · intro hxy
+        have hxyG : G.Adj x.val y.val := by simpa [H] using hxy
+        have hyS := y.property
+        simp only [S] at hyS
+        rcases hyS with hyc | hy
+        · exact (hcx.2 hxyG.symm).elim
+        · rcases hy with hyd | hyr
+          · exact Subtype.ext hyd
+          · have hyI := (mem_rowDiff_iff G I c d y.val).mp hyr |>.1
+            have hne : x.val ≠ y.val := fun h => G.irrefl (h ▸ hxyG)
+            exact (hI hxI hyI hne hxyG).elim
+      · rintro rfl
+        simpa [H, d'] using hdx.1.symm
+  have hconn : H.Connected := by
+    rw [connected_iff_exists_forall_reachable]
+    refine ⟨c', fun x => ?_⟩
+    by_cases hxc : x = c'
+    · simpa [hxc]
+    by_cases hxd : x = d'
+    · exact hxd ▸ hc'd'.reachable.symm
+    · rcases hleaf x hxc hxd with hleft | hright
+      · exact ((hleft c').2 rfl).reachable.symm
+      · exact ((hright d').2 rfl).reachable.trans hc'd'.reachable.symm
+  have hacyc : H.IsAcyclic := by
+    rw [isAcyclic_iff_forall_not_isCycle]
+    intro x p hp
+    have hnoLeaf (z : {x // x ∈ (S : Finset V)}) (hz : z ∈ p.support) :
+        z = c' ∨ z = d' := by
+      by_cases hzc : z = c'
+      · exact Or.inl hzc
+      by_cases hzd : z = d'
+      · exact Or.inr hzd
+      rcases hleaf z hzc hzd with hleft | hright
+      · have h1 := (hleft p.snd).mp (p.adj_snd hp.not_nil)
+        have h2 := (hleft p.penultimate).mp (p.adj_penultimate hp.not_nil).symm
+        exact (hp.snd_ne_penultimate (h1.trans h2.symm)).elim
+      · have h1 := (hright p.snd).mp (p.adj_snd hp.not_nil)
+        have h2 := (hright p.penultimate).mp (p.adj_penultimate hp.not_nil).symm
+        exact (hp.snd_ne_penultimate (h1.trans h2.symm)).elim
+    have hx := hnoLeaf x (p.start_mem_support)
+    have hsnd := hnoLeaf p.snd p.snd_mem_support
+    have hpen := hnoLeaf p.penultimate p.penultimate_mem_support
+    have hxs : p.snd ≠ x := hp.snd_ne_start
+    have hxp : p.penultimate ≠ x := hp.penultimate_ne_start
+    rcases hx with rfl | rfl
+    · have hsnd' : p.snd = d' := by
+        rcases hsnd with hsnd | hsnd
+        · exact (hxs hsnd).elim
+        · exact hsnd
+      have hpen' : p.penultimate = d' := by
+        rcases hpen with hpen | hpen
+        · exact (hxp hpen).elim
+        · exact hpen
+      exact hp.snd_ne_penultimate (hsnd'.trans hpen'.symm)
+    · have hsnd' : p.snd = c' := by
+        rcases hsnd with hsnd | hsnd
+        · exact hsnd
+        · exact (hxs hsnd).elim
+      have hpen' : p.penultimate = c' := by
+        rcases hpen with hpen | hpen
+        · exact hpen
+        · exact (hxp hpen).elim
+      exact hp.snd_ne_penultimate (hsnd'.trans hpen'.symm)
+  simpa [H, S, R] using (show H.IsTree from ⟨hconn, hacyc⟩)
+
 
 /-- A Mathlib-level formulation of the bound on the largest induced tree. -/
 def inducedTreeBound (G : SimpleGraph V) (k : ℕ) : Prop :=
