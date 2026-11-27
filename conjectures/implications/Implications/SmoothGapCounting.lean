@@ -85,7 +85,10 @@ private theorem eventually_primeBelow_count_le_two_mul
       _ ≤ Nat.primeCounting (B n) := Nat.monotone_primeCounting (Nat.sub_le _ _)
   have hcard' : ((B n).primesBelow.card : ℝ) ≤ Nat.primeCounting (B n) := by
     exact_mod_cast hcard
-  exact hcard'.trans hpi'.le
+  calc
+    ((B n).primesBelow.card : ℝ) ≤ Nat.primeCounting (B n) := hcard'
+    _ ≤ 2 * ((B n : ℝ) / Real.log (B n : ℝ)) := hpi'.le
+    _ = 2 * (B n : ℝ) / Real.log (B n : ℝ) := by ring
 
 private theorem primeAt_strictMono : StrictMono primeAt := by
   intro a b hab
