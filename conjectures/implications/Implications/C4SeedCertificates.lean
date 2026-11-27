@@ -239,82 +239,85 @@ private theorem compatible_of_nodup_pairwise {g : Array Nat} (l : List (Fin 41))
   have hperm : l.Perm sorted := by
     apply List.perm_of_nodup_nodup_toFinset_eq hnd
     · exact (List.nodup_finRange 41).filter _
-    · simp [sorted, s, List.toFinset_filter]
+    · rw [List.toFinset_filter]
+      simp [sorted, s, List.toFinset_finRange]
   have hsorted : sorted.Pairwise (fun u v => compatible g u.val v.val = true) :=
-    hperm.pairwise_iff.mp hp
+    (hperm.pairwise_iff (by intro u v; simp [compatible, Nat.land_comm])).mp hp
   refine ⟨sorted.map Fin.val, ?_, ?_, ?_⟩
-  · simp [sorted, List.length_filter, ← List.toFinset_card_of_nodup hnd]
-  · simpa [sorted] using (List.filter_sublist (p := fun u : Fin 41 => u ∈ s)).map Fin.val
-  · simpa using hsorted
+  · rw [← hperm.length_eq]
+  · simpa using (List.filter_sublist (p := fun u : Fin 41 => u ∈ s)).map Fin.val
+  · exact (List.pairwise_map.mpr hsorted)
 
-/-- Six vertices in an ordered sublist of `Fin 41` cannot have pairwise
-disjoint open neighborhoods in any graph isomorphic to one of the masks.
+/-- Six distinct vertices cannot have pairwise disjoint open neighborhoods in
+any graph isomorphic to one of the masks.
 The statement is intentionally conditional on the supplied seed; it does not
 assert that the three records exhaust the extremal 41-vertex graphs. -/
 theorem no_disjoint_six_of_seed_iso (G : SimpleGraph (Fin 41))
     (hseed : Nonempty (G ≃g seed1Graph) ∨ Nonempty (G ≃g seed2Graph) ∨
       Nonempty (G ≃g seed3Graph)) :
-    ¬ ∃ chosen : List (Fin 41), chosen.length = 6 ∧
-      chosen.Sublist (List.finRange 41) ∧
+    ¬ ∃ chosen : List (Fin 41), chosen.length = 6 ∧ chosen.Nodup ∧
       chosen.Pairwise (fun u v => Disjoint (G.neighborSet u) (G.neighborSet v)) := by
   intro h
-  obtain ⟨chosen, hlen, hsub, hpairs⟩ := h
+  obtain ⟨chosen, hlen, hnd, hpairs⟩ := h
   rcases hseed with hseed1 | hseed
   · obtain ⟨hIso⟩ := hseed1
     let mapped := chosen.map hIso
     have hmappedLen : mapped.length = 6 := by simp [mapped, hlen]
-    have hmappedSub : mapped.map Fin.val |>.Sublist (List.range 41) := by
-      simpa [mapped] using hsub.map hIso
+    have hmappedNodup : mapped.Nodup := hnd.map hIso.injective
     have hmappedPairs : mapped.Pairwise (fun u v =>
         Disjoint (seed1Graph.neighborSet u) (seed1Graph.neighborSet v)) := by
       apply List.pairwise_map.mpr
       exact hpairs.imp fun u v huv => by
-        rw [← SimpleGraph.Iso.image_neighborSet hIso]
-        exact Set.disjoint_image_iff.mpr (by simpa using huv)
+        rw [Set.disjoint_left] at huv ⊢
+        intro x hx₁ hx₂
+        exact huv (hIso.symm x)
+          ((SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₁))
+          ((SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₂))
     have hcompat : mapped.Pairwise (fun u v => compatible seed1 u.val v.val = true) := by
       exact hmappedPairs.imp fun u v huv => (seed1_neighbor_disjoint_iff u v).1 huv
-    have hc : ExistsCompatibleClique seed1 (List.range 41) 6 := by
-      refine ⟨mapped.map Fin.val, ?_, hmappedSub, ?_⟩
-      · simpa [hmappedLen]
-      · simpa using hcompat
-    exact seed1_no_compatible_six hc
+    have hc := compatible_of_nodup_pairwise mapped hmappedNodup hcompat
+    have hc' : ExistsCompatibleClique seed1 (List.range 41) 6 := by
+      simpa [hmappedLen] using hc
+    exact seed1_no_compatible_six hc'
   · rcases hseed with hseed2 | hseed3
     · obtain ⟨hIso⟩ := hseed2
       let mapped := chosen.map hIso
       have hmappedLen : mapped.length = 6 := by simp [mapped, hlen]
-      have hmappedSub : mapped.map Fin.val |>.Sublist (List.range 41) := by
-        simpa [mapped] using hsub.map hIso
+      have hmappedNodup : mapped.Nodup := hnd.map hIso.injective
       have hmappedPairs : mapped.Pairwise (fun u v =>
           Disjoint (seed2Graph.neighborSet u) (seed2Graph.neighborSet v)) := by
         apply List.pairwise_map.mpr
         exact hpairs.imp fun u v huv => by
-          rw [← SimpleGraph.Iso.image_neighborSet hIso]
-          exact Set.disjoint_image_iff.mpr (by simpa using huv)
+          rw [Set.disjoint_left] at huv ⊢
+          intro x hx₁ hx₂
+          exact huv (hIso.symm x)
+            ((SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₁))
+            ((SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₂))
       have hcompat : mapped.Pairwise (fun u v => compatible seed2 u.val v.val = true) := by
         exact hmappedPairs.imp fun u v huv => (seed2_neighbor_disjoint_iff u v).1 huv
-      have hc : ExistsCompatibleClique seed2 (List.range 41) 6 := by
-        refine ⟨mapped.map Fin.val, ?_, hmappedSub, ?_⟩
-        · simpa [hmappedLen]
-        · simpa using hcompat
-      exact seed2_no_compatible_six hc
+      have hc := compatible_of_nodup_pairwise mapped hmappedNodup hcompat
+      have hc' : ExistsCompatibleClique seed2 (List.range 41) 6 := by
+        simpa [hmappedLen] using hc
+      exact seed2_no_compatible_six hc'
     · obtain ⟨hIso⟩ := hseed3
       let mapped := chosen.map hIso
       have hmappedLen : mapped.length = 6 := by simp [mapped, hlen]
-      have hmappedSub : mapped.map Fin.val |>.Sublist (List.range 41) := by
-        simpa [mapped] using hsub.map hIso
+      have hmappedNodup : mapped.Nodup := hnd.map hIso.injective
       have hmappedPairs : mapped.Pairwise (fun u v =>
           Disjoint (seed3Graph.neighborSet u) (seed3Graph.neighborSet v)) := by
         apply List.pairwise_map.mpr
         exact hpairs.imp fun u v huv => by
-          rw [← SimpleGraph.Iso.image_neighborSet hIso]
-          exact Set.disjoint_image_iff.mpr (by simpa using huv)
+          rw [Set.disjoint_left] at huv ⊢
+          intro x hx₁ hx₂
+          exact huv (hIso.symm x)
+            ((SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₁))
+            ((SimpleGraph.Iso.apply_mem_neighborSet_iff hIso).1 (by simpa using hx₂))
       have hcompat : mapped.Pairwise (fun u v => compatible seed3 u.val v.val = true) := by
         exact hmappedPairs.imp fun u v huv => (seed3_neighbor_disjoint_iff u v).1 huv
-      have hc : ExistsCompatibleClique seed3 (List.range 41) 6 := by
-        refine ⟨mapped.map Fin.val, ?_, hmappedSub, ?_⟩
-        · simpa [hmappedLen]
-        · simpa using hcompat
-      exact seed3_no_compatible_six hc
+      have hc := compatible_of_nodup_pairwise mapped hmappedNodup hcompat
+      have hc' : ExistsCompatibleClique seed3 (List.range 41) 6 := by
+        simpa [hmappedLen] using hc
+      exact seed3_no_compatible_six hc'
 
 #print axioms seed1_no_compatible_six
 #print axioms seed2_no_compatible_six
