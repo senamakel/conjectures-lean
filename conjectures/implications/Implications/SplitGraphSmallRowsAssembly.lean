@@ -107,4 +107,65 @@ theorem hamiltonian_of_clique_ended_chain
     exact hcover' x
   exact ⟨_, _, p, hp.isHamiltonian_of_mem hvertices⟩
 
+/-- Combine the shared-neighbor five-vertex block with a disjoint chain of
+ordinary clique-ended blocks, then append the unused clique vertices. -/
+theorem hamiltonian_of_shared_block_and_remaining_chain
+    (G : SimpleGraph V) (C I : Finset V) (hC : G.IsClique (C : Set V))
+    (hdisjCI : Disjoint C I)
+    (a c b i j : V) (ha : a ∈ C) (hc : c ∈ C) (hb : b ∈ C)
+    (hi : i ∈ I) (hj : j ∈ I) (hij : i ≠ j)
+    (hac : a ≠ c) (hcb : c ≠ b) (hab : a ≠ b)
+    (hai : G.Adj a i) (hci : G.Adj c i)
+    (hcj : G.Adj c j) (hbj : G.Adj b j)
+    (rest tail : List V)
+    (hrestNodup : rest.Nodup) (hrestChain : rest.IsChain G.Adj)
+    (hrestHeadC : ∀ x, x ∈ rest.head? → x ∈ C)
+    (hrestLastC : ∀ x, x ∈ rest.getLast? → x ∈ C)
+    (hdisjointSpecial : ∀ x, x ∈ [a, i, c, j, b] → x ∉ rest)
+    (htailNodup : tail.Nodup) (htailC : ∀ x ∈ tail, x ∈ C)
+    (hdisjointTail : ∀ x ∈ ([a, i, c, j, b] ++ rest), x ∉ tail)
+    (hcover : ∀ x : V, x ∈ [a, i, c, j, b] ++ rest ∨ x ∈ tail)
+    (hne : ([a, i, c, j, b] ++ rest ++ tail) ≠ []) :
+    ∃ u v : V, ∃ p : G.Walk u v, p.IsHamiltonian := by
+  obtain ⟨pBlock, hBlockPath, hBlockSupport⟩ := shared_clique_neighbor_block
+    G C I hdisjCI a c b i j ha hc hb hi hj hij hac hcb hab hai hci hcj hbj
+  have hblockNodup : ([a, i, c, j, b] : List V).Nodup := by
+    apply (SimpleGraph.Walk.isPath_def pBlock).1 hBlockPath
+    simpa [hBlockSupport]
+  have hblockChain : ([a, i, c, j, b] : List V).IsChain G.Adj := by
+    simpa [hBlockSupport] using pBlock.adj_support
+  have hbaseNodup : ([a, i, c, j, b] ++ rest).Nodup := by
+    rw [List.nodup_append']
+    exact ⟨hblockNodup, hrestNodup, hdisjointSpecial⟩
+  have hbaseChain : ([a, i, c, j, b] ++ rest).IsChain G.Adj := by
+    rw [List.isChain_append]
+    refine ⟨hblockChain, hrestChain, ?_⟩
+    intro x hx y hy
+    have hxEq : x = b := by simpa using hx
+    have hxC : x ∈ C := hxEq ▸ hb
+    have hyC := hrestHeadC y hy
+    have hxy : x ≠ y := by
+      intro h
+      subst y
+      exact hdisjointSpecial b (by simp) (List.mem_of_mem_head? hy)
+    exact hC hxC hyC hxy
+  have hbaseLastC : ∀ x, x ∈ ([a, i, c, j, b] ++ rest).getLast? → x ∈ C := by
+    intro x hx
+    by_cases hrest : rest = []
+    · simpa [hrest] using (show x ∈ ([a, i, c, j, b] : List V).getLast? from by
+        simpa [hrest] using hx)
+      exact hb
+    · rw [List.getLast?_append_of_ne_nil _ hrest] at hx
+      exact hrestLastC x (by simpa using hx)
+  have hneqTailStart : ∀ x, x ∈ ([a, i, c, j, b] ++ rest).getLast? →
+      ∀ y, y ∈ tail.head? → x ≠ y := by
+    intro x hx y hy heq
+    subst y
+    exact hdisjointTail x (List.mem_of_mem_getLast? hx) (List.mem_of_mem_head? hy)
+  have hfinalne : ([a, i, c, j, b] ++ rest) ++ tail ≠ [] := by
+    simpa [List.append_assoc] using hne
+  exact hamiltonian_of_clique_ended_chain G C hC
+    ([a, i, c, j, b] ++ rest) tail hbaseNodup hbaseChain hbaseLastC
+    htailNodup htailC hdisjointTail hcover (by simpa [List.append_assoc] using hne)
+
 end SplitGraphSmallRowsAssembly
