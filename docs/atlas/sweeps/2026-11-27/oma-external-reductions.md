@@ -10,6 +10,11 @@ This sweep covers public Lean developments and recovered local attempts with an 
 | [AlgebraicGeometry.resolution_of_singularities_of_charZero](https://lefttosolve.com/p/AlgebraicGeometry.resolution_of_singularities_of_charZero) | [resolutionorg/hironaka](https://github.com/resolutionorg/hironaka), the [resolution module in riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis), and [local checked glue](../../../../conjectures/hironaka-fc/README.md) | Isolate smooth modification and the morphism properties needed by the exact registry statement. Reuse the checked glue where it ports at the pinned Mathlib release. |
 | [Green100.green_100.parts.i](https://lefttosolve.com/p/Green100.green_100.parts.i) | [OpenAI's non-surjunctive group construction](https://github.com/openai/math) and the prior [source audit](../2026-11-26/newsfeed.md). | Separate the construction from the proof that sofic groups are surjunctive. The previous sweep found a published argument for the latter and no Lean proof of that component. |
 
+## Checker and submission status
+
+- Poincaré R1 passed the pinned checker with the three standard axioms. Its four leaves are nonzero integral top homology of the three-sphere, vanishing integral top homology for connected noncompact three-manifolds, Moise smoothing, and the smooth three-dimensional Poincaré theorem in the compact second-countable case. The proof of the parent implication includes the homotopy-invariance and second-countability bridges. Submitted as [upstream PR #4454](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4454). The desk returned HTTP 500 and issued no lease.
+- Hironaka R1 has a checked geometric assembly at an explicitly shared universe. The registry linter requires a bare chain of hypothesis names and the bare target, which Lean generalizes at independent universe levels. The exact registry submission fails on that mismatch. A checker interface for explicitly shared universe arguments, or a suitable universe-independent descent argument, would let this route proceed.
+
 ## Earlier attempts and follow-up candidates
 
 | Target | Recovered public evidence | Remaining work |
