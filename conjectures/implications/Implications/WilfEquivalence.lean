@@ -1,50 +1,42 @@
-import Mathlib
+import Implications.WilfCounts
 
 /-!
-# Marked occurrences and exact occurrence sets
+# From marked-occurrence bijections to exact occurrence sets
 
-This file isolates the finite counting bridge used for super-strong Wilf
--equivalence. A bijection preserving any prescribed collection of occurrences
-proves equality of all superset counts; Boolean-lattice inversion then recovers
-equality for permutations with an exact occurrence set.
+A bijection for every prescribed collection of starts gives equality of all
+upper-cone counts. Finite Boolean-lattice inversion then gives equality for
+permutations with each exact set of occurrence starts.
 -/
 
-namespace WilfEquivalence
+namespace Implications.WilfEquivalence
 
-variable {α : Type*} [Fintype α] [DecidableEq α]
-variable {X Y : Type*} [Fintype X] [Fintype Y]
+open WilfCounts
 
-/-- The set of starts at which `x` has the designated occurrence. -/
-def occurrenceSet (occurs : α → X → Prop) (x : X)
-    [DecidablePred (fun a => occurs a x)] : Finset α :=
-  Finset.univ.filter (fun a => occurs a x)
+variable {α X Y : Type*} [Fintype α] [DecidableEq α]
+variable [Fintype X] [Fintype Y]
 
-/-- A marked set `M` is present among the occurrences of `x`. -/
-def HasMarkedOccurrences (occurs : α → X → Prop) (M : Finset α) (x : X) : Prop :=
-  ∀ a ∈ M, occurs a x
+/-- A bijection between the objects satisfying any given marked set of
+occurrences induces equal marked counts. -/
+theorem markedCount_eq_of_markedEquiv
+    (occX : X → Finset α) (occY : Y → Finset α)
+    (h : ∀ marks : Finset α,
+      {x : X // marks ⊆ occX x} ≃ {y : Y // marks ⊆ occY y})
+    (marks : Finset α) :
+    markedCount occX marks = markedCount occY marks := by
+  classical
+  unfold markedCount
+  simpa only [Finset.card_eq_card_subtype] using Fintype.card_congr (h marks)
 
-/-- The exact set of occurrence starts of `x` is `M`. -/
-def HasExactOccurrences (occurs : α → X → Prop) (M : Finset α) (x : X)
-    [DecidablePred (fun a => occurs a x)] : Prop :=
-  occurrenceSet occurs x = M
+/-- Marked-occurrence bijections imply super-strong equivalence: every exact
+occurrence set has the same number of objects on both sides. -/
+theorem exactCount_eq_of_markedEquiv
+    (occX : X → Finset α) (occY : Y → Finset α)
+    (h : ∀ marks : Finset α,
+      {x : X // marks ⊆ occX x} ≃ {y : Y // marks ⊆ occY y})
+    (exactStarts : Finset α) :
+    exactCount occX exactStarts = exactCount occY exactStarts := by
+  apply exactCount_eq_of_markedCount_eq occX occY
+  intro marks
+  exact markedCount_eq_of_markedEquiv occX occY h marks
 
-end WilfEquivalence
-
-namespace WilfEquivalence
-
-variable {α : Type*} [Fintype α] [DecidableEq α]
-variable {X Y : Type*} [Fintype X] [Fintype Y]
-
-/-- A bijection for each prescribed marked set gives equal counts for all
-permutations containing that set of occurrences. -/
-theorem marked_card_eq_of_equiv
-    (occX : α → X → Prop) (occY : α → Y → Prop)
-    (h : ∀ M : Finset α,
-      {x : X // HasMarkedOccurrences occX M x} ≃
-        {y : Y // HasMarkedOccurrences occY M y})
-    (M : Finset α) :
-    Fintype.card {x : X // HasMarkedOccurrences occX M x} =
-      Fintype.card {y : Y // HasMarkedOccurrences occY M y} := by
-  exact Fintype.card_congr (h M)
-
-end WilfEquivalence
+end Implications.WilfEquivalence
