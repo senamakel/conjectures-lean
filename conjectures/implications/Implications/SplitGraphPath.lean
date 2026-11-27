@@ -320,16 +320,17 @@ theorem exists_distinct_row_attachments
         · exact hiDiff
         · exact hjDiff
       have := Finset.card_le_card hsub
-      have := hdiff a ha d hd hda.symm
-      simp [hij] at this ⊢
+      have hle : 2 ≤ (rowDiff G I a d).card := by simpa [hij] using this
+      have hbound := hdiff a ha d hd hda.symm
       omega
     obtain ⟨x, hx⟩ := hrowd
     have hxI : x = i ∨ x = j := by
       have hx' := (Finset.mem_filter.mp hx).1
-      simpa [hIeq, Finset.mem_insert, Finset.mem_singleton] using hx'
+      rw [hIeq] at hx'
+      simpa using hx'
     rcases hxI with rfl | rfl
     · exact ⟨i, j, d, a, by simp [hIeq], by simp [hIeq], hij, hd, ha, hda.symm,
-        (Finset.mem_filter.mp hx).2, hai⟩
+        (Finset.mem_filter.mp hx).2, hbj⟩
     · exact ⟨j, i, d, a, by simp [hIeq], by simp [hIeq], hij.symm, hd, ha, hda.symm,
         (Finset.mem_filter.mp hx).2, hai⟩
 
