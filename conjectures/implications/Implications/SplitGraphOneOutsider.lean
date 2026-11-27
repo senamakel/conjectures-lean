@@ -72,8 +72,7 @@ theorem hamiltonian_of_one_outsider_shared_pair_path
     · rcases hv with hvu | hvspare
       · exact hvu ▸ hu
       · exact hspareC v hvspare
-    · simp only [List.mem_singleton] at hv
-      exact hv ▸ hy
+    · exact hv ▸ hy
   have hsegmentChain : segment.IsChain G.Adj :=
     clique_list_chain G C hC segment hsegmentNodup hsegmentC
   have hsegmentHead : segment.head? = some u := by simp [segment]
@@ -87,7 +86,7 @@ theorem hamiltonian_of_one_outsider_shared_pair_path
     rw [hsegmentLast] at hv
     simp only [Option.mem_def, Option.some.injEq] at hv
     subst v
-    simp only [List.head?_append_of_ne_nil, hsegmentHead] at hw
+    rw [show tail.head? = some u by simp [tail, segment, hsegmentHead]] at hw
     simp only [Option.mem_def, Option.some.injEq] at hw
     subst w
     exact hby
@@ -98,8 +97,7 @@ theorem hamiltonian_of_one_outsider_shared_pair_path
       have hcoreLast : core.getLast? = some c := by simp [core]
       rw [hcoreLast] at hv
       simp only [Option.mem_def, Option.some.injEq] at hv
-      have htailHead : tail.head? = some u := by
-        rw [List.head?_append_of_ne_nil segment (by simp), hsegmentHead]
+      have htailHead : tail.head? = some u := by simp [tail, segment, hsegmentHead]
       rw [htailHead] at hw
       simp only [Option.mem_def, Option.some.injEq] at hw
       subst v
