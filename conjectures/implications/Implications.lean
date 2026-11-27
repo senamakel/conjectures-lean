@@ -54,3 +54,4 @@ import Implications.SplitGraphBoundedDeletions
 import Implications.SplitGraphKappaThreeHall
 import Implications.SplitGraphKappaThreeAnchor
 import Implications.SplitGraphKappaThreeFourTriples
+import Implications.SplitGraphKappaThreeTripleRows
