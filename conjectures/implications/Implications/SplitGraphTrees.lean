@@ -54,8 +54,8 @@ theorem star_isTree (G : SimpleGraph V) (I : Finset V) (c : V)
             apply Subtype.ext
             exact hy
           · exact False.elim (hI (Finset.mem_filter.mp hx).1
-              (Finset.mem_filter.mp hy).1 (fun h => x.ne y (Subtype.ext h)) hadj)
-    · rintro ⟨hxy, hx | hxy, hy⟩
+              (Finset.mem_filter.mp hy).1 (fun h => hxy (Subtype.ext h)) hadj)
+    · rintro ⟨hxy, hx | hy⟩
       · have hxval : x.val = c := congrArg Subtype.val hx
         have hyrow : y.val ∈ row G I c := by
           rcases Finset.mem_insert.mp y.property with h | h
