@@ -45,8 +45,7 @@ theorem star_isTree (G : SimpleGraph V) (I : Finset V) (c : V)
       refine ⟨?_, ?_⟩
       · intro hxy
         have heq : x.val = y.val := congrArg Subtype.val hxy
-        have hadj' : G.Adj x.val x.val := by simp [heq] at hadj
-          exact hadj
+        have hadj' : G.Adj x.val x.val := by simpa [heq] using hadj
         exact G.irrefl hadj'
       · rcases Finset.mem_insert.mp x.property with hx | hx
         · left
@@ -57,8 +56,7 @@ theorem star_isTree (G : SimpleGraph V) (I : Finset V) (c : V)
             apply Subtype.ext
             exact hy
           · have hne : x.val ≠ y.val := fun heq => by
-              have hadj' : G.Adj x.val x.val := by simp [heq] at hadj
-                exact hadj
+              have hadj' : G.Adj x.val x.val := by simpa [heq] using hadj
               exact G.irrefl hadj'
             exact False.elim (hI (Finset.mem_filter.mp hx).1
               (Finset.mem_filter.mp hy).1 hne hadj)
