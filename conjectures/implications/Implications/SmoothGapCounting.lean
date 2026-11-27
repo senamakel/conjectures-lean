@@ -188,9 +188,10 @@ theorem cutoffHitCount (N B j : ℕ) (hB : 0 < B) :
     intro r hr
     exact (Finset.mem_filter.mp hr).2.le
   have hSboundNat := smallGapMultiHitBound S hSsub hSgap hSlarge
-  have hSbound : (j : ℝ) * (S.card : ℝ) ≤ U.card := by
-    have := Nat.cast_le.mpr hSboundNat
-    simpa [U, Nat.cast_mul] using this
+  have hSbound : (j : ℝ) * (S.card : ℝ) ≤ (U.card : ℝ) := by
+    have hcast : ((j * S.card : ℕ) : ℝ) ≤ ((U.card : ℕ) : ℝ) := by
+      exact_mod_cast hSboundNat
+    simpa [Nat.cast_mul] using hcast
   have hLscaled : (B : ℝ) * j * (L.card : ℝ) ≤ (j : ℝ) * primeAt N := by
     calc
       _ = (j : ℝ) * ((B : ℝ) * (L.card : ℝ)) := by ring
@@ -201,7 +202,7 @@ theorem cutoffHitCount (N B j : ℕ) (hB : 0 < B) :
       _ ≤ _ := mul_le_mul_of_nonneg_left hSbound (by positivity)
   rw [hcard]
   calc
-    (B : ℝ) * (j : ℝ) * (L.card + S.card : ℝ) =
+    (B : ℝ) * (j : ℝ) * (↑(L.card + S.card) : ℝ) =
         (B : ℝ) * (j : ℝ) * (L.card : ℝ) + (B : ℝ) * (j : ℝ) * (S.card : ℝ) := by
       rw [Nat.cast_add]
       ring
