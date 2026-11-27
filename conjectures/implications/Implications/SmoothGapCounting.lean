@@ -183,11 +183,12 @@ private theorem eventually_logLogCutoff_primeCount_le :
         gcongr
       _ = Real.log (primeAt n : ℝ) / 4 := by
         field_simp
+        <;> norm_num
   exact hpi.trans hbound
 
 private theorem log_two_lt_one : Real.log 2 < 1 := by
   rw [Real.log_lt_iff_lt_exp (by norm_num)]
-  have h := Real.add_one_lt_exp (by norm_num : (0 : ℝ) < 1)
+  have h := Real.add_one_lt_exp (by norm_num : (1 : ℝ) ≠ 0)
   norm_num at h ⊢
   linarith
 
@@ -208,12 +209,17 @@ private theorem eventually_logLogCutoff_smoothFactor_le :
     dsimp [k]
     exact hpi
   have hpow : (2 ^ k : ℝ) = Real.exp ((k : ℝ) * Real.log 2) := by
-    rw [← Real.exp_nat_mul (Real.log 2) k, Real.exp_log (by norm_num)]
-    ring_nf
+    calc
+      (2 : ℝ) ^ k = (Real.exp (Real.log 2)) ^ k := by
+        rw [Real.exp_log (by norm_num)]
+      _ = Real.exp ((k : ℝ) * Real.log 2) := by
+        rw [← Real.exp_nat_mul]
   have hexp : Real.exp ((k : ℝ) * Real.log 2) ≤
       Real.exp (Real.log (primeAt n : ℝ) / 4) := by
     apply Real.exp_le_exp.mpr
-    exact (mul_le_mul_of_nonneg_left log_two_lt_one.le (Nat.cast_nonneg _)).trans hk
+    have harg : (k : ℝ) * Real.log 2 ≤ (k : ℝ) := by
+      nlinarith [log_two_lt_one, (Nat.cast_nonneg k : (0 : ℝ) ≤ k)]
+    exact harg.trans hk
   have hsqrt : Real.sqrt (primeAt n : ℝ) =
       Real.exp (Real.log (primeAt n : ℝ) / 2) := by
     rw [Real.sqrt_eq_rpow, Real.rpow_def_of_pos hx]
