@@ -214,3 +214,5 @@ theorem reciprocalPrimeSum_le_dyadic_harmonic :
         exact mul_le_mul_of_nonneg_left hh (by dsimp [D]; positivity)
 
 end Implications.SmoothPrimeReciprocal
+
+#print axioms Implications.SmoothPrimeReciprocal.reciprocalPrimeSum_le_dyadic_harmonic
