@@ -144,9 +144,10 @@ theorem smoothGapUniverseCardBound (N B : ℕ) (hB : 0 < B) :
     have hmem := Finset.mem_filter.mp hm
     by_cases hm0 : m = 0
     · simp [hm0]
-    · right
+    · apply Finset.mem_insert.mpr
+      right
       apply Nat.mem_smoothNumbersUpTo.mpr
-      refine ⟨Finset.mem_range.mp hmem.1 |>.le, ?_⟩
+      refine ⟨(Finset.mem_range.mp hmem.1).le, ?_⟩
       apply Nat.mem_smoothNumbers'.2
       intro p hp hpd
       by_cases hm1 : m = 1
@@ -158,9 +159,8 @@ theorem smoothGapUniverseCardBound (N B : ℕ) (hB : 0 < B) :
     U.card ≤ (insert 0 (Nat.smoothNumbersUpTo (primeAt N) B)).card :=
       Finset.card_le_card hsubset
     _ ≤ 1 + (Nat.smoothNumbersUpTo (primeAt N) B).card := by
-      by_cases hz : 0 ∈ Nat.smoothNumbersUpTo (primeAt N) B
-      · simp [Finset.card_insert_of_mem hz]
-      · simp [Finset.card_insert_of_not_mem hz]
+      simpa [Nat.add_comm] using
+        (Finset.card_insert_le 0 (Nat.smoothNumbersUpTo (primeAt N) B))
     _ ≤ 1 + 2 ^ B.primesBelow.card * (primeAt N).sqrt := by
       exact Nat.add_le_add_left (Nat.smoothNumbersUpTo_card_le _ _) 1
 
