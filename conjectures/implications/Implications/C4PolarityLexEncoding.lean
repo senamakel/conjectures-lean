@@ -111,8 +111,7 @@ theorem lexFreshIds_ge (next : Nat) (left right : List Nat) :
           by_cases hxy : x = y
           · simpa [lexFreshIds, hxy] using ih next ys
           · have hbeq : (x == y) = false := by simp [hxy]
-            rw [lexFreshIds, hbeq, if_false]
-            simp only [List.mem_cons]
+            simp only [lexFreshIds, hbeq, Bool.false_eq_true, ↓reduceIte, List.mem_cons]
             intro v hv
             rcases hv with rfl | hv
             · exact Nat.le_refl _
@@ -130,7 +129,7 @@ theorem lexFreshIds_nodup (next : Nat) (left right : List Nat) :
           by_cases hxy : x = y
           · simpa [lexFreshIds, hxy] using ih next ys
           · have hbeq : (x == y) = false := by simp [hxy]
-            rw [lexFreshIds, hbeq, if_false]
+            simp only [lexFreshIds, hbeq, Bool.false_eq_true, ↓reduceIte]
             apply List.nodup_cons.mpr
             constructor
             · intro h
