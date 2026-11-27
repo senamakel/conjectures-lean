@@ -275,3 +275,21 @@ was 515.10 MB. Its partial binary LRAT trace is 425,834,000 bytes, SHA-256
 `fc54ba38582c13f86baff5680c752500f07563806258538ab3a601d7ecbc4372`.
 There is no model or complete proof. Only case 1 was run; cases 2..4 remain
 untouched, so this screen says nothing conclusive about the full graph claim.
+
+## Remaining root-matching cases
+
+The orbit audit gives four disjoint classes under the allowed relabeling.
+Case 1 already returned UNKNOWN. This run covers only cases 2, 3, and 4,
+once each. Testing the remaining fixed patterns probes whether the unresolved
+case-1 run was specific to its neighborhood matching. The root-fixed CNFs
+retain all other constraints and their prior ordering.
+
+Generate the three instances with `--matching-case 2`, `3`, and `4`.
+Run CaDiCaL 2.1.2 with binary LRAT and its 120-second wall limit, plus an
+external 130-second wall timeout and a 125-second CPU limit per process.
+Use one solver process per case, a 2 GiB virtual-memory limit and a 2 GiB
+file-size limit per process. Keep the formula, log, and any trace or model
+under `.lake/c4-k4-matching-slices/`. Stop each case at a complete SAT or
+UNSAT result, its limit, or an error. The total solver budget is 375 CPU
+seconds. Independently check any model or proof and report capped cases
+as unresolved.
