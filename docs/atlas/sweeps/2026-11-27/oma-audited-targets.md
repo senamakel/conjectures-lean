@@ -126,3 +126,12 @@ big-O formulation at half the requested exponent, then composes it with
 only the standard three axioms. The existing zeta theorem supplies the
 big-O premise under RH. OMA acceptance of the unconditional proof would
 still need a checker-compatible RH and analytic proof path.
+
+## Robin forward-direction reduction
+
+The nested reduction splits the forward implication into the finite
+divisor-sum range through `log n ≤ exp 30` and the RH-dependent logarithmic
+estimate above that threshold. The Lean assembly exponentiates the latter
+and uses positivity of the divisor sum and `n`. OMA's local checker accepted
+the exact parent step with only the three standard axioms. Both new
+hypotheses remain open in OMA. [OMA PR #4271](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4271)
