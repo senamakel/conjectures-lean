@@ -85,6 +85,91 @@ theorem unique_overlapping_predecessor (marks shifts : Finset ℕ)
     · omega
     · have htuGap := hgap (u - t) hd
       omega
+
+/-- If a summand based at another marked start moves a point of the central window,
+its start is an allowed overlap shift immediately before or after the central start. -/
+theorem moved_position_has_overlapping_neighbor (marks shifts : Finset ℕ)
+    (hsep : SeparatedBy marks shifts)
+    (m : Equiv.Perm (Fin 8))
+    {s t : ℕ} (hs : s ∈ marks) (ht : t ∈ marks) (hst : s ≠ t)
+    (i j : Fin 8) (hj : j ∈ m.support)
+    (hcoord : s + i.val = t + j.val) :
+    (t < s ∧ s - t ∈ shifts ∧ s - t < 8) ∨
+      (s < t ∧ t - s ∈ shifts ∧ t - s < 8) := by
+  have hi8 := i.isLt
+  have hj8 := j.isLt
+  rcases lt_or_gt_of_ne hst with hts | hst'
+  · rcases hsep t ht s hs hts with hfar | hd
+    · omega
+    · exact Or.inl ⟨hts, hd, by omega⟩
+  · rcases hsep s hs t ht hst' with hfar | hd
+    · omega
+    · exact Or.inr ⟨hst', hd, by omega⟩
+
+private noncomputable def markedComponent {n : ℕ} (marks : Finset ℕ)
+    (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n) (t : ℕ) :
+    Equiv.Perm (Fin n) :=
+  if ht : t ∈ marks then liftWindow t (hb t ht) m else Equiv.refl _
+
+private theorem markedComponents_disjoint {n : ℕ} (marks shifts : Finset ℕ)
+    (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n)
+    (hsep : SeparatedBy marks shifts)
+    (htranslate : ∀ d ∈ shifts, ∀ i j : Fin 8,
+      i ∈ m.support → j ∈ m.support → i.val ≠ d + j.val) :
+    (marks : Set ℕ).Pairwise
+      (fun s t => Equiv.Perm.Disjoint
+        (markedComponent marks m hb s) (markedComponent marks m hb t)) := by
+  have hpair := lifted_windows_pairwise_disjoint marks shifts m hb hsep htranslate
+  intro s hs t ht hst
+  simpa [markedComponent, hs, ht] using hpair s hs t ht hst
+
+/-- Two distinct marked starts cannot both move the same point under their lifted
+local permutations, under the translated-support separation hypothesis. -/
+theorem lifted_support_mover_unique {n : ℕ} (marks shifts : Finset ℕ)
+    (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n)
+    (hsep : SeparatedBy marks shifts)
+    (htranslate : ∀ d ∈ shifts, ∀ i j : Fin 8,
+      i ∈ m.support → j ∈ m.support → i.val ≠ d + j.val)
+    {s t : ℕ} (hs : s ∈ marks) (ht : t ∈ marks) (hst : s ≠ t)
+    {x : Fin n} (hx₁ : x ∈ (liftWindow s (hb s hs) m).support)
+    (hx₂ : x ∈ (liftWindow t (hb t ht) m).support) : False := by
+  have hdisj := lifted_windows_pairwise_disjoint marks shifts m hb hsep htranslate
+    s hs t ht hst
+  rw [Equiv.Perm.disjoint_iff_disjoint_support] at hdisj
+  exact (Finset.disjoint_left.mp hdisj) hx₁ hx₂
+
+/-- At a point moved by one marked-window summand, the global assembled permutation
+acts exactly as that summand. -/
+theorem assemble_apply_of_lifted_support {n : ℕ} (marks shifts : Finset ℕ)
+    (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n)
+    (hsep : SeparatedBy marks shifts)
+    (htranslate : ∀ d ∈ shifts, ∀ i j : Fin 8,
+      i ∈ m.support → j ∈ m.support → i.val ≠ d + j.val)
+    {t : ℕ} (ht : t ∈ marks) {x : Fin n}
+    (hx : x ∈ (liftWindow t (hb t ht) m).support) :
+    WilfDisjointPermutations.assemble marks (markedComponent marks m hb)
+      (markedComponents_disjoint marks shifts m hb hsep htranslate) x =
+        liftWindow t (hb t ht) m x := by
+  simpa [markedComponent, ht] using
+    WilfDisjointPermutations.assemble_apply_of_mem_support marks
+      (markedComponent marks m hb)
+      (markedComponents_disjoint marks shifts m hb hsep htranslate) ht hx
+
+/-- If no marked-window summand moves a point, the assembled permutation fixes it. -/
+theorem assemble_apply_of_no_lifted_support {n : ℕ} (marks shifts : Finset ℕ)
+    (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n)
+    (hsep : SeparatedBy marks shifts)
+    (htranslate : ∀ d ∈ shifts, ∀ i j : Fin 8,
+      i ∈ m.support → j ∈ m.support → i.val ≠ d + j.val)
+    {x : Fin n} (hx : ∀ t (ht : t ∈ marks),
+      x ∉ (liftWindow t (hb t ht) m).support) :
+    WilfDisjointPermutations.assemble marks (markedComponent marks m hb)
+      (markedComponents_disjoint marks shifts m hb hsep htranslate) x = x := by
+  apply WilfDisjointPermutations.assemble_apply_of_forall_fixes
+  intro t ht
+  have hnot := hx t ht
+  change x ∉ (markedComponent marks m hb t).support at hnot
+  simpa [markedComponent, ht] using hnot
   · exact h
   · rcases hsep u hu t ht h with hfar | hd
     · omega
@@ -125,6 +210,10 @@ theorem lifted_windows_pairwise_disjoint {n : ℕ} (marks shifts : Finset ℕ)
 #print axioms liftWindow_support_image
 #print axioms unique_overlapping_successor
 #print axioms unique_overlapping_predecessor
+#print axioms moved_position_has_overlapping_neighbor
 #print axioms lifted_windows_pairwise_disjoint
+#print axioms lifted_support_mover_unique
+#print axioms assemble_apply_of_lifted_support
+#print axioms assemble_apply_of_no_lifted_support
 
 end Implications.WilfWindowGeometry
