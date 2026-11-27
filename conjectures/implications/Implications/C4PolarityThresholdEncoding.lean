@@ -122,7 +122,7 @@ theorem thresholdGateDimacs_extend (assignment : Nat → Bool)
     (hbelow : below.natAbs ≠ varId) :
     cnfValue (extendVariable assignment varId value)
       (thresholdGateDimacs above x below (Int.ofNat varId)) = true := by
-  have hpos : (0 : Int) < Int.ofNat varId := Int.ofNat_pos.mpr hvar
+  have hpos : (0 : Int) < Int.ofNat varId := by exact_mod_cast hvar
   have hout : Int.ofNat varId ≠ 0 := ne_of_gt hpos
   apply (thresholdGateDimacs_iff (extendVariable assignment varId value)
     above x below (Int.ofNat varId) ha hx hb hout).2
