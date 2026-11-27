@@ -32,7 +32,7 @@ private theorem degree_sum_partition {V : Type*} [Fintype V] [DecidableEq V]
     change (∑ v ∈ A, (G.neighborFinset v ∩ A).card) =
       2 * (G.induce (A : Set V)).edgeFinset.card
     rw [← (G.induce (A : Set V)).sum_degrees_eq_twice_card_edges]
-    rw [← Finset.sum_coe_sort A (fun v => (G.neighborFinset v.1 ∩ A).card)]
+    rw [← Finset.sum_coe_sort A (fun v => (G.neighborFinset v ∩ A).card)]
     refine Finset.sum_congr rfl fun v _ => ?_
     rw [SimpleGraph.degree]
     refine Finset.card_bij
@@ -115,8 +115,6 @@ theorem retained_edge_count_eq_104_add_deleted_score
     have hcount : (∑ v ∈ D, if v ∈ A then 1 else 0) = (D ∩ A).card := by
       rw [← Finset.card_filter]
       congr 1
-      ext v
-      simp [Finset.mem_inter]
     calc
       (∑ v ∈ D, G.degree v) + (D ∩ A).card =
           (∑ v ∈ D, (8 - (if v ∈ A then 1 else 0))) + (D ∩ A).card := by
@@ -127,7 +125,7 @@ theorem retained_edge_count_eq_104_add_deleted_score
       _ = 8 * D.card - (D ∩ A).card + (D ∩ A).card := by
         simp only [Finset.sum_const, nsmul_eq_mul]
         rw [hcount]
-        ring
+        omega
       _ = 120 := by rw [hD]; omega
   have hcountRelation :
       inducedEdgeCount G R + (∑ v ∈ D, G.degree v) =
