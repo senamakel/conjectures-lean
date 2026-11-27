@@ -52,10 +52,11 @@ LRAT trace, which is not a proof and was not replayed. Thus the first screen
 neither establishes UNSAT nor yields a model.
 
 The original protocol called this a CPU cap, but CaDiCaL's `-t` option is a
-real-time limit. The observed CPU use stayed below 120 s. The next precise
-option, if separately authorized, is to regenerate the same formula after
-deduplicating the C4 clauses: swapping the two opposite vertex-pairs emits the
+real-time limit. The observed CPU use stayed below 120 s. The optional
+`--deduplicate-c4` mode removes duplicate C4 clauses: swapping the two opposite vertex-pairs emits the
 same clause twice, so requiring the first pair's lower endpoint to be smaller
-retains exactly one copy and halves that block from 671,580 to 335,790 clauses.
-This leaves all constraints and symmetries unchanged. Do not treat this as a
-second run under the first screen's stop condition.
+retains exactly one copy and halves that block from 607,620 to 303,810 clauses.
+The resulting instance had 756,652 clauses and the same normalized clause
+set as the original. Its SHA-256 was
+`96a0a88fe8c3570bdb0953d4616c4e10fe7fbb3566c3a7896f8863419ef31200`.
+The solver measurement above is from the original instance.
