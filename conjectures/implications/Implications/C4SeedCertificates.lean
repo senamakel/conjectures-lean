@@ -5,16 +5,15 @@ import Mathlib.Data.List.Pairwise
 /-!
 # Finite certificates for the three published 41-vertex `C₄` extremal seeds
 
-The [McKay sparse6 data file](https://users.cecs.anu.edu.au/~bdm/data/extremal/c4_n41e132.maybe.s6)
-is represented here
-by their 41 neighbourhood bitmasks.  Their SHA-256 digests, in order, are
+The three records in the [McKay sparse6 data file](https://users.cecs.anu.edu.au/~bdm/data/extremal/c4_n41e132.maybe.s6)
+are represented here by their 41 neighbourhood bitmasks.  Their SHA-256 digests, in order, are
 `4033a0cc2e1e8f6d7cb05009d2ed0b0cfcec9ce969d76c6ed2faec68b3405927`,
 `7b21f509d31f8002aba9c00d5a21a1db422177bd6a832cee6b4e80dad460db60`, and
 `8282afa2558555cbdad70ff78767b188cd328b83626e8b59c0f11ad31e000042`.
 Each record decodes to 41 vertices and 132 edges. For vertices `u` and `v`, having no common
 neighbour is the bitwise condition `land (N u) (N v) = 0`.
 
-`compatibleCliqueSearch` is a depth-pruned search.  It either skips the next
+`compatibleCliqueSearchBool` is a depth-pruned search.  It either skips the next
 candidate, or takes it and restricts later candidates to vertices compatible
 with it. `search_correct` proves equivalence with the proposition that an
 actual pairwise-compatible list of the requested size is a sublist of the
@@ -38,7 +37,7 @@ def compatibleCliqueSearchBool (g : Array Nat) : List Nat → Nat → Bool
   | v :: vs, k + 1 =>
       compatibleCliqueSearchBool g vs (k + 1) ||
         compatibleCliqueSearchBool g (vs.filter (compatible g v)) k
-termination_by candidates remaining => candidates.length
+termination_by candidates _ => candidates.length
 decreasing_by
   · simp_wf
   · simp_wf
