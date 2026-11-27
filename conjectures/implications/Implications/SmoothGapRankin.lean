@@ -32,7 +32,7 @@ theorem smoothNumbersUpTo_card_le_rankin (X Y : ℕ) (s : ℝ) (hX : 0 < X)
   have hf_nonneg (m : Y.smoothNumbers) : 0 ≤ f m := by
     dsimp [f, rankinWeight]
     exact Real.rpow_nonneg (by positivity) _
-  let e : (↑S.attach) ↪ Y.smoothNumbers where
+  let e : (↑S) ↪ Y.smoothNumbers where
     toFun n := (⟨(n : ℕ), (Nat.mem_smoothNumbersUpTo.mp
       (show (n : ℕ) ∈ X.smoothNumbersUpTo Y from n.property)).2⟩ : Y.smoothNumbers)
     inj' := by
@@ -47,7 +47,7 @@ theorem smoothNumbersUpTo_card_le_rankin (X Y : ℕ) (s : ℝ) (hX : 0 < X)
     calc
       (∑ m ∈ T, f m) ≤ ∑' m : Y.smoothNumbers, f m := hf.sum_le_tsum T (by intro m hm; exact hf_nonneg m)
       _ = ∏ p ∈ Y.primesBelow, (1 - f p)⁻¹ := hEuler.2.tsum_eq
-  have hpoint (n : ↑S.attach) : 1 ≤ (X : ℝ) ^ s * f (e n) := by
+  have hpoint (n : ↑S) : 1 ≤ (X : ℝ) ^ s * f (e n) := by
     have hn0 : 0 < (n : ℕ) := Nat.pos_of_ne_zero
       (Nat.mem_smoothNumbersUpTo.mp (show (n : ℕ) ∈ X.smoothNumbersUpTo Y from n.property)).2.1
     have hnX : (n : ℝ) ≤ X := by
