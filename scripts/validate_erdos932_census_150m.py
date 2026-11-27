@@ -6,7 +6,6 @@ from the byte-array Eratosthenes scan that produced the census.
 """
 
 import csv
-import math
 import sys
 
 

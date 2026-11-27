@@ -27,6 +27,7 @@ import Implications.C4DegreeBounds
 import Implications.C4DegreeEightCap
 import Implications.C4SeedCertificates
 import Implications.SmoothGapCounting
+import Implications.SmoothGapWitness150m
 import Implications.SmoothGapInfinitude
 import Implications.SplitGraphPath
 import Implications.C4VertexExtension

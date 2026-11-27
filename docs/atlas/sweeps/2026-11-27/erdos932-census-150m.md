@@ -1,24 +1,31 @@
-# Erdős 932: bounded census to 150 million
+# Erdős 932 census through 150 million
 
-## Pre-registered search
+The census found **11,197 qualifying gaps** among the 8,444,396 consecutive-prime gaps with left endpoint at most 150,000,000. It reproduced all 10,000 indices in the OEIS b-file and added 1,197 rows in [the extension table](erdos932-census-150m-extension.tsv). OEIS uses one-based prime indices and its table ends at index 6,386,830, corresponding to the prime 111,551,057. The conjecture asks whether infinitely many gaps qualify and remains open. [OEIS indices](https://oeis.org/A387864) · [OEIS left primes](https://oeis.org/A387863) · [Erdős problem](https://www.erdosproblems.com/932)
 
-Date: 2026-11-27. The target is Erdős Problem 932: for infinitely many indices (r), the open gap ((p_r,p_{r+1})) contains at least two integers whose largest prime factor is strictly less than the gap length (g=p_{r+1}-p_r).
+## Search and validation
 
-OEIS A387864's b-file contains 10,000 indices and ends at (r=6{,}386{,}830). A387863 gives the corresponding prime endpoint (p_r=111{,}551{,}057). The proposed extension checks every prime left endpoint (p_rle150{,}000{,}000), approximately 34.5% farther in (p). The local density over the known range is about (10{,}000/6{,}386{,}830); this gives a weak reason to expect some additional hits, while Erdős's density-zero result warns that the hit rate can decline. The purpose is the finite-census advance listed by the SciNet problem entry, not an infinitude inference.
+The search protocol recorded on 27 November 2026 capped one thread at 120 CPU seconds. The published table's observed hit rate made a 34% extension of its prime range a reasonable place to look. An Eratosthenes sieve generates consecutive primes through 150,100,000 to include the successor of every left endpoint in range. For each gap of length (g), the program divides each interior integer by every prime strictly smaller than (g), with multiplicity. An integer qualifies precisely when its residual is 1. The program records the first two qualifying integers in each gap in the extension.
 
-The search is deterministic and exhaustive over that range. A byte sieve generates primes through (150{,}100{,}000), which supplies the next prime for every left endpoint at most (150{,}000{,}000). For each gap (g), each interior (m) is tested by exact trial division by every prime (ell<g). It qualifies iff the residual is 1, exactly the condition that its largest prime factor is strictly less than (g). The script first checks all 10,000 OEIS indices in order and the corresponding endpoint prime.
+An independent trial-division validator checked both listed primes in every row, checked that no prime lies between them, and confirmed that both listed integers meet the strict factor bound. A fresh run of the exhaustive scan reproduced the table byte for byte in about six seconds. The table's SHA-256 is `c39b641a824e998b6a9fcdd84b159438a307d5837a02ce8d3b0fc12400c18fc0`.
 
-Stop condition: finish the complete range or stop at 120 CPU seconds. The program is single-threaded and receives an OS CPU-time limit. The expected work is one sieve to (150.1) million and one exact test for every integer lying strictly inside a scanned prime gap. The earlier scouting pass completed in 97.829 CPU seconds but did not save the full extension table; this rerun was authorized to capture that table.
+The final qualifying gap is between 149,973,611 and 149,973,667, and the witnesses are 149,973,616 and 149,973,660. Lean proves these endpoints occur consecutively in the zero-based prime sequence and both witnesses have largest prime factor below 56. The theorem does not compute the index. The verified axiom list is `[propext, Classical.choice, Quot.sound]`. [Lean certificate](../../../../conjectures/implications/Implications/SmoothGapWitness150m.lean)
 
-## Sources checked before the run
+The 27 November Exa and GitHub checks found the 10,000-entry OEIS table and the merged one-hit density result, with no larger public census found. [OEIS table](https://oeis.org/A387864/b387864.txt) · [One-hit density proof](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/1815) · [SciNet census criterion](https://api.scinet.pub/p/c9854261-4d4f-4be1-aa98-65270fe45e66)
 
-- [OEIS A387863](https://oeis.org/A387863) and its b-file: prime endpoints of gaps with at least two qualifying integers.
-- [OEIS A387864](https://oeis.org/A387864) and its b-file: gap indices. Its comment attributes the 1976 infinitude conjecture and still says it is open; its linked Chai Wah Wu table is for (n=1,ldots,10000).
-- [Erdős Problems #932](https://www.erdosproblems.com/932) and its discussion page: still listed open; the thread says finite computation cannot resolve the infinitude question.
-- [SciNet #932](https://api.scinet.pub/p/c9854261-4d4f-4be1-aa98-65270fe45e66), posted 2026-07-21: identifies extending the A387864 census as an accepted finite advance; it reports zero logged investigations.
+## Reproduce
 
-No larger public census endpoint was found in those records. Exa and GitHub searches for A387863, A387864, Erdős 932, and the endpoint are recorded in the handoff.
+Run from the repository root.
 
-## Result
-
-Pending the registered run and independent validation.
+```sh
+mkdir -p .lake/erdos932-census
+curl -fsSL https://oeis.org/A387864/b387864.txt -o .lake/erdos932-census/b387864.txt
+printf '%s  %s\n' '01c68a6cb27e5a0f7b7d9734fbe3076945c1a512c6281c7fd32431985c3b8969' \
+  .lake/erdos932-census/b387864.txt | sha256sum --check
+g++ -O3 -std=c++20 scripts/erdos932_census_150m.cpp -o .lake/erdos932-census/scan
+(ulimit -t 120; .lake/erdos932-census/scan .lake/erdos932-census/b387864.txt \
+  .lake/erdos932-census/extension.tsv)
+cmp .lake/erdos932-census/extension.tsv docs/atlas/sweeps/2026-11-27/erdos932-census-150m-extension.tsv
+python3 scripts/validate_erdos932_census_150m.py .lake/erdos932-census/extension.tsv
+cd conjectures/implications
+lake build Implications.SmoothGapWitness150m
+```
