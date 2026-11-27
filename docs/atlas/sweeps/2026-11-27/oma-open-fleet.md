@@ -241,3 +241,12 @@ bounds and the necessary parity, order and coprimality
 constraints. None has a square discriminant. This larger
 range is an exploratory result until the finite certificate
 checks in Lean.
+
+[CrystalSharedDualY.lean](CrystalSharedDualY.lean) checks the
+extension through `y = 31` at the OMA pin. It enumerates divisors
+of the second component bound and checks the first bound before
+evaluating the discriminant. The parity and order filters leave
+831 candidate triples, and nine survive both divisibility checks.
+None has a square discriminant. The verified theorem excludes all
+odd `3 ≤ y ≤ 31` in the `x = 1` branch for every `g,z`.
+Its axiom closure is `propext`, `Classical.choice`, and `Quot.sound`.
