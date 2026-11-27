@@ -46,4 +46,60 @@ theorem largeGapCount (N B : ℕ) :
     _ ≤ (primeAt N : ℝ) := by
       exact sub_le_self _ (by positivity)
 
+/-- Disjoint finite sets, each with at least `j` elements and all contained in
+`U`, contribute at least `j` elements apiece to `U`. -/
+theorem disjointCardBound {ι α : Type*} [DecidableEq α]
+    (S : Finset ι) (A : ι → Finset α) (U : Finset α) (j : ℕ)
+    (hdisj : (S : Set ι).PairwiseDisjoint A)
+    (hlarge : ∀ i ∈ S, j ≤ (A i).card)
+    (hsub : S.biUnion A ⊆ U) :
+    j * S.card ≤ U.card := by
+  calc
+    j * S.card = ∑ i ∈ S, j := by simp [mul_comm]
+    _ ≤ ∑ i ∈ S, (A i).card := by
+      exact Finset.sum_le_sum fun i hi => hlarge i hi
+    _ = (S.biUnion A).card := (Finset.card_biUnion hdisj).symm
+    _ ≤ U.card := Finset.card_le_card hsub
+
+/-- The open interiors between distinct consecutive primes are pairwise
+disjoint. -/
+theorem primeGapInteriors_pairwiseDisjoint (N : ℕ) :
+    ((Finset.range N : Finset ℕ) : Set ℕ).PairwiseDisjoint
+      (fun r => Finset.Ioo (primeAt r) (primeAt (r + 1))) := by
+  intro i hi k hk hik
+  rcases lt_or_gt_of_ne hik with hlt | hgt
+  · apply Finset.disjoint_left.mpr
+    intro x hxi hxk
+    simp only [Finset.mem_Ioo] at hxi hxk
+    have hik' : i + 1 ≤ k := by omega
+    have hgap : primeAt (i + 1) ≤ primeAt k := primeAt_strictMono.monotone hik'
+    omega
+  · apply Finset.disjoint_left.mpr
+    intro x hxk hxi
+    simp only [Finset.mem_Ioo] at hxi hxk
+    have hki' : k + 1 ≤ i := by omega
+    have hgap : primeAt (k + 1) ≤ primeAt i := primeAt_strictMono.monotone hki'
+    omega
+
+/-- A finite multi-hit bound for prime gaps. If every selected gap contributes
+at least `j` smooth integers, and all of those integers lie in a common finite
+set `U`, then the number of selected gaps is at most `|U| / j`. Pairwise
+disjointness of the prime-gap interiors is proved here, not assumed. -/
+theorem primeGapSmoothCountBound {N j : ℕ} (S U : Finset ℕ)
+    (hS : S ⊆ Finset.range N)
+    (hlarge : ∀ r ∈ S, j ≤
+      ((Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
+        (fun m => m.maxPrimeFac < primeGap r)).card)
+    (hsub : S.biUnion (fun r =>
+      (Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
+        (fun m => m.maxPrimeFac < primeGap r)) ⊆ U) :
+    j * S.card ≤ U.card := by
+  apply disjointCardBound S
+    (fun r => (Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
+      (fun m => m.maxPrimeFac < primeGap r)) U j
+  · exact (primeGapInteriors_pairwiseDisjoint N).mono hS
+      (fun r => Finset.disjoint_filter_filter.mpr ?_)
+  · exact hlarge
+  · exact hsub
+
 end Implications.SmoothGapCounting
