@@ -30,8 +30,6 @@ def W : ℕ := 614889782588491410
 def E : ℕ :=
   5397346292805549782720214077673687806275517530364350655459511599582614290
 
-def decimalLimitExponent : ℕ := 10 ^ 74
-
 def crtExponent : List ℕ :=
   [946866288615739509321066849959644752832899644419237537322679246829569143,
    2343225385769350445363922254029248522876362434355196192526458056824627189,
@@ -119,20 +117,25 @@ using `W < 10^18`. This comparison is kernel-reduced. -/
 theorem exponentDecimalBound : 18 * E + 2 < 10 ^ 74 := by
   norm_num [E]
 
-/-- The finite construction bound from Gyarmati's Lemma 6 is verified without
-expanding `W^E`. -/
-theorem publishedNumericalBound : 49 * W ^ E < 10 ^ decimalLimitExponent := by
+/-- For any exponent bound `k`, the size estimate follows from `18 * e + 2 < k`
+without expanding `W^e`. -/
+theorem productBoundOfExponentBound {e k : ℕ} (he : 18 * e + 2 < k) :
+    49 * W ^ e < 10 ^ k := by
   have hW : W ≤ 10 ^ 18 := by norm_num [W]
-  have hWE : W ^ E ≤ 10 ^ (18 * E) := by
+  have hWE : W ^ e ≤ 10 ^ (18 * e) := by
     calc
-      W ^ E ≤ (10 ^ 18) ^ E := Nat.pow_le_pow_left hW E
-      _ = 10 ^ (18 * E) := by rw [← Nat.pow_mul]
+      W ^ e ≤ (10 ^ 18) ^ e := Nat.pow_le_pow_left hW e
+      _ = 10 ^ (18 * e) := by rw [← Nat.pow_mul]
   calc
-    49 * W ^ E ≤ 49 * 10 ^ (18 * E) := Nat.mul_le_mul_left 49 hWE
-    _ < 100 * 10 ^ (18 * E) := by
+    49 * W ^ e ≤ 49 * 10 ^ (18 * e) := Nat.mul_le_mul_left 49 hWE
+    _ < 100 * 10 ^ (18 * e) := by
       exact Nat.mul_lt_mul_of_pos_right (by omega) (by positivity)
-    _ = 10 ^ (18 * E + 2) := by rw [Nat.pow_add]; norm_num [Nat.mul_comm]
-    _ < 10 ^ decimalLimitExponent := Nat.pow_lt_pow_right (by norm_num)
-      (by simpa [decimalLimitExponent] using exponentDecimalBound)
+    _ = 10 ^ (18 * e + 2) := by rw [Nat.pow_add]; norm_num [Nat.mul_comm]
+    _ < 10 ^ k := Nat.pow_lt_pow_right (by norm_num) he
+
+/-- Gyarmati's published decimal bound, stated with the enormous numeral in
+the exponent. The generic estimate above keeps Lean from evaluating this power. -/
+theorem publishedNumericalBound : 49 * W ^ E < 10 ^ (10 ^ 74) :=
+  productBoundOfExponentBound (e := E) (k := 10 ^ 74) exponentDecimalBound
 
 end Implications.PerfectPowerGapCRT
