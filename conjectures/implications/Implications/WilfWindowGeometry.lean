@@ -64,6 +64,16 @@ theorem unique_overlapping_successor (marks shifts : Finset ℕ)
     · omega
     · have hutGap := hgap (t - u) hd
       omega
+  · exact h
+  · rcases hsep u hu t ht h with hfar | hd
+    · omega
+    · have hutGap := hgap (t - u) hd
+      omega
+  · exact h
+  · rcases hsep u hu t ht h with hfar | hd
+    · omega
+    · have hutGap := hgap (t - u) hd
+      omega
 
 /-- The corresponding uniqueness statement for an earlier overlapping window. -/
 theorem unique_overlapping_predecessor (marks shifts : Finset ℕ)
@@ -98,18 +108,49 @@ theorem moved_position_has_overlapping_neighbor (marks shifts : Finset ℕ)
       (s < t ∧ t - s ∈ shifts ∧ t - s < 8) := by
   have hi8 := i.isLt
   have hj8 := j.isLt
-  rcases lt_or_gt_of_ne hst with hts | hst'
-  · rcases hsep t ht s hs hts with hfar | hd
-    · omega
-    · exact Or.inl ⟨hts, hd, by omega⟩
+  rcases lt_or_gt_of_ne hst with hst' | hts
   · rcases hsep s hs t ht hst' with hfar | hd
     · omega
     · exact Or.inr ⟨hst', hd, by omega⟩
+  · rcases hsep t ht s hs hts with hfar | hd
+    · omega
+    · exact Or.inl ⟨hts, hd, by omega⟩
 
 private noncomputable def markedComponent {n : ℕ} (marks : Finset ℕ)
     (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n) (t : ℕ) :
     Equiv.Perm (Fin n) :=
   if ht : t ∈ marks then liftWindow t (hb t ht) m else Equiv.refl _
+
+/-- If local moved offsets never meet their translates at an allowed gap, the lifted
+permutations at all marked windows have pairwise-disjoint supports. -/
+theorem lifted_windows_pairwise_disjoint {n : ℕ} (marks shifts : Finset ℕ)
+    (m : Equiv.Perm (Fin 8))
+    (hb : ∀ s ∈ marks, s + 8 ≤ n)
+    (hsep : SeparatedBy marks shifts)
+    (htranslate : ∀ d ∈ shifts, ∀ i j : Fin 8,
+      i ∈ m.support → j ∈ m.support → i.val ≠ d + j.val) :
+    ∀ s (hs : s ∈ marks), ∀ t (ht : t ∈ marks), s ≠ t →
+      Equiv.Perm.Disjoint (liftWindow s (hb s hs) m)
+        (liftWindow t (hb t ht) m) := by
+  have hordered {s t : ℕ} (hs : s ∈ marks) (ht : t ∈ marks) (hst : s < t) :
+      Equiv.Perm.Disjoint (liftWindow s (hb s hs) m) (liftWindow t (hb t ht) m) := by
+    rw [Equiv.Perm.disjoint_iff_disjoint_support]
+    apply Finset.disjoint_left.mpr
+    intro x hx hx'
+    rw [liftWindow_support_image] at hx hx'
+    obtain ⟨i, hi, hix⟩ := Finset.mem_image.mp hx
+    obtain ⟨j, hj, hjx⟩ := Finset.mem_image.mp hx'
+    have hindex := congrArg Fin.val (hix.trans hjx.symm)
+    change s + i.val = t + j.val at hindex
+    rcases hsep s hs t ht hst with hfar | hd
+    · have hi8 := i.isLt
+      have hj8 := j.isLt
+      omega
+    · exact htranslate (t - s) hd i j hi hj (by omega)
+  intro s hs t ht hst
+  rcases lt_or_gt_of_ne hst with h | h
+  · exact hordered hs ht h
+  · exact (hordered ht hs h).symm
 
 private theorem markedComponents_disjoint {n : ℕ} (marks shifts : Finset ℕ)
     (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n)
@@ -167,45 +208,7 @@ theorem assemble_apply_of_no_lifted_support {n : ℕ} (marks shifts : Finset ℕ
       (markedComponents_disjoint marks shifts m hb hsep htranslate) x = x := by
   apply WilfDisjointPermutations.assemble_apply_of_forall_fixes
   intro t ht
-  have hnot := hx t ht
-  change x ∉ (markedComponent marks m hb t).support at hnot
-  simpa [markedComponent, ht] using hnot
-  · exact h
-  · rcases hsep u hu t ht h with hfar | hd
-    · omega
-    · have hutGap := hgap (t - u) hd
-      omega
-
-/-- If local moved offsets never meet their translates at an allowed gap, the lifted
-permutations at all marked windows have pairwise-disjoint supports. -/
-theorem lifted_windows_pairwise_disjoint {n : ℕ} (marks shifts : Finset ℕ)
-    (m : Equiv.Perm (Fin 8))
-    (hb : ∀ s ∈ marks, s + 8 ≤ n)
-    (hsep : SeparatedBy marks shifts)
-    (htranslate : ∀ d ∈ shifts, ∀ i j : Fin 8,
-      i ∈ m.support → j ∈ m.support → i.val ≠ d + j.val) :
-    ∀ s (hs : s ∈ marks), ∀ t (ht : t ∈ marks), s ≠ t →
-      Equiv.Perm.Disjoint (liftWindow s (hb s hs) m)
-        (liftWindow t (hb t ht) m) := by
-  have hordered {s t : ℕ} (hs : s ∈ marks) (ht : t ∈ marks) (hst : s < t) :
-      Equiv.Perm.Disjoint (liftWindow s (hb s hs) m) (liftWindow t (hb t ht) m) := by
-    rw [Equiv.Perm.disjoint_iff_disjoint_support]
-    apply Finset.disjoint_left.mpr
-    intro x hx hx'
-    rw [liftWindow_support_image] at hx hx'
-    obtain ⟨i, hi, hix⟩ := Finset.mem_image.mp hx
-    obtain ⟨j, hj, hjx⟩ := Finset.mem_image.mp hx'
-    have hindex := congrArg Fin.val (hix.trans hjx.symm)
-    change s + i.val = t + j.val at hindex
-    rcases hsep s hs t ht hst with hfar | hd
-    · have hi8 := i.isLt
-      have hj8 := j.isLt
-      omega
-    · exact htranslate (t - s) hd i j hi hj (by omega)
-  intro s hs t ht hst
-  rcases lt_or_gt_of_ne hst with h | h
-  · exact hordered hs ht h
-  · exact (hordered ht hs h).symm
+  simpa [markedComponent, ht] using (Equiv.Perm.notMem_support.mp (hx t ht))
 
 #print axioms liftWindow_support_image
 #print axioms unique_overlapping_successor
