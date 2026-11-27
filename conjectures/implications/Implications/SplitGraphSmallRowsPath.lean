@@ -79,20 +79,21 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
       · exact hjSel
     have htwo : ({i, j} : Finset V).card = 2 := by simp [hij]
     have hle := Finset.card_le_card hpair
-    rw [hrows x hxC, htwo] at hle
+    have hle' : ({i, j} : Finset V).card ≤ (selected x).card := hle
+    rw [hrows x hxC, htwo] at hle'
     omega
 
   have hcross_endpoints (i j : V) (hi : i ∈ I) (hj : j ∈ I) (hij : i ≠ j) :
       left i ≠ left j ∧ left i ≠ right j ∧ right i ≠ left j ∧ right i ≠ right j := by
     refine ⟨?_, ?_, ?_, ?_⟩
     · intro h
-      exact hij (hendpoint_eq i j (left i) hi hj (Or.inl rfl) (Or.inl h.symm))
+      exact hij (hendpoint_eq i j (left i) hi hj (Or.inl rfl) (Or.inl h))
     · intro h
-      exact hij (hendpoint_eq i j (left i) hi hj (Or.inl rfl) (Or.inr h.symm))
+      exact hij (hendpoint_eq i j (left i) hi hj (Or.inl rfl) (Or.inr h))
     · intro h
-      exact hij (hendpoint_eq i j (right i) hi hj (Or.inr rfl) (Or.inl h.symm))
+      exact hij (hendpoint_eq i j (right i) hi hj (Or.inr rfl) (Or.inl h))
     · intro h
-      exact hij (hendpoint_eq i j (right i) hi hj (Or.inr rfl) (Or.inr h.symm))
+      exact hij (hendpoint_eq i j (right i) hi hj (Or.inr rfl) (Or.inr h))
 
   have hblock_nodup (i : V) (hi : i ∈ I) : (block i).Nodup := by
     simp [block, hleft_ne i hi, hright_ne i hi, hneq i hi]
@@ -104,24 +105,25 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
     simp [block] at hx hy
     rcases hx with hxi | hxi | hxi <;> rcases hy with hyj | hyj | hyj
     · exact (hcross_endpoints i j hi hj hij).1 (hxi.symm.trans hyj)
-    · have hiC : x ∈ C := by simpa [hxi] using hleftC i hi
-      have hxI : x ∈ I := by simpa [hyj] using hj
+      · have hiC : x ∈ C := hxi.symm ▸ hleftC i hi
+        have hxI : x ∈ I := hyj.symm ▸ hj
       exact (Finset.disjoint_left.mp hdisj) hiC hxI
     · exact (hcross_endpoints i j hi hj hij).2.1 (hxi.symm.trans hyj)
-    · have hiI : x ∈ I := by simpa [hxi] using hi
-      have hxC : x ∈ C := by simpa [hyj] using hleftC j hj
+    · have hiI : x ∈ I := hxi.symm ▸ hi
+      have hxC : x ∈ C := hyj.symm ▸ hleftC j hj
       exact (Finset.disjoint_left.mp hdisj) hxC hiI
     · exact hij (hxi.symm.trans hyj)
-    · have hiC : x ∈ C := by simpa [hxi] using hrightC j hj
-      exact (Finset.disjoint_left.mp hdisj) hiC (by simpa [hyj] using hi)
+    · have hiC : x ∈ C := hyj.symm ▸ hrightC j hj
+      exact (Finset.disjoint_left.mp hdisj) hiC (hxi.symm ▸ hi)
     · exact (hcross_endpoints i j hi hj hij).2.2.1 (hxi.symm.trans hyj)
-    · have hiI : x ∈ I := by simpa [hyj] using hj
-      have hxC : x ∈ C := by simpa [hxi] using hrightC i hi
+    · have hiI : x ∈ I := hyj.symm ▸ hj
+      have hxC : x ∈ C := hxi.symm ▸ hrightC i hi
       exact (Finset.disjoint_left.mp hdisj) hxC hiI
     · exact (hcross_endpoints i j hi hj hij).2.2.2 (hxi.symm.trans hyj)
 
   have hbase_nodup : base.Nodup := by
-    rw [base, List.nodup_flatMap]
+    change (I.toList.flatMap block).Nodup
+    rw [List.nodup_flatMap]
     refine ⟨?_, ?_⟩
     · intro i hi
       exact hblock_nodup i (List.mem_toFinset.mp (by simpa using hi))
@@ -144,11 +146,11 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
 
   have hbase_unused : ∀ c ∈ base, c ∉ unused.toList := by
     intro c hcBase hcUnused
-    have hcUn : c ∈ unused := List.mem_toFinset.mp hcUnused
+    have hcUn : c ∈ unused := Finset.mem_toList.mp hcUnused
     have hcC : c ∈ C := (Finset.mem_sdiff.mp hcUn).1
     have hcNotUsed : c ∉ used := (Finset.mem_sdiff.mp hcUn).2
     obtain ⟨i, hi, hci⟩ := List.mem_flatMap.mp hcBase
-    have hiI := List.mem_toFinset.mp (by simpa using hi)
+    have hiI := Finset.mem_toList.mp hi
     simp [block] at hci
     rcases hci with h | h | h
     · have : c ∈ used := Finset.mem_biUnion.mpr ⟨i, hiI, by simp [h]
@@ -160,7 +162,8 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
       exact hcNotUsed this
 
   have hpath_nodup : pathList.Nodup := by
-    rw [pathList, List.nodup_append']
+    change (base ++ unused.toList).Nodup
+    rw [List.nodup_append']
     exact ⟨hbase_nodup, unused.nodup_toList, hbase_unused⟩
 
   have hbase_last_C : ∀ c, c ∈ base.getLast? → c ∈ C := by
