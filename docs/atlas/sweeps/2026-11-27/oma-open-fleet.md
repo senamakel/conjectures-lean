@@ -266,7 +266,7 @@ parameter `t` gives the partner `s = 2(t−1)²). Therefore
 in [CrystalQuotientFour.lean](CrystalQuotientFour.lean).
 
 In the `x = 1` quotient-four branch, Lean checks that the
-nonzero integer `(d−3)²−8) bounds `y` in absolute value.
+nonzero integer `(d−3)²−8` bounds `y` in absolute value.
 For `y ≥ 33`, the positive even difference must therefore
 be at least 10. This makes the branch finite for each fixed
 difference, even when the reduced component is allowed to vary.
