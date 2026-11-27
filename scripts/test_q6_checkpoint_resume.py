@@ -4,6 +4,7 @@
 import struct
 import subprocess
 import sys
+import hashlib
 from pathlib import Path
 
 
@@ -135,11 +136,33 @@ def main() -> int:
                          capture_output=True, check=False)
     if bad.returncode != 2:
         raise AssertionError("resume accepted corrupted checkpoint")
+    fields = cp.read_text().splitlines()
+    header = fields[0].split()
+    header[7] = str(int(header[7]) + 1)
+    bad_cp.write_text(" ".join(header) + "\n" + "\n".join(fields[1:]) + "\n")
+    bad = subprocess.run([str(BIN), "3", str(resumed), "--dimension", "4", "--min-vertices", "3",
+                          "--force-saturated", "--early-cycle", "--checkpoint", str(bad_cp), "--resume"],
+                         cwd=ROOT, text=True, capture_output=True, check=False)
+    if bad.returncode != 2:
+        raise AssertionError("resume accepted a non-record-aligned output offset")
+    header[7] = str(int(cp.read_text().splitlines()[0].split()[7]))
+    header[9] = str(int(header[9]) + 1)
+    bad_cp.write_text(" ".join(header) + "\n" + "\n".join(fields[1:]) + "\n")
+    bad = subprocess.run([str(BIN), "3", str(resumed), "--dimension", "4", "--min-vertices", "3",
+                          "--force-saturated", "--early-cycle", "--checkpoint", str(bad_cp), "--resume"],
+                         cwd=ROOT, text=True, capture_output=True, check=False)
+    if bad.returncode != 2:
+        raise AssertionError("resume accepted an output offset/count mismatch")
     bad = subprocess.run([str(BIN), "3", str(OUT / "same.bin"), "--dimension", "4",
                           "--checkpoint", str(OUT / "same.bin")], cwd=ROOT,
                          text=True, capture_output=True, check=False)
     if bad.returncode != 2:
         raise AssertionError("enumerator accepted identical output/checkpoint paths")
+    before = hashlib.sha256(resumed.read_bytes()).hexdigest()
+    run(resumed, cp, resume=True, capped=True)
+    after = hashlib.sha256(resumed.read_bytes()).hexdigest()
+    if after != before:
+        raise AssertionError("repeated resume from an empty frontier changed output")
     print(f"PASS q4_masks={len(got)} resume_invocations={rounds} frontier_final=0")
     return 0
 
