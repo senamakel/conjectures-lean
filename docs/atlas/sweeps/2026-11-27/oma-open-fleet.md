@@ -81,3 +81,17 @@ coefficients, a contradiction. The exact leaf proof passed the OMA pin
 with the standard three axioms and was submitted upstream. The odd
 `m ≥ 5` case and the shared-divisor branch remain open.
 [Merged split #4513](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4513) · [Multiplier-three proof #4534](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4534)
+
+### Finite candidate sets at each cross multiplier
+
+[CrystalFixedMultiplier.lean](CrystalFixedMultiplier.lean) verifies at the
+OMA pin that every fixed cross multiplier `m ≥ 2` admits only finitely
+many possible first components after sorting. The two integral quotients
+are each below `m² + 3`. For each quotient pair, if the second component
+`c` satisfies `c² + Bc + D = 0` and the difference of the two conics
+gives `Lc + M = 0`, the first component is a root of
+`M² − BML + DL²`. Modulo `m` this polynomial is the monic square
+`(X² − p(X+1))²`, where `p` is the first quotient, so the integer
+polynomial is nonzero. This supplies a finite exact-algebra route for
+each fixed multiplier. It leaves the unbounded multiplier assertion and
+the shared-divisor case open.
