@@ -95,8 +95,52 @@ theorem tripleRow_common_outside_pair
   · exact tripleRow_outside_attachments_eq A T B hA (hsize T hTR) (hsize B hBR)
       (hdiff A hAR T hTR) (hdiff A hAR B hBR) (hdiff T hTR B hBR) ht hb htb
 
+/-- The third vertex of a triple row occurs only in copies of the full triple
+when at least two distinct outsiders occur in the row family. -/
+theorem tripleRow_third_forces_full_row
+    {α : Type*} [DecidableEq α] (A : Finset α) (R : Finset (Finset α))
+    (hA : A.card = 3) (hAR : A ∈ R)
+    (hsize : ∀ B ∈ R, B.card ≤ 3)
+    (hdiff : ∀ B ∈ R, ∀ D ∈ R, (B \ D ∪ D \ B).card ≤ 2)
+    {B D T : Finset α} (hBR : B ∈ R) (hDR : D ∈ R) (hTR : T ∈ R)
+    {b d x : α} (hb : b ∈ B \ A) (hd : d ∈ D \ A) (hne : b ≠ d)
+    (hx : x ∈ A \ B) (hxT : x ∈ T) :
+    T = A := by
+  obtain ⟨P, hPA, hPsize, hcommon⟩ :=
+    tripleRow_common_outside_pair A R hA hAR hsize hdiff hBR hDR hb hd hne
+  have hBP : A ∩ B = P := hcommon B hBR ⟨b, hb⟩
+  have hxA := (Finset.mem_sdiff.mp hx).1
+  have hxB := (Finset.mem_sdiff.mp hx).2
+  have hTsub : T ⊆ A := by
+    intro y hy
+    by_contra hyA
+    have hTP := hcommon T hTR ⟨y, Finset.mem_sdiff.mpr ⟨hy, hyA⟩⟩
+    have hxP : x ∈ P := hTP ▸ Finset.mem_inter.mpr ⟨hxA, hxT⟩
+    exact hxB (Finset.mem_inter.mp (hBP.symm ▸ hxP)).2
+  have hbA := (Finset.mem_sdiff.mp hb).2
+  have hbDiff : b ∈ B \ T :=
+    Finset.mem_sdiff.mpr ⟨(Finset.mem_sdiff.mp hb).1, fun h => hbA (hTsub h)⟩
+  have hxDiff : x ∈ T \ B := Finset.mem_sdiff.mpr ⟨hxT, hxB⟩
+  have hpos := Finset.card_pos.mpr ⟨x, hxDiff⟩
+  have hBT := hdiff B hBR T hTR
+  rw [card_row_difference] at hBT
+  have hsmall : (B \ T).card ≤ 1 := by omega
+  have hPT : P ⊆ T := by
+    intro y hy
+    by_contra hyT
+    have hmem := Finset.mem_inter.mp (hBP.symm ▸ hy)
+    have hyb := Finset.card_le_one_iff.mp hsmall
+      (Finset.mem_sdiff.mpr ⟨hmem.2, hyT⟩) hbDiff
+    exact hbA (hyb ▸ hmem.1)
+  have hxP : x ∉ P := fun h => hxB (Finset.mem_inter.mp (hBP.symm ▸ h)).2
+  have hinsT : insert x P ⊆ T := Finset.insert_subset hxT hPT
+  have hcard := Finset.card_le_card hinsT
+  rw [Finset.card_insert_of_notMem hxP, hPsize] at hcard
+  exact Finset.eq_of_subset_of_card_le hTsub (by omega)
+
 end SplitGraphComponents
 
 #print axioms SplitGraphComponents.tripleRow_outside_counts
 #print axioms SplitGraphComponents.tripleRow_outside_attachments_eq
 #print axioms SplitGraphComponents.tripleRow_common_outside_pair
+#print axioms SplitGraphComponents.tripleRow_third_forces_full_row
