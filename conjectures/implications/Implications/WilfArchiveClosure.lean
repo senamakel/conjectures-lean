@@ -38,6 +38,8 @@ private theorem exactOccurrenceCount_eq_swap14 (n : ℕ) (marks : Finset (Fin n)
     simpa only [← hpq, Function.comp_apply] using
       overlap_cycle_order p swap14 hinjP (by decide) hmaxP hsecondP hcrossP f hf hn i j
   · intro f hf hn i j
+    have hswap : swap14.symm = swap14 := by simp [swap14]
+    rw [hswap]
     simpa only [← hqp, Function.comp_apply, Equiv.symm_symm] using
       overlap_cycle_order q swap14 hinjQ (by decide) hmaxQ hsecondQ hcrossQ f hf hn i j
 
