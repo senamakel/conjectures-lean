@@ -45,14 +45,13 @@ private theorem primeAt_count_asymptotic :
   have hratio' : Tendsto (fun n : ℕ =>
       ((Nat.primeCounting (primeAt n) : ℝ) /
         ((primeAt n : ℝ) / Real.log (primeAt n : ℝ)))) atTop (nhds 1) := by
-    convert hratio using 1 <;> ext n <;> simp
+    convert hratio using 1
   have hfinal : Tendsto (fun n : ℕ => ((n + 1 : ℕ) : ℝ) *
       Real.log (primeAt n : ℝ) / (primeAt n : ℝ)) atTop (nhds 1) := by
     refine hratio'.congr' ?_
     filter_upwards [hprime.eventually (eventually_gt_atTop (0 : ℝ))] with n hn
     rw [primeCounting_primeAt]
     field_simp
-    <;> ring
   exact hfinal
 
 private theorem primeAt_strictMono : StrictMono primeAt := by
@@ -331,6 +330,7 @@ theorem hitIndexProportionBound (N B j : ℕ) (hB : 0 < B) :
     _ = (((j : ℝ) * primeAt N) / (N + 1 : ℝ)) / B +
         (1 + 2 ^ B.primesBelow.card * (primeAt N).sqrt) / (N + 1 : ℝ) := by
       field_simp
-      <;> ring
+      push_cast
+      ring
 
 end Implications.SmoothGapCounting
