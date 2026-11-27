@@ -399,9 +399,11 @@ theorem hamiltonian_of_split_partition_two_outsiders
     intro u hu v hv
     simp [base] at hu
     subst u
-    exact hC hsC (hrestC v hv) (by
+    have hvMem : v ∈ rest := List.mem_of_mem_head? hv
+    exact hC hsC (hrestC v hvMem) (by
       intro h
-      exact hbaseRest s (by simp [base]) (h ▸ hv))
+      subst v
+      exact hbaseRest s (by simp [base]) hvMem)
   have hcover : ∀ v : V, v ∈ l := by
     intro v
     have hv : v ∈ C ∨ v ∈ I := by
