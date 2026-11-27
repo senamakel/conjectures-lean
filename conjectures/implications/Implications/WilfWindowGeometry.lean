@@ -110,10 +110,12 @@ theorem moved_position_has_overlapping_neighbor (marks shifts : Finset ℕ)
     · omega
     · exact Or.inl ⟨hts, hd, by omega⟩
 
+private abbrev MarkedStart (marks : Finset ℕ) := {t : ℕ // t ∈ marks}
+
 private noncomputable def markedComponent {n : ℕ} (marks : Finset ℕ)
-    (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n) (t : ℕ) :
+    (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n) (t : MarkedStart marks) :
     Equiv.Perm (Fin n) :=
-  if ht : t ∈ marks then liftWindow t (hb t ht) m else Equiv.refl _
+  liftWindow t.val (hb t.val t.property) m
 
 /-- If local moved offsets never meet their translates at an allowed gap, the lifted
 permutations at all marked windows have pairwise-disjoint supports. -/
@@ -151,13 +153,15 @@ private theorem markedComponents_disjoint {n : ℕ} (marks shifts : Finset ℕ)
     (hsep : SeparatedBy marks shifts)
     (htranslate : ∀ d ∈ shifts, ∀ i j : Fin 8,
       i ∈ m.support → j ∈ m.support → i.val ≠ d + j.val) :
-    (marks : Set ℕ).Pairwise
+    (Finset.univ : Finset (MarkedStart marks) : Set (MarkedStart marks)).Pairwise
       (fun s t => Equiv.Perm.Disjoint
         (markedComponent marks m hb s) (markedComponent marks m hb t)) := by
   have hpair := lifted_windows_pairwise_disjoint marks shifts m hb hsep htranslate
-  intro s hs t ht hst
-  rw [markedComponent, dif_pos hs, markedComponent, dif_pos ht]
-  exact hpair s hs t ht hst
+  intro s _ t _ hst
+  apply hpair s.val s.property t.val t.property
+  intro h
+  apply hst
+  exact Subtype.ext h
 
 /-- Two distinct marked starts cannot both move the same point under their lifted
 local permutations, under the translated-support separation hypothesis. -/
@@ -176,7 +180,6 @@ theorem lifted_support_mover_unique {n : ℕ} (marks shifts : Finset ℕ)
 
 /-- At a point moved by one marked-window summand, the global assembled permutation
 acts exactly as that summand. -/
-set_option maxHeartbeats 600000 in
 theorem assemble_apply_of_lifted_support {n : ℕ} (marks shifts : Finset ℕ)
     (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n)
     (hsep : SeparatedBy marks shifts)
@@ -184,16 +187,16 @@ theorem assemble_apply_of_lifted_support {n : ℕ} (marks shifts : Finset ℕ)
       i ∈ m.support → j ∈ m.support → i.val ≠ d + j.val)
     {t : ℕ} (ht : t ∈ marks) {x : Fin n}
     (hx : x ∈ (liftWindow t (hb t ht) m).support) :
-    WilfDisjointPermutations.assemble marks (markedComponent marks m hb)
+    WilfDisjointPermutations.assemble (Finset.univ : Finset (MarkedStart marks))
+      (markedComponent marks m hb)
       (markedComponents_disjoint marks shifts m hb hsep htranslate) x =
         liftWindow t (hb t ht) m x := by
-  simpa only [markedComponent, dif_pos ht] using
-    WilfDisjointPermutations.assemble_apply_of_mem_support marks
-      (markedComponent marks m hb)
-      (markedComponents_disjoint marks shifts m hb hsep htranslate) ht hx
+  exact WilfDisjointPermutations.assemble_apply_of_mem_support
+    (Finset.univ : Finset (MarkedStart marks)) (markedComponent marks m hb)
+    (markedComponents_disjoint marks shifts m hb hsep htranslate)
+    ⟨t, ht⟩ (Finset.mem_univ _) hx
 
 /-- If no marked-window summand moves a point, the assembled permutation fixes it. -/
-set_option maxHeartbeats 600000 in
 theorem assemble_apply_of_no_lifted_support {n : ℕ} (marks shifts : Finset ℕ)
     (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n)
     (hsep : SeparatedBy marks shifts)
@@ -201,14 +204,14 @@ theorem assemble_apply_of_no_lifted_support {n : ℕ} (marks shifts : Finset ℕ
       i ∈ m.support → j ∈ m.support → i.val ≠ d + j.val)
     {x : Fin n} (hx : ∀ t (ht : t ∈ marks),
       x ∉ (liftWindow t (hb t ht) m).support) :
-    WilfDisjointPermutations.assemble marks (markedComponent marks m hb)
+    WilfDisjointPermutations.assemble (Finset.univ : Finset (MarkedStart marks))
+      (markedComponent marks m hb)
       (markedComponents_disjoint marks shifts m hb hsep htranslate) x = x := by
-  exact WilfDisjointPermutations.assemble_apply_of_forall_fixes marks
-    (markedComponent marks m hb)
+  exact WilfDisjointPermutations.assemble_apply_of_forall_fixes
+    (Finset.univ : Finset (MarkedStart marks)) (markedComponent marks m hb)
     (markedComponents_disjoint marks shifts m hb hsep htranslate) (by
-      intro t ht
-      simpa only [markedComponent, dif_pos ht] using
-        (Equiv.Perm.notMem_support.mp (hx t ht)))
+      intro t _
+      exact Equiv.Perm.notMem_support.mp (hx t.val t.property))
 
 #print axioms liftWindow_support_image
 #print axioms unique_overlapping_successor
