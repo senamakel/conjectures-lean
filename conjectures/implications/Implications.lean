@@ -40,3 +40,5 @@ import Implications.WilfThreeCycleGlobal
 import Implications.WilfWindowGeometry
 import Implications.WilfArchiveClosure
 import Implications.C4PolarityDimacs
+
+import Implications.C4PolarityCnfGates
