@@ -54,7 +54,7 @@ private theorem swaps_nonfirst {n : ℕ} (marks : Finset ℕ)
 private theorem swaps_first_lt_second {n : ℕ} (marks : Finset ℕ)
     (hb : ∀ s ∈ marks, s + 7 < n)
     (hd : ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t)
-    (π : Equiv.Perm (Fin n)) (p : Fin 8 → Fin 8) (hp : p = sigma ∨ p = tau)
+    (π : Equiv.Perm (Fin n)) (p : Fin 8 → Fin 8) (hcross : p 3 < p 7)
     (hπ : ∀ s ∈ marks, ContainsAt π s p) {s : ℕ} (hs : s ∈ marks) :
     π (swapIndex marks hb hd (atOffset s (hb s hs) 0)) <
       π (atOffset s (hb s hs) 2) := by
@@ -79,20 +79,20 @@ private theorem swaps_first_lt_second {n : ℕ} (marks : Finset ℕ)
       omega
     rw [hw₀, hw₂]
     obtain ⟨_, hpattern⟩ := hπ t ht
-    exact (hpattern 3 7).mpr (by rcases hp with rfl | rfl <;> decide)
+    exact (hpattern 3 7).mpr hcross
   · have hw₀ : swapIndex marks hb hd (atOffset s (hb s hs) 0) =
         atOffset s (hb s hs) 0 := Fin.ext (swapIndex_val_other _ _ _ _ hleft hright)
     rw [hw₀]
     obtain ⟨_, hpattern⟩ := hπ s hs
     exact (hpattern 0 2).mpr (by rcases hp with rfl | rfl <;> decide)
 
-private theorem rank_first_lt (p : Fin 8 → Fin 8) (hp : p = sigma ∨ p = tau) :
-    ∀ i : Fin 8, i ≠ 0 → p 0 < p i := by
-  rcases hp with rfl | rfl <;> decide
+private theorem rank_first_lt (p : Fin 8 → Fin 8)
+    (hfirst : ∀ i : Fin 8, i ≠ 0 → p 0 < p i) :
+    ∀ i : Fin 8, i ≠ 0 → p 0 < p i := hfirst
 
-private theorem rank_second_lt (p : Fin 8 → Fin 8) (hp : p = sigma ∨ p = tau) :
-    ∀ i : Fin 8, i ≠ 0 → i ≠ 2 → p 2 < p i := by
-  rcases hp with rfl | rfl <;> decide
+private theorem rank_second_lt (p : Fin 8 → Fin 8)
+    (hsecond : ∀ i : Fin 8, i ≠ 0 → i ≠ 2 → p 2 < p i) :
+    ∀ i : Fin 8, i ≠ 0 → i ≠ 2 → p 2 < p i := hsecond
 
 private theorem windowSwap_nonfirst (i : Fin 8) (hi : i ≠ 0) : windowSwap i ≠ 0 := by
   intro he
@@ -112,7 +112,10 @@ private noncomputable def swapPerm {n : ℕ} (marks : Finset ℕ)
 theorem containsAt_swapped {n : ℕ} (marks : Finset ℕ)
     (hb : ∀ s ∈ marks, s + 7 < n)
     (hd : ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t)
-    (π : Equiv.Perm (Fin n)) (p : Fin 8 → Fin 8) (hp : p = sigma ∨ p = tau)
+    (π : Equiv.Perm (Fin n)) (p : Fin 8 → Fin 8)
+    (hfirst : ∀ i : Fin 8, i ≠ 0 → p 0 < p i)
+    (hsecond : ∀ i : Fin 8, i ≠ 0 → i ≠ 2 → p 2 < p i)
+    (hcross : p 3 < p 7)
     (hπ : ∀ s ∈ marks, ContainsAt π s p) {s : ℕ} (hs : s ∈ marks) :
     ContainsAt ((swapPerm marks hb hd).trans π) s (p ∘ windowSwap) := by
   obtain ⟨_, hpattern⟩ := hπ s hs
@@ -123,12 +126,12 @@ theorem containsAt_swapped {n : ℕ} (marks : Finset ℕ)
   have hmin : ∀ i : Fin 8, i ≠ 0 → π (f (m 0)) < π (f (m i)) := by
     intro i hi
     rw [hnonfirst i hi]
-    have hfirst := swaps_first_lt_second marks hb hd π p hp hπ hs
+    have hminwindow := swaps_first_lt_second marks hb hd π p hcross hπ hs
     by_cases hi₂ : windowSwap i = 2
     · rw [hi₂]
-      exact hfirst
-    · exact hfirst.trans ((hpattern 2 (windowSwap i)).mpr
-        (rank_second_lt p hp _ (windowSwap_nonfirst i hi) hi₂))
+      exact hminwindow
+    · exact hminwindow.trans ((hpattern 2 (windowSwap i)).mpr
+        (rank_second_lt p hsecond _ (windowSwap_nonfirst i hi) hi₂))
   refine ⟨hb s hs, ?_⟩
   intro i j
   change (π (f (m i)) < π (f (m j))) ↔ p (windowSwap i) < p (windowSwap j)
@@ -137,11 +140,11 @@ theorem containsAt_swapped {n : ℕ} (marks : Finset ℕ)
     by_cases hj : j = 0
     · subst j
       simp
-    · exact iff_of_true (hmin j hj) (rank_first_lt p hp _ (windowSwap_nonfirst j hj))
+    · exact iff_of_true (hmin j hj) (rank_first_lt p hfirst _ (windowSwap_nonfirst j hj))
   · by_cases hj : j = 0
     · subst j
       exact iff_of_false (not_lt_of_gt (hmin i hi))
-        (not_lt_of_gt (rank_first_lt p hp _ (windowSwap_nonfirst i hi)))
+        (not_lt_of_gt (rank_first_lt p hfirst _ (windowSwap_nonfirst i hi)))
     · rw [hnonfirst i hi, hnonfirst j hj]
       exact hpattern _ _
 
@@ -150,37 +153,88 @@ private def Marked {n : ℕ} (p : Fin 8 → Fin 8) (marks : Finset ℕ)
   ∀ s ∈ marks, ContainsAt π s p
 
 private noncomputable def swapMarked {n : ℕ} (marks : Finset ℕ)
-    (p q : Fin 8 → Fin 8) (hp : p = sigma ∨ p = tau) (hq : p ∘ windowSwap = q)
+    (p q : Fin 8 → Fin 8)
+    (hoverlap : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
+    (hfirst : ∀ i : Fin 8, i ≠ 0 → p 0 < p i)
+    (hsecond : ∀ i : Fin 8, i ≠ 0 → i ≠ 2 → p 2 < p i)
+    (hcross : p 3 < p 7) (hq : p ∘ windowSwap = q)
     (π : {f : Equiv.Perm (Fin n) // Marked p marks f}) :
     {f : Equiv.Perm (Fin n) // Marked q marks f} := by
   let hb := marked_starts_bounded π.val p marks π.property
-  let hd := marked_starts_separated π.val p hp marks π.property
+  let hd := marked_starts_separated_of_overlap π.val p hoverlap marks π.property
   refine ⟨(swapPerm marks hb hd).trans π.val, ?_⟩
   intro s hs
   rw [← hq]
-  exact containsAt_swapped marks hb hd π.val p hp π.property hs
+  exact containsAt_swapped marks hb hd π.val p hfirst hsecond hcross π.property hs
 
 private theorem swapMarked_swapMarked {n : ℕ} (marks : Finset ℕ)
-    (p q : Fin 8 → Fin 8) (hp : p = sigma ∨ p = tau) (hq : q = sigma ∨ q = tau)
+    (p q : Fin 8 → Fin 8)
+    (hoverlap : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
+    (hoverlapQ : ∀ d, 1 ≤ d → d < 8 → overlapCompatible q d = true → d = 5 ∨ d = 7)
+    (hfirst : ∀ i : Fin 8, i ≠ 0 → p 0 < p i)
+    (hsecond : ∀ i : Fin 8, i ≠ 0 → i ≠ 2 → p 2 < p i)
+    (hcross : p 3 < p 7)
+    (hfirstQ : ∀ i : Fin 8, i ≠ 0 → q 0 < q i)
+    (hsecondQ : ∀ i : Fin 8, i ≠ 0 → i ≠ 2 → q 2 < q i)
+    (hcrossQ : q 3 < q 7)
     (hpq : p ∘ windowSwap = q) (hqp : q ∘ windowSwap = p)
     (π : {f : Equiv.Perm (Fin n) // Marked p marks f}) :
-    swapMarked marks q p hq hqp (swapMarked marks p q hp hpq π) = π := by
+    swapMarked marks q p hoverlapQ hfirstQ hsecondQ hcrossQ hqp
+      (swapMarked marks p q hoverlap hfirst hsecond hcross hpq π) = π := by
   apply Subtype.ext
   apply Equiv.ext
   intro i
   exact congrArg π.val (swapIndex_involutive marks (marked_starts_bounded π.val p marks π.property)
-    (marked_starts_separated π.val p hp marks π.property) i)
+    (marked_starts_separated_of_overlap π.val p hoverlap marks π.property) i)
+
+/-- A reusable marked-occurrence bijection for a pair exchanged by positions
+four and six, provided their overlap and rank checks meet the finite criteria. -/
+noncomputable def markedEquivOfSwap (n : ℕ) (marks : Finset ℕ)
+    (p q : Fin 8 → Fin 8)
+    (hoverlap : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
+    (hoverlapQ : ∀ d, 1 ≤ d → d < 8 → overlapCompatible q d = true → d = 5 ∨ d = 7)
+    (hfirst : ∀ i : Fin 8, i ≠ 0 → p 0 < p i)
+    (hsecond : ∀ i : Fin 8, i ≠ 0 → i ≠ 2 → p 2 < p i)
+    (hcross : p 3 < p 7)
+    (hfirstQ : ∀ i : Fin 8, i ≠ 0 → q 0 < q i)
+    (hsecondQ : ∀ i : Fin 8, i ≠ 0 → i ≠ 2 → q 2 < q i)
+    (hcrossQ : q 3 < q 7)
+    (hpq : p ∘ windowSwap = q) (hqp : q ∘ windowSwap = p) :
+    {f : Equiv.Perm (Fin n) // Marked p marks f} ≃
+      {f : Equiv.Perm (Fin n) // Marked q marks f} where
+  toFun := swapMarked marks p q hoverlap hfirst hsecond hcross hpq
+  invFun := swapMarked marks q p hoverlapQ hfirstQ hsecondQ hcrossQ hqp
+  left_inv := swapMarked_swapMarked marks p q hoverlap hoverlapQ hfirst hsecond hcross
+    hfirstQ hsecondQ hcrossQ hpq hqp
+  right_inv := swapMarked_swapMarked marks q p hoverlapQ hoverlap hfirstQ hsecondQ hcrossQ
+    hfirst hsecond hcross hqp hpq
 
 /-- A bijection between the permutations realizing all prescribed starts for
 the two patterns. -/
 noncomputable def markedEquiv (n : ℕ) (marks : Finset ℕ) :
     {f : Equiv.Perm (Fin n) // Marked sigma marks f} ≃
       {f : Equiv.Perm (Fin n) // Marked tau marks f} where
-  toFun := swapMarked marks sigma tau (Or.inl rfl) windowSwap_sigma
-  invFun := swapMarked marks tau sigma (Or.inr rfl) windowSwap_tau
-  left_inv := swapMarked_swapMarked marks sigma tau (Or.inl rfl) (Or.inr rfl)
+  toFun := swapMarked marks sigma tau sigma_overlap_compatible_only_at_5_or_7
+    (by intro i hi; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide)
+    (by intro i hi hi2; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide)
+    (by decide) windowSwap_sigma
+  invFun := swapMarked marks tau sigma tau_overlap_compatible_only_at_5_or_7
+    (by intro i hi; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide)
+    (by intro i hi hi2; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide)
+    (by decide) windowSwap_tau
+  left_inv := swapMarked_swapMarked marks sigma tau sigma_overlap_compatible_only_at_5_or_7
+    tau_overlap_compatible_only_at_5_or_7
+    (by intro i hi; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide)
+    (by intro i hi hi2; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide) (by decide)
+    (by intro i hi; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide)
+    (by intro i hi hi2; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide) (by decide)
     windowSwap_sigma windowSwap_tau
-  right_inv := swapMarked_swapMarked marks tau sigma (Or.inr rfl) (Or.inl rfl)
+  right_inv := swapMarked_swapMarked marks tau sigma tau_overlap_compatible_only_at_5_or_7
+    sigma_overlap_compatible_only_at_5_or_7
+    (by intro i hi; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide)
+    (by intro i hi hi2; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide) (by decide)
+    (by intro i hi; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide)
+    (by intro i hi hi2; rcases i with ⟨i, hi8⟩; interval_cases i <;> decide) (by decide)
     windowSwap_tau windowSwap_sigma
 
 /-- All starting positions where the permutation has the designated pattern. -/

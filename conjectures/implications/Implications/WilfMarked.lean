@@ -163,6 +163,16 @@ theorem same_pattern_start_distance {n : Nat} (π : Equiv.Perm (Fin n))
   rcases hp with rfl | rfl
   · have h := sigma_overlap_compatible_only_at_5_or_7 d (by omega) hts (by simpa [d] using hov)
     simpa [d] using h
+
+/-- Generic form of the overlap-distance argument, parameterized by the finite
+overlap check for a pattern. -/
+theorem same_pattern_start_distance_of_overlap {n : Nat} (π : Equiv.Perm (Fin n))
+    (p : Fin 8 → Fin 8)
+    (hoverlap : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
+    (s t : Nat) (hs : ContainsAt π s p) (ht : ContainsAt π t p)
+    (hst : s < t) (hts : t - s < 8) : t - s = 5 ∨ t - s = 7 := by
+  have hov := same_pattern_overlap_compatible π p s t hs ht hst hts
+  exact hoverlap (t - s) (by omega) hts (by simpa using hov)
   · have h := tau_overlap_compatible_only_at_5_or_7 d (by omega) hts (by simpa [d] using hov)
     simpa [d] using h
 
@@ -172,6 +182,17 @@ theorem same_pattern_starts_separated {n : Nat} (π : Equiv.Perm (Fin n))
     (hst : s < t) : 5 ≤ t - s := by
   by_cases hsmall : t - s < 8
   · rcases same_pattern_start_distance π p hp s t hs ht hst hsmall with h | h <;> omega
+  · omega
+
+/-- Every two occurrences are separated by at least five positions when the
+pattern has no compatible overlap shorter than five. -/
+theorem same_pattern_starts_separated_of_overlap {n : Nat} (π : Equiv.Perm (Fin n))
+    (p : Fin 8 → Fin 8)
+    (hoverlap : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
+    (s t : Nat) (hs : ContainsAt π s p) (ht : ContainsAt π t p)
+    (hst : s < t) : 5 ≤ t - s := by
+  by_cases hsmall : t - s < 8
+  · rcases same_pattern_start_distance_of_overlap π p hoverlap s t hs ht hst hsmall with h | h <;> omega
   · omega
 
 /-- The two positions exchanged by the local marked-window operation. -/
@@ -191,12 +212,36 @@ theorem swap_supports_disjoint {n : Nat} (π : Equiv.Perm (Fin n))
   simp [swapSupport] at hx hy
   rcases hx with hxs | hxs <;> rcases hy with hyt | hyt <;> omega
 
+theorem swap_supports_disjoint_of_overlap {n : Nat} (π : Equiv.Perm (Fin n))
+    (p : Fin 8 → Fin 8)
+    (hoverlap : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
+    (s t : Nat) (hs : ContainsAt π s p) (ht : ContainsAt π t p) (hne : s ≠ t) :
+    Disjoint (swapSupport s) (swapSupport t) := by
+  have hgap : 5 ≤ t - s ∨ 5 ≤ s - t := by
+    by_cases hst : s < t
+    · exact Or.inl (same_pattern_starts_separated_of_overlap π p hoverlap s t hs ht hst)
+    · have hts : t < s := by omega
+      exact Or.inr (same_pattern_starts_separated_of_overlap π p hoverlap t s ht hs hts)
+  rw [Finset.disjoint_left]
+  intro x hx hy
+  simp [swapSupport] at hx hy
+  rcases hx with hxs | hxs <;> rcases hy with hyt | hyt <;> omega
+
 theorem marked_starts_separated {n : Nat} (π : Equiv.Perm (Fin n))
     (p : Fin 8 → Fin 8) (hp : p = sigma ∨ p = tau) (marks : Finset Nat)
     (hmarks : ∀ s ∈ marks, ContainsAt π s p) :
     ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t := by
   intro s hs t ht hst
   have hgap := same_pattern_starts_separated π p hp s t (hmarks s hs) (hmarks t ht) hst
+  omega
+
+theorem marked_starts_separated_of_overlap {n : Nat} (π : Equiv.Perm (Fin n))
+    (p : Fin 8 → Fin 8)
+    (hoverlap : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
+    (marks : Finset Nat) (hmarks : ∀ s ∈ marks, ContainsAt π s p) :
+    ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t := by
+  intro s hs t ht hst
+  have hgap := same_pattern_starts_separated_of_overlap π p hoverlap s t (hmarks s hs) (hmarks t ht) hst
   omega
 
 theorem marked_starts_bounded {n : Nat} (π : Equiv.Perm (Fin n))
