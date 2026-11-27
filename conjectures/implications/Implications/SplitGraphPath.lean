@@ -1,4 +1,5 @@
 import Implications.SplitGraphTrees
+import Implications.SplitGraphComponents
 
 /-!
 Small combinatorial consequences of the row bounds used for split graphs.
@@ -425,7 +426,7 @@ theorem hamiltonian_of_split_partition_two_outsiders
 /-- The exact-two-outsider triple-row case follows from row size and
 symmetric-difference bounds plus two clique neighbours per outsider. -/
 theorem hamiltonian_of_split_partition_two_outsiders_of_rows
-    (G : SimpleGraph V) [DecidableRel G.Adj] (C I : Finset V) (t z w : V)
+    (G : SimpleGraph V) (C I : Finset V) (t z w : V)
     (hC : G.IsClique (C : Set V)) (hdisj : Disjoint C I)
     (hpartition : (Finset.univ : Finset V) = C ∪ I)
     (ht : t ∈ C) (hA : (row G I t).card = 3)
@@ -433,24 +434,14 @@ theorem hamiltonian_of_split_partition_two_outsiders_of_rows
     (hzA : z ∉ row G I t) (hwA : w ∉ row G I t)
     (hrow : ∀ q ∈ C, (row G I q).card ≤ 3)
     (hdiff : ∀ q ∈ C, ∀ d ∈ C, q ≠ d → (rowDiff G I q d).card ≤ 2)
-    (hdeg : ∀ i ∈ I, 2 ≤ (C.filter fun q => G.Adj q i).card) :
+    (hdeg : ∀ i ∈ I, ∃ q ∈ C, ∃ d ∈ C, q ≠ d ∧ G.Adj q i ∧ G.Adj d i) :
     ∃ (u v : V) (p : G.Walk u v), p.IsHamiltonian := by
   classical
   let A := row G I t
   have hzI : z ∈ I := by rw [hI]; simp
   have hwI : w ∈ I := by rw [hI]; simp
-  have hzN : 1 < (C.filter fun q => G.Adj q z).card := by have := hdeg z hzI; omega
-  have hwN : 1 < (C.filter fun q => G.Adj q w).card := by have := hdeg w hwI; omega
-  obtain ⟨x, hxN, y, hyN, hxy⟩ := Finset.one_lt_card.mp hzN
-  obtain ⟨r, hrN, s, hsN, hrs⟩ := Finset.one_lt_card.mp hwN
-  have hxC : x ∈ C := (Finset.mem_filter.mp hxN).1
-  have hyC : y ∈ C := (Finset.mem_filter.mp hyN).1
-  have hrC : r ∈ C := (Finset.mem_filter.mp hrN).1
-  have hsC : s ∈ C := (Finset.mem_filter.mp hsN).1
-  have hxzG : G.Adj x z := (Finset.mem_filter.mp hxN).2
-  have hyzG : G.Adj y z := (Finset.mem_filter.mp hyN).2
-  have hrwG : G.Adj r w := (Finset.mem_filter.mp hrN).2
-  have hswG : G.Adj s w := (Finset.mem_filter.mp hsN).2
+  obtain ⟨x, hxC, y, hyC, hxy, hxzG, hyzG⟩ := hdeg z hzI
+  obtain ⟨r, hrC, s, hsC, hrs, hrwG, hswG⟩ := hdeg w hwI
   have hRsize : ∀ B ∈ C.image (row G I), B.card ≤ 3 := by
     intro B hB
     obtain ⟨q, hq, rfl⟩ := Finset.mem_image.mp hB
@@ -589,8 +580,8 @@ theorem hamiltonian_of_split_partition_two_outsiders_of_rows
           · exact Or.inr (Or.inr (Or.inr (Or.inl hqr)))
           · by_cases hqs : q = s
             · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hqs))))
-            · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr
-                (List.mem_toFinset.mpr (Finset.mem_sdiff.mpr ⟨hq, by simp [hqt, hqx, hqy, hqr, hqs]⟩)))))
+            · right; right; right; right; right
+              exact List.mem_toFinset.mpr (Finset.mem_sdiff.mpr ⟨hq, by simp [hqt, hqx, hqy, hqr, hqs]⟩)
   exact hamiltonian_of_split_partition_two_outsiders G C I a b c z w t x y r s rest
     hC hpartition hIeq hct hta hax hxz hzy hyb hbr hrw hws hsC
     hbaseNodup hrestNodup hrestC hbaseRest hcoverC
