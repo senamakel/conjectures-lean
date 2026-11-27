@@ -16,6 +16,12 @@ This sweep covers public Lean developments and recovered local attempts with an 
 - Green 100(i) R1 passed the pinned checker with the three standard axioms. The two leaves are the injective nonsurjective finite-field linear cellular automaton and Gromov–Weiss surjunctivity specialized to those automata. Submitted as [upstream PR #4467](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4467). The desk returned HTTP 500 and issued no lease.
 - Hironaka R1 has a checked geometric assembly at an explicitly shared universe. The registry linter requires a bare chain of hypothesis names and the bare target, which Lean generalizes at independent universe levels. The exact registry submission fails on that mismatch. A checker interface for explicitly shared universe arguments, or a suitable universe-independent descent argument, would let this route proceed.
 
+## Follow-up after the parent merges
+
+GitHub merged both parent reductions. The Left to Solve parent API still returned an empty step list for each, and the new leaf briefs returned HTTP 404. Replaying the merged PR numbers through the site's verdict endpoint returned HTTP 500 for both. An older Idoneal leaf still loaded, so the missing entries could be reproduced specifically on the new reductions.
+
+Poincaré `R1.H4.R1` passed the pinned checker with the three standard axioms and is [pushed to the fork](https://github.com/senamakel/open-math-agents/tree/oma/poincare-smooth-r1). It uses homotopy invariance of simple connectivity to reduce the exact smooth obligation to simple connectivity of the standard three-sphere and the published smooth endpoint. Upstream submission awaits registration of the parent leaf. The [sphere connectivity source](https://github.com/frenzymath/PoincareConjecture/blob/main/PoincareLib/Topology/Homotopy/Sphere/SphereConnectivity.lean) supplies a blueprint for the first new obligation.
+
 ## Earlier attempts and follow-up candidates
 
 | Target | Recovered public evidence | Remaining work |
