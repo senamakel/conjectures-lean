@@ -24,8 +24,18 @@ theorem markedCount_eq_of_markedEquiv
     (marks : Finset α) :
     markedCount occX marks = markedCount occY marks := by
   classical
+  have hx : Fintype.card {x : X // marks ⊆ occX x} =
+      (Finset.univ.filter fun x : X => marks ⊆ occX x).card :=
+    Fintype.card_of_subtype _ (by intro x; simp)
+  have hy : Fintype.card {y : Y // marks ⊆ occY y} =
+      (Finset.univ.filter fun y : Y => marks ⊆ occY y).card :=
+    Fintype.card_of_subtype _ (by intro y; simp)
   unfold markedCount
-  simpa only [Finset.card_eq_card_subtype] using Fintype.card_congr (h marks)
+  calc
+    (Finset.univ.filter fun x : X => marks ⊆ occX x).card =
+        Fintype.card {x : X // marks ⊆ occX x} := hx.symm
+    _ = Fintype.card {y : Y // marks ⊆ occY y} := Fintype.card_congr (h marks)
+    _ = (Finset.univ.filter fun y : Y => marks ⊆ occY y).card := hy
 
 /-- Marked-occurrence bijections imply super-strong equivalence: every exact
 occurrence set has the same number of objects on both sides. -/
