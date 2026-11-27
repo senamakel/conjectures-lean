@@ -83,7 +83,7 @@ theorem crossing_offsets (marks : Finset ℕ) (hsep : SeparatedStarts marks)
     rcases hsep t ht s hs hts with h | h <;> omega
 
 private theorem components_disjoint {n : ℕ} (m : Equiv.Perm (Fin 8))
-    (hm : ∀ i : Fin 8, m i ≠ i ↔ i = 1 ∨ i = 3 ∨ i = 4)
+    (hm : ∀ i : Fin 8, m i ≠ i → i = 1 ∨ i = 3 ∨ i = 4)
     (marks : Finset ℕ) (hb : ∀ s ∈ marks, s + 7 < n) (hsep : SeparatedStarts marks) :
     (marks : Set ℕ).Pairwise
       (fun s t => Equiv.Perm.Disjoint (component m s : Equiv.Perm (Fin n)) (component m t)) := by
@@ -95,11 +95,12 @@ private theorem components_disjoint {n : ℕ} (m : Equiv.Perm (Fin 8))
   obtain ⟨j, hj, he'⟩ := (mem_component_support m (hb t ht) x).mp hx'
   have hindex := congrArg Fin.val (he.trans he'.symm)
   change s + i.val = t + j.val at hindex
-  obtain ⟨_, rfl, _⟩ := crossing_offsets marks hsep hs ht hst ((hm j).mp hj) hindex
-  simpa using (hm 6).mp hi
+  obtain ⟨_, rfl, _⟩ := crossing_offsets marks hsep hs ht hst (hm j hj) hindex
+  rcases hm 6 hi with h | h | h <;> norm_num at h
 
 private theorem assembled_on_window {n : ℕ} (m : Equiv.Perm (Fin 8))
-    (hm : ∀ i : Fin 8, m i ≠ i ↔ i = 1 ∨ i = 3 ∨ i = 4)
+    (hm : ∀ i : Fin 8, m i ≠ i → i = 1 ∨ i = 3 ∨ i = 4)
+    (hm1 : m 1 ≠ 1)
     (marks : Finset ℕ) (hb : ∀ s ∈ marks, s + 7 < n) (hsep : SeparatedStarts marks)
     {s : ℕ} (hs : s ∈ marks) (i : Fin 8) :
     WilfDisjointPermutations.assemble marks (component m) (components_disjoint m hm marks hb hsep)
@@ -118,7 +119,7 @@ private theorem assembled_on_window {n : ℕ} (m : Equiv.Perm (Fin 8))
     rw [← he]
     rw [WilfDisjointPermutations.assemble_apply_of_mem_support _ _ _ hnext.2]
     · exact component_apply m (hb _ hnext.2) 1
-    · exact (mem_component_support m (hb _ hnext.2) _).mpr ⟨1, (hm 1).mpr (Or.inl rfl), rfl⟩
+      · exact (mem_component_support m (hb _ hnext.2) _).mpr ⟨1, hm1, rfl⟩
   · rw [dite_eq_right hnext]
     by_cases hmove : m i ≠ i
     · rw [WilfDisjointPermutations.assemble_apply_of_mem_support _ _ _ hs]
@@ -135,7 +136,7 @@ private theorem assembled_on_window {n : ℕ} (m : Equiv.Perm (Fin 8))
         obtain ⟨j, hj, he⟩ := (mem_component_support m (hb _ ht) _).mp hmem
         have hindex := congrArg Fin.val he.symm
         change s + i.val = t + j.val at hindex
-        obtain ⟨ht', hi, _⟩ := crossing_offsets marks hsep hs ht (Ne.symm heq) ((hm j).mp hj) hindex
+        obtain ⟨ht', hi, _⟩ := crossing_offsets marks hsep hs ht (Ne.symm heq) (hm j hj) hindex
         exact hnext ⟨hi, ht' ▸ ht⟩
 
 private def Marked {n : ℕ} (marks : Finset ℕ) (p : Fin 8 → Fin 8)
@@ -144,7 +145,8 @@ private def Marked {n : ℕ} (marks : Finset ℕ) (p : Fin 8 → Fin 8)
 
 private noncomputable def moveMarked {n : ℕ} (marks : Finset ℕ) (p q : Fin 8 → Fin 8)
     (m : Equiv.Perm (Fin 8))
-    (hm : ∀ i : Fin 8, m i ≠ i ↔ i = 1 ∨ i = 3 ∨ i = 4)
+    (hm : ∀ i : Fin 8, m i ≠ i → i = 1 ∨ i = 3 ∨ i = 4)
+    (hm1 : m 1 ≠ 1)
     (hover : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
     (hq : p ∘ m = q)
     (hlocal : ∀ f : Fin 13 → Fin n, WindowOrder p f 0 → WindowOrder p f 5 →
@@ -177,7 +179,7 @@ private noncomputable def moveMarked {n : ℕ} (marks : Finset ℕ) (p q : Fin 8
         π.val (g (windowEmbedding s (hb s hs) k)) = f (overlapImage m k) := by
       change π.val (WilfDisjointPermutations.assemble marks (component m)
         (components_disjoint m hm marks hb hsep) (windowEmbedding s (hb s hs) k)) = _
-      rw [assembled_on_window m hm marks hb hsep hs]
+      rw [assembled_on_window m hm hm1 marks hb hsep hs]
       by_cases hk : k = 6
       · rw [dite_eq_left ⟨hk, hnext⟩]
         congr 1
@@ -194,19 +196,20 @@ private noncomputable def moveMarked {n : ℕ} (marks : Finset ℕ) (p q : Fin 8
         windowEmbedding s (hb s hs) (m k) := by
       change WilfDisjointPermutations.assemble marks (component m)
         (components_disjoint m hm marks hb hsep) (windowEmbedding s (hb s hs) k) = _
-      rw [assembled_on_window m hm marks hb hsep hs, dite_eq_right (fun h => hnext h.2)]
+      rw [assembled_on_window m hm hm1 marks hb hsep hs, dite_eq_right (fun h => hnext h.2)]
     rw [hfix i, hfix j, ← hq]
     obtain ⟨_, hpat⟩ := hfirst
     exact hpat (m i) (m j)
 
 private theorem moveMarked_injective {n : ℕ} (marks : Finset ℕ) (p q : Fin 8 → Fin 8)
     (m : Equiv.Perm (Fin 8))
-    (hm : ∀ i : Fin 8, m i ≠ i ↔ i = 1 ∨ i = 3 ∨ i = 4)
+    (hm : ∀ i : Fin 8, m i ≠ i → i = 1 ∨ i = 3 ∨ i = 4)
+    (hm1 : m 1 ≠ 1)
     (hover : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
     (hq : p ∘ m = q)
     (hlocal : ∀ f : Fin 13 → Fin n, WindowOrder p f 0 → WindowOrder p f 5 →
       ∀ i j, f (overlapImage m i) < f (overlapImage m j) ↔ q i < q j) :
-    Function.Injective (moveMarked marks p q m hm hover hq hlocal) := by
+    Function.Injective (moveMarked marks p q m hm hm1 hover hq hlocal) := by
   intro a b hab
   apply Subtype.ext
   let hb := marked_starts_bounded a.val p marks a.property
