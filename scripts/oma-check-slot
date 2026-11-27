@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Bound concurrent OMA checks (including checks run by submit) on one host.
+set -euo pipefail
+
+slots=${OMA_CHECK_SLOTS:-8}
+slot_dir=${OMA_CHECK_SLOT_DIR:-"$HOME/work/personal/oma-fleet/.slots"}
+if (( $# == 0 )) || [[ ! $slots =~ ^[1-9][0-9]*$ ]]; then
+  echo "Usage: OMA_CHECK_SLOTS=<positive integer> $0 command [args...]" >&2
+  exit 2
+fi
+command -v flock >/dev/null || { echo "$0: needs flock" >&2; exit 1; }
+mkdir -p -- "$slot_dir"
+
+while true; do
+  for ((slot=1; slot<=slots; slot++)); do
+    exec 9>>"$slot_dir/$slot"
+    if flock -n 9; then
+      # Keep the lock in this shell so background children cannot retain it.
+      "$@" 9>&-
+      exit
+    fi
+    exec 9>&-
+  done
+  sleep 2
+done

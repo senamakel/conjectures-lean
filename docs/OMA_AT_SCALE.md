@@ -83,3 +83,32 @@ Artifact and checker result, or blocker:
 ```
 
 Use an isolated OMA checkout and its current checker. Review the exact statement, axioms, and any difference between the Lean target and the source. Recheck prior art and live work before submission. Report parent closure only after every required step checks. Track proofs, reductions, and steps separately in the batch summary, along with blocked targets and evidence another batch could reuse. [Verification and handoff](ATTACK.md#5-verify-and-hand-off)
+
+## Run multiple OMA workers
+
+The upstream launcher creates detached worktrees and restarts headless sessions after 60 seconds. It accepts 1–16 workers, defaults to `OMA_KIND=known`, and runs until stopped. For this workspace's research, assign exact IDs and use finite sessions with the novelty and budget rules above. [Upstream fleet.sh](https://github.com/GuillaumeBAUD-coder/open-math-agents/blob/78822595bcd2304a0417c486beffbf858101e4fd/tools/fleet.sh)
+
+1. Give each worker a checkout based on OMA upstream and a scratch directory. Use the fork to push submission branches. Put `lake` on PATH and set `OMA_AGENT` and `OMA_MODEL`. Read the formal-conjectures pin from the worker checkout's `data/catalog.json`.
+2. Share a prepared pin for scratch elaboration. Use `FormalConjecturesUtil` and the smallest imports that express the exact goal. Confirm retrieved declarations at that pin. Audit the target's definitions for dependencies on unfinished upstream lemmas, including values defined using `.choose`.
+3. Use a central PR snapshot. Repeated bulk GraphQL queries exhausted the shared quota during the November 27 run and interrupted PR creation. For a fleet, use paginated REST and publish a timestamped snapshot only after every page succeeds. A failed refresh leaves the last successful snapshot stale. Check exact IDs, descendants and changed Lean paths. Query old merged work as well as the live open queue.
+
+   ```sh
+   gh api --paginate --slurp "repos/$repo/pulls?state=open&per_page=100" > "$run_dir/open-rest.json"
+   gh api --paginate "repos/$repo/pulls/$pr/files?per_page=100" --jq '.[].filename'
+   ```
+
+4. Record the local assignment and elaborate a complete draft in scratch before claiming a desk lease where possible. Refresh the desk, local claims, and upstream PRs just before leasing. Hold one lease at a time, heartbeat according to the current desk instructions, and release promptly if the target changes, is solved, or hits a blocker.
+5. Point `OMA_FC` at a worker-private pinned checkout for final verification. The checker copies reductions and statements, edits `lakefile.toml`, and builds modules. Serialize access if workers share a writable checker checkout. Keep setup and updates out of concurrent runs. [OMA checker](https://github.com/GuillaumeBAUD-coder/open-math-agents/blob/ea1ab6394ba60f3b80439548deb8baba0838c75c/tools/check.sh)
+6. Limit heavy commands across workers. Both `check` and `submit` take a slot because submit reruns check. From the worker's OMA checkout, with `conjectures_checkout` pointing to this repository:
+
+   ```sh
+   "$conjectures_checkout/scripts/oma-check-slot" tools/oma.sh check "$id"
+   # When authorized to submit:
+   "$conjectures_checkout/scripts/oma-check-slot" tools/oma.sh submit "$id"
+   ```
+
+   The fleet used eight slots on its host. Set the same `OMA_CHECK_SLOT_DIR` and `OMA_CHECK_SLOTS` across workers. Use one slot for workers sharing a writable checker checkout. Keep heartbeats running while waiting for a slot.
+
+7. Record the exact ID, pin, verdict, PR number and eventual state, or the blocker and conditions for retrying. A merged leaf settles its own obligation. The parent closes when its reduction and all required leaves check.
+
+See the [fleet research notes](atlas/sweeps/2026-11-27/oma-fleet.md) for reusable premises, merged variants and port blockers.
