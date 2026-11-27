@@ -333,5 +333,6 @@ theorem hitIndexProportionBound (N B j : ℕ) (hB : 0 < B) :
         (1 + 2 ^ B.primesBelow.card * (primeAt N).sqrt) / (N + 1 : ℝ) := by
       field_simp
       push_cast
+      rfl
 
 end Implications.SmoothGapCounting
