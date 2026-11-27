@@ -207,7 +207,7 @@ def main() -> int:
     temp_alias = OUT / "temp-alias.chk"
     temp_alias.unlink(missing_ok=True)
     temp_alias.with_name(temp_alias.name + ".tmp").unlink(missing_ok=True)
-    temp_alias.with_name(temp_alias.name + ".tmp").symlink_to(marker)
+    temp_alias.with_name(temp_alias.name + ".tmp").symlink_to(marker.resolve())
     separate_output = OUT / "separate-output.bin"
     temp_result = subprocess.run([str(BIN), "3", str(separate_output), "--dimension", "4",
                                   "--min-vertices", "3", "--checkpoint", str(temp_alias), "--node-cap", "1"],
