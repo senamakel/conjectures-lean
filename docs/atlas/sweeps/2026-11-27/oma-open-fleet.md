@@ -49,3 +49,13 @@ gives `(s−t)((s+t)(n+1)+st)=0`. Nonnegative distinct sums make the second
 factor positive, so the sums agree. Equal sums and products determine the
 unordered pair. The checked result uses only the three standard axioms and
 leaves collisions between distinct parameters open.
+
+The fixed-parameter proof is now part of a checked reduction of the exact OMA
+target. It sorts both factorizations, then separates the remaining parameter
+comparison according to whether the two smaller factors are coprime. In
+the coprime case each smaller factor divides the opposite larger factor.
+With a common divisor, one can cancel it from the product equation and
+retain it in the two crystal conditions. Both obligations remain open.
+The pinned OMA checker accepted the reduction with only the three standard
+axioms. The PR discloses that the desk returned a non-JSON response and
+issued no lease. [OMA PR #4439](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4439)
