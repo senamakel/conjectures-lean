@@ -15,7 +15,7 @@ variable {V : Type*} [Fintype V] [DecidableEq V]
 
 /-- The independent-set vertices adjacent to a given clique vertex. -/
 def row (G : SimpleGraph V) (I : Finset V) (c : V) : Finset V :=
-  I.filter fun v => G.Adj c v
+  I.filter (fun v => G.Adj c v)
 
 /-- The symmetric difference of the rows of two clique vertices. -/
 def rowDiff (G : SimpleGraph V) (I : Finset V) (c d : V) : Finset V :=
