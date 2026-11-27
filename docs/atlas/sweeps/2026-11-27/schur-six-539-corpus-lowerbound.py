@@ -225,17 +225,13 @@ def main() -> None:
     print(dict(sorted(Counter((m, q) for _, m, q, *_ in cases).items())))
     print("cases_below_30_lower_bound", sum(bound < 30 for bound, *_ in cases))
     print("minimum_combined_bound", min(bound for bound, *_ in cases))
-    print("worst_cases")
-    for bound, m, q, label, colour, pairs, packed in sorted(cases)[:20]:
-        print({
-            "bound": bound,
-            "m": m,
-            "q": q,
-            "word": label,
-            "append_colour": colour,
-            "conflict_pairs": pairs,
-            "packed_unions": packed,
-        })
+    print("low_case_bounds: label append_colour m q lower_bound")
+    for bound, m, q, label, colour, pairs, packed in sorted(cases):
+        print(label, colour, m, q, bound)
+    minimum_cases = [case for case in cases if case[0] == min(c[0] for c in cases)]
+    for bound, m, q, label, colour, pairs, packed in minimum_cases:
+        print("minimum_case_packed_pair_ids", label, tuple(pair for pair, _ in packed))
+        print("minimum_case_union_sizes", label, tuple(len(union) for _, union in packed))
     if any(bound < 30 for bound, *_ in cases):
         print("CONCLUSION: this packing does not exclude distance 29 for every pinned input")
     else:
