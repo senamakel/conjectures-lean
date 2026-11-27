@@ -147,6 +147,72 @@ theorem scoreInputs_count_true (D : Finset (Fin 57)) :
   rw [absolute_score_count, orthogonal_pair_score_count]
   omega
 
+
+/-- The neighbor subsets used for the survivor clauses. A subset of size
+`degree(i) - 5` is exactly one of the combinations emitted by Python. -/
+def neighborExcesses (i : Fin 57) : Finset (Finset (Fin 57)) :=
+  Finset.powersetCard (graph.degree i - 5) (graph.neighborFinset i)
+
+/-- One clause emitted for vertex `i` and a selected neighbor subset. -/
+def neighborSurvivorClause (D : Finset (Fin 57)) (i : Fin 57)
+    (S : Finset (Fin 57)) : List Bool :=
+  decide (i ∈ D) :: S.toList.map (fun j => !(decide (j ∈ D)))
+
+private theorem survivor_neighbor_subset_exists (D N S : Finset (Fin 57))
+    (hSN : S ⊆ N) (hS : S.card = N.card - 5)
+    (hSurvive : 6 ≤ (N \ D).card) : ∃ j ∈ S, j ∉ D := by
+  by_contra hn
+  have hSD : S ⊆ D := by
+    intro j hj
+    by_contra hnot
+    exact hn ⟨j, hj, hnot⟩
+  have hdisj : Disjoint S (N \ D) := by
+    apply Finset.disjoint_left.mpr
+    intro j hj hjs
+    exact (Finset.mem_sdiff.mp hjs).2 (hSD hj)
+  have hunion : S ∪ (N \ D) ⊆ N := by
+    intro j hj
+    rcases Finset.mem_union.mp hj with hjS | hjN
+    · exact hSN hjS
+    · exact (Finset.mem_sdiff.mp hjN).1
+  have hcard : S.card + (N \ D).card ≤ N.card := by
+    calc
+      _ = (S ∪ (N \ D)).card := by rw [Finset.card_union_of_disjoint hdisj]
+      _ ≤ N.card := Finset.card_le_card hunion
+  have hNfive : 5 ≤ N.card := by omega
+  omega
+
+/-- If the undeleted part of every vertex neighborhood has size at least six,
+all neighbor-survivor clauses emitted by the encoder are true. -/
+theorem neighbor_survivor_clauses_of_min_degree (D : Finset (Fin 57))
+    (hmin : ∀ i, i ∉ D → 6 ≤ (graph.neighborFinset i \ D).card) :
+    ∀ i, ∀ S ∈ neighborExcesses i,
+      Implications.C4PolarityCnfGates.clauseSat (neighborSurvivorClause D i S) = true := by
+  classical
+  intro i S hS
+  by_cases hi : i ∈ D
+  · simp [neighborSurvivorClause, Implications.C4PolarityCnfGates.clauseSat, hi]
+  · have hsubset := (Finset.mem_powersetCard.mp hS).1
+    have hcard := (Finset.mem_powersetCard.mp hS).2
+    obtain ⟨j, hjS, hjD⟩ := survivor_neighbor_subset_exists D
+      (graph.neighborFinset i) S hsubset hcard (hmin i hi)
+    apply List.any_eq_true.mpr
+    refine ⟨true, ?_, rfl⟩
+    rw [neighborSurvivorClause, List.mem_cons]
+    right
+    rw [List.mem_map]
+    exact ⟨j, Finset.mem_toList.mpr hjS, by simp [hjD]⟩
+
+/-- The canonical candidate score condition together with minimum degree six
+on the retained graph implies every one of the encoder's neighbor clauses. -/
+theorem candidate_neighbor_survivor_clauses (D : Finset (Fin 57))
+    (hCand : C4PolarityCanonical.Candidate D)
+    (hmin : ∀ i, i ∉ D → 6 ≤ (graph.neighborFinset i \ D).card) :
+    ∀ i, ∀ S ∈ neighborExcesses i,
+      Implications.C4PolarityCnfGates.clauseSat (neighborSurvivorClause D i S) = true :=
+  neighbor_survivor_clauses_of_min_degree D hmin
+
 end Implications.C4PolarityEncoderInputs
 
 #print axioms Implications.C4PolarityEncoderInputs.scoreInputs_count_true
+#print axioms Implications.C4PolarityEncoderInputs.candidate_neighbor_survivor_clauses
