@@ -14,6 +14,7 @@ struct Search {
   std::array<std::uint64_t, 64> neighbors{};
   std::uint64_t nodes = 0;
   std::uint64_t labeled = 0;
+  std::uint64_t cyclic_leaves = 0;
   bool stopped = false;
   std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 
@@ -59,12 +60,16 @@ struct Search {
           }
         }
       }
-      if (degree_sum / 2 != edges || edges != vertices - components) {
+      if (degree_sum != 2 * edges) {
         std::cerr << "invariant failure: edges=" << edges
                   << " vertices=" << vertices
                   << " components=" << components
                   << " degree_sum=" << degree_sum << '\n';
         stopped = true;
+        return;
+      }
+      if (edges != vertices - components) {
+        ++cyclic_leaves;
         return;
       }
       ++labeled;
@@ -114,6 +119,7 @@ int main() {
       std::chrono::steady_clock::now() - search.start).count();
   std::cout << (search.stopped ? "STOPPED" : "COMPLETE")
             << " nodes=" << search.nodes << " labeled=" << search.labeled
+            << " cyclic_leaves=" << search.cyclic_leaves
             << " wall_seconds=" << seconds << '\n';
   return search.stopped ? 1 : 0;
 }
