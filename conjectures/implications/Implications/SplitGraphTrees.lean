@@ -140,16 +140,16 @@ theorem doubleStar_isTree (G : SimpleGraph V) (C I : Finset V) (c d : V)
       · exact Or.inr hzd
       rcases hleaf z hzc hzd with hleft | hright
       · have hsub : (H.neighborSet z).Subsingleton := by
-          intro a b ha hb
-          have ha' : H.Adj z a := by simpa using ha
-          have hb' : H.Adj z b := by simpa using hb
-          exact ((hleft a).mp ha').trans ((hleft b).mp hb').symm
+          intro a ha b hb
+          change H.Adj z a at ha
+          change H.Adj z b at hb
+          exact ((hleft a).mp ha).trans ((hleft b).mp hb).symm
         exact (hp.isTrail.notMem_support_of_subsingleton_neighborSet hzx hzx hsub) hz |>.elim
       · have hsub : (H.neighborSet z).Subsingleton := by
-          intro a b ha hb
-          have ha' : H.Adj z a := by simpa using ha
-          have hb' : H.Adj z b := by simpa using hb
-          exact ((hright a).mp ha').trans ((hright b).mp hb').symm
+          intro a ha b hb
+          change H.Adj z a at ha
+          change H.Adj z b at hb
+          exact ((hright a).mp ha).trans ((hright b).mp hb).symm
         exact (hp.isTrail.notMem_support_of_subsingleton_neighborSet hzx hzx hsub) hz |>.elim
     have hsndMem : p.snd ∈ p.support :=
       List.mem_of_mem_tail (p.snd_mem_tail_support hp.not_nil)
@@ -157,12 +157,14 @@ theorem doubleStar_isTree (G : SimpleGraph V) (C I : Finset V) (c d : V)
       List.mem_of_mem_dropLast (p.penultimate_mem_dropLast_support hp.not_nil)
     have hsndX : p.snd ≠ x := by
       intro h
-      subst p.snd
-      exact H.irrefl (p.adj_snd hp.not_nil)
+      have hadj := p.adj_snd hp.not_nil
+      rw [h] at hadj
+      exact H.irrefl hadj
     have hpenX : p.penultimate ≠ x := by
       intro h
-      subst p.penultimate
-      exact H.irrefl (p.adj_penultimate hp.not_nil)
+      have hadj := p.adj_penultimate hp.not_nil
+      rw [h] at hadj
+      exact H.irrefl hadj
     have hsnd := hnoLeaf p.snd hsndMem hsndX
     have hpen := hnoLeaf p.penultimate hpenMem hpenX
     rcases hx with rfl | rfl
