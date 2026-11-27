@@ -1,7 +1,7 @@
 import Implications.SplitGraphTrees
 
 /-!
-The full triple-row case in the connectivity-two split-graph path argument.
+The case where a triple row covers the independent side in the split-graph path argument.
 -/
 
 namespace SplitGraphTripleRowPath
@@ -165,7 +165,6 @@ theorem hamiltonian_of_split_partition_triple_row_of_rows
     (hC : G.IsClique (C : Set V)) (hdisj : Disjoint C I)
     (hpartition : (Finset.univ : Finset V) = C ∪ I)
     (ht : t ∈ C) (hroweq : row G I t = I) (hIcard : I.card = 3)
-    (_hrow : ∀ q ∈ C, (row G I q).card ≤ 3)
     (hdiff : ∀ q ∈ C, ∀ d ∈ C, q ≠ d → (rowDiff G I q d).card ≤ 2)
     (hdeg : ∀ i ∈ I, ∃ q ∈ C, ∃ d ∈ C, q ≠ d ∧ G.Adj q i ∧ G.Adj d i) :
     ∃ (u v : V) (p : G.Walk u v), p.IsHamiltonian := by
@@ -274,7 +273,7 @@ theorem hamiltonian_of_split_partition_triple_row_of_rows
   · exact path_of_distinct_attachments G C I t a b c x y hC hdisj hpartition
       haI hbI hcI hab hac hbc labelsABC ht hxC hyC hxt hyt hxy
       (adjT a haI) (adjT c hcI) hxa hyb
-  
+
 end SplitGraphTripleRowPath
 
 #print axioms SplitGraphTripleRowPath.hamiltonian_of_split_partition_triple_row_of_rows
