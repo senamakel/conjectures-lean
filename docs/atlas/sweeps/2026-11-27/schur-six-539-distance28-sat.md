@@ -115,3 +115,31 @@ its pinned source with its checked-in configure/make flow. DRAT-trim's pinned
 C source required `-D_GNU_SOURCE` for `getc_unlocked` to be declared on this
 Linux/glibc build; the checker source itself was unchanged. The solver's exit
 code 20 is CaDiCaL's documented UNSAT status.
+
+## Direct contradiction at the pair (6, 533)
+
+An independent regeneration reproduced the CNF digest. Twelve of the
+at-least-one clauses have every literal contradicted by input unit clauses.
+One of these clauses concerns (6, 533). The following ten old triples are
+direct witnesses. The endpoint being recolored is the only position in
+its triple belonging to any of the 28 support pairs. Every other position
+in that triple already has the listed canonical color.
+
+| Endpoint | New color | Monochromatic triple |
+| ---: | ---: | --- |
+| 6 | 0 | 3 + 3 = 6 |
+| 6 | 1 | 6 + 84 = 90 |
+| 6 | 2 | 6 + 14 = 20 |
+| 6 | 3 | 6 + 9 = 15 |
+| 6 | 5 | 6 + 187 = 193 |
+| 533 | 0 | 3 + 533 = 536 |
+| 533 | 1 | 84 + 449 = 533 |
+| 533 | 2 | 14 + 519 = 533 |
+| 533 | 3 | 9 + 524 = 533 |
+| 533 | 5 | 178 + 355 = 533 |
+
+The check verified the ten identities and the unchanged colors directly
+against the pinned word. Since 6 and 533 cannot both retain append color 4,
+one of the ten forbidden recolors must occur under the fixed support.
+Combined with uniqueness of the minimum support, this rules out every
+extension within 28 changes of the 997 stored words.
