@@ -20,7 +20,8 @@ noncomputable def row (S : Finset V) (inc : V → V → Prop) (c : V) : Finset V
   exact S.filter (fun x => inc c x)
 
 /-- Count incidences by rows or by left vertices. -/
-theorem sum_row_card_eq_sum_degree (C S : Finset V) (inc : V → V → Prop) :
+theorem sum_row_card_eq_sum_degree (C S : Finset V) (inc : V → V → Prop)
+    [DecidableRel inc] :
     (∑ c ∈ C, (row S inc c).card) =
       ∑ x ∈ S, (C.filter (fun c => inc c x)).card := by
   classical
@@ -34,7 +35,6 @@ theorem sum_row_card_eq_sum_degree (C S : Finset V) (inc : V → V → Prop) :
             _ = ∑ x ∈ S, if inc c x then 1 else 0 := by
               simp only [row]
               rw [Finset.sum_filter]
-              simp
     _ = ∑ x ∈ S, ∑ c ∈ C, if inc c x then 1 else 0 := by
           rw [Finset.sum_comm]
     _ = ∑ x ∈ S, (C.filter (fun c => inc c x)).card := by
@@ -44,15 +44,13 @@ theorem sum_row_card_eq_sum_degree (C S : Finset V) (inc : V → V → Prop) :
             ∑ c ∈ C, if inc c x then 1 else 0 =
                 ∑ c ∈ C.filter (fun c => inc c x), (1 : ℕ) := by
                   rw [Finset.sum_filter]
-                  simp
             _ = _ := by simp
 
 /-- If every left vertex has three incidences, every row has size at most
 four, and one four-element anchor leaves at most one incidence outside it in
 each row, then every selected set has at most one more vertex than rows. -/
 theorem hall_deficit_one_of_single_anchor
-    (C S : Finset V) (inc : V → V → Prop) (A : Finset V)
-    (hA : A ⊆ S)
+    (C S : Finset V) (inc : V → V → Prop) [DecidableRel inc] (A : Finset V)
     (hdegree : ∀ x ∈ S, 3 ≤ (C.filter (fun c => inc c x)).card)
     (hrow : ∀ c ∈ C, (row S inc c).card ≤ 4)
     (hanchor : A.card = 4)
@@ -63,7 +61,7 @@ theorem hall_deficit_one_of_single_anchor
   have hlarge : C.card + 2 ≤ S.card := by omega
   have htotalLow : 3 * S.card ≤ ∑ c ∈ C, (row S inc c).card := by
     calc
-      3 * S.card = ∑ x ∈ S, 3 := by simp
+      3 * S.card = ∑ x ∈ S, 3 := by simp; ring
       _ ≤ ∑ x ∈ S, (C.filter (fun c => inc c x)).card := by
         apply Finset.sum_le_sum
         intro x hx
@@ -76,7 +74,7 @@ theorem hall_deficit_one_of_single_anchor
         apply Finset.sum_le_sum
         intro c hc
         exact hrow c hc
-      _ = _ := by simp
+      _ = _ := by simp; ring
   have hC : 6 ≤ C.card := by omega
   have houtsideCount :
       (∑ c ∈ C, ((row S inc c) \ A).card) ≤ C.card := by
