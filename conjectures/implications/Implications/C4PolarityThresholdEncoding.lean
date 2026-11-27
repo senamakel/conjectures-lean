@@ -50,13 +50,12 @@ theorem thresholdFreshVariables_gt_base {nextVar limit inputCount : Nat}
     Int.ofNat nextVar < v := by
   simp only [thresholdFreshVariables, List.mem_map, List.mem_range] at hv
   obtain ⟨j, hj, rfl⟩ := hv
-  norm_cast
+  simp only [Int.ofNat_lt]
   omega
 
 theorem thresholdVar_gt_base {nextVar limit row k : Nat} (hk : 0 < k) :
     Int.ofNat nextVar < thresholdVar nextVar limit row k := by
-  simp [thresholdVar]
-  norm_cast
+  simp only [thresholdVar, Int.ofNat_lt]
   omega
 
 /-- The four-clause DIMACS gate agrees with the Boolean recurrence when all
@@ -71,18 +70,18 @@ theorem thresholdGateDimacs_iff (assignment : Nat → Bool)
   have hneg : ∀ lit : Int, lit ≠ 0 →
       literalValue assignment (-lit) = !literalValue assignment lit := by
     intro lit hlit
-    by_cases hlt : lit < 0
-    · have hpos : ¬ -lit < 0 := by omega
-      simp [literalValue, hlt, hpos, Int.natAbs_neg]
-    · have hpos : 0 < lit := by omega
-      have hneglt : -lit < 0 := by omega
-      simp [literalValue, hlt, hpos, hneglt, Int.natAbs_neg]
+    cases lit with
+    | ofNat n =>
+        cases n with
+        | zero => contradiction
+        | succ n => simp [literalValue]
+    | negSucc n => simp [literalValue]
   have hgate := Implications.C4PolarityCnfGates.threshold_gate_iff
     (literalValue assignment above) (literalValue assignment x)
     (literalValue assignment below) (literalValue assignment out)
   simpa [Implications.C4PolarityCnfGates.thresholdGateClauses,
     Implications.C4PolarityCnfGates.clauseSat, cnfValue, thresholdGateDimacs,
-    clauseValue, hneg above ha, hneg x hx, hneg below hb, hneg out ho] using hgate
+    clauseValue, and_assoc, hneg above ha, hneg x hx, hneg below hb, hneg out ho] using hgate
 
 /-- Build the clauses for one row, zipping `previous[k]`,
 `previous[k - 1]`, and the newly allocated output. -/
