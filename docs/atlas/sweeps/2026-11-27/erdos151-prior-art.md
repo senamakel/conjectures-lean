@@ -1,0 +1,8 @@
+# Erdős 151, the K₄-free reduction
+
+Checked 2026-11-27 against the [merged OMA reduction](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/5115), the live OMA brief, Exa, LemmaGraph and GitHub PR search.
+
+- **R2.H1** assumes `H n ≤ 9`. This implies `n ≤ 39` by `R(3,10) ≥ 40`. Veljjanoski's public write-up claims the required bound for every graph through order 39, including the K₄-free case. No matching Lean proof PR surfaced. The public claim remains unreviewed. [Proof claim](https://erdosproblems.ai/wiki/problems/extremal_graph_theory/E0151/claims/2026_09_28_veljjanoski) · [Write-up](https://github.com/veljjanoski/erdos151/blob/b648f36b34c7ad348a813d14a29e5b521b04c06e/PROOF.md)
+- **R2.H2** assumes `10 ≤ H n`, maximum degree strictly below `H n`, and an edge with at least three common neighbors. The write-up's sparse-triangle argument handles edges in at most two triangles, which the merged reduction already excludes. The first possible order of a counterexample after the claimed order-39 bound is `R(3,10)`, in `{40,41}`. At that threshold the published neighborhood reduction allows a local bound of four or five, while its coloring step requires a bound of two. The general H2 leaf also ranges over larger `H n`. [Write-up](https://github.com/veljjanoski/erdos151/blob/b648f36b34c7ad348a813d14a29e5b521b04c06e/PROOF.md) · [Exact reduction](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/5115/files)
+
+GitHub searches found parallel activity on R1, including PR #5331. The priority is an uncovered H2 case with its minimum-order and triangle hypotheses explicit. [Parallel PR](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/5331)
