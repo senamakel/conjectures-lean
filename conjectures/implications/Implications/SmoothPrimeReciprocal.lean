@@ -213,6 +213,38 @@ theorem reciprocalPrimeSum_le_dyadic_harmonic :
             Rat.cast_inv, Rat.cast_natCast, one_div]
         exact mul_le_mul_of_nonneg_left hh (by dsimp [D]; positivity)
 
+/-- A finite Euler product with local parameters at most `3/4` is bounded by the
+exponential of four times their sum. -/
+theorem finite_geometric_product_le_exp_four_sum {ι : Type*} [DecidableEq ι]
+    (s : Finset ι) (u : ι → ℝ)
+    (hu0 : ∀ i ∈ s, 0 ≤ u i) (hu3 : ∀ i ∈ s, u i ≤ 3 / 4) :
+    (∏ i ∈ s, (1 - u i)⁻¹) ≤ Real.exp (4 * ∑ i ∈ s, u i) := by
+  have hterm : ∀ i ∈ s, (1 - u i)⁻¹ ≤ Real.exp (4 * u i) := by
+    intro i hi
+    have h0 := hu0 i hi
+    have h3 := hu3 i hi
+    have hden : 0 < 1 - u i := by linarith
+    have hinv : 0 < (1 - u i)⁻¹ := inv_pos.mpr hden
+    have hlog := Real.log_le_sub_one_of_pos hinv
+    have hratio : (1 - u i)⁻¹ - 1 ≤ 4 * u i := by
+      have h := mul_le_mul_of_nonneg_left (le_of_lt hden) (by positivity : 0 ≤ 4 * u i)
+      field_simp at h ⊢
+      nlinarith
+    have hlog' : Real.log ((1 - u i)⁻¹) ≤ 4 * u i := hlog.trans hratio
+    rw [← Real.exp_log hinv]
+    exact Real.exp_le_exp.mpr hlog'
+  calc
+    (∏ i ∈ s, (1 - u i)⁻¹) ≤ ∏ i ∈ s, Real.exp (4 * u i) := by
+      apply Finset.prod_le_prod
+      · intro i hi
+        exact inv_nonneg.mpr (by linarith [hu3 i hi])
+      · intro i hi
+        exact hterm i hi
+    _ = Real.exp (4 * ∑ i ∈ s, u i) := by
+      rw [← Real.exp_sum]
+      congr 1
+      rw [Finset.mul_sum]
+
 end Implications.SmoothPrimeReciprocal
 
 #print axioms Implications.SmoothPrimeReciprocal.reciprocalPrimeSum_le_dyadic_harmonic
