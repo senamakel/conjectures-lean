@@ -23,10 +23,12 @@ theorem sum_deletionEdgeCount (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
     (∑ v : Fin 42, deletionEdgeCount G v) = 40 * G.edgeFinset.card := by
   classical
   unfold deletionEdgeCount
-  change (∑ v ∈ (Finset.univ : Finset (Fin 42)), (G.edgeFinset.card - G.degree v)) = _
-  rw [Finset.sum_sub_distrib]
+  have hle : ∀ v ∈ (Finset.univ : Finset (Fin 42)), G.degree v ≤ G.edgeFinset.card := by
+    intro v hv
+    exact SimpleGraph.degree_le_card_edgeFinset G v
+  rw [Finset.sum_tsub_distrib Finset.univ hle]
   have hdeg := G.sum_degrees_eq_twice_card_edges
-  have hconst : (∑ _v : Fin 42, G.edgeFinset.card) = 42 * G.edgeFinset.card := by simp
+  simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin] at *
   omega
 
 /-- The explicit 41-vertex extremal bound on every deletion implies `ex(42,C4) ≤ 138`.
