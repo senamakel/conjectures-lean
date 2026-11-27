@@ -59,7 +59,9 @@ The following exact paper statements and adapters compile on the OMA pin.
 Both adapters use `propext`, `Classical.choice` and `Quot.sound`.
 They establish the statement match given the corresponding F8Labs
 theorem types. The upstream proofs themselves were written for a
-newer Mathlib.
+newer Mathlib. The complete F8Labs proof of 2.7(i) also rebuilt on this
+workspace’s Lean `v4.36.0` pin with the standard three axioms. A local replay
+of its 2.14(ii) file hit a 200-second cap before returning an axiom report.
 
 ```lean
 import Mathlib.NumberTheory.PrimeCounting
