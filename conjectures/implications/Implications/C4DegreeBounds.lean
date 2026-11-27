@@ -165,6 +165,19 @@ theorem neighbor_degree_le_seven_of_degree_eight (v : V)
       (fun w hw => Nat.zero_le _) hu
   omega
 
+/-- Every neighbor of a degree-eight vertex has degree six or seven; together
+with the excess bound, at most one of the neighbors can have degree seven. -/
+theorem neighbor_degree_eq_six_or_seven_of_degree_eight (v : V)
+    (hcard : Fintype.card V = 42)
+    (hmin : ∀ u, 6 ≤ G.degree u)
+    (hC4 : C4VertexExtension.C4Free G)
+    (hv : G.degree v = 8)
+    {u : V} (hu : u ∈ G.neighborFinset v) :
+    G.degree u = 6 ∨ G.degree u = 7 := by
+  have hlow := hmin u
+  have hhigh := neighbor_degree_le_seven_of_degree_eight G v hcard hmin hC4 hv hu
+  omega
+
 #print axioms degree_window_bound
 #print axioms neighbor_degree_excess_le_one_of_degree_eight
 #print axioms neighbor_degree_le_seven_of_degree_eight
