@@ -55,3 +55,4 @@ import Implications.C4PolarityFullAssignment
 import Implications.C4PolaritySymmetryCertificate
 import Implications.C4PolaritySurvivorBound
 import Implications.C4Extremal42SearchConstraints
+import Implications.C4Extremal42RootLabel
