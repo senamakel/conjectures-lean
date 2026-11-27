@@ -74,10 +74,10 @@ theorem orthogonal_pair_score_count (D : Finset (Fin 57)) :
       ⟨p.2, (Finset.mem_filter.mp hp).2.2⟩) ?_ ?_ ?_
   · intro p hp
     have hp' := (Finset.mem_filter.mp hp).1
-    have hadj := (Finset.mem_filter.mp hp').2.2
+    have horth := (Finset.mem_filter.mp hp').2.2
     change Sym2.mk _ _ ∈ H.edgeFinset
     rw [SimpleGraph.mem_edgeFinset, SimpleGraph.mem_edgeSet]
-    exact (SimpleGraph.induce_adj).2 ⟨by omega, hadj⟩
+    exact (SimpleGraph.induce_adj).2 ⟨by omega, horth⟩
   · intro p hp q hq heq
     simp only [Sym2.eq_iff] at heq
     rcases heq with heq | heq
@@ -86,7 +86,9 @@ theorem orthogonal_pair_score_count (D : Finset (Fin 57)) :
       have hq12 := (Finset.mem_filter.mp (Finset.mem_filter.mp hq).1).2.1
       have heq1 : p.1 = q.2 := Subtype.ext_iff.mp heq.1
       have heq2 : p.2 = q.1 := Subtype.ext_iff.mp heq.2
-      have hrev : p.2 < p.1 := by simpa [heq1, heq2] using hq12
+      have hrev : p.2 < p.1 := by
+        rw [← heq2, ← heq1] at hq12
+        exact hq12
       omega
   · intro e he
     obtain ⟨ab, habeq⟩ := Sym2.mk_surjective e
@@ -94,17 +96,14 @@ theorem orthogonal_pair_score_count (D : Finset (Fin 57)) :
     have hab : H.Adj a b := by
       rw [← habeq] at he
       have heEdge := SimpleGraph.mem_edgeFinset.mp he
-      exact SimpleGraph.mem_edgeSet.mp heEdge
-    have hne : a.val ≠ b.val := by
-      intro h
-      apply H.loopless.irrefl a
-      simpa [h] using hab
+      exact (SimpleGraph.mem_edgeSet H).mp heEdge
+    have hne : a.val ≠ b.val := (SimpleGraph.induce_adj.mp hab).1
     rcases lt_or_gt_of_ne hne with hlt | hgt
     · refine ⟨(a.val, b.val), ?_, ?_⟩
       · apply Finset.mem_filter.mpr
         refine ⟨?_, ⟨a.property, b.property⟩⟩
         apply Finset.mem_filter.mpr
-        exact ⟨Finset.mem_univ _, hlt, (SimpleGraph.induce_adj.mp hab)⟩
+        exact ⟨Finset.mem_univ _, hlt, (SimpleGraph.induce_adj.mp hab).2⟩
       · change Sym2.mk a b = e
         exact habeq
     · have hba : graph.Adj b.val a.val := graph.symm b.val a.val (SimpleGraph.induce_adj.mp hab)
@@ -112,10 +111,13 @@ theorem orthogonal_pair_score_count (D : Finset (Fin 57)) :
       · apply Finset.mem_filter.mpr
         refine ⟨?_, ⟨b.property, a.property⟩⟩
         apply Finset.mem_filter.mpr
-        exact ⟨Finset.mem_univ _, hgt, hba⟩
+        exact ⟨Finset.mem_univ _, hgt, hba.2⟩
       · change Sym2.mk b a = e
-        rw [Sym2.eq_iff]
-        exact Or.inr ⟨rfl, rfl⟩
+        calc
+          Sym2.mk b a = Sym2.mk a b := by
+            apply Sym2.eq_iff.mpr
+            exact Or.inr ⟨rfl, rfl⟩
+          _ = e := by simpa using habeq
 
 /-- The absolute-point indicators count the deleted absolute points. -/
 theorem absolute_score_count (D : Finset (Fin 57)) :
