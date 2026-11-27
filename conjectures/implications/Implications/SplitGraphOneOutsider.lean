@@ -50,7 +50,6 @@ theorem hamiltonian_of_one_outsider_shared_pair_path
     (hpartition : (Finset.univ : Finset V) = C ∪ I)
     (hI : I = {a, b, c, z})
     (hpathNodup : (([z, x, a, t, c, u] ++ spare ++ [y, b]) : List V).Nodup)
-    (hsegmentNodup : ([u] ++ spare ++ [y]).Nodup)
     (hu : u ∈ C) (hy : y ∈ C)
     (hspareC : ∀ v ∈ spare, v ∈ C)
     (hcoverC : ∀ v ∈ C, v ∈ ([u] ++ spare ++ [y]))
@@ -62,6 +61,18 @@ theorem hamiltonian_of_one_outsider_shared_pair_path
   let segment : List V := [u] ++ spare ++ [y]
   let tail : List V := segment ++ [b]
   let path := core ++ tail
+  have hsegmentSubPath : segment.Sublist path := by
+    have hsegTail : segment.Sublist tail := by
+      exact List.Sublist.append_right (List.Sublist.refl segment) [b]
+    dsimp [path, tail, core, segment]
+    apply List.Sublist.cons z
+    apply List.Sublist.cons x
+    apply List.Sublist.cons a
+    apply List.Sublist.cons t
+    apply List.Sublist.cons c
+    simpa [List.append_assoc] using hsegTail
+  have hsegmentNodup : segment.Nodup := hsegmentSubPath.nodup (by
+    simpa [path, core, tail, segment, List.append_assoc] using hpathNodup)
   have hcoreChain : core.IsChain G.Adj := by
     simp [core, List.isChain_cons, hzx, hxa, hat, htc]
   have hsegmentC : ∀ v ∈ segment, v ∈ C := by
