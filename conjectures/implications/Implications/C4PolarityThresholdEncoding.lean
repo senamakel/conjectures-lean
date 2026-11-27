@@ -78,7 +78,7 @@ theorem thresholdGateDimacs_iff (assignment : Nat → Bool)
         cases n with
         | zero => contradiction
         | succ n => rfl
-    | negSucc n => rfl
+    | negSucc n => simp [literalValue]
   have hgate := Implications.C4PolarityCnfGates.threshold_gate_iff
     (literalValue assignment above) (literalValue assignment x)
     (literalValue assignment below) (literalValue assignment out)
