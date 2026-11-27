@@ -167,11 +167,14 @@ theorem cutoffHitCount (N B j : ℕ) (hB : 0 < B) :
       (Finset.mem_filter.mp hr).2⟩
   have hLnat := Finset.card_le_card hLsub
   have hLbound := largeGapCount N B
+  have hLcard : (L.card : ℝ) ≤
+      (((Finset.range N).filter (fun r => B ≤ primeGap r)).card : ℝ) := by
+    exact_mod_cast hLnat
   have hLB : (B : ℝ) * (L.card : ℝ) ≤ primeAt N := by
     calc
       (B : ℝ) * (L.card : ℝ) ≤
           (B : ℝ) * (((Finset.range N).filter (fun r => B ≤ primeGap r)).card : ℝ) :=
-        mul_le_mul_of_nonneg_left (Nat.cast_le.mpr hLnat) (by positivity)
+        mul_le_mul_of_nonneg_left hLcard (by positivity)
       _ ≤ _ := hLbound
   have hSsub : S ⊆ Finset.range N := by
     intro r hr
@@ -198,7 +201,7 @@ theorem cutoffHitCount (N B j : ℕ) (hB : 0 < B) :
       _ ≤ _ := mul_le_mul_of_nonneg_left hSbound (by positivity)
   rw [hcard]
   calc
-    (B : ℝ) * j * ((L.card : ℝ) + S.card) =
+    (B : ℝ) * j * (↑(L.card + S.card) : ℝ) =
         (B : ℝ) * j * (L.card : ℝ) + (B : ℝ) * j * (S.card : ℝ) := by ring
     _ ≤ (j : ℝ) * primeAt N + (B : ℝ) * (U.card : ℝ) := add_le_add hLscaled hSscaled
 

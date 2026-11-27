@@ -1,5 +1,8 @@
 import Mathlib.Combinatorics.SimpleGraph.Basic
 
+set_option maxHeartbeats 2000000
+set_option maxRecDepth 4096
+
 /-!
 # Adding a vertex to a C4-free graph
 
@@ -39,8 +42,6 @@ def addVertex {V : Type*} (G : SimpleGraph V) (s : Set V) : SimpleGraph (Option 
     (x : V) : (addVertex G s).Adj none (some x) ↔ x ∈ s := Iff.rfl
 
 /-- Exact criterion for the one-vertex extension to remain C4-free. -/
-set_option maxHeartbeats 2000000
-set_option maxRecDepth 4096
 theorem addVertex_c4Free_iff {V : Type*} (G : SimpleGraph V) (s : Set V) :
     C4Free (addVertex G s) ↔
       C4Free G ∧ ∀ ⦃x y z : V⦄, x ≠ y → x ∈ s → y ∈ s →
@@ -62,6 +63,12 @@ theorem addVertex_c4Free_iff {V : Type*} (G : SimpleGraph V) (s : Set V) :
   · rintro ⟨hG, hS⟩ x y z w hxy hzw hxz hyz htwo
     cases x <;> cases y <;> cases z <;> cases w <;>
       simp only [addVertex] at * <;> aesop (config := { maxRuleApplications := 1000 })
+    all_goals
+      first
+      | exact hS (by simpa using hzw.symm) hxz left (G.symm.symm _ _ hyz)
+          (G.symm.symm _ _ right)
+      | exact hS (by simpa using hzw) hyz right (G.symm.symm _ _ hxz)
+          (G.symm.symm _ _ left)
 
 #print axioms addVertex_c4Free_iff
 
