@@ -1,4 +1,4 @@
-import Mathlib
+import Implications.WilfMarked
 
 /-! Rank comparisons for the two-window swap of 23157684 and 23167584. -/
 
@@ -50,7 +50,28 @@ theorem replacement_order_23167584 {α : Type*} [Preorder α] (f : Fin 13 → α
   · exact iff_of_true (haf.trans (hsecond 1 6 (by decide))) (by decide)
   · exact iff_of_true (haf.trans (hsecond 1 7 (by decide))) (by decide)
 
+/-- Lift the local certificate to two marked occurrences in a permutation. -/
+theorem replacement_order_of_occurrences {n : ℕ} (π : Equiv.Perm (Fin n))
+    (p : Fin 8 → Fin 8) (hp : p = pattern23157684 ∨ p = pattern23167584)
+    (t : ℕ) (ht : t + 12 < n) (hfirst : WilfMarked.ContainsAt π t p)
+    (hsecond : WilfMarked.ContainsAt π (t + 5) p) (j : Fin 8) (hj : j ≠ 0) :
+    π ⟨t + 3, by omega⟩ < π ⟨t + 5 + j.val, by have := j.isLt; omega⟩ ↔
+      p 0 < p j := by
+  let f : Fin 13 → Fin n := fun k => π ⟨t + k.val, by have := k.isLt; omega⟩
+  obtain ⟨_, hb₀⟩ := hfirst
+  obtain ⟨_, hb₅⟩ := hsecond
+  have h₀ : WindowOrder p f 0 := by
+    intro i k hik
+    simpa [f, position] using (hb₀ i k).mpr hik
+  have h₅ : WindowOrder p f 5 := by
+    intro i k hik
+    simpa [f, position, Nat.add_assoc] using (hb₅ i k).mpr hik
+  rcases hp with rfl | rfl
+  · simpa [f, position, Nat.add_assoc] using replacement_order_23157684 f h₀ h₅ j hj
+  · simpa [f, position, Nat.add_assoc] using replacement_order_23167584 f h₀ h₅ j hj
+
 #print axioms replacement_order_23157684
 #print axioms replacement_order_23167584
+#print axioms replacement_order_of_occurrences
 
 end Implications.WilfTwoWindowOrder
