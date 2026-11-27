@@ -19,7 +19,7 @@ noncomputable def row (G : SimpleGraph V) (I : Finset V) (c : V) : Finset V := b
   exact I.filter (fun v => G.Adj c v)
 
 /-- The symmetric difference of the rows of two clique vertices. -/
-def rowDiff (G : SimpleGraph V) (I : Finset V) (c d : V) : Finset V :=
+noncomputable def rowDiff (G : SimpleGraph V) (I : Finset V) (c d : V) : Finset V :=
   (row G I c \ row G I d) ∪ (row G I d \ row G I c)
 
 /-- A Mathlib-level formulation of the bound on the largest induced tree. -/
@@ -39,7 +39,8 @@ theorem row_card_le (G : SimpleGraph V) (C I : Finset V) (k : ℕ)
     intro hci
     exact (Finset.disjoint_left.mp hdisj hc hci)
   have hcn : c ∉ row G I c := by
-    simp [row, G.irrefl]
+    intro h
+    exact G.irrefl c (Finset.mem_filter.mp h).2
   have hbound := hTreeBound (insert c (row G I c)) (hStar c hc)
   rw [Finset.card_insert_of_notMem hcn] at hbound
   omega
@@ -61,17 +62,15 @@ theorem row_symmDiff_card_le (G : SimpleGraph V) (C I : Finset V) (k : ℕ)
     intro hdi
     exact (Finset.disjoint_left.mp hdisj hd hdi)
   have hcRow : c ∉ rowDiff G I c d := by
-    simp only [rowDiff, Finset.mem_union, Finset.mem_sdiff, row, Finset.mem_filter]
     intro h
-    rcases h with h | h
-    · exact hcI h.2
-    · exact hcI h.2
+    rcases Finset.mem_union.mp h with h | h
+    · exact hcI (Finset.mem_filter.mp h.1).1
+    · exact hcI (Finset.mem_filter.mp h.1).1
   have hdRow : d ∉ rowDiff G I c d := by
-    simp only [rowDiff, Finset.mem_union, Finset.mem_sdiff, row, Finset.mem_filter]
     intro h
-    rcases h with h | h
-    · exact hdI h.2
-    · exact hdI h.2
+    rcases Finset.mem_union.mp h with h | h
+    · exact hdI (Finset.mem_filter.mp h.1).1
+    · exact hdI (Finset.mem_filter.mp h.1).1
   have hcdRow : c ∉ insert d (rowDiff G I c d) := by
     simp [hcd, hcRow]
   have hTree := hTreeBound
