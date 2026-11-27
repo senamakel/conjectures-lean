@@ -365,7 +365,7 @@ permutation property, and adjacency pair in the concrete finite certificate. -/
 theorem symmetryRows_valid : ∀ p ∈ symmetryRows, rowValid p := by
   native_decide
 
-def rowIso (p : List Nat) (h : rowValid p) : graph ≃g graph := by
+noncomputable def rowIso (p : List Nat) (h : rowValid p) : graph ≃g graph := by
   let e := Equiv.ofBijective (rowFunction p) h.2.2.1
   exact RelIso.mk e (by
     intro i j
@@ -380,7 +380,8 @@ theorem rowFunction_list (p : List Nat) (h : rowValid p) :
   have hnf : n < (List.finRange 57).length := by simp [hn]
   simp only [List.getElem_map, List.getElem_finRange hnf]
   simp [rowFunction, List.getElem!_eq_getElem?_getD,
-    List.getElem?_eq_getElem hnp, h.2.1 ⟨n, hn⟩]
+    List.getElem?_eq_getElem hnp]
+  rw [Nat.mod_eq_of_lt (h.2.1 ⟨n, hn⟩)]
 
 /-- Concrete Lean interface for `no_candidate_of_checked_trace.hperms`. -/
 theorem hperms (p : List Nat) (hp : p ∈ symmetryRows) :
