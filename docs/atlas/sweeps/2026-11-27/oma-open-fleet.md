@@ -95,3 +95,16 @@ gives `Lc + M = 0`, the first component is a root of
 polynomial is nonzero. This supplies a finite exact-algebra route for
 each fixed multiplier. It leaves the unbounded multiplier assertion and
 the shared-divisor case open.
+
+An exact resultant scan tested the next two odd multipliers after 5. With
+the smaller components ordered as `3 ≤ a ≤ c ≤ m*a`, the smaller quotient
+satisfies `q < m+3` and the greater quotient satisfies `p < m²+3`. Only
+`q < p` can give a distinct-parameter collision. The scan tested the 414
+quotient pairs for `m = 7` and the 847 for `m = 9`, stopping on the first
+admissible integer root or after exhausting these pairs. It found no
+integer root `a ≥ 3` in 6.32 seconds, within a 60-second wall cap. For all
+but `(m,p,q) = (7,18,3)`, a prime below 200 gives a resultant with no roots
+modulo that prime. The exceptional quotient 3 can be handled separately
+by the lower bound on the smaller quotient. These exploratory checks
+suggest small kernel-checkable modular certificates. They have yet to
+be certified in Lean.
