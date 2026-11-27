@@ -137,6 +137,25 @@ theorem absolute_score_count (D : Finset (Fin 57)) :
     simp [absoluteIndices, absolute, List.toFinset_filter, List.toFinset_finRange]
   rw [hlen, hfset]
 
+/-- The diagonal score segment has the eight absolute entries in ascending
+point index. -/
+theorem absoluteIndices_length : absoluteIndices.length = 8 := by
+  classical
+  have h := List.toFinset_card_of_nodup
+    ((List.nodup_finRange 57).filter fun i : Fin 57 => decide (orthogonal i i))
+  simpa [absoluteIndices, absolute_card] using h.symm
+
+/-- The second score segment contains one entry for each of the 224 graph edges. -/
+theorem orthogonalPairs_length : orthogonalPairs.length = 224 := by
+  classical
+  have h := orthogonal_pair_score_count (Finset.univ : Finset (Fin 57))
+  simpa [List.countP_map, inducedEdgeCount, C4PolarityOrderSeven.edge_card] using h
+
+/-- The score list has the same 232 inputs as the Python script: eight absolute
+indicators followed by 224 lexicographically ordered edge indicators. -/
+theorem scoreInputs_length (D : Finset (Fin 57)) : (scoreInputs D).length = 232 := by
+  simp [scoreInputs, absoluteIndices_length, orthogonalPairs_length]
+
 /-- The Boolean score list has exactly the deletion score used in the edge
 count reduction: induced deleted edges plus deleted absolute points. -/
 theorem scoreInputs_count_true (D : Finset (Fin 57)) :
@@ -154,7 +173,7 @@ def neighborExcesses (i : Fin 57) : Finset (Finset (Fin 57)) :=
   Finset.powersetCard (graph.degree i - 5) (graph.neighborFinset i)
 
 /-- One clause emitted for vertex `i` and a selected neighbor subset. -/
-def neighborSurvivorClause (D : Finset (Fin 57)) (i : Fin 57)
+noncomputable def neighborSurvivorClause (D : Finset (Fin 57)) (i : Fin 57)
     (S : Finset (Fin 57)) : List Bool :=
   decide (i ∈ D) :: S.toList.map (fun j => !(decide (j ∈ D)))
 
@@ -206,7 +225,7 @@ theorem neighbor_survivor_clauses_of_min_degree (D : Finset (Fin 57))
 /-- The canonical candidate score condition together with minimum degree six
 on the retained graph implies every one of the encoder's neighbor clauses. -/
 theorem candidate_neighbor_survivor_clauses (D : Finset (Fin 57))
-    (hCand : C4PolarityCanonical.Candidate D)
+    (_hCand : C4PolarityCanonical.Candidate D)
     (hmin : ∀ i, i ∉ D → 6 ≤ (graph.neighborFinset i \ D).card) :
     ∀ i, ∀ S ∈ neighborExcesses i,
       Implications.C4PolarityCnfGates.clauseSat (neighborSurvivorClause D i S) = true :=
@@ -215,4 +234,5 @@ theorem candidate_neighbor_survivor_clauses (D : Finset (Fin 57))
 end Implications.C4PolarityEncoderInputs
 
 #print axioms Implications.C4PolarityEncoderInputs.scoreInputs_count_true
+#print axioms Implications.C4PolarityEncoderInputs.neighbor_survivor_clauses_of_min_degree
 #print axioms Implications.C4PolarityEncoderInputs.candidate_neighbor_survivor_clauses
