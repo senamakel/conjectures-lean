@@ -8,10 +8,10 @@ namespace Implications.WilfPatternSwap
 
 open WilfMarked WilfGlobalSwap
 
-private def atOffset {n : ℕ} (s : ℕ) (hs : s + 7 < n) (i : Fin 8) : Fin n :=
+def atOffset {n : ℕ} (s : ℕ) (hs : s + 7 < n) (i : Fin 8) : Fin n :=
   ⟨s + i.val, by have := i.isLt; omega⟩
 
-private theorem swaps_nonfirst {n : ℕ} (marks : Finset ℕ)
+theorem swaps_nonfirst {n : ℕ} (marks : Finset ℕ)
     (hb : ∀ s ∈ marks, s + 7 < n)
     (hd : ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t)
     {s : ℕ} (hs : s ∈ marks) (i : Fin 8) (hi : i ≠ 0) :
@@ -101,7 +101,7 @@ private theorem windowSwap_nonfirst (i : Fin 8) (hi : i ≠ 0) : windowSwap i �
   rw [← windowSwap_involutive i, he]
   rfl
 
-private noncomputable def swapPerm {n : ℕ} (marks : Finset ℕ)
+noncomputable def swapPerm {n : ℕ} (marks : Finset ℕ)
     (hb : ∀ s ∈ marks, s + 7 < n)
     (hd : ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t) : Equiv.Perm (Fin n) where
   toFun := swapIndex marks hb hd
@@ -226,7 +226,7 @@ noncomputable def occurrenceSet {n : ℕ} (p : Fin 8 → Fin 8) (π : Equiv.Perm
   classical
   exact Finset.univ.filter fun i => ContainsAt π i.val p
 
-private theorem subset_occurrenceSet_iff {n : ℕ} (p : Fin 8 → Fin 8)
+theorem subset_occurrenceSet_iff {n : ℕ} (p : Fin 8 → Fin 8)
     (marks : Finset (Fin n)) (π : Equiv.Perm (Fin n)) :
     marks ⊆ occurrenceSet p π ↔ Marked p (marks.image Fin.val) π := by
   classical
