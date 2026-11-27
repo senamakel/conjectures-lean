@@ -272,7 +272,7 @@ theorem weighted_geometric_product_le_exp {s : Finset ℕ} {Y : ℝ} {σ : ℝ}
 
 /-- The prime Euler product at exponent `σ` is controlled by the reciprocal-prime
 mass, with the expected Rankin weight `Y^(1-σ)`. -/
-theorem primeEulerProduct_rankin_bound (Y : ℕ) (σ : ℝ)
+theorem primeEulerProduct_rankin_bound (Y : ℕ) (σ : ℝ) (hY2 : 2 ≤ Y)
     (hσlo : 1 / 2 ≤ σ) (hσhi : σ ≤ 1) :
     ∃ D : ℝ, 0 < D ∧
       (∏ p ∈ Y.primesBelow, (1 - ((p : ℝ) ^ σ)⁻¹)⁻¹) ≤
@@ -281,18 +281,14 @@ theorem primeEulerProduct_rankin_bound (Y : ℕ) (σ : ℝ)
   obtain ⟨D, hD, hrecip⟩ := reciprocalPrimeSum_le_dyadic_harmonic
   refine ⟨D, hD, ?_⟩
   let u : ℕ → ℝ := fun p => ((p : ℝ) ^ σ)⁻¹
-  have hYpos : 0 < (Y : ℝ) := by
-    by_contra hy
-    have hYzero : Y = 0 := by omega
-    subst Y
-    simp
+  have hYpos : 0 < (Y : ℝ) := by exact_mod_cast (by omega : 0 < Y)
   have hlocal0 : ∀ p ∈ Y.primesBelow, 0 ≤ u p := by
     intro p hp
     dsimp [u]
     positivity
   have hlocal3 : ∀ p ∈ Y.primesBelow, u p ≤ 3 / 4 := by
     intro p hp
-    have hp' : p.Prime := by simpa [Nat.primesBelow] using hp
+    have hp' : p.Prime := (Finset.mem_filter.mp hp).2
     have hp2 : 2 ≤ p := hp'.two_le
     have hpcast : (2 : ℝ) ≤ p := by exact_mod_cast hp2
     have hp1 : (1 : ℝ) ≤ p := by linarith
@@ -305,12 +301,11 @@ theorem primeEulerProduct_rankin_bound (Y : ℕ) (σ : ℝ)
       nlinarith [Real.sqrt_nonneg (2 : ℝ)]
     have hfactor : (4 / 3 : ℝ) ≤ (p : ℝ) ^ σ := hsqrt.trans hbase
     dsimp [u]
-    rw [inv_le_comm₀ (by positivity) (by norm_num : (0 : ℝ) < 4 / 3)]
-    linarith
+    exact (one_div_le_one_div_of_le (by norm_num) hfactor).trans (by norm_num)
   have hlocal : ∀ p ∈ Y.primesBelow,
       u p ≤ (Y : ℝ) ^ (1 - σ) / p := by
     intro p hp
-    have hp' : p.Prime := by simpa [Nat.primesBelow] using hp
+    have hp' : p.Prime := (Finset.mem_filter.mp hp).2
     have hpY : p < Y := by
       have hmem := Finset.mem_filter.mp hp
       exact Finset.mem_range.mp hmem.1
@@ -331,7 +326,7 @@ theorem primeEulerProduct_rankin_bound (Y : ℕ) (σ : ℝ)
         ∑ p ∈ (Finset.Icc 1 Y).filter Nat.Prime, (1 : ℝ) / p := by
     apply Finset.sum_le_sum_of_subset_of_nonneg
     · intro p hp
-      have hp' : p.Prime := by simpa [s, Nat.primesBelow] using hp
+      have hp' : p.Prime := (Finset.mem_filter.mp hp).2
       have hmem := Finset.mem_filter.mp hp
       exact Finset.mem_filter.mpr ⟨Finset.mem_Icc.mpr
         ⟨hp'.one_le, (Finset.mem_range.mp hmem.1).le⟩, hp'⟩
@@ -354,7 +349,7 @@ theorem primeEulerProduct_rankin_bound (Y : ℕ) (σ : ℝ)
         (∑ p ∈ s, (1 : ℝ) / p)) := hprod'
     _ ≤ Real.exp (4 * (Y : ℝ) ^ (1 - σ) * D *
         (1 + Real.log (((Nat.log 2 Y + 1 : ℕ) : ℝ)))) := by
-      convert hexp using 1 <;> ring
+      convert hexp using 1 <;> ring_nf
 
 end Implications.SmoothPrimeReciprocal
 
