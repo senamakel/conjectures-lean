@@ -11,11 +11,271 @@ telescoping the consecutive prime gaps.
 
 namespace Implications.SmoothGapCounting
 
+open Filter
+
 /-- The `n`th prime, in the indexing convention used by formal-conjectures. -/
 noncomputable def primeAt (n : ℕ) : ℕ := Nat.nth Nat.Prime n
 
 /-- The gap between the `n`th prime and its successor. -/
 noncomputable def primeGap (n : ℕ) : ℕ := primeAt (n + 1) - primeAt n
+
+/-- A logarithmic cutoff for counting smooth numbers in the first `N` prime gaps. -/
+noncomputable def logLogCutoff (n : ℕ) : ℕ :=
+  ⌊Real.log (primeAt n : ℝ) * Real.log (Real.log (primeAt n : ℝ)) / 16⌋₊
+
+private theorem primeCounting_primeAt (n : ℕ) :
+    Nat.primeCounting (primeAt n) = n + 1 := by
+  change Nat.count Nat.Prime (Nat.nth Nat.Prime n + 1) = n + 1
+  exact Nat.count_nth_succ_of_infinite Nat.infinite_setOfPred_prime n
+
+private theorem primeAt_count_asymptotic :
+    Tendsto (fun n : ℕ => ((n + 1 : ℕ) : ℝ) *
+      Real.log (primeAt n : ℝ) / (primeAt n : ℝ)) atTop (nhds 1) := by
+  have hnat : Tendsto primeAt atTop atTop := by
+    rw [tendsto_atTop_atTop]
+    intro b
+    refine ⟨b, fun n hbn => ?_⟩
+    have hp := Nat.add_two_le_nth_prime n
+    change b ≤ Nat.nth Nat.Prime n
+    omega
+  have hprime : Tendsto (fun n : ℕ => (primeAt n : ℝ)) atTop atTop := by
+    exact tendsto_natCast_atTop_atTop.comp hnat
+  have heq := Nat.isEquivalent_primeCounting.comp_tendsto hprime
+  have hden : ∀ᶠ n : ℕ in atTop,
+      (primeAt n : ℝ) / Real.log (primeAt n : ℝ) ≠ 0 := by
+    filter_upwards [hprime.eventually (eventually_gt_atTop 1)] with n hn
+    exact div_ne_zero (by linarith) (Real.log_pos hn).ne'
+  have hratio := (Asymptotics.isEquivalent_iff_tendsto_one hden).mp heq
+  have hratio' : Tendsto (fun n : ℕ =>
+      ((Nat.primeCounting (primeAt n) : ℝ) /
+        ((primeAt n : ℝ) / Real.log (primeAt n : ℝ)))) atTop (nhds 1) := by
+    convert hratio using 1
+    ext n
+    simp
+  have hfinal : Tendsto (fun n : ℕ => ((n + 1 : ℕ) : ℝ) *
+      Real.log (primeAt n : ℝ) / (primeAt n : ℝ)) atTop (nhds 1) := by
+    refine hratio'.congr' ?_
+    filter_upwards [hprime.eventually (eventually_gt_atTop (0 : ℝ))] with n hn
+    rw [primeCounting_primeAt]
+    field_simp
+  exact hfinal
+
+private theorem eventually_primeBelow_count_le_two_mul
+    (B : ℕ → ℕ) (hB : Tendsto (fun n => (B n : ℝ)) atTop atTop) :
+    ∀ᶠ n : ℕ in atTop,
+      ((B n).primesBelow.card : ℝ) ≤ 2 * (B n : ℝ) / Real.log (B n : ℝ) := by
+  have heq := Nat.isEquivalent_primeCounting.comp_tendsto hB
+  have hden : ∀ᶠ n : ℕ in atTop,
+      (B n : ℝ) / Real.log (B n : ℝ) ≠ 0 := by
+    filter_upwards [hB.eventually (eventually_gt_atTop 1)] with n hn
+    exact div_ne_zero (by linarith) (Real.log_pos hn).ne'
+  have hratio := (Asymptotics.isEquivalent_iff_tendsto_one hden).mp heq
+  have hlt : ∀ᶠ n : ℕ in atTop,
+      ((Nat.primeCounting (B n) : ℝ) / ((B n : ℝ) / Real.log (B n : ℝ))) < 2 := by
+    filter_upwards [hratio.eventually (Iio_mem_nhds (by norm_num : (1 : ℝ) < 2))]
+      with n hn
+    simpa using hn
+  filter_upwards [hB.eventually (eventually_gt_atTop 1), hlt] with n hn hpi
+  have hlog : 0 < Real.log (B n : ℝ) := Real.log_pos hn
+  have hdenpos : 0 < (B n : ℝ) / Real.log (B n : ℝ) := div_pos (by linarith) hlog
+  have hpi' :
+      (Nat.primeCounting (B n) : ℝ) < 2 * ((B n : ℝ) / Real.log (B n : ℝ)) :=
+    (div_lt_iff₀ hdenpos).mp hpi
+  have hcard : (B n).primesBelow.card ≤ Nat.primeCounting (B n) := by
+    calc
+      (B n).primesBelow.card = Nat.primeCounting' (B n) :=
+        Nat.primesBelow_card_eq_primeCounting' _
+      _ = Nat.primeCounting (B n - 1) := (Nat.primeCounting_sub_one _).symm
+      _ ≤ Nat.primeCounting (B n) := Nat.monotone_primeCounting (Nat.sub_le _ _)
+  have hcard' : ((B n).primesBelow.card : ℝ) ≤ Nat.primeCounting (B n) := by
+    exact_mod_cast hcard
+  calc
+    ((B n).primesBelow.card : ℝ) ≤ Nat.primeCounting (B n) := hcard'
+    _ ≤ 2 * ((B n : ℝ) / Real.log (B n : ℝ)) := hpi'.le
+    _ = 2 * (B n : ℝ) / Real.log (B n : ℝ) := by ring
+
+private theorem logLogCutoff_tendsto_atTop :
+    Tendsto (fun n => (logLogCutoff n : ℝ)) atTop atTop := by
+  have hp : Tendsto (fun n => (primeAt n : ℝ)) atTop atTop := by
+    have hnat : Tendsto primeAt atTop atTop := by
+      rw [tendsto_atTop_atTop]
+      intro b
+      refine ⟨b, fun n hbn => ?_⟩
+      have hp := Nat.add_two_le_nth_prime n
+      change b ≤ Nat.nth Nat.Prime n
+      omega
+    exact tendsto_natCast_atTop_atTop.comp hnat
+  have hlog : Tendsto (fun n => Real.log (primeAt n : ℝ)) atTop atTop :=
+    Real.tendsto_log_atTop.comp hp
+  have hloglog : Tendsto (fun n => Real.log (Real.log (primeAt n : ℝ))) atTop atTop :=
+    Real.tendsto_log_atTop.comp hlog
+  have hprod : Tendsto (fun n =>
+      Real.log (primeAt n : ℝ) * Real.log (Real.log (primeAt n : ℝ)) / 16)
+      atTop atTop := by
+    convert (hlog.atTop_mul_atTop₀ hloglog).atTop_div_const (by norm_num : (0 : ℝ) < 16)
+      using 1
+  exact tendsto_natCast_atTop_atTop.comp (tendsto_nat_floor_atTop.comp hprod)
+
+private theorem eventually_logLogCutoff_log_lower :
+    ∀ᶠ n : ℕ in atTop,
+      Real.log (Real.log (primeAt n : ℝ)) / 2 ≤ Real.log (logLogCutoff n : ℝ) := by
+  have hprime : Tendsto (fun n : ℕ => (primeAt n : ℝ)) atTop atTop := by
+    have hnat : Tendsto primeAt atTop atTop := by
+      rw [tendsto_atTop_atTop]
+      intro b
+      refine ⟨b, fun n hbn => ?_⟩
+      have hp := Nat.add_two_le_nth_prime n
+      change b ≤ Nat.nth Nat.Prime n
+      omega
+    exact tendsto_natCast_atTop_atTop.comp hnat
+  have hlog := Real.tendsto_log_atTop.comp hprime
+  have hloglog := Real.tendsto_log_atTop.comp hlog
+  filter_upwards [hlog.eventually_ge_atTop 1024, hloglog.eventually_ge_atTop 1]
+    with n hL hLL
+  change 1024 ≤ Real.log (primeAt n : ℝ) at hL
+  change 1 ≤ Real.log (Real.log (primeAt n : ℝ)) at hLL
+  have hLpos : 0 < Real.log (primeAt n : ℝ) := by linarith
+  have hsqrt_le : Real.sqrt (Real.log (primeAt n : ℝ)) ≤
+      (Real.log (primeAt n : ℝ)) / 32 := by
+    nlinarith [Real.sq_sqrt (le_of_lt hLpos)]
+  have hfloor : Real.log (primeAt n : ℝ) *
+      Real.log (Real.log (primeAt n : ℝ)) / 16 <
+      (logLogCutoff n : ℝ) + 1 := Nat.lt_floor_add_one _
+  have hB_lower : Real.sqrt (Real.log (primeAt n : ℝ)) ≤ (logLogCutoff n : ℝ) := by
+    have hratio : (Real.log (primeAt n : ℝ)) / 32 ≤
+        Real.log (primeAt n : ℝ) * Real.log (Real.log (primeAt n : ℝ)) / 16 - 1 := by
+      nlinarith [hL, hLL]
+    linarith
+  rw [← Real.log_sqrt (le_of_lt hLpos)]
+  exact Real.log_le_log (by positivity) hB_lower
+
+private theorem eventually_logLogCutoff_lower :
+    ∀ᶠ n : ℕ in atTop,
+      Real.log (primeAt n : ℝ) * Real.log (Real.log (primeAt n : ℝ)) / 32 ≤
+        (logLogCutoff n : ℝ) := by
+  have hprime : Tendsto (fun n : ℕ => (primeAt n : ℝ)) atTop atTop := by
+    have hnat : Tendsto primeAt atTop atTop := by
+      rw [tendsto_atTop_atTop]
+      intro b
+      refine ⟨b, fun n hbn => ?_⟩
+      have hp := Nat.add_two_le_nth_prime n
+      change b ≤ Nat.nth Nat.Prime n
+      omega
+    exact tendsto_natCast_atTop_atTop.comp hnat
+  have hlog := Real.tendsto_log_atTop.comp hprime
+  have hloglog := Real.tendsto_log_atTop.comp hlog
+  filter_upwards [hlog.eventually_ge_atTop 1024, hloglog.eventually_ge_atTop 1]
+    with n hL hLL
+  change 1024 ≤ Real.log (primeAt n : ℝ) at hL
+  change 1 ≤ Real.log (Real.log (primeAt n : ℝ)) at hLL
+  have hX : 2 ≤ Real.log (primeAt n : ℝ) *
+      Real.log (Real.log (primeAt n : ℝ)) / 16 := by nlinarith
+  have hf : Real.log (primeAt n : ℝ) *
+      Real.log (Real.log (primeAt n : ℝ)) / 16 <
+      (logLogCutoff n : ℝ) + 1 := Nat.lt_floor_add_one _
+  nlinarith
+
+private theorem eventually_primeAt_over_index_le :
+    ∀ᶠ n : ℕ in atTop,
+      (primeAt n : ℝ) / ((n + 1 : ℕ) : ℝ) ≤ 2 * Real.log (primeAt n : ℝ) := by
+  have hratio := primeAt_count_asymptotic
+  filter_upwards [hratio.eventually (Ioi_mem_nhds (by norm_num : (1 / 2 : ℝ) < 1))]
+    with n hn
+  have hx : 0 < (primeAt n : ℝ) := by exact_mod_cast (Nat.prime_nth_prime n).pos
+  have hN : 0 < ((n + 1 : ℕ) : ℝ) := by positivity
+  have hmul : (1 / 2 : ℝ) * (primeAt n : ℝ) <
+      ((n + 1 : ℕ) : ℝ) * Real.log (primeAt n : ℝ) :=
+    (lt_div_iff₀ hx).mp hn
+  apply (div_le_iff₀ hN).2
+  nlinarith
+
+private theorem eventually_logLogCutoff_primeCount_le :
+    ∀ᶠ n : ℕ in atTop,
+      ((logLogCutoff n).primesBelow.card : ℝ) ≤
+        Real.log (primeAt n : ℝ) / 4 := by
+  filter_upwards [eventually_primeBelow_count_le_two_mul logLogCutoff logLogCutoff_tendsto_atTop,
+    eventually_logLogCutoff_log_lower,
+    (Real.tendsto_log_atTop.comp (Real.tendsto_log_atTop.comp
+      (tendsto_natCast_atTop_atTop.comp (by
+        rw [tendsto_atTop_atTop]
+        intro b
+        refine ⟨b, fun n hbn => ?_⟩
+        have hp := Nat.add_two_le_nth_prime n
+        change b ≤ Nat.nth Nat.Prime n
+        omega)))).eventually_ge_atTop 1]
+    with n hpi hlogB hLL
+  change 1 ≤ Real.log (Real.log (primeAt n : ℝ)) at hLL
+  have hL : 0 < Real.log (primeAt n : ℝ) := by
+    have hp : 1 < (primeAt n : ℝ) := by
+      exact_mod_cast (show 1 < Nat.nth Nat.Prime n from
+        Nat.Prime.one_lt (Nat.prime_nth_prime n))
+    exact Real.log_pos hp
+  have hLLpos : 0 < Real.log (Real.log (primeAt n : ℝ)) := by linarith
+  have hBupper : (logLogCutoff n : ℝ) ≤
+      Real.log (primeAt n : ℝ) * Real.log (Real.log (primeAt n : ℝ)) / 16 :=
+    Nat.floor_le (by positivity)
+  have hbound : 2 * (logLogCutoff n : ℝ) / Real.log (logLogCutoff n : ℝ) ≤
+      Real.log (primeAt n : ℝ) / 4 := by
+    calc
+      2 * (logLogCutoff n : ℝ) / Real.log (logLogCutoff n : ℝ) ≤
+          2 * (Real.log (primeAt n : ℝ) * Real.log (Real.log (primeAt n : ℝ)) / 16) /
+            (Real.log (Real.log (primeAt n : ℝ)) / 2) := by
+        gcongr
+      _ = Real.log (primeAt n : ℝ) / 4 := by
+        field_simp
+        <;> norm_num
+  exact hpi.trans hbound
+
+private theorem log_two_lt_one : Real.log 2 < 1 := by
+  rw [Real.log_lt_iff_lt_exp (by norm_num)]
+  have h := Real.add_one_lt_exp (by norm_num : (1 : ℝ) ≠ 0)
+  norm_num at h ⊢
+  linarith
+
+private theorem eventually_logLogCutoff_smoothFactor_le :
+    ∀ᶠ n : ℕ in atTop,
+      (2 ^ (logLogCutoff n).primesBelow.card : ℝ) *
+        Real.sqrt (primeAt n : ℝ) ≤
+          Real.exp (3 * Real.log (primeAt n : ℝ) / 4) := by
+  filter_upwards [eventually_logLogCutoff_primeCount_le] with n hpi
+  let k := (logLogCutoff n).primesBelow.card
+  have hL : 0 < Real.log (primeAt n : ℝ) := by
+    have hp : 1 < (primeAt n : ℝ) := by
+      exact_mod_cast (show 1 < Nat.nth Nat.Prime n from
+        Nat.Prime.one_lt (Nat.prime_nth_prime n))
+    exact Real.log_pos hp
+  have hx : 0 < (primeAt n : ℝ) := by
+    exact_mod_cast (Nat.prime_nth_prime n).pos
+  have hk : (k : ℝ) ≤ Real.log (primeAt n : ℝ) / 4 := by
+    dsimp [k]
+    exact hpi
+  have hpow : (2 ^ k : ℝ) = Real.exp ((k : ℝ) * Real.log 2) := by
+    calc
+      (2 : ℝ) ^ k = (Real.exp (Real.log 2)) ^ k := by
+        rw [Real.exp_log (by norm_num)]
+      _ = Real.exp ((k : ℝ) * Real.log 2) := by
+        rw [← Real.exp_nat_mul]
+  have hexp : Real.exp ((k : ℝ) * Real.log 2) ≤
+      Real.exp (Real.log (primeAt n : ℝ) / 4) := by
+    apply Real.exp_le_exp.mpr
+    have harg : (k : ℝ) * Real.log 2 ≤ (k : ℝ) := by
+      nlinarith [log_two_lt_one, (Nat.cast_nonneg k : (0 : ℝ) ≤ k)]
+    exact harg.trans hk
+  have hsqrt : Real.sqrt (primeAt n : ℝ) =
+      Real.exp (Real.log (primeAt n : ℝ) / 2) := by
+    rw [Real.sqrt_eq_rpow, Real.rpow_def_of_pos hx]
+    congr 1
+    ring
+  rw [hpow, hsqrt]
+  calc
+    Real.exp ((k : ℝ) * Real.log 2) * Real.exp (Real.log (primeAt n : ℝ) / 2) ≤
+        Real.exp (Real.log (primeAt n : ℝ) / 4) *
+          Real.exp (Real.log (primeAt n : ℝ) / 2) :=
+      mul_le_mul_of_nonneg_right hexp (by positivity)
+    _ = Real.exp (3 * Real.log (primeAt n : ℝ) / 4) := by
+      rw [← Real.exp_add]
+      congr 1
+      ring
 
 private theorem primeAt_strictMono : StrictMono primeAt := by
   intro a b hab
@@ -257,5 +517,113 @@ theorem cutoffHitCount_smoothNumbers (N B j : ℕ) (hB : 0 < B) :
     _ ≤ (j : ℝ) * primeAt N + (B : ℝ) *
         ((1 + 2 ^ B.primesBelow.card * (primeAt N).sqrt : ℕ) : ℝ) := by
       gcongr
+
+/-- An explicit upper bound for the proportion of the first `N` prime gaps
+with at least `j` qualifying integers. The cutoff `B` is free to depend on
+`N`; the two terms expose the tradeoff between large gaps and smooth integers.
+-/
+theorem hitIndexProportionBound (N B j : ℕ) (hB : 0 < B) :
+    (j : ℝ) * (((Finset.range N).filter (fun r =>
+      j ≤ ((Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
+        (fun m => m.maxPrimeFac < primeGap r)).card)).card : ℝ) /
+        (N + 1 : ℝ) ≤
+      (((j : ℝ) * primeAt N) / (N + 1 : ℝ)) / B +
+        (1 + 2 ^ B.primesBelow.card * (primeAt N).sqrt) / (N + 1 : ℝ) := by
+  have hb : (0 : ℝ) < B := by exact_mod_cast hB
+  have hn : (0 : ℝ) < (N + 1 : ℝ) := by positivity
+  have hcut := cutoffHitCount_smoothNumbers N B j hB
+  have hden : (0 : ℝ) < (B : ℝ) * (N + 1 : ℝ) := mul_pos hb hn
+  calc
+    _ = ((B : ℝ) * (j : ℝ) * (((Finset.range N).filter (fun r =>
+        j ≤ ((Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
+          (fun m => m.maxPrimeFac < primeGap r)).card)).card : ℝ)) /
+          ((B : ℝ) * (N + 1 : ℝ)) := by
+      field_simp
+    _ ≤ ((j : ℝ) * primeAt N + (B : ℝ) *
+        ((1 + 2 ^ B.primesBelow.card * (primeAt N).sqrt : ℕ) : ℝ)) /
+          ((B : ℝ) * (N + 1 : ℝ)) :=
+      div_le_div_of_nonneg_right hcut (le_of_lt hden)
+    _ = (((j : ℝ) * primeAt N) / (N + 1 : ℝ)) / B +
+        (1 + 2 ^ B.primesBelow.card * (primeAt N).sqrt) / (N + 1 : ℝ) := by
+      field_simp
+      push_cast
+      rfl
+
+/-- An explicit eventual two-term upper bound for the relative count of
+two-hit gaps. The first term is the logarithmic cutoff contribution; the
+second is the smooth-number tail after applying Mathlib's square-root bound.
+-/
+theorem eventually_twoHitGapCount_bound :
+    ∀ᶠ n : ℕ in atTop,
+      (((Finset.range n).filter (fun r =>
+        2 ≤ ((Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
+          (fun m => m.maxPrimeFac < primeGap r)).card)).card : ℝ) /
+          (n + 1 : ℝ) ≤
+        64 / Real.log (Real.log (primeAt n : ℝ)) +
+          (1 + Real.exp (3 * Real.log (primeAt n : ℝ) / 4)) /
+            (2 * (n + 1 : ℝ)) := by
+  filter_upwards [eventually_logLogCutoff_lower,
+    eventually_primeAt_over_index_le,
+    eventually_logLogCutoff_smoothFactor_le,
+    (Real.tendsto_log_atTop.comp (Real.tendsto_log_atTop.comp
+      (tendsto_natCast_atTop_atTop.comp (by
+        rw [tendsto_atTop_atTop]
+        intro b
+        refine ⟨b, fun n hbn => ?_⟩
+        have hp := Nat.add_two_le_nth_prime n
+        change b ≤ Nat.nth Nat.Prime n
+        omega)))).eventually_gt_atTop 0]
+    with n hB hindex htail hLLpos
+  change 0 < Real.log (Real.log (primeAt n : ℝ)) at hLLpos
+  have hLpos : 0 < Real.log (primeAt n : ℝ) := by
+    exact Real.log_pos (by
+      exact_mod_cast (show 1 < Nat.nth Nat.Prime n from
+        Nat.Prime.one_lt (Nat.prime_nth_prime n)))
+  have hBpos : 0 < logLogCutoff n := by
+    have : 0 < Real.log (primeAt n : ℝ) *
+        Real.log (Real.log (primeAt n : ℝ)) / 32 := by positivity
+    exact Nat.cast_pos.mp (lt_of_lt_of_le this hB)
+  have hNpos : (0 : ℝ) < (n + 1 : ℝ) := by positivity
+  have hprop := hitIndexProportionBound n (logLogCutoff n) 2 hBpos
+  let C := (((Finset.range n).filter (fun r =>
+    2 ≤ ((Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
+      (fun m => m.maxPrimeFac < primeGap r)).card)).card : ℝ)
+  have hcount : C / (n + 1 : ℝ) ≤
+      ((primeAt n : ℝ) / (n + 1 : ℝ)) / (logLogCutoff n) +
+        (1 + 2 ^ (logLogCutoff n).primesBelow.card *
+          (primeAt n).sqrt) / (2 * (n + 1 : ℝ)) := by
+    dsimp [C] at hprop ⊢
+    have hden : (0 : ℝ) < 2 * (n + 1 : ℝ) * logLogCutoff n := by positivity
+    field_simp at hprop ⊢
+    nlinarith
+  have hindex' : (primeAt n : ℝ) / (n + 1 : ℝ) ≤
+      2 * Real.log (primeAt n : ℝ) := by
+    simpa [Nat.cast_add] using hindex
+  have hfirst : ((primeAt n : ℝ) / (n + 1 : ℝ)) /
+        (logLogCutoff n) ≤ 64 / Real.log (Real.log (primeAt n : ℝ)) := by
+    calc
+      _ ≤ (2 * Real.log (primeAt n : ℝ)) / (logLogCutoff n) :=
+        div_le_div_of_nonneg_right hindex' (by positivity)
+      _ ≤ (2 * Real.log (primeAt n : ℝ)) /
+          (Real.log (primeAt n : ℝ) * Real.log (Real.log (primeAt n : ℝ)) / 32) := by
+        gcongr
+      _ = 64 / Real.log (Real.log (primeAt n : ℝ)) := by
+        field_simp
+        <;> ring
+  have htail' :
+      (1 + 2 ^ (logLogCutoff n).primesBelow.card * (primeAt n).sqrt) /
+          (2 * (n + 1 : ℝ)) ≤
+        (1 + Real.exp (3 * Real.log (primeAt n : ℝ) / 4)) /
+          (2 * (n + 1 : ℝ)) := by
+    apply div_le_div_of_nonneg_right _ (by positivity)
+    calc
+      1 + 2 ^ (logLogCutoff n).primesBelow.card * (primeAt n).sqrt ≤
+          1 + 2 ^ (logLogCutoff n).primesBelow.card *
+            Real.sqrt (primeAt n : ℝ) := by
+        gcongr
+        exact Real.nat_sqrt_le_real_sqrt
+      _ ≤ 1 + Real.exp (3 * Real.log (primeAt n : ℝ) / 4) := by
+        simpa [add_comm] using add_le_add_left htail 1
+  simpa [C] using hcount.trans (add_le_add hfirst htail')
 
 end Implications.SmoothGapCounting
