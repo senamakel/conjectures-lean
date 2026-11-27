@@ -1,0 +1,527 @@
+\documentclass[11pt,reqno]{amsart}
+
+\IfFileExists{lmodern.sty}{\usepackage[T1]{fontenc}\usepackage{lmodern}}{}
+\usepackage[utf8]{inputenc}
+\usepackage[expansion=false]{microtype}
+\usepackage[a4paper,margin=24mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{placeins}
+\raggedbottom
+\setlength{\emergencystretch}{2em}
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[hidelinks,pdftitle={Formal Verification of Parity Obstructions and Fixed-Point Exclusions for Proper-Divisor Moments (OEIS A245211) in Lean 4},pdfauthor={Mar Allen P. Sugui}]{hyperref}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{refutation}[theorem]{Refutation Check}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\leanid}[1]{\texttt{\upshape\def\_{\char95\relax}#1}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+
+\title[Proper-Divisor Moments (OEIS A245211) in Lean 4]{Formal Verification of Parity Obstructions and Fixed-Point Exclusions for Proper-Divisor Moments (OEIS A245211) in Lean 4}
+\author[M.~A.~P.~Sugui]{Mar Allen P. Sugui}
+\urladdr{https://mariyaholic.github.io/}
+\date{November 22, 2026}
+\subjclass[2020]{Primary 11A25, 68V20; Secondary 11Y70, 11D61}
+\keywords{Divisor function, proper divisors, arithmetic functions, OEIS A245211, Lean 4, formal verification}
+
+\begin{document}
+
+\begin{abstract}
+Jaroslav Krizek conjectured that 21 is the only positive integer equal to the sum $a(n)$ of $d\,\tau(d)$ over its proper divisors $d$, where $\tau(d)$ counts positive divisors. We prove in Lean 4.35.0 that 21 is the only fixed point with $\Omega(n)\le 6$, counting prime factors with multiplicity. For a squarefree product of $k$ primes, a fixed point would satisfy $\prod_{p\mid n}(2p+1)=(2^k+1)n$. At $k=5$ and $k=6$, dominance and growth bounds leave 14 and 30 candidates for the least prime, respectively. Factoring successive terms $2p+1$ excludes every candidate. For repeated primes we use exact-exponent parity, dominance bounds and congruences. Across eight modules we also certify the first 66 terms of OEIS A245211, the minima 72 and 144 of A245213 and A245214, and uniqueness through $n=150$. A separate Python sieve finds only 21 through $10^6$. Whether a fixed point coprime to 6 with $\Omega(n)\ge 7$ exists remains open.
+\end{abstract}
+
+\maketitle
+
+\section{Problem Statement and Scope of the Formalization}
+
+For a positive integer $n$, let $\tau(n) = \sum_{d \mid n} 1$ (OEIS A000005~\cite{OEIS-A000005}) and $\sigma(n) = \sum_{d \mid n} d$ (OEIS A000203~\cite{OEIS-A000203}) denote the classical divisor-count and divisor-sum functions~\cite{Apostol1976,Burton1976,Tattersall1999}. Gabdullin, Iudelevich and Luca study the number of distinct values of $n\,\tau(n)$ \cite{GabdullinIudelevich2023}. Noppakaew and Pongsriiam study injectivity for products of polynomials and arithmetic functions, including $n\,\tau(n)$ \cite{NoppakaewPongsriiam2023}. Summing this weight over all divisors gives the full first moment
+\[
+  S(n) \;=\; \sum_{d \mid n} d\,\tau(d)
+  \;=\; (\operatorname{id}\cdot\tau * 1)(n)
+\]
+(OEIS A060640~\cite{OEIS-A060640}). Because $d \mapsto d\,\tau(d)$ is multiplicative, $S(n)$ is multiplicative and takes the prime-power values
+\[
+  S(p^e) \;=\; 1 + \sum_{j=1}^e (j + 1)\,p^j,
+  \qquad
+  S(p) \;=\; 2p + 1.
+\]
+On July 23, 2014, Jaroslav Krizek introduced sequence A245211 in the On-Line Encyclopedia of Integer Sequences~\cite{OEIS-A245211} as the proper-divisor restriction of $S(n)$:
+\[
+  a(n) \;=\; \sum_{\substack{d \mid n \\ d < n}} d\,\tau(d)
+  \;=\; S(n) - n\,\tau(n),
+\]
+where $n\,\tau(n)$ is OEIS A038040~\cite{OEIS-A038040}. On the same date, Krizek introduced three companion sequences measuring the balance between the top term $n\,\tau(n)$ and the proper-divisor sum $a(n)$:
+\begin{align*}
+  \text{A245212}(n) &\;=\; n\,\tau(n) - a(n) \;=\; 2n\,\tau(n) - S(n) \quad\text{\cite{OEIS-A245212}}, \\
+  \text{A245213} &\;=\; \{\,n \ge 1 \mid \text{A245212}(n) < n\,\} \;=\; \{72, 96, 120, 144, 180, \dots\} \quad\text{\cite{OEIS-A245213}}, \\
+  \text{A245214} &\;=\; \{\,n \ge 1 \mid \text{A245212}(n) < 0\,\} \;=\; \{144, 192, 216, 240, 288, \dots\} \quad\text{\cite{OEIS-A245214}}.
+\end{align*}
+At $n = 21 = 3 \cdot 7$, the proper divisors are $1, 3, 7$, giving
+\[
+  a(21) \;=\; 1\cdot\tau(1) + 3\cdot\tau(3) + 7\cdot\tau(7) \;=\; 1\cdot 1 + 3\cdot 2 + 7\cdot 2 \;=\; 21.
+\]
+Krizek observed in~\cite{OEIS-A245211} that $a(p) = 1$ for every prime $p$, that $a(2p) = 2p + 5$ for every odd prime $p$, that $n = 144$ is the smallest integer with $n\,\tau(n) < a(n)$, and that $n = 21$ is the only known solution to $a(n) = n$. In the Google DeepMind Formal Conjectures repository~\cite{FormalConjectures2026}, \texttt{FormalConjectures/OEIS/245211.lean} states the uniqueness of $n = 21$ as an open target alongside five \leanid{decide} evaluations $a(1)$ through $a(5)$.
+
+Table~\ref{tab:scope} lists the results proved in the eight modules of the Lean 4.35.0 package~\cite{deMouraUllrich2021}, the independent computations and the remaining question.
+
+\begin{table}[htbp]
+\centering
+\caption{Scope of the formalization and the independent computations.}
+\label{tab:scope}
+\small
+\begin{tabular}{@{}l>{\raggedright\arraybackslash}p{6.9cm}l>{\raggedright\arraybackslash}p{3.4cm}@{}}
+\toprule
+Regime & Result or question & Status & Source \\
+\midrule
+Divisor sums & $S(n)=a(n)+n\,\tau(n)$ for $n>0$, and sums over divisor lists. & Lean & \leanid{Basic.lean} \\
+Dominance & If $n=km$, $k,m>1$ and $k\le\tau(m)$, then $a(n)>n$. Every positive fixed point is odd. & Lean & \leanid{Dominance.lean} \\
+Prime families & Prime powers are excluded. Among semiprimes and among multiples of 3, only 21 is fixed. & Lean & \leanid{Families.lean} \\
+Exact exponents & At a fixed point $n=p^e m$ with $p$ prime, $e\ge1$, $p\nmid m$ and $m>1$, $e\,\tau(m)<p$. If $\tau(n)$ is even, $e$ is 0 or 1 modulo 4. & Lean & \leanid{Parity.lean} \\
+$\Omega(n)\le4$ & Only 21 is fixed. At five factors, a fixed point would be squarefree with least prime at least 17. & Lean & \leanid{OmegaFour.lean} \\
+$\Omega(n)=5$ & Growth and forced prime divisors exclude every squarefree case. Only 21 is fixed through five factors. & Lean & \leanid{OmegaFive.lean} \\
+$\Omega(n)=6$ & All 11 exponent partitions are excluded. Only 21 is fixed through six factors. & Lean & \leanid{OmegaSix.lean} \\
+OEIS values & First 66 terms \cite{OEIS-A245211}, companion minima 72 and 144 \cite{OEIS-A245213,OEIS-A245214}, $a(725)=724$, uniqueness through 150. & Lean & \leanid{TableCerts.lean} \\
+Finite checks & Only 21 is fixed through $10^6$. Forced closure leaves zero least primes for $k=5,6$. & Python & \leanid{a245211\_\allowbreak search.py} \\
+Other fixed points & Does any $n$ with $\gcd(n,6)=1$ and $\Omega(n)\ge7$ satisfy $a(n)=n$? & Open & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+\FloatBarrier
+
+\section{Summation Primitives, OEIS Identities, and Refutation Checks}
+
+To evaluate divisor sums inside the Lean 4.35.0~\cite{deMouraUllrich2021} kernel without exceeding the default maximum recursion depth (\texttt{maxRecDepth = 1024}), \leanid{OeisA245211/Basic.lean} defines the range sum $\leanid{sumUpTo}\;f\;k = \sum_{i=1}^k f(i)$ via a balanced binary-tree recursion $\leanid{sumRangeBin}\;f\;\leanid{fuel}\;a\;\leanid{len}$ of depth $16$ ($2^{16} = 65{,}536$), and proves its exact equivalence (\leanid{sumRangeBin\_\allowbreak eq\_\allowbreak sumRangeLinear}) with the linear recurrence $\leanid{sumRangeLinear}$. This yields the definitional and $[\leanid{simp}]$ step equations (\leanid{sumUpTo\_\allowbreak zero}, \leanid{sumUpTo\_\allowbreak succ}):
+\[
+  \leanid{sumUpTo}\;f\;0 \;=\; 0,
+  \qquad
+  \leanid{sumUpTo}\;f\;(k + 1) \;=\; \leanid{sumUpTo}\;f\;k + f(k + 1).
+\]
+Using the decidable positive divisibility predicate $\leanid{dividesB}\;d\;n := (0 < d) \land (n \bmod d == 0)$, we define weighted divisor sums up to $k$:
+\[
+  \leanid{sumDivUpTo}\;n\;w\;k \;:=\; \leanid{sumUpTo}\;\bigl(\lambda d \Rightarrow \text{if }\leanid{dividesB}\;d\;n\text{ then }w(d)\text{ else }0\bigr)\;k,
+\]
+with $\leanid{sumDiv}\;n\;w := \leanid{sumDivUpTo}\;n\;w\;n$ and $\leanid{sumProperDiv}\;n\;w := \leanid{sumDivUpTo}\;n\;w\;(n - 1)$.
+
+\begin{definition}[Arithmetic Functions and Companion Predicates; \leanid{Basic.lean}]
+For $n \in \N$, we define the divisor-count, divisor-sum, and proper-divisor moment functions~\cite{OEIS-A000005,OEIS-A000203,OEIS-A038040,OEIS-A060640,OEIS-A245211,OEIS-A245212}:
+\begin{align*}
+  \leanid{tau}\;n &:= \leanid{sumDiv}\;n\;(\lambda \_ \Rightarrow 1), &
+  \leanid{sigma}\;n &:= \leanid{sumDiv}\;n\;(\lambda d \Rightarrow d), \\
+  \leanid{nTau}\;n &:= n \cdot \leanid{tau}\;n, &
+  \leanid{fullMoment}\;n &:= \leanid{sumDiv}\;n\;(\lambda d \Rightarrow d \cdot \leanid{tau}\;d), \\
+  \leanid{a}\;n &:= \leanid{sumProperDiv}\;n\;(\lambda d \Rightarrow d \cdot \leanid{tau}\;d), &
+  \leanid{cantileverDiff}\;n &:= (\leanid{nTau}\;n : \Z) - (\leanid{a}\;n : \Z),
+\end{align*}
+together with the decidable predicates $\leanid{IsFixedPoint}\;n := 0 < n \land \leanid{a}\;n = n$, $\leanid{IsInA245213}\;n := 0 < n \land \leanid{cantileverDiff}\;n < (n : \Z)$~\cite{OEIS-A245213}, and $\leanid{IsInA245214}\;n := 0 < n \land \leanid{cantileverDiff}\;n < 0$~\cite{OEIS-A245214}.
+\end{definition}
+
+In \leanid{Basic.lean}, we also construct the explicit duplicate-free divisor lists $\leanid{divisors}\;n$ and $\leanid{properDivisors}\;n$ and establish their equivalence with the summation primitives.
+
+\begin{theorem}[OEIS Identities and Divisor-List Equivalences; \leanid{Basic.lean}]
+\label{thm:basic}
+For every $n \in \N$:
+\begin{enumerate}
+  \item (\leanid{fullMoment\_\allowbreak eq\_\allowbreak a\_\allowbreak add\_\allowbreak nTau}, \leanid{a\_\allowbreak eq\_\allowbreak fullMoment\_\allowbreak sub\_\allowbreak nTau}) Whenever $0 < n$, Krizek's additive identity~\cite{OEIS-A245211} gives $\leanid{fullMoment}\;n = \leanid{a}\;n + \leanid{nTau}\;n$ and $\leanid{a}\;n = \leanid{fullMoment}\;n - \leanid{nTau}\;n$.
+  \item (\leanid{a\_\allowbreak int\_\allowbreak eq\_\allowbreak nTau\_\allowbreak sub\_\allowbreak cantileverDiff}) By the cantilever difference definition~\cite{OEIS-A245211,OEIS-A245212}, $(\leanid{a}\;n : \Z) = (\leanid{nTau}\;n : \Z) - \leanid{cantileverDiff}\;n$.
+  \item (\leanid{isInA245214\_\allowbreak iff}, \leanid{isInA245213\_\allowbreak iff}) For the companion sequences~\cite{OEIS-A245213,OEIS-A245214}, we have $\leanid{IsInA245214}\;n \iff 0 < n \land \leanid{nTau}\;n < \leanid{a}\;n$ and $\leanid{IsInA245213}\;n \iff 0 < n \land \leanid{nTau}\;n < \leanid{a}\;n + n$, so $\leanid{IsInA245214}\;n \implies \leanid{IsInA245213}\;n$ (\leanid{isInA245213\_\allowbreak of\_\allowbreak isInA245214}).
+  \item (\leanid{isFixedPoint\_\allowbreak iff\_\allowbreak fullMoment}) $\leanid{IsFixedPoint}\;n \iff 0 < n \land \leanid{fullMoment}\;n = n \cdot (\leanid{tau}\;n + 1)$.
+  \item (\leanid{mem\_\allowbreak divisors\_\allowbreak iff}, \leanid{mem\_\allowbreak properDivisors\_\allowbreak iff}) We have $d \in \leanid{divisors}\;n \iff 1 \le d \le n \land d \mid n$, and for $0 < n$, $d \in \leanid{properDivisors}\;n \iff 1 \le d < n \land d \mid n$; both lists are duplicate-free (\leanid{divisors\_\allowbreak nodup}, \leanid{properDivisors\_\allowbreak nodup}).
+  \item (\leanid{tau\_\allowbreak eq\_\allowbreak length\_\allowbreak divisors}, \leanid{a\_\allowbreak eq\_\allowbreak sumList\_\allowbreak properDivisors}) For every $n \in \N$, $\leanid{tau}\;n = (\leanid{divisors}\;n).\leanid{length}$ and
+  \[
+    \leanid{a}\;n \;=\; \leanid{sumList}\;(\leanid{properDivisors}\;n)\;(\lambda d \Rightarrow d \cdot \leanid{tau}\;d).
+  \]
+\end{enumerate}
+\end{theorem}
+
+To confirm that $\leanid{IsFixedPoint}$, $\leanid{IsInA245213}$, and $\leanid{IsInA245214}$ are non-vacuous and separate boundary cases, we prove explicit refutations alongside the witness $n = 21$:
+
+\begin{refutation}[\leanid{Basic.lean}, \leanid{TableCerts.lean}]
+\label{ref:checks}
+\leavevmode
+\begin{enumerate}
+  \item (\leanid{not\_\allowbreak isFixedPoint\_\allowbreak 0}--\leanid{not\_\allowbreak isFixedPoint\_\allowbreak 33}, \leanid{not\_\allowbreak isFixedPoint\_\allowbreak 725}) The boundary input $n = 0$ ($0 < n$ fails), unit $n = 1$ ($a(1) = 0$), primes $n = 2, 3$ ($a(p) = 1$), even numbers $n = 4, 6$ ($a(4) = 5$, $a(6) = 11$), odd prime squares $n = 9, 25$ ($a(9) = 7$, $a(25) = 11$), odd semiprimes $n = 15, 33$ ($a(15) = 17$, $a(33) = 29$), and the near-miss $n = 725 = 5^2 \cdot 29$ ($a(725) = 724$) all satisfy $\neg\,\leanid{IsFixedPoint}\;n$.
+  \item (\leanid{not\_\allowbreak isInA245213\_\allowbreak 71}, \leanid{isInA245213\_\allowbreak 72}, \leanid{not\_\allowbreak isInA245214\_\allowbreak 72}, \leanid{not\_\allowbreak isInA245214\_\allowbreak 143}, \leanid{isInA245214\_\allowbreak 144}) At $n = 71$, $\neg\,\leanid{IsInA245213}\;71$ holds; at $n = 72$, $\leanid{IsInA245213}\;72$ holds ($\leanid{cantileverDiff}\;72 = 62 < 72$) while $\neg\,\leanid{IsInA245214}\;72$ holds ($62 \not< 0$), strictly separating \text{A245213} from \text{A245214}; and at $n = 143$ and $144$, $\neg\,\leanid{IsInA245214}\;143$ and $\leanid{IsInA245214}\;144$ ($\leanid{cantileverDiff}\;144 = -66 < 0$) hold.
+  \item (\leanid{properDivisors\_\allowbreak 21}, \leanid{a\_\allowbreak 21}, \leanid{isFixedPoint\_\allowbreak 21}) At $n = 21$, $\leanid{properDivisors}\;21 = [1, 3, 7]$, $\leanid{a}\;21 = 21$, and $\leanid{IsFixedPoint}\;21$.
+\end{enumerate}
+\end{refutation}
+
+\section{The Fundamental Dominance Inequality and Parity Exclusions}
+
+Because every term $d\,\tau(d)$ in $a(n)$ is nonnegative, sampling any two distinct proper divisors $1 < m < n$ of $n$ gives a lower bound on $a(n)$ without requiring the prime factorization of $n$. In \leanid{OeisA245211/Dominance.lean}, we prove general point-sampling lower bounds for $\leanid{sumUpTo}$ (\leanid{le\_\allowbreak sumUpTo}, \leanid{add\_\allowbreak le\_\allowbreak sumUpTo}, \leanid{add\_\allowbreak three\_\allowbreak le\_\allowbreak sumUpTo}) and deduce lower bounds on $\tau(m)$ and $a(n)$.
+
+\begin{lemma}[Divisor-Count Lower Bounds; \leanid{Dominance.lean}]
+\label{lem:tau_bounds}
+\leavevmode
+\begin{enumerate}
+  \item (\leanid{tau\_\allowbreak pos}) For every $n > 0$, $1 \le \leanid{tau}\;n$.
+  \item (\leanid{tau\_\allowbreak ge\_\allowbreak two}) For every $m > 1$, $2 \le \leanid{tau}\;m$ since $1$ and $m$ are distinct divisors of $m$.
+  \item (\leanid{tau\_\allowbreak ge\_\allowbreak three\_\allowbreak of\_\allowbreak proper\_\allowbreak divisor}) If $m$ has a proper divisor $1 < d < m$ with $d \mid m$, then $3 \le \leanid{tau}\;m$ since $1 < d < m$ all divide $m$.
+  \item (\leanid{a\_\allowbreak ge\_\allowbreak one\_\allowbreak add\_\allowbreak properDiv}) If $1 < d < n$ and $d \mid n$, then $1 + d \cdot \leanid{tau}\;d \le \leanid{a}\;n$.
+\end{enumerate}
+\end{lemma}
+
+\begin{theorem}[Fundamental Dominance Theorem; \leanid{Dominance.lean}]
+\label{thm:dominance}
+Suppose $n = k \cdot m$ with $1 < k$, $1 < m$, and $k \le \leanid{tau}\;m$. By \leanid{gt\_\allowbreak self\_\allowbreak of\_\allowbreak dvd\_\allowbreak le\_\allowbreak tau}, the proper divisors $1$ and $m$ of $n$ force
+\[
+  \leanid{a}\;n \;\ge\; 1 + m \cdot \leanid{tau}\;m \;\ge\; 1 + k \cdot m \;=\; n + 1 \;>\; n,
+\]
+and in particular $\neg\,\leanid{IsFixedPoint}\;n$ (\leanid{not\_\allowbreak isFixedPoint\_\allowbreak of\_\allowbreak dvd\_\allowbreak le\_\allowbreak tau}).
+\end{theorem}
+
+\begin{proof}
+Both 1 and $m$ are proper divisors of $km$, and $m>1$ makes them distinct. Their contributions give $a(n)\ge1+m\,\tau(m)\ge1+mk=n+1$.
+\end{proof}
+
+Applying Theorem~\ref{thm:dominance} with $k = 2$ and $k = 3$ immediately eliminates all even integers and all multiples of $3$ with a composite cofactor:
+
+\begin{corollary}[Unconditional Even and Composite-Multiple-of-$3$ Exclusions; \leanid{Dominance.lean}]
+\label{cor:even}
+\leavevmode
+\begin{enumerate}
+  \item (\leanid{a\_\allowbreak two\_\allowbreak mul\_\allowbreak ge}, \leanid{a\_\allowbreak gt\_\allowbreak self\_\allowbreak of\_\allowbreak even\_\allowbreak gt\_\allowbreak two}) For every $m \ge 2$, $\leanid{a}(2m) \ge 2m + 1$. Equivalently, every even integer $n > 2$ satisfies $\leanid{a}\;n \ge n + 1 > n$.
+  \item (\leanid{ne\_\allowbreak self\_\allowbreak of\_\allowbreak even}, \leanid{not\_\allowbreak isFixedPoint\_\allowbreak of\_\allowbreak even}, \leanid{odd\_\allowbreak of\_\allowbreak isFixedPoint}) Since $\leanid{a}\;2 = 1 \ne 2$, no positive even integer satisfies $\leanid{a}\;n = n$. Every fixed point of OEIS A245211 is odd ($n \bmod 2 = 1$).
+  \item (\leanid{a\_\allowbreak three\_\allowbreak mul\_\allowbreak ge\_\allowbreak of\_\allowbreak proper\_\allowbreak divisor}) Whenever $m$ has a proper divisor $1 < d < m$ with $d \mid m$, Lemma~\ref{lem:tau_bounds}(3) gives $\leanid{tau}\;m \ge 3$, so $\leanid{a}(3m) \ge 3m + 1 > 3m$ and $\neg\,\leanid{IsFixedPoint}\;(3m)$ (\leanid{not\_\allowbreak isFixedPoint\_\allowbreak three\_\allowbreak mul\_\allowbreak of\_\allowbreak proper\_\allowbreak divisor}).
+\end{enumerate}
+\end{corollary}
+
+\section{Primes, Prime Powers, Semiprimes, Multiples of 3, and Three-Prime Families}
+
+In \leanid{OeisA245211/Families.lean}, we define arithmetic primality $\leanid{IsPrime}\;p := 2 \le p \land (\forall d,\; d \mid p \to d = 1 \lor d = p)$ and establish support-reduction lemmas for $\leanid{sumUpTo}$ when the summand is supported at $\{1\}$ (\leanid{sumUpTo\_\allowbreak eq\_\allowbreak single}), $\{1, a\}$ (\leanid{sumUpTo\_\allowbreak eq\_\allowbreak pair}), or $\{1, a, b\}$ (\leanid{sumUpTo\_\allowbreak eq\_\allowbreak triple}), or when all terms with $d > 1$ vanish modulo $p$ (\leanid{sumUpTo\_\allowbreak mod\_\allowbreak eq\_\allowbreak first}).
+
+\begin{theorem}[Primes and Prime Powers; \leanid{Families.lean}]
+\label{thm:primes_powers}
+Let $p \in \N$.
+\begin{enumerate}
+  \item (\leanid{tau\_\allowbreak of\_\allowbreak isPrime}, \leanid{isPrime\_\allowbreak iff\_\allowbreak tau\_\allowbreak eq\_\allowbreak two}) By the divisor-count characterization of primes~\cite[Ch.~2]{Apostol1976}, \cite[Ch.~6]{Burton1976}, $\leanid{IsPrime}\;p \iff 2 \le p \land \leanid{tau}\;p = 2$. This equivalence equips $\leanid{IsPrime}\;p$ with a decidable instance (\leanid{instDecidableIsPrime}).
+  \item (\leanid{a\_\allowbreak of\_\allowbreak isPrime}, \leanid{a\_\allowbreak lt\_\allowbreak self\_\allowbreak of\_\allowbreak isPrime}) For every prime $p$, $\leanid{a}\;p = 1 < p$ (Krizek's first 2014 OEIS formula~\cite{OEIS-A245211}), so $\neg\,\leanid{IsFixedPoint}\;p$ (\leanid{not\_\allowbreak isFixedPoint\_\allowbreak of\_\allowbreak isPrime}).
+  \item (\leanid{a\_\allowbreak prime\_\allowbreak pow\_\allowbreak mod\_\allowbreak p}, \leanid{ne\_\allowbreak self\_\allowbreak of\_\allowbreak prime\_\allowbreak pow}) For every prime $p$ and exponent $k \ge 1$, every divisor $d > 1$ of $p^k$ is a multiple of $p$ (\leanid{dvd\_\allowbreak of\_\allowbreak dvd\_\allowbreak prime\_\allowbreak pow}). Consequently, every proper-divisor term $d \cdot \leanid{tau}\;d$ with $d > 1$ is divisible by $p$, giving
+  \[
+    \leanid{a}(p^k) \bmod p \;=\; 1 \;\ne\; 0 \;=\; p^k \bmod p,
+  \]
+  and therefore $\leanid{a}(p^k) \ne p^k$ and $\neg\,\leanid{IsFixedPoint}\;(p^k)$ (\leanid{not\_\allowbreak isFixedPoint\_\allowbreak prime\_\allowbreak pow}).
+\end{enumerate}
+\end{theorem}
+
+Next, using Euclid's prime divisibility lemma (\leanid{coprime\_\allowbreak or\_\allowbreak dvd\_\allowbreak of\_\allowbreak isPrime})~\cite[Ch.~1]{Apostol1976}, \cite[Ch.~2]{Burton1976}, we classify all divisors of a product of two primes $p \cdot q$ (\leanid{dvd\_\allowbreak mul\_\allowbreak primes}) and all proper divisors when $p < q$ (\leanid{proper\_\allowbreak dvd\_\allowbreak mul\_\allowbreak primes}: $d \in \{1, p, q\}$), obtaining the closed-form semiprime formula and unconditional fixed-point uniqueness across all semiprimes and all multiples of $3$.
+
+\begin{theorem}[Semiprime Formula and Uniqueness Among Semiprimes and Multiples of $3$; \leanid{Families.lean}]
+\label{thm:semiprime_mult3}
+\leavevmode
+\begin{enumerate}
+  \item (\leanid{a\_\allowbreak semiprime}) For primes $p < q$, the proper divisors of $p q$ are $1, p, q$, each prime divisor having $\tau = 2$, so
+  \[
+    \leanid{a}(p q) \;=\; 1 + 2p + 2q.
+  \]
+  \item (\leanid{a\_\allowbreak two\_\allowbreak mul\_\allowbreak odd\_\allowbreak prime}, \leanid{a\_\allowbreak three\_\allowbreak mul\_\allowbreak prime}) For every prime $p > 2$, $\leanid{a}(2p) = 2p + 5$ (Krizek's second 2014 OEIS formula~\cite{OEIS-A245211}), and for every prime $p > 3$, $\leanid{a}(3p) = 2p + 7$.
+  \item (\leanid{semiprime\_\allowbreak fixedPoint\_\allowbreak iff}) For any primes $p \le q$,
+  \[
+    \leanid{IsFixedPoint}\;(p q) \;\Longleftrightarrow\; p = 3 \;\land\; q = 7.
+  \]
+  \item (\leanid{three\_\allowbreak dvd\_\allowbreak fixedPoint\_\allowbreak iff\_\allowbreak eq\_\allowbreak 21}) For every $n \in \N$ divisible by $3$,
+  \[
+    \leanid{IsFixedPoint}\;n \;\Longleftrightarrow\; n = 21.
+  \]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+For $p=q$, the prime-power exclusion applies. For $p<q$, the equation becomes $(p-2)(q-2)=5$, whose ordered positive factors are 1 and 5 (\leanid{semiprime\_\allowbreak diophantine\_\allowbreak eq}). This gives $p=3$ and $q=7$. For a multiple $n=3m$, the case $m=0$ fails positivity and $m=1$ gives $a(3)=1$. If $m$ is composite, \leanid{exists\_\allowbreak proper\_\allowbreak divisor\_\allowbreak of\_\allowbreak not\_\allowbreak isPrime} gives a divisor strictly between 1 and $m$, so Corollary 3.3 gives $a(3m)>3m$. A prime cofactor reduces to the semiprime calculation.
+\end{proof}
+
+Finally, we establish the polynomial and Diophantine identities governing the remaining three-prime-factor shapes $n = p^2 q$ and $n = p q r$ (since $p^3$ is excluded by Theorem~\ref{thm:primes_powers}(3)); their direct connection to $\neg\,\leanid{IsFixedPoint}\;n$ is completed in Section~6 once multiplicativity of $\tau$ and $S$ is established.
+
+\begin{theorem}[Three-Prime-Factor Identities and Exclusions; \leanid{Families.lean}]
+\label{thm:omega3}
+\leavevmode
+\begin{enumerate}
+  \item (\leanid{p2q\_\allowbreak near\_\allowbreak miss\_\allowbreak identity}, \leanid{odd\_\allowbreak p2q\_\allowbreak formula\_\allowbreak ne\_\allowbreak self}) For distinct primes $p \ne q$, the proper divisors of $p^2 q$ are $1, p, p^2, q, p q$, whose $\tau$-weighted sum is the polynomial $1 + 2p + 3p^2 + 2q + 4pq$. For all $p, q \in \N$ with $p \ge 5$ and $q \ge 3$,
+  \[
+    (p^2 - 4p - 2)(q - 3) + (1 + 2p + 3p^2 + 2q + 4pq) \;=\; p^2 q + 7(2p + 1),
+  \]
+  and whenever $p \bmod 2 = 1$ and $q \bmod 2 = 1$, $1 + 2p + 3p^2 + 2q + 4pq$ is even whereas $p^2 q$ is odd, so they are never equal.
+  \item (\leanid{three\_\allowbreak prime\_\allowbreak moment\_\allowbreak ne}) For all primes $p < q < r$, the product $(2p + 1)(2q + 1)(2r + 1)$ (which equals $S(p q r)$ by Theorem~\ref{thm:parity}(1)) satisfies
+  \[
+    (2p + 1)(2q + 1)(2r + 1) \;\ne\; 9\,p\,q\,r.
+  \]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+For $p\ge11$ the ordered primes are at least 11, 13 and 17. The product of the three ratios $2+1/x$ is at most $21735/2431<9$ (\leanid{three\_\allowbreak prime\_\allowbreak growth\_\allowbreak bound}). For $p=2$ the two sides have opposite parity. For $p=3$, divisibility forces one of the other primes to be 7, leaving $15(2x+1)=27x$ for the remaining prime. For $p=5$, one prime must be 11, leaving $23(2x+1)=45x$. Both equations are impossible for positive $x$. For $p=7$, the factor 5 would have to divide one of the larger primes.
+\end{proof}
+
+\section{Multiplicativity, General Parity Obstruction, and Sharpened Dominance}
+
+In \leanid{OeisA245211/Parity.lean}, we lift the divisor summation primitives to general multiplicative decompositions and prove two structural theorems governing arbitrary fixed points.
+
+\begin{theorem}[Multiplicativity and Odd Prime-Power Parity; \leanid{Parity.lean}]
+\label{thm:parity}
+Let $a, b, p, e \in \N$ with $\gcd(a, b) = 1$, $0 < a$, $0 < b$, and $p$ prime.
+\begin{enumerate}
+  \item (\leanid{tau\_\allowbreak mul\_\allowbreak of\_\allowbreak coprime}, \leanid{fullMoment\_\allowbreak mul\_\allowbreak of\_\allowbreak coprime}) Both $\tau$ and the Dirichlet convolution moment $S = \leanid{fullMoment}$ are multiplicative on coprime arguments~\cite[Ch.~2]{Apostol1976}, \cite[Ch.~6]{Burton1976}, \cite{OEIS-A060640}:
+  \[
+    \tau(a b) \;=\; \tau(a)\,\tau(b),
+    \qquad
+    S(a b) \;=\; S(a)\,S(b).
+  \]
+  \item (\leanid{tau\_\allowbreak prime\_\allowbreak pow}, \leanid{fullMoment\_\allowbreak prime\_\allowbreak pow\_\allowbreak succ}) On prime powers~\cite[Ch.~6]{Burton1976}, \cite[Ch.~3]{Tattersall1999}, $\tau(p^e) = e + 1$ and $S(p^{e+1}) = S(p^e) + (e + 2)p^{e+1}$.
+  \item (\leanid{fullMoment\_\allowbreak prime\_\allowbreak pow\_\allowbreak mod\_\allowbreak two}, \leanid{fullMoment\_\allowbreak prime\_\allowbreak pow\_\allowbreak odd\_\allowbreak iff})\\
+  When $p$ is odd ($p \bmod 2 = 1$), each term $(j+1)p^j \equiv j + 1 \pmod 2$, giving
+  \[
+    S(p^e) \bmod 2 \;=\; \frac{(e + 1)(e + 2)}{2} \bmod 2.
+  \]
+  In particular, $S(p^e)$ is odd if and only if $e \equiv 0 \pmod 4$ or $e \equiv 1 \pmod 4$.
+\end{enumerate}
+\end{theorem}
+
+\begin{theorem}[General Parity Obstruction and Sharpened Dominance; \leanid{Parity.lean}]
+\label{thm:obstruction}
+Suppose $\leanid{IsFixedPoint}\;n$ holds.
+\begin{enumerate}
+  \item (\leanid{exact\_\allowbreak exponent\_\allowbreak mod\_\allowbreak four\_\allowbreak of\_\allowbreak isFixedPoint},\\ \leanid{not\_\allowbreak isFixedPoint\_\allowbreak of\_\allowbreak exact\_\allowbreak exponent\_\allowbreak mod\_\allowbreak four\_\allowbreak ge\_\allowbreak two}) If $\tau(n)$ is even ($\leanid{tau}\;n \bmod 2 = 0$, i.e., $n$ is not a square~\cite[Ch.~6]{Burton1976}, \cite[Ch.~3]{Tattersall1999}) and $p^e \parallel n$ ($p^e \mid n$, $p^{e+1} \nmid n$) for a prime $p$, then $S(n) = n(\tau(n) + 1)$ is odd, so $S(p^e)$ must be odd; by Theorem~\ref{thm:parity}(3), $e \equiv 0 \pmod 4$ or $e \equiv 1 \pmod 4$. Every prime-power exponent with $e \equiv 2, 3 \pmod 4$ is excluded whenever $\tau(n)$ is even.
+  \item (\leanid{sharpened\_\allowbreak dominance\_\allowbreak bound}, \leanid{exact\_\allowbreak prime\_\allowbreak pow\_\allowbreak tau\_\allowbreak lt\_\allowbreak prime}) If $n = p^e m$ with $p$ prime, $\gcd(p^e, m) = 1$, $1 \le e$, and $1 < m$, then factoring $n = p \cdot (p^{e-1} m)$ with $p^{e-1} m > 1$ and $\tau(p^{e-1} m) = e\,\tau(m)$ and applying Theorem~\ref{thm:dominance} (\leanid{not\_\allowbreak isFixedPoint\_\allowbreak of\_\allowbreak dvd\_\allowbreak le\_\allowbreak tau}) to the proper divisors $1$ and $p^{e-1} m$ gives
+  \[
+    a(n) \;\ge\; 1 + (p^{e-1} m)\,\tau(p^{e-1} m) \;=\; 1 + e\,p^{e-1} m\,\tau(m),
+  \]
+  forcing $e\,\tau(m) < p$.
+\end{enumerate}
+\end{theorem}
+
+\section{Classification by Prime-Factor Multiplicity}
+
+In the module \leanid{OmegaFour.lean}, we define the prime-factor multiplicity function $\leanid{omegaBig}\;n = \Omega(n)$ (OEIS A001222~\cite{OEIS-A001222}) by well-founded division by $\leanid{minFac}\;n$, prove for prime $p$ and positive $m,u,v$ that $\leanid{omegaBig}\;(p m) = 1 + \leanid{omegaBig}\;m$ (\leanid{omegaBig\_\allowbreak prime\_\allowbreak mul}) and $\leanid{omegaBig}\;(u v) = \leanid{omegaBig}\;u + \leanid{omegaBig}\;v$ (\leanid{omegaBig\_\allowbreak mul}), and establish sorted prime-list decomposition (\leanid{exists\_\allowbreak primes\_\allowbreak of\_\allowbreak omegaBig})~\cite[Ch.~1]{Apostol1976}, \cite[Ch.~3]{Burton1976}.
+
+\begin{theorem}[Complete $\Omega(n) \le 4$ Classification; \leanid{OmegaFour.lean}]
+\label{thm:omega4}
+\leavevmode
+\begin{enumerate}
+  \item (\leanid{not\_\allowbreak isFixedPoint\_\allowbreak prime\_\allowbreak cube\_\allowbreak mul\_\allowbreak prime},\\ \leanid{not\_\allowbreak isFixedPoint\_\allowbreak prime\_\allowbreak sq\_\allowbreak mul\_\allowbreak two\_\allowbreak primes}) For all distinct primes $p, q, r$, neither $p^3 q$ ($\tau = 8$, $e_p = 3$) nor $p^2 q r$ ($\tau = 12$, $e_p = 2$) is a fixed point, by Theorem~\ref{thm:obstruction}(1).
+  \item (\leanid{p2q2\_\allowbreak diophantine\_\allowbreak ne}, \leanid{not\_\allowbreak isFixedPoint\_\allowbreak prime\_\allowbreak sq\_\allowbreak mul\_\allowbreak prime\_\allowbreak sq}) For all distinct primes $p \ne q$, $p^2 q^2$ is never a fixed point: modulo $5$, the polynomial $3x^2 + 2x + 1$ never vanishes for any $x \in \N$ (\leanid{three\_\allowbreak sq\_\allowbreak add\_\allowbreak two\_\allowbreak mul\_\allowbreak add\_\allowbreak one\_\allowbreak mod\_\allowbreak five\_\allowbreak ne\_\allowbreak zero}), so $5 \nmid (3p^2 + 2p + 1)(3q^2 + 2q + 1)$ whereas $5 \mid 10 p^2 q^2$ for all $p, q \in \N$ (\leanid{p2q2\_\allowbreak diophantine\_\allowbreak ne}); moreover, for $p \ge 13$ and $q \ge 17$, $(3p^2 + 2p + 1)(3q^2 + 2q + 1) < 10 p^2 q^2$ (\leanid{p2q2\_\allowbreak growth\_\allowbreak bound}).
+  \item (\leanid{four\_\allowbreak prime\_\allowbreak moment\_\allowbreak ne}, \leanid{not\_\allowbreak isFixedPoint\_\allowbreak four\_\allowbreak distinct\_\allowbreak primes})\\
+  For all primes $5 \le p < q < r < s$, $(2p+1)(2q+1)(2r+1)(2s+1) \ne 17 p q r s$: for $p \ge 29$, $(q, r, s) \ge (31, 37, 41)$ yields $(2p+1)(2q+1)(2r+1)(2s+1) < 17 p q r s$ (\leanid{four\_\allowbreak prime\_\allowbreak growth\_\allowbreak bound}), while every $p \in \{5, 7, 11, 13, 17, 19, 23\}$ is eliminated by Cunningham-chain divisibility of $2x + 1$ against $17 p q r s$.
+  \item (\leanid{fixedPoint\_\allowbreak eq\_\allowbreak 21\_\allowbreak of\_\allowbreak omegaBig\_\allowbreak le\_\allowbreak four}, \leanid{omegaBig\_\allowbreak ge\_\allowbreak five\_\allowbreak of\_\allowbreak isFixedPoint\_\allowbreak ne\_\allowbreak 21}) For every $n \in \N$, if $\leanid{IsFixedPoint}\;n$ and $\Omega(n) \le 4$, then $n = 21$. Equivalently, every fixed point $n \ne 21$ satisfies $\gcd(n, 6) = 1$ and $\Omega(n) \ge 5$.
+\end{enumerate}
+\end{theorem}
+
+\begin{theorem}[$\Omega(n) = 5$ Reduction; \leanid{OmegaFour.lean}]
+\label{thm:omega5}
+\leavevmode
+\begin{enumerate}
+  \item (\leanid{not\_\allowbreak isFixedPoint\_\allowbreak prime\_\allowbreak four\_\allowbreak mul\_\allowbreak prime}) For distinct primes $p, q \ge 5$, $p^4 q$ is never a fixed point: Theorem~\ref{thm:obstruction}(2) forces $p \ge 11$ ($4 \cdot 2 < p$) and $q \ge 7$ ($1 \cdot 5 < q$); for $p \ge 31$, $S(p^4)(2q + 1) < 11 p^4 q$ (\leanid{p4q\_\allowbreak growth\_\allowbreak bound}), and for $p \in \{11, 13, 17, 19, 23, 29\}$, $(11 p^4 - 2 S(p^4)) q = S(p^4)$ fails divisibility.
+  \item (\leanid{omegaFive\_\allowbreak must\_\allowbreak be\_\allowbreak squarefree\_\allowbreak ge\_\allowbreak 17}) Every fixed point $n$ with $\Omega(n) = 5$ is squarefree of the form $n = p q r s t$ with primes $17 \le p < q < r < s < t$. All non-squarefree families $p^5$, $p^4 q$, $p^3 q^2$, $p^3 q r$, $p^2 q^2 r$, and $p^2 q r s$ are unconditionally excluded, and Theorem~\ref{thm:obstruction}(2) with $m = q r s t$ gives $\tau(m) = 16 < p$, so $p \ge 17$.
+\end{enumerate}
+\end{theorem}
+
+For a squarefree fixed point with prime set $P$ of size $k$, multiplicativity gives $\prod_{x\in P}(2x+1)=(2^k+1)n$. If $x\in P$ and a prime $f$ divides $2x+1$ but does not divide $2^k+1$, then $f$ must also belong to $P$. We call this step Cunningham forced closure. A forced prime below the least member of $P$ contradicts its minimality.
+
+\begin{theorem}[Five distinct primes, \leanid{OmegaFive.lean}]
+A squarefree product of five primes with least prime $p\ge17$ cannot be fixed. Here $2^5+1=33=3\cdot11$. For $p\ge73$, the ordered primes are at least $73,79,83,89,97$. Since $2+1/x$ decreases with $x$, their product of ratios is strictly less than 33 (\leanid{five\_\allowbreak prime\_\allowbreak growth\_\allowbreak bound}). For the 14 primes $17\le p<73$, \leanid{prime\_\allowbreak dvd\_\allowbreak 33pqrst\_\allowbreak mem} forces prime divisors other than 3 and 11 into the product, and \leanid{prime\_\allowbreak dvd\_\allowbreak 33pqrst\_\allowbreak impossible} excludes any such divisor below $p$. For example, $p=23$ forces 47, and $2\cdot47+1=95$ forces $5<23$. The resulting inequality \leanid{five\_\allowbreak prime\_\allowbreak moment\_\allowbreak ne} gives \leanid{not\_\allowbreak isFixedPoint\_\allowbreak five\_\allowbreak distinct\_\allowbreak primes}.
+\end{theorem}
+
+Combining this result with the repeated-prime cases gives \leanid{not\_\allowbreak isFixedPoint\_\allowbreak of\_\allowbreak omegaBig\_\allowbreak eq\_\allowbreak five} and \leanid{fixedPoint\_\allowbreak eq\_\allowbreak 21\_\allowbreak of\_\allowbreak omegaBig\_\allowbreak le\_\allowbreak five}. The corollary \leanid{omegaBig\_\allowbreak ge\_\allowbreak six\_\allowbreak of\_\allowbreak isFixedPoint\_\allowbreak ne\_\allowbreak 21} gives $\Omega(n)\ge6$ for any other fixed point.
+
+\begin{theorem}[Six prime factors with repetition, \leanid{OmegaSix.lean}]
+A fixed point with six prime factors would have six distinct primes. Removing its least prime $p$ would leave a divisor with 32 divisors, so dominance requires $p>32$ and primality gives $p\ge37$ (\leanid{omegaSix\_\allowbreak must\_\allowbreak be\_\allowbreak squarefree\_\allowbreak ge\_\allowbreak 37}). Table~\ref{tab:partitions} gives the proof for each exponent partition, with distinct letters denoting distinct primes.
+\end{theorem}
+
+\begin{table}[htbp]
+\centering
+\caption{The 11 exponent partitions of 6 and their exclusions in \leanid{OmegaSix.lean}.}
+\label{tab:partitions}
+\small
+\begin{tabular}{@{}ll>{\raggedright\arraybackslash}p{8cm}@{}}
+\toprule
+Partition & Factorization & Reason for exclusion \\
+\midrule
+$(6)$ & $p^6$ & The proper-divisor moment is 1 modulo $p$. \\
+$(5,1)$ & $p^5q$ & Growth for $p\ge79$ and 17 modular checks for $11\le p\le73$. \\
+$(4,2)$ & $p^4q^2$ & $S(n)$ is 2 modulo 4, while $16n$ is 0 modulo 4. \\
+$(4,1,1)$ & $p^4qr$ & Growth for $p\ge53$, $q\ge29$, $r\ge31$, followed by finite cases outside that range. \\
+$(3,3)$ & $p^3q^3$ & Even $\tau(n)$ excludes exponent 3. \\
+$(3,2,1)$ & $p^3q^2r$ & Even $\tau(n)$ excludes exponent 3. \\
+$(3,1,1,1)$ & $p^3qrs$ & Even $\tau(n)$ excludes exponent 3. \\
+$(2,2,2)$ & $p^2q^2r^2$ & $S(n)$ is 0 modulo 8, while $28n$ is 4 modulo 8. \\
+$(2,2,1,1)$ & $p^2q^2rs$ & Even $\tau(n)$ excludes exponent 2. \\
+$(2,1,1,1,1)$ & $p^2qrst$ & Even $\tau(n)$ excludes exponent 2. \\
+$(1,1,1,1,1,1)$ & $pqrstu$ & Growth for $p\ge181$ and closure at the 30 primes $37\le p<181$. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For $p^5q$, dominance gives $p\ge11$ and $q\ge7$. The formula \leanid{fullMoment\_\allowbreak prime\_\allowbreak pow\_\allowbreak five} reduces the fixed-point equation to $(13p^5-2S(p^5))q=S(p^5)$. Below the cutoff in \leanid{p5q\_\allowbreak growth\_\allowbreak bound}, the coefficient of $q$ fails to divide the right side at each of the 17 primes. This proves \leanid{not\_\allowbreak isFixedPoint\_\allowbreak prime\_\allowbreak five\_\allowbreak mul\_\allowbreak prime}. For $p^4qr$ with $q<r$, dominance gives $p\ge17$, $q\ge11$ and $r\ge13$. The proof of \leanid{not\_\allowbreak isFixedPoint\_\allowbreak prime\_\allowbreak four\_\allowbreak mul\_\allowbreak two\_\allowbreak primes} combines \leanid{p4qr\_\allowbreak growth\_\allowbreak bound} with divisibility in $S(p^4)(2q+1)(2r+1)=21p^4qr$. The two congruence arguments in Table~\ref{tab:partitions} give \leanid{not\_\allowbreak isFixedPoint\_\allowbreak prime\_\allowbreak four\_\allowbreak mul\_\allowbreak prime\_\allowbreak sq} and \leanid{not\_\allowbreak isFixedPoint\_\allowbreak three\_\allowbreak prime\_\allowbreak sq}.
+
+\begin{theorem}[Six distinct primes, \leanid{OmegaSix.lean}]
+For six ordered primes with least prime $p\ge37$, the moment equation is $\prod_{x\mid n,\,x\ {\rm prime}}(2x+1)=65n$, with $65=5\cdot13$. Once $p\ge181$, the six primes are at least $181,191,193,197,199,211$. The product of the six ratios $2+1/x$ is then strictly less than 65 (\leanid{six\_\allowbreak prime\_\allowbreak growth\_\allowbreak bound}). For each of the 30 remaining least primes, \leanid{prime\_\allowbreak dvd\_\allowbreak 65pqrstu\_\allowbreak mem} and \leanid{prime\_\allowbreak dvd\_\allowbreak 65pqrstu\_\allowbreak impossible} propagate prime factors outside $\{5,13\}$ to a contradiction. For example, at $p=37$, the factor 3 of $2p+1=75$ is already smaller than 37. The theorems \leanid{six\_\allowbreak prime\_\allowbreak moment\_\allowbreak ne} and \leanid{not\_\allowbreak isFixedPoint\_\allowbreak six\_\allowbreak distinct\_\allowbreak primes} exclude the squarefree case.
+\end{theorem}
+
+\begin{corollary}[Classification through six prime factors]
+The theorem \leanid{not\_\allowbreak isFixedPoint\_\allowbreak of\_\allowbreak omegaBig\_\allowbreak eq\_\allowbreak six} excludes every positive integer with exactly six prime factors. Hence \leanid{fixedPoint\_\allowbreak eq\_\allowbreak 21\_\allowbreak of\_\allowbreak omegaBig\_\allowbreak le\_\allowbreak six} proves that every positive fixed point with $\Omega(n)\le6$ equals 21. Since $a(21)=21$, this is a classification in both directions. For any other fixed point, \leanid{omegaBig\_\allowbreak ge\_\allowbreak seven\_\allowbreak of\_\allowbreak isFixedPoint\_\allowbreak ne\_\allowbreak 21} gives $\Omega(n)\ge7$ and \leanid{gcd\_\allowbreak six\_\allowbreak eq\_\allowbreak one\_\allowbreak of\_\allowbreak isFixedPoint\_\allowbreak ne\_\allowbreak 21} gives $\gcd(n,6)=1$.
+\end{corollary}
+
+The independent Python verifier uses two searches. Its five-prime hyperbolic search bounds the first three primes using the decreasing ratio $2+1/x$. For a triple with $D=pqr$, $N=(2p+1)(2q+1)(2r+1)$ and $A=33D-4N>0$, it factors $33DN$ to solve $(As-2N)(At-2N)=33DN$ for the last pair. It examines 16 first primes, 340 pairs and 43,849 triples and finds zero solutions. It tests candidate primes with the first twelve prime bases of the Miller--Rabin test \cite{Miller1976,Rabin1980,SorensonWebster2017}.
+
+The forced-closure routine tests squarefree products for $3\le k\le10$. Given a candidate least prime, it repeatedly factors $2x+1$ for each required prime $x$. It rejects the candidate if a required prime is smaller than the proposed least prime or if more than $k$ distinct primes are required. For $k=5$ all 14 candidates fail. For $k=6$ the integer lower bound is 33, the first candidate prime is 37, and all 30 candidates fail. The script also checks the congruences and finite cases for repeated primes at $k=6$. The Lean classification uses its own proofs for every partition.
+
+\section{Certified OEIS Table Milestones and Near-Miss Analysis}
+
+In \leanid{OeisA245211/TableCerts.lean}, we certify the complete 66-term OEIS table, the exact onset of both companion sequences A245213 and A245214, and bounded fixed-point uniqueness up to $n = 150$.
+
+\begin{theorem}[Certified OEIS Milestones and Bounded Uniqueness; \leanid{TableCerts.lean}]
+\label{thm:tables}
+\leavevmode
+\begin{enumerate}
+  \item (\leanid{map\_\allowbreak a\_\allowbreak range\_\allowbreak 66}, \leanid{a\_\allowbreak 1\_\allowbreak eq}--\leanid{a\_\allowbreak 25\_\allowbreak eq}, \leanid{a\_\allowbreak 66\_\allowbreak eq}) The values $\leanid{a}(1), \dots, \leanid{a}(66)$ match the 66 entries in the \texttt{\%S}, \texttt{\%T}, and \texttt{\%U} lines of OEIS A245211~\cite{OEIS-A245211}, subsuming the five pointwise checks $a(1),\dots,a(5)$ in \texttt{FormalConjectures/OEIS/245211.lean}~\cite{FormalConjectures2026}.
+  \item (\leanid{isInA245213\_\allowbreak 72}, \leanid{not\_\allowbreak isInA245213\_\allowbreak below\_\allowbreak 72}) For $1 \le n < 72$, $\neg\,\leanid{IsInA245213}\;n$ holds, while $\leanid{IsInA245213}\;72$ holds ($\leanid{a}(72) = 802$ and $72\,\tau(72) = 864$), certifying that $\min(\text{A245213}) = 72$~\cite{OEIS-A245213}.
+  \item (\leanid{isInA245214\_\allowbreak 144}, \leanid{not\_\allowbreak isInA245214\_\allowbreak below\_\allowbreak 144}) For $1 \le n < 144$, $\neg\,\leanid{IsInA245214}\;n$ holds, while $\leanid{IsInA245214}\;144$ holds ($\leanid{a}(144) = 2226 > 2160 = 144\,\tau(144)$), certifying Krizek's sign-change remark $\min(\text{A245214}) = 144$~\cite{OEIS-A245211,OEIS-A245214}.
+  \item (\leanid{fixedPoint\_\allowbreak iff\_\allowbreak eq\_\allowbreak 21\_\allowbreak upto\_\allowbreak 150}) For every $n$ with $1 \le n \le 150$, $\leanid{IsFixedPoint}\;n \iff n = 21$.
+\end{enumerate}
+\end{theorem}
+
+Theorem~\ref{thm:omega3}(1) explains why $n = 725 = 5^2 \cdot 29$ is the closest odd composite near-miss below $1{,}000{,}000$: setting $p = 5$ gives $p^2 - 4p - 2 = 3$ and $7(2p + 1) = 77$, so $a(5^2 q) - 5^2 q = 77 - 3(q - 3)$. Choosing $q = 29$ makes $3(q - 3) = 78 = 77 + 1$, giving $a(725) = 724 = 725 - 1$ (\leanid{a\_\allowbreak 725\_\allowbreak eq}). Similarly, for $n = 5 \cdot 23 \cdot r$, $(2\cdot 5 + 1)(2\cdot 23 + 1)(2r + 1) = 517(2r + 1) = 1034r + 517$ against $9 \cdot 115 r = 1035r$, so $a(115r) - 115r = 517 - r$; the prime closest to $517$ is $r = 521$, yielding $n = 59{,}915 = 5 \cdot 23 \cdot 521$ with $a(59{,}915) = 59{,}911 = n - 4$. Extending the Python sieve to $N = 1{,}000{,}000$ adds two odd composite near-misses with $|a(n) - n| \le 15$, namely $n = 415{,}207 = 13 \cdot 19 \cdot 41^2$ and $n = 735{,}319 = 13^2 \cdot 19 \cdot 229$ (both with $a(n) - n = -13$, and both unconditionally excluded from being fixed points by Theorem~\ref{thm:obstruction}(1) since $\Omega(n) = 4$ and $\tau(n) = 12$). Table~\ref{tab:nearmiss} lists all odd composite integers $n \le 1{,}000{,}000$ with $0 < |a(n) - n| \le 15$ found by \leanid{solver/a245211\_\allowbreak search.py}.
+
+\begin{table}[ht]
+\centering
+\caption{All odd composite integers $1 \le n \le 1{,}000{,}000$ satisfying $0 < |a(n) - n| \le 15$.}
+\label{tab:nearmiss}
+\small
+\begin{tabular}{@{}rlrrrr>{\raggedright\arraybackslash}p{4.6cm}@{}}
+\toprule
+$n$ & Factorization & $\Omega(n)$ & $\tau(n)$ & $a(n)$ & $a(n) - n$ & Governing identity / Lean certificate \\
+\midrule
+9 & $3^2$ & 2 & 3 & 7 & $-2$ & \leanid{a\_\allowbreak 9\_\allowbreak eq}, \leanid{not\_\allowbreak isFixedPoint\_\allowbreak 9} \\
+15 & $3 \cdot 5$ & 2 & 4 & 17 & $+2$ & \leanid{a\_\allowbreak 15\_\allowbreak eq}, \leanid{not\_\allowbreak isFixedPoint\_\allowbreak 15} \\
+25 & $5^2$ & 2 & 3 & 11 & $-14$ & \leanid{a\_\allowbreak 25\_\allowbreak eq}, \leanid{not\_\allowbreak isFixedPoint\_\allowbreak 25} \\
+27 & $3^3$ & 3 & 4 & 34 & $+7$ & \leanid{ne\_\allowbreak self\_\allowbreak of\_\allowbreak prime\_\allowbreak pow} \\
+33 & $3 \cdot 11$ & 2 & 4 & 29 & $-4$ & \leanid{a\_\allowbreak three\_\allowbreak mul\_\allowbreak prime}, \leanid{not\_\allowbreak isFixedPoint\_\allowbreak 33} \\
+35 & $5 \cdot 7$ & 2 & 4 & 25 & $-10$ & \leanid{a\_\allowbreak semiprime} \\
+39 & $3 \cdot 13$ & 2 & 4 & 33 & $-6$ & \leanid{a\_\allowbreak three\_\allowbreak mul\_\allowbreak prime} \\
+51 & $3 \cdot 17$ & 2 & 4 & 41 & $-10$ & \leanid{a\_\allowbreak three\_\allowbreak mul\_\allowbreak prime} \\
+57 & $3 \cdot 19$ & 2 & 4 & 45 & $-12$ & \leanid{a\_\allowbreak three\_\allowbreak mul\_\allowbreak prime} \\
+605 & $5 \cdot 11^2$ & 3 & 6 & 616 & $+11$ & \leanid{odd\_\allowbreak p2q\_\allowbreak formula\_\allowbreak ne\_\allowbreak self} \\
+725 & $5^2 \cdot 29$ & 3 & 6 & 724 & $-1$ & \leanid{p2q\_\allowbreak near\_\allowbreak miss\_\allowbreak identity}, \leanid{a\_\allowbreak 725\_\allowbreak eq} \\
+775 & $5^2 \cdot 31$ & 3 & 6 & 768 & $-7$ & \leanid{p2q\_\allowbreak near\_\allowbreak miss\_\allowbreak identity} \\
+8701 & $7 \cdot 11 \cdot 113$ & 3 & 8 & 8707 & $+6$ & \leanid{three\_\allowbreak prime\_\allowbreak moment\_\allowbreak ne} \\
+57845 & $5 \cdot 23 \cdot 503$ & 3 & 8 & 57859 & $+14$ & $a(115r) - 115r = 517 - r$ \\
+58535 & $5 \cdot 23 \cdot 509$ & 3 & 8 & 58543 & $+8$ & $a(115r) - 115r = 517 - r$ \\
+59915 & $5 \cdot 23 \cdot 521$ & 3 & 8 & 59911 & $-4$ & $a(115r) - 115r = 517 - r$ \\
+60145 & $5 \cdot 23 \cdot 523$ & 3 & 8 & 60139 & $-6$ & $a(115r) - 115r = 517 - r$ \\
+415207 & $13 \cdot 19 \cdot 41^2$ & 4 & 12 & 415194 & $-13$ & \leanid{not\_\allowbreak isFixedPoint\_\allowbreak prime\_\allowbreak sq\_\allowbreak mul\_\allowbreak two\_\allowbreak primes} \\
+735319 & $13^2 \cdot 19 \cdot 229$ & 4 & 12 & 735306 & $-13$ & \leanid{not\_\allowbreak isFixedPoint\_\allowbreak prime\_\allowbreak sq\_\allowbreak mul\_\allowbreak two\_\allowbreak primes} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Verification Audit and Axiom Footprint}
+
+We ran \leanid{lake} with the toolchain Lean 4.35.0 \cite{deMouraUllrich2021}. The project imports eight modules and has no external Lean dependencies.
+\begin{verbatim}
+$ lake clean && lake build
+Build completed successfully (11 jobs).
+\end{verbatim}
+A source scan of the A245211 package found zero occurrences of \leanid{sorry}, \leanid{axiom}, \leanid{native\_\allowbreak decide}, \leanid{ofReduceBool}, \leanid{trustCompiler}, \leanid{unsafe} or \leanid{set\_\allowbreak option}. The independent verifier reproduced the first 66 OEIS terms and found 21 as the only fixed point through one million. Supplying Andersen's \leanid{b245211.txt} from OEIS \cite{OEIS-A245211} enables a further comparison of the first 10,000 values.
+
+Table~\ref{tab:axioms} counts public theorems by the exact dependency set reported by Lean's \texttt{\#print axioms} command. The column symbols $P$, $Q$ and $C$ denote \leanid{propext}, \leanid{Quot.sound} and \leanid{Classical.choice}, respectively.
+
+\begin{table}[htbp]
+\centering
+\caption{Axiom footprint of public theorems by module and exact dependency set.}
+\label{tab:axioms}
+\small
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+Module & None & $P$ & $Q$ & $P,Q$ & $P,C,Q$ & Total \\
+\midrule
+\leanid{Basic} & 19 & 1 & 0 & 23 & 6 & 49 \\
+\leanid{Dominance} & 0 & 0 & 0 & 19 & 0 & 19 \\
+\leanid{Families} & 0 & 1 & 0 & 34 & 6 & 41 \\
+\leanid{Parity} & 2 & 2 & 0 & 9 & 19 & 32 \\
+\leanid{OmegaFour} & 0 & 0 & 0 & 10 & 25 & 35 \\
+\leanid{OmegaFive} & 0 & 0 & 0 & 1 & 7 & 8 \\
+\leanid{OmegaSix} & 0 & 0 & 0 & 0 & 16 & 16 \\
+\leanid{TableCerts} & 41 & 0 & 0 & 2 & 0 & 43 \\
+Total & 62 & 4 & 0 & 98 & 79 & 243 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\FloatBarrier
+\subsection*{Author Contributions and AI Disclosure}
+Mar Allen P. Sugui developed the Lean formalization and Python verifier with assistance from Gemini 4 Argon and Gemini 4 Hydrogen. GPT-6.2 Astra and GPT-6.1 Terra assisted with the v1.1.0 manuscript revision, comparison of the two editions and release verification. The Lean kernel checks the five- and six-factor classifications directly. Readers can reproduce the independent numerical checks with the Python script in the release archive.
+
+\FloatBarrier
+\begin{thebibliography}{19}
+
+\bibitem{Apostol1976}
+T.~M.~Apostol, \emph{Introduction to Analytic Number Theory}, Undergraduate Texts in Mathematics, Springer-Verlag, New York, 1976.
+
+\bibitem{Burton1976}
+D.~M.~Burton, \emph{Elementary Number Theory}, Allyn and Bacon, Boston, 1976.
+
+\bibitem{deMouraUllrich2021}
+L.~de Moura and S.~Ullrich, \emph{The Lean 4 theorem prover and programming language}, in Automated Deduction -- CADE 28 (A.~Platzer and G.~Sutcliffe, eds.), Lecture Notes in Comput. Sci. \textbf{12699}, Springer, Cham, 2021, pp.~625--635.
+
+\bibitem{FormalConjectures2026}
+Formal Conjectures Contributors (Google DeepMind), \emph{Formal Conjectures: A collection of formalized open conjectures in Lean 4}, \href{https://github.com/google-deepmind/formal-conjectures/blob/2207c54d0dbe960de591d280f997b195bf3f6e28/FormalConjectures/OEIS/245211.lean}{OEIS problem 245211 at revision \texttt{2207c54}} (checked November 22, 2026).
+
+\bibitem{GabdullinIudelevich2023}
+M.~R.~Gabdullin, V.~V.~Iudelevich, and F.~Luca, \emph{Numbers of the form $k f(k)$}, Int. J. Number Theory \textbf{19} (2023), no.~5, 1191--1204.
+
+\bibitem{Miller1976}
+G.~L.~Miller, \emph{Riemann's hypothesis and tests for primality}, J. Comput. System Sci. \textbf{13} (1976), no.~3, 300--317.
+
+\bibitem{NoppakaewPongsriiam2023}
+P.~Noppakaew and P.~Pongsriiam, \emph{Product of some polynomials and arithmetic functions}, J. Integer Seq. \textbf{26} (2023), Article 23.9.1.
+
+\bibitem{OEIS-A000005}
+OEIS Foundation Inc., \emph{The On-Line Encyclopedia of Integer Sequences}, Entry A000005: $d(n)$ (also called $\tau(n)$ or $\sigma_0(n)$), the number of divisors of $n$, authored by N.~J.~A.~Sloane, \url{https://oeis.org/A000005} (checked November 22, 2026).
+
+\bibitem{OEIS-A000203}
+OEIS Foundation Inc., \emph{The On-Line Encyclopedia of Integer Sequences}, Entry A000203: $a(n) = \sigma(n)$, the sum of the divisors of $n$, authored by N.~J.~A.~Sloane, \url{https://oeis.org/A000203} (checked November 22, 2026).
+
+\bibitem{OEIS-A001222}
+OEIS Foundation Inc., \emph{The On-Line Encyclopedia of Integer Sequences}, Entry A001222: Number of prime divisors of $n$ counted with multiplicity ($\Omega(n)$), authored by N.~J.~A.~Sloane, \url{https://oeis.org/A001222} (checked November 22, 2026).
+
+\bibitem{OEIS-A038040}
+OEIS Foundation Inc., \emph{The On-Line Encyclopedia of Integer Sequences}, Entry A038040: $a(n) = n \cdot d(n)$, where $d(n)$ is the number of divisors of $n$, \url{https://oeis.org/A038040} (checked November 22, 2026).
+
+\bibitem{OEIS-A060640}
+OEIS Foundation Inc., \emph{The On-Line Encyclopedia of Integer Sequences}, Entry A060640: $a(n) = \sum_{d \mid n} d \cdot \tau(d)$, \url{https://oeis.org/A060640} (checked November 22, 2026).
+
+\bibitem{OEIS-A245211}
+OEIS Foundation Inc., \emph{The On-Line Encyclopedia of Integer Sequences}, Entry A245211: $a(n) = \sum_{d < n,\, d \mid n} d \cdot \tau(d)$, authored by J.~Krizek (July 23, 2014), including \href{https://oeis.org/A245211/b245211.txt}{\texttt{b245211.txt}} (J.~K.~Andersen), \url{https://oeis.org/A245211} (checked November 22, 2026).
+
+\bibitem{OEIS-A245212}
+OEIS Foundation Inc., \emph{The On-Line Encyclopedia of Integer Sequences}, Entry A245212: $a(n) = n \cdot \tau(n) - \sum_{d < n,\, d \mid n} d \cdot \tau(d)$, authored by J.~Krizek (July 23, 2014), \url{https://oeis.org/A245212} (checked November 22, 2026).
+
+\bibitem{OEIS-A245213}
+OEIS Foundation Inc., \emph{The On-Line Encyclopedia of Integer Sequences}, Entry A245213: Numbers $n$ such that $\text{A245212}(n) < n$, authored by J.~Krizek (July 23, 2014), \url{https://oeis.org/A245213} (checked November 22, 2026).
+
+\bibitem{OEIS-A245214}
+OEIS Foundation Inc., \emph{The On-Line Encyclopedia of Integer Sequences}, Entry A245214: Numbers $n$ such that $\text{A245212}(n) < 0$, authored by J.~Krizek (July 23, 2014), \url{https://oeis.org/A245214} (checked November 22, 2026).
+
+\bibitem{Rabin1980}
+M.~O.~Rabin, \emph{Probabilistic algorithm for testing primality}, J. Number Theory \textbf{12} (1980), no.~1, 128--138.
+
+\bibitem{SorensonWebster2017}
+J.~P.~Sorenson and J.~Webster, \emph{Strong pseudoprimes to twelve prime bases}, Math. Comp. \textbf{86} (2017), no.~304, 985--1003.
+
+\bibitem{Tattersall1999}
+J.~J.~Tattersall, \emph{Elementary Number Theory in Nine Chapters}, Cambridge Univ. Press, Cambridge, 1999.
+
+\end{thebibliography}
+
+\end{document}

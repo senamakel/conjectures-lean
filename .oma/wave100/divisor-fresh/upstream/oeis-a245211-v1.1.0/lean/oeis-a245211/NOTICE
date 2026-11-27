@@ -1,0 +1,12 @@
+Divisor-Count Moments of Proper Divisors (OEIS A245211) — Lean 4 Formalization and Verifier
+Copyright 2026 Mar Allen P. Sugui
+
+This distribution includes the dependency-free Lean 4.35.0 formalization
+(lean/oeis-a245211/) and accompanying Python verification and Diophantine search
+script (solver/a245211_search.py), developed by Mar Allen P. Sugui
+(https://mariyaholic.github.io/) with assistance from Gemini 4 Argon and
+Gemini 4 Hydrogen, and released under the Apache License, Version 2.0.
+
+When redistributing or building derivative works under Apache-2.0 Section 4(d),
+retain this NOTICE attribution file and cite the original release metadata in
+CITATION.cff.

@@ -1,0 +1,39 @@
+{
+  "title": "Formal Verification of Parity Obstructions and Fixed-Point Exclusions for Proper-Divisor Moments (OEIS A245211) in Lean 4",
+  "upload_type": "publication",
+  "publication_type": "preprint",
+  "publication_date": "2026-11-22",
+  "creators": [
+    {
+      "name": "Sugui, Mar Allen P."
+    }
+  ],
+  "description": "This eight-module Lean 4.35.0 library formalizes the proper-divisor moment a(n) = sum over proper divisors d of d * tau(d) (OEIS A245211). Basic, Dominance, Families, Parity, OmegaFour, OmegaFive, OmegaSix, and TableCerts use no external Lean packages. The only positive fixed point with Omega(n) <= 6 is 21, where Omega counts prime factors with multiplicity. OmegaFive excludes squarefree five-prime products by Cunningham forced closure. OmegaSix excludes all 11 exponent partitions of 6. Any other fixed point must be coprime to 6 and have Omega(n) >= 7. Lean also certifies the first 66 values, the minima 72 and 144 of A245213 and A245214, a(725) = 724, and uniqueness through 150. An independent Python sieve finds only 21 through 1,000,000. Its forced-closure search rejects all 14 candidate least primes for five distinct factors and all 30 for six.",
+  "access_right": "open",
+  "keywords": [
+    "divisor function",
+    "proper divisors",
+    "OEIS A245211",
+    "OEIS A060640",
+    "OEIS A245212",
+    "Lean 4",
+    "formal verification",
+    "11A25",
+    "68V20",
+    "11Y70"
+  ],
+  "notes": "Mar Allen P. Sugui developed the Lean library and Python verifier with assistance from Gemini 4 Argon and Gemini 4 Hydrogen. GPT-6.2 Astra and GPT-6.1 Terra assisted with the v1.1.0 manuscript revision and release checks. The archive oeis-a245211-v1.1.0.zip includes the eight Lean modules, solver/a245211_search.py, and the paper sources. The manuscript is licensed under CC BY 4.0 and the source code under Apache 2.0.",
+  "related_identifiers": [
+    {
+      "identifier": "https://mariyaholic.github.io/",
+      "relation": "isCitedBy",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://oeis.org/A245211",
+      "relation": "isSupplementedBy",
+      "scheme": "url"
+    }
+  ],
+  "version": "1.1.0"
+}

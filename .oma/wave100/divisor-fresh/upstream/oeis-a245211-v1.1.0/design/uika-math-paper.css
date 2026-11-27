@@ -1,0 +1,476 @@
+/* ============================================================
+   UIKA — Mathematics Release Paper Style (skills/document-craft, ADR-0040)
+   Imports design/uika-canonical.css and applies the print/screen paper
+   parameter set (skills/figure-craft/kit/themes/paper.json, ADR-0034 §5).
+   Measure: 66ch prose column; body: 16px / 1.55 screen, 10.5pt print;
+   contrast >= 4.5:1 (WCAG 2.2 AA); tabular numerals on all exact tables.
+   ============================================================ */
+@import url("./uika-canonical.css");
+
+/* Paper parameter set (ADR-0034 §5 token values) */
+[data-face="paper"] {
+  --face: "paper";
+  --bg-deepest: #ededea;
+  --bg-ground: #ffffff;
+  --bg-panel: #f6f6f4;
+  --bg-panel-2: #ededea;
+  --bg-input: #f6f6f4;
+  --line: #d9d9d2;
+  --line-subtle: #e6e6e0;
+  --line-strong: #b8b8ad;
+  --gold: #8a6a20;
+  --gold-bright: #6f5518;
+  --gold-dim: #b8a06a;
+  --gold-glow: rgba(138, 106, 32, 0.12);
+  --lavender: #5a4f8a;
+  --lavender-dim: rgba(90, 79, 138, 0.10);
+  --platinum: #111110;
+  --marigold: #b25a1e;
+  --lining: #a2434d;
+  --lining-dim: rgba(162, 67, 77, 0.10);
+  --sage: #3f7a55;
+  --sage-dim: rgba(63, 122, 85, 0.12);
+  --wine: #7a2340;
+  --wine-dim: rgba(122, 35, 64, 0.08);
+  --text: #22211e;
+  --text-bright: #111110;
+  --muted: #5f5d57;
+  --slate: #8b887f;
+}
+
+/* Role layer for mathematics release documents */
+:root {
+  --paper-measure: 66ch;
+  --paper-wide: 82ch;
+  --paper-serif: Georgia, "Times New Roman", serif;
+  --paper-sans: var(--font-brand), "Segoe UI", system-ui, sans-serif;
+  --paper-mono: var(--font-mono), Consolas, "Liberation Mono", monospace;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body.math-paper {
+  margin: 0;
+  padding: 2.5rem 1.5rem 4rem;
+  background-color: var(--bg-ground);
+  color: var(--text);
+  font-family: var(--paper-serif);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.paper-shell {
+  max-width: var(--paper-wide);
+  margin: 0 auto;
+}
+
+.paper-prose,
+.paper-header,
+.paper-abstract,
+.paper-section > p,
+.paper-section > ul,
+.paper-section > ol,
+.math-env,
+.math-proof,
+.paper-footer {
+  max-width: var(--paper-measure);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Top toolbar (screen only) */
+.paper-toolbar {
+  max-width: var(--paper-measure);
+  margin: 0 auto 2rem;
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-family: var(--paper-sans);
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.paper-toolbar-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.paper-btn {
+  appearance: none;
+  background: var(--bg-ground);
+  color: var(--text);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.6rem;
+  font-family: var(--paper-sans);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.paper-btn[aria-pressed="true"] {
+  border-color: var(--gold);
+  background: var(--gold-glow);
+  color: var(--text-bright);
+  font-weight: 600;
+}
+
+/* Title block */
+.paper-header {
+  border-bottom: 2px solid var(--line-strong);
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.paper-kicker {
+  font-family: var(--paper-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 0.5rem;
+}
+
+.paper-title {
+  font-family: var(--paper-serif);
+  font-size: 1.75rem;
+  line-height: 1.25;
+  color: var(--text-bright);
+  margin: 0 0 0.75rem;
+  font-weight: 700;
+}
+
+.paper-subtitle {
+  font-size: 1.05rem;
+  line-height: 1.45;
+  color: var(--muted);
+  margin: 0 0 1rem;
+}
+
+.paper-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  font-family: var(--paper-sans);
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+/* Abstract */
+.paper-abstract {
+  background: var(--bg-panel);
+  border-left: 3px solid var(--gold);
+  padding: 1rem 1.25rem;
+  margin-bottom: 2rem;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.paper-abstract-title {
+  font-family: var(--paper-sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-bright);
+  margin: 0 0 0.5rem;
+}
+
+.paper-abstract p {
+  margin: 0 0 0.75rem;
+}
+
+.paper-abstract p:last-child {
+  margin-bottom: 0;
+}
+
+/* Headings and paragraph rhythm (USWDS: space above >= 1.5x space below) */
+.paper-section {
+  margin-bottom: 2.25rem;
+}
+
+.paper-section h2 {
+  max-width: var(--paper-measure);
+  margin: 2.1rem auto 0.75rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--paper-serif);
+  font-size: 1.25rem;
+  line-height: 1.3;
+  color: var(--text-bright);
+}
+
+.paper-section h3 {
+  max-width: var(--paper-measure);
+  margin: 1.5rem auto 0.5rem;
+  font-family: var(--paper-serif);
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  color: var(--text-bright);
+}
+
+.paper-section p {
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+
+.paper-section ul,
+.paper-section ol {
+  margin-top: 0;
+  margin-bottom: 1em;
+  padding-left: 1.4rem;
+}
+
+.paper-section li {
+  margin-bottom: 0.35em;
+}
+
+/* Mathematical environments */
+.math-env {
+  margin-top: 1.15rem;
+  margin-bottom: 1.15rem;
+  padding: 0.85rem 1.1rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--lavender);
+  border-radius: var(--radius-sm);
+}
+
+.math-env.env-definition {
+  border-left-color: var(--gold);
+}
+
+.math-env.env-theorem,
+.math-env.env-lemma {
+  border-left-color: var(--lavender);
+}
+
+.math-env.env-exact {
+  border-left-color: var(--sage);
+}
+
+.math-env.env-refutation {
+  border-left-color: var(--lining);
+}
+
+.math-env-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.math-env-label {
+  font-weight: 700;
+  color: var(--text-bright);
+}
+
+.lean-badge {
+  font-family: var(--paper-mono);
+  font-size: 0.75rem;
+  padding: 0.1rem 0.45rem;
+  background: var(--bg-panel-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-bright);
+  text-decoration: none;
+}
+
+.math-env p:last-child {
+  margin-bottom: 0;
+}
+
+.math-proof {
+  margin-top: -0.5rem;
+  margin-bottom: 1.25rem;
+  padding-left: 0.85rem;
+  border-left: 2px solid var(--line);
+  font-size: 0.96875rem;
+}
+
+.math-proof-label {
+  font-style: italic;
+  color: var(--text-bright);
+}
+
+.math-qed {
+  float: right;
+  color: var(--muted);
+  font-style: normal;
+}
+
+/* Displayed equations */
+.math-display {
+  max-width: var(--paper-measure);
+  margin: 0.9rem auto;
+  padding: 0.5rem 0.75rem;
+  overflow-x: auto;
+  text-align: center;
+  font-family: var(--paper-serif);
+}
+
+code, pre {
+  font-family: var(--paper-mono);
+  font-size: 0.875em;
+}
+
+code {
+  background: var(--bg-panel-2);
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+}
+
+pre {
+  max-width: var(--paper-measure);
+  margin: 1rem auto;
+  padding: 0.85rem 1rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  line-height: 1.45;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+}
+
+/* Exact tables (skills/document-craft §6) */
+.paper-table-wrap {
+  max-width: var(--paper-wide);
+  margin: 1.25rem auto;
+  overflow-x: auto;
+}
+
+table.paper-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--paper-sans);
+  font-size: 0.84375rem;
+  font-variant-numeric: tabular-nums;
+}
+
+table.paper-table caption {
+  caption-side: top;
+  text-align: left;
+  font-family: var(--paper-serif);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 0.5rem;
+}
+
+table.paper-table th,
+table.paper-table td {
+  padding: 0.45rem 0.65rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+table.paper-table thead th {
+  border-top: 2px solid var(--line-strong);
+  border-bottom: 2px solid var(--line-strong);
+  background: var(--bg-panel);
+  color: var(--text-bright);
+  font-weight: 600;
+}
+
+table.paper-table tbody tr:last-child td,
+table.paper-table tbody tr:last-child th {
+  border-bottom: 2px solid var(--line-strong);
+}
+
+table.paper-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.status-tag {
+  display: inline-block;
+  font-family: var(--paper-mono);
+  font-size: 0.72rem;
+  padding: 0.08rem 0.4rem;
+  border-radius: 3px;
+  border: 1px solid var(--line-strong);
+}
+
+.status-exact {
+  background: var(--sage-dim);
+  color: var(--sage);
+  border-color: var(--sage);
+}
+
+.status-record {
+  background: var(--gold-glow);
+  color: var(--gold-bright);
+  border-color: var(--gold);
+}
+
+.status-open {
+  background: var(--lining-dim);
+  color: var(--lining);
+  border-color: var(--lining);
+}
+
+/* Provenance and colophon footer */
+.paper-footer {
+  margin-top: 3rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line-strong);
+  font-family: var(--paper-sans);
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+/* Forced-colors survival (skills/theme-craft) */
+@media (forced-colors: active) {
+  .math-env,
+  .paper-abstract,
+  .paper-toolbar,
+  .lean-badge,
+  .status-tag {
+    border: 1px solid CanvasText;
+  }
+}
+
+/* Print / PDF layout */
+@page {
+  size: A4;
+  margin: 20mm 18mm;
+}
+
+@media print {
+  body.math-paper {
+    padding: 0;
+    background: #ffffff;
+    color: #000000;
+    font-size: 10.5pt;
+    line-height: 1.48;
+  }
+  .paper-toolbar {
+    display: none !important;
+  }
+  .math-env,
+  .paper-abstract,
+  table.paper-table {
+    break-inside: avoid;
+  }
+}

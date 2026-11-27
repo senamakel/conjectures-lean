@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en" data-face="paper">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Formal Verification of Parity Obstructions and Fixed-Point Exclusions for Proper-Divisor Moments (OEIS A245211) in Lean 4</title>
+  <link rel="stylesheet" href="../../design/uika-math-paper.css">
+  <style>
+    .math-paper a, .math-paper .paper-kicker { color: var(--text); }
+    .math-paper code { overflow-wrap: anywhere; }
+  </style>
+</head>
+<body class="math-paper">
+  <div class="paper-shell">
+    <nav class="paper-toolbar" aria-label="Document display controls">
+      <div>
+        <strong>Formal Mathematics Release</strong> &middot; OEIS A245211 &middot; Lean 4.35.0
+      </div>
+      <div class="paper-toolbar-actions" role="group" aria-label="Color theme selection">
+        <button type="button" class="paper-btn" data-set-face="paper" aria-pressed="true">Paper (Print)</button>
+        <button type="button" class="paper-btn" data-set-face="sumimi" aria-pressed="false">Warm</button>
+        <button type="button" class="paper-btn" data-set-face="doloris" aria-pressed="false">Night</button>
+        <button type="button" class="paper-btn" id="btn-print">Print / PDF</button>
+      </div>
+    </nav>
+
+    <main>
+      <header class="paper-header">
+        <p class="paper-kicker">Proper-Divisor Moments &middot; Formal Mathematics Release</p>
+        <h1 class="paper-title">Formal Verification of Parity Obstructions and Fixed-Point Exclusions for Proper-Divisor Moments (OEIS A245211) in Lean 4</h1>
+        <p class="paper-subtitle">Fixed points with at most six prime factors, counted with multiplicity</p>
+        <div class="paper-meta">
+          <span>Mar Allen P. Sugui</span>
+          <span><a href="https://mariyaholic.github.io/">mariyaholic.github.io</a> &middot; <a href="https://github.com/mariyaholic">github.com/mariyaholic</a></span>
+          <span>November 22, 2026</span>
+          <span>MSC 2020 11A25, 68V20 / 11Y70, 11D61</span>
+          <span><code>leanprover/lean4:v4.35.0</code></span>
+          <span><a href="./oeis-a245211.pdf">PDF</a> · <a href="./oeis-a245211.tex">LaTeX source</a></span>
+        </div>
+      </header>
+
+      <section class="paper-abstract" aria-labelledby="abstract-heading">
+        <h2 id="abstract-heading" class="paper-abstract-title">Abstract</h2>
+        <p>Jaroslav Krizek conjectured that 21 is the only positive integer equal to the sum <i>a</i>(<i>n</i>) of <i>d</i> τ(<i>d</i>) over its proper divisors <i>d</i>, where τ(<i>d</i>) counts positive divisors. We prove in Lean 4.35.0 that 21 is the only fixed point with Ω(<i>n</i>)≤ 6, counting prime factors with multiplicity. For a squarefree product of <i>k</i> primes, a fixed point would satisfy ∏<sub><i>p</i>∣ <i>n</i></sub>(2<i>p</i>+1)=(2<sup><i>k</i></sup>+1)<i>n</i>. At <i>k</i>=5 and <i>k</i>=6, dominance and growth bounds leave 14 and 30 candidates for the least prime, respectively. Factoring successive terms 2<i>p</i>+1 excludes every candidate. For repeated primes we use exact-exponent parity, dominance bounds and congruences. Across eight modules we also certify the first 66 terms of OEIS A245211, the minima 72 and 144 of A245213 and A245214, and uniqueness through <i>n</i>=150. A separate Python sieve finds only 21 through 10<sup>6</sup>. Whether a fixed point coprime to 6 with Ω(<i>n</i>)≥ 7 exists remains open.</p>
+      </section>
+
+      <section class="paper-section" id="sec-scope">
+        <h2>1. Problem Statement and Scope of the Formalization</h2>
+        <p>
+          For a positive integer <em>n</em>, let &tau;(<em>n</em>) = &sum;<sub><em>d</em> | <em>n</em></sub> 1 (OEIS A000005 [8]) and &sigma;(<em>n</em>) = &sum;<sub><em>d</em> | <em>n</em></sub> <em>d</em> (OEIS A000203 [9]) denote the classical divisor-count and divisor-sum functions [1, 2, 19]. Gabdullin, Iudelevich and Luca study the number of distinct values of <i>n</i> τ(<i>n</i>) [5]. Noppakaew and Pongsriiam study injectivity for products of polynomials and arithmetic functions, including <i>n</i> τ(<i>n</i>) [7]. Summing this weight over all divisors gives the full first moment
+        </p>
+        <div class="math-display">
+          <em>S</em>(<em>n</em>) = &sum;<sub><em>d</em> | <em>n</em></sub> <em>d</em>&thinsp;&tau;(<em>d</em>) = (id &middot; &tau; * 1)(<em>n</em>)
+        </div>
+        <p>
+          (OEIS A060640 [12]). Because <em>d</em> &mapsto; <em>d</em>&thinsp;&tau;(<em>d</em>) is multiplicative, <em>S</em>(<em>n</em>) is multiplicative and takes the prime-power values
+        </p>
+        <div class="math-display">
+          <em>S</em>(<em>p</em><sup><em>e</em></sup>) = 1 + &sum;<sub><em>j</em>=1</sub><sup><em>e</em></sup> (<em>j</em> + 1)&thinsp;<em>p</em><sup><em>j</em></sup>, &emsp; <em>S</em>(<em>p</em>) = 2<em>p</em> + 1.
+        </div>
+        <p>
+          On July 23, 2014, Jaroslav Krizek introduced sequence A245211 in the On-Line Encyclopedia of Integer Sequences [13] as the proper-divisor restriction of <em>S</em>(<em>n</em>):
+        </p>
+        <div class="math-display">
+          <em>a</em>(<em>n</em>) = &sum;<sub><em>d</em> | <em>n</em>, <em>d</em> &lt; <em>n</em></sub> <em>d</em>&thinsp;&tau;(<em>d</em>) = <em>S</em>(<em>n</em>) &minus; <em>n</em>&thinsp;&tau;(<em>n</em>),
+        </div>
+        <p>
+          where <em>n</em>&thinsp;&tau;(<em>n</em>) is OEIS A038040 [11]. On the same date, Krizek introduced three companion sequences measuring the balance between the top term <em>n</em>&thinsp;&tau;(<em>n</em>) and the proper-divisor sum <em>a</em>(<em>n</em>):
+        </p>
+        <div class="math-display">
+          A245212(<em>n</em>) = <em>n</em>&thinsp;&tau;(<em>n</em>) &minus; <em>a</em>(<em>n</em>) = 2<em>n</em>&thinsp;&tau;(<em>n</em>) &minus; <em>S</em>(<em>n</em>) [14],<br>
+          A245213 = {<em>n</em> &ge; 1 | A245212(<em>n</em>) &lt; <em>n</em>} = {72, 96, 120, 144, 180, &hellip;} [15],<br>
+          A245214 = {<em>n</em> &ge; 1 | A245212(<em>n</em>) &lt; 0} = {144, 192, 216, 240, 288, &hellip;} [16].
+        </div>
+        <p>
+          At <em>n</em> = 21 = 3 &middot; 7, the proper divisors are 1, 3, 7, giving
+        </p>
+        <div class="math-display">
+          <em>a</em>(21) = 1 &middot; &tau;(1) + 3 &middot; &tau;(3) + 7 &middot; &tau;(7) = 1 &middot; 1 + 3 &middot; 2 + 7 &middot; 2 = 21.
+        </div>
+        <p>
+          Krizek observed in [13] that <em>a</em>(<em>p</em>) = 1 for every prime <em>p</em>, that <em>a</em>(2<em>p</em>) = 2<em>p</em> + 5 for every odd prime <em>p</em>, that <em>n</em> = 144 is the smallest integer with <em>n</em>&thinsp;&tau;(<em>n</em>) &lt; <em>a</em>(<em>n</em>), and that <em>n</em> = 21 is the only known solution to <em>a</em>(<em>n</em>) = <em>n</em>. In the Google DeepMind Formal Conjectures repository [4], <code>FormalConjectures/OEIS/245211.lean</code> states the uniqueness of <em>n</em> = 21 as an open target alongside five <code>decide</code> evaluations <em>a</em>(1) through <em>a</em>(5).
+        </p>
+        <p>
+          Table 1 lists the results proved in the eight modules of the Lean 4.35.0 package [3], the independent computations and the remaining question.
+        </p>
+
+        <div class="paper-table-wrap">
+          <table class="paper-table">
+            <caption>Table 1. Scope of the formalization and the independent computations.</caption>
+            <thead><tr><th scope="col">Regime</th><th scope="col">Result or question</th><th scope="col">Status</th><th scope="col">Source</th></tr></thead>
+            <tbody>
+              <tr><td>Divisor sums</td><td>S(<i>n</i>)=<i>a</i>(<i>n</i>)+<i>n</i> τ(<i>n</i>) for <i>n</i>&gt;0, and sums over divisor lists.</td><td>Lean</td><td><code>Basic.lean</code></td></tr>
+              <tr><td>Dominance</td><td>If <i>n</i>=km, <i>k</i>,<i>m</i>&gt;1 and <i>k</i>≤τ(<i>m</i>), then <i>a</i>(<i>n</i>)&gt;<i>n</i>. Every positive fixed point is odd.</td><td>Lean</td><td><code>Dominance.lean</code></td></tr>
+              <tr><td>Prime families</td><td>Prime powers are excluded. Among semiprimes and among multiples of 3, only 21 is fixed.</td><td>Lean</td><td><code>Families.lean</code></td></tr>
+              <tr><td>Exact exponents</td><td>At a fixed point <i>n</i>=<i>p</i><sup><i>e</i></sup> <i>m</i> with <i>p</i> prime, <i>e</i>≥1, <i>p</i>∤ <i>m</i> and <i>m</i>&gt;1, <i>e</i> τ(<i>m</i>)&lt;<i>p</i>. If τ(<i>n</i>) is even, <i>e</i> is 0 or 1 modulo 4.</td><td>Lean</td><td><code>Parity.lean</code></td></tr>
+              <tr><td>Ω(<i>n</i>)≤4</td><td>Only 21 is fixed. At five factors, a fixed point would be squarefree with least prime at least 17.</td><td>Lean</td><td><code>OmegaFour.lean</code></td></tr>
+              <tr><td>Ω(<i>n</i>)=5</td><td>Growth and forced prime divisors exclude every squarefree case. Only 21 is fixed through five factors.</td><td>Lean</td><td><code>OmegaFive.lean</code></td></tr>
+              <tr><td>Ω(<i>n</i>)=6</td><td>All 11 exponent partitions are excluded. Only 21 is fixed through six factors.</td><td>Lean</td><td><code>OmegaSix.lean</code></td></tr>
+              <tr><td>OEIS values</td><td>First 66 terms [13], companion minima 72 and 144 [15, 16], <i>a</i>(725)=724, uniqueness through 150.</td><td>Lean</td><td><code>TableCerts.lean</code></td></tr>
+              <tr><td>Finite checks</td><td>Only 21 is fixed through 10<sup>6</sup>. Forced closure leaves zero least primes for <i>k</i>=5,6.</td><td>Python</td><td><code>a245211_search.py</code></td></tr>
+              <tr><td>Other fixed points</td><td>Does any <i>n</i> with gcd(<i>n</i>,6)=1 and Ω(<i>n</i>)≥7 satisfy <i>a</i>(<i>n</i>)=<i>n</i>?</td><td>Open</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="paper-section" id="sec-basic">
+        <h2>2. Summation Primitives, OEIS Identities, and Refutation Checks</h2>
+        <p>
+          To evaluate divisor sums inside the Lean 4.35.0 [3] kernel without exceeding the default maximum recursion depth (<code>maxRecDepth = 1024</code>), <code>OeisA245211/Basic.lean</code> defines the range sum <code>sumUpTo</code> <em>f</em> <em>k</em> = &sum;<sub><em>i</em>=1</sub><sup><em>k</em></sup> <em>f</em>(<em>i</em>) via a balanced binary-tree recursion <code>sumRangeBin</code> <em>f</em> <code>fuel</code> <em>a</em> <code>len</code> of depth 16 (2<sup>16</sup> = 65,536), and proves its exact equivalence (<code>sumRangeBin_eq_sumRangeLinear</code>) with the linear recurrence <code>sumRangeLinear</code>. This yields the definitional and <code>[simp]</code> step equations (<code>sumUpTo_zero</code>, <code>sumUpTo_succ</code>):
+        </p>
+        <div class="math-display">
+          <code>sumUpTo</code> <em>f</em> 0 = 0, &emsp; <code>sumUpTo</code> <em>f</em> (<em>k</em> + 1) = <code>sumUpTo</code> <em>f</em> <em>k</em> + <em>f</em>(<em>k</em> + 1).
+        </div>
+        <p>
+          Using the decidable positive divisibility predicate <code>dividesB</code> <em>d</em> <em>n</em> := (0 &lt; <em>d</em>) &and; (<em>n</em> mod <em>d</em> == 0), we define weighted divisor sums up to <em>k</em>:
+        </p>
+        <div class="math-display">
+          <code>sumDivUpTo</code> <em>n</em> <em>w</em> <em>k</em> := <code>sumUpTo</code> (&lambda;<em>d</em> &rArr; if <code>dividesB</code> <em>d</em> <em>n</em> then <em>w</em>(<em>d</em>) else 0) <em>k</em>,
+        </div>
+        <p>
+          with <code>sumDiv</code> <em>n</em> <em>w</em> := <code>sumDivUpTo</code> <em>n</em> <em>w</em> <em>n</em> and <code>sumProperDiv</code> <em>n</em> <em>w</em> := <code>sumDivUpTo</code> <em>n</em> <em>w</em> (<em>n</em> &minus; 1).
+        </p>
+
+        <div class="theorem-block">
+          <p class="theorem-head">Definition 2.1 (Arithmetic Functions and Companion Predicates; <code>Basic.lean</code>).</p>
+          <p>
+            For <em>n</em> &isin; <strong>N</strong>, we define the divisor-count, divisor-sum, and proper-divisor moment functions [8, 9, 11&ndash;14] <code>tau</code> <em>n</em> := <code>sumDiv</code> <em>n</em> (&lambda;_ &rArr; 1), <code>sigma</code> <em>n</em> := <code>sumDiv</code> <em>n</em> (&lambda;<em>d</em> &rArr; <em>d</em>), <code>nTau</code> <em>n</em> := <em>n</em> &middot; <code>tau</code> <em>n</em>, <code>fullMoment</code> <em>n</em> := <code>sumDiv</code> <em>n</em> (&lambda;<em>d</em> &rArr; <em>d</em> &middot; <code>tau</code> <em>d</em>), <code>a</code> <em>n</em> := <code>sumProperDiv</code> <em>n</em> (&lambda;<em>d</em> &rArr; <em>d</em> &middot; <code>tau</code> <em>d</em>), and <code>cantileverDiff</code> <em>n</em> := (<code>nTau</code> <em>n</em> : <strong>Z</strong>) &minus; (<code>a</code> <em>n</em> : <strong>Z</strong>), together with the decidable predicates <code>IsFixedPoint</code> <em>n</em> := 0 &lt; <em>n</em> &and; <code>a</code> <em>n</em> = <em>n</em>, <code>IsInA245213</code> <em>n</em> := 0 &lt; <em>n</em> &and; <code>cantileverDiff</code> <em>n</em> &lt; (<em>n</em> : <strong>Z</strong>) [15], and <code>IsInA245214</code> <em>n</em> := 0 &lt; <em>n</em> &and; <code>cantileverDiff</code> <em>n</em> &lt; 0 [16].
+          </p>
+        </div>
+
+        <div class="theorem-block">
+          <p class="theorem-head">Theorem 2.2 (OEIS Identities and Divisor-List Equivalences; <code>Basic.lean</code>).</p>
+          <p>For every <em>n</em> &isin; <strong>N</strong>:</p>
+          <ol>
+            <li>(<code>fullMoment_eq_a_add_nTau</code>, <code>a_eq_fullMoment_sub_nTau</code>) Whenever 0 &lt; <em>n</em>, Krizek's additive identity [13] gives <code>fullMoment</code> <em>n</em> = <code>a</code> <em>n</em> + <code>nTau</code> <em>n</em> and <code>a</code> <em>n</em> = <code>fullMoment</code> <em>n</em> &minus; <code>nTau</code> <em>n</em>.</li>
+            <li>(<code>a_int_eq_nTau_sub_cantileverDiff</code>) By the cantilever difference definition [13, 14], (<code>a</code> <em>n</em> : <strong>Z</strong>) = (<code>nTau</code> <em>n</em> : <strong>Z</strong>) &minus; <code>cantileverDiff</code> <em>n</em>.</li>
+            <li>(<code>isInA245214_iff</code>, <code>isInA245213_iff</code>) For the companion sequences [15, 16], we have <code>IsInA245214</code> <em>n</em> &hArr; 0 &lt; <em>n</em> &and; <code>nTau</code> <em>n</em> &lt; <code>a</code> <em>n</em> and <code>IsInA245213</code> <em>n</em> &hArr; 0 &lt; <em>n</em> &and; <code>nTau</code> <em>n</em> &lt; <code>a</code> <em>n</em> + <em>n</em>, so <code>IsInA245214</code> <em>n</em> &rArr; <code>IsInA245213</code> <em>n</em> (<code>isInA245213_of_isInA245214</code>).</li>
+            <li>(<code>isFixedPoint_iff_fullMoment</code>) <code>IsFixedPoint</code> <em>n</em> &hArr; 0 &lt; <em>n</em> &and; <code>fullMoment</code> <em>n</em> = <em>n</em> &middot; (<code>tau</code> <em>n</em> + 1).</li>
+            <li>(<code>mem_divisors_iff</code>, <code>mem_properDivisors_iff</code>) We have <em>d</em> &isin; <code>divisors</code> <em>n</em> &hArr; 1 &le; <em>d</em> &le; <em>n</em> &and; <em>d</em> | <em>n</em>, and for 0 &lt; <em>n</em>, <em>d</em> &isin; <code>properDivisors</code> <em>n</em> &hArr; 1 &le; <em>d</em> &lt; <em>n</em> &and; <em>d</em> | <em>n</em>; both lists are duplicate-free (<code>divisors_nodup</code>, <code>properDivisors_nodup</code>).</li>
+            <li>(<code>tau_eq_length_divisors</code>, <code>a_eq_sumList_properDivisors</code>) For every <em>n</em> &isin; <strong>N</strong>, <code>tau</code> <em>n</em> = (<code>divisors</code> <em>n</em>).<code>length</code> and <code>a</code> <em>n</em> = <code>sumList</code> (<code>properDivisors</code> <em>n</em>) (&lambda;<em>d</em> &rArr; <em>d</em> &middot; <code>tau</code> <em>d</em>).</li>
+          </ol>
+        </div>
+
+        <div class="theorem-block">
+          <p class="theorem-head">Refutation Check 2.3 (<code>Basic.lean</code>, <code>TableCerts.lean</code>).</p>
+          <ol>
+            <li>(<code>not_isFixedPoint_0</code>&ndash;<code>not_isFixedPoint_33</code>, <code>not_isFixedPoint_725</code>) The boundary input <em>n</em> = 0 (0 &lt; <em>n</em> fails), unit <em>n</em> = 1 (<em>a</em>(1) = 0), primes <em>n</em> = 2, 3 (<em>a</em>(<em>p</em>) = 1), even numbers <em>n</em> = 4, 6 (<em>a</em>(4) = 5, <em>a</em>(6) = 11), odd prime squares <em>n</em> = 9, 25 (<em>a</em>(9) = 7, <em>a</em>(25) = 11), odd semiprimes <em>n</em> = 15, 33 (<em>a</em>(15) = 17, <em>a</em>(33) = 29), and the near-miss <em>n</em> = 725 = 5<sup>2</sup> &middot; 29 (<em>a</em>(725) = 724) all satisfy &not;<code>IsFixedPoint</code> <em>n</em>.</li>
+            <li>(<code>not_isInA245213_71</code>, <code>isInA245213_72</code>, <code>not_isInA245214_72</code>, <code>not_isInA245214_143</code>, <code>isInA245214_144</code>) At <em>n</em> = 71, &not;<code>IsInA245213</code> 71 holds; at <em>n</em> = 72, <code>IsInA245213</code> 72 holds (<code>cantileverDiff</code> 72 = 62 &lt; 72) while &not;<code>IsInA245214</code> 72 holds (62 &nlt; 0), strictly separating A245213 from A245214; and at <em>n</em> = 143 and 144, &not;<code>IsInA245214</code> 143 and <code>IsInA245214</code> 144 (<code>cantileverDiff</code> 144 = &minus;66 &lt; 0) hold.</li>
+            <li>(<code>properDivisors_21</code>, <code>a_21</code>, <code>isFixedPoint_21</code>) At <em>n</em> = 21, <code>properDivisors</code> 21 = [1, 3, 7], <code>a</code> 21 = 21, and <code>IsFixedPoint</code> 21.</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="paper-section" id="sec-dominance">
+        <h2>3. The Fundamental Dominance Inequality and Parity Exclusions</h2>
+        <p>
+          Because every term <em>d</em>&thinsp;&tau;(<em>d</em>) in <em>a</em>(<em>n</em>) is nonnegative, sampling any two distinct proper divisors 1 &lt; <em>m</em> &lt; <em>n</em> of <em>n</em> gives a lower bound on <em>a</em>(<em>n</em>) without requiring the prime factorization of <em>n</em>. In <code>OeisA245211/Dominance.lean</code>, we prove general point-sampling lower bounds for <code>sumUpTo</code> (<code>le_sumUpTo</code>, <code>add_le_sumUpTo</code>, <code>add_three_le_sumUpTo</code>) and deduce lower bounds on &tau;(<em>m</em>) and <em>a</em>(<em>n</em>).
+        </p>
+
+        <div class="theorem-block">
+          <p class="theorem-head">Lemma 3.1 (Divisor-Count Lower Bounds; <code>Dominance.lean</code>).</p>
+          <ol>
+            <li>(<code>tau_pos</code>) For every <em>n</em> &gt; 0, 1 &le; <code>tau</code> <em>n</em>.</li>
+            <li>(<code>tau_ge_two</code>) For every <em>m</em> &gt; 1, 2 &le; <code>tau</code> <em>m</em> since 1 and <em>m</em> are distinct divisors of <em>m</em>.</li>
+            <li>(<code>tau_ge_three_of_proper_divisor</code>) If <em>m</em> has a proper divisor 1 &lt; <em>d</em> &lt; <em>m</em> with <em>d</em> | <em>m</em>, then 3 &le; <code>tau</code> <em>m</em> since 1 &lt; <em>d</em> &lt; <em>m</em> all divide <em>m</em>.</li>
+            <li>(<code>a_ge_one_add_properDiv</code>) If 1 &lt; <em>d</em> &lt; <em>n</em> and <em>d</em> | <em>n</em>, then 1 + <em>d</em> &middot; <code>tau</code> <em>d</em> &le; <code>a</code> <em>n</em>.</li>
+          </ol>
+        </div>
+
+        <div class="theorem-block">
+          <p class="theorem-head">Theorem 3.2 (Fundamental Dominance Theorem; <code>Dominance.lean</code>).</p>
+          <p>
+            Suppose <em>n</em> = <em>k</em> &middot; <em>m</em> with 1 &lt; <em>k</em>, 1 &lt; <em>m</em>, and <em>k</em> &le; <code>tau</code> <em>m</em>. By <code>gt_self_of_dvd_le_tau</code>, the proper divisors 1 and <em>m</em> of <em>n</em> force
+          </p>
+          <div class="math-display">
+            <code>a</code> <em>n</em> &ge; 1 + <em>m</em> &middot; <code>tau</code> <em>m</em> &ge; 1 + <em>k</em> &middot; <em>m</em> = <em>n</em> + 1 &gt; <em>n</em>,
+          </div>
+          <p>
+            and in particular &not;<code>IsFixedPoint</code> <em>n</em> (<code>not_isFixedPoint_of_dvd_le_tau</code>).
+          </p>
+        </div>
+        <p class="math-proof"><em>Proof.</em> Both 1 and <i>m</i> are proper divisors of km, and <i>m</i>&gt;1 makes them distinct. Their contributions give <i>a</i>(<i>n</i>)≥1+<i>m</i> τ(<i>m</i>)≥1+mk=<i>n</i>+1.</p>
+
+        <div class="theorem-block">
+          <p class="theorem-head">Corollary 3.3 (Unconditional Even and Composite-Multiple-of-3 Exclusions; <code>Dominance.lean</code>).</p>
+          <ol>
+            <li>(<code>a_two_mul_ge</code>, <code>a_gt_self_of_even_gt_two</code>) For every <em>m</em> &ge; 2, <code>a</code>(2<em>m</em>) &ge; 2<em>m</em> + 1. Equivalently, every even integer <em>n</em> &gt; 2 satisfies <code>a</code> <em>n</em> &ge; <em>n</em> + 1 &gt; <em>n</em>.</li>
+            <li>(<code>ne_self_of_even</code>, <code>not_isFixedPoint_of_even</code>, <code>odd_of_isFixedPoint</code>) Since <code>a</code> 2 = 1 &ne; 2, no positive even integer satisfies <code>a</code> <em>n</em> = <em>n</em>. Every fixed point of OEIS A245211 is odd (<em>n</em> mod 2 = 1).</li>
+            <li>(<code>a_three_mul_ge_of_proper_divisor</code>) Whenever <em>m</em> has a proper divisor 1 &lt; <em>d</em> &lt; <em>m</em> with <em>d</em> | <em>m</em>, Lemma 3.1(3) gives <code>tau</code> <em>m</em> &ge; 3, so <code>a</code>(3<em>m</em>) &ge; 3<em>m</em> + 1 &gt; 3<em>m</em> and &not;<code>IsFixedPoint</code> (3<em>m</em>) (<code>not_isFixedPoint_three_mul_of_proper_divisor</code>).</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="paper-section" id="sec-families">
+        <h2>4. Primes, Prime Powers, Semiprimes, Multiples of 3, and Three-Prime Families</h2>
+        <p>
+          In <code>OeisA245211/Families.lean</code>, we define arithmetic primality <code>IsPrime</code> <em>p</em> := 2 &le; <em>p</em> &and; (&forall;<em>d</em>, <em>d</em> | <em>p</em> &rarr; <em>d</em> = 1 &or; <em>d</em> = <em>p</em>) and establish support-reduction lemmas for <code>sumUpTo</code> when the summand is supported at {1} (<code>sumUpTo_eq_single</code>), {1, <em>a</em>} (<code>sumUpTo_eq_pair</code>), or {1, <em>a</em>, <em>b</em>} (<code>sumUpTo_eq_triple</code>), or when all terms with <em>d</em> &gt; 1 vanish modulo <em>p</em> (<code>sumUpTo_mod_eq_first</code>).
+        </p>
+
+        <div class="theorem-block">
+          <p class="theorem-head">Theorem 4.1 (Primes and Prime Powers; <code>Families.lean</code>).</p>
+          <p>Let <em>p</em> &isin; <strong>N</strong>.</p>
+          <ol>
+            <li>(<code>tau_of_isPrime</code>, <code>isPrime_iff_tau_eq_two</code>) By the divisor-count characterization of primes [1, Ch. 2; 2, Ch. 6], <code>IsPrime</code> <em>p</em> &hArr; 2 &le; <em>p</em> &and; <code>tau</code> <em>p</em> = 2. This equivalence equips <code>IsPrime</code> <em>p</em> with a decidable instance (<code>instDecidableIsPrime</code>).</li>
+            <li>(<code>a_of_isPrime</code>, <code>a_lt_self_of_isPrime</code>) For every prime <em>p</em>, <code>a</code> <em>p</em> = 1 &lt; <em>p</em> (Krizek's first 2014 OEIS formula [13]), so &not;<code>IsFixedPoint</code> <em>p</em> (<code>not_isFixedPoint_of_isPrime</code>).</li>
+            <li>(<code>a_prime_pow_mod_p</code>, <code>ne_self_of_prime_pow</code>) For every prime <em>p</em> and exponent <em>k</em> &ge; 1, every divisor <em>d</em> &gt; 1 of <em>p</em><sup><em>k</em></sup> is a multiple of <em>p</em> (<code>dvd_of_dvd_prime_pow</code>). Consequently, every proper-divisor term <em>d</em> &middot; <code>tau</code> <em>d</em> with <em>d</em> &gt; 1 is divisible by <em>p</em>, giving <code>a</code>(<em>p</em><sup><em>k</em></sup>) mod <em>p</em> = 1 &ne; 0 = <em>p</em><sup><em>k</em></sup> mod <em>p</em>, and therefore <code>a</code>(<em>p</em><sup><em>k</em></sup>) &ne; <em>p</em><sup><em>k</em></sup> and &not;<code>IsFixedPoint</code> (<em>p</em><sup><em>k</em></sup>) (<code>not_isFixedPoint_prime_pow</code>).</li>
+          </ol>
+        </div>
+
+        <p>
+          Next, using Euclid's prime divisibility lemma (<code>coprime_or_dvd_of_isPrime</code>) [1, Ch. 1; 2, Ch. 2], we classify all divisors of a product of two primes <em>p</em> &middot; <em>q</em> (<code>dvd_mul_primes</code>) and all proper divisors when <em>p</em> &lt; <em>q</em> (<code>proper_dvd_mul_primes</code>: <em>d</em> &isin; {1, <em>p</em>, <em>q</em>}), obtaining the closed-form semiprime formula and unconditional fixed-point uniqueness across all semiprimes and all multiples of 3.
+        </p>
+
+        <div class="theorem-block">
+          <p class="theorem-head">Theorem 4.2 (Semiprime Formula and Uniqueness Among Semiprimes and Multiples of 3; <code>Families.lean</code>).</p>
+          <ol>
+            <li>(<code>a_semiprime</code>) For primes <em>p</em> &lt; <em>q</em>, the proper divisors of <em>pq</em> are 1, <em>p</em>, <em>q</em>, each prime divisor having &tau; = 2, so <code>a</code>(<em>pq</em>) = 1 + 2<em>p</em> + 2<em>q</em>.</li>
+            <li>(<code>a_two_mul_odd_prime</code>, <code>a_three_mul_prime</code>) For every prime <em>p</em> &gt; 2, <code>a</code>(2<em>p</em>) = 2<em>p</em> + 5 (Krizek's second 2014 OEIS formula [13]), and for every prime <em>p</em> &gt; 3, <code>a</code>(3<em>p</em>) = 2<em>p</em> + 7.</li>
+            <li>(<code>semiprime_fixedPoint_iff</code>) For any primes <em>p</em> &le; <em>q</em>, <code>IsFixedPoint</code> (<em>pq</em>) &hArr; <em>p</em> = 3 &and; <em>q</em> = 7.</li>
+            <li>(<code>three_dvd_fixedPoint_iff_eq_21</code>) For every <em>n</em> &isin; <strong>N</strong> divisible by 3, <code>IsFixedPoint</code> <em>n</em> &hArr; <em>n</em> = 21.</li>
+          </ol>
+        </div>
+        <p class="math-proof"><em>Proof.</em> For <i>p</i>=<i>q</i>, the prime-power exclusion applies. For <i>p</i>&lt;<i>q</i>, the equation becomes (<i>p</i>-2)(<i>q</i>-2)=5, whose ordered positive factors are 1 and 5 (<code>semiprime_diophantine_eq</code>). This gives <i>p</i>=3 and <i>q</i>=7. For a multiple <i>n</i>=3<i>m</i>, the case <i>m</i>=0 fails positivity and <i>m</i>=1 gives <i>a</i>(3)=1. If <i>m</i> is composite, <code>exists_proper_divisor_of_not_isPrime</code> gives a divisor strictly between 1 and <i>m</i>, so Corollary 3.3 gives <i>a</i>(3<i>m</i>)&gt;3<i>m</i>. A prime cofactor reduces to the semiprime calculation.</p>
+
+        <div class="theorem-block">
+          <p class="theorem-head">Theorem 4.3 (Three-Prime-Factor Identities and Exclusions; <code>Families.lean</code>).</p>
+          <ol>
+            <li>(<code>p2q_near_miss_identity</code>, <code>odd_p2q_formula_ne_self</code>) For distinct primes <em>p</em> &ne; <em>q</em>, the proper divisors of <em>p</em><sup>2</sup><em>q</em> are 1, <em>p</em>, <em>p</em><sup>2</sup>, <em>q</em>, <em>pq</em>, whose &tau;-weighted sum is the polynomial 1 + 2<em>p</em> + 3<em>p</em><sup>2</sup> + 2<em>q</em> + 4<em>pq</em>. For all <em>p</em>, <em>q</em> &isin; <strong>N</strong> with <em>p</em> &ge; 5 and <em>q</em> &ge; 3,
+              <div class="math-display">
+                (<em>p</em><sup>2</sup> &minus; 4<em>p</em> &minus; 2)(<em>q</em> &minus; 3) + (1 + 2<em>p</em> + 3<em>p</em><sup>2</sup> + 2<em>q</em> + 4<em>pq</em>) = <em>p</em><sup>2</sup><em>q</em> + 7(2<em>p</em> + 1),
+              </div>
+              and whenever <em>p</em> mod 2 = 1 and <em>q</em> mod 2 = 1, 1 + 2<em>p</em> + 3<em>p</em><sup>2</sup> + 2<em>q</em> + 4<em>pq</em> is even whereas <em>p</em><sup>2</sup><em>q</em> is odd, so they are never equal.
+            </li>
+            <li>(<code>three_prime_moment_ne</code>) For all primes <em>p</em> &lt; <em>q</em> &lt; <em>r</em>, the product (2<em>p</em> + 1)(2<em>q</em> + 1)(2<em>r</em> + 1) (which equals <em>S</em>(<em>pqr</em>) by Theorem 5.1(1)) satisfies
+              <div class="math-display">
+                (2<em>p</em> + 1)(2<em>q</em> + 1)(2<em>r</em> + 1) &ne; 9&thinsp;<em>p</em>&thinsp;<em>q</em>&thinsp;<em>r</em>.
+              </div>
+            </li>
+          </ol>
+        </div>
+        <p class="math-proof"><em>Proof.</em> For <i>p</i>≥11 the ordered primes are at least 11, 13 and 17. The product of the three ratios 2+1/<i>x</i> is at most 21735/2431&lt;9 (<code>three_prime_growth_bound</code>). For <i>p</i>=2 the two sides have opposite parity. For <i>p</i>=3, divisibility forces one of the other primes to be 7, leaving 15(2<i>x</i>+1)=27<i>x</i> for the remaining prime. For <i>p</i>=5, one prime must be 11, leaving 23(2<i>x</i>+1)=45<i>x</i>. Both equations are impossible for positive <i>x</i>. For <i>p</i>=7, the factor 5 would have to divide one of the larger primes.</p>
+      </section>
+
+      <section class="paper-section" id="sec-parity">
+        <h2>5. Multiplicativity, General Parity Obstruction, and Sharpened Dominance</h2>
+        <p>
+          In <code>OeisA245211/Parity.lean</code>, we prove that &tau; and <em>S</em> are multiplicative on coprime arguments, derive the exact prime-power parity congruence, and establish two structural obstructions for general fixed points.
+        </p>
+
+        <div class="theorem-block">
+          <p class="theorem-head">Theorem 5.1 (Multiplicativity and Odd Prime-Power Parity; <code>Parity.lean</code>).</p>
+          <p>Let <em>a</em>, <em>b</em>, <em>p</em>, <em>e</em> &isin; <strong>N</strong> with gcd(<em>a</em>, <em>b</em>) = 1, 0 &lt; <em>a</em>, 0 &lt; <em>b</em>, and <em>p</em> prime.</p>
+          <ol>
+            <li>(<code>tau_mul_of_coprime</code>, <code>fullMoment_mul_of_coprime</code>) Both &tau; and the Dirichlet convolution moment <em>S</em> = <code>fullMoment</code> [1, Ch. 2; 2, Ch. 6; 12] are multiplicative on coprime arguments: &tau;(<em>ab</em>) = &tau;(<em>a</em>)&thinsp;&tau;(<em>b</em>) and <em>S</em>(<em>ab</em>) = <em>S</em>(<em>a</em>)&thinsp;<em>S</em>(<em>b</em>).</li>
+            <li>(<code>tau_prime_pow</code>, <code>fullMoment_prime_pow_succ</code>) On prime powers [2, Ch. 6; 19, Ch. 3], &tau;(<em>p</em><sup><em>e</em></sup>) = <em>e</em> + 1 and <em>S</em>(<em>p</em><sup><em>e</em>+1</sup>) = <em>S</em>(<em>p</em><sup><em>e</em></sup>) + (<em>e</em> + 2)&thinsp;<em>p</em><sup><em>e</em>+1</sup>.</li>
+            <li>(<code>fullMoment_prime_pow_mod_two</code>, <code>fullMoment_prime_pow_odd_iff</code>) When <em>p</em> is odd (<em>p</em> mod 2 = 1), <em>S</em>(<em>p</em><sup><em>e</em></sup>) mod 2 = ((<em>e</em> + 1)(<em>e</em> + 2)/2) mod 2, so <em>S</em>(<em>p</em><sup><em>e</em></sup>) is odd if and only if <em>e</em> &equiv; 0 (mod 4) or <em>e</em> &equiv; 1 (mod 4).</li>
+          </ol>
+        </div>
+
+        <div class="theorem-block">
+          <p class="theorem-head">Theorem 5.2 (General Parity Obstruction and Sharpened Dominance; <code>Parity.lean</code>).</p>
+          <p>Suppose <code>IsFixedPoint</code> <em>n</em> holds.</p>
+          <ol>
+            <li>(<code>exact_exponent_mod_four_of_isFixedPoint</code>, <code>not_isFixedPoint_of_exact_exponent_mod_four_ge_two</code>) If &tau;(<em>n</em>) is even (<code>tau</code> <em>n</em> mod 2 = 0, i.e., <em>n</em> is not a square [2, Ch. 6; 19, Ch. 3]) and <em>p</em><sup><em>e</em></sup> &parallel; <em>n</em> for a prime <em>p</em>, then <em>S</em>(<em>n</em>) = <em>n</em>(&tau;(<em>n</em>) + 1) is odd, so <em>S</em>(<em>p</em><sup><em>e</em></sup>) is odd and <em>e</em> &equiv; 0 or 1 (mod 4). Every prime-power exponent with <em>e</em> &equiv; 2, 3 (mod 4) is excluded whenever &tau;(<em>n</em>) is even.</li>
+            <li>(<code>sharpened_dominance_bound</code>, <code>exact_prime_pow_tau_lt_prime</code>) If <em>n</em> = <em>p</em><sup><em>e</em></sup><em>m</em> with <em>p</em> prime, gcd(<em>p</em><sup><em>e</em></sup>, <em>m</em>) = 1, 1 &le; <em>e</em>, and 1 &lt; <em>m</em>, then factoring <em>n</em> = <em>p</em> &middot; (<em>p</em><sup><em>e</em>&minus;1</sup><em>m</em>) with &tau;(<em>p</em><sup><em>e</em>&minus;1</sup><em>m</em>) = <em>e</em>&thinsp;&tau;(<em>m</em>) and applying Theorem 3.2 (<code>not_isFixedPoint_of_dvd_le_tau</code>) to the proper divisors 1 and <em>p</em><sup><em>e</em>&minus;1</sup><em>m</em> forces <em>e</em>&thinsp;&tau;(<em>m</em>) &lt; <em>p</em>.</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="paper-section" id="sec-omega4">
+        <h2>6. Classification by Prime-Factor Multiplicity</h2>
+        <p>
+          In <code>OeisA245211/OmegaFour.lean</code>, we define <code>omegaBig</code> <em>n</em> = &Omega;(<em>n</em>) (OEIS A001222 [10]), prove Ω(<i>pm</i>) = 1 + Ω(<i>m</i>) for prime <i>p</i> and positive <i>m</i> (<code>omegaBig_prime_mul</code>), additivity on positive factors (<code>omegaBig_mul</code>) and sorted prime-list decomposition (<code>exists_primes_of_omegaBig</code>) [1, Ch. 1; 2, Ch. 3], and close all &Omega;(<em>n</em>) &le; 4 cases.
+        </p>
+
+        <div class="theorem-block">
+          <p class="theorem-head">Theorem 6.1 (Complete &Omega;(<em>n</em>) &le; 4 Classification; <code>OmegaFour.lean</code>).</p>
+          <ol>
+            <li>(<code>not_isFixedPoint_prime_cube_mul_prime</code>, <code>not_isFixedPoint_prime_sq_mul_two_primes</code>) For distinct primes <em>p</em>, <em>q</em>, <em>r</em>, neither <em>p</em><sup>3</sup><em>q</em> (&tau; = 8, <em>e</em><sub><em>p</em></sub> = 3) nor <em>p</em><sup>2</sup><em>qr</em> (&tau; = 12, <em>e</em><sub><em>p</em></sub> = 2) is a fixed point, by Theorem 5.2(1).</li>
+            <li>(<code>p2q2_diophantine_ne</code>, <code>not_isFixedPoint_prime_sq_mul_prime_sq</code>) For all distinct primes <em>p</em> &ne; <em>q</em>, <em>p</em><sup>2</sup><em>q</em><sup>2</sup> is never a fixed point: modulo 5, the polynomial 3<em>x</em><sup>2</sup> + 2<em>x</em> + 1 never vanishes for any <em>x</em> &isin; <strong>N</strong> (<code>three_sq_add_two_mul_add_one_mod_five_ne_zero</code>), so 5 &nmid; (3<em>p</em><sup>2</sup> + 2<em>p</em> + 1)(3<em>q</em><sup>2</sup> + 2<em>q</em> + 1) whereas 5 | 10<em>p</em><sup>2</sup><em>q</em><sup>2</sup> for all <em>p</em>, <em>q</em> &isin; <strong>N</strong> (<code>p2q2_diophantine_ne</code>); moreover, for <em>p</em> &ge; 13 and <em>q</em> &ge; 17, (3<em>p</em><sup>2</sup> + 2<em>p</em> + 1)(3<em>q</em><sup>2</sup> + 2<em>q</em> + 1) &lt; 10<em>p</em><sup>2</sup><em>q</em><sup>2</sup> (<code>p2q2_growth_bound</code>).</li>
+            <li>(<code>four_prime_moment_ne</code>, <code>not_isFixedPoint_four_distinct_primes</code>) For primes 5 &le; <em>p</em> &lt; <em>q</em> &lt; <em>r</em> &lt; <em>s</em>, (2<em>p</em> + 1)(2<em>q</em> + 1)(2<em>r</em> + 1)(2<em>s</em> + 1) &ne; 17<em>pqrs</em>: for <em>p</em> &ge; 29, the growth bound <code>four_prime_growth_bound</code> holds, and each <em>p</em> &isin; {5, 7, 11, 13, 17, 19, 23} is eliminated by Cunningham-chain divisibility.</li>
+            <li>(<code>fixedPoint_eq_21_of_omegaBig_le_four</code>, <code>omegaBig_ge_five_of_isFixedPoint_ne_21</code>) Every fixed point with &Omega;(<em>n</em>) &le; 4 equals 21. Equivalently, every fixed point <em>n</em> &ne; 21 satisfies gcd(<em>n</em>, 6) = 1 and &Omega;(<em>n</em>) &ge; 5.</li>
+          </ol>
+        </div>
+
+        <div class="theorem-block">
+          <p class="theorem-head">Theorem 6.2 (&Omega;(<em>n</em>) = 5 Reduction; <code>OmegaFour.lean</code>).</p>
+          <ol>
+            <li>(<code>not_isFixedPoint_prime_four_mul_prime</code>) For distinct primes <em>p</em>, <em>q</em> &ge; 5, <em>p</em><sup>4</sup><em>q</em> is never a fixed point: Theorem 5.2(2) forces <em>p</em> &ge; 11 and <em>q</em> &ge; 7, <code>p4q_growth_bound</code> closes <em>p</em> &ge; 31, and <em>p</em> &isin; {11, 13, 17, 19, 23, 29} fails exact divisibility.</li>
+            <li>(<code>omegaFive_must_be_squarefree_ge_17</code>) Every fixed point with &Omega;(<em>n</em>) = 5 is squarefree of the form <em>n</em> = <em>pqrst</em> with primes 17 &le; <em>p</em> &lt; <em>q</em> &lt; <em>r</em> &lt; <em>s</em> &lt; <em>t</em>.</li>
+          </ol>
+        </div>
+        <p>For a squarefree fixed point with prime set P of size <i>k</i>, multiplicativity gives ∏<sub><i>x</i>∈ P</sub>(2<i>x</i>+1)=(2<sup><i>k</i></sup>+1)<i>n</i>. If <i>x</i>∈ P and a prime <i>f</i> divides 2<i>x</i>+1 but does not divide 2<sup><i>k</i></sup>+1, then <i>f</i> must also belong to P. We call this step Cunningham forced closure. A forced prime below the least member of P contradicts its minimality.</p>
+        <div class="theorem-block">
+          <p class="theorem-head">Theorem 6.3 (Five distinct primes, <code>OmegaFive.lean</code>).</p>
+        <p>A squarefree product of five primes with least prime <i>p</i>≥17 cannot be fixed. Here 2<sup>5</sup>+1=33=3·11. For <i>p</i>≥73, the ordered primes are at least 73,79,83,89,97. Since 2+1/<i>x</i> decreases with <i>x</i>, their product of ratios is strictly less than 33 (<code>five_prime_growth_bound</code>). For the 14 primes 17≤ <i>p</i>&lt;73, <code>prime_dvd_33pqrst_mem</code> forces prime divisors other than 3 and 11 into the product, and <code>prime_dvd_33pqrst_impossible</code> excludes any such divisor below <i>p</i>. For example, <i>p</i>=23 forces 47, and 2·47+1=95 forces 5&lt;23. The resulting inequality <code>five_prime_moment_ne</code> gives <code>not_isFixedPoint_five_distinct_primes</code>.</p>
+        </div>
+
+        <p>Combining this result with the repeated-prime cases gives <code>not_isFixedPoint_of_omegaBig_eq_five</code> and <code>fixedPoint_eq_21_of_omegaBig_le_five</code>. The corollary <code>omegaBig_ge_six_of_isFixedPoint_ne_21</code> gives Ω(<i>n</i>)≥6 for any other fixed point.</p>
+        <div class="theorem-block">
+          <p class="theorem-head">Theorem 6.4 (Six prime factors with repetition, <code>OmegaSix.lean</code>).</p>
+        <p>A fixed point with six prime factors would have six distinct primes. Removing its least prime <i>p</i> would leave a divisor with 32 divisors, so dominance requires <i>p</i>&gt;32 and primality gives <i>p</i>≥37 (<code>omegaSix_must_be_squarefree_ge_37</code>). Table 2 gives the proof for each exponent partition, with distinct letters denoting distinct primes.</p>
+        </div>
+
+        <div class="paper-table-wrap">
+          <table class="paper-table">
+            <caption>Table 2. The 11 exponent partitions of 6 and their exclusions in <code>OmegaSix.lean</code>.</caption>
+            <thead><tr><th scope="col">Partition</th><th scope="col">Factorization</th><th scope="col">Reason for exclusion</th></tr></thead>
+            <tbody>
+              <tr><td>(6)</td><td><i>p</i><sup>6</sup></td><td>The proper-divisor moment is 1 modulo <i>p</i>.</td></tr>
+              <tr><td>(5,1)</td><td><i>p</i><sup>5</sup><i>q</i></td><td>Growth for <i>p</i>≥79 and 17 modular checks for 11≤ <i>p</i>≤73.</td></tr>
+              <tr><td>(4,2)</td><td><i>p</i><sup>4</sup><i>q</i><sup>2</sup></td><td>S(<i>n</i>) is 2 modulo 4, while 16<i>n</i> is 0 modulo 4.</td></tr>
+              <tr><td>(4,1,1)</td><td><i>p</i><sup>4</sup>qr</td><td>Growth for <i>p</i>≥53, <i>q</i>≥29, <i>r</i>≥31, followed by finite cases outside that range.</td></tr>
+              <tr><td>(3,3)</td><td><i>p</i><sup>3</sup><i>q</i><sup>3</sup></td><td>Even τ(<i>n</i>) excludes exponent 3.</td></tr>
+              <tr><td>(3,2,1)</td><td><i>p</i><sup>3</sup><i>q</i><sup>2</sup><i>r</i></td><td>Even τ(<i>n</i>) excludes exponent 3.</td></tr>
+              <tr><td>(3,1,1,1)</td><td><i>p</i><sup>3</sup>qrs</td><td>Even τ(<i>n</i>) excludes exponent 3.</td></tr>
+              <tr><td>(2,2,2)</td><td><i>p</i><sup>2</sup><i>q</i><sup>2</sup><i>r</i><sup>2</sup></td><td>S(<i>n</i>) is 0 modulo 8, while 28<i>n</i> is 4 modulo 8.</td></tr>
+              <tr><td>(2,2,1,1)</td><td><i>p</i><sup>2</sup><i>q</i><sup>2</sup>rs</td><td>Even τ(<i>n</i>) excludes exponent 2.</td></tr>
+              <tr><td>(2,1,1,1,1)</td><td><i>p</i><sup>2</sup>qrst</td><td>Even τ(<i>n</i>) excludes exponent 2.</td></tr>
+              <tr><td>(1,1,1,1,1,1)</td><td>pqrstu</td><td>Growth for <i>p</i>≥181 and closure at the 30 primes 37≤ <i>p</i>&lt;181.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>For <i>p</i><sup>5</sup><i>q</i>, dominance gives <i>p</i>≥11 and <i>q</i>≥7. The formula <code>fullMoment_prime_pow_five</code> reduces the fixed-point equation to (13<i>p</i><sup>5</sup>-2S(<i>p</i><sup>5</sup>))<i>q</i>=S(<i>p</i><sup>5</sup>). Below the cutoff in <code>p5q_growth_bound</code>, the coefficient of <i>q</i> fails to divide the right side at each of the 17 primes. This proves <code>not_isFixedPoint_prime_five_mul_prime</code>. For <i>p</i><sup>4</sup>qr with <i>q</i>&lt;<i>r</i>, dominance gives <i>p</i>≥17, <i>q</i>≥11 and <i>r</i>≥13. The proof of <code>not_isFixedPoint_prime_four_mul_two_primes</code> combines <code>p4qr_growth_bound</code> with divisibility in S(<i>p</i><sup>4</sup>)(2<i>q</i>+1)(2<i>r</i>+1)=21<i>p</i><sup>4</sup>qr. The two congruence arguments in Table 2 give <code>not_isFixedPoint_prime_four_mul_prime_sq</code> and <code>not_isFixedPoint_three_prime_sq</code>.</p>
+        <div class="theorem-block">
+          <p class="theorem-head">Theorem 6.5 (Six distinct primes, <code>OmegaSix.lean</code>).</p>
+        <p>For six ordered primes with least prime <i>p</i>≥37, the moment equation is ∏<sub><i>x</i>∣<i>n</i>, <i>x</i> prime</sub>(2<i>x</i>+1)=65<i>n</i>, with 65=5·13. Once <i>p</i>≥181, the six primes are at least 181,191,193,197,199,211. The product of the six ratios 2+1/<i>x</i> is then strictly less than 65 (<code>six_prime_growth_bound</code>). For each of the 30 remaining least primes, <code>prime_dvd_65pqrstu_mem</code> and <code>prime_dvd_65pqrstu_impossible</code> propagate prime factors outside {5,13} to a contradiction. For example, at <i>p</i>=37, the factor 3 of 2<i>p</i>+1=75 is already smaller than 37. The theorems <code>six_prime_moment_ne</code> and <code>not_isFixedPoint_six_distinct_primes</code> exclude the squarefree case.</p>
+        </div>
+
+        <div class="theorem-block">
+          <p class="theorem-head">Corollary 6.6 (Classification through six prime factors).</p>
+        <p>The theorem <code>not_isFixedPoint_of_omegaBig_eq_six</code> excludes every positive integer with exactly six prime factors. Hence <code>fixedPoint_eq_21_of_omegaBig_le_six</code> proves that every positive fixed point with Ω(<i>n</i>)≤6 equals 21. Since <i>a</i>(21)=21, this is a classification in both directions. For any other fixed point, <code>omegaBig_ge_seven_of_isFixedPoint_ne_21</code> gives Ω(<i>n</i>)≥7 and <code>gcd_six_eq_one_of_isFixedPoint_ne_21</code> gives gcd(<i>n</i>,6)=1.</p>
+        </div>
+
+        <p>The independent Python verifier uses two searches. Its five-prime hyperbolic search bounds the first three primes using the decreasing ratio 2+1/<i>x</i>. For a triple with D=pqr, N=(2<i>p</i>+1)(2<i>q</i>+1)(2<i>r</i>+1) and A=33D-4N&gt;0, it factors 33DN to solve (As-2N)(At-2N)=33DN for the last pair. It examines 16 first primes, 340 pairs and 43,849 triples and finds zero solutions. It tests candidate primes with the first twelve prime bases of the Miller–Rabin test [6, 17, 18].</p>
+        <p>The forced-closure routine tests squarefree products for 3≤ <i>k</i>≤10. Given a candidate least prime, it repeatedly factors 2<i>x</i>+1 for each required prime <i>x</i>. It rejects the candidate if a required prime is smaller than the proposed least prime or if more than <i>k</i> distinct primes are required. For <i>k</i>=5 all 14 candidates fail. For <i>k</i>=6 the integer lower bound is 33, the first candidate prime is 37, and all 30 candidates fail. The script also checks the congruences and finite cases for repeated primes at <i>k</i>=6. The Lean classification uses its own proofs for every partition.</p>
+      </section>
+
+      <section class="paper-section" id="sec-tables">
+        <h2>7. Certified OEIS Table Milestones and Near-Miss Analysis</h2>
+        <p>
+          In <code>OeisA245211/TableCerts.lean</code>, we certify the complete 66-term OEIS table, the exact onset of both companion sequences A245213 and A245214, and bounded fixed-point uniqueness up to <em>n</em> = 150.
+        </p>
+
+        <div class="theorem-block">
+          <p class="theorem-head">Theorem 7.1 (Certified OEIS Milestones and Bounded Uniqueness; <code>TableCerts.lean</code>).</p>
+          <ol>
+            <li>(<code>map_a_range_66</code>, <code>a_1_eq</code>&ndash;<code>a_25_eq</code>, <code>a_66_eq</code>) The values <code>a</code>(1), &hellip;, <code>a</code>(66) match the 66 entries in the <code>%S</code>, <code>%T</code>, and <code>%U</code> lines of OEIS A245211 [13], subsuming the five pointwise checks <em>a</em>(1), &hellip;, <em>a</em>(5) in <code>FormalConjectures/OEIS/245211.lean</code> [4].</li>
+            <li>(<code>isInA245213_72</code>, <code>not_isInA245213_below_72</code>) For 1 &le; <em>n</em> &lt; 72, &not;<code>IsInA245213</code> <em>n</em> holds, while <code>IsInA245213</code> 72 holds (<code>a</code>(72) = 802 and 72&thinsp;&tau;(72) = 864), certifying that min(A245213) = 72 [15].</li>
+            <li>(<code>isInA245214_144</code>, <code>not_isInA245214_below_144</code>) For 1 &le; <em>n</em> &lt; 144, &not;<code>IsInA245214</code> <em>n</em> holds, while <code>IsInA245214</code> 144 holds (<code>a</code>(144) = 2226 &gt; 2160 = 144&thinsp;&tau;(144)), certifying Krizek's sign-change remark min(A245214) = 144 [13, 16].</li>
+            <li>(<code>fixedPoint_iff_eq_21_upto_150</code>) For every <em>n</em> with 1 &le; <em>n</em> &le; 150, <code>IsFixedPoint</code> <em>n</em> &hArr; <em>n</em> = 21.</li>
+          </ol>
+        </div>
+
+        <p>
+          Theorem 4.3(1) explains why <em>n</em> = 725 = 5<sup>2</sup> &middot; 29 is the closest odd composite near-miss below 1,000,000: setting <em>p</em> = 5 gives <em>p</em><sup>2</sup> &minus; 4<em>p</em> &minus; 2 = 3 and 7(2<em>p</em> + 1) = 77, so <em>a</em>(5<sup>2</sup><em>q</em>) &minus; 5<sup>2</sup><em>q</em> = 77 &minus; 3(<em>q</em> &minus; 3). Choosing <em>q</em> = 29 makes 3(<em>q</em> &minus; 3) = 78 = 77 + 1, giving <em>a</em>(725) = 724 = 725 &minus; 1 (<code>a_725_eq</code>). Similarly, for <em>n</em> = 5 &middot; 23 &middot; <em>r</em>, (2&middot;5 + 1)(2&middot;23 + 1)(2<em>r</em> + 1) = 517(2<em>r</em> + 1) = 1034<em>r</em> + 517 against 9 &middot; 115<em>r</em> = 1035<em>r</em>, so <em>a</em>(115<em>r</em>) &minus; 115<em>r</em> = 517 &minus; <em>r</em>; the prime closest to 517 is <em>r</em> = 521, yielding <em>n</em> = 59,915 = 5 &middot; 23 &middot; 521 with <em>a</em>(59,915) = 59,911 = <em>n</em> &minus; 4. Extending the Python sieve to <em>N</em> = 1,000,000 adds two odd composite near-misses with |<em>a</em>(<em>n</em>) &minus; <em>n</em>| &le; 15, namely <em>n</em> = 415,207 = 13 &middot; 19 &middot; 41<sup>2</sup> and <em>n</em> = 735,319 = 13<sup>2</sup> &middot; 19 &middot; 229 (both with <em>a</em>(<em>n</em>) &minus; <em>n</em> = &minus;13, and both excluded by Theorem 5.2(1)). Table 3 lists all odd composite integers <em>n</em> &le; 1,000,000 with 0 &lt; |<em>a</em>(<em>n</em>) &minus; <em>n</em>| &le; 15 found by <code>solver/a245211_search.py</code>.
+        </p>
+
+        <div class="paper-table-wrap">
+          <table class="paper-table">
+            <caption>Table 3. All odd composite integers 1 &le; <em>n</em> &le; 1,000,000 satisfying 0 &lt; |<em>a</em>(<em>n</em>) &minus; <em>n</em>| &le; 15.</caption>
+            <thead>
+              <tr>
+                <th scope="col" class="num"><em>n</em></th>
+                <th scope="col">Factorization</th>
+                <th scope="col" class="num">&Omega;(<em>n</em>)</th>
+                <th scope="col" class="num">&tau;(<em>n</em>)</th>
+                <th scope="col" class="num"><em>a</em>(<em>n</em>)</th>
+                <th scope="col" class="num"><em>a</em>(<em>n</em>) &minus; <em>n</em></th>
+                <th scope="col">Governing Identity / Lean Certificate</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="num">9</td>
+                <td>3<sup>2</sup></td>
+                <td class="num">2</td>
+                <td class="num">3</td>
+                <td class="num">7</td>
+                <td class="num">&minus;2</td>
+                <td><code>a_9_eq</code>, <code>not_isFixedPoint_9</code></td>
+              </tr>
+              <tr>
+                <td class="num">15</td>
+                <td>3 &middot; 5</td>
+                <td class="num">2</td>
+                <td class="num">4</td>
+                <td class="num">17</td>
+                <td class="num">+2</td>
+                <td><code>a_15_eq</code>, <code>not_isFixedPoint_15</code></td>
+              </tr>
+              <tr>
+                <td class="num">25</td>
+                <td>5<sup>2</sup></td>
+                <td class="num">2</td>
+                <td class="num">3</td>
+                <td class="num">11</td>
+                <td class="num">&minus;14</td>
+                <td><code>a_25_eq</code>, <code>not_isFixedPoint_25</code></td>
+              </tr>
+              <tr>
+                <td class="num">27</td>
+                <td>3<sup>3</sup></td>
+                <td class="num">3</td>
+                <td class="num">4</td>
+                <td class="num">34</td>
+                <td class="num">+7</td>
+                <td><code>ne_self_of_prime_pow</code></td>
+              </tr>
+              <tr>
+                <td class="num">33</td>
+                <td>3 &middot; 11</td>
+                <td class="num">2</td>
+                <td class="num">4</td>
+                <td class="num">29</td>
+                <td class="num">&minus;4</td>
+                <td><code>a_three_mul_prime</code>, <code>not_isFixedPoint_33</code></td>
+              </tr>
+              <tr>
+                <td class="num">35</td>
+                <td>5 &middot; 7</td>
+                <td class="num">2</td>
+                <td class="num">4</td>
+                <td class="num">25</td>
+                <td class="num">&minus;10</td>
+                <td><code>a_semiprime</code></td>
+              </tr>
+              <tr>
+                <td class="num">39</td>
+                <td>3 &middot; 13</td>
+                <td class="num">2</td>
+                <td class="num">4</td>
+                <td class="num">33</td>
+                <td class="num">&minus;6</td>
+                <td><code>a_three_mul_prime</code></td>
+              </tr>
+              <tr>
+                <td class="num">51</td>
+                <td>3 &middot; 17</td>
+                <td class="num">2</td>
+                <td class="num">4</td>
+                <td class="num">41</td>
+                <td class="num">&minus;10</td>
+                <td><code>a_three_mul_prime</code></td>
+              </tr>
+              <tr>
+                <td class="num">57</td>
+                <td>3 &middot; 19</td>
+                <td class="num">2</td>
+                <td class="num">4</td>
+                <td class="num">45</td>
+                <td class="num">&minus;12</td>
+                <td><code>a_three_mul_prime</code></td>
+              </tr>
+              <tr>
+                <td class="num">605</td>
+                <td>5 &middot; 11<sup>2</sup></td>
+                <td class="num">3</td>
+                <td class="num">6</td>
+                <td class="num">616</td>
+                <td class="num">+11</td>
+                <td><code>odd_p2q_formula_ne_self</code></td>
+              </tr>
+              <tr>
+                <td class="num">725</td>
+                <td>5<sup>2</sup> &middot; 29</td>
+                <td class="num">3</td>
+                <td class="num">6</td>
+                <td class="num">724</td>
+                <td class="num">&minus;1</td>
+                <td><code>p2q_near_miss_identity</code>, <code>a_725_eq</code></td>
+              </tr>
+              <tr>
+                <td class="num">775</td>
+                <td>5<sup>2</sup> &middot; 31</td>
+                <td class="num">3</td>
+                <td class="num">6</td>
+                <td class="num">768</td>
+                <td class="num">&minus;7</td>
+                <td><code>p2q_near_miss_identity</code></td>
+              </tr>
+              <tr>
+                <td class="num">8701</td>
+                <td>7 &middot; 11 &middot; 113</td>
+                <td class="num">3</td>
+                <td class="num">8</td>
+                <td class="num">8707</td>
+                <td class="num">+6</td>
+                <td><code>three_prime_moment_ne</code></td>
+              </tr>
+              <tr>
+                <td class="num">57845</td>
+                <td>5 &middot; 23 &middot; 503</td>
+                <td class="num">3</td>
+                <td class="num">8</td>
+                <td class="num">57859</td>
+                <td class="num">+14</td>
+                <td><em>a</em>(115<em>r</em>) &minus; 115<em>r</em> = 517 &minus; <em>r</em></td>
+              </tr>
+              <tr>
+                <td class="num">58535</td>
+                <td>5 &middot; 23 &middot; 509</td>
+                <td class="num">3</td>
+                <td class="num">8</td>
+                <td class="num">58543</td>
+                <td class="num">+8</td>
+                <td><em>a</em>(115<em>r</em>) &minus; 115<em>r</em> = 517 &minus; <em>r</em></td>
+              </tr>
+              <tr>
+                <td class="num">59915</td>
+                <td>5 &middot; 23 &middot; 521</td>
+                <td class="num">3</td>
+                <td class="num">8</td>
+                <td class="num">59911</td>
+                <td class="num">&minus;4</td>
+                <td><em>a</em>(115<em>r</em>) &minus; 115<em>r</em> = 517 &minus; <em>r</em></td>
+              </tr>
+              <tr>
+                <td class="num">60145</td>
+                <td>5 &middot; 23 &middot; 523</td>
+                <td class="num">3</td>
+                <td class="num">8</td>
+                <td class="num">60139</td>
+                <td class="num">&minus;6</td>
+                <td><em>a</em>(115<em>r</em>) &minus; 115<em>r</em> = 517 &minus; <em>r</em></td>
+              </tr>
+              <tr>
+                <td class="num">415207</td>
+                <td>13 &middot; 19 &middot; 41<sup>2</sup></td>
+                <td class="num">4</td>
+                <td class="num">12</td>
+                <td class="num">415194</td>
+                <td class="num">&minus;13</td>
+                <td><code>not_isFixedPoint_prime_sq_mul_two_primes</code></td>
+              </tr>
+              <tr>
+                <td class="num">735319</td>
+                <td>13<sup>2</sup> &middot; 19 &middot; 229</td>
+                <td class="num">4</td>
+                <td class="num">12</td>
+                <td class="num">735306</td>
+                <td class="num">&minus;13</td>
+                <td><code>not_isFixedPoint_prime_sq_mul_two_primes</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="paper-section" id="sec-audit">
+        <h2>8. Verification Audit and Axiom Footprint</h2>
+        <p>We ran <code>lake</code> with the toolchain Lean 4.35.0 [3]. The project imports eight modules and has no external Lean dependencies.</p>
+        <pre><code>$ lake clean &amp;&amp; lake build
+Build completed successfully (11 jobs).</code></pre>
+        <p>A source scan of the A245211 package found zero occurrences of <code>sorry</code>, <code>axiom</code>, <code>native_decide</code>, <code>ofReduceBool</code>, <code>trustCompiler</code>, <code>unsafe</code> or <code>set_option</code>. The independent verifier reproduced the first 66 OEIS terms and found 21 as the only fixed point through one million. Supplying Andersen's <code>b245211.txt</code> from OEIS [13] enables a further comparison of the first 10,000 values.</p>
+        <p>Table 4 counts public theorems by the exact dependency set reported by Lean's <code>#print axioms</code> command. The column symbols P, Q and C denote <code>propext</code>, <code>Quot.sound</code> and <code>Classical.choice</code>, respectively.</p>
+        <div class="paper-table-wrap">
+          <table class="paper-table">
+            <caption>Table 4. Axiom footprint of public theorems by module and exact dependency set.</caption>
+            <thead><tr><th scope="col">Module</th><th scope="col">None</th><th scope="col">P</th><th scope="col">Q</th><th scope="col">P,Q</th><th scope="col">P,C,Q</th><th scope="col">Total</th></tr></thead>
+            <tbody>
+              <tr><td><code>Basic</code></td><td>19</td><td>1</td><td>0</td><td>23</td><td>6</td><td>49</td></tr>
+              <tr><td><code>Dominance</code></td><td>0</td><td>0</td><td>0</td><td>19</td><td>0</td><td>19</td></tr>
+              <tr><td><code>Families</code></td><td>0</td><td>1</td><td>0</td><td>34</td><td>6</td><td>41</td></tr>
+              <tr><td><code>Parity</code></td><td>2</td><td>2</td><td>0</td><td>9</td><td>19</td><td>32</td></tr>
+              <tr><td><code>OmegaFour</code></td><td>0</td><td>0</td><td>0</td><td>10</td><td>25</td><td>35</td></tr>
+              <tr><td><code>OmegaFive</code></td><td>0</td><td>0</td><td>0</td><td>1</td><td>7</td><td>8</td></tr>
+              <tr><td><code>OmegaSix</code></td><td>0</td><td>0</td><td>0</td><td>0</td><td>16</td><td>16</td></tr>
+              <tr><td><code>TableCerts</code></td><td>41</td><td>0</td><td>0</td><td>2</td><td>0</td><td>43</td></tr>
+              <tr><td>Total</td><td>62</td><td>4</td><td>0</td><td>98</td><td>79</td><td>243</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Author Contributions and AI Disclosure</h3>
+        <p>Mar Allen P. Sugui developed the Lean formalization and Python verifier with assistance from Gemini 4 Argon and Gemini 4 Hydrogen. GPT-6.2 Astra and GPT-6.1 Terra assisted with the v1.1.0 manuscript revision, comparison of the two editions and release verification. The Lean kernel checks the five- and six-factor classifications directly. Readers can reproduce the independent numerical checks with the Python script in the release archive.</p>
+      </section>
+
+      <section class="paper-section" id="references">
+        <h2>References</h2>
+        <ol>
+          <li>T. M. Apostol, <em>Introduction to Analytic Number Theory</em>, Undergraduate Texts in Mathematics, Springer-Verlag, New York, 1976.</li>
+          <li>D. M. Burton, <em>Elementary Number Theory</em>, Allyn and Bacon, Boston, 1976.</li>
+          <li>L. de Moura and S. Ullrich, <em>The Lean 4 theorem prover and programming language</em>, in Automated Deduction &ndash; CADE 28 (A. Platzer and G. Sutcliffe, eds.), Lecture Notes in Comput. Sci. <strong>12699</strong>, Springer, Cham, 2021, pp. 625&ndash;635.</li>
+          <li>Formal Conjectures Contributors (Google DeepMind), <em>Formal Conjectures: A collection of formalized open conjectures in Lean 4</em>, <a href="https://github.com/google-deepmind/formal-conjectures/blob/2207c54d0dbe960de591d280f997b195bf3f6e28/FormalConjectures/OEIS/245211.lean">OEIS problem 245211 at revision <code>2207c54</code></a> (checked November 22, 2026).</li>
+          <li>M. R. Gabdullin, V. V. Iudelevich, and F. Luca, <em>Numbers of the form k f(k)</em>, Int. J. Number Theory <strong>19</strong> (2023), no. 5, 1191&ndash;1204.</li>
+          <li>G. L. Miller, <em>Riemann's hypothesis and tests for primality</em>, J. Comput. System Sci. <strong>13</strong> (1976), no. 3, 300&ndash;317.</li>
+          <li>P. Noppakaew and P. Pongsriiam, <em>Product of some polynomials and arithmetic functions</em>, J. Integer Seq. <strong>26</strong> (2023), Article 23.9.1.</li>
+          <li>OEIS Foundation Inc., <em>The On-Line Encyclopedia of Integer Sequences</em>, Entry <a href="https://oeis.org/A000005">A000005</a>: <em>d</em>(<em>n</em>) (also called &tau;(<em>n</em>) or &sigma;<sub>0</sub>(<em>n</em>)), the number of divisors of <em>n</em>, authored by N. J. A. Sloane (checked November 22, 2026).</li>
+          <li>OEIS Foundation Inc., <em>The On-Line Encyclopedia of Integer Sequences</em>, Entry <a href="https://oeis.org/A000203">A000203</a>: <em>a</em>(<em>n</em>) = &sigma;(<em>n</em>), the sum of the divisors of <em>n</em>, authored by N. J. A. Sloane (checked November 22, 2026).</li>
+          <li>OEIS Foundation Inc., <em>The On-Line Encyclopedia of Integer Sequences</em>, Entry <a href="https://oeis.org/A001222">A001222</a>: Number of prime divisors of <em>n</em> counted with multiplicity (&Omega;(<em>n</em>)), authored by N. J. A. Sloane (checked November 22, 2026).</li>
+          <li>OEIS Foundation Inc., <em>The On-Line Encyclopedia of Integer Sequences</em>, Entry <a href="https://oeis.org/A038040">A038040</a>: <em>a</em>(<em>n</em>) = <em>n</em> &middot; <em>d</em>(<em>n</em>), where <em>d</em>(<em>n</em>) is the number of divisors of <em>n</em> (checked November 22, 2026).</li>
+          <li>OEIS Foundation Inc., <em>The On-Line Encyclopedia of Integer Sequences</em>, Entry <a href="https://oeis.org/A060640">A060640</a>: <em>a</em>(<em>n</em>) = &sum;<sub><em>d</em> | <em>n</em></sub> <em>d</em> &middot; &tau;(<em>d</em>) (checked November 22, 2026).</li>
+          <li>OEIS Foundation Inc., <em>The On-Line Encyclopedia of Integer Sequences</em>, Entry <a href="https://oeis.org/A245211">A245211</a>: <em>a</em>(<em>n</em>) = &sum;<sub><em>d</em> &lt; <em>n</em>, <em>d</em> | <em>n</em></sub> <em>d</em> &middot; &tau;(<em>d</em>), authored by J. Krizek (July 23, 2014), including <a href="https://oeis.org/A245211/b245211.txt">b245211.txt</a> (J. K. Andersen) (checked November 22, 2026).</li>
+          <li>OEIS Foundation Inc., <em>The On-Line Encyclopedia of Integer Sequences</em>, Entry <a href="https://oeis.org/A245212">A245212</a>: <em>a</em>(<em>n</em>) = <em>n</em> &middot; &tau;(<em>n</em>) &minus; &sum;<sub><em>d</em> &lt; <em>n</em>, <em>d</em> | <em>n</em></sub> <em>d</em> &middot; &tau;(<em>d</em>), authored by J. Krizek (July 23, 2014) (checked November 22, 2026).</li>
+          <li>OEIS Foundation Inc., <em>The On-Line Encyclopedia of Integer Sequences</em>, Entry <a href="https://oeis.org/A245213">A245213</a>: Numbers <em>n</em> such that A245212(<em>n</em>) &lt; <em>n</em>, authored by J. Krizek (July 23, 2014) (checked November 22, 2026).</li>
+          <li>OEIS Foundation Inc., <em>The On-Line Encyclopedia of Integer Sequences</em>, Entry <a href="https://oeis.org/A245214">A245214</a>: Numbers <em>n</em> such that A245212(<em>n</em>) &lt; 0, authored by J. Krizek (July 23, 2014) (checked November 22, 2026).</li>
+          <li>M. O. Rabin, <em>Probabilistic algorithm for testing primality</em>, J. Number Theory <strong>12</strong> (1980), no. 1, 128&ndash;138.</li>
+          <li>J. P. Sorenson and J. Webster, <em>Strong pseudoprimes to twelve prime bases</em>, Math. Comp. <strong>86</strong> (2017), no. 304, 985&ndash;1003.</li>
+          <li>J. J. Tattersall, <em>Elementary Number Theory in Nine Chapters</em>, Cambridge Univ. Press, Cambridge, 1999.</li>
+        </ol>
+      </section>
+    </main>
+
+  </div>
+
+  <script>
+    (function () {
+      var buttons = document.querySelectorAll('[data-set-face]');
+      buttons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var face = btn.getAttribute('data-set-face');
+          document.documentElement.setAttribute('data-face', face);
+          buttons.forEach(function (b) {
+            b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+          });
+        });
+      });
+      var printBtn = document.getElementById('btn-print');
+      if (printBtn) {
+        printBtn.addEventListener('click', function () {
+          window.print();
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

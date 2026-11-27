@@ -1,0 +1,6 @@
+name = "oeis-a245211"
+version = "0.1.0"
+defaultTargets = ["OeisA245211"]
+
+[[lean_lib]]
+name = "OeisA245211"
