@@ -23,7 +23,68 @@ theorem inducedDeletionCount_eq (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
     inducedDeletionCount G v = G.edgeFinset.card - G.degree v := by
   rw [inducedDeletionCount, SimpleGraph.card_edgeFinset_induce_compl_singleton,
     SimpleGraph.card_edgeFinset_deleteIncidenceSet]
+  rfl
 
+
+/-- Summing the actual induced deletion sizes counts every original edge 40 times. -/
+theorem sum_inducedDeletionCount (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj] :
+    (∑ v : Fin 42, inducedDeletionCount G v) = 40 * G.edgeFinset.card := by
+  classical
+  have hle : ∀ v ∈ (Finset.univ : Finset (Fin 42)), G.degree v ≤ G.edgeFinset.card := by
+    intro v hv
+    exact SimpleGraph.degree_le_card_edgeFinset G v
+  calc
+    (∑ v : Fin 42, inducedDeletionCount G v) =
+        ∑ v : Fin 42, (G.edgeFinset.card - G.degree v) := by
+      apply Finset.sum_congr rfl
+      intro v hv
+      exact inducedDeletionCount_eq G v
+    _ = (∑ _v : Fin 42, G.edgeFinset.card) - ∑ v : Fin 42, G.degree v := by
+      rw [Finset.sum_tsub_distrib Finset.univ hle]
+    _ = 40 * G.edgeFinset.card := by
+      rw [G.sum_degrees_eq_twice_card_edges]
+      simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin]
+      omega
+
+/-- The actual induced 41-vertex bound implies the 42-vertex edge bound. -/
+theorem simpleGraph_edge_count_le_138 (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    (h41 : ∀ v, inducedDeletionCount G v ≤ 132) : G.edgeFinset.card ≤ 138 := by
+  have hsum : (∑ v : Fin 42, inducedDeletionCount G v) ≤ 42 * 132 := by
+    calc
+      (∑ v : Fin 42, inducedDeletionCount G v) ≤ ∑ _v : Fin 42, 132 :=
+        Finset.sum_le_sum fun v _ => h41 v
+      _ = 42 * 132 := by simp
+  rw [sum_inducedDeletionCount] at hsum
+  omega
+
+/-- If the edge count is 138, some induced deletion is an extremal 41-vertex graph,
+and the deleted vertex has degree six. -/
+theorem simpleGraph_extremal_vertex_degree_six (G : SimpleGraph (Fin 42))
+    [DecidableRel G.Adj] (h41 : ∀ v, inducedDeletionCount G v ≤ 132)
+    (he : G.edgeFinset.card = 138) :
+    ∃ v : Fin 42, G.degree v = 6 ∧ inducedDeletionCount G v = 132 := by
+  have hsum := sum_inducedDeletionCount G
+  have hexist : ∃ v : Fin 42, inducedDeletionCount G v = 132 := by
+    by_contra hn
+    have hlt : ∀ v : Fin 42, inducedDeletionCount G v ≤ 131 := by
+      intro v
+      have hv := h41 v
+      by_contra hnot
+      have heq : inducedDeletionCount G v = 132 := by omega
+      exact hn ⟨v, heq⟩
+    have hsmall : (∑ v : Fin 42, inducedDeletionCount G v) ≤ 42 * 131 := by
+      calc
+        (∑ v : Fin 42, inducedDeletionCount G v) ≤ ∑ _v : Fin 42, 131 :=
+          Finset.sum_le_sum fun v _ => hlt v
+        _ = 42 * 131 := by simp
+    rw [hsum, he] at hsmall
+    omega
+  obtain ⟨v, hv⟩ := hexist
+  refine ⟨v, ?_, hv⟩
+  rw [inducedDeletionCount_eq] at hv
+  have hdeg : G.degree v ≤ G.edgeFinset.card := by
+    exact SimpleGraph.degree_le_card_edgeFinset G v
+  omega
 
 /-- The edge-counting consequence of the 41-vertex extremal bound. `deletionCount v`
 records the edges after deleting `v`; `hcount` is the double-counting identity. -/
@@ -62,6 +123,8 @@ theorem extremal_vertex_degree_six
   rw [hcount] at hsum
   omega
 
+#print axioms simpleGraph_edge_count_le_138
+#print axioms simpleGraph_extremal_vertex_degree_six
 #print axioms edge_count_le_138
 #print axioms extremal_vertex_degree_six
 
