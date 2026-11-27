@@ -21,6 +21,7 @@ private lemma subset_of_card_eq_two_of_symmDiff_le_one {s t : Finset V}
   intro x hx
   by_contra hxt
   have hxs : x ∈ s \ t := Finset.mem_sdiff.mpr ⟨hx, hxt⟩
+  have hxs' := Finset.mem_sdiff.mp hxs
   by_cases hts : t ⊆ s
   · have hxt' : x ∉ t := hxt
     have hxnot : x ∉ t := hxt'
@@ -34,10 +35,10 @@ private lemma subset_of_card_eq_two_of_symmDiff_le_one {s t : Finset V}
     have hxy : x ≠ y := by
       intro heq
       subst y
-      exact hys hxs.1
+      exact hys hxs'.1
     have hxy' : y ∉ s \ t := by
       intro hy
-      exact hys hy.1
+      exact hys (Finset.mem_sdiff.mp hy).1
     have hpair : ({x, y} : Finset V) ⊆ (s \ t) ∪ (t \ s) := by
       intro z hz
       simp only [Finset.mem_insert, Finset.mem_singleton] at hz
@@ -58,14 +59,14 @@ private lemma eq_of_card_eq_one_of_symmDiff_le_one {s t : Finset V}
     by_contra hxt
     have hxs : x ∈ s \ t := Finset.mem_sdiff.mpr ⟨hx, hxt⟩
     by_cases hts : t ⊆ s
-    · have hst : s = t := Finset.eq_of_subset_of_card_le hts (by omega)
+    · have hst : t = s := Finset.eq_of_subset_of_card_le hts (by omega)
       exact hxt (hst ▸ hx)
     · obtain ⟨y, hyt, hys⟩ := Finset.not_subset.mp hts
       have hysdiff : y ∈ t \ s := Finset.mem_sdiff.mpr ⟨hyt, hys⟩
       have hxy : x ≠ y := by
         intro heq
         subst y
-        exact hys hxs.1
+        exact hys (Finset.mem_sdiff.mp hxs).1
       have hpair : ({x, y} : Finset V) ⊆ (s \ t) ∪ (t \ s) := by
         intro z hz
         simp only [Finset.mem_insert, Finset.mem_singleton] at hz
@@ -79,14 +80,14 @@ private lemma eq_of_card_eq_one_of_symmDiff_le_one {s t : Finset V}
     by_contra hxt
     have hxt' : x ∈ t \ s := Finset.mem_sdiff.mpr ⟨hx, hxt⟩
     by_cases hst : s ⊆ t
-    · have hts : t = s := Finset.eq_of_subset_of_card_le hst (by omega)
+    · have hts : s = t := Finset.eq_of_subset_of_card_le hst (by omega)
       exact hxt (hts ▸ hx)
     · obtain ⟨y, hys, hyt⟩ := Finset.not_subset.mp hst
       have hysdiff : y ∈ s \ t := Finset.mem_sdiff.mpr ⟨hys, hyt⟩
       have hxy : x ≠ y := by
         intro heq
         subst y
-        exact hyt hxt'.1
+        exact hyt (Finset.mem_sdiff.mp hxt').1
       have hpair : ({x, y} : Finset V) ⊆ (s \ t) ∪ (t \ s) := by
         intro z hz
         simp only [Finset.mem_insert, Finset.mem_singleton] at hz
@@ -116,7 +117,7 @@ theorem independent_card_le_two_of_row_bounds
     have hI : I ⊆ row G I c₀ := by
       intro i hi
       obtain ⟨c, hc, hci⟩ := hcover i hi
-      exact hsub c hc (Finset.mem_filter.mpr ⟨hi, hci.symm⟩)
+      exact hsub c hc (Finset.mem_filter.mpr ⟨hi, hci⟩)
     exact (Finset.card_le_card hI).trans (by omega)
   · have hsmall : ∀ c ∈ C, (row G I c).card ≤ 1 := by
       intro c hc
@@ -129,27 +130,26 @@ theorem independent_card_le_two_of_row_bounds
     · obtain ⟨i, hi⟩ := Finset.nonempty_iff_ne_empty.mpr hempty
       obtain ⟨c₀, hc₀, hci₀⟩ := hcover i hi
       have hc₀row : (row G I c₀).card = 1 := by
-        have hmem : i ∈ row G I c₀ := Finset.mem_filter.mpr ⟨hi, hci₀.symm⟩
+        have hmem : i ∈ row G I c₀ := Finset.mem_filter.mpr ⟨hi, hci₀⟩
         have : 0 < (row G I c₀).card := Finset.card_pos.mpr ⟨i, hmem⟩
+        have := hsmall c₀ hc₀
         omega
-      have hsame : ∀ c ∈ C, row G I c = row G I c₀ := by
+      have hsame : ∀ c ∈ C, (row G I c).Nonempty → row G I c = row G I c₀ := by
         intro c hc
+        intro hnonempty
         by_cases hcc : c = c₀
         · simpa [hcc]
-        · by_cases hnon : (row G I c).card = 0
-          · have hzero : row G I c = ∅ := Finset.card_eq_zero.mp hnon
-            have hdiff' := hdiff c hc c₀ hc₀ hcc
-            rw [hzero] at hdiff'
-            simp [rowDiff, hzero] at hdiff'
+        · have hone : (row G I c).card = 1 := by
+            have hpos : 0 < (row G I c).card := Finset.card_pos.mpr hnonempty
             omega
-          · have hone : (row G I c).card = 1 := by omega
-            exact eq_of_card_eq_one_of_symmDiff_le_one hone hc₀row (by
-              simpa [rowDiff, hcc, Finset.union_comm] using hdiff c hc c₀ hc₀ hcc)
+          exact eq_of_card_eq_one_of_symmDiff_le_one hone hc₀row (by
+            simpa [rowDiff, hcc, Finset.union_comm] using hdiff c hc c₀ hc₀ hcc)
       have hI : I ⊆ row G I c₀ := by
         intro j hj
         obtain ⟨c, hc, hcj⟩ := hcover j hj
-        rw [← hsame c hc]
-        exact Finset.mem_filter.mpr ⟨hj, hcj.symm⟩
+        have hmem : j ∈ row G I c := Finset.mem_filter.mpr ⟨hj, hcj⟩
+        rw [hsame c hc ⟨j, hmem⟩]
+        exact hmem
       exact (Finset.card_le_card hI).trans (by omega)
 
 end SplitGraphPath

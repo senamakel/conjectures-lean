@@ -47,6 +47,9 @@ theorem sigma_overlap_compatible_only_at_5_or_7 (shift : Nat)
 theorem sigma_overlap_compatible_5 : overlapCompatible sigmaList 5 = true := by decide
 theorem sigma_overlap_compatible_7 : overlapCompatible sigmaList 7 = true := by decide
 
+theorem sigmaList_get (i : Fin 8) : sigmaList[i.val]! = (sigma i).val := by
+  fin_cases i <;> rfl
+
 /-- The adjacent transposition of the fourth and sixth positions. -/
 def windowSwap (i : Fin 8) : Fin 8 :=
   if i = 3 then 5 else if i = 5 then 3 else i
