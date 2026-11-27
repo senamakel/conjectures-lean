@@ -1,0 +1,776 @@
+import Mathlib
+
+/-! Exact finite covers for normalized pairs with smaller reduced component three. -/
+
+namespace CrystalSharedThree
+
+theorem largeComponent_dvd (a b : ℕ)
+    (h : (a+1)*(b+1) ∣ (a+b)^2) : (b : ℤ)+1 ∣ ((a : ℤ)-1)^2 := by
+  have hs : b+1 ∣ (a+b)^2 := (dvd_mul_left (b+1) (a+1)).trans h
+  have hs' : (b : ℤ)+1 ∣ ((a : ℤ)+b)^2 := by exact_mod_cast hs
+  have hrewrite : ((a : ℤ)-1)^2 =
+      ((a : ℤ)+b)^2 - ((b : ℤ)+1)*(2*(a : ℤ)+b-1) := by ring
+  rw [hrewrite]
+  exact dvd_sub hs' (dvd_mul_right _ _)
+
+theorem normalized_bounds {g x y z : ℕ}
+    (hg : 1 < g) (hx : 0 < x) (horder : g*y ≤ x*z)
+    (hdiv : (g*x+1)*(y*z+1) ∣ (g*x+y*z)^2) :
+    y*z ≤ g*x*(g*x-2) ∧ y^2 ≤ x^2*(g*x-2) := by
+  have hgx : 2 ≤ g*x := by
+    have := Nat.mul_le_mul_left g (show 1 ≤ x by omega)
+    omega
+  obtain ⟨k,hk⟩ := largeComponent_dvd (g*x) (y*z) hdiv
+  push_cast at hk
+  have hdpos : (0 : ℤ) < (y : ℤ)*z+1 := by positivity
+  have hnpos : (0 : ℤ) < (((g : ℤ)*x)-1)^2 := by
+    have hgx' : (2 : ℤ) ≤ (g : ℤ)*x := by exact_mod_cast hgx
+    exact pow_pos (by omega) _
+  have hkpos : 0 < k := by
+    by_contra he
+    have hm := mul_nonpos_of_nonneg_of_nonpos hdpos.le (le_of_not_gt he)
+    rw [← hk] at hm
+    exact hnpos.not_ge hm
+  have hle : (y : ℤ)*z+1 ≤ (((g : ℤ)*x)-1)^2 := by
+    rw [hk]
+    simpa only [mul_one] using
+      (mul_le_mul_of_nonneg_left (show (1 : ℤ) ≤ k by omega) hdpos.le)
+  have hu : y*z ≤ g*x*(g*x-2) := by
+    have hcast : ((g*x-2 : ℕ) : ℤ) = (g : ℤ)*x-2 := by
+      rw [Nat.cast_sub hgx]
+      push_cast
+      rfl
+    exact_mod_cast (show (y : ℤ)*z ≤ ((g : ℤ)*x)*((g*x-2 : ℕ) : ℤ) by
+      rw [hcast]
+      linarith only [hle,
+        show ((g : ℤ)*x-1)^2-1 = ((g : ℤ)*x)*((g : ℤ)*x-2) by ring])
+  refine ⟨hu, ?_⟩
+  have ht : g*y^2 ≤ g*(x^2*(g*x-2)) := by
+    calc
+      g*y^2 = (g*y)*y := by ring
+      _ ≤ (x*z)*y := Nat.mul_le_mul_right y horder
+      _ = x*(y*z) := by ring
+      _ ≤ x*(g*x*(g*x-2)) := Nat.mul_le_mul_left x hu
+      _ = g*(x^2*(g*x-2)) := by ring
+  exact Nat.le_of_mul_le_mul_left ht (by omega)
+
+theorem one_component_bounds {g y z : ℕ}
+    (hg : 1 < g) (horder : g*y ≤ z)
+    (hdiv : (g+1)*(y*z+1) ∣ (g+y*z)^2) :
+    y*z ≤ g*(g-2) ∧ y^2+2 ≤ g := by
+  obtain ⟨hz,hy⟩ := normalized_bounds hg (show 0 < 1 by decide)
+    (by simpa using horder) (by simpa using hdiv)
+  simp at hz hy
+  exact ⟨hz, by omega⟩
+
+theorem difference_bounds {g x y z r s : ℤ} (hg : 2 ≤ g)
+    (hx : 1 ≤ x) (hxy : x < y) (ho : g*y ≤ x*z)
+    (hr : 0 < r)
+    (hp : (y*z+1)*r = (g*x-1)^2)
+    (hq : (x*z+1)*s = (g*y-1)^2) :
+    0 < x^3*s-y^3*r ∧ x^3*s-y^3*r < 2*x^2*(y-x) := by
+  have hy : 1 ≤ y := by omega
+  have hgz : 0 < g*y := by positivity
+  have hz : 0 < z := by
+    by_contra! hn
+    exact hgz.not_ge (ho.trans (mul_nonpos_of_nonneg_of_nonpos (by omega) hn))
+  have hrBound : y^2*r < g*x^3 := by
+    have h₁ : (g*y)*y*r ≤ (x*z)*y*r :=
+      mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right ho (by omega)) hr.le
+    have h₂ : ((x : ℤ)*(g*x-1)^2) < g*(g*x^3) := by
+      have hgx : 2 ≤ g*x := by nlinarith [mul_nonneg (show 0 ≤ g-2 by omega) (show 0 ≤ x-1 by omega)]
+      have hsq : (g*x-1)^2 < (g*x)^2 := by nlinarith only [hgx]
+      calc
+        x*(g*x-1)^2 < x*(g*x)^2 := mul_lt_mul_of_pos_left hsq (by omega)
+        _ = g*(g*x^3) := by ring
+    have h₃ : (x*z)*y*r ≤ x*(g*x-1)^2 := by
+      calc
+        (x*z)*y*r = x*(y*z*r) := by ring
+        _ ≤ x*((y*z+1)*r) :=
+          mul_le_mul_of_nonneg_left (by nlinarith only [hr]) (by omega)
+        _ = x*(g*x-1)^2 := by rw [hp]
+    have hm : g*(y^2*r) < g*(g*x^3) := by
+      calc
+        g*(y^2*r) = (g*y)*y*r := by ring
+        _ ≤ (x*z)*y*r := h₁
+        _ ≤ x*(g*x-1)^2 := h₃
+        _ < g*(g*x^3) := h₂
+    exact lt_of_mul_lt_mul_left hm (by omega)
+  have id : (x*z+1)*(x^3*s-y^3*r) =
+      (y-x)*(2*g*x^2*y-x^2-x*y-y^2*r) := by
+    linear_combination x^3*hq-y^2*x*hp
+  have hCore : 0 < 2*g*x^2*y-x^2-x*y-y^2*r := by
+    have hMid : x^2+x*y ≤ g*x^2*y := by
+      have hxx : x ≤ x*x := by nlinarith [mul_nonneg (show 0 ≤ x by omega) (show 0 ≤ x-1 by omega)]
+      have hyy : x ≤ y := by omega
+      have h₁ := mul_le_mul_of_nonneg_left hyy (show 0 ≤ x by omega)
+      have h₂ := mul_le_mul_of_nonneg_right hxx (show 0 ≤ y by omega)
+      have h₃ : 2*(x*x*y) ≤ g*(x*x*y) :=
+        mul_le_mul_of_nonneg_right hg (by positivity)
+      nlinarith only [h₁,h₂,h₃]
+    have hBig : g*x^3 ≤ g*x^2*y :=
+      (show g*x^3 = (g*x^2)*x by ring) ▸
+        mul_le_mul_of_nonneg_left hxy.le (by positivity)
+    linarith only [hrBound, hMid, hBig]
+  have hden : 0 < x*z+1 := by positivity
+  constructor
+  · by_contra! hn
+    have hnon := mul_nonpos_of_nonneg_of_nonpos hden.le hn
+    rw [id] at hnon
+    exact (mul_pos (sub_pos.mpr hxy) hCore).not_ge hnon
+  · have hLower : g*y < x*z+1 := by omega
+    have hSmall : 2*g*x^2*y-x^2-x*y-y^2*r < 2*x^2*(x*z+1) := by
+      have h₁ := mul_lt_mul_of_pos_left hLower (show 0 < 2*x^2 by positivity)
+      have h₂ : 0 < x^2+x*y+y^2*r := by positivity
+      nlinarith only [h₁,h₂]
+    have hProduct :
+        (x*z+1)*(x^3*s-y^3*r) < (x*z+1)*(2*x^2*(y-x)) := by
+      rw [id]
+      calc
+        (y-x)*(2*g*x^2*y-x^2-x*y-y^2*r) < (y-x)*(2*x^2*(x*z+1)) :=
+          mul_lt_mul_of_pos_left hSmall (sub_pos.mpr hxy)
+        _ = (x*z+1)*(2*x^2*(y-x)) := by ring
+    exact lt_of_mul_lt_mul_left hProduct hden.le
+
+theorem partner_discriminant {g x y z r s : ℤ} (hg : 2 ≤ g)
+    (hx : 1 ≤ x) (hxy : x < y) (ho : g*y ≤ x*z) (hr : 0 < r)
+    (hp : (y*z+1)*r = (g*x-1)^2)
+    (hq : (x*z+1)*s = (g*y-1)^2) :
+    let d := x^3*s-y^3*r
+    d < x*y*(y-x) ∧
+      (d*(g*x-1)-y^2*r*(y-x))^2 = x^2*(y-x)*r*s*(x*y*(y-x)-d) := by
+  let d := x^3*s-y^3*r
+  change d < x*y*(y-x) ∧ _
+  have hgypos : 0 < g*y := mul_pos (by omega) (by omega)
+  have hden : 0 < x*z+1 := by omega
+  have hy : 0 < y := by omega
+  have hgx : 1 < g*x := by
+    have h := mul_le_mul_of_nonneg_left hx (show 0 ≤ g by omega)
+    simpa using (show 1 < g*1 from by omega).trans_le h
+  have hgy : 1 < g*y :=
+    hgx.trans (mul_lt_mul_of_pos_left hxy (by omega))
+  have hs : 0 < s := by
+    by_contra! hn
+    have hm := mul_nonpos_of_nonneg_of_nonpos hden.le hn
+    rw [hq] at hm
+    exact (pow_pos (sub_pos.mpr hgy) 2).not_ge hm
+  have hd : (x*z+1)*d = (y-x)*(2*g*x^2*y-x^2-x*y-y^2*r) := by
+    dsimp [d]
+    linear_combination x^3*hq-y^2*x*hp
+  have hquad : d*(x*(g*x-1)^2+(y-x)*r) =
+      y*r*(y-x)*(2*g*x^2*y-x^2-x*y-y^2*r) := by
+    rw [show x*(g*x-1)^2+(y-x)*r = y*r*(x*z+1) by linear_combination -x*hp]
+    linear_combination (y*r)*hd
+  have hsquare :
+      (d*(g*x-1)-y^2*r*(y-x))^2 = x^2*(y-x)*r*s*(x*y*(y-x)-d) := by
+    apply mul_left_cancel₀ (show x ≠ 0 by omega)
+    dsimp [d] at hquad ⊢
+    linear_combination (x^3*s-y^3*r)*hquad
+  refine ⟨?_, hsquare⟩
+  have hc : 0 < x^2*(y-x)*r*s := by positivity
+  have hle : d ≤ x*y*(y-x) := by
+    by_contra! hn
+    have hneg := mul_neg_of_pos_of_neg hc (sub_neg.mpr hn)
+    rw [← hsquare] at hneg
+    exact (sq_nonneg _).not_gt hneg
+  refine lt_of_le_of_ne hle ?_
+  intro he
+  have hzero : (d*(g*x-1)-y^2*r*(y-x))^2 = 0 := by
+    rw [hsquare, he, sub_self, mul_zero]
+  have hlin : d*(g*x-1)-y^2*r*(y-x) = 0 := by
+    simpa only [pow_two, mul_eq_zero, or_self] using hzero
+  rw [he] at hlin
+  have hfactor : (y*(y-x))*(x*(g*x-1)-y*r) = 0 := by
+    linear_combination hlin
+  have hcancel : x*(g*x-1) = y*r := by
+    have hpos : 0 < y*(y-x) := by positivity
+    exact sub_eq_zero.mp ((mul_eq_zero.mp hfactor).resolve_left hpos.ne')
+  have hfactor' : (g*x-1)*(y*(g*x-1)-x*(y*z+1)) = 0 := by
+    linear_combination -y*hp-(y*z+1)*hcancel
+  have hlin' : y*(g*x-1)-x*(y*z+1) = 0 :=
+    (mul_eq_zero.mp hfactor').resolve_left (sub_pos.mpr hgx).ne'
+  have hgz : g < z := by
+    apply lt_of_mul_lt_mul_left (a := x) _ (by omega)
+    calc
+      x*g = g*x := by ring
+      _ < g*y := mul_lt_mul_of_pos_left hxy (by omega)
+      _ ≤ x*z := ho
+  have hpos : 0 < x*y*(z-g) := by positivity
+  nlinarith only [hlin', hpos, hx, hy]
+
+theorem component_dvd_bound {g x y z r s : ℤ}
+    (hp : (y*z+1)*r = (g*x-1)^2)
+    (hq : (x*z+1)*s = (g*y-1)^2)
+    (hu2 : g*x+1 ∣ (y*z-1)^2) :
+    let d := x^3*s-y^3*r
+    let C := (x+y)*(d+(y-x)*y*(x+2*y))
+    g*x+1 ∣ 16*C^2 := by
+  let A := g*x+1
+  let d := x^3*s-y^3*r
+  let C := (x+y)*(d+(y-x)*y*(x+2*y))
+  let u := y*z-1
+  let K := x*d-(y-x)*y^3
+  change A ∣ 16*C^2
+  change A ∣ u^2 at hu2
+  have hp' : A ∣ (u+2)*r-4 := ⟨g*x-3, by
+    dsimp [A,u]
+    linear_combination hp⟩
+  have hr' : A ∣ 4*r+4*u-8 := by
+    rw [show 4*r+4*u-8 = u^2*r-(u-2)*((u+2)*r-4) by ring]
+    exact dvd_sub (dvd_mul_of_dvd_left hu2 r) (dvd_mul_of_dvd_right hp' (u-2))
+  have hd : (x*z+1)*d = (y-x)*(2*g*x^2*y-x^2-x*y-y^2*r) := by
+    dsimp [d]
+    linear_combination x^3*hq-y^2*x*hp
+  have hE : A ∣ d*(x*u+x+y)+(y-x)*y*(x^2+3*x*y+y^2*r) :=
+    ⟨2*x*y^2*(y-x), by
+      dsimp [A,u]
+      linear_combination y*hd⟩
+  have hLin : A ∣ 4*(C+K*u) := by
+    rw [show 4*(C+K*u) =
+        4*(d*(x*u+x+y)+(y-x)*y*(x^2+3*x*y+y^2*r))-
+          ((y-x)*y^3)*(4*r+4*u-8) by dsimp [C,K]; ring]
+    exact dvd_sub (dvd_mul_of_dvd_right hE 4)
+      (dvd_mul_of_dvd_right hr' ((y-x)*y^3))
+  rw [show 16*C^2 = (4*(C+K*u))*(4*(C-K*u))+(16*K^2)*u^2 by ring]
+  exact dvd_add (dvd_mul_of_dvd_left hLin (4*(C-K*u)))
+    (dvd_mul_of_dvd_right hu2 (16*K^2))
+
+def factoredProduct (fs : List (ℕ × ℕ)) : ℕ :=
+  fs.foldr (fun (p,e) n => p^e*n) 1
+
+def factoredDivisors (fs : List (ℕ × ℕ)) : List ℕ :=
+  fs.foldr (fun (p,e) ds =>
+    (List.range (e+1)).flatMap fun k => ds.map fun a => p^k*a) [1]
+
+theorem mem_factoredDivisors {fs : List (ℕ × ℕ)} {a : ℕ}
+    (hp : ∀ p ∈ fs, p.1.Prime) (hd : a ∣ factoredProduct fs) :
+    a ∈ factoredDivisors fs := by
+  induction fs generalizing a with
+  | nil => simp [factoredProduct, factoredDivisors] at hd ⊢; exact hd
+  | cons f fs ih =>
+    obtain ⟨p,e⟩ := f
+    change a ∣ p^e * factoredProduct fs at hd
+    obtain ⟨b,c,hb,hc,rfl⟩ := Nat.dvd_mul.mp hd
+    obtain ⟨k,hk,rfl⟩ := Nat.dvd_prime_pow (hp (p,e) (by simp)) |>.mp hb
+    have hm := ih (fun q hq => hp q (List.mem_cons_of_mem _ hq)) hc
+    change p^k*c ∈ (List.range (e+1)).flatMap (fun j =>
+      (factoredDivisors fs).map fun v => p^j*v)
+    exact List.mem_flatMap.mpr ⟨k, List.mem_range.mpr (by omega),
+      List.mem_map.mpr ⟨c,hm,rfl⟩⟩
+
+def discriminant (y d a : ℕ) : ℤ :=
+  let Y : ℤ := y
+  let D : ℤ := d
+  let G : ℤ := (a : ℤ)-1
+  ((Y-3)*(D+Y*(9+3*Y)-6*G*Y^2))^2 - 12*Y^3*(Y-3)*D*(G-1)^2
+
+def divisorConstant (y d : ℕ) : ℕ :=
+  16*((y+3)*(d+(y-3)*y*(3+2*y)))^2
+
+def excludesRow (y d : ℕ) (fs : List (ℕ × ℕ)) : Bool :=
+  (factoredDivisors fs).all fun a =>
+    let v := discriminant y d a
+    decide (a % 6 ≠ 4 ∨ a < 10 ∨ ¬ y*y ≤ 9*(a-3) ∨
+      a = 10 ∨ v.natAbs.sqrt^2 ≠ v.natAbs)
+
+theorem nonsquare_of_row {y d a : ℕ} {fs : List (ℕ × ℕ)}
+    (hprod : factoredProduct fs = divisorConstant y d)
+    (hprime : ∀ p ∈ fs, p.1.Prime) (hcheck : excludesRow y d fs = true)
+    (hdvd : a ∣ divisorConstant y d) (he : a % 6 = 4) (hle : 10 ≤ a)
+    (hbound : y*y ≤ 9*(a-3)) (ha : a ≠ 10) :
+    ∀ t : ℤ, discriminant y d a ≠ t^2 := by
+  intro t ht
+  have hm := mem_factoredDivisors hprime (hprod ▸ hdvd : a ∣ factoredProduct fs)
+  have hc := of_decide_eq_true (List.all_eq_true.mp hcheck a hm)
+  rcases hc with h | h | h | h | h
+  · exact h he
+  · exact h.not_ge hle
+  · exact h hbound
+  · exact ha h
+  · apply h
+    rw [ht, Int.natAbs_pow, Nat.sqrt_eq']
+
+theorem even_partner (a b : ℕ) (ha : Odd a) (hb : Odd b)
+    (hd : (a+1)*(b+1) ∣ (a+b)^2)
+    {r : ℤ} (hr : ((b : ℤ)+1)*r = ((a : ℤ)-1)^2) : ∃ j : ℤ, r = 2*j := by
+  obtain ⟨q,hq⟩ := hd
+  have hq' : ((a : ℤ)+b)^2 = (a+1)*(b+1)*q := by exact_mod_cast hq
+  have hV : r = ((q : ℤ)-2)*(a+1)+4-(b+1) := by
+    apply mul_left_cancel₀ (show ((b : ℤ)+1) ≠ 0 by positivity)
+    linear_combination hr+hq'
+  obtain ⟨u,hu⟩ := ha
+  obtain ⟨v,hv⟩ := hb
+  have hu' : (a : ℤ) = 2*(u : ℤ)+1 := by exact_mod_cast hu
+  have hv' : (b : ℤ) = 2*(v : ℤ)+1 := by exact_mod_cast hv
+  refine ⟨((q : ℤ)-2)*(u+1)+2-(v+1), ?_⟩
+  rw [hV, hu', hv']
+  ring
+
+set_option maxHeartbeats 0 in
+set_option maxRecDepth 100000 in
+theorem certified_rows (y d : ℕ) (hy : y = 5 ∨ y = 7 ∨ y = 11)
+    (hd : 0 < d) (hdhi : d < min 18 (3*y)*(y-3)) (hde : d % 2 = 0) :
+    ∃ fs : List (ℕ × ℕ), factoredProduct fs = divisorConstant y d ∧
+      (∀ p ∈ fs, p.1.Prime) ∧ excludesRow y d fs = true := by
+  rcases hy with rfl | rfl | rfl <;> norm_num at hdhi <;>
+    interval_cases d <;> first | omega | skip
+  · refine ⟨[(2, 14), (3, 2), (11, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 12), (67, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 16), (17, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 12), (3, 2), (23, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 14), (5, 2), (7, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 12), (71, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 18), (3, 4)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 12), (73, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 14), (37, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 12), (3, 2), (5, 4)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 16), (19, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 12), (7, 2), (11, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 14), (3, 2), (13, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 12), (79, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (5, 2), (239, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 16), (3, 2), (5, 4)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (5, 2), (241, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (5, 2), (11, 4)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (3, 10), (5, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 12), (5, 2), (61, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (5, 4), (7, 4)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (3, 2), (5, 2), (41, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (5, 2), (13, 2), (19, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 14), (5, 2), (31, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (3, 2), (5, 2), (83, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (5, 8)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (5, 2), (251, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 12), (3, 4), (5, 2), (7, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (5, 2), (11, 2), (23, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (5, 2), (127, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (3, 2), (5, 4), (17, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 24), (5, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (5, 2), (257, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (3, 2), (5, 2), (43, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (5, 2), (7, 2), (37, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 12), (5, 4), (13, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (3, 4), (5, 2), (29, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (5, 2), (131, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (5, 2), (263, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 14), (3, 2), (5, 2), (11, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (5, 4), (53, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (5, 2), (7, 2), (19, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (3, 2), (5, 2), (89, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 12), (5, 2), (67, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (5, 2), (269, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (3, 6), (5, 4)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (5, 2), (271, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 16), (5, 2), (17, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (3, 2), (5, 2), (7, 2), (13, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (3, 2), (7, 2), (367, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (7, 2), (19, 2), (29, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (7, 2), (1103, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 16), (3, 2), (7, 2), (23, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (5, 2), (7, 2), (13, 2), (17, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (7, 4), (79, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (3, 6), (7, 2), (41, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 12), (7, 2), (277, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (7, 2), (1109, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (3, 2), (5, 2), (7, 2), (37, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (7, 2), (11, 2), (101, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 14), (7, 2), (139, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (3, 2), (7, 4), (53, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (7, 2), (557, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (5, 2), (7, 2), (223, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 12), (3, 4), (7, 2), (31, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (7, 2), (1117, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (7, 2), (13, 2), (43, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (3, 2), (7, 2), (373, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 18), (5, 2), (7, 4)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (7, 2), (19, 2), (59, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (3, 2), (7, 2), (11, 2), (17, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (7, 2), (1123, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 12), (7, 2), (281, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (3, 4), (5, 6), (7, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (7, 2), (563, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (7, 6), (23, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 14), (3, 2), (7, 2), (47, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (7, 2), (1129, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (5, 2), (7, 2), (113, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (3, 2), (7, 2), (13, 2), (29, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 12), (7, 2), (283, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (7, 2), (11, 2), (103, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (3, 8), (7, 4)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (5, 2), (7, 2), (227, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 16), (7, 2), (71, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (3, 2), (7, 2), (379, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (7, 2), (569, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (7, 2), (17, 2), (67, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 12), (3, 2), (5, 2), (7, 2), (19, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (7, 4), (163, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (7, 2), (571, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (3, 4), (7, 2), (127, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 14), (7, 2), (11, 2), (13, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (5, 2), (7, 2), (229, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (3, 2), (7, 2), (191, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (7, 2), (31, 2), (37, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 12), (7, 4), (41, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (3, 2), (7, 2), (383, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (5, 4), (7, 2), (23, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (7, 2), (1151, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 22), (3, 4), (7, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (7, 2), (1153, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (7, 2), (577, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (3, 2), (5, 2), (7, 4), (11, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 12), (7, 2), (17, 4)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (7, 2), (13, 2), (89, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (3, 2), (7, 2), (193, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (7, 2), (19, 2), (61, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 14), (5, 2), (7, 2), (29, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (3, 6), (7, 2), (43, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (7, 4), (83, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (7, 2), (1163, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 12), (3, 2), (7, 2), (97, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (5, 2), (7, 2), (233, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (7, 2), (11, 2), (53, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (3, 2), (7, 2), (389, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 16), (7, 2), (73, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (7, 4), (167, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 10), (3, 4), (5, 2), (7, 2), (13, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+  · refine ⟨[(2, 8), (7, 2), (1171, 2)], by decide, ?_, by decide +kernel⟩
+    simp [List.mem_cons]
+    try norm_num
+
+theorem common_three {y z : ℕ} (hy : y = 5 ∨ y = 7 ∨ y = 11)
+    (ho : 3*y ≤ 3*z) (hdiv : (3*3+1)*(y*z+1) ∣ (3*3+y*z)^2) :
+    False := by
+  have hu := (normalized_bounds (show 1 < 3 by decide) (show 0 < 3 by decide) ho hdiv).1
+  have hy1 : 1 ≤ y := by omega
+  have hz : z ≤ 63 := by
+    have hm : 1*z ≤ y*z := Nat.mul_le_mul_right z hy1
+    norm_num at hm hu
+    omega
+  rcases hy with rfl | rfl | rfl <;> interval_cases z  <;> norm_num at hdiv
+
+theorem no_three_slice {g y z : ℕ}
+    (hg : 1 < g) (hy : y = 5 ∨ y = 7 ∨ y = 11) (hgo : Odd g) (hyo : Odd y)
+    (hzo : Odd z) (ho : g*y ≤ 3*z)
+    (hf : (g*3+1)*(y*z+1) ∣ (g*3+y*z)^2)
+    (hh : (g*y+1)*(3*z+1) ∣ (g*y+3*z)^2) : False := by
+  by_cases hg3 : g = 3
+  · subst g
+    exact common_three hy ho hf
+  obtain ⟨_,hybound⟩ := normalized_bounds hg (show 0 < 3 by decide) ho hf
+  obtain ⟨r,hr'⟩ := largeComponent_dvd (g*3) (y*z) hf
+  obtain ⟨s,hs'⟩ := largeComponent_dvd (g*y) (3*z) hh
+  have hr := hr'.symm
+  have hs := hs'.symm
+  have hrpos : 0 < r := by
+    have hden : 0 < (((y*z : ℕ) : ℤ)+1) := by positivity
+    have hn : 0 < (((g*3 : ℕ) : ℤ)-1)^2 := by
+      have hg' : (1 : ℤ) < (g*3 : ℕ) := by exact_mod_cast (show 1 < g*3 by omega)
+      exact pow_pos (sub_pos.mpr hg') _
+    by_contra! hle
+    exact hn.not_ge (hr ▸ mul_nonpos_of_nonneg_of_nonpos hden.le hle)
+  obtain ⟨u,hu⟩ := even_partner (g*3) (y*z) (hgo.mul (by decide)) (hyo.mul hzo) hf hr
+  obtain ⟨v,hv⟩ := even_partner (g*y) (3*z) (hgo.mul hyo) ((by decide : Odd 3).mul hzo) hh hs
+  push_cast at hr hs
+  have ho' : (g : ℤ)*y ≤ 3*z := by exact_mod_cast ho
+  have hg' : (2 : ℤ) ≤ g := by exact_mod_cast (show 2 ≤ g by omega)
+  have hy' : (3 : ℤ) < y := by exact_mod_cast (show 3 < y by omega)
+  let d := (3 : ℤ)^3*s-(y : ℤ)^3*r
+  have hd : (0 : ℤ) < d ∧ d < 18*((y : ℤ)-3) := by
+    simpa [d] using difference_bounds (g := (g : ℤ)) (x := 3)
+      hg' (by decide) hy' ho' hrpos hr hs
+  have hd' : d < 3*(y : ℤ)*((y : ℤ)-3) :=
+    (partner_discriminant (x := 3) hg' (by decide) hy' ho' hrpos hr hs).1
+  let D := d.toNat
+  have hD : (D : ℤ) = d := Int.toNat_of_nonneg hd.1.le
+  have hDb : 0 < D ∧ D < min 18 (3*y)*(y-3) := by
+    have hy0 : 3 ≤ y := by omega
+    have hmin : ((min 18 (3*y) : ℕ) : ℤ) = min 18 (3*(y : ℤ)) := by
+      norm_cast
+    have hb : (D : ℤ) < (((min 18 (3*y)*(y-3) : ℕ) : ℤ)) := by
+      rw [hD, Nat.cast_mul, hmin, Nat.cast_sub hy0, Nat.cast_ofNat]
+      rcases le_total (18 : ℤ) (3*(y : ℤ)) with h | h
+      · simpa [min_eq_left h] using hd.2
+      · simpa [min_eq_right h] using hd'
+    exact_mod_cast (show (0 : ℤ) < D ∧ _ from ⟨by rw [hD]; exact hd.1, hb⟩)
+  have hDe : D % 2 = 0 := by
+    have hf : d = 2*(3^3*v-(y : ℤ)^3*u) := by
+      dsimp [d]
+      rw [hu,hv]
+      ring
+    omega
+  have hgo' : (g*3+1) % 6 = 4 := by obtain ⟨k,hk⟩ := hgo; omega
+  have hdvs : (g : ℤ)*3+1 ∣ ((y : ℤ)*z-1)^2 := by
+    have hv := largeComponent_dvd (y*z) (g*3) (by simpa [mul_comm, add_comm] using hf)
+    push_cast at hv
+    exact hv
+  have hmain := component_dvd_bound (x := 3) hr hs hdvs
+  have hconstant : g*3+1 ∣ divisorConstant y D := by
+    apply Int.natCast_dvd_natCast.mp
+    have hy0 : 3 ≤ y := by omega
+    simp only [divisorConstant, Nat.cast_mul, Nat.cast_add, Nat.cast_pow,
+      Nat.cast_ofNat, Nat.cast_sub hy0, Nat.cast_one, hD]
+    simpa [d, add_comm 3 (y : ℤ)] using hmain
+  obtain ⟨fs,hprod,hprime,hrow⟩ := certified_rows y D hy hDb.1 hDb.2 hDe
+  have hsize : 10 ≤ g*3+1 := by omega
+  have hyy : y*y ≤ 9*(g*3+1-3) := by
+    have he : g*3+1-3 = g*3-2 := by omega
+    simpa [he,pow_two] using hybound
+  have hdiscr := nonsquare_of_row hprod hprime hrow hconstant hgo' hsize hyy (by omega)
+  have hdelta : (3*(z : ℤ)+1)*d =
+      ((y : ℤ)-3)*(18*(g : ℤ)*y-9-3*(y : ℤ)-(y : ℤ)^2*r) := by
+    dsimp [d]
+    linear_combination 27*hs - 3*(y : ℤ)^2*hr
+  have hquad : d*(3*((g : ℤ)*3-1)^2+((y : ℤ)-3)*r) =
+      (y : ℤ)*r*((y : ℤ)-3)*(18*(g : ℤ)*y-9-3*(y : ℤ)-(y : ℤ)^2*r) := by
+    rw [show 3*((g : ℤ)*3-1)^2+((y : ℤ)-3)*r = y*r*(3*z+1) by
+      linear_combination -3*hr]
+    linear_combination ((y : ℤ)*r)*hdelta
+  let A : ℤ := (y : ℤ)^3*((y : ℤ)-3)
+  let B : ℤ := ((y : ℤ)-3)*(d+(y : ℤ)*(9+3*y)-18*(g : ℤ)*y^2)
+  apply hdiscr (2*A*r+B)
+  dsimp [discriminant,A,B]
+  push_cast
+  rw [hD]
+  linear_combination (-4*(y : ℤ)^3*((y : ℤ)-3))*hquad
+
+#print axioms no_three_slice
+
+end CrystalSharedThree

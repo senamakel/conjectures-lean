@@ -215,3 +215,12 @@ but every candidate discriminant fails the exact integer-square test.
 The pinned Lean proof checks the factorization, covers all divisors,
 and evaluates exact square roots in the kernel. Its axiom closure is
 `propext`, `Classical.choice`, and `Quot.sound`.
+
+[CrystalSharedThree.lean](CrystalSharedThree.lean) rules out the
+normalized pairs with smaller reduced component `x = 3` and larger
+component `y ∈ {5,7,11}`. This covers all admissible odd coprime
+`y ≤ 11` when `x = 3`. The checked discriminant certificates
+eliminate 8,045 candidate states with `g ≠ 3`. For `g = 3`,
+the bound `y*z ≤ 63` makes the original square divisibility a
+small exact check. This proves the slice for every possible
+common divisor and larger factor, using only the standard axioms.
