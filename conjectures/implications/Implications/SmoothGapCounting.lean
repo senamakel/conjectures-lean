@@ -19,6 +19,10 @@ noncomputable def primeAt (n : ℕ) : ℕ := Nat.nth Nat.Prime n
 /-- The gap between the `n`th prime and its successor. -/
 noncomputable def primeGap (n : ℕ) : ℕ := primeAt (n + 1) - primeAt n
 
+/-- A logarithmic cutoff for counting smooth numbers in the first `N` prime gaps. -/
+noncomputable def logLogCutoff (n : ℕ) : ℕ :=
+  ⌊Real.log (primeAt n : ℝ) * Real.log (Real.log (primeAt n : ℝ)) / 16⌋₊
+
 private theorem primeCounting_primeAt (n : ℕ) :
     Nat.primeCounting (primeAt n) = n + 1 := by
   change Nat.count Nat.Prime (Nat.nth Nat.Prime n + 1) = n + 1
@@ -89,6 +93,28 @@ private theorem eventually_primeBelow_count_le_two_mul
     ((B n).primesBelow.card : ℝ) ≤ Nat.primeCounting (B n) := hcard'
     _ ≤ 2 * ((B n : ℝ) / Real.log (B n : ℝ)) := hpi'.le
     _ = 2 * (B n : ℝ) / Real.log (B n : ℝ) := by ring
+
+private theorem logLogCutoff_tendsto_atTop :
+    Tendsto (fun n => (logLogCutoff n : ℝ)) atTop atTop := by
+  have hp : Tendsto (fun n => (primeAt n : ℝ)) atTop atTop := by
+    have hnat : Tendsto primeAt atTop atTop := by
+      rw [tendsto_atTop_atTop]
+      intro b
+      refine ⟨b, fun n hbn => ?_⟩
+      have hp := Nat.add_two_le_nth_prime n
+      change b ≤ Nat.nth Nat.Prime n
+      omega
+    exact tendsto_natCast_atTop_atTop.comp hnat
+  have hlog : Tendsto (fun n => Real.log (primeAt n : ℝ)) atTop atTop :=
+    Real.tendsto_log_atTop.comp hp
+  have hloglog : Tendsto (fun n => Real.log (Real.log (primeAt n : ℝ))) atTop atTop :=
+    Real.tendsto_log_atTop.comp hlog
+  have hprod : Tendsto (fun n =>
+      Real.log (primeAt n : ℝ) * Real.log (Real.log (primeAt n : ℝ)) / 16)
+      atTop atTop := by
+    convert (hlog.atTop_mul_atTop₀ hloglog).atTop_div_const (by norm_num : (0 : ℝ) < 16)
+      using 1 <;> ext n <;> simp
+  exact tendsto_natCast_atTop_atTop.comp (tendsto_nat_floor_atTop.comp hprod)
 
 private theorem primeAt_strictMono : StrictMono primeAt := by
   intro a b hab
