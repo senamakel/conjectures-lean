@@ -49,3 +49,4 @@ import Implications.C4PolarityCnfGates
 import Implications.C4PolarityLexEncoding
 import Implications.C4PolarityCounterAssignment
 import Implications.C4PolarityLratBridge
+import Implications.C4PolarityCertifiedFormula
