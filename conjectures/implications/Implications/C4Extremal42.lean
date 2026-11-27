@@ -1,5 +1,5 @@
-set_option maxHeartbeats 1000000
 import Mathlib.Combinatorics.SimpleGraph.DegreeSum
+set_option maxHeartbeats 1000000
 import Mathlib.Tactic
 
 /-!
