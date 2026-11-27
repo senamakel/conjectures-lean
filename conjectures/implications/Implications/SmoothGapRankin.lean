@@ -6,7 +6,7 @@ namespace Implications.SmoothGapRankin
 
 /-- The multiplicative weight `n ↦ n ^ (-s)`. -/
 noncomputable def rankinWeight (s : ℝ) : ℕ →* ℝ where
-  toFun n := (n.val : ℝ) ^ (-s)
+  toFun n := (n : ℝ) ^ (-s)
   map_one' := by simp
   map_mul' m n := by
     rw [Nat.cast_mul, Real.mul_rpow (by positivity) (by positivity)]
@@ -32,12 +32,12 @@ theorem smoothNumbersUpTo_card_le_rankin (X Y : ℕ) (s : ℝ) (hX : 0 < X)
   have hf_nonneg (m : Y.smoothNumbers) : 0 ≤ f m := by
     dsimp [f, rankinWeight]
     exact Real.rpow_nonneg (by positivity) _
-  let e : {n : ℕ // n ∈ X.smoothNumbersUpTo Y} ↪ Y.smoothNumbers where
-    toFun n := (⟨n.val, (Nat.mem_smoothNumbersUpTo.mp n.property).2⟩ : Y.smoothNumbers)
-    inj' := by
+  let e : {n : ℕ // n ∈ X.smoothNumbersUpTo Y} ↪ Y.smoothNumbers :=
+    ⟨(fun n : {n : ℕ // n ∈ X.smoothNumbersUpTo Y} =>
+      (⟨n.val, (Nat.mem_smoothNumbersUpTo.mp n.property).2⟩ : Y.smoothNumbers)), by
       intro a b h
       apply Subtype.ext
-      exact congrArg Subtype.val h
+      exact congrArg Subtype.val h⟩
   let T := S.attach.map e
   have hsum_map : (∑ m ∈ T, f m) = ∑ n ∈ S.attach, f (e n) := by
     simp [T, Finset.sum_map]
