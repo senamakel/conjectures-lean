@@ -64,7 +64,8 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
     exact hneq j hj this
   have hneqab : a ≠ b := by
     intro h
-    have heq := hunique a (hleftC i hi) hneqac i hi j hj
+    have haC : a ∈ C := hlefti ▸ hleftC i hi
+    have heq := hunique a haC hneqac i hi j hj
       (Or.inl hlefti) (Or.inr (hrightj.trans h.symm))
     exact hij heq
   have hblockNodup (k : V) (hk : k ∈ others) : (block k).Nodup := by
@@ -77,7 +78,7 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
       intro h
       have hkC : k ∈ C := by simpa [h] using hrightC k hkI
       exact (Finset.disjoint_left.mp hdisj) hkC hkI
-    simp [block, hleft_ne, hright_ne, hneq k hkI]
+    simp [block, hleft_ne, hright_ne.symm, hneq k hkI]
   have hblockChain (k : V) (hk : k ∈ others) : (block k).IsChain G.Adj := by
     have hkI := (Finset.mem_sdiff.mp hk).1
     simp [block, List.isChain_cons, hleftAdj k hkI, (hrightAdj k hkI).symm]
@@ -101,16 +102,16 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
     · have hxC : x ∈ C := hxL.symm ▸ hleftC k hkI
       have hxe : x ≠ c := by
         intro h
-        exact hnotC k hkO (Or.inl (hxL.trans h))
+        exact hnotC k hkO (Or.inl (hxL.symm.trans h))
       have hkl' := hunique x hxC hxe k hkI l hlI (Or.inl hxL.symm) (Or.inl hyL.symm)
       exact hkl hkl'
     · have hxC : x ∈ C := hxL.symm ▸ hleftC k hkI
-      have hxInI : x ∈ I := hxI.symm ▸ hlI
+      have hxInI : x ∈ I := hyI.symm ▸ hlI
       exact (Finset.disjoint_left.mp hdisj) hxC hxInI
     · have hxC : x ∈ C := hxL.symm ▸ hleftC k hkI
       have hxe : x ≠ c := by
         intro h
-        exact hnotC k hkO (Or.inl (hxL.trans h))
+        exact hnotC k hkO (Or.inl (hxL.symm.trans h))
       have hkl' := hunique x hxC hxe k hkI l hlI (Or.inl hxL.symm) (Or.inr hyR.symm)
       exact hkl hkl'
     · have hxInI : x ∈ I := hxI.symm ▸ hkI
@@ -123,16 +124,16 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
     · have hxC : x ∈ C := hxR.symm ▸ hrightC k hkI
       have hxe : x ≠ c := by
         intro h
-        exact hnotC k hkO (Or.inr (hxR.trans h))
+        exact hnotC k hkO (Or.inr (hxR.symm.trans h))
       have hkl' := hunique x hxC hxe k hkI l hlI (Or.inr hxR.symm) (Or.inl hyL.symm)
       exact hkl hkl'
     · have hxC : x ∈ C := hxR.symm ▸ hrightC k hkI
-      have hxInI : x ∈ I := hxI.symm ▸ hlI
+      have hxInI : x ∈ I := hyI.symm ▸ hlI
       exact (Finset.disjoint_left.mp hdisj) hxC hxInI
     · have hxC : x ∈ C := hxR.symm ▸ hrightC k hkI
       have hxe : x ≠ c := by
         intro h
-        exact hnotC k hkO (Or.inr (hxR.trans h))
+        exact hnotC k hkO (Or.inr (hxR.symm.trans h))
       have hkl' := hunique x hxC hxe k hkI l hlI (Or.inr hxR.symm) (Or.inr hyR.symm)
       exact hkl hkl'
 
@@ -142,7 +143,24 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
     refine ⟨?_, ?_⟩
     · intro k hk
       exact hblockNodup k (Finset.mem_toList.mp hk)
-    · intro k hk l hl hkl
-      exact hblocksDisjoint k hk l hl hkl
+    · have hp : ∀ l, (∀ k ∈ l, k ∈ others) → l.Nodup →
+          List.Pairwise (fun k l => List.Disjoint (block k) (block l)) l := by
+        intro l
+        induction l with
+        | nil => simp
+        | cons k ks ih =>
+          intro hmem hnd
+          rw [List.pairwise_cons]
+          refine ⟨?_, ih ?_ (List.nodup_cons.mp hnd).2⟩
+          · intro l hl
+            have hkO : k ∈ others := hmem k (by simp)
+            have hlO : l ∈ others := hmem l (by simp [hl])
+            exact hblocksDisjoint k (by simp) l (by simp [hl]) (by
+              intro heq
+              subst l
+              exact (List.nodup_cons.mp hnd).1 hl)
+          · intro l hl
+            exact hmem l (by simp [hl])
+      exact hp others.toList (fun k hk => Finset.mem_toList.mp hk) others.nodup_toList
 
 end SplitGraphSmallRowsOneShared
