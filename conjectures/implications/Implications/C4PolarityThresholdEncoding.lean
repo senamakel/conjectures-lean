@@ -154,7 +154,8 @@ def thresholdRowClauses (x : Int) (previous outputs : List Int) : List (List Int
 theorem thresholdRowClauses_length (x : Int) (previous outputs : List Int)
     (hprev : previous.length = outputs.length + 1) :
     (thresholdRowClauses x previous outputs).length = 4 * outputs.length := by
-  simp [thresholdRowClauses, List.length_flatMap, hprev]
+  simp [thresholdRowClauses, thresholdGateDimacs, List.length_flatMap,
+    List.sum_map_mul_right, hprev]
 
 /-- Recursively append one row of threshold gates per input. The state list
 contains the literal for thresholds `0` through `limit`; threshold zero is
