@@ -1,5 +1,6 @@
 import Mathlib.Data.Fin.Basic
 import Mathlib.Tactic
+import Mathlib.Combinatorics.SimpleGraph.CycleGraph
 import Mathlib.Combinatorics.SimpleGraph.DeleteEdges
 import Mathlib.Combinatorics.SimpleGraph.DegreeSum
 
@@ -86,6 +87,37 @@ theorem simpleGraph_extremal_vertex_degree_six (G : SimpleGraph (Fin 42))
     exact SimpleGraph.degree_le_card_edgeFinset G v
   omega
 
+/-- In a graph containing no copy of a four-cycle, distinct vertices share at most one neighbor. -/
+theorem commonNeighbors_subsingleton_of_cycleGraph_free {V : Type*} (G : SimpleGraph V)
+    (hfree : (SimpleGraph.cycleGraph 4).Free G) (u w : V) (huw : u ≠ w) :
+    (G.commonNeighbors u w).Subsingleton := by
+  intro x hx y hy
+  rcases hx with ⟨hux, hwx⟩
+  rcases hy with ⟨huy, hwy⟩
+  by_contra hxy
+  let f : Fin 4 → V := ![u, x, w, y]
+  have hinj : Function.Injective f := by
+    have hux' := hux.ne
+    have huy' := huy.ne
+    have hwx' := hwx.ne
+    have hwy' := hwy.ne
+    intro i j h
+    fin_cases i <;> fin_cases j <;> simp_all [f, eq_comm]
+  apply hfree
+  refine ⟨⟨⟨f, ?_⟩, hinj⟩⟩
+  intro i j hij
+  fin_cases i <;> fin_cases j <;>
+    first
+    | exact hux
+    | exact hux.symm
+    | exact huy
+    | exact huy.symm
+    | exact hwx
+    | exact hwx.symm
+    | exact hwy
+    | exact hwy.symm
+    | exact (by decide : ¬ (SimpleGraph.cycleGraph 4).Adj _ _) hij |>.elim
+
 /-- A vertex of degree six gives six neighbors with no shared neighbor in its induced deletion,
 provided that any two vertices have at most one common neighbor in the original graph. -/
 theorem compatible_six_of_degree_six (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
@@ -116,8 +148,20 @@ theorem simpleGraph_edge_count_le_137_of_no_compatible_six
   obtain ⟨v, hv, hd⟩ := simpleGraph_extremal_vertex_degree_six G h41 he
   exact hno v hd (compatible_six_of_degree_six G hC4 hv)
 
+/-- The conditional 137-edge bound stated for Mathlib's four-cycle-free graphs. -/
+theorem simpleGraph_c4Free_edge_count_le_137
+    (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    (hfree : (SimpleGraph.cycleGraph 4).Free G)
+    (h41 : ∀ v, inducedDeletionCount G v ≤ 132)
+    (hno : ∀ v, inducedDeletionCount G v = 132 →
+      ¬ ∃ S : Finset (Fin 42), S.card = 6 ∧ v ∉ S ∧
+        ∀ u ∈ S, ∀ w ∈ S, u ≠ w → ∀ x, x ≠ v → G.Adj u x → ¬ G.Adj w x) :
+    G.edgeFinset.card ≤ 137 :=
+  simpleGraph_edge_count_le_137_of_no_compatible_six G h41
+    (commonNeighbors_subsingleton_of_cycleGraph_free G hfree) hno
+
 #print axioms simpleGraph_edge_count_le_138
 #print axioms simpleGraph_extremal_vertex_degree_six
-#print axioms simpleGraph_edge_count_le_137_of_no_compatible_six
+#print axioms simpleGraph_c4Free_edge_count_le_137
 
 end C4Extremal42
