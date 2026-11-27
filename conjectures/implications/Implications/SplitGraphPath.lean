@@ -377,7 +377,7 @@ theorem hamiltonian_of_split_partition_two_outsiders
     (hct : G.Adj c t) (hta : G.Adj t a) (hax : G.Adj a x)
     (hxz : G.Adj x z) (hzy : G.Adj z y) (hyb : G.Adj y b)
     (hbr : G.Adj b r) (hrw : G.Adj r w) (hws : G.Adj w s)
-    (htC : t ∈ C) (hxC : x ∈ C) (hyC : y ∈ C) (hrC : r ∈ C) (hsC : s ∈ C)
+    (hsC : s ∈ C)
     (hbaseNodup : ([c, t, a, x, z, y, b, r, w, s] : List V).Nodup)
     (hrestNodup : rest.Nodup)
     (hrestC : ∀ v ∈ rest, v ∈ C)
@@ -615,5 +615,6 @@ end SplitGraphPath
 #print axioms SplitGraphPath.hamiltonian_of_clique_order_with_two_endpoints
 #print axioms SplitGraphPath.hamiltonian_of_split_partition_two_endpoints
 #print axioms SplitGraphPath.exists_distinct_row_attachments
+#print axioms SplitGraphPath.hamiltonian_of_split_partition_two_outsiders
 #print axioms SplitGraphPath.hamiltonian_of_split_partition_row_bounds
 #print axioms SplitGraphPath.hamiltonian_of_split_partition_of_inducedTreeBound
