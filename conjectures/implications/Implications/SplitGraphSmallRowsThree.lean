@@ -35,10 +35,12 @@ theorem three_pair_rows_are_triangle
       have hpair : s = {a,b} ∨ s = {b,c} ∨ s = {a,c} := by
         rcases Finset.card_eq_two.mp hcardS with ⟨x,y,hxy,heq⟩
         have hx : x = a ∨ x = b ∨ x = c := by
-          have := hsTriple (by simp [heq])
+          have hxmem : x ∈ s := by rw [heq]; simp
+          have := hsTriple hxmem
           simpa using this
         have hy : y = a ∨ y = b ∨ y = c := by
-          have := hsTriple (by simp [heq])
+          have hymem : y ∈ s := by rw [heq]; simp
+          have := hsTriple hymem
           simpa using this
         rcases hx with hxa | hxb | hxc <;>
           rcases hy with hya | hyb | hyc <;>
@@ -48,6 +50,6 @@ theorem three_pair_rows_are_triangle
       simp [hab, hac, hbc]
     have hEq := Finset.eq_of_subset_of_card_le hFsub
       (by rw [hcardF, htargetCard])
-    exact ⟨a,b,c,hab,hac,hbc,hEq.symm⟩
+    exact ⟨a,b,c,hab,hac,hbc,hEq⟩
 
 end SplitGraphSmallRowsThree
