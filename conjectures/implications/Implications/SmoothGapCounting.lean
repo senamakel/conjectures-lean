@@ -647,12 +647,13 @@ private theorem eventually_twoHitGapCount_tail_tendsto_zero :
   have hlogsmall' : Tendsto (fun n : ℕ =>
       Real.log (primeAt n : ℝ) / (primeAt n : ℝ) ^ (1 / 4 : ℝ))
       atTop (nhds 0) := by
-    simpa only [Function.comp_apply] using hlogsmall.comp hp
+    convert hlogsmall.comp hp using 1 <;> rfl
   have hbase : Tendsto (fun n : ℕ =>
       (1 : ℝ) / (n + 1 : ℝ)) atTop (nhds 0) := by
-    simpa [one_div] using
-      (tendsto_inv_atTop_zero.comp
-        (tendsto_natCast_atTop_atTop.add_const (1 : ℝ)))
+    convert tendsto_inv_atTop_zero.comp
+      (tendsto_atTop_add_const_right atTop (1 : ℝ) tendsto_natCast_atTop_atTop) using 1
+    ext n
+    simp [one_div]
   have htail : Tendsto (fun n : ℕ =>
       Real.exp (3 * Real.log (primeAt n : ℝ) / 4) /
         (2 * (n + 1 : ℝ))) atTop (nhds 0) := by
@@ -673,10 +674,12 @@ private theorem eventually_twoHitGapCount_tail_tendsto_zero :
           (primeAt n : ℝ) ^ (1 / 4 : ℝ) = (primeAt n : ℝ) := by
         rw [Real.rpow_def_of_pos hpn]
         rw [← Real.exp_add]
-        rw [Real.exp_log hpn]
         congr 1
-        ring
-      field_simp
+        have : 3 * Real.log (primeAt n : ℝ) / 4 +
+            Real.log (primeAt n : ℝ) * (1 / 4 : ℝ) =
+            Real.log (primeAt n : ℝ) := by ring
+        rw [this, Real.exp_log hpn]
+      rw [div_eq_div_iff (by positivity) (by positivity)]
       nlinarith [hidentity]
     have hfactor : Tendsto (fun n : ℕ =>
         ((primeAt n : ℝ) / (n + 1 : ℝ)) /
@@ -699,11 +702,11 @@ private theorem eventually_twoHitGapCount_tail_tendsto_zero :
         constructor
         · positivity
         · rw [div_le_div_iff₀ hden]
-          nlinarith
+          nlinarith [Real.rpow_pos_of_pos hp0 (1 / 4 : ℝ)]
       exact squeeze_zero' (by
         filter_upwards [hp.eventually (eventually_gt_atTop (0 : ℝ))] with n hn
-        positivity) hbound hratio
-    exact hfactor.congr' hrewrite
+        positivity) (hbound.mono fun n hn => hn.2) hratio
+    exact hfactor.congr' hrewrite.symm
   have hsum := hbase.add (by simpa [div_eq_mul_inv, mul_assoc] using htail)
   convert hsum.const_mul (1 / 2 : ℝ) using 1 <;> field_simp <;> ring
 
