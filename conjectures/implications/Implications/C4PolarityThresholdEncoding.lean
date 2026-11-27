@@ -322,7 +322,7 @@ theorem thresholdRowClauses_eq_gateClauses_of_positive_outputs
         (fun gate => thresholdGateDimacs gate.above gate.input gate.below
           (Int.ofNat gate.output)) := by
   simp [thresholdRowClauses, thresholdRowGates, thresholdRowVars,
-    thresholdGateDimacs, Int.natAbs_natCast]
+    thresholdGateDimacs, List.flatMap_map]
 
 theorem thresholdRowClauses_length (x : Int) (previous outputs : List Int)
     (hprev : previous.length = outputs.length + 1) :
