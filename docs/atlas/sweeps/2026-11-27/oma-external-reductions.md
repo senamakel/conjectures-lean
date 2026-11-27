@@ -99,6 +99,12 @@ The [compact-support reduction](https://github.com/senamakel/open-math-agents/tr
 
 A pinned Lean prototype now proves the canonical zero-sphere augmentation kernel is isomorphic to the integers, using only the three standard axioms. It identifies the two path components, sends their coproduct to the two integer coordinates, and sends the augmentation to coordinate sum. This supplies the algebraic end of the alternative circle route via degree-one relative homology. The exact OMA submission awaits a checked parent reduction for that route.
 
+### Alternative circle homology route
+
+The relative-homology route for the exact circle calculation was rechecked and submitted as [#5006](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/5006). It reduces the circle calculation to the antipodal open cover, the degree-one relative pair and excision map, transport of the degree-zero kernel, and the zero-sphere augmentation kernel. This keeps the missing commutator-kernel theorem out of this route.
+
+The [circle cover proof](https://github.com/senamakel/open-math-agents/tree/oma/pcare-circle-cover) at `eeb6d9a` and [zero-sphere kernel proof](https://github.com/senamakel/open-math-agents/tree/oma/pcare-zero-sphere-kernel) at `008c349` both passed the exact pinned OMA checker with the three standard axioms. They close H1 and H4 respectively against the submitted R2 interface and are staged for one-file submission after #5006 is merged and registers its leaves.
+
 ### Green 100(i) closure
 
 [Matrix obstruction #4716](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4716) merged at `6cd6ae1abf18`. Its public replay returned HTTP 200. The [parent registry API](https://lefttosolve.com/api/problems/Green100.green_100.parts.i) now reports a solution with polarity `proof`. Both parent obligations are solved. The construction route uses [matrix obstruction #4716](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4716) and [matrix transfer #4557](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4557), and the second obligation is closed by [direct surjunctivity #4573](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4573). That direct proof makes the two descendants of the alternative surjunctivity reduction unnecessary to close the parent.
