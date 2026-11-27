@@ -89,7 +89,8 @@ theorem sum_innerNeighbors_card_ge_seven (v : V)
     simpa [S, G.card_neighborFinset_eq_degree] using hv
   have hSsub : S ⊆ Finset.univ.erase v := by
     intro z hz
-    have hzv : z ≠ v := G.ne_of_adj (G.symm.symm v z (by simpa using hz))
+    have hvz : G.Adj v z := by simpa [S] using hz
+    have hzv : z ≠ v := G.ne_of_adj (G.symm.symm v z hvz)
     exact Finset.mem_erase.mpr ⟨hzv, Finset.mem_univ _⟩
   have hdisj : (S : Set V).PairwiseDisjoint T := by
     intro u hu w hw huw
@@ -152,12 +153,13 @@ theorem sum_innerNeighbors_card_ge_seven (v : V)
       intro z hz
       rcases Finset.mem_filter.mp hz with ⟨hzu, hzv⟩
       have hz_ne_v : z ≠ v := by
+        have hvz : G.Adj v z := by simpa using hzv
         intro hz
         subst z
-        have : G.Adj v v := by simpa using hzv
-        exact G.loopless.irrefl v this
+        exact G.loopless.irrefl v (by simpa using hvz)
       exact Finset.mem_erase.mpr ⟨hz_ne_v, by simpa using hzu⟩
     exact (Finset.card_sdiff_add_card_eq_card hsub).symm
+  rw [hpartition] at htotalLower
   omega
 
 theorem sum_outerNeighbors_card_le (v : V)
