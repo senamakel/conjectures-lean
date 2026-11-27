@@ -1,5 +1,6 @@
 import Mathlib.Data.Fin.Basic
 import Mathlib.Tactic
+import Mathlib.Combinatorics.SimpleGraph.DeleteEdges
 
 /-!
 # The one-vertex counting reduction for `ex(42, C4)`
@@ -10,6 +11,18 @@ If `e = 138`, at least one deletion must retain all 132 edges; that vertex has d
 -/
 
 namespace C4Extremal42
+
+/-- The actual edge count after taking the induced subgraph off one vertex. -/
+noncomputable def inducedDeletionCount (G : SimpleGraph (Fin 42)) (v : Fin 42) : ℕ :=
+  #(G.induce ({v}ᶜ : Set (Fin 42))).edgeFinset
+
+/-- An induced deletion has exactly the original edge count minus the deleted vertex degree. -/
+theorem inducedDeletionCount_eq (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    (v : Fin 42) :
+    inducedDeletionCount G v = G.edgeFinset.card - G.degree v := by
+  rw [inducedDeletionCount, SimpleGraph.card_edgeFinset_induce_compl_singleton,
+    SimpleGraph.card_edgeFinset_deleteIncidenceSet]
+
 
 /-- The edge-counting consequence of the 41-vertex extremal bound. `deletionCount v`
 records the edges after deleting `v`; `hcount` is the double-counting identity. -/
