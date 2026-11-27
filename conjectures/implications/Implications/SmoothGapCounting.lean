@@ -42,11 +42,10 @@ private theorem primeAt_count_asymptotic :
     filter_upwards [hprime.eventually (eventually_gt_atTop 1)] with n hn
     exact div_ne_zero (by linarith) (Real.log_pos hn).ne'
   have hratio := (Asymptotics.isEquivalent_iff_tendsto_one hden).mp heq
-  have hfloor (n : ℕ) : ⌊(primeAt n : ℝ)⌋₊ = primeAt n := by simp
   have hratio' : Tendsto (fun n : ℕ =>
       ((Nat.primeCounting (primeAt n) : ℝ) /
         ((primeAt n : ℝ) / Real.log (primeAt n : ℝ)))) atTop (nhds 1) := by
-    simpa only [Function.comp_apply, hfloor] using hratio
+    simpa only [Function.comp_apply, Nat.floor_natCast] using hratio
   have hfinal : Tendsto (fun n : ℕ => ((n + 1 : ℕ) : ℝ) *
       Real.log (primeAt n : ℝ) / (primeAt n : ℝ)) atTop (nhds 1) := by
     refine hratio'.congr' ?_
