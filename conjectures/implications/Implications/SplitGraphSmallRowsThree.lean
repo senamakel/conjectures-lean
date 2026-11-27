@@ -292,26 +292,30 @@ theorem three_selected_rows_form_triangle
   have hinj : Set.InjOn selected S := by
     intro q hq d hd heq
     by_contra hqd
-    obtain ⟨e, he, hqe, hde⟩ := by
-      have hpairSub : ({q,d} : Finset C) ⊆ S := by
-        intro c hc
-        simp only [Finset.mem_insert, Finset.mem_singleton] at hc
-        rcases hc with rfl | rfl
-        · exact hq
-        · exact hd
-      have hpairCard : ({q,d} : Finset C).card = 2 := by simp [hqd]
-      have hdiffCard : (S \ {q,d}).card = 1 := by
-        rw [Finset.card_sdiff_of_subset hpairSub, hScard, hpairCard]
-      obtain ⟨e, he⟩ := Finset.card_pos.mp (by omega : 0 < (S \ {q,d}).card)
-      have heS := (Finset.mem_sdiff.mp he).1
-      have heNot := (Finset.mem_sdiff.mp he).2
-      have hqe : e ≠ q := by simpa using (Finset.mem_insert.mp (Finset.mem_insert.mpr (Or.inl rfl)))
-      have hqNot : q ∉ ({q,d} : Finset C) := by simpa [hqd]
-      have hde : e ≠ d := by
-        intro h
-        subst e
-        exact heNot (by simp)
-      exact ⟨e, heS, hqe, hde⟩
+    have hpairSub : ({q,d} : Finset C) ⊆ S := by
+      intro c hc
+      simp only [Finset.mem_insert, Finset.mem_singleton] at hc
+      rcases hc with rfl | rfl
+      · exact hq
+      · exact hd
+    have hpairCard : ({q,d} : Finset C).card = 2 := by simp [hqd]
+    have hdiffCard : (S \ {q,d}).card = 1 := by
+      rw [Finset.card_sdiff_of_subset hpairSub, hScard, hpairCard]
+    have hdiffNonempty : (S \ {q,d}).Nonempty :=
+      Finset.card_pos.mp (by omega : 0 < (S \ {q,d}).card)
+    obtain ⟨e, heSD⟩ := hdiffNonempty
+    have heS := (Finset.mem_sdiff.mp heSD).1
+    have heNot := (Finset.mem_sdiff.mp heSD).2
+    have hqe : e ≠ q := by
+      intro h
+      subst e
+      exact heNot (by simp)
+    have hde : e ≠ d := by
+      intro h
+      subst e
+      exact heNot (by simp)
+    let hthird := ⟨e, heS, hqe, hde⟩
+    obtain ⟨e, he, hqe, hde⟩ := hthird
     obtain ⟨i, hiq, hie⟩ := hmeet q hq e he hqe
     have hid : i ∈ selected d := by simpa [heq] using hiq
     have hiI : i ∈ indep := hselectedSub q hq hiq
@@ -356,10 +360,14 @@ theorem three_selected_rows_form_triangle
   obtain ⟨x, hx, hxEq⟩ := Finset.mem_image.mp hmemAB
   obtain ⟨y, hy, hyEq⟩ := Finset.mem_image.mp hmemBC
   obtain ⟨z, hz, hzEq⟩ := Finset.mem_image.mp hmemAC
-  have hxy : x ≠ y := by intro he; apply (by
-    intro h; have hc : c ∈ ({a,b} : Finset I) := h ▸ (by simp); simp [hac, hbc] at hc)
-    rw [he, hxEq] at hyEq
-    exact Finset.mem_singleton.mp (by simp [hyEq] : b ∈ ({a,c} : Finset I))
+  have hxy : x ≠ y := by
+    intro he
+    have hEq : ({a,b} : Finset I) = {b,c} := by rw [← hxEq, he, hyEq]
+    have hc : c ∈ ({a,b} : Finset I) := hEq.symm ▸ (by simp)
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hc
+    rcases hc with hc | hc
+    · exact hac hc.symm
+    · exact hbc hc
   have hxz : x ≠ z := by
     intro he
     have hEq : ({a,b} : Finset I) = {a,c} := hxEq.symm.trans (by simpa [he] using hzEq.symm)
