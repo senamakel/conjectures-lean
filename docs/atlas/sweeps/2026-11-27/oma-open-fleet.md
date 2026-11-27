@@ -108,3 +108,24 @@ modulo that prime. The exceptional quotient 3 can be handled separately
 by the lower bound on the smaller quotient. These exploratory checks
 suggest small kernel-checkable modular certificates. They have yet to
 be certified in Lean.
+
+### Checked cases for odd multipliers 5 through 15
+
+The OMA pin checked the exact nested reduction for the coprime branch
+with `m ≥ 5`. After sorting distinct components, the smaller quotient
+satisfies `4 ≤ q < m+3` and the other satisfies `q ≤ p < m²+3`.
+The submitted Lean file verifies 7,071 pairs `q < p` across 54 rows
+using explicit moduli at most 89. Each certificate rules out every
+residue of the eliminant's first-component variable. The remaining
+obligations are `m ≥ 17, q = 4` and `m ≥ 17, q ≥ 5`; the former has
+the consecutive-square parametrization from the crystal recurrence.
+The exact pinned checker accepted the main implication with only
+`propext`, `Classical.choice`, and `Quot.sound`. The desk returned
+`not_found_or_solved` for the merged step's ID, which the PR discloses.
+[Small-multiplier reduction #4741](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4741)
+
+The non-coprime branch has a separate checked submission. For
+`g = gcd(a,c)`, it writes the two pairs as `(g*x,y*z)` and
+`(g*y,x*z)`, with `x,y` coprime. The remaining distinct-component
+obligation forces `g = z` from the two normalized crystal divisibilities
+and the order constraints. [GCD normalization #4633](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4633)
