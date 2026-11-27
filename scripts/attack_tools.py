@@ -64,12 +64,12 @@ def main():
     shortlist.add_argument("--take", type=int, default=3)
     links = commands.add_parser("links", help="find proposed bridge lemmas shared by targets")
     handoff = commands.add_parser("packet", help="emit a proof-agent packet for one ID")
-    handoff.add_argument("id")
     collision = commands.add_parser("overlap", help="match one ID against a GitHub PR snapshot")
     collision.add_argument("id")
     collision.add_argument("--prs", type=Path, required=True)
     for command in (shortlist, links, handoff):
         command.add_argument("report", type=Path)
+    handoff.add_argument("id")
     for command in (shortlist, handoff):
         command.add_argument("--prs", type=Path, help="GitHub open-PR snapshot")
     args = parser.parse_args()

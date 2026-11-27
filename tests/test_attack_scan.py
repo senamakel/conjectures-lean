@@ -1,3 +1,8 @@
+import json
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
 import unittest
 
 from scripts.attack_scan import evidence_score, lemma_record, proposition, rows
@@ -28,6 +33,14 @@ class AttackScanTest(unittest.TestCase):
                {"number": 3, "files": [{"path": "docs/P.lean"}]}]
         self.assertEqual([pr["number"] for pr in overlaps("P", prs)], [1])
         self.assertEqual([pr["number"] for pr in overlaps("P.R1.H1.R1", prs)], [1])
+
+    def test_packet_command_accepts_report_before_id(self):
+        with tempfile.TemporaryDirectory() as directory:
+            report = Path(directory) / "scan.json"
+            report.write_text(json.dumps({"candidates": [{"id": "P"}]}), encoding="utf-8")
+            command = Path(__file__).resolve().parents[1] / "scripts" / "attack_tools.py"
+            output = subprocess.check_output([sys.executable, command, "packet", report, "P"])
+        self.assertEqual(json.loads(output)["candidate"]["id"], "P")
 
     def test_link_suggestions_require_distinct_targets_and_evidence(self):
         hit = {"name": "bridge", "shared_symbols": ["G.IsClique"],
