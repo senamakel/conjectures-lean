@@ -71,6 +71,22 @@ billion nodes, with the existing 110-second internal wall cap and 2 GiB address
 space cap. This phase measures whether constraint-aware ordering reaches the
 reported forest census at a useful rate. It still stops before orbit reduction.
 
+## Exact-edge partition protocol
+
+The dynamic run reached 2.5 billion nodes in 77.37 seconds (67.44 CPU seconds),
+emitting 847,152 eligible masks and rejecting 990,634 cyclic leaves at 7,912
+KiB maximum RSS. The reported total is 4,576,964, so the one-run node cap is
+insufficient. Continue as four disjoint deterministic slices, exact edge count
+`E=23,24,25,26`; their union is the original labeled census. Save each slice's
+normalized 64-bit vertex masks only under ignored `.lake/snakepit8/` artifacts
+for possible later orbit checking. Each slice has a 180-second internal wall
+cap, 200-second external timeout, 2 GiB address-space cap, single-threaded
+execution, and 6-billion-node cap. Four runs therefore consume at most 12 CPU
+minutes; stop the sequence earlier if aggregate measured CPU reaches 14
+minutes, any invariant fails, or a slice hits its cap. The expected sum is
+4,576,964 masks; a mismatch requires debugging, not a result claim. Orbit
+reduction and Q8 compatibility are explicitly out of this phase.
+
 ## Interpretation
 
 Finishing the count reproduces only the Q7 enumeration stage; it does not prove

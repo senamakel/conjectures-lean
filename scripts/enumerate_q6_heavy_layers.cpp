@@ -2,12 +2,15 @@
 #include <bit>
 #include <chrono>
 #include <cstdint>
+#include <fstream>
 #include <iostream>
+#include <string>
 
 // Independent first-phase census for the Q7-at-53 split argument.
 // Normalize a degree-two vertex and its two neighbors to {0,1,2} in Q6.
 // Count induced linear-forest layers with 23..26 edges and at least 27 vertices.
-// Resource caps are enforced by the caller and the 2.5B-node cap below.
+// Usage: enumerate_q6_heavy_layers <exact-edge-count 23..26> <mask-output>
+// Resource caps are enforced by the caller and the per-slice caps below.
 
 struct Search {
   std::array<std::uint8_t, 64> degree{};
@@ -16,12 +19,17 @@ struct Search {
   std::uint64_t labeled = 0;
   std::uint64_t cyclic_leaves = 0;
   bool stopped = false;
+  int target_edges;
+  std::ofstream masks;
   std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 
+  Search(int target, const std::string &output)
+      : target_edges(target), masks(output, std::ios::binary | std::ios::trunc) {}
+
   bool within_limits() {
-    if (nodes >= 2'500'000'000ULL ||
+    if (nodes >= 6'000'000'000ULL ||
         ((nodes & 0xffff) == 0 &&
-         std::chrono::steady_clock::now() - start >= std::chrono::seconds(110))) {
+         std::chrono::steady_clock::now() - start >= std::chrono::seconds(180))) {
       stopped = true;
       return false;
     }
@@ -33,11 +41,11 @@ struct Search {
     if (!within_limits()) return;
     ++nodes;
     int remaining_count = std::popcount(remaining);
-    if (edges > 26 || edges + 2 * remaining_count < 23 ||
+    if (edges > target_edges || edges + 2 * remaining_count < target_edges ||
         vertices + remaining_count < 27)
       return;
     if (remaining == 0) {
-      if (edges < 23 || vertices < 27) return;
+      if (edges != target_edges || vertices < 27) return;
       std::array<bool, 64> seen{};
       int components = 0;
       int degree_sum = 0;
@@ -73,6 +81,17 @@ struct Search {
       }
       if (edges != vertices - components) {
         ++cyclic_leaves;
+        return;
+      }
+      if (!masks) {
+        std::cerr << "failed to open mask output\n";
+        stopped = true;
+        return;
+      }
+      masks.write(reinterpret_cast<const char *>(&selected), sizeof(selected));
+      if (!masks) {
+        std::cerr << "failed writing mask output\n";
+        stopped = true;
         return;
       }
       ++labeled;
@@ -128,13 +147,24 @@ struct Search {
   }
 };
 
-int main() {
-  Search search;
+int main(int argc, char **argv) {
+  if (argc != 3) {
+    std::cerr << "usage: enumerate_q6_heavy_layers <exact-edge-count 23..26> <mask-output>\n";
+    return 2;
+  }
+  int target = std::stoi(argv[1]);
+  if (target < 23 || target > 26) return 2;
+  Search search(target, argv[2]);
+  if (!search.masks) {
+    std::cerr << "could not open mask output\n";
+    return 2;
+  }
   search.run();
   const double seconds = std::chrono::duration<double>(
       std::chrono::steady_clock::now() - search.start).count();
   std::cout << (search.stopped ? "STOPPED" : "COMPLETE")
-            << " nodes=" << search.nodes << " labeled=" << search.labeled
+            << " target_edges=" << target << " nodes=" << search.nodes
+            << " labeled=" << search.labeled
             << " cyclic_leaves=" << search.cyclic_leaves
             << " wall_seconds=" << seconds << '\n';
   return search.stopped ? 1 : 0;
