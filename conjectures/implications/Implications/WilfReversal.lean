@@ -50,7 +50,9 @@ noncomputable def reversePermEquiv (n : ℕ) :
 
 private theorem reverseIndex_eq {n : ℕ} (s : ℕ) (hs : s + 7 < n)
     (i : Fin 8) :
-    Fin.revPerm ⟨s + (Fin.rev i).val, by have hi := (Fin.rev i).isLt; omega⟩ =
+    Fin.revPerm ⟨s + (Fin.rev i).val, by
+        have hi : (Fin.rev i).val ≤ 7 := Nat.le_of_lt_succ (Fin.rev i).isLt
+        omega⟩ =
       ⟨n - 8 - s + i.val, by have hi := i.isLt; omega⟩ := by
   have hi : (Fin.rev i).val = 7 - i.val := by
     simp [Fin.rev]
@@ -63,6 +65,13 @@ private theorem reverseIndex_eq {n : ℕ} (s : ℕ) (hs : s + 7 < n)
     omega
   apply Fin.ext
   simpa [Fin.revPerm_apply] using hn
+
+private theorem reverseIndex_rev_eq {n : ℕ} (s : ℕ) (hs : s + 7 < n)
+    (i : Fin 8) :
+    Fin.revPerm ⟨s + i.val, by have hi : i.val ≤ 7 := Nat.le_of_lt_succ i.isLt; omega⟩ =
+      ⟨n - 8 - s + (Fin.rev i).val, by have hi := (Fin.rev i).isLt; omega⟩ := by
+  have h := reverseIndex_eq s hs (Fin.rev i)
+  simpa using h
 
 /-- A reversed permutation contains the reversed pattern at the reflected
 start exactly when the original permutation contains the original pattern. -/
@@ -93,17 +102,15 @@ private theorem containsAt_reverse_iff {n : ℕ} (π : Equiv.Perm (Fin n))
     have h' := h (Fin.rev i) (Fin.rev j)
     have hi := reverseIndex_eq s.val hs i
     have hj := reverseIndex_eq s.val hs j
-    have hir := reverseIndex_eq s.val hs (Fin.rev i)
-    have hjr := reverseIndex_eq s.val hs (Fin.rev j)
-    have hrr_i : Fin.rev (Fin.rev i) = i := Fin.rev_rev i
-    have hrr_j : Fin.rev (Fin.rev j) = j := Fin.rev_rev j
+    have hir := reverseIndex_rev_eq s.val hs i
+    have hjr := reverseIndex_rev_eq s.val hs j
     have hcmp : (π (Fin.revPerm ⟨s.val + i.val, by
         have hk := i.isLt
         omega⟩) <
       π (Fin.revPerm ⟨s.val + j.val, by
         have hk := j.isLt
         omega⟩)) ↔ p (Fin.rev i) < p (Fin.rev j) := by
-      simpa [hir, hjr, hrr_i, hrr_j, Fin.rev, Fin.revPerm_apply] using h'
+      simpa [hir, hjr, Fin.rev, Fin.revPerm_apply] using h'
     simpa [reversePattern, Fin.revPerm_apply] using hcmp
 
 /-- Reversal maps the exact occurrence-start set to its reflected image. -/
@@ -119,8 +126,9 @@ theorem occurrenceSet_reverse {n : ℕ} (p : Fin 8 → Fin 8)
     have hv := hc.1
     have hsource := (containsAt_reverse_iff π p s hv).mp hc
     refine Finset.mem_map.mpr ⟨reverseStartEquiv n s, ?_, ?_⟩
-    · exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, by
-        simpa [reverseStartEquiv, reverseStartFun, hv] using hsource⟩
+    · have hstart : (reverseStartEquiv n s).val = n - 8 - s.val := by
+        simp [reverseStartEquiv, reverseStartFun, hv]
+      exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, by simpa [hstart] using hsource⟩
     · exact reverseStartFun_involutive s
   · intro hs
     rcases Finset.mem_map.mp hs with ⟨t, ht, hts⟩
@@ -142,9 +150,10 @@ theorem occurrenceSet_reverse {n : ℕ} (p : Fin 8 → Fin 8)
       simpa [reverseStartFun, hvs] using congrArg Fin.val hts'
     have hsource : ContainsAt (Fin.revPerm.trans π) s.val (reversePattern p) := by
       apply (containsAt_reverse_iff π p s hvs).mpr
-      change ContainsAt π (reverseStartFun s).val p
-      rw [reverseStartFun, dif_pos hvs]
-      simpa [htsval] using hc
+      have hc' : ContainsAt π (n - 8 - s.val) p := by
+        rw [← htsval]
+        exact hc
+      exact hc'
     exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, hsource⟩
 
 private theorem exactCount_eq_of_equiv_occurrenceSets {α β X Y : Type*}
