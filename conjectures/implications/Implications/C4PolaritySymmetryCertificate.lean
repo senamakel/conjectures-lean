@@ -363,8 +363,6 @@ def rowValid (p : List Nat) : Prop :=
 /-- Every certified row is a graph automorphism. The proof checks every value,
 permutation property, and adjacency pair in the concrete finite certificate. -/
 theorem symmetryRows_valid : ∀ p ∈ symmetryRows, rowValid p := by
-set_option diagnostics true in
-#synth Decidable (∀ p ∈ symmetryRows, rowValid p)
   native_decide
 
 noncomputable def rowIso (p : List Nat) (h : rowValid p) : graph ≃g graph := by
@@ -383,7 +381,8 @@ theorem rowFunction_list (p : List Nat) (h : rowValid p) :
   simp only [List.getElem_map, List.getElem_finRange hnf]
   simp [rowFunction, List.getElem!_eq_getElem?_getD,
     List.getElem?_eq_getElem hnp]
-  rw [Nat.mod_eq_of_lt (h.2.1 ⟨n, hn⟩)]
+  have hb := h.2.1 ⟨n, hn⟩
+  omega
 
 /-- Concrete Lean interface for `no_candidate_of_checked_trace.hperms`. -/
 theorem hperms (p : List Nat) (hp : p ∈ symmetryRows) :
