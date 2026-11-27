@@ -9,6 +9,151 @@ namespace SplitGraphSmallRowsThree
 
 open SplitGraphTrees
 
+variable {V : Type*} [Fintype V] [DecidableEq V]
+
+omit [Fintype V] in
+private theorem hamiltonian_of_list
+    (G : SimpleGraph V) (l : List V) (hne : l ≠ []) (hnodup : l.Nodup)
+    (hchain : l.IsChain G.Adj) (hcover : ∀ v : V, v ∈ l) :
+    ∃ u v : V, ∃ p : G.Walk u v, p.IsHamiltonian := by
+  classical
+  let p := SimpleGraph.Walk.ofSupport l hne hchain
+  have hp : p.IsPath := by
+    apply (SimpleGraph.Walk.isPath_def p).2
+    simpa [p, SimpleGraph.Walk.support_ofSupport hne hchain] using hnodup
+  have hvertices : ∀ v : V, v ∈ p.support := by
+    intro v
+    rw [SimpleGraph.Walk.support_ofSupport hne hchain]
+    exact hcover v
+  exact ⟨_, _, p, hp.isHamiltonian_of_mem hvertices⟩
+
+/-- Append a disjoint chain of clique-ended blocks and then the unused clique
+vertices to a prefix whose final vertex lies in the clique. -/
+theorem hamiltonian_of_prefix_and_remaining_chain
+    (G : SimpleGraph V) (C : Finset V) (hC : G.IsClique (C : Set V))
+    (prefix rest tail : List V)
+    (hprefixNodup : prefix.Nodup) (hprefixChain : prefix.IsChain G.Adj)
+    (hprefixLastC : ∀ x, x ∈ prefix.getLast? → x ∈ C)
+    (hrestNodup : rest.Nodup) (hrestChain : rest.IsChain G.Adj)
+    (hrestHeadC : ∀ x, x ∈ rest.head? → x ∈ C)
+    (hrestLastC : ∀ x, x ∈ rest.getLast? → x ∈ C)
+    (hprefixRestDisjoint : ∀ x ∈ prefix, x ∉ rest)
+    (htailNodup : tail.Nodup) (htailC : ∀ x ∈ tail, x ∈ C)
+    (hbaseTailDisjoint : ∀ x ∈ prefix ++ rest, x ∉ tail)
+    (hcover : ∀ x : V, x ∈ prefix ++ rest ∨ x ∈ tail)
+    (hne : prefix ++ rest ++ tail ≠ []) :
+    ∃ u v : V, ∃ p : G.Walk u v, p.IsHamiltonian := by
+  classical
+  let base := prefix ++ rest
+  have hbaseNodup : base.Nodup := by
+    simp only [base]
+    rw [List.nodup_append']
+    exact ⟨hprefixNodup, hrestNodup, hprefixRestDisjoint⟩
+  have hbaseChain : base.IsChain G.Adj := by
+    simp only [base]
+    rw [List.isChain_append]
+    refine ⟨hprefixChain, hrestChain, ?_⟩
+    intro x hx y hy
+    exact hC (hprefixLastC x hx) (hrestHeadC y hy) (by
+      intro heq
+      subst y
+      exact hprefixRestDisjoint x (List.mem_of_mem_getLast? hx)
+        (List.mem_of_mem_head? hy))
+  have hbaseLastC : ∀ x, x ∈ base.getLast? → x ∈ C := by
+    intro x hx
+    by_cases hrest : rest = []
+    · subst rest
+      simpa [base] using hprefixLastC x hx
+    · have hlast : base.getLast? = rest.getLast? := by
+        simp [base, hrest]
+      rw [hlast] at hx
+      exact hrestLastC x hx
+  apply hamiltonian_of_list G (base ++ tail) (by simpa [base] using hne)
+  · rw [List.nodup_append']
+    exact ⟨hbaseNodup, htailNodup, by simpa [base] using hbaseTailDisjoint⟩
+  · rw [List.isChain_append]
+    refine ⟨hbaseChain, ?_, ?_⟩
+    · rw [List.isChain_iff_forall_rel_of_append_cons_cons]
+      intro x y l₁ l₂ heq
+      have hx : x ∈ tail := by rw [heq]; simp
+      have hy : y ∈ tail := by rw [heq]; simp
+      have hxy : x ≠ y := by
+        intro heqxy
+        subst y
+        have hcount := (List.nodup_iff_count_le_one.mp htailNodup) x
+        rw [heq] at hcount
+        simp [List.count_append] at hcount
+        omega
+      exact hC (htailC x hx) (htailC y hy) hxy
+    · intro x hx y hy
+      exact hC (hbaseLastC x hx) (htailC y (List.mem_of_mem_head? hy)) (by
+        intro heqxy
+        subst y
+        exact hbaseTailDisjoint x (List.mem_of_mem_getLast? hx)
+          (List.mem_of_mem_head? hy))
+  · intro x
+    rcases hcover x with hx | hx
+    · exact List.mem_append_left _ (by simpa [base] using hx)
+    · exact List.mem_append_right _ hx
+
+/-- The six-vertex path through the three pair rows, starting at an independent
+vertex and ending at a clique vertex. -/
+theorem triangle_prefix_is_nodup_chain
+    (G : SimpleGraph V) (C I : Finset V) (hdisj : Disjoint C I)
+    (a b c x y z : V)
+    (ha : a ∈ I) (hb : b ∈ I) (hc : c ∈ I)
+    (hx : x ∈ C) (hy : y ∈ C) (hz : z ∈ C)
+    (hab : a ≠ b) (hac : a ≠ c) (hbc : b ≠ c)
+    (hxy : x ≠ y) (hxz : x ≠ z) (hyz : y ≠ z)
+    (hax : G.Adj a x) (hxb : G.Adj x b)
+    (hby : G.Adj b y) (hyc : G.Adj y c) (hcz : G.Adj c z) :
+    ([a, x, b, y, c, z] : List V).Nodup ∧
+      ([a, x, b, y, c, z] : List V).IsChain G.Adj ∧
+      ∀ v, v ∈ ([a, x, b, y, c, z] : List V).getLast? → v ∈ C := by
+  have haC : a ∉ C := fun h => (Finset.disjoint_left.mp hdisj) h ha
+  have hbC : b ∉ C := fun h => (Finset.disjoint_left.mp hdisj) h hb
+  have hcC : c ∉ C := fun h => (Finset.disjoint_left.mp hdisj) h hc
+  have hxI : x ∉ I := fun h => (Finset.disjoint_left.mp hdisj) hx h
+  have hyI : y ∉ I := fun h => (Finset.disjoint_left.mp hdisj) hy h
+  have hzI : z ∉ I := fun h => (Finset.disjoint_left.mp hdisj) hz h
+  have hnodup : ([a, x, b, y, c, z] : List V).Nodup := by
+    simp [hab, hac, hbc, hxy, hxz, hyz, haC, hbC, hcC, hxI, hyI, hzI,
+      hab.symm, hac.symm, hbc.symm, hxy.symm, hxz.symm, hyz.symm]
+  have hchain : ([a, x, b, y, c, z] : List V).IsChain G.Adj := by
+    simp [List.isChain_cons, hax, hxb, hby, hyc, hcz]
+  refine ⟨hnodup, hchain, ?_⟩
+  intro v hv
+  simpa using hz
+
+/-- A triangle of selected pair rows supplies the prefix; any disjoint chain
+of the remaining clique-ended blocks and the unused clique tail completes it. -/
+theorem hamiltonian_of_triangle_block_and_remaining_chain
+    (G : SimpleGraph V) (C I : Finset V) (hC : G.IsClique (C : Set V))
+    (hdisj : Disjoint C I) (a b c x y z : V)
+    (ha : a ∈ I) (hb : b ∈ I) (hc : c ∈ I)
+    (hx : x ∈ C) (hy : y ∈ C) (hz : z ∈ C)
+    (hab : a ≠ b) (hac : a ≠ c) (hbc : b ≠ c)
+    (hxy : x ≠ y) (hxz : x ≠ z) (hyz : y ≠ z)
+    (hax : G.Adj a x) (hxb : G.Adj x b)
+    (hby : G.Adj b y) (hyc : G.Adj y c) (hcz : G.Adj c z)
+    (rest tail : List V)
+    (hrestNodup : rest.Nodup) (hrestChain : rest.IsChain G.Adj)
+    (hrestHeadC : ∀ v, v ∈ rest.head? → v ∈ C)
+    (hrestLastC : ∀ v, v ∈ rest.getLast? → v ∈ C)
+    (hprefixRestDisjoint : ∀ v ∈ [a, x, b, y, c, z], v ∉ rest)
+    (htailNodup : tail.Nodup) (htailC : ∀ v ∈ tail, v ∈ C)
+    (hbaseTailDisjoint : ∀ v ∈ ([a, x, b, y, c, z] ++ rest), v ∉ tail)
+    (hcover : ∀ v : V, v ∈ [a, x, b, y, c, z] ++ rest ∨ v ∈ tail)
+    (hne : [a, x, b, y, c, z] ++ rest ++ tail ≠ []) :
+    ∃ u v : V, ∃ p : G.Walk u v, p.IsHamiltonian := by
+  obtain ⟨hprefNodup, hprefChain, hprefLastC⟩ := triangle_prefix_is_nodup_chain
+    G C I hdisj a b c x y z ha hb hc hx hy hz hab hac hbc hxy hxz hyz
+    hax hxb hby hyc hcz
+  exact hamiltonian_of_prefix_and_remaining_chain G C hC
+    [a, x, b, y, c, z] rest tail hprefNodup hprefChain hprefLastC
+    hrestNodup hrestChain hrestHeadC hrestLastC hprefixRestDisjoint
+    htailNodup htailC hbaseTailDisjoint hcover hne
+
 variable {α : Type*} [DecidableEq α]
 
 /-- Three distinct, pairwise-intersecting two-element rows with no common
