@@ -426,6 +426,74 @@ theorem degree_six_vertex_has_at_most_two_degree_eight_neighbors
   have hU4le : (U3 ∪ N z).card ≤ U.card := Finset.card_le_card hsubU
   omega
 
+
+/-- Exactly six degree-six vertices meet two of the four degree-eight neighborhoods. -/
+theorem count_degree_six_with_two_degree_eight_neighbors
+    (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    (hDel : ∀ v, C4Extremal42.inducedDeletionCount G v ≤ 132)
+    (he : G.edgeFinset.card = 138) (hC4 : C4VertexExtension.C4Free G)
+    (h8 : (Finset.univ.filter fun v => G.degree v = 8).card = 4) :
+    (Finset.univ.filter fun x => G.degree x = 6 ∧
+      (G.neighborFinset x ∩ Finset.univ.filter fun u => G.degree u = 8).card = 2).card = 6 := by
+  classical
+  let A := Finset.univ.filter fun x => G.degree x = 6
+  let D := Finset.univ.filter fun u => G.degree u = 8
+  let m := fun x => (G.neighborFinset x ∩ D).card
+  have hA : A.card = 22 := by
+    have hc := C4DegreeEightCap.count_extremal_deletions_eq G hDel he hC4
+    have hEq : (Finset.univ.filter fun v => C4Extremal42.inducedDeletionCount G v = 132) = A := by
+      ext v
+      simp only [A, Finset.mem_filter, Finset.mem_univ, true_and,
+        C4Extremal42.inducedDeletionCount_eq, he]
+      omega
+    rw [hEq, h8] at hc
+    exact hc
+  have hCount (S : Finset (Fin 42)) (x : Fin 42) :
+      (∑ u ∈ S, if G.Adj x u then (1 : ℕ) else 0) = (G.neighborFinset x ∩ S).card := by
+    have hsets : S.filter (fun u => G.Adj x u) = G.neighborFinset x ∩ S := by
+      ext u
+      simp [G.mem_neighborFinset, and_comm]
+    rw [← Finset.sum_filter, hsets]
+    simp
+  have hsum : (∑ x ∈ A, m x) = 28 := by
+    calc
+      _ = ∑ x ∈ A, ∑ u ∈ D, if G.Adj x u then (1 : ℕ) else 0 := by
+        apply Finset.sum_congr rfl
+        intro x _
+        exact (hCount D x).symm
+      _ = ∑ u ∈ D, ∑ x ∈ A, if G.Adj u x then (1 : ℕ) else 0 := by
+        rw [Finset.sum_comm]
+        apply Finset.sum_congr rfl
+        intro u _
+        apply Finset.sum_congr rfl
+        intro x _
+        simp only [G.adj_comm x u]
+      _ = ∑ _u ∈ D, (7 : ℕ) := by
+        apply Finset.sum_congr rfl
+        intro u hu
+        rw [hCount]
+        exact degree_eight_vertex_has_seven_degree_six_neighbors G hDel he hC4 h8
+          (Finset.mem_filter.mp hu).2
+      _ = 28 := by simp [D, h8]
+  have hsplit : (∑ x ∈ A, m x) = A.card + (A.filter fun x => m x = 2).card := by
+    calc
+      _ = ∑ x ∈ A, (1 + if m x = 2 then 1 else 0) := by
+        apply Finset.sum_congr rfl
+        intro x hx
+        have hx6 := (Finset.mem_filter.mp hx).2
+        have hhi := degree_six_vertex_has_at_most_two_degree_eight_neighbors G hDel he hC4 h8 hx6
+        change m x ≤ 2 at hhi
+        obtain ⟨u, huD, hxu⟩ := Finset.mem_biUnion.mp
+          (degree_six_vertex_in_degree_eight_union G hDel he hC4 h8 hx6)
+        have hlo : 0 < m x := by
+          apply Finset.card_pos.mpr
+          refine ⟨u, Finset.mem_inter.mpr ⟨?_, huD⟩⟩
+          exact (G.mem_neighborFinset x u).mpr ((G.mem_neighborFinset u x).mp hxu).symm
+        split <;> omega
+      _ = _ := by simp [Finset.sum_add_distrib]
+  have htarget : (A.filter fun x => m x = 2).card = 6 := by omega
+  simpa [A, m, D, Finset.filter_filter] using htarget
+
 end C4DegreeEightMultiplicity
 
 #print axioms C4DegreeEightMultiplicity.degree_eight_neighborhood_union_card_eq_26
@@ -433,3 +501,5 @@ end C4DegreeEightMultiplicity
 #print axioms C4DegreeEightMultiplicity.degree_eight_vertex_has_seven_degree_six_neighbors
 #print axioms C4DegreeEightMultiplicity.degree_six_vertex_in_degree_eight_union
 #print axioms C4DegreeEightMultiplicity.degree_six_vertex_has_at_most_two_degree_eight_neighbors
+
+#print axioms C4DegreeEightMultiplicity.count_degree_six_with_two_degree_eight_neighbors
