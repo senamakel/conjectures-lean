@@ -153,7 +153,7 @@ private theorem markedComponents_disjoint {n : ℕ} (marks shifts : Finset ℕ)
     (hsep : SeparatedBy marks shifts)
     (htranslate : ∀ d ∈ shifts, ∀ i j : Fin 8,
       i ∈ m.support → j ∈ m.support → i.val ≠ d + j.val) :
-    (Finset.univ : Finset (MarkedStart marks) : Set (MarkedStart marks)).Pairwise
+    ((Finset.univ : Finset (MarkedStart marks)) : Set (MarkedStart marks)).Pairwise
       (fun s t => Equiv.Perm.Disjoint
         (markedComponent marks m hb s) (markedComponent marks m hb t)) := by
   have hpair := lifted_windows_pairwise_disjoint marks shifts m hb hsep htranslate
