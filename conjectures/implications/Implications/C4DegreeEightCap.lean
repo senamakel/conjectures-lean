@@ -138,10 +138,6 @@ private theorem degree_seven_neighbors_card_le_one (G : SimpleGraph (Fin 42))
   have hy7 := (Finset.mem_filter.mp (Finset.mem_inter.mp hy).2).2
   have hsum := C4DegreeBounds.neighbor_degree_excess_le_one_of_degree_eight
     G u (by simp) hmin hC4 hu
-  have hxle : G.degree x - 6 ≤ ∑ w ∈ G.neighborFinset u, (G.degree w - 6) :=
-    Finset.single_le_sum (fun w hw => Nat.zero_le _) hxN
-  have hyle : G.degree y - 6 ≤ ∑ w ∈ G.neighborFinset u, (G.degree w - 6) :=
-    Finset.single_le_sum (fun w hw => Nat.zero_le _) hyN
   have hxySum : (G.degree x - 6) + (G.degree y - 6) ≤
       ∑ w ∈ G.neighborFinset u, (G.degree w - 6) := by
     have hsubset : insert x {y} ⊆ G.neighborFinset u := by
@@ -198,6 +194,7 @@ theorem degree_eight_count_le_four_of_extremal_42
     intro x hxD hxU
     rcases Finset.mem_biUnion.mp hxU with ⟨u, huD, hxu⟩
     have hu8 := (Finset.mem_filter.mp huD).2
+    have hx8 := (Finset.mem_filter.mp hxD).2
     have hbound := C4DegreeBounds.neighbor_degree_le_seven_of_degree_eight
       G u (by simp) hmin hC4 hu8 hxu
     omega
@@ -239,7 +236,6 @@ theorem degree_eight_count_le_four_of_extremal_42
   have hEcount : E.card + 2 * D.card = 24 := by
     have hsumDeg : (∑ v : Fin 42, G.degree v) = 276 := by
       rw [G.sum_degrees_eq_twice_card_edges, he]
-      norm_num
     have hsumExcess : (∑ v : Fin 42, (G.degree v - 6)) = 24 := by
       have hdecomp : (∑ v : Fin 42, G.degree v) =
           (∑ v : Fin 42, (G.degree v - 6)) + 252 := by
@@ -264,7 +260,14 @@ theorem degree_eight_count_le_four_of_extremal_42
           intro v hv
           exact hterm v
         _ = E.card + 2 * D.card := by
-          simp [E, D, Finset.sum_add_distrib, Finset.sum_ite_mem_eq]
+          rw [Finset.sum_add_distrib]
+          have hseven : (∑ v : Fin 42, if G.degree v = 7 then 1 else 0) = E.card := by
+            simp [E, Finset.sum_ite_mem_eq]
+          have height : (∑ v : Fin 42, if G.degree v = 8 then 2 else 0) = 2 * D.card := by
+            calc
+              _ = ∑ v ∈ D, (2 : ℕ) := by simp [D, Finset.sum_ite_mem_eq]
+              _ = 2 * D.card := by simp
+          rw [hseven, height]
     omega
   have htarget : D.card ≤ 4 := by
     by_contra hgt
@@ -285,7 +288,7 @@ theorem degree_eight_count_le_four_of_extremal_42
       rw [hk] at hUnionBound
       norm_num at hUnionBound
       omega
-  exact htarget
+  exact hnot htarget
 
 end C4DegreeEightCap
 
