@@ -1,6 +1,6 @@
 import Mathlib.Data.Finset.Card
 import Mathlib.Data.Finset.Basic
-import Mathlib.Tactic.Omega
+import Mathlib.Tactic
 
 /-!
 Hall-type bookkeeping for the connectivity-three split-graph case of WOWII 199.
