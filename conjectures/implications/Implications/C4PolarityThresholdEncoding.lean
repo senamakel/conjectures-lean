@@ -220,6 +220,70 @@ theorem extendThresholdGates_preserves (assignment : Nat → Bool)
       · intro later hlater
         exact hfresh later (by simp [hlater])
 
+/-- Running an ordered sequence of threshold gates satisfies every gate's
+four DIMACS clauses in the final extended assignment. -/
+theorem thresholdGateList_satisfies (assignment : Nat → Bool)
+    (gates : List ThresholdGate) (hordered : ThresholdGate.Ordered gates) :
+    ∀ gate ∈ gates,
+      cnfValue (extendThresholdGates assignment gates)
+        (thresholdGateDimacs gate.above gate.input gate.below (Int.ofNat gate.output)) = true := by
+  induction gates generalizing assignment with
+  | nil => simp
+  | cons gate gates ih =>
+      rcases hordered with ⟨hpos, habove, hinput, hbelow, hlater, htail⟩
+      intro current hmem
+      rcases List.mem_cons.mp hmem with rfl | hmem
+      · have haboveNe : gate.above ≠ 0 := by
+          intro hz
+          simp [hz] at habove
+          omega
+        have hinputNe : gate.input ≠ 0 := by
+          intro hz
+          simp [hz] at hinput
+          omega
+        have hbelowNe : gate.below ≠ 0 := by
+          intro hz
+          simp [hz] at hbelow
+          omega
+        let afterGate := extendThresholdGate assignment gate
+        let finalAssignment := extendThresholdGates afterGate gates
+        have hAbovePres : literalValue finalAssignment gate.above =
+            literalValue assignment gate.above := by
+          apply extendThresholdGates_preserves
+          intro later hlaterMem
+          have hlt := hlater later hlaterMem
+          omega
+        have hInputPres : literalValue finalAssignment gate.input =
+            literalValue assignment gate.input := by
+          apply extendThresholdGates_preserves
+          intro later hlaterMem
+          have hlt := hlater later hlaterMem
+          omega
+        have hBelowPres : literalValue finalAssignment gate.below =
+            literalValue assignment gate.below := by
+          apply extendThresholdGates_preserves
+          intro later hlaterMem
+          have hlt := hlater later hlaterMem
+          omega
+        have hOutputPres : literalValue finalAssignment (Int.ofNat gate.output) =
+            thresholdGateValue assignment gate := by
+          change literalValue (extendThresholdGates afterGate gates)
+            (Int.ofNat gate.output) = thresholdGateValue assignment gate
+          rw [extendThresholdGates_preserves]
+          · simp [afterGate, extendThresholdGate, literalValue_extendVariable_self]
+          · intro later hlaterMem
+            have hlt := hlater later hlaterMem
+            simp [Int.natAbs_natCast]
+            omega
+        apply (thresholdGateDimacs_iff finalAssignment gate.above gate.input gate.below
+          (Int.ofNat gate.output) haboveNe hinputNe hbelowNe (by
+            intro hzero
+            have : gate.output = 0 := by exact_mod_cast hzero
+            omega)).2
+        rw [hOutputPres, hAbovePres, hInputPres, hBelowPres]
+        rfl
+      · apply ih (extendThresholdGate assignment gate) htail current hmem
+
 /-- Build the clauses for one row, zipping `previous[k]`,
 `previous[k - 1]`, and the newly allocated output. -/
 def thresholdRowClauses (x : Int) (previous outputs : List Int) : List (List Int) :=
