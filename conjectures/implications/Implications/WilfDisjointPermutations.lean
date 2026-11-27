@@ -29,17 +29,19 @@ theorem assemble_apply_of_mem_support {ι α : Type*} [DecidableEq ι] [Fintype 
   have hrest_fixes : ∀ j ∈ s.erase i, k j x = x := by
     intro j hj
     rcases Finset.mem_erase.mp hj with ⟨hji, hjs⟩
-    rcases hdisj hjs hi hji with hjfix | hifix
+    rcases hdisj hjs hi hji x with hjfix | hifix
     · exact hjfix
     · exact (hxne hifix).elim
   have hrest : (s.erase i).noncommProd k hrest_comm x = x :=
     Finset.noncommProd_induction _ _ hrest_comm (fun f : Equiv.Perm α => f x = x)
       (fun f g hf hg => by simp [Equiv.Perm.mul_apply, hf, hg])
       rfl hrest_fixes
-  change (s.noncommProd k (hdisj.imp fun _ _ => Equiv.Perm.Disjoint.commute)) x = k i x
-  rw [← Finset.insert_erase hi,
-    Finset.noncommProd_insert_of_notMem _ _ _ _ (Finset.not_mem_erase i s)]
-  simp only [Equiv.Perm.mul_apply, hrest]
+  have hprod : k i * (s.erase i).noncommProd k hrest_comm =
+      s.noncommProd k (hdisj.imp fun _ _ => Equiv.Perm.Disjoint.commute) := by
+    exact Finset.mul_noncommProd_erase s hi k
+      (hdisj.imp fun _ _ => Equiv.Perm.Disjoint.commute)
+  have hEval := congrArg (fun f : Equiv.Perm α => f x) hprod
+  simpa [Equiv.Perm.mul_apply, hrest] using hEval.symm
 
 /-- Away from every component support, the assembled permutation fixes the point. -/
 theorem assemble_apply_of_forall_fixes {ι α : Type*} [DecidableEq ι] [Fintype α] [DecidableEq α]
