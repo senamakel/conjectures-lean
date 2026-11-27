@@ -301,9 +301,10 @@ theorem primeEulerProduct_rankin_bound (Y : ℕ) (σ : ℝ) (hY2 : 2 ≤ Y)
       nlinarith [Real.sqrt_nonneg (2 : ℝ)]
     have hfactor : (4 / 3 : ℝ) ≤ (p : ℝ) ^ σ := hsqrt.trans hbase
     dsimp [u]
-    change 1 / ((p : ℝ) ^ σ) ≤ 3 / 4
-    rw [div_le_iff₀ (by positivity)]
-    nlinarith
+    calc
+      ((p : ℝ) ^ σ)⁻¹ ≤ (4 / 3 : ℝ)⁻¹ := by
+        simpa [one_div] using (one_div_le_one_div_of_le (by norm_num) hfactor)
+      _ = 3 / 4 := by norm_num
   have hlocal : ∀ p ∈ Y.primesBelow,
       u p ≤ (Y : ℝ) ^ (1 - σ) / p := by
     intro p hp
