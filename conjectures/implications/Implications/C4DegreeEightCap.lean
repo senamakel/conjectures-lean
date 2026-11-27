@@ -111,7 +111,7 @@ theorem degree_eight_count_le_seven (G : SimpleGraph (Fin 42)) [DecidableRel G.A
         simp [D]
   omega
 
- /-- The `ex(41,C4) ≤ 132` deletion input gives minimum degree six for a
+/-- The `ex(41,C4) ≤ 132` deletion input gives minimum degree six for a
 42-vertex, 138-edge graph.  Thus such a C4-free graph has at most seven
 degree-eight vertices. -/
 theorem degree_eight_count_le_seven_of_extremal_42
