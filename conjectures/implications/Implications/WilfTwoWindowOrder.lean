@@ -50,11 +50,12 @@ theorem replacement_order_23167584 {α : Type*} [Preorder α] (f : Fin 13 → α
   · exact iff_of_true (haf.trans (hsecond 1 6 (by decide))) (by decide)
   · exact iff_of_true (haf.trans (hsecond 1 7 (by decide))) (by decide)
 
-/-- Lift the local certificate to two marked occurrences in a permutation. -/
-theorem replacement_order_of_occurrences {n : ℕ} (π : Equiv.Perm (Fin n))
-    (p : Fin 8 → Fin 8) (hp : p = pattern23157684 ∨ p = pattern23167584)
-    (t : ℕ) (ht : t + 12 < n) (hfirst : WilfMarked.ContainsAt π t p)
-    (hsecond : WilfMarked.ContainsAt π (t + 5) p) (j : Fin 8) (hj : j ≠ 0) :
+/-- Lift any local order argument to two marked occurrences in a permutation. -/
+theorem lift_replacement_order {n : ℕ} (p : Fin 8 → Fin 8) (j : Fin 8)
+    (hlocal : ∀ f : Fin 13 → Fin n, WindowOrder p f 0 → WindowOrder p f 5 →
+      (f 3 < f (position 5 j) ↔ p 0 < p j))
+    (π : Equiv.Perm (Fin n)) (t : ℕ) (ht : t + 12 < n)
+    (hfirst : WilfMarked.ContainsAt π t p) (hsecond : WilfMarked.ContainsAt π (t + 5) p) :
     π ⟨t + 3, by omega⟩ < π ⟨t + 5 + j.val, by have := j.isLt; omega⟩ ↔
       p 0 < p j := by
   let f : Fin 13 → Fin n := fun k => π ⟨t + k.val, by have := k.isLt; omega⟩
@@ -66,9 +67,19 @@ theorem replacement_order_of_occurrences {n : ℕ} (π : Equiv.Perm (Fin n))
   have h₅ : WindowOrder p f 5 := by
     intro i k hik
     simpa [f, position, Nat.add_assoc] using (hb₅ i k).mpr hik
+  simpa [f, position, Nat.add_assoc] using hlocal f h₀ h₅
+
+/-- Lift the local certificate to two marked occurrences in a permutation. -/
+theorem replacement_order_of_occurrences {n : ℕ} (π : Equiv.Perm (Fin n))
+    (p : Fin 8 → Fin 8) (hp : p = pattern23157684 ∨ p = pattern23167584)
+    (t : ℕ) (ht : t + 12 < n) (hfirst : WilfMarked.ContainsAt π t p)
+    (hsecond : WilfMarked.ContainsAt π (t + 5) p) (j : Fin 8) (hj : j ≠ 0) :
+    π ⟨t + 3, by omega⟩ < π ⟨t + 5 + j.val, by have := j.isLt; omega⟩ ↔
+      p 0 < p j := by
+  apply lift_replacement_order p j _ π t ht hfirst hsecond
   rcases hp with rfl | rfl
-  · simpa [f, position, Nat.add_assoc] using replacement_order_23157684 f h₀ h₅ j hj
-  · simpa [f, position, Nat.add_assoc] using replacement_order_23167584 f h₀ h₅ j hj
+  · exact fun f hf hs => replacement_order_23157684 f hf hs j hj
+  · exact fun f hf hs => replacement_order_23167584 f hf hs j hj
 
 #print axioms replacement_order_23157684
 #print axioms replacement_order_23167584
