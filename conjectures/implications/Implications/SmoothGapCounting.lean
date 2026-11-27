@@ -17,6 +17,11 @@ noncomputable def primeAt (n : ℕ) : ℕ := Nat.nth Nat.Prime n
 /-- The gap between the `n`th prime and its successor. -/
 noncomputable def primeGap (n : ℕ) : ℕ := primeAt (n + 1) - primeAt n
 
+private theorem primeCounting_primeAt (n : ℕ) :
+    Nat.primeCounting (primeAt n) = n + 1 := by
+  change Nat.count Nat.Prime (Nat.nth Nat.Prime n + 1) = n + 1
+  exact Nat.count_nth_succ_of_infinite Nat.infinite_setOfPred_prime n
+
 private theorem primeAt_strictMono : StrictMono primeAt := by
   intro a b hab
   exact Nat.nth_strictMono Nat.infinite_setOfPred_prime hab
