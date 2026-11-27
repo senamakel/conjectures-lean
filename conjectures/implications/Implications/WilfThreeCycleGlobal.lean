@@ -8,6 +8,13 @@ namespace Implications.WilfThreeCycleGlobal
 
 open WilfMarked WilfTwoWindowOrder WilfThreeCycleOrder
 
+/-- The middle pattern in archive block 41, obtained by swapping entries at positions one and
+three of `23145786`. -/
+def pattern24135786 : Fin 8 → Fin 8 := ![1, 3, 0, 2, 4, 6, 7, 5]
+
+/-- The position transposition relating the first and middle patterns of block 41. -/
+def swap13 : Equiv.Perm (Fin 8) := Equiv.swap 1 3
+
 private abbrev windowEmbedding {n : ℕ} (s : ℕ) (hs : s + 7 < n) : Fin 8 ↪ Fin n :=
   WilfDisjointPermutations.windowEmbedding s (by omega)
 
@@ -222,6 +229,17 @@ private theorem moveMarked_injective {n : ℕ} (marks : Finset ℕ) (p q : Fin 8
   have hx := congrArg (fun e : Equiv.Perm (Fin n) => e (g.symm x)) he
   simpa only [Equiv.trans_apply, Equiv.apply_symm_apply] using hx
 
+private theorem marked_iff_subset {n : ℕ} (p : Fin 8 → Fin 8)
+    (chosen : Finset (Fin n)) (π : Equiv.Perm (Fin n)) :
+    chosen ⊆ WilfPatternSwap.occurrenceSet p π ↔ Marked (chosen.image Fin.val) p π := by
+  classical
+  constructor
+  · intro h s hs
+    obtain ⟨i, hi, rfl⟩ := Finset.mem_image.mp hs
+    exact (Finset.mem_filter.mp (h hi)).2
+  · intro h i hi
+    exact Finset.mem_filter.mpr ⟨Finset.mem_univ i, h i.val (Finset.mem_image_of_mem _ hi)⟩
+
 /-- A marked-window bijection turns a local overlap certificate into exact count equality.
 
 The moved points of `m` only need to lie among offsets `1`, `3`, and `4`; the separate
@@ -272,47 +290,85 @@ theorem exactOccurrenceCount_eq_of_markedSwap (n : ℕ) (marks : Finset (Fin n))
     ((Fintype.equivOfCardEq hcount).trans
       (Equiv.subtypeEquivRight (marked_iff_subset q chosen)).symm)
 
-private theorem marked_iff_subset {n : ℕ} (p : Fin 8 → Fin 8)
-    (chosen : Finset (Fin n)) (π : Equiv.Perm (Fin n)) :
-    chosen ⊆ WilfPatternSwap.occurrenceSet p π ↔ Marked (chosen.image Fin.val) p π := by
-  classical
-  constructor
-  · intro h s hs
-    obtain ⟨i, hi, rfl⟩ := Finset.mem_image.mp hs
-    exact (Finset.mem_filter.mp (h hi)).2
-  · intro h i hi
-    exact Finset.mem_filter.mpr ⟨Finset.mem_univ i, h i.val (Finset.mem_image_of_mem _ hi)⟩
-
 /-- The marked three-position cycle proves exact occurrence-count equality. -/
 theorem exactOccurrenceCount_eq_23145786_25134786 (n : ℕ) (marks : Finset (Fin n)) :
     WilfCounts.exactCount (WilfPatternSwap.occurrenceSet pattern23145786) marks =
       WilfCounts.exactCount (WilfPatternSwap.occurrenceSet pattern25134786) marks := by
-  classical
-  apply WilfEquivalence.exactCount_eq_of_markedEquiv
-  intro chosen
-  let chosenNat := chosen.image Fin.val
   have hpq : pattern23145786 ∘ cycle = pattern25134786 := by funext i; fin_cases i <;> rfl
   have hqp : pattern25134786 ∘ cycle.symm = pattern23145786 := by funext i; fin_cases i <;> rfl
-  have hcount : Fintype.card {π : Equiv.Perm (Fin n) // Marked chosenNat pattern23145786 π} =
-      Fintype.card {π : Equiv.Perm (Fin n) // Marked chosenNat pattern25134786 π} := by
-    apply le_antisymm
-    · apply Fintype.card_le_of_injective _
-        (moveMarked_injective chosenNat pattern23145786 pattern25134786 cycle
-          (by decide) _ hpq overlap_order_23145786_25134786)
-      apply overlap_compatible_only_at_5_or_7_of_decide
-      intro d hd hsmall
-      interval_cases d <;> decide
-    · apply Fintype.card_le_of_injective _
-        (moveMarked_injective chosenNat pattern25134786 pattern23145786 cycle.symm
-          (by decide) _ hqp overlap_order_25134786_23145786)
-      apply overlap_compatible_only_at_5_or_7_of_decide
-      intro d hd hsmall
-      interval_cases d <;> decide
-  exact (Equiv.subtypeEquivRight (marked_iff_subset pattern23145786 chosen)).trans
-    ((Fintype.equivOfCardEq hcount).trans
-      (Equiv.subtypeEquivRight (marked_iff_subset pattern25134786 chosen)).symm)
+  apply exactOccurrenceCount_eq_of_markedSwap n marks pattern23145786 pattern25134786 cycle
+  · intro i hi
+    have hcycle : ∀ i : Fin 8, cycle i ≠ i ↔ i = 1 ∨ i = 3 ∨ i = 4 := by decide
+    exact (hcycle i).mp hi
+  · exact (by decide : cycle 1 ≠ 1)
+  · intro d hd hsmall
+    interval_cases d <;> decide
+  · intro d hd hsmall
+    interval_cases d <;> decide
+  · exact hpq
+  · exact hqp
+  · exact overlap_order_23145786_25134786
+  · exact overlap_order_25134786_23145786
+
+private theorem overlap_order_23145786_24135786 {α : Type*} [Preorder α]
+    (f : Fin 13 → α) (hf : WindowOrder pattern23145786 f 0)
+    (hn : WindowOrder pattern23145786 f 5) (i j : Fin 8) :
+    f (overlapImage swap13 i) < f (overlapImage swap13 j) ↔
+      pattern24135786 i < pattern24135786 j := by
+  have hpq : pattern23145786 ∘ swap13 = pattern24135786 := by
+    funext k
+    fin_cases k <;> rfl
+  rw [← hpq]
+  exact overlap_cycle_order pattern23145786 swap13 (by decide) (by decide)
+    (by decide) (by decide) (by decide) f hf hn i j
+
+private theorem overlap_order_24135786_23145786 {α : Type*} [Preorder α]
+    (f : Fin 13 → α) (hf : WindowOrder pattern24135786 f 0)
+    (hn : WindowOrder pattern24135786 f 5) (i j : Fin 8) :
+    f (overlapImage swap13.symm i) < f (overlapImage swap13.symm j) ↔
+      pattern23145786 i < pattern23145786 j := by
+  have hqp : pattern24135786 ∘ swap13.symm = pattern23145786 := by
+    funext k
+    fin_cases k <;> rfl
+  rw [← hqp]
+  exact overlap_cycle_order pattern24135786 swap13.symm (by decide) (by decide)
+    (by decide) (by decide) (by decide) f hf hn i j
+
+/-- Swapping zero-based positions one and three preserves the exact occurrence count. -/
+theorem exactOccurrenceCount_eq_23145786_24135786 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (WilfPatternSwap.occurrenceSet pattern23145786) marks =
+      WilfCounts.exactCount (WilfPatternSwap.occurrenceSet pattern24135786) marks := by
+  have hpq : pattern23145786 ∘ swap13 = pattern24135786 := by
+    funext i
+    fin_cases i <;> rfl
+  have hqp : pattern24135786 ∘ swap13.symm = pattern23145786 := by
+    funext i
+    fin_cases i <;> rfl
+  apply exactOccurrenceCount_eq_of_markedSwap n marks pattern23145786 pattern24135786 swap13
+  · intro i hi
+    have hm : ∀ i : Fin 8, swap13 i ≠ i → i = 1 ∨ i = 3 ∨ i = 4 := by decide
+    exact hm i hi
+  · by decide
+  · intro d hd hsmall
+    interval_cases d <;> decide
+  · intro d hd hsmall
+    interval_cases d <;> decide
+  · exact hpq
+  · exact hqp
+  · exact overlap_order_23145786_24135786
+  · exact overlap_order_24135786_23145786
+
+/-- The first, middle, and last patterns in archive block 41 have equal exact counts. -/
+theorem exactOccurrenceCount_eq_24135786_25134786 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (WilfPatternSwap.occurrenceSet pattern24135786) marks =
+      WilfCounts.exactCount (WilfPatternSwap.occurrenceSet pattern25134786) marks := by
+  exact (exactOccurrenceCount_eq_23145786_24135786 n marks).symm.trans
+    (exactOccurrenceCount_eq_23145786_25134786 n marks)
 
 #print axioms crossing_offsets
+#print axioms exactOccurrenceCount_eq_of_markedSwap
+#print axioms exactOccurrenceCount_eq_23145786_24135786
+#print axioms exactOccurrenceCount_eq_24135786_25134786
 #print axioms exactOccurrenceCount_eq_23145786_25134786
 
 end Implications.WilfThreeCycleGlobal
