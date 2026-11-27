@@ -116,6 +116,37 @@ private theorem logLogCutoff_tendsto_atTop :
       using 1 <;> ext n <;> simp
   exact tendsto_natCast_atTop_atTop.comp (tendsto_nat_floor_atTop.comp hprod)
 
+private theorem eventually_logLogCutoff_log_lower :
+    ∀ᶠ n : ℕ in atTop,
+      Real.log (Real.log (primeAt n : ℝ)) / 2 ≤ Real.log (logLogCutoff n : ℝ) := by
+  have hprime : Tendsto (fun n : ℕ => (primeAt n : ℝ)) atTop atTop := by
+    have hnat : Tendsto primeAt atTop atTop := by
+      rw [tendsto_atTop_atTop]
+      intro b
+      refine ⟨b, fun n hbn => ?_⟩
+      have hp := Nat.add_two_le_nth_prime n
+      change b ≤ Nat.nth Nat.Prime n
+      omega
+    exact tendsto_natCast_atTop_atTop.comp hnat
+  have hlog := Real.tendsto_log_atTop.comp hprime
+  have hloglog := Real.tendsto_log_atTop.comp hlog
+  filter_upwards [hlog.eventually_ge_atTop 1024, hloglog.eventually_ge_atTop 1]
+    with n hL hLL
+  have hLpos : 0 < Real.log (primeAt n : ℝ) := by linarith
+  have hsqrt_le : Real.sqrt (Real.log (primeAt n : ℝ)) ≤
+      (Real.log (primeAt n : ℝ)) / 32 := by
+    nlinarith [Real.sq_sqrt (le_of_lt hLpos)]
+  have hfloor : Real.log (primeAt n : ℝ) *
+      Real.log (Real.log (primeAt n : ℝ)) / 16 <
+      (logLogCutoff n : ℝ) + 1 := Nat.lt_floor_add_one _
+  have hB_lower : Real.sqrt (Real.log (primeAt n : ℝ)) ≤ (logLogCutoff n : ℝ) := by
+    have hratio : (Real.log (primeAt n : ℝ)) / 32 ≤
+        Real.log (primeAt n : ℝ) * Real.log (Real.log (primeAt n : ℝ)) / 16 - 1 := by
+      nlinarith [hL, hLL]
+    linarith
+  rw [← Real.log_sqrt (le_of_lt hLpos)]
+  exact Real.log_le_log (by positivity) hB_lower
+
 private theorem primeAt_strictMono : StrictMono primeAt := by
   intro a b hab
   exact Nat.nth_strictMono Nat.infinite_setOfPred_prime hab
