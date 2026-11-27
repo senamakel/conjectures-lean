@@ -54,7 +54,8 @@ private theorem swaps_nonfirst {n : ℕ} (marks : Finset ℕ)
 private theorem swaps_first_lt_second {n : ℕ} (marks : Finset ℕ)
     (hb : ∀ s ∈ marks, s + 7 < n)
     (hd : ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t)
-    (π : Equiv.Perm (Fin n)) (p : Fin 8 → Fin 8) (hcross : p 3 < p 7)
+    (π : Equiv.Perm (Fin n)) (p : Fin 8 → Fin 8)
+    (hfirst : ∀ i : Fin 8, i ≠ 0 → p 0 < p i) (hcross : p 3 < p 7)
     (hπ : ∀ s ∈ marks, ContainsAt π s p) {s : ℕ} (hs : s ∈ marks) :
     π (swapIndex marks hb hd (atOffset s (hb s hs) 0)) <
       π (atOffset s (hb s hs) 2) := by
@@ -84,7 +85,7 @@ private theorem swaps_first_lt_second {n : ℕ} (marks : Finset ℕ)
         atOffset s (hb s hs) 0 := Fin.ext (swapIndex_val_other _ _ _ _ hleft hright)
     rw [hw₀]
     obtain ⟨_, hpattern⟩ := hπ s hs
-    exact (hpattern 0 2).mpr (by rcases hp with rfl | rfl <;> decide)
+    exact (hpattern 0 2).mpr (hfirst 2 (by decide))
 
 private theorem rank_first_lt (p : Fin 8 → Fin 8)
     (hfirst : ∀ i : Fin 8, i ≠ 0 → p 0 < p i) :
@@ -126,7 +127,7 @@ theorem containsAt_swapped {n : ℕ} (marks : Finset ℕ)
   have hmin : ∀ i : Fin 8, i ≠ 0 → π (f (m 0)) < π (f (m i)) := by
     intro i hi
     rw [hnonfirst i hi]
-    have hminwindow := swaps_first_lt_second marks hb hd π p hcross hπ hs
+    have hminwindow := swaps_first_lt_second marks hb hd π p hfirst hcross hπ hs
     by_cases hi₂ : windowSwap i = 2
     · rw [hi₂]
       exact hminwindow
