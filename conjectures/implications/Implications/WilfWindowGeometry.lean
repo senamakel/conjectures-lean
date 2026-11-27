@@ -69,4 +69,7 @@ theorem lifted_windows_pairwise_disjoint {n : ℕ} (marks shifts : Finset ℕ)
   · exact hordered hs ht h
   · exact (hordered ht hs h).symm
 
+#print axioms liftWindow_support_image
+#print axioms lifted_windows_pairwise_disjoint
+
 end Implications.WilfWindowGeometry
