@@ -301,6 +301,42 @@ theorem exactOccurrenceCount_eq_block57_common (n : ℕ) (marks : Finset (Fin n)
   exact (exactOccurrenceCount_eq_28756143_28745163 n marks).symm.trans
     (exactOccurrenceCount_eq_28756143_28746153 n marks)
 
+/-- The two members of source archive block 18 have equal exact counts. -/
+theorem exactOccurrenceCount_eq_block18_common (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern18725364) marks =
+      WilfCounts.exactCount (occurrenceSet pattern18726354) marks :=
+  exactOccurrenceCount_eq_18725364_18726354 n marks
+
+/-- The two members of source archive block 37 have equal exact counts. -/
+theorem exactOccurrenceCount_eq_block37_common (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern18735264) marks =
+      WilfCounts.exactCount (occurrenceSet pattern18736254) marks :=
+  exactOccurrenceCount_eq_18735264_18736254 n marks
+
+/-- The two members of source archive block 49 have equal exact counts. -/
+theorem exactOccurrenceCount_eq_block49_common (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern28715364) marks =
+      WilfCounts.exactCount (occurrenceSet pattern28716354) marks :=
+  exactOccurrenceCount_eq_28715364_28716354 n marks
+
+/-- The two members of source archive block 56 have equal exact counts. -/
+theorem exactOccurrenceCount_eq_block56_common (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern28735164) marks =
+      WilfCounts.exactCount (occurrenceSet pattern28736154) marks :=
+  exactOccurrenceCount_eq_28735164_28736154 n marks
+
+/-- The two members of source archive block 69 have equal exact counts. -/
+theorem exactOccurrenceCount_eq_block69_common (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern38716254) marks =
+      WilfCounts.exactCount (occurrenceSet pattern38715264) marks :=
+  exactOccurrenceCount_eq_38716254_38715264 n marks
+
+/-- The two members of source archive block 70 have equal exact counts. -/
+theorem exactOccurrenceCount_eq_block70_common (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern38726154) marks =
+      WilfCounts.exactCount (occurrenceSet pattern38725164) marks :=
+  exactOccurrenceCount_eq_38726154_38725164 n marks
+
 #print axioms exactOccurrenceCount_eq_34265781_35264781
 #print axioms exactOccurrenceCount_eq_34265781_36254781
 #print axioms exactOccurrenceCount_eq_34165782_36154782
@@ -323,4 +359,10 @@ theorem exactOccurrenceCount_eq_block57_common (n : ℕ) (marks : Finset (Fin n)
 #print axioms exactOccurrenceCount_eq_38726154_38725164
 #print axioms exactOccurrenceCount_eq_block11_common
 #print axioms exactOccurrenceCount_eq_block57_common
+#print axioms exactOccurrenceCount_eq_block18_common
+#print axioms exactOccurrenceCount_eq_block37_common
+#print axioms exactOccurrenceCount_eq_block49_common
+#print axioms exactOccurrenceCount_eq_block56_common
+#print axioms exactOccurrenceCount_eq_block69_common
+#print axioms exactOccurrenceCount_eq_block70_common
 
