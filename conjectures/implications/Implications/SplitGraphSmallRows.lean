@@ -272,8 +272,9 @@ theorem selected_two_rows_card_le_three
         · exact Finset.mem_filter.mpr ⟨(Finset.mem_filter.mp hc).1, hic⟩
         · exact Finset.mem_filter.mpr ⟨(Finset.mem_filter.mp hd).1, by simpa [hrows] using hic⟩
         · exact Finset.mem_filter.mpr ⟨(Finset.mem_filter.mp he).1, hie⟩
+      have hde' : d ≠ e := by intro heq; exact hde heq.symm
       have hthree : ({c, d, e} : Finset C).card = 3 := by
-        simp [hcd, hce, hde.symm]
+        simp [hcd, hce, hde']
       have hle := Finset.card_le_card htriple
       rw [hdegree i hiI, hthree] at hle
       omega
