@@ -485,7 +485,7 @@ theorem hamiltonian_of_split_partition_three_double_rows
   classical
   obtain ⟨x,y,z,a,b,c,hxC,hyC,hzC,hxy,hxz,hyz,hab,hac,hbc,
       hrowX,hrowY,hrowZ⟩ := chosen_three_double_rows_form_triangle
-    G C I left hleftC hrightC hleftAdj hrightAdj hneq hrow hdiff hcount
+    G C I left right hleftC hrightC hleftAdj hrightAdj hneq hrow hdiff hcount
   let special : Finset V := {a,b,c}
   let O : Finset V := I \ special
   have hOSub : O ⊆ I := Finset.sdiff_subset
