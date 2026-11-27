@@ -202,7 +202,22 @@ struct Search {
         magic != "SNAKECP1" || dim != dimension || target != target_edges || minv != minimum_vertices ||
         force != force_saturated_neighbors || cycle != early_cycle_check || capacity != use_capacity_bound) return false;
     std::size_t n; if (!(in >> n)) return false; frontier.clear();
-    for (std::size_t i=0;i<n;++i) { std::size_t len; if (!(in>>len)) return false; Prefix p; for (std::size_t j=0;j<len;++j) { int v,b; if (!(in>>v>>b)) return false; p.push_back({v,b!=0}); } frontier.push_back(std::move(p)); }
+    for (std::size_t i=0;i<n;++i) {
+      std::size_t len; if (!(in>>len)) return false; Prefix p;
+      for (std::size_t j=0;j<len;++j) {
+        int v,b; if (!(in>>v>>b) || v<0 || v>=(1<<dimension) || (b!=0 && b!=1)) return false;
+        p.push_back({v,b!=0});
+      }
+      frontier.push_back(std::move(p));
+    }
+    for (std::size_t i=0;i<frontier.size();++i)
+      for (std::size_t j=0;j<frontier.size();++j) {
+        if (i==j || frontier[i].size()>frontier[j].size()) continue;
+        bool prefix=true;
+        for (std::size_t k=0;k<frontier[i].size();++k)
+          if (frontier[i][k].vertex!=frontier[j][k].vertex || frontier[i][k].include!=frontier[j][k].include) { prefix=false; break; }
+        if (prefix) return false;
+      }
     if (offset % sizeof(std::uint64_t) != 0 || labeled != offset / sizeof(std::uint64_t)) return false;
     std::error_code ec; auto size = std::filesystem::file_size(output_path, ec);
     return !ec && size >= offset;

@@ -107,6 +107,20 @@ def main() -> int:
     run(plain, cp_plain, resume=False, capped=False)
     if run(resumed, cp, resume=False, capped=True) != 1:
         raise AssertionError("13-node capped invocation unexpectedly completed")
+    first_frontier = frontier(cp)
+    if not first_frontier:
+        raise AssertionError("capped run did not record a resumable frontier")
+    duplicate_cp, duplicate_out = OUT / "duplicate.chk", OUT / "duplicate.bin"
+    duplicate_out.write_bytes(resumed.read_bytes())
+    lines = cp.read_text().splitlines()
+    lines[1] = str(int(lines[1]) + 1)
+    lines.append(lines[2])
+    duplicate_cp.write_text("\n".join(lines) + "\n")
+    bad = subprocess.run([str(BIN), "3", str(duplicate_out), "--dimension", "4", "--min-vertices", "3",
+                          "--force-saturated", "--early-cycle", "--checkpoint", str(duplicate_cp), "--resume"],
+                         cwd=ROOT, text=True, capture_output=True, check=False)
+    if bad.returncode != 2:
+        raise AssertionError("resume accepted a duplicate/overlapping frontier")
     rounds = 1
     while frontier(cp):
         if rounds >= 1000:
