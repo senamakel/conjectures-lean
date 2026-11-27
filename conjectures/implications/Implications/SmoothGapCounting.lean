@@ -45,7 +45,7 @@ private theorem primeAt_count_asymptotic :
   have hratio' : Tendsto (fun n : ℕ =>
       ((Nat.primeCounting (primeAt n) : ℝ) /
         ((primeAt n : ℝ) / Real.log (primeAt n : ℝ)))) atTop (nhds 1) := by
-    simpa only [Function.comp_apply, Nat.floor_natCast] using hratio
+    convert hratio using 1 <;> ext n <;> simp
   have hfinal : Tendsto (fun n : ℕ => ((n + 1 : ℕ) : ℝ) *
       Real.log (primeAt n : ℝ) / (primeAt n : ℝ)) atTop (nhds 1) := by
     refine hratio'.congr' ?_
@@ -301,5 +301,36 @@ theorem cutoffHitCount_smoothNumbers (N B j : ℕ) (hB : 0 < B) :
     _ ≤ (j : ℝ) * primeAt N + (B : ℝ) *
         ((1 + 2 ^ B.primesBelow.card * (primeAt N).sqrt : ℕ) : ℝ) := by
       gcongr
+
+/-- An explicit upper bound for the proportion of the first `N` prime gaps
+with at least `j` qualifying integers. The cutoff `B` is free to depend on
+`N`; the two terms expose the tradeoff between large gaps and smooth integers.
+-/
+theorem hitIndexProportionBound (N B j : ℕ) (hB : 0 < B) :
+    (j : ℝ) * (((Finset.range N).filter (fun r =>
+      j ≤ ((Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
+        (fun m => m.maxPrimeFac < primeGap r)).card)).card : ℝ) /
+        (N + 1 : ℝ) ≤
+      (((j : ℝ) * primeAt N) / (N + 1 : ℝ)) / B +
+        (1 + 2 ^ B.primesBelow.card * (primeAt N).sqrt) / (N + 1 : ℝ) := by
+  have hb : (0 : ℝ) < B := by exact_mod_cast hB
+  have hn : (0 : ℝ) < (N + 1 : ℝ) := by positivity
+  have hcut := cutoffHitCount_smoothNumbers N B j hB
+  have hden : (0 : ℝ) < (B : ℝ) * (N + 1 : ℝ) := mul_pos hb hn
+  calc
+    _ = ((B : ℝ) * (j : ℝ) * (((Finset.range N).filter (fun r =>
+        j ≤ ((Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
+          (fun m => m.maxPrimeFac < primeGap r)).card)).card : ℝ)) /
+          ((B : ℝ) * (N + 1 : ℝ)) := by
+      field_simp
+      <;> ring
+    _ ≤ ((j : ℝ) * primeAt N + (B : ℝ) *
+        ((1 + 2 ^ B.primesBelow.card * (primeAt N).sqrt : ℕ) : ℝ)) /
+          ((B : ℝ) * (N + 1 : ℝ)) :=
+      div_le_div_of_nonneg_right hcut (le_of_lt hden)
+    _ = (((j : ℝ) * primeAt N) / (N + 1 : ℝ)) / B +
+        (1 + 2 ^ B.primesBelow.card * (primeAt N).sqrt) / (N + 1 : ℝ) := by
+      field_simp
+      <;> ring
 
 end Implications.SmoothGapCounting
