@@ -173,7 +173,7 @@ theorem deletionStage_satisfies (D : Finset (Fin 57)) (hD : D.card = 15) :
   simpa only [deletionStage, cnfValue, List.all_append, Bool.and_eq_true] using
     And.intro (And.intro hsentinel hcounter) hunits
 
-private theorem score_input_valid :
+theorem score_input_valid :
     ∀ l ∈ scoreDimacsInputs, l ≠ 0 ∧ l.natAbs ≤ 1194 := by
   intro l hl
   unfold scoreDimacsInputs at hl

@@ -50,3 +50,4 @@ import Implications.C4PolarityLexEncoding
 import Implications.C4PolarityCounterAssignment
 import Implications.C4PolarityLratBridge
 import Implications.C4PolarityCertifiedFormula
+import Implications.C4PolarityFullAssignment

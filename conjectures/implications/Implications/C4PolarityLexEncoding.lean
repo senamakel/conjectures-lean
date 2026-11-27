@@ -505,7 +505,7 @@ theorem orbitLexAssignment_preserves (truth next : Nat) (deleted : List Nat)
     rw [ih _ _ (lt_of_lt_of_le hn (lexNext_ge _ _ _))]
     exact lexAssignment_preserves_below_base _ _ _ _ _ hn
 
-private theorem cnfValue_congr_of_bound (a b : Nat → Bool) (cs : List (List Int))
+theorem cnfValue_congr_of_bound (a b : Nat → Bool) (cs : List (List Int))
     (bound : Nat) (hab : ∀ n < bound, a n = b n)
     (hc : ∀ c ∈ cs, ∀ l ∈ c, l.natAbs < bound) :
     cnfValue a cs = cnfValue b cs := by
