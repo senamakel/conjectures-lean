@@ -95,7 +95,8 @@ theorem swapIndex_involutive (marks : Finset Nat)
         obtain ⟨s, hs, hsi⟩ := hright
         refine ⟨s, hs, ?_⟩
         have hv := swapIndex_val_right marks hbounded hsep i hright0
-        simpa [hv] using hsi
+        rw [hv]
+        omega
       have hnot : ¬ IsRight marks (swapIndex marks hbounded hsep i) := by
         intro h
         exact no_left_right marks hsep _ ⟨hleft', h⟩
