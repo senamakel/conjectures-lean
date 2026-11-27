@@ -153,7 +153,7 @@ private theorem eventually_logLogCutoff_primeCount_le :
     ∀ᶠ n : ℕ in atTop,
       ((logLogCutoff n).primesBelow.card : ℝ) ≤
         Real.log (primeAt n : ℝ) / 4 := by
-  filter_upwards [eventually_primeBelow_count_le logLogCutoff logLogCutoff_tendsto_atTop,
+  filter_upwards [eventually_primeBelow_count_le_two_mul logLogCutoff logLogCutoff_tendsto_atTop,
     eventually_logLogCutoff_log_lower,
     (Real.tendsto_log_atTop.comp (Real.tendsto_log_atTop.comp
       (tendsto_natCast_atTop_atTop.comp (by
@@ -164,9 +164,11 @@ private theorem eventually_logLogCutoff_primeCount_le :
         change b ≤ Nat.nth Nat.Prime n
         omega)))).eventually_ge_atTop 1]
     with n hpi hlogB hLL
+  change 1 ≤ Real.log (Real.log (primeAt n : ℝ)) at hLL
   have hL : 0 < Real.log (primeAt n : ℝ) := by
-    have := Nat.add_two_le_nth_prime n
-    have hp : 1 < (primeAt n : ℝ) := by exact_mod_cast (by omega : 1 < primeAt n)
+    have hp : 1 < (primeAt n : ℝ) := by
+      exact_mod_cast (show 1 < Nat.nth Nat.Prime n from
+        Nat.Prime.one_lt (Nat.prime_nth_prime n))
     exact Real.log_pos hp
   have hLLpos : 0 < Real.log (Real.log (primeAt n : ℝ)) := by linarith
   have hBupper : (logLogCutoff n : ℝ) ≤
