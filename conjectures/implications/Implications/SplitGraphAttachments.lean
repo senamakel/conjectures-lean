@@ -61,6 +61,21 @@ theorem exists_outsider_attachments
     · rfl
   rw [hbd]
 
+/-- The clique has room for both attachments of every outsider and the center. -/
+theorem twice_outsiders_add_one_le_clique_card
+    (G : SimpleGraph V) (C I : Finset V) (t : V)
+    (ht : t ∈ C) (hA : (row G I t).card = 3)
+    (hrow : ∀ q ∈ C, (row G I q).card ≤ 3)
+    (hdiff : ∀ q ∈ C, ∀ d ∈ C, q ≠ d → (rowDiff G I q d).card ≤ 2)
+    (hdeg : ∀ i ∈ I, ∃ q ∈ C, ∃ d ∈ C, q ≠ d ∧ G.Adj q i ∧ G.Adj d i) :
+    2 * (I \ row G I t).card + 1 ≤ C.card := by
+  obtain ⟨f, _⟩ := exists_outsider_attachments G C I t ht hA hrow hdiff hdeg
+  have h := Fintype.card_le_of_injective f f.injective
+  simp [Finset.card_erase_of_mem ht] at h
+  have := Finset.card_pos.mpr ⟨t, ht⟩
+  omega
+
 #print axioms exists_outsider_attachments
+#print axioms twice_outsiders_add_one_le_clique_card
 
 end Implications.SplitGraphAttachments
