@@ -42,7 +42,7 @@ theorem odd_block (n k i : Nat) (hk : 0 < k) (hi : i < n) :
         2 * (2 ^ (n - (j + 1)) * (3 ^ j * k)) by ac_rfl]
       rw [show 2 ^ (n - (j + 1)) * (3 ^ j * 3 * k) =
         3 * (2 ^ (n - (j + 1)) * (3 ^ j * k)) by ac_rfl]
-      trace_state
+      generalize 2 ^ (n - (j + 1)) * (3 ^ j * k) = t at hpos ⊢
       omega
   rw [hexact i (by omega), show n - i = n - i - 1 + 1 by omega, Nat.pow_succ]
   have hpos : 0 < 2 ^ (n - i - 1) * (3 ^ i * k) :=
