@@ -26,11 +26,18 @@ def addVertex {V : Type*} (G : SimpleGraph V) (s : Set V) : SimpleGraph (Option 
     symm := by
       constructor
       intro a b hab
-      cases a <;> cases b <;> simp_all
+      cases a with
+      | none => cases b <;> exact hab
+      | some a =>
+        cases b with
+        | none => exact hab
+        | some b => exact G.symm.symm a b hab
     loopless := by
       constructor
       intro a ha
-      cases a <;> simp_all }
+      cases a with
+      | none => exact ha
+      | some a => exact G.loopless.irrefl a ha }
 
 @[simp] theorem addVertex_adj_some_some {V : Type*} (G : SimpleGraph V) (s : Set V)
     (x y : V) : (addVertex G s).Adj (some x) (some y) ↔ G.Adj x y := Iff.rfl
