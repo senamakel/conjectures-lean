@@ -394,12 +394,11 @@ theorem hamiltonian_of_split_partition_row_bounds
         intro hmem
         exact (Finset.disjoint_left.mp hdisj) hmem hj
       have hIeq : I = {i, j} := by
-        apply Finset.eq_of_subset_of_card_le (by simp [hi, hj])
-        simp [hij, htwo]
+        exact Finset.eq_of_subset_of_card_le (by simp [hi, hj]) (by simp [hij, htwo])
       have hpart : (Finset.univ : Finset V) = C ∪ {i, j} := by
         simpa [hIeq, Finset.union_assoc, Finset.union_left_comm, Finset.union_comm] using hpartition
       exact hamiltonian_of_split_partition_two_endpoints G C i j a b hC
-        hpart hiC hjC hij ha hb hab hia hbj
+        hpart hiC hjC hij ha hb hab hia.symm hbj
     · have hCone : C.card = 1 := by omega
       obtain ⟨c, hCeq⟩ := Finset.card_eq_one.mp hCone
       have hc : c ∈ C := by simpa [hCeq]
@@ -414,17 +413,17 @@ theorem hamiltonian_of_split_partition_row_bounds
         simpa [this] using hdj
       have hiC : i ∉ C := by
         intro hmem
-        exact (Finset.disjoint_left.mp hdisj) hmem hi
+        exact (Finset.disjoint_left.mp hdisj) hmem (by simp [hIeq])
       have hjC : j ∉ C := by
         intro hmem
-        exact (Finset.disjoint_left.mp hdisj) hmem hj
+        exact (Finset.disjoint_left.mp hdisj) hmem (by simp [hIeq])
       have hnodup : ([i, c, j] : List V).Nodup := by
         simp [hiC, hjC, hCeq, hij]
       have hchain : ([i, c, j] : List V).IsChain G.Adj := by
         simp [List.isChain_cons, hci.symm, hcj]
       apply hamiltonian_of_list G [i, c, j] (by simp) hnodup hchain
       intro v
-      have hv : v ∈ C ∪ I := by simpa [hpartition] using (Finset.mem_univ v)
+      have hv : v ∈ C ∪ I := by rw [← hpartition]; exact Finset.mem_univ v
       rcases Finset.mem_union.mp hv with hvC | hvI
       · have : v = c := by simpa [hCeq] using hvC
         simp [this]
@@ -433,13 +432,14 @@ theorem hamiltonian_of_split_partition_row_bounds
   · by_cases hone : I.card = 1
     · obtain ⟨i, hi⟩ := Finset.card_eq_one.mp hone
       obtain ⟨c, hc, hci⟩ := hcover i (by simp [hi])
+      have hiMem : i ∈ I := by simp [hi]
       let m := C.erase c
       let l := c :: m.toList
       have hmnodup : m.toList.Nodup := m.nodup_toList
       have hcnot : c ∉ m := by simp [m]
       have hiC : i ∉ C := by
         intro hmem
-        exact (Finset.disjoint_left.mp hdisj) hmem hi
+        exact (Finset.disjoint_left.mp hdisj) hmem hiMem
       have hlnodup : l.Nodup := by simp [l, hcnot, hmnodup]
       have hlfin : l.toFinset = C := by
         ext x
@@ -449,14 +449,13 @@ theorem hamiltonian_of_split_partition_row_bounds
         simp [List.isChain_cons, l, hci.symm, hlchain]
       have hiNotL : i ∉ l := by
         intro hil
-        apply hiC
-        simpa [hlfin] using (List.mem_toFinset.mpr hil)
+        exact hiC (by simpa [hlfin] using (List.mem_toFinset.mpr hil))
       have hnodup : (i :: l).Nodup := by simp [hiNotL, hlnodup]
       apply hamiltonian_of_list G (i :: l) (by simp) hnodup hchain
       intro v
-      have hv : v ∈ C ∪ I := by simpa [hpartition] using (Finset.mem_univ v)
+      have hv : v ∈ C ∪ I := by rw [← hpartition]; exact Finset.mem_univ v
       rcases Finset.mem_union.mp hv with hvC | hvI
-      · have hvl : v ∈ l := by simpa [hlfin] using hvC
+      · have hvl : v ∈ l := List.mem_toFinset.mp (by simpa [hlfin] using hvC)
         simp [hvl]
       · have : v = i := by simpa [hi] using hvI
         simp [this]
@@ -471,7 +470,7 @@ theorem hamiltonian_of_split_partition_row_bounds
       exact hCne.ne_empty this
     apply hamiltonian_of_list G l hne hnodup hchain
     intro v
-    have hv : v ∈ C ∪ I := by simpa [hpartition] using (Finset.mem_univ v)
+    have hv : v ∈ C ∪ I := by rw [← hpartition]; exact Finset.mem_univ v
     simpa [l, hempty, hfin] using (Finset.mem_union.mp hv).resolve_right (by simp [hempty])
 
 end SplitGraphPath
