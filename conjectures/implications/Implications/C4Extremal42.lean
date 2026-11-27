@@ -12,13 +12,16 @@ edges. Summing the remaining-edge counts counts every edge 40 times.
 namespace C4Extremal42
 
 /-- Edge count left after deleting a vertex. -/
-def deletionEdgeCount (G : SimpleGraph (Fin 42)) (v : Fin 42) : ℕ :=
+def deletionEdgeCount (G : SimpleGraph (Fin 42)) (v : Fin 42)
+    [Fintype ↑G.edgeSet] [∀ v, Fintype ↑(G.neighborSet v)] : ℕ :=
   G.edgeFinset.card - G.degree v
 
 /-- The deletion sum counts each edge once for each of the 40 vertices it does not meet. -/
 theorem sum_deletionEdgeCount (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj] :
     (∑ v : Fin 42, deletionEdgeCount G v) = 40 * G.edgeFinset.card := by
   classical
+  letI : Fintype ↑G.edgeSet := Fintype.ofFinite _
+  letI : ∀ v, Fintype ↑(G.neighborSet v) := fun v => Fintype.ofFinite _
   unfold deletionEdgeCount
   rw [Finset.sum_sub_distrib]
   have hdeg := G.sum_degrees_eq_twice_card_edges
@@ -29,6 +32,9 @@ theorem sum_deletionEdgeCount (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj] :
 The hypothesis `h41` is the pointwise form of `ex(41,C4) ≤ 132` for the 42-vertex graph. -/
 theorem edge_count_le_138 (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
     (h41 : ∀ v, deletionEdgeCount G v ≤ 132) : G.edgeFinset.card ≤ 138 := by
+  classical
+  letI : Fintype ↑G.edgeSet := Fintype.ofFinite _
+  letI : ∀ v, Fintype ↑(G.neighborSet v) := fun v => Fintype.ofFinite _
   have hsum : (∑ v : Fin 42, deletionEdgeCount G v) ≤ 42 * 132 := by
     calc
       (∑ v : Fin 42, deletionEdgeCount G v) ≤ ∑ _v : Fin 42, 132 :=
@@ -43,6 +49,9 @@ theorem extremal_vertex_degree_six (G : SimpleGraph (Fin 42)) [DecidableRel G.Ad
     (h41 : ∀ v, deletionEdgeCount G v ≤ 132)
     (he : G.edgeFinset.card = 138) :
     ∃ v : Fin 42, G.degree v = 6 ∧ deletionEdgeCount G v = 132 := by
+  classical
+  letI : Fintype ↑G.edgeSet := Fintype.ofFinite _
+  letI : ∀ v, Fintype ↑(G.neighborSet v) := fun v => Fintype.ofFinite _
   have hsum := sum_deletionEdgeCount G
   have hexist : ∃ v : Fin 42, deletionEdgeCount G v = 132 := by
     by_contra hn
