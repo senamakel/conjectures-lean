@@ -32,3 +32,4 @@ import Implications.WilfTwoWindowOrder
 import Implications.WilfCertifiedSwap
 import Implications.WilfChainCertificate
 import Implications.WilfThreeCycleOrder
+import Implications.WilfThreeCycleGlobal

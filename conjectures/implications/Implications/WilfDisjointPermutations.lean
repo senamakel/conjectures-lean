@@ -1,0 +1,107 @@
+import Mathlib
+
+/-! Reassembling finitely many permutations with pairwise disjoint supports. -/
+
+namespace Implications.WilfDisjointPermutations
+
+/-- The product of a pairwise-disjoint finite family of permutations. -/
+def assemble {ι α : Type*} [DecidableEq ι] [Fintype α] [DecidableEq α] (s : Finset ι)
+    (k : ι → Equiv.Perm α)
+    (hdisj : (s : Set ι).Pairwise fun i j => Equiv.Perm.Disjoint (k i) (k j)) :
+    Equiv.Perm α :=
+  s.noncommProd k (hdisj.imp fun _ _ => Equiv.Perm.Disjoint.commute)
+
+/-- On the support of one component, the assembled permutation acts as that component. -/
+theorem assemble_apply_of_mem_support {ι α : Type*} [DecidableEq ι] [Fintype α] [DecidableEq α]
+    (s : Finset ι) (k : ι → Equiv.Perm α)
+    (hdisj : (s : Set ι).Pairwise fun i j => Equiv.Perm.Disjoint (k i) (k j))
+    {i : ι} (hi : i ∈ s) {x : α} (hx : x ∈ (k i).support) :
+    assemble s k hdisj x = k i x := by
+  classical
+  have hcomm : (s : Set ι).Pairwise fun i j => Commute (k i) (k j) :=
+    hdisj.imp fun _ _ => Equiv.Perm.Disjoint.commute
+  have hrest_comm : (s.erase i : Set ι).Pairwise fun j l => Commute (k j) (k l) := by
+    intro j hj l hl hne
+    have hj' : j ∈ s := Finset.mem_of_mem_erase hj
+    have hl' : l ∈ s := Finset.mem_of_mem_erase hl
+    exact hcomm hj' hl' hne
+  have hxne : k i x ≠ x := by simpa using hx
+  have hrest_fixes : ∀ j ∈ s.erase i, k j x = x := by
+    intro j hj
+    rcases Finset.mem_erase.mp hj with ⟨hji, hjs⟩
+    rcases hdisj hjs hi hji x with hjfix | hifix
+    · exact hjfix
+    · exact (hxne hifix).elim
+  have hrest : (s.erase i).noncommProd k hrest_comm x = x :=
+    Finset.noncommProd_induction _ _ hrest_comm (fun f : Equiv.Perm α => f x = x)
+      (fun f g hf hg => by simp [Equiv.Perm.mul_apply, hf, hg])
+      rfl hrest_fixes
+  have hprod : k i * (s.erase i).noncommProd k hrest_comm =
+      s.noncommProd k (hdisj.imp fun _ _ => Equiv.Perm.Disjoint.commute) := by
+    exact Finset.mul_noncommProd_erase s hi k
+      (hdisj.imp fun _ _ => Equiv.Perm.Disjoint.commute)
+  have hEval := congrArg (fun f : Equiv.Perm α => f x) hprod
+  simpa [assemble, Equiv.Perm.mul_apply, hrest] using hEval.symm
+
+/-- Away from every component support, the assembled permutation fixes the point. -/
+theorem assemble_apply_of_forall_fixes {ι α : Type*} [DecidableEq ι] [Fintype α] [DecidableEq α]
+    (s : Finset ι) (k : ι → Equiv.Perm α)
+    (hdisj : (s : Set ι).Pairwise fun i j => Equiv.Perm.Disjoint (k i) (k j))
+    {x : α} (hfix : ∀ i ∈ s, k i x = x) :
+    assemble s k hdisj x = x := by
+  classical
+  have hcomm : (s : Set ι).Pairwise fun i j => Commute (k i) (k j) :=
+    hdisj.imp fun _ _ => Equiv.Perm.Disjoint.commute
+  exact Finset.noncommProd_induction s k hcomm (fun f : Equiv.Perm α => f x = x)
+    (fun f g hf hg => by simp [Equiv.Perm.mul_apply, hf, hg])
+    rfl hfix
+
+/-- A point outside the union of the component supports is fixed by the assembly. -/
+theorem assemble_apply_of_not_mem_support {ι α : Type*} [DecidableEq ι] [Fintype α] [DecidableEq α]
+    (s : Finset ι) (k : ι → Equiv.Perm α)
+    (hdisj : (s : Set ι).Pairwise fun i j => Equiv.Perm.Disjoint (k i) (k j))
+    {x : α} (hx : x ∉ s.biUnion fun i => (k i).support) :
+    assemble s k hdisj x = x := by
+  apply assemble_apply_of_forall_fixes s k hdisj
+  intro i hi
+  have hnot : x ∉ (k i).support := by
+    intro hmem
+    exact hx (Finset.mem_biUnion.mpr ⟨i, hi, hmem⟩)
+  simpa using hnot
+
+/-- The support of the assembled permutation is exactly the union of the component supports. -/
+theorem assemble_support {ι α : Type*} [DecidableEq ι] [Fintype α] [DecidableEq α]
+    (s : Finset ι) (k : ι → Equiv.Perm α)
+    (hdisj : (s : Set ι).Pairwise fun i j => Equiv.Perm.Disjoint (k i) (k j)) :
+    (assemble s k hdisj).support = s.biUnion fun i => (k i).support := by
+  exact Equiv.Perm.support_noncommProd hdisj
+
+/-- The embedding of the offsets of an eight-element window into `Fin n`. -/
+def windowEmbedding {n : ℕ} (t : ℕ) (ht : t + 8 ≤ n) : Fin 8 ↪ Fin n where
+  toFun i := ⟨t + i.val, by have := i.isLt; omega⟩
+  inj' i j h := Fin.ext (Nat.add_left_cancel (congrArg Fin.val h))
+
+/-- Extend a permutation of an eight-element window by the identity outside it. -/
+noncomputable def liftWindow {n : ℕ} (t : ℕ) (ht : t + 8 ≤ n)
+    (σ : Equiv.Perm (Fin 8)) : Equiv.Perm (Fin n) :=
+  σ.viaEmbedding (windowEmbedding t ht)
+
+/-- The lifted window permutation acts as its original permutation on the window. -/
+theorem liftWindow_apply {n : ℕ} (t : ℕ) (ht : t + 8 ≤ n)
+    (σ : Equiv.Perm (Fin 8)) (i : Fin 8) :
+    liftWindow t ht σ (windowEmbedding t ht i) = windowEmbedding t ht (σ i) := by
+  exact Equiv.Perm.viaEmbedding_apply σ (windowEmbedding t ht) i
+
+/-- A lifted window permutation fixes every point strictly outside the window. -/
+theorem liftWindow_apply_of_exterior {n : ℕ} (t : ℕ) (ht : t + 8 ≤ n)
+    (σ : Equiv.Perm (Fin 8)) (x : Fin n)
+    (hx : x.val < t ∨ t + 8 ≤ x.val) :
+    liftWindow t ht σ x = x := by
+  apply Equiv.Perm.viaEmbedding_apply_of_notMem
+  intro hxRange
+  rcases hxRange with ⟨i, hi⟩
+  have hval : x.val = t + i.val := (congrArg Fin.val hi).symm
+  have hilt := i.isLt
+  rcases hx with hbefore | hafter <;> omega
+
+end Implications.WilfDisjointPermutations
