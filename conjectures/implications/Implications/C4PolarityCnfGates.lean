@@ -85,6 +85,20 @@ def lexConstraint : Bool → List Bool → List Bool → Bool
 
 theorem lex_constraint_iff (xs ys : List Bool) (hlen : xs.length = ys.length) :
     lexConstraint true xs ys = lexAtLeast xs ys := by
+  have hfalse : ∀ (xs ys : List Bool), xs.length = ys.length →
+      lexConstraint false xs ys = true := by
+    intro xs
+    induction xs with
+    | nil =>
+        intro ys hlen
+        cases ys <;> simp [lexConstraint] at hlen ⊢
+    | cons x xs ih =>
+        intro ys hlen
+        cases ys with
+        | nil => simp at hlen
+        | cons y ys =>
+            simp only [List.length_cons, Nat.succ.injEq] at hlen
+            simp [lexConstraint, ih ys hlen]
   induction xs generalizing ys with
   | nil => cases ys <;> simp [lexConstraint, lexAtLeast] at hlen ⊢
   | cons x xs ih =>
@@ -93,7 +107,7 @@ theorem lex_constraint_iff (xs ys : List Bool) (hlen : xs.length = ys.length) :
       | cons y ys =>
           simp only [List.length_cons, Nat.succ.injEq] at hlen
           cases x <;> cases y <;>
-            simp [lexConstraint, lexAtLeast, ih ys hlen]
+            simp [lexConstraint, lexAtLeast, ih ys hlen, hfalse xs ys hlen]
 
 end Implications.C4PolarityCnfGates
 
