@@ -376,7 +376,7 @@ theorem chosen_neighbor_rows_card_le_three
     (horiginalSub : ∀ c ∈ clique, original c ⊆ indep)
     (horiginal : ∀ c ∈ clique, (original c).card ≤ 2)
     (hdiff : ∀ c ∈ clique, ∀ d ∈ clique, c ≠ d →
-      (original c \\ original d ∪ original d \\ original c).card ≤ 2)
+      (original c \ original d ∪ original d \ original c).card ≤ 2)
     (hleftC : ∀ i ∈ indep, left i ∈ clique)
     (hrightC : ∀ i ∈ indep, right i ∈ clique)
     (hleftRow : ∀ i ∈ indep, i ∈ original (left i))
