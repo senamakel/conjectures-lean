@@ -24,3 +24,4 @@ import Implications.WilfEquivalence
 import Implications.C4Extremal42
 import Implications.SmoothGapCounting
 import Implications.SplitGraphPath
+import Implications.C4VertexExtension
