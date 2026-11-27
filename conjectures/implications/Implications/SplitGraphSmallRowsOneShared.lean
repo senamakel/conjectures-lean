@@ -500,4 +500,87 @@ theorem hamiltonian_of_one_shared_selected_row
     left right hleftC hrightC hleftAdj hrightAdj hneq c a b i j hi hj hij
     hlefti hrighti hleftj hrightj hprops.1 hprops.2 huniv
 
+/-- A single selected row of size two can be traversed after orienting the
+two incident blocks. All other selected rows have size at most one. -/
+theorem hamiltonian_of_unique_double_selected_row
+    (G : SimpleGraph V) (C I : Finset V)
+    (hC : G.IsClique (C : Set V)) (hdisj : Disjoint C I)
+    (hpartition : (Finset.univ : Finset V) = C ∪ I)
+    (left right : V → V)
+    (hleftC : ∀ k ∈ I, left k ∈ C) (hrightC : ∀ k ∈ I, right k ∈ C)
+    (hleftAdj : ∀ k ∈ I, G.Adj (left k) k)
+    (hrightAdj : ∀ k ∈ I, G.Adj (right k) k)
+    (hneq : ∀ k ∈ I, left k ≠ right k)
+    (hrows : ∀ x ∈ C, (I.filter (fun k => left k = x ∨ right k = x)).card ≤ 2)
+    (hdouble : (C.filter (fun x =>
+      (I.filter (fun k => left k = x ∨ right k = x)).card = 2)).card = 1) :
+    ∃ u v : V, ∃ p : G.Walk u v, p.IsHamiltonian := by
+  classical
+  obtain ⟨c, hc⟩ := Finset.card_eq_one.mp hdouble
+  have hcMem : c ∈ C.filter (fun x =>
+      (I.filter (fun k => left k = x ∨ right k = x)).card = 2) := by
+    rw [hc]
+    simp
+  obtain ⟨hcC, hcRow⟩ := Finset.mem_filter.mp hcMem
+  obtain ⟨i,j,hij,hijRow⟩ := Finset.card_eq_two.mp hcRow
+  have hci : i ∈ I ∧ (left i = c ∨ right i = c) := by
+    apply Finset.mem_filter.mp
+    rw [hijRow]
+    simp
+  have hcj : j ∈ I ∧ (left j = c ∨ right j = c) := by
+    apply Finset.mem_filter.mp
+    rw [hijRow]
+    simp
+  let swap (k : V) : Prop := (k = i ∧ left k = c) ∨ (k = j ∧ right k = c)
+  let L (k : V) := if swap k then right k else left k
+  let R (k : V) := if swap k then left k else right k
+  have hL (k : V) (hk : k ∈ I) : L k ∈ C ∧ G.Adj (L k) k := by
+    by_cases h : swap k
+    · simpa [L, h] using And.intro (hrightC k hk) (hrightAdj k hk)
+    · simpa [L, h] using And.intro (hleftC k hk) (hleftAdj k hk)
+  have hR (k : V) (hk : k ∈ I) : R k ∈ C ∧ G.Adj (R k) k := by
+    by_cases h : swap k
+    · simpa [R, h] using And.intro (hleftC k hk) (hleftAdj k hk)
+    · simpa [R, h] using And.intro (hrightC k hk) (hrightAdj k hk)
+  have hLR (k : V) (hk : k ∈ I) : L k ≠ R k := by
+    by_cases h : swap k
+    · simpa [L,R,h] using (hneq k hk).symm
+    · simpa [L,R,h] using hneq k hk
+  have hRi : R i = c := by
+    rcases hci.2 with hl | hr
+    · have h : swap i := Or.inl ⟨rfl,hl⟩
+      simp [R,h,hl]
+    · have h : ¬ swap i := by
+        simp [swap,hij,show left i ≠ c from hr ▸ hneq i hci.1]
+      simp [R,h,hr]
+  have hLj : L j = c := by
+    rcases hcj.2 with hl | hr
+    · have h : ¬ swap j := by
+        simp [swap,hij.symm,show right j ≠ c from hl ▸ (hneq j hcj.1).symm]
+      simp [L,h,hl]
+    · have h : swap j := Or.inr ⟨rfl,hr⟩
+      simp [L,h,hr]
+  have hrowEq (x : V) :
+      I.filter (fun k => L k = x ∨ R k = x) =
+        I.filter (fun k => left k = x ∨ right k = x) := by
+    ext k
+    by_cases h : swap k <;> simp [L,R,h,or_comm]
+  refine hamiltonian_of_one_shared_selected_row G C I hC hdisj hpartition L R
+    (fun k hk => (hL k hk).1) (fun k hk => (hR k hk).1)
+    (fun k hk => (hL k hk).2) (fun k hk => (hR k hk).2) hLR
+    c (L i) (R j) i j hci.1 hcj.1 hij rfl hRi hLj rfl
+    (by rw [hrowEq c]; exact hcRow) ?_ ⟨c, Finset.mem_univ c⟩
+  intro x hx hxc
+  rw [hrowEq x]
+  have hb := hrows x hx
+  by_contra h
+  have htwo : (I.filter (fun k => left k = x ∨ right k = x)).card = 2 := by omega
+  have hm : x ∈ C.filter (fun q =>
+      (I.filter (fun k => left k = q ∨ right k = q)).card = 2) :=
+    Finset.mem_filter.mpr ⟨hx,htwo⟩
+  rw [hc] at hm
+  exact hxc (Finset.mem_singleton.mp hm)
+
 end SplitGraphSmallRowsOneShared
+
+#print axioms SplitGraphSmallRowsOneShared.hamiltonian_of_unique_double_selected_row
