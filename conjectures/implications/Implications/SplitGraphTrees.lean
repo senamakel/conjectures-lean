@@ -140,6 +140,101 @@ theorem star_isTree (G : SimpleGraph V) (I : Finset V) (c : V)
   rw [hEq]
   exact SimpleGraph.isTree_starGraph center
 
+/-- Two adjacent clique vertices and the symmetric-difference leaves induce a double-star tree. -/
+theorem doubleStar_isTree (G : SimpleGraph V) (C I : Finset V) (c d : V)
+    (hC : ∀ ⦃x y⦄, x ∈ C → y ∈ C → x ≠ y → G.Adj x y)
+    (hI : G.IsIndepSet (I : Set V)) (hdisj : Disjoint C I)
+    (hc : c ∈ C) (hd : d ∈ C) (hcd : c ≠ d) :
+    (G.induce
+      ((insert c (insert d (rowDiff G I c d) : Finset V) : Finset V) : Set V)).IsTree := by
+  classical
+  let leaves := rowDiff G I c d
+  have hcI : c ∉ I := fun h => Finset.disjoint_left.mp hdisj hc h
+  have hdI : d ∉ I := fun h => Finset.disjoint_left.mp hdisj hd h
+  have hLeavesI : ∀ z ∈ leaves, z ∈ I := by
+    intro z hz
+    rcases Finset.mem_union.mp hz with h | h
+    · exact (Finset.mem_filter.mp (Finset.mem_sdiff.mp h).1).1
+    · exact (Finset.mem_filter.mp (Finset.mem_sdiff.mp h).1).1
+  have hBase : (G.induce ((insert c ({d} : Finset V) : Finset V) : Set V)).IsTree := by
+    have hOne := star_isTree G (∅ : Finset V) d (by simp [SimpleGraph.IsIndepSet])
+    have hOne' : (G.induce (({d} : Finset V) : Set V)).IsTree := by
+      simpa [row, Finset.filter_empty] using hOne
+    exact induce_insert_of_unique_adj G {d} c d hOne' (by simp [hcd]) (by simp)
+      (hC hc hd hcd) (by intro b hb; simpa using hb)
+  have hBuild : ∀ L : Finset V, L ⊆ leaves →
+      (G.induce ((insert c (insert d L : Finset V) : Finset V) : Set V)).IsTree := by
+    intro L hL
+    induction L using Finset.induction_on with
+    | empty => simpa using hBase
+    | @insert z L hz ih =>
+      have hL' : L ⊆ leaves := Finset.subset_trans (Finset.subset_insert z L) hL
+      have hT := ih hL'
+      have hzLeaves : z ∈ leaves := hL (Finset.mem_insert_self z L)
+      have hzI := hLeavesI z hzLeaves
+      have hcz : G.Adj c z ∨ G.Adj d z := by
+        rcases Finset.mem_union.mp hzLeaves with h | h
+        · exact Or.inl (Finset.mem_filter.mp (Finset.mem_sdiff.mp h).1).2
+        · exact Or.inr (Finset.mem_filter.mp (Finset.mem_sdiff.mp h).1).2
+      have hcdNot : ¬ (G.Adj c z ∧ G.Adj d z) := by
+        intro hh
+        rcases Finset.mem_union.mp hzLeaves with h | h
+        · exact (Finset.mem_sdiff.mp h).2 (Finset.mem_filter.mpr
+            ⟨(Finset.mem_filter.mp (Finset.mem_sdiff.mp h).1).1, hh.2⟩)
+        · exact (Finset.mem_sdiff.mp h).2 (Finset.mem_filter.mpr
+            ⟨(Finset.mem_filter.mp (Finset.mem_sdiff.mp h).1).1, hh.1⟩)
+      by_cases hcz : G.Adj c z
+      · have hdz : ¬ G.Adj d z := fun hdz => hcdNot ⟨hcz, hdz⟩
+        have hzNot : z ∉ insert c (insert d L) := by
+          intro hmem
+          rcases Finset.mem_insert.mp hmem with heq | hmem
+          · exact hcI (heq ▸ hzI)
+          · rcases Finset.mem_insert.mp hmem with heq | hmem
+            · exact hdI (heq ▸ hzI)
+            · exact hz (Finset.mem_insert_of_mem hmem)
+        have huniq : ∀ ⦃b⦄, b ∈ insert c (insert d L) → G.Adj z b → b = c := by
+          intro b hb hadj
+          rcases Finset.mem_insert.mp hb with heq | hb
+          · exact heq
+          · rcases Finset.mem_insert.mp hb with heq | hbL
+            · exact (hdz (by simpa [heq] using hadj.symm)).elim
+            · have hbI := hLeavesI b (hL (Finset.mem_insert_of_mem hbL))
+              have hne : z ≠ b := fun heq => hz (heq ▸ Finset.mem_insert_of_mem hbL)
+              exact (hI hzI hbI hne hadj).elim
+        have hnext := induce_insert_of_unique_adj G (insert c (insert d L)) z c hT
+          hzNot (by simp) hcz.symm huniq
+        have hset : insert z (insert c (insert d L)) = insert c (insert d (insert z L)) := by
+          ext x
+          simp [or_assoc, or_left_comm, or_comm]
+        rw [hset]
+        exact hnext
+      · have hdz : G.Adj d z := hcz.resolve_left hcz
+        have hczNot : ¬ G.Adj c z := hcz
+        have hzNot : z ∉ insert c (insert d L) := by
+          intro hmem
+          rcases Finset.mem_insert.mp hmem with heq | hmem
+          · exact hcI (heq ▸ hzI)
+          · rcases Finset.mem_insert.mp hmem with heq | hmem
+            · exact hdI (heq ▸ hzI)
+            · exact hz (Finset.mem_insert_of_mem hmem)
+        have huniq : ∀ ⦃b⦄, b ∈ insert c (insert d L) → G.Adj z b → b = d := by
+          intro b hb hadj
+          rcases Finset.mem_insert.mp hb with heq | hb
+          · exact (hczNot (by simpa [heq] using hadj.symm)).elim
+          · rcases Finset.mem_insert.mp hb with heq | hbL
+            · exact heq
+            · have hbI := hLeavesI b (hL (Finset.mem_insert_of_mem hbL))
+              have hne : z ≠ b := fun heq => hz (heq ▸ Finset.mem_insert_of_mem hbL)
+              exact (hI hzI hbI hne hadj).elim
+        have hnext := induce_insert_of_unique_adj G (insert c (insert d L)) z d hT
+          hzNot (by simp) hdz.symm huniq
+        have hset : insert z (insert c (insert d L)) = insert c (insert d (insert z L)) := by
+          ext x
+          simp [or_assoc, or_left_comm, or_comm]
+        rw [hset]
+        exact hnext
+  exact hBuild leaves (Finset.Subset.rfl)
+
 /-- The induced star bound gives the size bound on each row. -/
 theorem row_card_le (G : SimpleGraph V) (C I : Finset V) (k : ℕ)
     (hI : G.IsIndepSet (I : Set V))
