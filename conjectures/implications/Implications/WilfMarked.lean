@@ -41,3 +41,7 @@ def ContainsAt {n : Nat} (π : Equiv.Perm (Fin n)) (s : Nat)
 /-- The elementary marked-window swap map. The structural proof that all swaps
 are compatible for a valid marked set is developed below. -/
 end WilfMarked
+
+#print axioms WilfMarked.windowSwap_involutive
+#print axioms WilfMarked.windowSwap_sigma
+#print axioms WilfMarked.windowSwap_tau
