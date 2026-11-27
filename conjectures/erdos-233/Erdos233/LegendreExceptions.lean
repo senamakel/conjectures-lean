@@ -36,10 +36,9 @@ lemma squareInterval_disjoint {m n : ℕ} (hmn : m ≠ n) :
 
 /-- A failed square interval is contained in the gap between its surrounding primes. -/
 lemma legendreFailure_gap {n : ℕ} (hn : 2 ≤ n) (hbad : legendreFailure n) :
-    ∃ k : ℕ,
-      (n + 1) ^ 2 ≤ (k + 1).nth Nat.Prime ∧
-      k.nth Nat.Prime < n ^ 2 ∧
-      2 * n + 1 ≤ primeGap k := by
+    let k := idx (n ^ 2) - 1
+    (n + 1) ^ 2 ≤ (k + 1).nth Nat.Prime ∧
+      k.nth Nat.Prime < n ^ 2 ∧ 2 * n + 1 ≤ primeGap k := by
   let k := idx (n ^ 2) - 1
   have hsq_gt : 2 < n ^ 2 := by nlinarith
   have hkpos : idx (n ^ 2) ≠ 0 := by
@@ -75,7 +74,7 @@ lemma legendreFailure_gap {n : ℕ} (hn : 2 ≤ n) (hbad : legendreFailure n) :
     rw [← hpow]
     exact hupper
   unfold primeGap
-  omega
+  exact ⟨hupper, hpk, by omega⟩
 
 lemma squareInterval_subset_gap {n k : ℕ}
     (hleft : k.nth Nat.Prime ≤ n ^ 2)
