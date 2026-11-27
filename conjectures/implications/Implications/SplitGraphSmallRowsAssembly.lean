@@ -152,8 +152,8 @@ theorem hamiltonian_of_shared_block_and_remaining_chain
   have hbaseLastC : ∀ x, x ∈ ([a, i, c, j, b] ++ rest).getLast? → x ∈ C := by
     intro x hx
     by_cases hrest : rest = []
-    · have hxEq : x = b := by simpa [hrest] using hx
-      exact hxEq ▸ hb
+    · have hxEq : b = x := by simpa [hrest] using hx
+      exact hxEq.symm ▸ hb
     · rw [List.getLast?_append_of_ne_nil _ hrest] at hx
       exact hrestLastC x (by simpa using hx)
   exact hamiltonian_of_clique_ended_chain G C hC
