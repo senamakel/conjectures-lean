@@ -61,48 +61,6 @@ theorem outside_anchor_le_one_of_rowDiff
     dsimp [A, R] at *
     omega
 
-/-- The split-graph row constraints imply the Hall deficit-one condition.
-Either no row is full, in which case ordinary incidence counting suffices, or
-a full row is an anchor and all other rows have at most one entry outside it. -/
-theorem hall_deficit_one_of_row_constraints
-    (C S : Finset V) (inc : V → V → Prop) [DecidableRel inc]
-    (hdegree : ∀ x ∈ S, 3 ≤ (C.filter (fun c => inc c x)).card)
-    (hrow : ∀ c ∈ C, (row S inc c).card ≤ 4)
-    (hdiff : ∀ c ∈ C, ∀ d ∈ C, c ≠ d → (rowDiff S inc c d).card ≤ 3) :
-    S.card ≤ C.card + 1 := by
-  classical
-  by_cases hfull : ∃ a ∈ C, (row S inc a).card = 4
-  · obtain ⟨a, ha, hanchor⟩ := hfull
-    apply hall_deficit_one_of_single_anchor C S inc (row S inc a)
-    · exact hdegree
-    · exact hrow
-    · simpa using hanchor
-    · exact outside_anchor_le_one_of_rowDiff C S inc a hanchor hrow
-        (fun c hc hca => hdiff c hc a ha hca)
-  · have hrow3 : ∀ c ∈ C, (row S inc c).card ≤ 3 := by
-      intro c hc
-      have hne : (row S inc c).card ≠ 4 := by
-        intro heq
-        exact hfull ⟨c, hc, heq⟩
-      omega
-    have hlow : 3 * S.card ≤ ∑ c ∈ C, (row S inc c).card := by
-      calc
-        3 * S.card = ∑ x ∈ S, 3 := by simp; ring
-        _ ≤ ∑ x ∈ S, (C.filter (fun c => inc c x)).card := by
-          apply Finset.sum_le_sum
-          intro x hx
-          exact hdegree x hx
-        _ = ∑ c ∈ C, (row S inc c).card :=
-          (sum_row_card_eq_sum_degree C S inc).symm
-    have hupp : (∑ c ∈ C, (row S inc c).card) ≤ 3 * C.card := by
-      calc
-        _ ≤ ∑ c ∈ C, (3 : ℕ) := by
-          apply Finset.sum_le_sum
-          intro c hc
-          exact hrow3 c hc
-        _ = _ := by simp; ring
-    omega
-
 /-- Count incidences by rows or by left vertices. -/
 theorem sum_row_card_eq_sum_degree (C S : Finset V) (inc : V → V → Prop)
     [DecidableRel inc] :
