@@ -59,7 +59,8 @@ private theorem path_of_distinct_attachments
     (hpartition : (Finset.univ : Finset V) = C ∪ I)
     (hi : i ∈ I) (hj : j ∈ I) (hk : k ∈ I)
     (hij : i ≠ j) (hik : i ≠ k) (hjk : j ≠ k)
-    (hI : I = {i,j,k}) (ht : t ∈ C) (hxC : x ∈ C) (hyC : y ∈ C)
+    (hI : ∀ v, v ∈ I → v = i ∨ v = j ∨ v = k)
+    (ht : t ∈ C) (hxC : x ∈ C) (hyC : y ∈ C)
     (hxt : x ≠ t) (hyt : y ≠ t) (hxy : x ≠ y)
     (hti : G.Adj t i) (htk : G.Adj t k)
     (hxi : G.Adj x i) (hyj : G.Adj y j) :
@@ -70,23 +71,31 @@ private theorem path_of_distinct_attachments
   let middle : List V := x :: (M.toList ++ [y])
   let prefList : List V := [k,t,i]
   let path : List V := prefList ++ middle ++ [j]
-  have hmiddleNodup : middle.Nodup := by simp [middle, M, D, hxy]
+  have hxM : x ∉ M := by simp [M, hxy]
+  have hyM : y ∉ M := by simp [M, hxy]
+  have hmiddleNodup : middle.Nodup := by simp [middle, hxM, hyM]
   have hmiddleFin : middle.toFinset = D := by
     ext v
-    simp [middle, M, D, Finset.mem_erase, and_assoc, and_left_comm, and_comm, hxy]
+    by_cases hvx : v = x
+    · subst v
+      simp [middle, D, hxy]
+    by_cases hvy : v = y
+    · subst v
+      simp [middle, M, D, hxy]
+    simp [middle, M, D, hvx, hvy]
   have hmiddleSub : ∀ v ∈ middle, v ∈ C := by
     intro v hv
     have hvD : v ∈ D := by simpa [hmiddleFin] using List.mem_toFinset.mpr hv
     exact (Finset.mem_erase.mp hvD).2
   have hmiddleChain := clique_list_chain G C hC middle hmiddleNodup hmiddleSub
   have hmiddleHead : middle.head? = some x := by simp [middle]
-  have hmiddleLast : middle.getLast? = some y := by simp [middle]
+  have hmiddleLast : middle.getLast? = some y := by simp [middle, List.getLast?_append]
   have hiC : i ∉ C := fun h => (Finset.disjoint_left.mp hdisj) h hi
   have hjC : j ∉ C := fun h => (Finset.disjoint_left.mp hdisj) h hj
   have hkC : k ∉ C := fun h => (Finset.disjoint_left.mp hdisj) h hk
   have hti' : t ≠ i := by intro he; subst i; exact hiC ht
   have htk' : t ≠ k := by intro he; subst k; exact hkC ht
-  have hprefListChain : prefList.IsChain G.Adj := by simp [prefList, hti, htk]
+  have hprefListChain : prefList.IsChain G.Adj := by simp [prefList, hti, htk.symm]
   have hprefListNodup : prefList.Nodup := by
     simp [prefList, hij, hik, hjk, hti', htk']
   have hprefListMiddle : (prefList ++ middle).Nodup := by
@@ -130,9 +139,7 @@ private theorem path_of_distinct_attachments
       · have hvD : v ∈ D := Finset.mem_erase.mpr ⟨hvt, hvC⟩
         have hvm : v ∈ middle := List.mem_toFinset.mp (by rw [hmiddleFin]; exact hvD)
         simp [path, prefList, hvm]
-    · rw [hI] at hvI
-      simp only [Finset.mem_insert, Finset.mem_singleton] at hvI
-      rcases hvI with rfl | rfl | rfl <;> simp [path, prefList]
+    · rcases hI v hvI with rfl | rfl | rfl <;> simp [path, prefList]
   exact hamiltonian_of_list G path (by simp [path, prefList]) hpathNodup hpathChain hcover
 
 /-- A full triple row plus the connectivity-two row bounds forces a Hamiltonian
@@ -151,6 +158,10 @@ theorem hamiltonian_of_split_partition_triple_row_of_rows
   have haI : a ∈ I := by rw [hIeq]; simp
   have hbI : b ∈ I := by rw [hIeq]; simp
   have hcI : c ∈ I := by rw [hIeq]; simp
+  have labelsABC : ∀ v, v ∈ I → v = a ∨ v = b ∨ v = c := by
+    intro v hv
+    rw [hIeq] at hv
+    simpa [Finset.mem_insert, Finset.mem_singleton] using hv
   have adjT (i : V) (hi : i ∈ I) : G.Adj t i := by
     have hm : i ∈ row G I t := by simpa [hroweq] using hi
     exact (Finset.mem_filter.mp hm).2
