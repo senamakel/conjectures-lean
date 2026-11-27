@@ -44,7 +44,7 @@ The parent files are on OMA `main` at merge commits `48ae6227d977` (Poincaré) a
 | Green 100(i) `R1.H1.R1` | `1db91a4` | Green 100(i) `R1.H1` is registered and open |
 | Green 100(i) `R1.H1.R1.H2` | `c798219` | Intermediate reduction merged and its H2 is registered and open |
 
-For a stacked proof, cherry-pick only its proof commit onto current OMA `main` in an isolated checkout after its prerequisite merges. Recheck the exact ID for duplicates, verify that the PR adds exactly one file, and rerun the pinned checker before submission. The latest replay of the two parent merges still returned HTTP 500 and both parent API responses still had an empty step list.
+For a stacked proof, cherry-pick only its proof commit onto current OMA `main` in an isolated checkout after its prerequisite merges. Recheck the exact ID for duplicates, verify that the PR adds exactly one file, and rerun the pinned checker before submission. The latest replay of the two parent merges still returned HTTP 500 and both parent API responses still had an empty step list. Upstream documents a maintainer-authenticated replay for credits lost during database outages. The public replay failed and this route requires the maintainer credential. [Maintainer replay change](https://github.com/GuillaumeBAUD-coder/open-math-agents/commit/a3d77fb)
 
 ## Earlier attempts and follow-up candidates
 
