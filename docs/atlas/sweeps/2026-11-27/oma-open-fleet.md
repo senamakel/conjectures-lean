@@ -287,3 +287,12 @@ leave 82 states, all excluded by the first component divisor
 bound. Combined with the lower bound 10, this forces `d ≥ 66`
 in the remaining quotient-four branch. The certificate checks at
 the pinned OMA revision with only the three standard axioms.
+
+After the odd-parameter reduction merged, its branch with smaller
+reduced factor 1 received a checked follow-on. It eliminates the
+remaining odd factors through 31 and retains two branches distinguished
+by whether the second quotient is four or at least five. The first
+branch also carries the prime-support and difference restrictions
+above, including `d ≥ 66`. The exact pinned OMA checker accepted the
+reduction. The desk returned `not_found_or_solved` for the exact
+child ID, as disclosed in the submission. [Merged parent #4990](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4990) · [Follow-on #5466](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/5466)
