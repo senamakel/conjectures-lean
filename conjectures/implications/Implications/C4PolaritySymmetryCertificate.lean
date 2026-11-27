@@ -2,7 +2,7 @@ import Implications.C4PolarityOrderSeven
 
 /-! Exact lex-sorted projective orthogonal symmetries used by the C4 encoder. -/
 
-set_option maxRecDepth 10000
+set_option maxRecDepth 1000000
 set_option maxHeartbeats 0
 
 namespace Implications.C4PolaritySymmetryCertificate
@@ -365,26 +365,29 @@ permutation property, and adjacency pair in the concrete finite certificate. -/
 theorem symmetryRows_valid : ∀ p ∈ symmetryRows, rowValid p := by
   native_decide
 
-def rowIso (p : List Nat) (h : rowValid p) : graph ≃g graph :=
-  RelIso.mk (Equiv.ofBijective (rowFunction p) h.2.2.1) h.2.2.2
+def rowIso (p : List Nat) (h : rowValid p) : graph ≃g graph := by
+  let e := Equiv.ofBijective (rowFunction p) h.2.2.1
+  exact RelIso.mk e (by
+    intro i j
+    exact h.2.2.2 i j)
 
 theorem rowFunction_list (p : List Nat) (h : rowValid p) :
     p = (List.finRange 57).map (fun i => (rowFunction p i).val) := by
   apply List.ext_getElem (by simp [h.1])
   intro n hn₁ hn₂
   have hn : n < 57 := by simpa using hn₂
-  have hn' : n < p.length := by simpa [h.1] using hn
-  simp only [List.getElem_map, List.getElem_finRange hn]
-  simp [rowFunction, List.getElem!_eq_getElem hn']
-  have hb := h.2.1 ⟨n, hn⟩
-  omega
+  have hnp : n < p.length := by simpa [h.1] using hn
+  have hnf : n < (List.finRange 57).length := by simp [hn]
+  simp only [List.getElem_map, List.getElem_finRange hnf]
+  simp [rowFunction, List.getElem!_eq_getElem?_getD,
+    List.getElem?_eq_getElem hnp, h.2.1 ⟨n, hn⟩]
 
 /-- Concrete Lean interface for `no_candidate_of_checked_trace.hperms`. -/
 theorem hperms (p : List Nat) (hp : p ∈ symmetryRows) :
     ∃ e : graph ≃g graph,
       p = (List.finRange 57).map (fun i => (e i).val) := by
   have hv := symmetryRows_valid p hp
-  exact ⟨rowIso p hv, rowFunction_list p hv⟩
+  exact ⟨rowIso p hv, by simpa [rowIso] using rowFunction_list p hv⟩
 
 @[simp] theorem symmetryRows_length : symmetryRows.length = 336 := by
   native_decide
