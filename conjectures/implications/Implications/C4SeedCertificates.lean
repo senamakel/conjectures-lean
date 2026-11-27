@@ -49,7 +49,7 @@ sublist of the candidates.  This is the mathematical specification of the
 search result.
 -/
 def ExistsCompatibleClique (g : Array Nat) (candidates : List Nat) (size : Nat) : Prop :=
-  ∃ chosen : List Nat, chosen.length = size ∧ chosen <+ candidates ∧
+  ∃ chosen : List Nat, chosen.length = size ∧ List.Sublist chosen candidates ∧
     chosen.Pairwise (fun u v => compatible g u v = true)
 
 /-- A true checker result produces an actual compatible sublist witness. -/
@@ -66,8 +66,7 @@ theorem search_sound (g : Array Nat) (candidates : List Nat) (size : Nat)
       have hsplit :
           compatibleCliqueSearchBool g vs (size + 1) = true ∨
             compatibleCliqueSearchBool g (vs.filter (compatible g v)) size = true := by
-        apply Bool.or_eq_true.mp
-        simpa [compatibleCliqueSearchBool] using h
+        simpa [compatibleCliqueSearchBool, Bool.or_eq_true] using h
       rcases hsplit with hskip | htake
       · obtain ⟨chosen, hlen, hsub, hpairs⟩ := search_sound g vs (size + 1) hskip
         exact ⟨chosen, hlen, hsub.cons v, hpairs⟩
@@ -115,7 +114,7 @@ theorem search_complete (g : Array Nat) (candidates : List Nat) (size : Nat)
               intro w hw
               exact hpairs.rel_of_pairwise_cons hw
             have htailFiltered :
-                chosen.tail <+ vs.filter (compatible g v) := by
+                List.Sublist chosen.tail (vs.filter (compatible g v)) := by
               rw [← List.filter_eq_self.mpr hcompatible]
               exact htail.filter (compatible g v)
             have htake :
