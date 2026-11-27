@@ -149,26 +149,12 @@ private def Marked {n : ℕ} (p : Fin 8 → Fin 8) (marks : Finset ℕ)
     (π : Equiv.Perm (Fin n)) : Prop :=
   ∀ s ∈ marks, ContainsAt π s p
 
-private theorem marked_bounded {n : ℕ} {p : Fin 8 → Fin 8} {marks : Finset ℕ}
-    {π : Equiv.Perm (Fin n)} (h : Marked p marks π) :
-    ∀ s ∈ marks, s + 7 < n := by
-  intro s hs
-  obtain ⟨hb, _⟩ := h s hs
-  exact hb
-
-private theorem marked_separated {n : ℕ} {p : Fin 8 → Fin 8} {marks : Finset ℕ}
-    {π : Equiv.Perm (Fin n)} (hp : p = sigma ∨ p = tau) (h : Marked p marks π) :
-    ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t := by
-  intro s hs t ht hst
-  have := same_pattern_starts_separated π p hp s t (h s hs) (h t ht) hst
-  omega
-
 private noncomputable def swapMarked {n : ℕ} (marks : Finset ℕ)
     (p q : Fin 8 → Fin 8) (hp : p = sigma ∨ p = tau) (hq : p ∘ windowSwap = q)
     (π : {f : Equiv.Perm (Fin n) // Marked p marks f}) :
     {f : Equiv.Perm (Fin n) // Marked q marks f} := by
-  let hb := marked_bounded π.property
-  let hd := marked_separated hp π.property
+  let hb := marked_starts_bounded π.val p marks π.property
+  let hd := marked_starts_separated π.val p hp marks π.property
   refine ⟨(swapPerm marks hb hd).trans π.val, ?_⟩
   intro s hs
   rw [← hq]
@@ -182,8 +168,8 @@ private theorem swapMarked_swapMarked {n : ℕ} (marks : Finset ℕ)
   apply Subtype.ext
   apply Equiv.ext
   intro i
-  exact congrArg π.val (swapIndex_involutive marks (marked_bounded π.property)
-    (marked_separated hp π.property) i)
+  exact congrArg π.val (swapIndex_involutive marks (marked_starts_bounded π.val p marks π.property)
+    (marked_starts_separated π.val p hp marks π.property) i)
 
 /-- A bijection between the permutations realizing all prescribed starts for
 the two patterns. -/
