@@ -121,3 +121,5 @@ theorem hamiltonian_of_one_outsider_shared_pair_path
     (by simpa [path, core, tail, segment] using hpathNodup) hchain hcover
 
 end SplitGraphOneOutsider
+
+#print axioms SplitGraphOneOutsider.hamiltonian_of_one_outsider_shared_pair_path
