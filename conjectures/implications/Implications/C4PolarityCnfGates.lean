@@ -61,7 +61,7 @@ theorem atLeast_append_singleton (k : Nat) (xs : List Bool) (x : Bool) :
       (atLeast k xs || (x && atLeast (k - 1) xs)) := by
   cases x
   · simp [atLeast, List.count_append]
-  · simp [atLeast, List.count_append] <;> omega
+  · simp [atLeast, List.count_append]; omega
 
 theorem atLeast_zero_nil : atLeast 0 [] = true := by
   simp [atLeast]
