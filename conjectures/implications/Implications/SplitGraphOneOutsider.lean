@@ -84,8 +84,8 @@ theorem hamiltonian_of_one_outsider_shared_pair_path
     refine List.IsChain.append hsegmentChain (by simp) ?_
     intro v hv w hw
     rw [hsegmentLast] at hv
-    have hv' : v = y := by simpa using hv
-    have hw' : w = b := by simpa using hw
+    have hv' : v = y := by simpa using hv.symm
+    have hw' : w = b := by simpa using hw.symm
     rw [hv', hw']
     exact hby
   have hchain : path.IsChain G.Adj := by
@@ -94,12 +94,12 @@ theorem hamiltonian_of_one_outsider_shared_pair_path
     · intro v hv w hw
       have hcoreLast : core.getLast? = some c := by simp [core]
       rw [hcoreLast] at hv
-      have hv' : v = c := by simpa using hv
+      have hv' : v = c := by simpa using hv.symm
       have htailHead : tail.head? = some u := by
         change (segment ++ [b]).head? = some u
         rw [List.head?_append_of_ne_nil segment (by simp [segment]), hsegmentHead]
       rw [htailHead] at hw
-      have hw' : w = u := by simpa using hw
+      have hw' : w = u := by simpa using hw.symm
       rw [hv', hw']
       exact hcu
   have hcover : ∀ v : V, v ∈ path := by
