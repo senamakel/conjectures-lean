@@ -394,7 +394,13 @@ theorem hamiltonian_of_split_partition_row_bounds
         intro hmem
         exact (Finset.disjoint_left.mp hdisj) hmem hj
       have hIeq : I = {i, j} := by
-        exact Finset.eq_of_subset_of_card_le (by simp [hi, hj]) (by simp [hij, htwo])
+        apply Finset.eq_of_subset_of_card_le
+        · intro x hx
+          simp only [Finset.mem_insert, Finset.mem_singleton] at hx
+          rcases hx with rfl | rfl
+          · exact hi
+          · exact hj
+        · simpa [htwo, hij]
       have hpart : (Finset.univ : Finset V) = C ∪ {i, j} := by
         simpa [hIeq, Finset.union_assoc, Finset.union_left_comm, Finset.union_comm] using hpartition
       exact hamiltonian_of_split_partition_two_endpoints G C i j a b hC
@@ -418,7 +424,15 @@ theorem hamiltonian_of_split_partition_row_bounds
         intro hmem
         exact (Finset.disjoint_left.mp hdisj) hmem (by simp [hIeq])
       have hnodup : ([i, c, j] : List V).Nodup := by
-        simp [hiC, hjC, hCeq, hij]
+        have hic : i ≠ c := by
+          intro heq
+          subst i
+          exact hiC hc
+        have hcj' : c ≠ j := by
+          intro heq
+          subst j
+          exact hjC hc
+        simp [hic, hcj', hij]
       have hchain : ([i, c, j] : List V).IsChain G.Adj := by
         simp [List.isChain_cons, hci.symm, hcj]
       apply hamiltonian_of_list G [i, c, j] (by simp) hnodup hchain
