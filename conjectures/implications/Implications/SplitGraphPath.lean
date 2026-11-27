@@ -586,23 +586,65 @@ theorem hamiltonian_of_split_partition_two_outsiders_of_rows
     let p := [c, t, a]
     let q := [x, z, y]
     let rblock := [b, r, w, s]
-    have hp : p.Nodup := by simp [p, hac.symm, hciRev t ht c hcI, hciRev t ht a haI]
-    have hq : q.Nodup := by simp [q, hxy, hci x hxC z hzI, hci y hyC z hzI]
+    have hp : p.Nodup := by simp [p, hac.symm, hciRev t ht c hcI, hci t ht a haI]
+    have hq : q.Nodup := by simp [q, hxy, hci x hxC z hzI, hci y hyC z hzI, hciRev y hyC z hzI]
     have hr : rblock.Nodup := by
       simp [rblock, hciRev r hrC b hbI, hciRev s hsC b hbI,
-        hci r hrC w hwI, hci s hsC w hwI, hbw, hrs]
+        hci r hrC w hwI, hci s hsC w hwI, hciRev s hsC w hwI, hbw, hrs]
     have hpq : ∀ v ∈ p, v ∉ q := by
       intro v hv hvq
       simp only [p, q, List.mem_cons, List.not_mem_nil, or_false] at hv hvq
-      rcases hv with hvc | hvt | hva <;> rcases hvq with hvx | hvz | hvy <;> aesop
+      rcases hv with hvc | hvt | hva
+      · rcases hvq with hvx | hvz | hvy
+        · exact hciRev x hxC c hcI (hvc.symm.trans hvx)
+        · exact hcz (hvc.symm.trans hvz)
+        · exact hciRev y hyC c hcI (hvc.symm.trans hvy)
+      · rcases hvq with hvx | hvz | hvy
+        · exact htx (hvt.symm.trans hvx)
+        · exact hciRev t ht z hzI (hvt.symm.trans hvz)
+        · exact hty (hvt.symm.trans hvy)
+      · rcases hvq with hvx | hvz | hvy
+        · exact hciRev x hxC a haI (hva.symm.trans hvx)
+        · exact haz (hva.symm.trans hvz)
+        · exact hciRev y hyC a haI (hva.symm.trans hvy)
     have hpr : ∀ v ∈ p, v ∉ rblock := by
       intro v hv hvr
       simp only [p, rblock, List.mem_cons, List.not_mem_nil, or_false] at hv hvr
-      rcases hv with hvc | hvt | hva <;> rcases hvr with hvb | hvr | hvw | hvs <;> aesop
+      rcases hv with hvc | hvt | hva
+      · rcases hvr with hvb | hvr | hvw | hvs
+        · exact hbc.symm (hvc.symm.trans hvb)
+        · exact hciRev r hrC c hcI (hvc.symm.trans hvr)
+        · exact hcw (hvc.symm.trans hvw)
+        · exact hciRev s hsC c hcI (hvc.symm.trans hvs)
+      · rcases hvr with hvb | hvr | hvw | hvs
+        · exact hci t ht b hbI (hvt.symm.trans hvb)
+        · exact htr (hvt.symm.trans hvr)
+        · exact hci t ht w hwI (hvt.symm.trans hvw)
+        · exact hts (hvt.symm.trans hvs)
+      · rcases hvr with hvb | hvr | hvw | hvs
+        · exact hab (hva.symm.trans hvb)
+        · exact hciRev r hrC a haI (hva.symm.trans hvr)
+        · exact haw (hva.symm.trans hvw)
+        · exact hciRev s hsC a haI (hva.symm.trans hvs)
     have hqr : ∀ v ∈ q, v ∉ rblock := by
       intro v hv hvr
       simp only [q, rblock, List.mem_cons, List.not_mem_nil, or_false] at hv hvr
-      rcases hv with hvx | hvz | hvy <;> rcases hvr with hvb | hvr | hvw | hvs <;> aesop
+      rcases hv with hvx | hvz | hvy
+      · rcases hvr with hvb | hvr | hvw | hvs
+        · exact hci x hxC b hbI (hvx.symm.trans hvb)
+        · exact hxr (hvx.symm.trans hvr)
+        · exact hci x hxC w hwI (hvx.symm.trans hvw)
+        · exact hxs (hvx.symm.trans hvs)
+      · rcases hvr with hvb | hvr | hvw | hvs
+        · exact hbz (hvz.symm.trans hvb)
+        · exact hciRev r hrC z hzI (hvz.symm.trans hvr)
+        · exact hzw (hvz.symm.trans hvw)
+        · exact hciRev s hsC z hzI (hvz.symm.trans hvs)
+      · rcases hvr with hvb | hvr | hvw | hvs
+        · exact hci y hyC b hbI (hvy.symm.trans hvb)
+        · exact hyr (hvy.symm.trans hvr)
+        · exact hci y hyC w hwI (hvy.symm.trans hvw)
+        · exact hys (hvy.symm.trans hvs)
     have hqrNodup : (q ++ rblock).Nodup := by
       rw [List.nodup_append']
       exact ⟨hq, hr, hqr⟩
