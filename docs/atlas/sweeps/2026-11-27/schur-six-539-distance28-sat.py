@@ -13,10 +13,8 @@ import argparse
 import gzip
 import hashlib
 import itertools
-import os
 import resource
 import subprocess
-import sys
 import urllib.request
 from pathlib import Path
 
@@ -207,7 +205,6 @@ def preflight(
         if not groups:
             continue
         counts[len(groups)] += 1
-        tuples += K ** len(groups)  # 10 choices per pair, K=6; corrected below
     # Each pair has 10 choices; K is kept as the palette size for clarity.
     tuples = sum((10**k) * count for k, count in counts.items())
     if tuples > MAX_LOCAL_TUPLES:
