@@ -153,9 +153,34 @@ theorem lexStep_auxiliary_assignment_satisfies (a : Nat → Bool)
   cases hp : a pref <;> cases hx : a x <;> cases hy : a y <;>
     simp_all [pos, hguard, hs]
 
+/-- A satisfying assignment to the comparison clauses extends the input
+assignment by setting the fresh prefix variable to the equality-prefix value. -/
+theorem lexStep_extension (a : Nat → Bool) (pref x y same : Nat)
+    (hp0 : 0 < pref) (hx0 : 0 < x) (hy0 : 0 < y) (hs0 : 0 < same)
+    (hguard : (!a pref || a x || !a y) = true)
+    (hps : pref ≠ same) (hxs : x ≠ same) (hys : y ≠ same) :
+    ∃ b : Nat → Bool, (∀ n, n ≠ same → b n = a n) ∧
+      b same = (a pref && (a x == a y)) ∧
+      cnfValue b (lexStepClauses pref x y same) = true := by
+  let b := Function.update a same (a pref && (a x == a y))
+  have hbp : b pref = a pref := by simp [b, Function.update, hps]
+  have hbx : b x = a x := by simp [b, Function.update, hxs]
+  have hby : b y = a y := by simp [b, Function.update, hys]
+  have hguardB : (!b pref || b x || !b y) = true := by
+    simpa [hbp, hbx, hby] using hguard
+  have hsame : b same = (a pref && (a x == a y)) := by
+    simp [b, Function.update]
+  refine ⟨b, ?_, hsame, ?_⟩
+  · intro n hns
+    simp [b, Function.update, hns]
+  · rw [lexStep_auxiliary_assignment_satisfies b pref x y same hp0 hx0 hy0 hs0]
+    · exact hguardB
+    · simpa [hbp, hbx, hby] using hsame
+
 end Implications.C4PolarityLexEncoding
 
 #print axioms Implications.C4PolarityLexEncoding.lexFreshIds_length
 #print axioms Implications.C4PolarityLexEncoding.lexNext_eq
 #print axioms Implications.C4PolarityLexEncoding.orbitLexNext_eq
 #print axioms Implications.C4PolarityLexEncoding.lexStep_auxiliary_assignment_satisfies
+#print axioms Implications.C4PolarityLexEncoding.lexStep_extension
