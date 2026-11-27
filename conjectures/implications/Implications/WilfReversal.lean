@@ -84,9 +84,6 @@ private theorem containsAt_reverse_iff {n : ℕ} (π : Equiv.Perm (Fin n))
     have h := hrev (Fin.rev i) (Fin.rev j)
     have hi := reverseIndex_eq s.val hs i
     have hj := reverseIndex_eq s.val hs j
-    change ((π (Fin.revPerm (windowIndex s.val hs (Fin.rev i))) <
-      π (Fin.revPerm (windowIndex s.val hs (Fin.rev j)))) ↔
-      reversePattern p (Fin.rev i) < reversePattern p (Fin.rev j) at h
     rw [hi, hj] at h
     simpa [reversePattern, Fin.revPerm_apply] using h
   · rintro ⟨_, h⟩
@@ -99,7 +96,8 @@ private theorem containsAt_reverse_iff {n : ℕ} (π : Equiv.Perm (Fin n))
     have hjr := reverseIndex_rev_eq s.val hs j
     have hcmp : (π (Fin.revPerm (windowIndex s.val hs i)) <
       π (Fin.revPerm (windowIndex s.val hs j))) ↔ p (Fin.rev i) < p (Fin.rev j) := by
-      simpa [hir, hjr, Fin.rev, Fin.revPerm_apply] using h'
+      rw [← hir, ← hjr]
+      simpa [Fin.rev] using h'
     simpa [reversePattern, Fin.revPerm_apply] using hcmp
 
 /-- Reversal maps the exact occurrence-start set to its reflected image. -/
