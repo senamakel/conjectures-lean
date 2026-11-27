@@ -35,15 +35,13 @@ strict-order comparisons as the pattern. The bound is expressed on the final
 index, so this works for any finite ambient permutation. -/
 def ContainsAt {n : Nat} (π : Equiv.Perm (Fin n)) (s : Nat)
     (p : Fin 8 → Fin 8) : Prop :=
-  s + 7 < n ∧ ∀ i j : Fin 8,
+  ∃ h : s + 7 < n, ∀ i j : Fin 8,
     (π ⟨s + i.val, by
       have hi : i.val ≤ 7 := Nat.le_of_lt_succ i.isLt
       omega⟩ < π ⟨s + j.val, by
       have hj : j.val ≤ 7 := Nat.le_of_lt_succ j.isLt
       omega⟩) ↔ p i < p j
 
-/-- The elementary marked-window swap map. The structural proof that all swaps
-are compatible for a valid marked set is developed below. -/
 end WilfMarked
 
 namespace WilfMarked
