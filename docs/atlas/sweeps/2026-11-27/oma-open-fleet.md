@@ -188,3 +188,17 @@ implies `y*z ≤ g*x*(g*x−2)` and `y² ≤ x²*(g*x−2)`.
 For `x = 1` this forces `y²+2 ≤ g`, hence `g ≥ 11` when
 `y ≥ 3`. Both bounds check at the OMA pin with only the standard
 axioms. The unbounded parameter ranges in #4990 remain open.
+
+[CrystalSharedPartners.lean](CrystalSharedPartners.lean) checks a
+second finite range, this time with the reduced components `x < y`
+fixed while the common divisor `g) may vary. Write
+`(y*z+1)*r = (g*x−1)²` and `(x*z+1)*s = (g*y−1)²` for the two
+Vieta partners. The scaled difference `d = x³*s−y³*r` satisfies
+`0 < d < min(2*x²,x*y)*(y−x)`. The second upper bound follows
+from a square discriminant identity, with equality ruled out by
+`z > g`. In addition, reducing the first square divisibility
+modulo `g*x+1` gives
+`g*x+1 ∣ 16*((x+y)*(d+(y−x)*y*(x+2*y)))²`. The right-hand
+side is positive and ranges over finitely many values as `d`
+varies. It therefore bounds `g` for fixed `x,y`, and the earlier
+bound then bounds `z`. All three theorems use only the standard axioms.
