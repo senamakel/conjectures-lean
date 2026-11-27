@@ -87,6 +87,42 @@ theorem two_original_rows_shape
   · right
     exact ⟨u, v, w, huv, huw, hvw, hCeq, hDeq⟩
 
+/-- In the equal-row case, the two labels and two clique vertices form a
+four-cycle. Its ordering `[i,c,j,d]` is a path with one independent endpoint
+and one clique endpoint, ready to attach to the remaining blocks. -/
+theorem four_cycle_path_block
+    (G : SimpleGraph V) (C I : Finset V) (c d i j : V)
+    (hdisj : Disjoint C I) (hc : c ∈ C) (hd : d ∈ C)
+    (hi : i ∈ I) (hj : j ∈ I) (hcd : c ≠ d) (hij : i ≠ j)
+    (hci : G.Adj c i) (hdi : G.Adj d i)
+    (hcj : G.Adj c j) (hdj : G.Adj d j) :
+    ∃ p : G.Walk i d, p.IsPath ∧ p.support = [i, c, j, d] := by
+  have hnodup : ([i, c, j, d] : List V).Nodup := by
+    have hic : i ≠ c := by
+      intro h
+      subst c
+      exact (Finset.disjoint_left.mp hdisj) hc hi
+    have hid : i ≠ d := by
+      intro h
+      subst d
+      exact (Finset.disjoint_left.mp hdisj) hd hi
+    have hcj' : c ≠ j := by
+      intro h
+      subst j
+      exact (Finset.disjoint_left.mp hdisj) hc hj
+    have hjd : j ≠ d := by
+      intro h
+      subst d
+      exact (Finset.disjoint_left.mp hdisj) hd hj
+    simp [List.nodup_cons, hic, hij, hid, hcj', hcd, hjd]
+  have hchain : ([i, c, j, d] : List V).IsChain G.Adj := by
+    simp [List.isChain_cons, hci.symm, hcj, hdj.symm]
+  let p := SimpleGraph.Walk.ofSupport ([i, c, j, d] : List V) (by simp) hchain
+  have hp : p.IsPath := by
+    apply (SimpleGraph.Walk.isPath_def p).2
+    simpa [p, SimpleGraph.Walk.support_ofSupport (by simp) hchain] using hnodup
+  exact ⟨p, hp, SimpleGraph.Walk.support_ofSupport (by simp) hchain⟩
+
 end SplitGraphSmallRowsTwo
 
 #print axioms SplitGraphSmallRowsTwo.two_original_rows_intersect
