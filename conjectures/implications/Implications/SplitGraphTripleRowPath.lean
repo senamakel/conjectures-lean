@@ -80,7 +80,7 @@ private theorem path_of_distinct_attachments
     rcases List.mem_append.mp hx with hxM' | hxy'
     · exact hxM (Finset.mem_toList.mp hxM')
     · simp at hxy'
-      exact hxy hxy'.symm
+      exact hxy hxy'
   have hmiddleFin : middle.toFinset = D := by
     ext v
     by_cases hvx : v = x
@@ -241,10 +241,18 @@ theorem hamiltonian_of_split_partition_triple_row_of_rows
         let path : List V := [a,t,b,x,c]
         have hti : t ∉ I := fun hi => (Finset.disjoint_left.mp hdisj) ht hi
         have hxi : x ∉ I := fun hi => (Finset.disjoint_left.mp hdisj) hxC hi
-        have hn : path.Nodup := by simp [path, hab, hac, hbc, hti, hxi, hxt]
+        have hat : a ≠ t := by intro he; exact hti (he ▸ haI)
+        have hax : a ≠ x := by intro he; exact hxi (he ▸ haI)
+        have htb : t ≠ b := by intro he; exact hti (he.symm ▸ hbI)
+        have htx : t ≠ x := hxt.symm
+        have htc : t ≠ c := by intro he; exact hti (he.symm ▸ hcI)
+        have hbx : b ≠ x := by intro he; exact hxi (he ▸ hbI)
+        have hxc : x ≠ c := by intro he; exact hxi (he.symm ▸ hcI)
+        have hn : path.Nodup := by
+          simp [path, hab, hac, hbc, hat, hax, htb, htx, htc, hbx, hxc]
         have hcAdj : G.Adj x c := hzc
         have hchain : path.IsChain G.Adj := by
-          simp [path, (adjT a haI).symm, adjT b hbI, hyb, hcAdj]
+          simp [path, (adjT a haI).symm, adjT b hbI, hyb.symm, hcAdj]
         have hcover : ∀ v : V, v ∈ path := by
           intro v
           have hv : v ∈ C ∪ I := by rw [← hpartition]; exact Finset.mem_univ v
