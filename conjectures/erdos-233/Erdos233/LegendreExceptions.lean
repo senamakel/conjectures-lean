@@ -69,12 +69,12 @@ lemma legendreFailure_gap {n : ℕ} (hn : 2 ≤ n) (hbad : legendreFailure n) :
     have hlt : (k + 1).nth Nat.Prime < (n + 1) ^ 2 := by omega
     exact hbad ((k + 1).nth Nat.Prime) (Nat.prime_nth_prime _) ⟨hnextgt, hlt⟩
   have hpow : (n + 1) ^ 2 = n ^ 2 + (2 * n + 1) := by ring
-  refine ⟨k, hupper, hpk, ?_⟩
+  refine ⟨hupper, hpk, ?_⟩
   have hsum : n ^ 2 + (2 * n + 1) ≤ (k + 1).nth Nat.Prime := by
     rw [← hpow]
     exact hupper
   unfold primeGap
-  exact ⟨hupper, hpk, by omega⟩
+  omega
 
 lemma squareInterval_subset_gap {n k : ℕ}
     (hleft : k.nth Nat.Prime ≤ n ^ 2)
