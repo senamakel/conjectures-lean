@@ -91,3 +91,19 @@ unary counters. It works with either symmetry split or the unrestricted
 formula. The option is off by default, preserving earlier input hashes.
 The gate encoding was exhaustively checked on 1,024 small input assignments
 covering all four constant terms and both fixed Boolean values.
+
+## Screen with shared and outside degree balance
+
+The explicit degree-balance constraints can propagate the consequences of
+fixed shared edges before a two-step witness is chosen. This screen tests
+whether that makes any of the 16 cases resolve at a short cap. It uses the
+shared-neighbor split and the balance option for every case, including the
+two densest cases previously tested without balance.
+
+Emit each formula with `--shared-neighbor-case N --shared-outside-balance`.
+Run CaDiCaL 2.1.2 with `--lrat --checkproof=2 -t 60` and a 70-second
+external wall timeout, a 65-second CPU limit and 2 GiB limits on address
+space and output file size per case. Run at most eight solvers in parallel.
+Stop each at SAT, UNSAT, a resource limit, or an error. The total solver
+CPU budget is 1,040 seconds. Verify any SAT model or complete UNSAT trace
+independently before marking a case resolved.
