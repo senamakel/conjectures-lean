@@ -11,14 +11,15 @@ edges. Summing the remaining-edge counts counts every edge 40 times.
 
 namespace C4Extremal42
 
-classical
 
 /-- Edge count left after deleting a vertex. -/
-def deletionEdgeCount (G : SimpleGraph (Fin 42)) (v : Fin 42) : ℕ :=
+def deletionEdgeCount (G : SimpleGraph (Fin 42)) (v : Fin 42)
+    [Fintype ↑G.edgeSet] [∀ v, Fintype ↑(G.neighborSet v)] : ℕ :=
   G.edgeFinset.card - G.degree v
 
 /-- The deletion sum counts each edge once for each of the 40 vertices it does not meet. -/
-theorem sum_deletionEdgeCount (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj] :
+theorem sum_deletionEdgeCount (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    [Fintype ↑G.edgeSet] [∀ v, Fintype ↑(G.neighborSet v)] :
     (∑ v : Fin 42, deletionEdgeCount G v) = 40 * G.edgeFinset.card := by
   classical
   unfold deletionEdgeCount
@@ -30,6 +31,7 @@ theorem sum_deletionEdgeCount (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj] :
 /-- The explicit 41-vertex extremal bound on every deletion implies `ex(42,C4) ≤ 138`.
 The hypothesis `h41` is the pointwise form of `ex(41,C4) ≤ 132` for the 42-vertex graph. -/
 theorem edge_count_le_138 (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    [Fintype ↑G.edgeSet] [∀ v, Fintype ↑(G.neighborSet v)]
     (h41 : ∀ v, deletionEdgeCount G v ≤ 132) : G.edgeFinset.card ≤ 138 := by
   classical
   have hsum : (∑ v : Fin 42, deletionEdgeCount G v) ≤ 42 * 132 := by
@@ -43,6 +45,7 @@ theorem edge_count_le_138 (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
 /-- A 138-edge graph under the 41-vertex bound has a degree-six vertex whose deletion
 leaves exactly 132 edges, an extremal 41-vertex seed. -/
 theorem extremal_vertex_degree_six (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    [Fintype ↑G.edgeSet] [∀ v, Fintype ↑(G.neighborSet v)]
     (h41 : ∀ v, deletionEdgeCount G v ≤ 132)
     (he : G.edgeFinset.card = 138) :
     ∃ v : Fin 42, G.degree v = 6 ∧ deletionEdgeCount G v = 132 := by
