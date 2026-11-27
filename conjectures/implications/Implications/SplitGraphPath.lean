@@ -178,12 +178,14 @@ theorem hamiltonian_of_clique_order_with_two_endpoints
       subst y
       have hcount := (List.nodup_iff_count_le_one.mp hl_nodup) x
       rw [heq] at hcount
-      simp only [List.count_append, List.count_cons] at hcount
+      simp [List.count_append, List.count_cons] at hcount
       omega
     apply hC
-    · rw [← hl_finset, List.mem_toFinset]
+    · change x ∈ l.toFinset
+      rw [hl_finset]
       exact hx
-    · rw [← hl_finset, List.mem_toFinset]
+    · change y ∈ l.toFinset
+      rw [hl_finset]
       exact hy
     · exact hxy
   have hchain : q.IsChain G.Adj := by
@@ -196,10 +198,12 @@ theorem hamiltonian_of_clique_order_with_two_endpoints
   have hlj : (l ++ [j]).Nodup := by
     rw [List.nodup_append']
     refine ⟨hl_nodup, by simp, ?_⟩
-    intro x hx hy
-    subst x
+    intro x hx y hy hxy
+    simp at hy
+    subst y
     apply hj
-    rw [← List.mem_toFinset, hl_finset]
+    change x ∈ l.toFinset
+    rw [hl_finset]
     exact hx
   have hnodup : q.Nodup := by
     dsimp [q]
@@ -207,8 +211,10 @@ theorem hamiltonian_of_clique_order_with_two_endpoints
     refine ⟨?_, hlj⟩
     intro h
     apply hi
-    rw [← List.mem_toFinset, hl_finset]
-    exact List.mem_append.mp h |>.resolve_right (by simp)
+    have hlmem : i ∈ l := (List.mem_append.mp h).resolve_right (by simp)
+    change i ∈ l.toFinset
+    rw [hl_finset]
+    exact hlmem
   have hpath : p.IsPath := by
     apply (SimpleGraph.Walk.isPath_def p).2
     simpa [p, SimpleGraph.Walk.support_ofSupport hne hchain] using hnodup
@@ -222,7 +228,8 @@ theorem hamiltonian_of_clique_order_with_two_endpoints
       exact this
     rcases Finset.mem_union.mp hv with hvC | hvij
     · have hvl : v ∈ l := by
-        rw [← List.mem_toFinset, hl_finset]
+        change v ∈ l.toFinset
+        rw [hl_finset]
         exact hvC
       simp [hvl]
     · simp only [Finset.mem_insert, Finset.mem_singleton] at hvij
