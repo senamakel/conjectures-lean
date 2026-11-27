@@ -10,15 +10,18 @@ EDGES = tuple(combinations(range(len(PAIRS)), 2))
 
 
 def allowed(edges):
-    """At each vertex, no two neighbors can share a root in their labels."""
+    """Require C4-freeness and distinct root incidences at each vertex."""
     seen_roots = [set() for _ in PAIRS]
+    neighbors = [set() for _ in PAIRS]
     for u, v in edges:
+        neighbors[u].add(v)
+        neighbors[v].add(u)
         for vertex, neighbor in ((u, v), (v, u)):
             roots = PAIRS[neighbor]
             if not seen_roots[vertex].isdisjoint(roots):
                 return False
             seen_roots[vertex].update(roots)
-    return True
+    return all(len(neighbors[u] & neighbors[v]) <= 1 for u, v in EDGES)
 
 
 def rename(edges, image):
@@ -39,7 +42,10 @@ def main():
             orbits[min(rename(edges, image) for image in root_actions)] += 1
 
     for edges, size in sorted(orbits.items(), key=lambda item: (len(item[0]), item[0])):
-        text = " ".join(f"{PAIRS[u][0]}{PAIRS[u][1]}-{PAIRS[v][0]}{PAIRS[v][1]}" for u, v in edges)
+        text = " ".join(
+            f"{a}{b}-{c}{d}" for u, v in edges
+            for (a, b), (c, d) in [(PAIRS[u], PAIRS[v])]
+        )
         print(f"{size:2}  {text or '(empty)'}")
     print("Labeled counts by edge count:", dict(sorted(counts.items())))
     print(f"{sum(counts.values())} labeled patterns, {len(orbits)} orbits")
