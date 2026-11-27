@@ -195,15 +195,21 @@ theorem hamiltonian_of_split_partition_triple_row_of_rows
           rw [hIeq] at hiI
           simpa [Finset.mem_insert, Finset.mem_singleton, eq_comm,
             or_comm, or_left_comm, or_assoc] using hiI
-        rcases hmemI with rfl | rfl | rfl
-        · exact path_of_distinct_attachments G C I t a b c u x hC hdisj hpartition
-            haI hbI hcI hab hac hbc hIeq ht hu hxC hut hxt hxa hyb
+        rcases hmemI with hia | hib | hic
+        · subst i
+          exact path_of_distinct_attachments G C I t a b c u x hC hdisj hpartition
+            haI hbI hcI hab hac hbc (by simpa [or_comm, or_left_comm, or_assoc] using labelsABC)
+            ht hu hxC hut hxt hux
             (adjT a haI) (adjT c hcI) hui hyb
-        · exact path_of_distinct_attachments G C I t b a c u x hC hdisj hpartition
-            hbI haI hcI hab.symm hbc hac.symm hIeq ht hu hxC hut hxt hyb hxa
+        · subst i
+          exact path_of_distinct_attachments G C I t b a c u x hC hdisj hpartition
+            hbI haI hcI hab.symm hbc hac.symm (by simpa [or_comm, or_left_comm, or_assoc] using labelsABC)
+            ht hu hxC hut hxt hux
             (adjT b hbI) (adjT c hcI) hui hxa
-        · exact path_of_distinct_attachments G C I t c a b u x hC hdisj hpartition
-            hcI haI hbI hac.symm hbc.symm hab hIeq ht hu hxC hut hxt hzc hxa
+        · subst i
+          exact path_of_distinct_attachments G C I t c a b u x hC hdisj hpartition
+            hcI haI hbI hac.symm hbc.symm hab (by simpa [or_comm, or_left_comm, or_assoc] using labelsABC)
+            ht hu hxC hut hxt hux
             (adjT c hcI) (adjT b hbI) hui hxa
       · have hCsub : C ⊆ {t,x} := by
           intro u hu
@@ -225,7 +231,7 @@ theorem hamiltonian_of_split_partition_triple_row_of_rows
         have hn : path.Nodup := by simp [path, hab, hac, hbc, hti, hxi, hxt]
         have hcAdj : G.Adj x c := hzc
         have hchain : path.IsChain G.Adj := by
-          simp [path, adjT a haI, adjT b hbI, hxa, hcAdj]
+          simp [path, (adjT a haI).symm, adjT b hbI, hyb, hcAdj]
         have hcover : ∀ v : V, v ∈ path := by
           intro v
           have hv : v ∈ C ∪ I := by rw [← hpartition]; exact Finset.mem_univ v
@@ -238,10 +244,11 @@ theorem hamiltonian_of_split_partition_triple_row_of_rows
             rcases hvI with rfl | rfl | rfl <;> simp [path]
         exact hamiltonian_of_list G path (by simp [path]) hn hchain hcover
     · exact path_of_distinct_attachments G C I t a c b x z hC hdisj hpartition
-        haI hcI hbI hac hbc.symm hab.symm hIeq ht hxC hzC hxt hzt hxz
+        haI hcI hbI hac hab hbc.symm (by simpa [or_comm, or_left_comm, or_assoc] using labelsABC)
+        ht hxC hzC hxt hzt hxz
         (adjT a haI) (adjT b hbI) hxa hzc
   · exact path_of_distinct_attachments G C I t a b c x y hC hdisj hpartition
-      haI hbI hcI hab hac hbc hIeq ht hxC hyC hxt hyt hxy
+      haI hbI hcI hab hac hbc labelsABC ht hxC hyC hxt hyt hxy
       (adjT a haI) (adjT c hcI) hxa hyb
   
 end SplitGraphTripleRowPath
