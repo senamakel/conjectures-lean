@@ -376,6 +376,7 @@ end Implications.C4PolarityThresholdEncoding
 
 #print axioms Implications.C4PolarityThresholdEncoding.thresholdGateDimacs_iff
 #print axioms Implications.C4PolarityThresholdEncoding.thresholdGateDimacs_extend
+#print axioms Implications.C4PolarityThresholdEncoding.thresholdGateList_satisfies
 #print axioms Implications.C4PolarityThresholdEncoding.thresholdRowClauses_length
 #print axioms Implications.C4PolarityThresholdEncoding.deletionCounterFreshCount
 #print axioms Implications.C4PolarityThresholdEncoding.scoreCounterFreshCount
