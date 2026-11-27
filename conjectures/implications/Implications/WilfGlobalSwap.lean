@@ -43,28 +43,31 @@ noncomputable def swapIndex (marks : Finset Nat)
       exact ⟨i.val - 2, hout⟩
     · exact i
 
-private theorem left_to_right (marks : Finset Nat)
+theorem swapIndex_val_left (marks : Finset Nat)
     (hbounded : ∀ s ∈ marks, s + 7 < n)
     (hsep : ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t)
     (i : Fin n) (hi : IsLeft marks i) :
-    IsRight marks (swapIndex marks hbounded hsep i) := by
-  have hleft := hi
-  obtain ⟨s, hs, hsi⟩ := hi
-  refine ⟨s, hs, ?_⟩
-  simp [swapIndex, hleft, hsi]
+    (swapIndex marks hbounded hsep i).val = i.val + 2 := by
+  simp [swapIndex, hi]
 
-private theorem right_to_left (marks : Finset Nat)
+theorem swapIndex_val_right (marks : Finset Nat)
     (hbounded : ∀ s ∈ marks, s + 7 < n)
     (hsep : ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t)
     (i : Fin n) (hi : IsRight marks i) :
-    IsLeft marks (swapIndex marks hbounded hsep i) := by
+    (swapIndex marks hbounded hsep i).val = i.val - 2 := by
   have hright := hi
   obtain ⟨s, hs, hsi⟩ := hi
   have hnot : ¬ IsLeft marks i := by
     intro hleft
     exact no_left_right marks hsep i ⟨hleft, hright⟩
-  refine ⟨s, hs, ?_⟩
-  simp [swapIndex, hnot, hright, hsi]
+  simp [swapIndex, hnot, hi]
+
+theorem swapIndex_val_other (marks : Finset Nat)
+    (hbounded : ∀ s ∈ marks, s + 7 < n)
+    (hsep : ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t)
+    (i : Fin n) (hleft : ¬ IsLeft marks i) (hright : ¬ IsRight marks i) :
+    (swapIndex marks hbounded hsep i).val = i.val := by
+  simp [swapIndex, hleft, hright]
 
 theorem swapIndex_involutive (marks : Finset Nat)
     (hbounded : ∀ s ∈ marks, s + 7 < n)
@@ -74,24 +77,34 @@ theorem swapIndex_involutive (marks : Finset Nat)
   intro i
   apply Fin.ext
   by_cases hleft : IsLeft marks i
-  · have hright := left_to_right marks hbounded hsep i hleft
+  · have hright : IsRight marks (swapIndex marks hbounded hsep i) := by
+      obtain ⟨s, hs, hsi⟩ := hleft
+      refine ⟨s, hs, ?_⟩
+      rw [swapIndex_val_left marks hbounded hsep i hleft]
+      omega
     have hnot : ¬ IsLeft marks (swapIndex marks hbounded hsep i) := by
       intro h
       exact no_left_right marks hsep _ ⟨h, hright⟩
-    simp only [swapIndex, dif_pos hleft, dif_neg hnot, Fin.val_mk]
+    have hval := swapIndex_val_right marks hbounded hsep _ hright
+    rw [hval, swapIndex_val_left marks hbounded hsep i hleft]
     obtain ⟨s, hs, hsi⟩ := hleft
     omega
   · by_cases hright : IsRight marks i
-    · have hleft' := right_to_left marks hbounded hsep i hright
+    · have hleft' : IsLeft marks (swapIndex marks hbounded hsep i) := by
+        obtain ⟨s, hs, hsi⟩ := hright
+        refine ⟨s, hs, ?_⟩
+        rw [swapIndex_val_right marks hbounded hsep i hright]
+        omega
       have hnot : ¬ IsRight marks (swapIndex marks hbounded hsep i) := by
         intro h
         exact no_left_right marks hsep _ ⟨hleft', h⟩
-      simp only [swapIndex, dif_neg hleft, dif_pos hright, dif_pos hleft', dif_neg hnot,
-        Fin.val_mk]
+      have hval := swapIndex_val_left marks hbounded hsep _ hleft'
+      rw [hval, swapIndex_val_right marks hbounded hsep i hright]
       obtain ⟨s, hs, hsi⟩ := hright
       omega
     · have hnot' : ¬ IsRight marks (swapIndex marks hbounded hsep i) := by
         simpa [swapIndex, hleft, hright]
-      simp [swapIndex, hleft, hright, hnot']
+      have hval := swapIndex_val_other marks hbounded hsep i hleft hright
+      rw [swapIndex_val_other marks hbounded hsep _ hleft hnot', hval]
 
 end Implications.WilfGlobalSwap
