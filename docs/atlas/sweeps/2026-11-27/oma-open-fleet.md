@@ -70,3 +70,14 @@ so the parameters agree. The nested reduction leaves the fixed multiplier
 checker accepted it with only the three standard axioms. At submission
 time the merged parent's step was not indexed by the desk. The PR records
 the unsuccessful lease request. [Merged parent #4439](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4439) · [Nested reduction #4513](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4513)
+
+The coprime split merged upstream. For `m = 3`, order the smaller components
+so `a ≤ c ≤ 3a`. The quotient for `(c,3a)` lies strictly between 3 and 6.
+Modulo 3 rules out 4, so the quotient is 5. The quotient for `(a,3c)` lies
+between 5 and 11. For each candidate 6 through 11, subtracting nine times
+the second conic equation from the first eliminates `c²`. Substitution
+gives a polynomial in `a−3` with negative constant and nonpositive remaining
+coefficients, a contradiction. The exact leaf proof passed the OMA pin
+with the standard three axioms and was submitted upstream. The odd
+`m ≥ 5` case and the shared-divisor branch remain open.
+[Merged split #4513](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4513) · [Multiplier-three proof #4534](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4534)
