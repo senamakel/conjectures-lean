@@ -490,29 +490,17 @@ theorem hamiltonian_of_split_partition_three_double_rows
   let O : Finset V := I \ special
   have hOSub : O ⊆ I := Finset.sdiff_subset
   have hS : C.filter (fun q => (I.filter (fun i => left i = q ∨ right i = q)).card = 2) = {x,y,z} := by
-    apply Finset.eq_of_subset_of_card_le
-    · intro q hq
-      by_cases hqx : q = x
-      · simp [hqx]
-      by_cases hqy : q = y
-      · simp [hqy]
-      by_cases hqz : q = z
-      · simp [hqz]
-      exfalso
-      have hcard3 : ({x,y,z} : Finset V).card = 3 := by simp [hxy, hxz, hyz]
-      have hle : ({x,y,z} : Finset V).card ≤
-          (C.filter (fun d => (I.filter (fun i => left i = d ∨ right i = d)).card = 2)).card := by
-        apply Finset.card_le_card
-        intro d hd
-        simp only [Finset.mem_insert, Finset.mem_singleton] at hd
-        rcases hd with rfl | rfl | rfl
-        · exact Finset.mem_filter.mpr ⟨hxC, by rw [hrowX]; simp⟩
-        · exact Finset.mem_filter.mpr ⟨hyC, by rw [hrowY]; simp⟩
-        · exact Finset.mem_filter.mpr ⟨hzC, by rw [hrowZ]; simp⟩
-      rw [hcount] at hle
-      omega
-    · rw [hcount]
-      simp [hxy, hxz, hyz]
+    have htriSub : ({x,y,z} : Finset V) ⊆
+        C.filter (fun q => (I.filter (fun i => left i = q ∨ right i = q)).card = 2) := by
+      intro q hq
+      simp only [Finset.mem_insert, Finset.mem_singleton] at hq
+      rcases hq with rfl | rfl | rfl
+      · exact Finset.mem_filter.mpr ⟨hxC, by rw [hrowX]; simp⟩
+      · exact Finset.mem_filter.mpr ⟨hyC, by rw [hrowY]; simp⟩
+      · exact Finset.mem_filter.mpr ⟨hzC, by rw [hrowZ]; simp⟩
+    have htriCard : ({x,y,z} : Finset V).card = 3 := by simp [hxy, hxz, hyz]
+    have hEq := Finset.eq_of_subset_of_card_le htriSub (by rw [hcount, htriCard])
+    exact hEq.symm
   have hselectedBound : ∀ q ∈ C,
       (I.filter (fun i => left i = q ∨ right i = q)).card ≤ 2 := by
     intro q hq
@@ -527,62 +515,37 @@ theorem hamiltonian_of_split_partition_three_double_rows
   have hselectedAtSpecial : ∀ q ∈ ({x,y,z} : Finset V),
       I.filter (fun i => left i = q ∨ right i = q) ⊆ special := by
     intro q hq i hi
-    have hqS : q ∈ C.filter
-        (fun d => (I.filter (fun j => left j = d ∨ right j = d)).card = 2) := by
-      rw [hS]
-      exact hq
-    have hi' := Finset.mem_filter.mp hi
-    have hEq : I.filter (fun j => left j = q ∨ right j = q) =
-        (if q = x then {a,b} else if q = y then {b,c} else {a,c}) := by
-      rcases (by simpa using hq : q = x ∨ q = y ∨ q = z) with h | h | h
-      · subst q; exact hrowX
-      · subst q; exact hrowY
-      · subst q; exact hrowZ
-    rw [hEq] at hi
-    by_cases hqx : q = x
-    · rw [if_pos hqx] at hi
-      simp only [Finset.mem_insert, Finset.mem_singleton] at hi
-      rcases hi with h | h | h <;> simp [special, h]
-    · by_cases hqy : q = y
-      · rw [if_neg hqx, if_pos hqy] at hi
-        simp only [Finset.mem_insert, Finset.mem_singleton] at hi
-        rcases hi with h | h | h <;> simp [special, h]
-      · rw [if_neg hqx, if_neg hqy] at hi
-        simp only [Finset.mem_insert, Finset.mem_singleton] at hi
-        rcases hi with h | h | h <;> simp [special, h]
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hq
+    rcases hq with hq | hq | hq
+    · subst q
+      rw [hrowX] at hi
+      simpa [special] using hi
+    · subst q
+      rw [hrowY] at hi
+      simpa [special] using hi
+    · subst q
+      rw [hrowZ] at hi
+      simpa [special] using hi
   have hOavoidSpecial : ∀ k ∈ O, left k ∉ {x,y,z} ∧ right k ∉ {x,y,z} := by
     intro k hk
     have hkI := (Finset.mem_sdiff.mp hk).1
     constructor <;> intro h
     · have hkrow : k ∈ I.filter (fun i => left i = left k ∨ right i = left k) :=
         Finset.mem_filter.mpr ⟨hkI, Or.inl rfl⟩
-      have : left k ∈ ({x,y,z} : Finset V) := by simpa using h
-      have hsubset := hselectedAtSpecial (left k) this hkrow
       have hknot := (Finset.mem_sdiff.mp hk).2
-      simp only [special, Finset.mem_insert, Finset.mem_singleton, not_or] at hknot
-      simp only [Finset.mem_insert, Finset.mem_singleton] at hsubset
-      rcases hsubset with h | h | h <;> exact hknot (by simpa [h])
+      exact hknot (hselectedAtSpecial (left k) h hkrow)
     · have hkrow : k ∈ I.filter (fun i => left i = right k ∨ right i = right k) :=
         Finset.mem_filter.mpr ⟨hkI, Or.inr rfl⟩
-      have : right k ∈ ({x,y,z} : Finset V) := by simpa using h
-      have hsubset := hselectedAtSpecial (right k) this hkrow
       have hknot := (Finset.mem_sdiff.mp hk).2
-      simp only [special, Finset.mem_insert, Finset.mem_singleton, not_or] at hknot
-      simp only [Finset.mem_insert, Finset.mem_singleton] at hsubset
-      rcases hsubset with h | h | h <;> exact hknot (by simpa [h])
+      exact hknot (hselectedAtSpecial (right k) h hkrow)
   have hunique : ∀ q ∈ C, ∀ k ∈ O, ∀ l ∈ O,
       (left k = q ∨ right k = q) → (left l = q ∨ right l = q) → k = l := by
     intro q hq k hk l hl hqk hql
     by_cases hqS : q ∈ ({x,y,z} : Finset V)
     · have hkr := Finset.mem_filter.mpr ⟨(Finset.mem_sdiff.mp hk).1, hqk⟩
-      have hlr := Finset.mem_filter.mpr ⟨(Finset.mem_sdiff.mp hl).1, hql⟩
       have hksub := hselectedAtSpecial q hqS hkr
-      have hlsub := hselectedAtSpecial q hqS hlr
       have hknot := (Finset.mem_sdiff.mp hk).2
-      have hlnot := (Finset.mem_sdiff.mp hl).2
-      simp only [special, Finset.mem_insert, Finset.mem_singleton, not_or] at hknot hlnot
-      simp only [special, Finset.mem_insert, Finset.mem_singleton] at hksub hlsup
-      sorry
+      exact False.elim (hknot hksub)
     · have hcard : (I.filter (fun i => left i = q ∨ right i = q)).card ≤ 1 := by
         have hle := hselectedBound q hq
         have hneTwo : (I.filter (fun i => left i = q ∨ right i = q)).card ≠ 2 := by
