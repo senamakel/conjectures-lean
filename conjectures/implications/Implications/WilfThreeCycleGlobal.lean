@@ -369,4 +369,97 @@ theorem exactOccurrenceCount_eq_24135786_25134786 (n : ℕ) (marks : Finset (Fin
 #print axioms exactOccurrenceCount_eq_24135786_25134786
 #print axioms exactOccurrenceCount_eq_23145786_25134786
 
+def pattern26134785 : Fin 8 → Fin 8 := ![1, 5, 0, 2, 3, 6, 7, 4]
+
+def pattern23146785 : Fin 8 → Fin 8 := ![1, 2, 0, 3, 5, 6, 7, 4]
+
+/-- Exact occurrence-count equality for a pair in archive block 42, indexed from zero. -/
+theorem exactOccurrenceCount_eq_26134785_23146785 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (WilfPatternSwap.occurrenceSet pattern26134785) marks =
+      WilfCounts.exactCount (WilfPatternSwap.occurrenceSet pattern23146785) marks := by
+  have hpq : pattern26134785 ∘ cycle.symm = pattern23146785 := by
+    funext i
+    fin_cases i <;> rfl
+  have hqp : pattern23146785 ∘ cycle = pattern26134785 := by
+    funext i
+    fin_cases i <;> rfl
+  refine exactOccurrenceCount_eq_of_markedSwap n marks _ _ cycle.symm
+    (by decide) (by decide) ?_ ?_ hpq hqp ?_ ?_
+  · intro d hd hsmall
+    interval_cases d <;> decide
+  · intro d hd hsmall
+    interval_cases d <;> decide
+  · intro f hfirst hnext i j
+    simpa only [← hpq, Function.comp_apply] using
+      overlap_cycle_order pattern26134785 cycle.symm (by decide) (by decide)
+        (by decide) (by decide) (by decide) f hfirst hnext i j
+  · intro f hfirst hnext i j
+    simpa only [← hqp, Function.comp_apply, Equiv.symm_symm] using
+      overlap_cycle_order pattern23146785 cycle (by decide) (by decide)
+        (by decide) (by decide) (by decide) f hfirst hnext i j
+
+#print axioms exactOccurrenceCount_eq_26134785_23146785
+
+def pattern26135784 : Fin 8 → Fin 8 := ![1, 5, 0, 2, 4, 6, 7, 3]
+
+def pattern23156784 : Fin 8 → Fin 8 := ![1, 2, 0, 4, 5, 6, 7, 3]
+
+/-- Exact occurrence-count equality for a pair in archive block 43, indexed from zero. -/
+theorem exactOccurrenceCount_eq_26135784_23156784 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (WilfPatternSwap.occurrenceSet pattern26135784) marks =
+      WilfCounts.exactCount (WilfPatternSwap.occurrenceSet pattern23156784) marks := by
+  have hpq : pattern26135784 ∘ cycle.symm = pattern23156784 := by
+    funext i
+    fin_cases i <;> rfl
+  have hqp : pattern23156784 ∘ cycle = pattern26135784 := by
+    funext i
+    fin_cases i <;> rfl
+  refine exactOccurrenceCount_eq_of_markedSwap n marks _ _ cycle.symm
+    (by decide) (by decide) ?_ ?_ hpq hqp ?_ ?_
+  · intro d hd hsmall
+    interval_cases d <;> decide
+  · intro d hd hsmall
+    interval_cases d <;> decide
+  · intro f hfirst hnext i j
+    simpa only [← hpq, Function.comp_apply] using
+      overlap_cycle_order pattern26135784 cycle.symm (by decide) (by decide)
+        (by decide) (by decide) (by decide) f hfirst hnext i j
+  · intro f hfirst hnext i j
+    simpa only [← hqp, Function.comp_apply, Equiv.symm_symm] using
+      overlap_cycle_order pattern23156784 cycle (by decide) (by decide)
+        (by decide) (by decide) (by decide) f hfirst hnext i j
+
+#print axioms exactOccurrenceCount_eq_26135784_23156784
+
+def pattern26145783 : Fin 8 → Fin 8 := ![1, 5, 0, 3, 4, 6, 7, 2]
+
+def pattern24156783 : Fin 8 → Fin 8 := ![1, 3, 0, 4, 5, 6, 7, 2]
+
+/-- Exact occurrence-count equality for a pair in archive block 47, indexed from zero. -/
+theorem exactOccurrenceCount_eq_26145783_24156783 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (WilfPatternSwap.occurrenceSet pattern26145783) marks =
+      WilfCounts.exactCount (WilfPatternSwap.occurrenceSet pattern24156783) marks := by
+  have hpq : pattern26145783 ∘ cycle.symm = pattern24156783 := by
+    funext i
+    fin_cases i <;> rfl
+  have hqp : pattern24156783 ∘ cycle = pattern26145783 := by
+    funext i
+    fin_cases i <;> rfl
+  refine exactOccurrenceCount_eq_of_markedSwap n marks _ _ cycle.symm
+    (by decide) (by decide) ?_ ?_ hpq hqp ?_ ?_
+  · intro d hd hsmall
+    interval_cases d <;> decide
+  · intro d hd hsmall
+    interval_cases d <;> decide
+  · intro f hfirst hnext i j
+    simpa only [← hpq, Function.comp_apply] using
+      overlap_cycle_order pattern26145783 cycle.symm (by decide) (by decide)
+        (by decide) (by decide) (by decide) f hfirst hnext i j
+  · intro f hfirst hnext i j
+    simpa only [← hqp, Function.comp_apply, Equiv.symm_symm] using
+      overlap_cycle_order pattern24156783 cycle (by decide) (by decide)
+        (by decide) (by decide) (by decide) f hfirst hnext i j
+
+#print axioms exactOccurrenceCount_eq_26145783_24156783
+
 end Implications.WilfThreeCycleGlobal
