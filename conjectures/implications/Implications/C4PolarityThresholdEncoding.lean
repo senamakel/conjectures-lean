@@ -63,6 +63,13 @@ theorem thresholdFreshVariables_length (nextVar limit inputCount : Nat) :
     (thresholdFreshVariables nextVar limit inputCount).length = inputCount * limit := by
   simp [thresholdFreshVariables]
 
+theorem thresholdFreshVariables_nodup (nextVar limit inputCount : Nat) :
+    (thresholdFreshVariables nextVar limit inputCount).Nodup := by
+  apply List.Nodup.map
+  · intro i j hij
+    omega
+  · exact List.nodup_range _
+
 theorem thresholdFreshVariables_gt_base {nextVar limit inputCount : Nat}
     {v : Int} (hv : v ∈ thresholdFreshVariables nextVar limit inputCount) :
     Int.ofNat nextVar < v := by
@@ -188,5 +195,6 @@ theorem scoreCounterLastThreshold :
 end Implications.C4PolarityThresholdEncoding
 
 #print axioms Implications.C4PolarityThresholdEncoding.thresholdGateDimacs_iff
+#print axioms Implications.C4PolarityThresholdEncoding.thresholdGateDimacs_extend
 #print axioms Implications.C4PolarityThresholdEncoding.deletionCounterFreshCount
 #print axioms Implications.C4PolarityThresholdEncoding.scoreCounterFreshCount
