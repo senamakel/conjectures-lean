@@ -73,6 +73,7 @@ theorem search_correct (g : Array Nat) (candidates : List Nat) (size : Nat) :
 termination_by candidates.length + size
 decreasing_by
   · simp_wf
+    omega
   · simp_wf
     have hfilter : (vs.filter (compatible g v)).length ≤ vs.length :=
       List.length_filter_le _ _
