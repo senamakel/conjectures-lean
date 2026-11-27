@@ -150,12 +150,7 @@ theorem absoluteIndices_length : absoluteIndices.length = 8 := by
 
 /-- The second score segment contains one entry for each of the 224 graph edges. -/
 theorem orthogonalPairs_length : orthogonalPairs.length = 224 := by
-  classical
-  have h := orthogonal_pair_score_count (Finset.univ : Finset (Fin 57))
-  have hlen : orthogonalPairs.length = graph.edgeFinset.card := by
-    simpa [List.countP_eq_length_filter, inducedEdgeCount] using h
-  rw [C4PolarityOrderSeven.edge_card] at hlen
-  exact hlen
+  decide
 
 /-- The score list has the same 232 inputs as the Python script: eight absolute
 indicators followed by 224 lexicographically ordered edge indicators. -/
