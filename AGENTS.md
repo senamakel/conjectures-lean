@@ -1,8 +1,22 @@
-# Conjectures workspace
+# Conjecture attacker
+
+Use this repository to identify and attack open targets from
+[Open Math Agents](https://github.com/GuillaumeBAUD-coder/open-math-agents).
+Start every attack with the discovery stage in [the research workflow](docs/ATTACK.md).
+Use the registry's exact problem ID and statement, check live status and prior work,
+and use Exa, GitHub, lemmagraph and the local Claude Code and Codex transcript search
+before selecting a proof, reduction, or refutation route. Record evidence and outcomes
+in the atlas. Use the registry's pinned checker for a registry submission.
+
+The tracker below describes the existing Lean packages and their proof standards.
+For those packages, update the tracker and [results inventory](RESULTS.md) when the
+verified status changes.
+
+## Lean package tracker
 
 This repository (`github.com/senamakel/conjectures-lean`) holds Lean 4 projects that formalise
 conjectures and theorems: the 17 headline results, each a consequence of RH or GRH, and further
-projects (see the table in `README.md`). Since 2026-11-26 the scope is any open conjecture in
+projects (see the table in `RESULTS.md`). Since 2026-11-26 the scope is any open conjecture in
 mathematics, theoretical computer science or mathematical physics (see "Scope"). Each project is a folder under
 `conjectures/` and a Lean package of its own, imported with its full history from the former standalone
 repository `github.com/senamakel/<name>`. This file is the tracker: when a box changes, update it
@@ -311,7 +325,7 @@ stop one that is running on it. A Lean version of a known proof is a formalisati
 this workspace is for. On 2026-11-26 four provers were stopped for this reason (further Cramér,
 Schinzel, abc and Berge–Fulkerson consequences); their partial branches (`impl-cramer-2`,
 `impl-schinzel-2`, `impl-abc-3`, `impl-combinatorics`) are unmerged and stay that way unless the
-owner asks. The implications already merged stay; the table in `README.md` marks nothing as new.
+owner asks. The implications already merged stay; the table in `RESULTS.md` marks nothing as new.
 
 Every edge in the atlas carries a `novelty` verdict (`docs/atlas/README.md`), and a prover is
 started only on an edge whose verdict is `not-found` or `asserted-unproved`.
@@ -962,7 +976,7 @@ The role is `counterexample-hunter` (`.claude/agents/`). Scripts of each sweep a
 - [ ] Erdős 855 (the form eventual in both `x` and `y`) does not follow from one tuple: it needs dense
       admissible tuples of every large width (the Hensley–Richards sieve). Sized L in
       `docs/atlas/sweeps/2026-11-26/disproof-erdos.md`; not started
-- [x] Statements copied word for word from formal-conjectures `9097e2f`; the table is in the root `README.md`
+- [x] Statements copied word for word from formal-conjectures `9097e2f`; the table is in the root `RESULTS.md`
 - [ ] `scripts/erdos142-discharge/` (the link to openai/math's `manuscriptQuantitativeDensityTheorem`) has not been typechecked
 - [ ] Some modules define copied names in root namespaces (`Nat.Full`, `Set.IsAPOfLength…`, `ABC`, `Erdos936`); move them
       under `Implications.` before a second module copies the same definition
@@ -999,7 +1013,7 @@ The role is `counterexample-hunter` (`.claude/agents/`). Scripts of each sweep a
 - Work inside the project folders goes on a branch made with `worktree <slug>` here, and lands
   through one PR to this repository, however many folders it touches.
 - Adding a conjecture: create `conjectures/<name>/` as its own Lean package (`lakefile`, `lean-toolchain`,
-  `README.md`), then give it a row in `README.md` and a section in the checklist below.
+  `README.md`), then give it a row in `RESULTS.md` and a section in the checklist below.
 - Projects require their siblings by local path (`path = "../<name>"` in `lakefile.toml`), so a
   change to one folder is seen by every project that depends on it at the next build, with no pin
   to bump. Run `lake update <Pkg>` in a dependent after adding or removing a sibling require.
