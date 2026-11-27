@@ -147,7 +147,7 @@ theorem smoothGapUniverseCardBound (N B : ℕ) (hB : 0 < B) :
     · apply Finset.mem_insert.mpr
       right
       apply Nat.mem_smoothNumbersUpTo.mpr
-      refine ⟨by omega, ?_⟩
+      refine ⟨Nat.le_of_lt_succ (Finset.mem_range.mp hmem.1), ?_⟩
       apply Nat.mem_smoothNumbers'.2
       intro p hp hpd
       by_cases hm1 : m = 1
