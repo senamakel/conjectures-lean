@@ -1,4 +1,5 @@
 import Mathlib.Algebra.Order.Chebyshev
+import Mathlib.Tactic
 
 /-!
 # A degree-eight cap from C4 codegree moments
@@ -25,10 +26,11 @@ theorem count_le_seven_of_codegree_moments
     (k n : ℕ) (a : Fin n → ℝ)
     (hk : 0 < k)
     (hsize : n + k = 42)
-    (hfirst : ∑ x, a x = 8 * (k : ℝ))
-    (hsecond : ∑ x, (a x ^ 2 - a x) ≤ (k : ℝ) * ((k : ℝ) - 1)) :
+    (hfirst : (∑ x : Fin n, a x) = 8 * (k : ℝ))
+    (hsecond : (∑ x : Fin n, (a x ^ 2 - a x)) ≤
+      (k : ℝ) * ((k : ℝ) - 1)) :
     k ≤ 7 := by
-  have hsumSq : ∑ x, a x ^ 2 ≤ (k : ℝ) * ((k : ℝ) + 7) := by
+  have hsumSq : (∑ x : Fin n, a x ^ 2) ≤ (k : ℝ) * ((k : ℝ) + 7) := by
     have hsecond' := hsecond
     rw [← Finset.sum_sub_distrib] at hsecond'
     linarith
