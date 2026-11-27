@@ -28,7 +28,8 @@ theorem sum_deletionEdgeCount (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
     exact SimpleGraph.degree_le_card_edgeFinset G v
   rw [Finset.sum_tsub_distrib Finset.univ hle]
   have hdeg := G.sum_degrees_eq_twice_card_edges
-  simp only [hdeg]
+  have hsumDeg : (∑ x : Fin 42, G.degree x) = 2 * G.edgeFinset.card := hdeg
+  rw [hsumDeg]
   simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin]
   omega
 
