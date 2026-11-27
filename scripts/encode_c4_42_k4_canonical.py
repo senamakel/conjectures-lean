@@ -151,7 +151,25 @@ def shared_neighbor_fixed(case: int) -> dict[frozenset[int], bool]:
     }
 
 
-def build(matching_case: int | None = None, *, shared_neighbor_case: int | None = None) -> Cnf:
+def add_shared_outside_balance(
+    cnf: Cnf, shared: list[int | bool], outside: list[int | bool], base: int,
+) -> None:
+    """Enforce count(outside) = base + count(shared), with at most two shared."""
+    shared_count = cnf.equivalent_atleast(shared, 3)
+    outside_count = cnf.equivalent_atleast(outside, base + 3)
+    cnf.clause(negate(shared_count[3]))
+    cnf.clause(outside_count[base])
+    cnf.clause(negate(outside_count[base + 3]))
+    for k in (1, 2):
+        cnf.clause(negate(shared_count[k]), outside_count[base + k])
+        cnf.clause(shared_count[k], negate(outside_count[base + k]))
+
+
+def build(
+    matching_case: int | None = None, *,
+    shared_neighbor_case: int | None = None,
+    shared_outside_balance: bool = False,
+) -> Cnf:
     if matching_case is not None and shared_neighbor_case is not None:
         raise ValueError("matching cases and shared-neighbor cases use distinct relabelings")
     cnf = Cnf()
@@ -209,6 +227,13 @@ def build(matching_case: int | None = None, *, shared_neighbor_case: int | None 
         count = cnf.equivalent_atleast(inputs, required + 1)
         cnf.clause(count[required])
         cnf.clause(negate(count[required + 1]))
+        if shared_outside_balance:
+            # Four unique two-step witnesses: shared neighbors contribute
+            # twice, private neighbors and owners once, and others zero.
+            add_shared_outside_balance(
+                cnf, [edge(v, w) for w in range(4, 10)],
+                [edge(v, w) for w in range(30, 42)], target - high_degree - 4,
+            )
     return cnf
 
 
@@ -225,6 +250,8 @@ def main() -> None:
                         help="fix one of four complete symmetry cases for the matching on N(0)")
     cases.add_argument("--shared-neighbor-case", type=int, choices=range(1, 17),
                        help="fix one of the 16 shared-neighbor orbits, in census output order")
+    parser.add_argument("--shared-outside-balance", action="store_true",
+                        help="add redundant degree balance between shared and outside neighbors")
     args = parser.parse_args()
     if args.check_scheme:
         check_scheme()
@@ -234,7 +261,10 @@ def main() -> None:
         return
     if args.output is None:
         parser.error("output is required unless --check-scheme is used")
-    cnf = build(args.matching_case, shared_neighbor_case=args.shared_neighbor_case)
+    cnf = build(
+        args.matching_case, shared_neighbor_case=args.shared_neighbor_case,
+        shared_outside_balance=args.shared_outside_balance,
+    )
     cnf.emit(args.output)
     print(f"wrote {args.output}: {cnf.nvars} variables, {len(cnf.clauses)} clauses")
 
