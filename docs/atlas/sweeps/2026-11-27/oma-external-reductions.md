@@ -73,6 +73,14 @@ The second sphere recurrence now has its own [checked reduction](https://github.
 
 Green 100 matrix transfer [#4557](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4557) merged at `3f8ebac0858c`. The public replay returned HTTP 200 and the exact `R1.H1.R1.H2` API reported `solved: true`. Its sibling matrix obstruction and the direct sofic surjunctivity verdict still determine closure of the parent.
 
+### Circle winding computation and Green matrix obstruction
+
+The [stacked circle winding proof](https://github.com/senamakel/open-math-agents/tree/oma/poincare-circle-winding) at `6359dca` passed the pinned checker with the three standard axioms. It transports Mathlib's real exponential quotient cover to the Euclidean unit circle, applies the simply connected cover's monodromy equivalence, and identifies its deck group of integer multiples of `2π` with the integers. This discharges the winding side of the staged degree-one homology reduction. The Hurewicz side remains open.
+
+Upstream [Green 100 matrix obstruction #4716](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4716) returned a checker acceptance using the three standard axioms. It constructs the finite-field group-algebra witness and embeds it into a one-by-one matrix. Its merge is pending, so keep the competing local square-completion reduction out of the submission queue.
+
+The matching-pin smooth Poincaré source uses M74 finite connected-sum recognition and M75 flow-to-endpoint assembly. The geometric types `SmoothFiniteConnectedSumAssembly` and `RepairedGlobalFlowData` are internal to that source and absent from OMA's checker environment. The endpoint keeps the original obligation while a faithful port of its assembly data remains outstanding.
+
 ## Earlier attempts and follow-up candidates
 
 | Target | Recovered public evidence | Remaining work |
