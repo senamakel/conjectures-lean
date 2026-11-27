@@ -96,7 +96,6 @@ theorem thresholdGateDimacs_iff (assignment : Nat → Bool)
         | succ n => rfl
     | negSucc n =>
         have hcast : (Int.ofNat n : Int) + 1 = Int.ofNat (n + 1) := by
-          push_cast
           rfl
         change literalValue assignment (Int.ofNat n + 1) =
           !literalValue assignment (Int.negSucc n)
@@ -123,8 +122,10 @@ theorem thresholdGateDimacs_extend (assignment : Nat → Bool)
     (hbelow : below.natAbs ≠ varId) :
     cnfValue (extendVariable assignment varId value)
       (thresholdGateDimacs above x below (Int.ofNat varId)) = true := by
+  have hpos : (0 : Int) < Int.ofNat varId := Int.ofNat_pos.mpr hvar
+  have hout : Int.ofNat varId ≠ 0 := ne_of_gt hpos
   apply (thresholdGateDimacs_iff (extendVariable assignment varId value)
-    above x below (Int.ofNat varId) ha hx hb (by omega)).2
+    above x below (Int.ofNat varId) ha hx hb hout).2
   rw [literalValue_extendVariable_self]
   simp only [literalValue_extendVariable_of_ne _ _ _ _ habove,
     literalValue_extendVariable_of_ne _ _ _ _ hxFresh,
