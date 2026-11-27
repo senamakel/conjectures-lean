@@ -28,3 +28,4 @@ import Implications.SmoothGapCounting
 import Implications.SplitGraphPath
 import Implications.C4VertexExtension
 import Implications.WilfPatternSwap
+import Implications.WilfTwoWindowOrder
