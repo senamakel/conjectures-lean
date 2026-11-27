@@ -10,6 +10,7 @@ open SplitGraphTrees
 
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
+omit [Fintype V] in
 private theorem hamiltonian_of_list
     (G : SimpleGraph V) (l : List V) (hne : l ≠ []) (hnodup : l.Nodup)
     (hchain : l.IsChain G.Adj) (hcover : ∀ v : V, v ∈ l) :
@@ -25,6 +26,7 @@ private theorem hamiltonian_of_list
     exact hcover v
   exact ⟨_, _, p, hpath.isHamiltonian_of_mem hvertices⟩
 
+omit [Fintype V] in
 private theorem clique_list_chain
     (G : SimpleGraph V) (C : Finset V) (hC : G.IsClique (C : Set V))
     (l : List V) (hnodup : l.Nodup) (hsub : ∀ x ∈ l, x ∈ C) : l.IsChain G.Adj := by
@@ -41,6 +43,7 @@ private theorem clique_list_chain
     omega
   exact hC (hsub x hx) (hsub y hy) hxy
 
+omit [Fintype V] [DecidableEq V] in
 private theorem chain_join {G : SimpleGraph V} {L R : List V} {x y : V}
     (hL : L.IsChain G.Adj) (hR : R.IsChain G.Adj)
     (hx : L.getLast? = some x) (hy : R.head? = some y) (hxy : G.Adj x y) :
@@ -162,7 +165,7 @@ theorem hamiltonian_of_split_partition_triple_row_of_rows
     (hC : G.IsClique (C : Set V)) (hdisj : Disjoint C I)
     (hpartition : (Finset.univ : Finset V) = C ∪ I)
     (ht : t ∈ C) (hroweq : row G I t = I) (hIcard : I.card = 3)
-    (hrow : ∀ q ∈ C, (row G I q).card ≤ 3)
+    (_hrow : ∀ q ∈ C, (row G I q).card ≤ 3)
     (hdiff : ∀ q ∈ C, ∀ d ∈ C, q ≠ d → (rowDiff G I q d).card ≤ 2)
     (hdeg : ∀ i ∈ I, ∃ q ∈ C, ∃ d ∈ C, q ≠ d ∧ G.Adj q i ∧ G.Adj d i) :
     ∃ (u v : V) (p : G.Walk u v), p.IsHamiltonian := by
@@ -273,3 +276,5 @@ theorem hamiltonian_of_split_partition_triple_row_of_rows
       (adjT a haI) (adjT c hcI) hxa hyb
   
 end SplitGraphTripleRowPath
+
+#print axioms SplitGraphTripleRowPath.hamiltonian_of_split_partition_triple_row_of_rows
