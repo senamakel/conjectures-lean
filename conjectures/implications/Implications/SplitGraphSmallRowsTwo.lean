@@ -158,7 +158,8 @@ theorem one_overlap_path_block
     simp [List.nodup_cons, hcenters.1.1, hcenters.1.2.1, hcenters.1.2.2,
       hcenters.2.1.1, hcenters.2.1.2, hcenters.2.2,
       hvw, hvu, huw,
-      hev', hew, heu, hcv, hcw, hcu', hdv, hdu, hdw', hfv, hfu, hfw]
+      hev', hew, heu, hcv, hcw, hcu', hdv, hdu, hdw', hfv, hfu, hfw,
+      hcv.symm, hdv.symm, hfv.symm, hdu.symm, hfu.symm, hfw.symm]
   have hchain : ([e, v, c, u, d, w, f] : List V).IsChain G.Adj := by
     simp [List.isChain_cons, hev, hvc, hcu, hud, hdw, hwf]
   let p := SimpleGraph.Walk.ofSupport ([e, v, c, u, d, w, f] : List V) (by simp) hchain
