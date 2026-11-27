@@ -132,6 +132,8 @@ private theorem eventually_logLogCutoff_log_lower :
   have hloglog := Real.tendsto_log_atTop.comp hlog
   filter_upwards [hlog.eventually_ge_atTop 1024, hloglog.eventually_ge_atTop 1]
     with n hL hLL
+  change 1024 ≤ Real.log (primeAt n : ℝ) at hL
+  change 1 ≤ Real.log (Real.log (primeAt n : ℝ)) at hLL
   have hLpos : 0 < Real.log (primeAt n : ℝ) := by linarith
   have hsqrt_le : Real.sqrt (Real.log (primeAt n : ℝ)) ≤
       (Real.log (primeAt n : ℝ)) / 32 := by
