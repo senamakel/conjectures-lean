@@ -189,6 +189,15 @@ Q6 layer generation consumed nearly the full budget and does not support
 starting the much larger Q8 compatible-pair search without a more efficient
 generator or the authors' implementation.
 
+## Independent validation
+
+A separate pass over the latest four mask files rebuilt the induced
+hypercube graph for each mask and checked the required vertex count,
+edge count, fixed pattern, maximum degree two, and acyclicity by
+union-find. It also checked that each file contains distinct masks and
+no incomplete record. All 2,102,067 masks passed. These checks verify
+the emitted records, while the node caps leave the enumeration partial.
+
 ## Interpretation
 
 Finishing the count reproduces only the Q7 enumeration stage; it does not prove
