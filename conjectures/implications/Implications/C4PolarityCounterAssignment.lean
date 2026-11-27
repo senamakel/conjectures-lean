@@ -129,8 +129,45 @@ theorem numberedCounter_satisfied
     numbered_gate_satisfied a base width inputs ha hb row.val row.isLt
       (col.val + 1) (by omega) col.isLt h.1 h.2
 
+/-- Variables beyond the last allocated ID also retain their input value. -/
+theorem valuation_preserves_above (a : Nat → Bool) (base width : Nat) (inputs : List Bool)
+    (v : Nat) (hv : base + inputs.length * width < v) :
+    valuation a base width inputs v = a v := by
+  simp [valuation, Nat.not_le.mpr hv]
+
+/-- The concrete deletion counter has 57 rows of width 16. Its final two
+signed unit clauses hold when exactly fifteen inputs are true. -/
+theorem deletion_units_satisfied (a : Nat → Bool) (bits : List Bool)
+    (hlen : bits.length = 57) (hcount : bits.count true = 15) :
+    cnfValue (valuation a 58 16 bits) [[969], [-970]] = true := by
+  have htake : bits.take 57 = bits := by rw [← hlen]; simp
+  have h15 := valuation_cell a 58 16 bits 56 15 (by omega) (by decide) (by decide)
+  have h16 := valuation_cell a 58 16 bits 56 16 (by omega) (by decide) (by decide)
+  change valuation a 58 16 bits 969 = atLeast 15 (bits.take 57) at h15
+  change valuation a 58 16 bits 970 = atLeast 16 (bits.take 57) at h16
+  have h15' : valuation a 58 16 bits 969 = true := by
+    simpa [htake, atLeast, hcount] using h15
+  have h16' : valuation a 58 16 bits 970 = false := by
+    simpa [htake, atLeast, hcount] using h16
+  change ((valuation a 58 16 bits 969 || false) &&
+    (((!valuation a 58 16 bits 970) || false) && true)) = true
+  simp [h15', h16']
+
+/-- The concrete score counter has 232 rows of width 34. Its final unit
+clause holds when at least thirty-four inputs are true. -/
+theorem score_unit_satisfied (a : Nat → Bool) (bits : List Bool)
+    (hlen : bits.length = 232) (hcount : 34 ≤ bits.count true) :
+    cnfValue (valuation a 1194 34 bits) [[9082]] = true := by
+  have htake : bits.take 232 = bits := by rw [← hlen]; simp
+  have h34 := valuation_cell a 1194 34 bits 231 34 (by omega) (by decide) (by decide)
+  change valuation a 1194 34 bits 9082 = atLeast 34 (bits.take 232) at h34
+  change ((valuation a 1194 34 bits 9082 || false) && true) = true
+  simpa [htake, atLeast, hcount] using h34
+
 end Implications.C4PolarityCounterAssignment
 
 #print axioms Implications.C4PolarityCounterAssignment.valuation_cell
 #print axioms Implications.C4PolarityCounterAssignment.numbered_gate_satisfied
 #print axioms Implications.C4PolarityCounterAssignment.numberedCounter_satisfied
+#print axioms Implications.C4PolarityCounterAssignment.deletion_units_satisfied
+#print axioms Implications.C4PolarityCounterAssignment.score_unit_satisfied
