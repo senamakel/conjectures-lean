@@ -30,20 +30,20 @@ private def neg (v : Nat) : Int := -(Int.ofNat v)
 
 /-- One nontrivial iteration of the Python lex loop: its guard clause followed
 by the five clauses defining the next equality-prefix variable. -/
-def lexStepClauses (prefix x y same : Nat) : List (List Int) :=
-  [[neg prefix, pos x, neg y],
-   [neg same, pos prefix],
+def lexStepClauses (pref x y same : Nat) : List (List Int) :=
+  [[neg pref, pos x, neg y],
+   [neg same, pos pref],
    [neg same, neg x, pos y],
    [neg same, pos x, neg y],
-   [neg prefix, pos x, pos y, pos same],
-   [neg prefix, neg x, neg y, pos same]]
+   [neg pref, pos x, pos y, pos same],
+   [neg pref, neg x, neg y, pos same]]
 
 /-- Compile the exact loop in `Cnf.lex_at_least`. `prefix` is the current
 equality-prefix variable and `next` is the next unused variable number. -/
-def lexClauses (prefix next : Nat) : List Nat → List Nat → List (List Int)
+def lexClauses (pref next : Nat) : List Nat → List Nat → List (List Int)
   | x :: xs, y :: ys =>
-      if x == y then lexClauses prefix next xs ys
-      else lexStepClauses prefix x y next ++ lexClauses next (next + 1) xs ys
+      if x == y then lexClauses pref next xs ys
+      else lexStepClauses pref x y next ++ lexClauses next (next + 1) xs ys
   | _, _ => []
 
 /-- Fresh DIMACS IDs allocated by the lex loop, in allocation order. -/
@@ -64,8 +64,9 @@ theorem lexFreshIds_length (next : Nat) (left right : List Nat) :
       cases right with
       | nil => rfl
       | cons y ys =>
-          simp only [lexFreshIds, List.zip_cons_cons, List.countP_cons]
-          split <;> simp [ih]
+          by_cases hxy : x = y
+          · simp [lexFreshIds, hxy, List.countP, ih]
+          · simp [lexFreshIds, hxy, List.countP, ih]
 
 /-- The final unused variable is the starting ID plus the number of non-skipped
 positions. This is the numbering convention of the Python loop. -/
@@ -82,42 +83,43 @@ theorem lexNext_eq (next : Nat) (left right : List Nat) :
       cases right with
       | nil => simp [lexNext, lexFreshIds]
       | cons y ys =>
-          simp only [lexNext, lexFreshIds]
-          split <;> simp [ih, Nat.add_assoc]
+          by_cases hxy : x = y
+          · simp [lexNext, lexFreshIds, hxy, ih]
+          · simp [lexNext, lexFreshIds, hxy, ih, Nat.add_assoc, Nat.add_comm]
 
 /-- The lex-loop allocator uses consecutive IDs starting at `next`. -/
 theorem lexFreshIds_eq_range (next : Nat) (left right : List Nat) :
-    lexFreshIds next left right = List.range ((lexFreshIds next left right).length) |>.map (· + next) := by
+    lexFreshIds next left right =
+      (List.range (lexFreshIds next left right).length).map (fun i => i + next) := by
   induction left generalizing right next with
   | nil => cases right <;> simp [lexFreshIds]
   | cons x xs ih =>
       cases right with
       | nil => simp [lexFreshIds]
       | cons y ys =>
-          simp only [lexFreshIds]
-          split
-          · simpa using ih ys next
-          · simp only [List.length_cons]
-            rw [ih ys (next + 1)]
+          by_cases hxy : x = y
+          · simpa [lexFreshIds, hxy] using ih next ys
+          · simp only [lexFreshIds, hxy, if_false, List.length_cons]
+            rw [ih (next + 1) ys]
             simp [List.range_succ, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
 
 /-- DIMACS clauses for an equality-prefix gate are satisfied when `same` is
 assigned the exact prefix conjunction. -/
-theorem lexStep_extension (a : Nat → Bool) (prefix x y same : Nat)
-    (hp : a prefix = true) (hx : a x = true) (hy : a y = false) :
+theorem lexStep_extension (a : Nat → Bool) (pref x y same : Nat)
+    (hp : a pref = true) (hx : a x = true) (hy : a y = false)
+    (hps : pref ≠ same) (hxs : x ≠ same) (hys : y ≠ same) :
     ∃ b : Nat → Bool, (∀ n, n ≠ same → b n = a n) ∧
       b same = (a prefix && (a x == a y)) ∧
       cnfValue b (lexStepClauses prefix x y same) = true := by
-  refine ⟨Function.update a same (a prefix && (a x == a y)), ?_, ?_, ?_⟩
+  refine ⟨Function.update a same (a pref && (a x == a y)), ?_, ?_, ?_⟩
   · intro n hns
     simp [Function.update, hns]
   · simp [Function.update]
-  · have hguard : (!a prefix || a x || !a y) = true := by simp [hp, hx, hy]
-    have hgate : prefixEqualityClauses (a prefix) (a x) (a y)
-        (a prefix && (a x == a y)) = true := by
-      apply prefix_equality_iff.mpr
+  · have hguard : (!a pref || a x || !a y) = true := by simp [hp, hx, hy]
+    have hgate : prefixEqualityClauses (a pref) (a x) (a y)
+        (a pref && (a x == a y)) = true := prefix_equality_iff.mpr rfl
     simp [cnfValue, clauseValue, literalValue, lexStepClauses, pos, neg,
-      hguard, hgate, Function.update]
+      hguard, hgate, Function.update, hps, hxs, hys]
 
 end Implications.C4PolarityLexEncoding
 
