@@ -626,4 +626,107 @@ theorem eventually_twoHitGapCount_bound :
         simpa [add_comm] using add_le_add_left htail 1
   simpa [C] using hcount.trans (add_le_add hfirst htail')
 
+/-- The smooth-number tail in the two-hit estimate tends to zero. This is the
+prime number theorem comparison `p_N / (N + 1) ≤ 2 log p_N` followed by the
+fact that a logarithm is dominated by any positive power. -/
+private theorem eventually_twoHitGapCount_tail_tendsto_zero :
+    Tendsto (fun n : ℕ =>
+      (1 + Real.exp (3 * Real.log (primeAt n : ℝ) / 4)) /
+        (2 * (n + 1 : ℝ))) atTop (nhds 0) := by
+  have hp : Tendsto (fun n : ℕ => (primeAt n : ℝ)) atTop atTop := by
+    have hnat : Tendsto primeAt atTop atTop := by
+      rw [tendsto_atTop_atTop]
+      intro b
+      refine ⟨b, fun n hbn => ?_⟩
+      have hprime := Nat.add_two_le_nth_prime n
+      change b ≤ Nat.nth Nat.Prime n
+      omega
+    exact tendsto_natCast_atTop_atTop.comp hnat
+  have hlogsmall :=
+    (isLittleO_log_rpow_atTop (by norm_num : (0 : ℝ) < 1 / 4)).tendsto' atTop
+  have hlogsmall' : Tendsto (fun n : ℕ =>
+      Real.log (primeAt n : ℝ) / (primeAt n : ℝ) ^ (1 / 4 : ℝ))
+      atTop (nhds 0) := by
+    simpa using hlogsmall.comp hp
+  have hbase : Tendsto (fun n : ℕ =>
+      (1 : ℝ) / (n + 1 : ℝ)) atTop (nhds 0) := by
+    simpa using (tendsto_natCast_atTop_nhds_zero_nat_add (1 : ℕ))
+  have htail : Tendsto (fun n : ℕ =>
+      Real.exp (3 * Real.log (primeAt n : ℝ) / 4) /
+        (2 * (n + 1 : ℝ))) atTop (nhds 0) := by
+    have hlog : ∀ᶠ n : ℕ in atTop, 0 < Real.log (primeAt n : ℝ) := by
+      filter_upwards [hp.eventually (eventually_gt_atTop (1 : ℝ))] with n hn
+      exact Real.log_pos hn
+    have hindex := eventually_primeAt_over_index_le
+    have hpowpos : ∀ᶠ n : ℕ in atTop, 0 < (primeAt n : ℝ) ^ (1 / 4 : ℝ) := by
+      filter_upwards [hp.eventually (eventually_gt_atTop (0 : ℝ))] with n hn
+      exact Real.rpow_pos_of_pos hn _
+    have hrewrite : ∀ᶠ n : ℕ in atTop,
+        Real.exp (3 * Real.log (primeAt n : ℝ) / 4) /
+            (2 * (n + 1 : ℝ)) =
+          ((primeAt n : ℝ) / (n + 1 : ℝ)) /
+            (2 * (primeAt n : ℝ) ^ (1 / 4 : ℝ)) := by
+      filter_upwards [hlog, hp.eventually (eventually_gt_atTop (0 : ℝ))] with n hln hpn
+      have hidentity : Real.exp (3 * Real.log (primeAt n : ℝ) / 4) *
+          (primeAt n : ℝ) ^ (1 / 4 : ℝ) = (primeAt n : ℝ) := by
+        rw [← Real.rpow_def_of_pos hpn]
+        rw [← Real.exp_add]
+        congr 1
+        ring
+      rw [div_eq_div_iff (by positivity) (by positivity)]
+      nlinarith [hidentity]
+    have hfactor : Tendsto (fun n : ℕ =>
+        ((primeAt n : ℝ) / (n + 1 : ℝ)) /
+          (2 * (primeAt n : ℝ) ^ (1 / 4 : ℝ))) atTop (nhds 0) := by
+      have hratio := hlogsmall'
+      have hevent : ∀ᶠ n : ℕ in atTop,
+          (primeAt n : ℝ) / (n + 1 : ℝ) ≤ 2 * Real.log (primeAt n : ℝ) :=
+        eventually_primeAt_over_index_le
+      have hbound : ∀ᶠ n : ℕ in atTop,
+          0 ≤ ((primeAt n : ℝ) / (n + 1 : ℝ)) /
+            (2 * (primeAt n : ℝ) ^ (1 / 4 : ℝ)) ∧
+          ((primeAt n : ℝ) / (n + 1 : ℝ)) /
+            (2 * (primeAt n : ℝ) ^ (1 / 4 : ℝ)) ≤
+              Real.log (primeAt n : ℝ) /
+                (primeAt n : ℝ) ^ (1 / 4 : ℝ) := by
+        filter_upwards [hevent, hp.eventually (eventually_gt_atTop (0 : ℝ))]
+          with n hn hp0
+        have hden : 0 < 2 * (primeAt n : ℝ) ^ (1 / 4 : ℝ) :=
+          mul_pos (by norm_num) (Real.rpow_pos_of_pos hp0 _)
+        constructor
+        · positivity
+        · rw [div_le_div_iff₀ hden]
+          nlinarith
+      exact squeeze_zero hratio (by simpa using hbound)
+    exact hfactor.congr' hrewrite
+  have hsum := hbase.add (by simpa [div_eq_mul_inv, mul_assoc] using htail)
+  convert hsum.const_mul (1 / 2 : ℝ) using 1 <;> simp [div_eq_mul_inv, mul_add]
+
+/-- The proportion of the first `N` prime gaps containing at least two
+qualifying smooth integers tends to zero. -/
+theorem twoHitGapCount_proportion_tendsto_zero :
+    Tendsto (fun n : ℕ =>
+      (((Finset.range n).filter (fun r =>
+        2 ≤ ((Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
+          (fun m => m.maxPrimeFac < primeGap r)).card)).card : ℝ) /
+          (n + 1 : ℝ)) atTop (nhds 0) := by
+  have hfirst : Tendsto (fun n : ℕ =>
+      64 / Real.log (Real.log (primeAt n : ℝ))) atTop (nhds 0) := by
+    have hll : Tendsto (fun n : ℕ => Real.log (Real.log (primeAt n : ℝ)))
+        atTop atTop :=
+      Real.tendsto_log_atTop.comp (Real.tendsto_log_atTop.comp
+        (tendsto_natCast_atTop_atTop.comp (by
+          rw [tendsto_atTop_atTop]
+          intro b
+          refine ⟨b, fun n hbn => ?_⟩
+          have hp := Nat.add_two_le_nth_prime n
+          change b ≤ Nat.nth Nat.Prime n
+          omega)))
+    simpa using (tendsto_const_nhds.div_atTop hll).const_mul 64
+  have hsum := hfirst.add eventually_twoHitGapCount_tail_tendsto_zero
+  filter_upwards [eventually_twoHitGapCount_bound] with n hn
+  exact squeeze_zero hsum (by
+    filter_upwards [eventually_twoHitGapCount_bound] with n hn
+    exact ⟨by positivity, hn⟩)
+
 end Implications.SmoothGapCounting
