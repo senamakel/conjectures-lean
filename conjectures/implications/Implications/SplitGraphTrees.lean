@@ -62,7 +62,8 @@ theorem doubleStar_isTree (G : SimpleGraph V) (C I : Finset V) (c d : V)
       (∀ y, H.Adj x y ↔ y = c') ∨ (∀ y, H.Adj x y ↔ y = d') := by
     have hxR : x.val ∈ R := by
       have hxS := x.property
-      simp only [S] at hxS
+      change x.val ∈ insert c (insert d R) at hxS
+      simp only [Finset.mem_insert] at hxS
       rcases hxS with h | h
       · exact (hxC (Subtype.ext h)).elim
       · rcases h with h | h
@@ -76,11 +77,12 @@ theorem doubleStar_isTree (G : SimpleGraph V) (C I : Finset V) (c d : V)
       · intro hxy
         have hxyG : G.Adj x.val y.val := by simpa [H] using hxy
         have hyS := y.property
-        simp only [S] at hyS
+        change y.val ∈ insert c (insert d R) at hyS
+        simp only [Finset.mem_insert] at hyS
         rcases hyS with hyc | hy
         · exact Subtype.ext hyc
         · rcases hy with hyd | hyr
-          · exact (hdx.2 hxyG.symm).elim
+          · exact (hcx.2 hxyG.symm).elim
           · have hyI := (mem_rowDiff_iff G I c d y.val).mp hyr |>.1
             have hne : x.val ≠ y.val := fun h => G.irrefl (h ▸ hxyG)
             exact (hI hxI hyI hne hxyG).elim
@@ -92,9 +94,10 @@ theorem doubleStar_isTree (G : SimpleGraph V) (C I : Finset V) (c d : V)
       · intro hxy
         have hxyG : G.Adj x.val y.val := by simpa [H] using hxy
         have hyS := y.property
-        simp only [S] at hyS
+        change y.val ∈ insert c (insert d R) at hyS
+        simp only [Finset.mem_insert] at hyS
         rcases hyS with hyc | hy
-        · exact (hcx.2 hxyG.symm).elim
+        · exact (hdx.2 hxyG.symm).elim
         · rcases hy with hyd | hyr
           · exact Subtype.ext hyd
           · have hyI := (mem_rowDiff_iff G I c d y.val).mp hyr |>.1
@@ -103,7 +106,7 @@ theorem doubleStar_isTree (G : SimpleGraph V) (C I : Finset V) (c d : V)
       · rintro rfl
         simpa [H, d'] using hdx.1.symm
   have hconn : H.Connected := by
-    rw [connected_iff_exists_forall_reachable]
+    rw [SimpleGraph.connected_iff_exists_forall_reachable]
     refine ⟨c', fun x => ?_⟩
     by_cases hxc : x = c'
     · simpa [hxc]
@@ -113,7 +116,7 @@ theorem doubleStar_isTree (G : SimpleGraph V) (C I : Finset V) (c d : V)
       · exact ((hleft c').2 rfl).reachable.symm
       · exact ((hright d').2 rfl).reachable.trans hc'd'.reachable.symm
   have hacyc : H.IsAcyclic := by
-    rw [isAcyclic_iff_forall_not_isCycle]
+    rw [SimpleGraph.isAcyclic_iff_forall_not_isCycle]
     intro x p hp
     have hnoLeaf (z : {x // x ∈ (S : Finset V)}) (hz : z ∈ p.support) :
         z = c' ∨ z = d' := by
