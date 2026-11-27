@@ -91,6 +91,10 @@ The [local top-homology reduction](https://github.com/senamakel/open-math-agents
 
 The published Hurewicz development contains the degree-one class map and surjectivity. Its injectivity theorem assumes a trivial fundamental group, so it leaves the commutator-kernel theorem open for the circle route. The winding proof remains staged for the corresponding sibling. The [strict Mayer–Vietoris reduction](https://github.com/senamakel/open-math-agents/tree/oma/poincare-relative-mv) at `667be24` passes the pinned checker with only the three standard axioms. It states relative singular chains using Mathlib cokernels inline and proves the naturality square and short exact sequence as lemmas. It separates contractible-subspace collapse, open-cover excision and the pair connecting isomorphism. The connecting isomorphism requires degree at least two. It is stacked behind #4833 and awaits registration of the corresponding H2.
 
+### Green 100(i) closure
+
+[Matrix obstruction #4716](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4716) merged at `6cd6ae1abf18`. Its public replay returned HTTP 200. The [parent registry API](https://lefttosolve.com/api/problems/Green100.green_100.parts.i) now reports a solution with polarity `proof`. Both parent obligations are solved. The construction route uses [matrix obstruction #4716](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4716) and [matrix transfer #4557](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4557), and the second obligation is closed by [direct surjunctivity #4573](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4573). That direct proof makes the two descendants of the alternative surjunctivity reduction unnecessary to close the parent.
+
 ## Earlier attempts and follow-up candidates
 
 | Target | Recovered public evidence | Remaining work |
