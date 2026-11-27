@@ -66,3 +66,10 @@ The replay uses one `native_decide` axiom for the 114,126 LRAT actions
 uses a separate finite `native_decide` certificate. The general The two target
 modules and replay took 44.47 seconds on the shared Lean 4.36.0 cache.
 42-vertex extremal question remains open.
+
+The replay also proves `Implications.C4PolarityEmbedded.induced_edge_count_le_137`.
+Its sole mathematical input, `C4PolaritySurvivorBound.Ex41C4Bound`, is
+the published upper bound of 132 edges for all 41-vertex C₄-free graphs.
+The bridge checks that each relevant induced subgraph is C₄-free and
+has exactly 41 vertices. The published upper bound remains an explicit
+Lean hypothesis. [Yan's versioned proof and certificates](https://doi.org/10.5281/zenodo.23334622)
