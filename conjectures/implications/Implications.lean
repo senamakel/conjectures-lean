@@ -30,6 +30,7 @@ import Implications.SmoothGapCounting
 import Implications.SmoothGapInfinitude
 import Implications.SplitGraphPath
 import Implications.C4VertexExtension
+import Implications.C4PolarityOrderSeven
 import Implications.WilfPatternSwap
 import Implications.WilfTwoWindowOrder
 import Implications.WilfCertifiedSwap
