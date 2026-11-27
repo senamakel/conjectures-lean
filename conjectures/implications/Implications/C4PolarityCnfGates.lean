@@ -106,7 +106,7 @@ theorem lex_constraint_iff (xs ys : List Bool) :
       | nil => simp [lexConstraint, lexAtLeast]
       | cons y ys =>
           cases x <;> cases y <;>
-            simp [lexConstraint, lexAtLeast, ih, hfalse xs ys]
+            simp [lexConstraint, lexAtLeast, ih, hfalse xs ys rfl]
 
 end Implications.C4PolarityCnfGates
 
