@@ -1,4 +1,4 @@
-import Implications.SmoothGapInfinitude
+import Implications.SmoothGapCounting
 import Implications.SmoothGapRankin
 import Implications.SmoothPrimeReciprocal
 
@@ -6,11 +6,13 @@ import Implications.SmoothPrimeReciprocal
 
 namespace Implications.SmoothGapAnalytic
 
-open SmoothGapCounting SmoothGapInfinitude SmoothGapRankin SmoothPrimeReciprocal
+open SmoothGapCounting SmoothGapRankin SmoothPrimeReciprocal
 
 /-- The number of the first `N` prime gaps having at least `j` qualifying integers. -/
 noncomputable def hitCount (N j : ℕ) : ℕ :=
-  ((Finset.range N).filter (fun r => j ≤ (hits r).card)).card
+  ((Finset.range N).filter (fun r =>
+    j ≤ ((Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
+      (fun m => m.maxPrimeFac < primeGap r)).card)).card
 
 /-- A uniform analytic bound on the finite cutoff estimate, with separate
 terms for large gaps and for smooth numbers inside shorter gaps. -/
@@ -21,7 +23,7 @@ theorem hitCount_le_rankin_cutoff :
         ((j : ℝ) * primeAt N / (N + 1 : ℝ)) / B +
           (1 + (primeAt N : ℝ) ^ s *
             Real.exp (4 * (B : ℝ) ^ (1 - s) * D *
-              (1 + Real.log (((Nat.log 2 B + 1 : ℕ) : ℝ)))) / (N + 1 : ℝ) := by
+              (1 + Real.log (((Nat.log 2 B + 1 : ℕ) : ℝ))))) / (N + 1 : ℝ) := by
   obtain ⟨D, hD, hproduct⟩ := primeEulerProduct_rankin_bound
   refine ⟨D, hD, fun N B j s hB hslo hshi => ?_⟩
   have hp : 0 < primeAt N := (Nat.prime_nth_prime N).pos
@@ -34,8 +36,7 @@ theorem hitCount_le_rankin_cutoff :
   simp only [hweight] at hcount
   have hM := hcount.trans (mul_le_mul_of_nonneg_left (hproduct B s hB hslo hshi)
     (Real.rpow_nonneg (by positivity : 0 ≤ (primeAt N : ℝ)) _))
-  simpa [hitCount, hits] using
-    hitIndexProportionBound_of_smoothNumbersUpTo N B j hBpos _ hM
+  exact hitIndexProportionBound_of_smoothNumbersUpTo N B j hBpos _ hM
 
 #print axioms hitCount_le_rankin_cutoff
 

@@ -36,7 +36,7 @@ theorem smoothNumbersUpTo_card_le_rankin (X Y : ℕ) (s : ℝ) (hX : 0 < X)
     ⟨(fun n : {n : ℕ // n ∈ X.smoothNumbersUpTo Y} =>
       (⟨n.val, (Nat.mem_smoothNumbersUpTo.mp n.property).2⟩ : Y.smoothNumbers)), by
       intro a b h
-      exact Subtype.ext (congrArg Subtype.val h)⟩
+      exact Subtype.ext (congrArg (fun m : Y.smoothNumbers => m.val) h)⟩
   let T := S.attach.map e
   have hsum_map : (∑ m ∈ T, f m) = ∑ n ∈ S.attach, f (e n) := by
     rw [Finset.sum_map]
@@ -71,5 +71,7 @@ theorem smoothNumbersUpTo_card_le_rankin (X Y : ℕ) (s : ℝ) (hX : 0 < X)
       _ = (X : ℝ) ^ s * ∑ m ∈ T, f m := by rw [← hsum_map]
   have hfinal := mul_le_mul_of_nonneg_left hsum_le (by positivity : 0 ≤ (X : ℝ) ^ s)
   exact_mod_cast (hcard.trans (by simpa [f] using hfinal))
+
+#print axioms smoothNumbersUpTo_card_le_rankin
 
 end Implications.SmoothGapRankin
