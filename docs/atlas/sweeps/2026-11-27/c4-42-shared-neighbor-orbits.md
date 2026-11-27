@@ -29,3 +29,12 @@ has been visited once. It takes under one CPU second on the build box.
 These are complete cases for the two constraints on the induced graph.
 Whether any representative extends to a 42-vertex, 138-edge C4-free graph
 remains open. The enumeration produces no SAT result or Lean certificate.
+
+## Rooted SAT instances
+
+Use `python3 scripts/encode_c4_42_k4_canonical.py --shared-neighbor-case 16 .lake/case-16.cnf`
+to emit the last case. Case numbers follow the census output, from 1 to 16.
+Each case fixes all 15 edges among the six witnesses before emitting clauses.
+The shared-neighbor orbit reduction permutes all four roots, while the separate
+matching reduction distinguishes root 0. Applying both independently can lose
+cases, so the encoder accepts only one of the two switches at a time.
