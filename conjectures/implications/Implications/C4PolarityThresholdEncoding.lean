@@ -234,31 +234,46 @@ theorem thresholdGateList_satisfies (assignment : Nat → Bool)
       rcases hordered with ⟨hpos, hAboveNe, hInputNe, hBelowNe,
         hAboveLt, hInputLt, hBelowLt, hLater, hTail⟩
       intro current hmem
+      let afterGate := extendThresholdGate assignment gate
+      let finalAssignment := extendThresholdGates afterGate gates
       cases hmem with
       | head =>
-        let afterGate := extendThresholdGate assignment gate
-        let finalAssignment := extendThresholdGates afterGate gates
         have hAbovePres : literalValue finalAssignment gate.above =
             literalValue assignment gate.above := by
           change literalValue (extendThresholdGates afterGate gates) gate.above = _
-          apply extendThresholdGates_preserves
-          intro later hlaterMem
-          have hlt := hLater later hlaterMem
-          omega
+          calc
+            _ = literalValue afterGate gate.above :=
+              extendThresholdGates_preserves afterGate gates gate.above (by
+                intro later hlaterMem
+                have hlt := hLater later hlaterMem
+                omega)
+            _ = literalValue assignment gate.above := by
+              exact literalValue_extendVariable_of_ne assignment gate.output
+                (thresholdGateValue assignment gate) gate.above (by omega)
         have hInputPres : literalValue finalAssignment gate.input =
             literalValue assignment gate.input := by
           change literalValue (extendThresholdGates afterGate gates) gate.input = _
-          apply extendThresholdGates_preserves
-          intro later hlaterMem
-          have hlt := hLater later hlaterMem
-          omega
+          calc
+            _ = literalValue afterGate gate.input :=
+              extendThresholdGates_preserves afterGate gates gate.input (by
+                intro later hlaterMem
+                have hlt := hLater later hlaterMem
+                omega)
+            _ = literalValue assignment gate.input := by
+              exact literalValue_extendVariable_of_ne assignment gate.output
+                (thresholdGateValue assignment gate) gate.input (by omega)
         have hBelowPres : literalValue finalAssignment gate.below =
             literalValue assignment gate.below := by
           change literalValue (extendThresholdGates afterGate gates) gate.below = _
-          apply extendThresholdGates_preserves
-          intro later hlaterMem
-          have hlt := hLater later hlaterMem
-          omega
+          calc
+            _ = literalValue afterGate gate.below :=
+              extendThresholdGates_preserves afterGate gates gate.below (by
+                intro later hlaterMem
+                have hlt := hLater later hlaterMem
+                omega)
+            _ = literalValue assignment gate.below := by
+              exact literalValue_extendVariable_of_ne assignment gate.output
+                (thresholdGateValue assignment gate) gate.below (by omega)
         have hOutputPres : literalValue finalAssignment (Int.ofNat gate.output) =
             thresholdGateValue assignment gate := by
           change literalValue (extendThresholdGates afterGate gates)
@@ -268,7 +283,8 @@ theorem thresholdGateList_satisfies (assignment : Nat → Bool)
               apply extendThresholdGates_preserves
               intro later hlaterMem
               have hlt := hLater later hlaterMem
-              simp only [Int.natAbs_natCast]
+              have habs : (Int.ofNat gate.output).natAbs = gate.output := by simp
+              rw [habs]
               omega
             _ = thresholdGateValue assignment gate := by
               simp [afterGate, extendThresholdGate, literalValue_extendVariable_self]
