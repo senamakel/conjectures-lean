@@ -121,3 +121,32 @@ one of 0..4, with corresponding non-root `(n6,n7,n8)` profiles
 `(17,24,0)`, `(18,22,1)`, `(19,20,2)`, `(20,18,3)`, `(21,16,4)`. Separate exact
 `--degree-eight-count k` instances for k=0..4 are a possible proof split, but
 this benchmark uses the combined cap and does not run those five cases.
+
+## Common-neighbor AMO benchmark result
+
+The exhaustive projection check passed for every edge assignment with zero to
+four possible common neighbors. The old default formula still hashes to
+`72fd863a9e29ca2422c129f2e885bba2a7343c9fb2a47dc482764aeae8b985a5`; the prior
+compact direct-clause formula still hashes to
+`66b84c521e0d6a0eb5dd7fe7749bb0e9da3415314d81e3c620f880503ebecbc4`.
+
+The combined handshake and common-neighbor AMO formula has 79,194 variables,
+184,200 clauses, 3,053,323 bytes and SHA-256
+`3579071c047015ea7ec371fdb884682e27f0bf2d45e757f16b172115dd88d7bb`. The AMO
+block contributes 124,640 clauses across 820 endpoint pairs: 39 implication
+clauses and 113 sequential-counter clauses per pair. Relative to the previous
+compact direct-clause formula, this adds 63,140 auxiliary variables while
+removing 179,170 clauses and 4,486,428 bytes. The default options and both
+previous formula hashes are unchanged.
+
+The single CaDiCaL 2.1.2 run hit its 120 s real-time limit after 117.88 s
+process CPU, with 922,757 conflicts, 1,133,616,237 propagations and 101.34 MB
+peak RSS. It returned `UNKNOWN`, exit 0, and left a 738 MB partial LRAT trace;
+there is no model and no complete proof. The smaller clause count did not settle
+the case within this budget.
+
+The script now supports `--degree-eight-count k` for k=0..4. Under the compact
+handshake condition, fixing n8=k also forces n7=24−2k and n6=17+k among the
+41 non-root vertices. This gives five exhaustive proof cases, but none was run
+in this screen. A future proof must check all five cases and replay every proof;
+the present combined-cap result remains only `UNKNOWN`.
