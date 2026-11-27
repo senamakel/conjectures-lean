@@ -51,3 +51,15 @@ The official checker accepted the Erdős 473 reduction with only standard axioms
 
 - `OeisA100474.conjecture` remains open. The pinned Lean artifact proves that any prime after index 2 occurs at an even index. Exact prime-block values were generated through index 512 and the even-index screen found no probable prime at indices 14–512. The prior OEIS table ends at index 12. No overlapping registry PR appeared in exact title search. The screen stopped at its preset index bound. [A100474Parity.lean](A100474Parity.lean) · [OEIS A100474](https://oeis.org/A100474)
 - `OeisA182510.conjecture1` remains open. The signed-XOR recurrence produced the eight expected zeros, including index 0, and no additional zero between 10001 and 10000000. This extends the table linked by OEIS, which reaches 10000. The search stopped at its preset index bound. [OEIS A182510](https://oeis.org/A182510)
+
+## Scaled shortlist
+
+Eight Luna lanes covered graph theory, OEIS, elementary number theory, geometry, algebra, analytic reduction leaves, word combinatorics and statement fidelity. The merge conflict in the OMA gitlink was resolved against upstream after comparing the actual Erdős 473 reduction with its merged copy. Merges are recorded in the feature branch history.
+
+- The graph lane found a short counting route for the Erdős 835 surjectivity leaf. An existing PR already implements the same bijection argument. [Erdős 835 H2](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/3531)
+- The geometry lane found no clean route for Erdős 982. The smallest unresolved polygon case is eight vertices. A separate finite geometric leaf in Erdős 1082 already has an exact overlapping PR. [Erdős 982](https://www.erdosproblems.com/982) · [Erdős 1082 H3](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/3353)
+- The proposed Erdős 384 leaf is a restriction of Ecklund's published 1969 binomial-factor theorem. The A189286 convolution and Hadamard order 668 likewise have relevant public results, despite stale registry listings. [Erdős 384](https://www.erdosproblems.com/384) · [A189286](https://oeis.org/A189286) · [Hadamard survey](https://arxiv.org/abs/2610.27175)
+- For A210186, a bounded modular scan after the published 300-index range found no violation through 2,138. For each modulus `m ≤ 300000`, it recorded the first pair of opposite residues of primorials modulo `m` and advanced the frontier when a new modulus certified more prefix lengths. The cap of 300,000 moduli, rather than the 3,000-index cap, determined the final coverage. [OEIS A210186](https://oeis.org/A210186)
+- For A024356, the known table reaches dimension 200. Elimination on a 1,024-dimensional prime Hankel matrix modulo 1,000,000,007 found nonzero determinants for every leading principal submatrix of dimensions 201–1,024. The only row interchange was between rows four and five at the known zero pivot. This screen produced no additional zero and no Lean certificate. [OEIS A024356](https://oeis.org/A024356)
+
+These checks have not closed a new registry target.
