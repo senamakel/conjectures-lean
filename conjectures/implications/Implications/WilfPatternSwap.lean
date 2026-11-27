@@ -8,10 +8,10 @@ namespace Implications.WilfPatternSwap
 
 open WilfMarked WilfGlobalSwap
 
-def atOffset {n : ℕ} (s : ℕ) (hs : s + 7 < n) (i : Fin 8) : Fin n :=
+private def atOffset {n : ℕ} (s : ℕ) (hs : s + 7 < n) (i : Fin 8) : Fin n :=
   ⟨s + i.val, by have := i.isLt; omega⟩
 
-theorem swaps_nonfirst {n : ℕ} (marks : Finset ℕ)
+private theorem swaps_nonfirst {n : ℕ} (marks : Finset ℕ)
     (hb : ∀ s ∈ marks, s + 7 < n)
     (hd : ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t)
     {s : ℕ} (hs : s ∈ marks) (i : Fin 8) (hi : i ≠ 0) :
@@ -51,14 +51,36 @@ theorem swaps_nonfirst {n : ℕ} (marks : Finset ℕ)
   rw [swapIndex_val_other _ _ _ _ hleft hright]
   simp [windowSwap, h3, h5]
 
-private theorem swaps_first_lt_second {n : ℕ} (marks : Finset ℕ)
+private theorem windowSwap_nonfirst (i : Fin 8) (hi : i ≠ 0) : windowSwap i ≠ 0 := by
+  intro he
+  apply hi
+  rw [← windowSwap_involutive i, he]
+  rfl
+
+private noncomputable def swapPerm {n : ℕ} (marks : Finset ℕ)
+    (hb : ∀ s ∈ marks, s + 7 < n)
+    (hd : ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t) : Equiv.Perm (Fin n) where
+  toFun := swapIndex marks hb hd
+  invFun := swapIndex marks hb hd
+  left_inv := swapIndex_involutive marks hb hd
+  right_inv := swapIndex_involutive marks hb hd
+
+/-- The ordered comparisons needed when a shift-five overlap changes the first entry. -/
+def FirstOrderCertificate (p : Fin 8 → Fin 8) : Prop :=
+  ∀ {n : ℕ} (π : Equiv.Perm (Fin n)) (t : ℕ) (ht : t + 12 < n),
+    ContainsAt π t p → ContainsAt π (t + 5) p →
+    ∀ j : Fin 8, j ≠ 0 →
+    (π ⟨t + 3, by omega⟩ < π ⟨t + 5 + j.val, by have := j.isLt; omega⟩ ↔
+      p 0 < p j)
+
+private theorem first_comparison {n : ℕ} (marks : Finset ℕ)
     (hb : ∀ s ∈ marks, s + 7 < n)
     (hd : ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t)
-    (π : Equiv.Perm (Fin n)) (p : Fin 8 → Fin 8)
-    (hfirst : ∀ i : Fin 8, i ≠ 0 → p 0 < p i) (hcross : p 3 < p 7)
-    (hπ : ∀ s ∈ marks, ContainsAt π s p) {s : ℕ} (hs : s ∈ marks) :
+    (π : Equiv.Perm (Fin n)) (p : Fin 8 → Fin 8) (hcert : FirstOrderCertificate p)
+    (hπ : ∀ s ∈ marks, ContainsAt π s p) {s : ℕ} (hs : s ∈ marks)
+    (j : Fin 8) (hj : j ≠ 0) :
     π (swapIndex marks hb hd (atOffset s (hb s hs) 0)) <
-      π (atOffset s (hb s hs) 2) := by
+      π (atOffset s (hb s hs) j) ↔ p 0 < p j := by
   have hleft : ¬ IsLeft marks (atOffset s (hb s hs) 0) := by
     rintro ⟨t, ht, he⟩
     change s + 0 = t + 3 at he
@@ -68,46 +90,88 @@ private theorem swaps_first_lt_second {n : ℕ} (marks : Finset ℕ)
   by_cases hright : IsRight marks (atOffset s (hb s hs) 0)
   · obtain ⟨t, ht, he⟩ := hright
     change s + 0 = t + 5 at he
+    have hst : s = t + 5 := by omega
     have hw₀ : swapIndex marks hb hd (atOffset s (hb s hs) 0) =
         atOffset t (hb t ht) 3 := by
       apply Fin.ext
       rw [swapIndex_val_right _ _ _ _ ⟨t, ht, he⟩]
       change (s + 0) - 2 = t + 3
       omega
-    have hw₂ : atOffset s (hb s hs) 2 = atOffset t (hb t ht) 7 := by
-      apply Fin.ext
-      change s + 2 = t + 7
-      omega
-    rw [hw₀, hw₂]
-    obtain ⟨_, hpattern⟩ := hπ t ht
-    exact (hpattern 3 7).mpr hcross
+    rw [hw₀]
+    have hroom : t + 12 < n := by have := hb s hs; omega
+    have hsecond : ContainsAt π (t + 5) p := hst ▸ hπ s hs
+    simpa [atOffset, hst] using hcert π t hroom (hπ t ht) hsecond j hj
   · have hw₀ : swapIndex marks hb hd (atOffset s (hb s hs) 0) =
-        atOffset s (hb s hs) 0 := Fin.ext (swapIndex_val_other _ _ _ _ hleft hright)
+        atOffset s (hb s hs) 0 :=
+      Fin.ext (swapIndex_val_other _ _ _ _ hleft hright)
     rw [hw₀]
     obtain ⟨_, hpattern⟩ := hπ s hs
-    exact (hpattern 0 2).mpr (hfirst 2 (by decide))
+    exact hpattern 0 j
 
-private theorem rank_first_lt (p : Fin 8 → Fin 8)
-    (hfirst : ∀ i : Fin 8, i ≠ 0 → p 0 < p i) :
-    ∀ i : Fin 8, i ≠ 0 → p 0 < p i := hfirst
-
-private theorem rank_second_lt (p : Fin 8 → Fin 8)
-    (hsecond : ∀ i : Fin 8, i ≠ 0 → i ≠ 2 → p 2 < p i) :
-    ∀ i : Fin 8, i ≠ 0 → i ≠ 2 → p 2 < p i := hsecond
-
-private theorem windowSwap_nonfirst (i : Fin 8) (hi : i ≠ 0) : windowSwap i ≠ 0 := by
-  intro he
-  apply hi
-  rw [← windowSwap_involutive i, he]
-  rfl
-
-noncomputable def swapPerm {n : ℕ} (marks : Finset ℕ)
+private theorem containsAt_swapped_of_certificate {n : ℕ} (marks : Finset ℕ)
     (hb : ∀ s ∈ marks, s + 7 < n)
-    (hd : ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t) : Equiv.Perm (Fin n) where
-  toFun := swapIndex marks hb hd
-  invFun := swapIndex marks hb hd
-  left_inv := swapIndex_involutive marks hb hd
-  right_inv := swapIndex_involutive marks hb hd
+    (hd : ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t)
+    (π : Equiv.Perm (Fin n)) (p : Fin 8 → Fin 8) (hzero : ∀ j : Fin 8, j ≠ 0 → p 0 ≠ p j)
+    (hcert : FirstOrderCertificate p) (hπ : ∀ s ∈ marks, ContainsAt π s p)
+    {s : ℕ} (hs : s ∈ marks) :
+    ContainsAt ((swapPerm marks hb hd).trans π) s (p ∘ windowSwap) := by
+  obtain ⟨_, hpattern⟩ := hπ s hs
+  let m := atOffset s (hb s hs)
+  let f := swapIndex marks hb hd
+  have hnonfirst (i : Fin 8) (hi : i ≠ 0) : f (m i) = m (windowSwap i) :=
+    swaps_nonfirst marks hb hd hs i hi
+  have hswap₀ : windowSwap 0 = 0 := by decide
+  have hcompare (i : Fin 8) (hi : i ≠ 0) :
+      π (f (m 0)) < π (f (m i)) ↔ p 0 < p (windowSwap i) := by
+    rw [hnonfirst i hi]
+    have hother : windowSwap i ≠ 0 := by
+      intro he
+      exact hi (windowSwap_involutive.injective (he.trans hswap₀.symm))
+    exact first_comparison marks hb hd π p hcert hπ hs (windowSwap i) hother
+  refine ⟨hb s hs, ?_⟩
+  intro i j
+  change (π (f (m i)) < π (f (m j))) ↔ p (windowSwap i) < p (windowSwap j)
+  by_cases hi : i = 0
+  · subst i
+    by_cases hj : j = 0
+    · subst j
+      simp
+    · rw [hswap₀]
+      exact hcompare j hj
+  · by_cases hj : j = 0
+    · subst j
+      rw [hswap₀]
+      have hπne : π (f (m 0)) ≠ π (f (m i)) := by
+        intro he
+        have hm := (swapIndex_involutive marks hb hd).injective (π.injective he)
+        have hv := congrArg Fin.val hm
+        change s + 0 = s + i.val at hv
+        exact hi (Fin.ext (by omega))
+      have hpne : p 0 ≠ p (windowSwap i) := hzero _ (windowSwap_nonfirst i hi)
+      constructor
+      · intro h
+        exact lt_of_le_of_ne (le_of_not_gt fun hy =>
+          (not_lt_of_gt h) ((hcompare i hi).mpr hy)) hpne.symm
+      · intro h
+        exact lt_of_le_of_ne (le_of_not_gt fun hy =>
+          (not_lt_of_gt h) ((hcompare i hi).mp hy)) hπne.symm
+    · rw [hnonfirst i hi, hnonfirst j hj]
+      exact hpattern _ _
+
+private theorem certificate_of_minimum (p : Fin 8 → Fin 8)
+    (hfirst : ∀ j : Fin 8, j ≠ 0 → p 0 < p j)
+    (hsecond : ∀ j : Fin 8, j ≠ 0 → j ≠ 2 → p 2 < p j)
+    (hcross : p 3 < p 7) : FirstOrderCertificate p := by
+  intro n π t ht ht0 ht5 j hj
+  obtain ⟨_, hbefore⟩ := ht0
+  obtain ⟨_, hafter⟩ := ht5
+  apply iff_of_true _ (hfirst j hj)
+  have hlt : π ⟨t + 3, by omega⟩ < π ⟨t + 5 + 2, by omega⟩ :=
+    (hbefore 3 7).mpr hcross
+  by_cases hj2 : j = 2
+  · subst j
+    exact hlt
+  · exact hlt.trans ((hafter 2 j).mpr (hsecond j hj hj2))
 
 /-- Swapping marked windows changes their order type from either pattern to the other. -/
 theorem containsAt_swapped {n : ℕ} (marks : Finset ℕ)
@@ -118,75 +182,52 @@ theorem containsAt_swapped {n : ℕ} (marks : Finset ℕ)
     (hsecond : ∀ i : Fin 8, i ≠ 0 → i ≠ 2 → p 2 < p i)
     (hcross : p 3 < p 7)
     (hπ : ∀ s ∈ marks, ContainsAt π s p) {s : ℕ} (hs : s ∈ marks) :
-    ContainsAt ((swapPerm marks hb hd).trans π) s (p ∘ windowSwap) := by
-  obtain ⟨_, hpattern⟩ := hπ s hs
-  let m := atOffset s (hb s hs)
-  let f := swapIndex marks hb hd
-  have hnonfirst : ∀ i : Fin 8, i ≠ 0 → f (m i) = m (windowSwap i) :=
-    fun i hi => swaps_nonfirst marks hb hd hs i hi
-  have hmin : ∀ i : Fin 8, i ≠ 0 → π (f (m 0)) < π (f (m i)) := by
-    intro i hi
-    rw [hnonfirst i hi]
-    have hminwindow := swaps_first_lt_second marks hb hd π p hfirst hcross hπ hs
-    by_cases hi₂ : windowSwap i = 2
-    · rw [hi₂]
-      exact hminwindow
-    · exact hminwindow.trans ((hpattern 2 (windowSwap i)).mpr
-        (rank_second_lt p hsecond _ (windowSwap_nonfirst i hi) hi₂))
-  refine ⟨hb s hs, ?_⟩
-  intro i j
-  change (π (f (m i)) < π (f (m j))) ↔ p (windowSwap i) < p (windowSwap j)
-  by_cases hi : i = 0
-  · subst i
-    by_cases hj : j = 0
-    · subst j
-      simp
-    · exact iff_of_true (hmin j hj) (rank_first_lt p hfirst _ (windowSwap_nonfirst j hj))
-  · by_cases hj : j = 0
-    · subst j
-      exact iff_of_false (not_lt_of_gt (hmin i hi))
-        (not_lt_of_gt (rank_first_lt p hfirst _ (windowSwap_nonfirst i hi)))
-    · rw [hnonfirst i hi, hnonfirst j hj]
-      exact hpattern _ _
+    ContainsAt ((swapPerm marks hb hd).trans π) s (p ∘ windowSwap) :=
+  containsAt_swapped_of_certificate marks hb hd π p (fun j hj => ne_of_lt (hfirst j hj))
+    (certificate_of_minimum p hfirst hsecond hcross) hπ hs
 
 private def Marked {n : ℕ} (p : Fin 8 → Fin 8) (marks : Finset ℕ)
     (π : Equiv.Perm (Fin n)) : Prop :=
   ∀ s ∈ marks, ContainsAt π s p
 
-private noncomputable def swapMarked {n : ℕ} (marks : Finset ℕ)
-    (p q : Fin 8 → Fin 8)
-    (hoverlap : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
-    (hfirst : ∀ i : Fin 8, i ≠ 0 → p 0 < p i)
-    (hsecond : ∀ i : Fin 8, i ≠ 0 → i ≠ 2 → p 2 < p i)
-    (hcross : p 3 < p 7) (hq : p ∘ windowSwap = q)
+private noncomputable def certifiedSwap {n : ℕ} (marks : Finset ℕ)
+    (p q : Fin 8 → Fin 8) (hoverlap : (∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)) (hzero : ∀ j : Fin 8, j ≠ 0 → p 0 ≠ p j)
+    (hcert : FirstOrderCertificate p) (hswap : p ∘ windowSwap = q)
     (π : {f : Equiv.Perm (Fin n) // Marked p marks f}) :
     {f : Equiv.Perm (Fin n) // Marked q marks f} := by
   let hb := marked_starts_bounded π.val p marks π.property
   let hd := marked_starts_separated_of_overlap π.val p hoverlap marks π.property
   refine ⟨(swapPerm marks hb hd).trans π.val, ?_⟩
   intro s hs
-  rw [← hq]
-  exact containsAt_swapped marks hb hd π.val p hfirst hsecond hcross π.property hs
+  rw [← hswap]
+  exact containsAt_swapped_of_certificate marks hb hd π.val p hzero hcert π.property hs
 
-private theorem swapMarked_swapMarked {n : ℕ} (marks : Finset ℕ)
-    (p q : Fin 8 → Fin 8)
-    (hoverlap : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
-    (hoverlapQ : ∀ d, 1 ≤ d → d < 8 → overlapCompatible q d = true → d = 5 ∨ d = 7)
-    (hfirst : ∀ i : Fin 8, i ≠ 0 → p 0 < p i)
-    (hsecond : ∀ i : Fin 8, i ≠ 0 → i ≠ 2 → p 2 < p i)
-    (hcross : p 3 < p 7)
-    (hfirstQ : ∀ i : Fin 8, i ≠ 0 → q 0 < q i)
-    (hsecondQ : ∀ i : Fin 8, i ≠ 0 → i ≠ 2 → q 2 < q i)
-    (hcrossQ : q 3 < q 7)
+private theorem certifiedSwap_twice {n : ℕ} (marks : Finset ℕ)
+    (p q : Fin 8 → Fin 8) (hoverlap : (∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)) (hoverlapQ : (∀ d, 1 ≤ d → d < 8 → overlapCompatible q d = true → d = 5 ∨ d = 7))
+    (hzero : ∀ j : Fin 8, j ≠ 0 → p 0 ≠ p j) (hzeroQ : ∀ j : Fin 8, j ≠ 0 → q 0 ≠ q j)
+    (hcert : FirstOrderCertificate p) (hcertQ : FirstOrderCertificate q)
     (hpq : p ∘ windowSwap = q) (hqp : q ∘ windowSwap = p)
     (π : {f : Equiv.Perm (Fin n) // Marked p marks f}) :
-    swapMarked marks q p hoverlapQ hfirstQ hsecondQ hcrossQ hqp
-      (swapMarked marks p q hoverlap hfirst hsecond hcross hpq π) = π := by
+    certifiedSwap marks q p hoverlapQ hzeroQ hcertQ hqp
+      (certifiedSwap marks p q hoverlap hzero hcert hpq π) = π := by
   apply Subtype.ext
   apply Equiv.ext
   intro i
-  exact congrArg π.val (swapIndex_involutive marks (marked_starts_bounded π.val p marks π.property)
-    (marked_starts_separated_of_overlap π.val p hoverlap marks π.property) i)
+  exact congrArg π.val
+    (swapIndex_involutive marks (marked_starts_bounded π.val p marks π.property)
+      (marked_starts_separated_of_overlap π.val p hoverlap marks π.property) i)
+
+private noncomputable def markedEquiv_of_certificate (n : ℕ) (marks : Finset ℕ)
+    (p q : Fin 8 → Fin 8) (hoverlap : (∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)) (hoverlapQ : (∀ d, 1 ≤ d → d < 8 → overlapCompatible q d = true → d = 5 ∨ d = 7))
+    (hzero : ∀ j : Fin 8, j ≠ 0 → p 0 ≠ p j) (hzeroQ : ∀ j : Fin 8, j ≠ 0 → q 0 ≠ q j)
+    (hcert : FirstOrderCertificate p) (hcertQ : FirstOrderCertificate q)
+    (hpq : p ∘ windowSwap = q) (hqp : q ∘ windowSwap = p) :
+    {f : Equiv.Perm (Fin n) // Marked p marks f} ≃
+      {f : Equiv.Perm (Fin n) // Marked q marks f} where
+  toFun := certifiedSwap marks p q hoverlap hzero hcert hpq
+  invFun := certifiedSwap marks q p hoverlapQ hzeroQ hcertQ hqp
+  left_inv := certifiedSwap_twice marks p q hoverlap hoverlapQ hzero hzeroQ hcert hcertQ hpq hqp
+  right_inv := certifiedSwap_twice marks q p hoverlapQ hoverlap hzeroQ hzero hcertQ hcert hqp hpq
 
 /-- A reusable marked-occurrence bijection for a pair exchanged by positions
 four and six, provided their overlap and rank checks meet the finite criteria. -/
@@ -202,13 +243,11 @@ noncomputable def markedEquivOfSwap (n : ℕ) (marks : Finset ℕ)
     (hcrossQ : q 3 < q 7)
     (hpq : p ∘ windowSwap = q) (hqp : q ∘ windowSwap = p) :
     {f : Equiv.Perm (Fin n) // Marked p marks f} ≃
-      {f : Equiv.Perm (Fin n) // Marked q marks f} where
-  toFun := swapMarked marks p q hoverlap hfirst hsecond hcross hpq
-  invFun := swapMarked marks q p hoverlapQ hfirstQ hsecondQ hcrossQ hqp
-  left_inv := swapMarked_swapMarked marks p q hoverlap hoverlapQ hfirst hsecond hcross
-    hfirstQ hsecondQ hcrossQ hpq hqp
-  right_inv := swapMarked_swapMarked marks q p hoverlapQ hoverlap hfirstQ hsecondQ hcrossQ
-    hfirst hsecond hcross hqp hpq
+      {f : Equiv.Perm (Fin n) // Marked q marks f} :=
+  markedEquiv_of_certificate n marks p q hoverlap hoverlapQ
+    (fun j hj => ne_of_lt (hfirst j hj)) (fun j hj => ne_of_lt (hfirstQ j hj))
+    (certificate_of_minimum p hfirst hsecond hcross)
+    (certificate_of_minimum q hfirstQ hsecondQ hcrossQ) hpq hqp
 
 /-- A bijection between the permutations realizing all prescribed starts for
 the two patterns. -/
@@ -226,7 +265,7 @@ noncomputable def occurrenceSet {n : ℕ} (p : Fin 8 → Fin 8) (π : Equiv.Perm
   classical
   exact Finset.univ.filter fun i => ContainsAt π i.val p
 
-theorem subset_occurrenceSet_iff {n : ℕ} (p : Fin 8 → Fin 8)
+private theorem subset_occurrenceSet_iff {n : ℕ} (p : Fin 8 → Fin 8)
     (marks : Finset (Fin n)) (π : Equiv.Perm (Fin n)) :
     marks ⊆ occurrenceSet p π ↔ Marked p (marks.image Fin.val) π := by
   classical
@@ -237,6 +276,25 @@ theorem subset_occurrenceSet_iff {n : ℕ} (p : Fin 8 → Fin 8)
   · intro h i hi
     exact Finset.mem_filter.mpr ⟨Finset.mem_univ i,
       h i.val (Finset.mem_image_of_mem Fin.val hi)⟩
+
+/-- A certified first-entry replacement extends to all marked windows and
+yields equality of exact occurrence-set counts. -/
+theorem exactOccurrenceCount_eq_of_certificate (n : ℕ) (marks : Finset (Fin n))
+    (p q : Fin 8 → Fin 8)
+    (hoverlap : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
+    (hoverlapQ : ∀ d, 1 ≤ d → d < 8 → overlapCompatible q d = true → d = 5 ∨ d = 7)
+    (hzero : ∀ j : Fin 8, j ≠ 0 → p 0 ≠ p j)
+    (hzeroQ : ∀ j : Fin 8, j ≠ 0 → q 0 ≠ q j)
+    (hcert : FirstOrderCertificate p) (hcertQ : FirstOrderCertificate q)
+    (hpq : p ∘ windowSwap = q) (hqp : q ∘ windowSwap = p) :
+    WilfCounts.exactCount (occurrenceSet p) marks =
+      WilfCounts.exactCount (occurrenceSet q) marks := by
+  apply WilfEquivalence.exactCount_eq_of_markedEquiv
+  intro chosen
+  exact (Equiv.subtypeEquivRight (subset_occurrenceSet_iff p chosen)).trans
+    ((markedEquiv_of_certificate n (chosen.image Fin.val) p q hoverlap hoverlapQ hzero hzeroQ
+      hcert hcertQ hpq hqp).trans
+      (Equiv.subtypeEquivRight (subset_occurrenceSet_iff q chosen)).symm)
 
 /-- The same marked-window argument yields equality of exact occurrence-set
 counts for any pair satisfying its checked overlap and rank hypotheses. -/
