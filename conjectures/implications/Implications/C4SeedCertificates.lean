@@ -50,7 +50,11 @@ def checker (g : Array Nat) (vertices size : Nat) : Bool :=
 theorem checker_false {g : Array Nat} {vertices size : Nat}
     (h : checker g vertices size = false) :
     ¬ compatibleCliqueSearch g (List.range vertices) size := by
-  simp [checker, compatibleCliqueSearch, h]
+  intro hc
+  change compatibleCliqueSearchBool g (List.range vertices) size = true at hc
+  change compatibleCliqueSearchBool g (List.range vertices) size = false at h
+  rw [hc] at h
+  contradiction
 
 private def seed1 : Array Nat := #[21541946382, 4325701, 2181050499, 274888393777, 805310568, 1236950712984, 68987961618, 2148565540, 8598850114, 567069903264, 1073825801, 1074013952, 537468948, 1168233469956, 1099679499328, 4296294592, 584116229120, 34381037602, 279189825536, 412385087744, 73957504, 618488930312, 1748107266, 8642363656, 377880576, 137598353412, 1116978282497, 292632412672, 553060925520, 13023318032, 139859069952, 319169757316, 696321867777, 1140859076864, 103280542209, 96636960768, 188980666432, 74122264608, 2282487816, 4565565952, 8657068064]
 
