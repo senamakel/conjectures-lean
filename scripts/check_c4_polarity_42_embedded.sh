@@ -23,5 +23,6 @@ Path(sys.argv[2]).write_bytes(Path(sys.argv[1]).read_bytes().decode("latin-1").e
 PY
 cp -- "$root/scripts/c4_polarity_42_embedded.lean" "$scratch/EmbeddedReplay.lean"
 
-lake "$@" build Implications.C4PolarityFullAssignment Implications.C4PolaritySymmetryCertificate
+lake "$@" build Implications.C4PolarityFullAssignment Implications.C4PolaritySymmetryCertificate \
+    Implications.C4PolaritySurvivorBound
 lake "$@" env lean "$scratch/EmbeddedReplay.lean"
