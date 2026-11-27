@@ -51,3 +51,4 @@ import Implications.WilfWindowGeometry
 import Implications.WilfArchiveClosure
 import Implications.SplitGraphHamiltonian
 import Implications.SplitGraphBoundedDeletions
+import Implications.SplitGraphKappaThreeHall
