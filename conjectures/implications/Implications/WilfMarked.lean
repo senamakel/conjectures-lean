@@ -191,6 +191,22 @@ theorem swap_supports_disjoint {n : Nat} (π : Equiv.Perm (Fin n))
   simp [swapSupport] at hx hy
   rcases hx with hxs | hxs <;> rcases hy with hyt | hyt <;> omega
 
+theorem marked_starts_separated {n : Nat} (π : Equiv.Perm (Fin n))
+    (p : Fin 8 → Fin 8) (hp : p = sigma ∨ p = tau) (marks : Finset Nat)
+    (hmarks : ∀ s ∈ marks, ContainsAt π s p) :
+    ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t := by
+  intro s hs t ht hst
+  have hgap := same_pattern_starts_separated π p hp s t (hmarks s hs) (hmarks t ht) hst
+  omega
+
+theorem marked_starts_bounded {n : Nat} (π : Equiv.Perm (Fin n))
+    (p : Fin 8 → Fin 8) (marks : Finset Nat)
+    (hmarks : ∀ s ∈ marks, ContainsAt π s p) :
+    ∀ s ∈ marks, s + 7 < n := by
+  intro s hs
+  rcases hmarks s hs with ⟨h, _⟩
+  exact h
+
 end WilfMarked
 
 namespace WilfMarked
@@ -204,5 +220,7 @@ namespace WilfMarked
 #print axioms same_pattern_start_distance
 #print axioms same_pattern_starts_separated
 #print axioms swap_supports_disjoint
+#print axioms marked_starts_separated
+#print axioms marked_starts_bounded
 
 end WilfMarked
