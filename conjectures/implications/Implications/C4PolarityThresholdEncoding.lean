@@ -59,6 +59,9 @@ def thresholdRowVars (nextVar limit : Nat) : List Int :=
 def thresholdFreshVariables (nextVar limit inputCount : Nat) : List Int :=
   (List.range (inputCount * limit)).map fun j => Int.ofNat (nextVar + j + 1)
 
+/-- Unit clause that fixes the encoder's distinguished variable to true. -/
+def thresholdTrueUnit (trueLit : Int) : List (List Int) := [[trueLit]]
+
 theorem thresholdFreshVariables_length (nextVar limit inputCount : Nat) :
     (thresholdFreshVariables nextVar limit inputCount).length = inputCount * limit := by
   simp [thresholdFreshVariables]
@@ -185,6 +188,11 @@ def deletionCounterBoundClauses (count : List Int) : List (List Int) :=
 def scoreCounterBoundClause (count : List Int) : List (List Int) :=
   [[count[34]!]]
 
+/-- Output literals in the final row, including threshold zero, which is the
+distinguished true literal. -/
+def thresholdFinalRow (trueLit : Int) (nextVar limit row : Nat) : List Int :=
+  [trueLit] ++ (List.range limit).map fun j => thresholdVar nextVar limit row (j + 1)
+
 theorem deletionCounterFreshCount :
     (thresholdFreshVariables 58 16 57).length = 912 := by
   norm_num [thresholdFreshVariables]
@@ -201,6 +209,14 @@ theorem scoreCounterLastThreshold :
     thresholdVar 970 34 231 34 = 8858 := by
   norm_num [thresholdVar]
 
+theorem deletionCounterUnits_are_encoder_units :
+    deletionCounterBoundClauses (thresholdFinalRow 1 58 16 56) = [[969], [-970]] := by
+  norm_num [deletionCounterBoundClauses, thresholdFinalRow, thresholdVar]
+
+theorem scoreCounterUnit_is_encoder_unit :
+    scoreCounterBoundClause (thresholdFinalRow 1 970 34 231) = [[8858]] := by
+  norm_num [scoreCounterBoundClause, thresholdFinalRow, thresholdVar]
+
 end Implications.C4PolarityThresholdEncoding
 
 #print axioms Implications.C4PolarityThresholdEncoding.thresholdGateDimacs_iff
@@ -208,3 +224,5 @@ end Implications.C4PolarityThresholdEncoding
 #print axioms Implications.C4PolarityThresholdEncoding.thresholdRowClauses_length
 #print axioms Implications.C4PolarityThresholdEncoding.deletionCounterFreshCount
 #print axioms Implications.C4PolarityThresholdEncoding.scoreCounterFreshCount
+#print axioms Implications.C4PolarityThresholdEncoding.deletionCounterUnits_are_encoder_units
+#print axioms Implications.C4PolarityThresholdEncoding.scoreCounterUnit_is_encoder_unit
