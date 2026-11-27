@@ -745,4 +745,124 @@ theorem twoHitGapCount_proportion_tendsto_zero :
     filter_upwards [eventually_twoHitGapCount_bound] with n hn
     exact hn) (by convert hsum using 1 <;> simp)
 
+/-- Eventually the explicit two-hit bound has the clean logarithmic rate
+`65 / log log p_N`. The smooth-number tail is smaller than one reciprocal
+double logarithm, since its product with `log log p_N` is bounded by a
+constant multiple of `(log p_N)^2 / p_N^(1/4)`, which tends to zero. -/
+theorem eventually_twoHitGapCount_bound_65 :
+    ∀ᶠ n : ℕ in atTop,
+      (((Finset.range n).filter (fun r =>
+        2 ≤ ((Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
+          (fun m => m.maxPrimeFac < primeGap r)).card)).card : ℝ) /
+          (n + 1 : ℝ) ≤ 65 / Real.log (Real.log (primeAt n : ℝ)) := by
+  let P : ℕ → ℝ := fun n => primeAt n
+  let L : ℕ → ℝ := fun n => Real.log (P n)
+  let LL : ℕ → ℝ := fun n => Real.log (L n)
+  let R : ℕ → ℝ := fun n => (L n) ^ 2 / (P n) ^ (1 / 4 : ℝ)
+  have hp : Tendsto P atTop atTop := by
+    have hnat : Tendsto primeAt atTop atTop := by
+      rw [tendsto_atTop_atTop]
+      intro b
+      refine ⟨b, fun n hbn => ?_⟩
+      have hprime := Nat.add_two_le_nth_prime n
+      change b ≤ Nat.nth Nat.Prime n
+      omega
+    exact tendsto_natCast_atTop_atTop.comp hnat
+  have hR : Tendsto R atTop (nhds 0) := by
+    have hlo := (isLittleO_log_rpow_rpow_atTop (2 : ℝ) (1 / 4 : ℝ)
+      (by norm_num : (0 : ℝ) < 1 / 4)).tendsto_div_nhds_zero
+    simpa [R, L, P, Function.comp_def] using hlo.comp hp
+  have hLL : Tendsto LL atTop atTop := by
+    simpa [LL, L, P, Function.comp_def] using
+      Real.tendsto_log_atTop.comp (Real.tendsto_log_atTop.comp hp)
+  have hRsmall : ∀ᶠ n : ℕ in atTop, 2 * R n ≤ 1 := by
+    filter_upwards [hR.eventually (Iio_mem_nhds (by norm_num : (0 : ℝ) < 1 / 2))]
+      with n hn
+    dsimp [R] at hn ⊢
+    nlinarith
+  filter_upwards [eventually_twoHitGapCount_bound,
+    eventually_primeAt_over_index_le,
+    hp.eventually (eventually_ge_atTop (1 : ℝ)),
+    (Real.tendsto_log_atTop.comp hp).eventually_gt_atTop 0,
+    hLL.eventually_gt_atTop 0, hRsmall] with n hbound hindex hp1 hLpos hLLpos hRs
+  let p := P n
+  let l := L n
+  let ll := LL n
+  let root := p ^ (1 / 4 : ℝ)
+  have hp0 : 0 < p := by dsimp [p, P]; linarith
+  have hl : 0 < l := by dsimp [l, L, P]; exact hLpos
+  have hll : 0 < ll := by dsimp [ll, LL]; exact hLLpos
+  have hllle : ll ≤ l := by
+    dsimp [ll, LL, l, L]
+    exact Real.log_le_self (le_of_lt hl)
+  have hroot : 0 < root := by dsimp [root]; exact Real.rpow_pos_of_pos hp0 _
+  have hrootle : root ≤ p := by
+    dsimp [root]
+    exact Real.rpow_le_rpow_of_exponent_le (by dsimp [p, P]; linarith)
+      (by norm_num : (1 / 4 : ℝ) ≤ 1)
+  have hidx : p / (n + 1 : ℝ) ≤ 2 * l := by
+    simpa [p, P, l, L, Nat.cast_add] using hindex
+  have hExp : Real.exp (3 * l / 4) * root = p := by
+    dsimp [root]
+    rw [Real.rpow_def_of_pos hp0]
+    rw [← Real.exp_add]
+    have he : 3 * l / 4 + l * (1 / 4 : ℝ) = l := by ring
+    rw [he, Real.exp_log (by
+      have : 0 < p := hp0
+      exact ne_of_gt this)]
+  have hExpDiv : Real.exp (3 * l / 4) / (2 * (n + 1 : ℝ)) * ll =
+      (p / (n + 1 : ℝ)) / (2 * root) * ll := by
+    have hmul : Real.exp (3 * l / 4) * root = p := hExp
+    field_simp
+    nlinarith [hmul]
+  have hfirst : ll / (2 * (n + 1 : ℝ)) ≤ l ^ 2 / root := by
+    have hden : 0 < 2 * (n + 1 : ℝ) := by positivity
+    have hdenP : 0 < p := hp0
+    calc
+      ll / (2 * (n + 1 : ℝ)) ≤ l / (2 * (n + 1 : ℝ)) := by
+        exact div_le_div_of_nonneg_right hllle (by positivity)
+      _ ≤ l ^ 2 / p := by
+        rw [div_le_div_iff₀ (by positivity) hdenP]
+        have : p ≤ 2 * l * (n + 1 : ℝ) := (div_le_iff₀ (by positivity)).mp hidx
+        nlinarith [mul_le_mul_of_nonneg_left this (le_of_lt hl)]
+      _ ≤ l ^ 2 / root := by
+        rw [div_le_div_iff₀ hroot hp0]
+        exact mul_le_mul_of_nonneg_left hrootle (sq_nonneg l)
+  have hsecond :
+      Real.exp (3 * l / 4) / (2 * (n + 1 : ℝ)) * ll ≤ l ^ 2 / root := by
+    rw [hExpDiv]
+    have hden : 0 < 2 * root := by positivity
+    calc
+      (p / (n + 1 : ℝ)) / (2 * root) * ll ≤ (2 * l) / (2 * root) * ll := by
+        gcongr
+      _ = l * ll / root := by field_simp <;> ring
+      _ ≤ l ^ 2 / root := by
+        gcongr
+  have htailWeighted :
+      (1 + Real.exp (3 * l / 4)) / (2 * (n + 1 : ℝ)) * ll ≤ 2 * R n := by
+    rw [add_div, one_div]
+    have h := add_le_add hfirst hsecond
+    dsimp [R, l, L, P]
+    have hpow : (P n) ^ (1 / 4 : ℝ) = root := rfl
+    simpa [div_eq_mul_inv, mul_add, mul_comm, mul_left_comm, mul_assoc, hpow] using h
+  have htailSmall :
+      (1 + Real.exp (3 * l / 4)) / (2 * (n + 1 : ℝ)) ≤ 1 / ll := by
+    apply (le_div_iff₀ hll).2
+    calc
+      (1 + Real.exp (3 * l / 4)) / (2 * (n + 1 : ℝ)) * ll ≤ 2 * R n := htailWeighted
+      _ ≤ 1 := hRs
+  have hbound' :
+      (((Finset.range n).filter (fun r =>
+        2 ≤ ((Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
+          (fun m => m.maxPrimeFac < primeGap r)).card)).card : ℝ) /
+          (n + 1 : ℝ) ≤ 64 / ll +
+            (1 + Real.exp (3 * l / 4)) / (2 * (n + 1 : ℝ)) := by
+    simpa [l, L, P, ll, LL] using hbound
+  calc
+    _ ≤ 64 / ll + (1 + Real.exp (3 * l / 4)) / (2 * (n + 1 : ℝ)) := hbound'
+    _ ≤ 64 / ll + 1 / ll := add_le_add_left htailSmall _
+    _ = 65 / Real.log (Real.log (primeAt n : ℝ)) := by
+      dsimp [ll, LL]
+      ring
+
 end Implications.SmoothGapCounting
