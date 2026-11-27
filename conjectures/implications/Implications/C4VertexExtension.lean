@@ -1,8 +1,5 @@
 import Mathlib.Combinatorics.SimpleGraph.Basic
 
-set_option maxHeartbeats 2000000
-set_option maxRecDepth 4096
-
 /-!
 # Adding a vertex to a C4-free graph
 
@@ -29,11 +26,11 @@ def addVertex {V : Type*} (G : SimpleGraph V) (s : Set V) : SimpleGraph (Option 
     symm := by
       constructor
       intro a b hab
-      cases a <;> cases b <;> simp_all <;> try exact G.symm.symm _ _ hab
+      cases a <;> cases b <;> simp_all
     loopless := by
       constructor
       intro a ha
-      cases a <;> simp_all <;> try exact G.loopless.irrefl ha }
+      cases a <;> simp_all }
 
 @[simp] theorem addVertex_adj_some_some {V : Type*} (G : SimpleGraph V) (s : Set V)
     (x y : V) : (addVertex G s).Adj (some x) (some y) ↔ G.Adj x y := Iff.rfl
