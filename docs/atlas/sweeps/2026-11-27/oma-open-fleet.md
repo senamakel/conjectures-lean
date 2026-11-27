@@ -202,3 +202,16 @@ modulo `g*x+1` gives
 side is positive and ranges over finitely many values as `d`
 varies. It therefore bounds `g` for fixed `x,y`, and the earlier
 bound then bounds `z`. All three theorems use only the standard axioms.
+
+[CrystalSharedSmallY.lean](CrystalSharedSmallY.lean) rules out the
+normalized `x = 1` case for all odd `3 ≤ y ≤ 15`, with no cutoff on
+`g` or `z`. The full crystal quotient makes each Vieta partner
+even, so the positive difference is even and less than `2(y−1)`.
+For each `y,d` the proof checks a prime factorization of the explicit
+constant divisible by `g+1`. Of its divisors, the even values at least
+`y²+3` give 9,870 candidate `y,d,g` triples in total. The
+discriminant of the quadratic in the first partner must be a square,
+but every candidate discriminant fails the exact integer-square test.
+The pinned Lean proof checks the factorization, covers all divisors,
+and evaluates exact square roots in the kernel. Its axiom closure is
+`propext`, `Classical.choice`, and `Quot.sound`.
