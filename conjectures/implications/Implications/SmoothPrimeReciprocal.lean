@@ -42,7 +42,8 @@ private theorem reciprocalPrimeDyadic_eventually :
       (Nat.primeCounting (2 ^ (k + 1)) : ℝ) ≤
         B * (2 : ℝ) ^ (k + 1) / Real.log ((2 : ℝ) ^ (k + 1)) := by
     have hfloor : ⌊(2 : ℝ) ^ (k + 1)⌋₊ = 2 ^ (k + 1) := by
-      rw [← Nat.cast_pow, Nat.floor_natCast]
+      rw [show (2 : ℝ) ^ (k + 1) = (2 ^ (k + 1) : ℕ) by norm_cast,
+        Nat.floor_natCast]
     rw [hfloor] at hk
     simpa [B, Real.log_pow] using hk
   have hlog2 : 0 < Real.log 2 := Real.log_pos (by norm_num)
@@ -79,6 +80,7 @@ private theorem reciprocalPrimeDyadic_eventually :
   have hlog_pow : Real.log ((2 : ℝ) ^ (k + 1)) = (k + 1 : ℝ) * Real.log 2 := by
     rw [Real.log_pow]
     push_cast
+    rfl
   calc
     _ ≤ (Nat.primeCounting (2 ^ (k + 1)) : ℝ) / (2 : ℝ) ^ k := hblock
     _ ≤ (B * (2 : ℝ) ^ (k + 1) / Real.log ((2 : ℝ) ^ (k + 1))) /
