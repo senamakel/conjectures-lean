@@ -287,7 +287,11 @@ theorem thresholdGateList_satisfies (assignment : Nat → Bool)
               rw [habs]
               omega
             _ = thresholdGateValue assignment gate := by
-              simp [afterGate, extendThresholdGate, literalValue_extendVariable_self]
+              change literalValue
+                (extendVariable assignment gate.output (thresholdGateValue assignment gate))
+                (Int.ofNat gate.output) = thresholdGateValue assignment gate
+              exact literalValue_extendVariable_self assignment gate.output
+                (thresholdGateValue assignment gate)
         have hOutputNe : Int.ofNat gate.output ≠ 0 := by
           intro hz
           have hnat : gate.output = 0 := Int.ofNat.inj (by simpa using hz)
