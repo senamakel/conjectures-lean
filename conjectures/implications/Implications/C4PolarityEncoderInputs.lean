@@ -51,8 +51,8 @@ private theorem countP_map_indicator {α : Type*} (l : List α) (P : α → Prop
   rw [List.countP_eq_length_filter]
 
 /-- The pair indicators count exactly the edges induced by the deletion set. -/
-set_option maxRecDepth 10000 in
-set_option maxHeartbeats 0 in
+set_option maxRecDepth 10000
+set_option maxHeartbeats 0
 theorem orthogonal_pair_score_count (D : Finset (Fin 57)) :
     (orthogonalPairs.map (fun p => decide (p.1 ∈ D ∧ p.2 ∈ D))).countP id =
       inducedEdgeCount graph D := by
@@ -76,7 +76,7 @@ theorem orthogonal_pair_score_count (D : Finset (Fin 57)) :
     have hadj := (Finset.mem_filter.mp hp').2.2
     change Sym2.mk _ _ ∈ H.edgeFinset
     rw [SimpleGraph.mem_edgeFinset, SimpleGraph.mem_edgeSet]
-    exact (SimpleGraph.induce_adj).2 hadj
+    exact (SimpleGraph.induce_adj).2 ⟨by omega, hadj⟩
   · intro p hp q hq heq
     simp only [Sym2.eq_iff] at heq
     rcases heq with heq | heq
@@ -86,13 +86,16 @@ theorem orthogonal_pair_score_count (D : Finset (Fin 57)) :
       have hrev : p.2 < p.1 := by simpa using hlt2
       omega
   · intro e he
-    have he' := (SimpleGraph.mem_edgeFinset.mp he)
-    obtain ⟨a, b, rfl⟩ := Sym2.mk_surjective e
-    have hab : H.Adj a b := by simpa [H] using (SimpleGraph.mem_edgeSet.mp he')
-    have hne : a.val ≠ b.val := by
+    obtain ⟨ab, habeq⟩ := Sym2.mk_surjective e
+    rcases ab with ⟨a, b⟩
+    have hab : H.Adj ⟨a, (by simpa [habeq] using (Finset.mem_filter.mp he).2.1)⟩
+        ⟨b, (by simpa [habeq] using (Finset.mem_filter.mp he).2.2)⟩ := by
+      have heEdge : Sym2.mk a b ∈ H.edgeSet := SimpleGraph.mem_edgeFinset.mp he
+      simpa [H, SimpleGraph.induce_adj] using SimpleGraph.mem_edgeSet.mp heEdge
+    have hne : a ≠ b := by
       intro h
-      apply H.loopless.irrefl a
-      simpa [h] using hab
+      subst b
+      exact H.loopless.irrefl ⟨a, (by simpa [habeq] using (Finset.mem_filter.mp he).2.1)⟩ hab
     rcases lt_or_gt_of_ne hne with hlt | hgt
     · refine ⟨(a.val, b.val), ?_, ?_⟩
       · simp [T, orthogonalPairFinset, Finset.mem_filter, hlt, H] at *
@@ -126,7 +129,9 @@ theorem absolute_score_count (D : Finset (Fin 57)) :
 count reduction: induced deleted edges plus deleted absolute points. -/
 theorem scoreInputs_count_true (D : Finset (Fin 57)) :
     (scoreInputs D).countP id = inducedEdgeCount graph D + (D ∩ absolute).card := by
-  simp only [scoreInputs, List.countP_append, List.countP_map, Function.comp_apply]
+  rw [scoreInputs, List.countP_append]
+  change (absoluteIndices.map (fun i => decide (i ∈ D))).countP id +
+    (orthogonalPairs.map (fun p => decide (p.1 ∈ D ∧ p.2 ∈ D))).countP id = _
   rw [absolute_score_count, orthogonal_pair_score_count]
 
 end Implications.C4PolarityEncoderInputs
