@@ -67,8 +67,11 @@ theorem eulerCost_div_rootScale_tendsto_zero :
   have hL : ∀ᶠ L : ℝ in atTop, 1 < L := eventually_gt_atTop 1
   have hlog : ∀ᶠ L : ℝ in atTop, 1 ≤ Real.log L :=
     Real.tendsto_log_atTop.eventually_ge_atTop 1
-  filter_upwards [hL, hlog] with L hL hlog
-  have hLpos : 0 < L := by linarith
+  have heq : ∀ᶠ L : ℝ in atTop,
+      L ^ (1 / 4 : ℝ) * Real.log L / rootScale L =
+        Real.log L ^ (1 / 2 : ℝ) / L ^ (1 / 4 : ℝ) := by
+    filter_upwards [hL, hlog] with L hL hlog
+    have hLpos : 0 < L := by linarith
   have hlogpos : 0 < Real.log L := by linarith
   have hroot : 0 < rootScale L := by
     apply Real.sqrt_pos.2
@@ -84,8 +87,7 @@ theorem eulerCost_div_rootScale_tendsto_zero :
     rw [Real.rpow_neg hLpos, Real.rpow_neg hlogpos]
     field_simp
     ring
-  rw [hscale]
-  exact hratio
+  exact hratio.congr' heq
 
 /-- Eventually the logarithmic Euler-product cost is at most one eighth of
 `R`, a convenient single bound for combining with Rankin and the reciprocal
@@ -99,7 +101,7 @@ theorem eventually_eulerCost_le_eighth_rootScale :
   have hroot : 0 < rootScale L := by
     apply Real.sqrt_pos.2
     exact mul_pos (by linarith) (Real.log_pos hL)
-  exact (div_lt_iff₀ hroot).mp hcost.le
+  exact (div_lt_iff₀ hroot).mp hcost
 
 end Implications.SmoothGapAsymptotic
 
