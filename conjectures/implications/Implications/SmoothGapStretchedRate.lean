@@ -1,10 +1,11 @@
 import Implications.SmoothGapAnalytic
+import Implications.SmoothGapAsymptotic
 
 /-! Converting the analytic cutoff estimate into a stretched-exponential rate. -/
 
 namespace Implications.SmoothGapStretchedRate
 
-open Filter SmoothGapCounting SmoothGapAnalytic
+open Filter SmoothGapCounting SmoothGapAnalytic SmoothGapAsymptotic
 
 private theorem log_primeAt_tendsto :
     Tendsto (fun n : ℕ => Real.log (primeAt n : ℝ)) atTop atTop := by
@@ -16,6 +17,32 @@ private theorem log_primeAt_tendsto :
     change b ≤ Nat.nth Nat.Prime n
     omega
   exact Real.tendsto_log_atTop.comp (tendsto_natCast_atTop_atTop.comp hnat)
+
+private theorem rounded_parameters (L : ℝ) (hL : 1 < L)
+    (hB : 2 ≤ smoothCutoffNat L) :
+    0 ≤ rootScale L ∧ rootScale L / 4 ≤ L ∧
+      1 / 2 ≤ 1 - rankinDelta L ∧ 1 - rankinDelta L ≤ 1 ∧
+      Real.exp (rootScale L / 2) / 2 ≤ (smoothCutoffNat L : ℝ) := by
+  have hLpos : 0 < L := by linarith
+  have hlog : 0 ≤ Real.log L := (Real.log_pos hL).le
+  have hR : 0 ≤ rootScale L := Real.sqrt_nonneg _
+  have hRle : rootScale L ≤ L := by
+    have hp := Real.log_le_sub_one_of_pos hLpos
+    have hsq := rootScale_sq hLpos hlog
+    by_contra! hc
+    have ht := mul_pos (sub_pos.mpr hc) (add_pos_of_pos_of_nonneg hLpos hR)
+    have hu := mul_nonneg hLpos.le (show 0 ≤ L - Real.log L by linarith)
+    nlinarith only [hsq, ht, hu]
+  have hδ := rankinDelta_mul_self hL
+  have hδ0 : 0 ≤ rankinDelta L := div_nonneg hlog (by positivity)
+  have hδ2 : rankinDelta L ≤ 1 / 2 := by
+    by_contra! hc
+    have ht := mul_lt_mul_of_pos_right hc hLpos
+    linarith
+  have hf := Nat.lt_floor_add_one (smoothCutoff L)
+  change Real.exp (rootScale L / 2) < (smoothCutoffNat L : ℝ) + 1 at hf
+  have hB' : (2 : ℝ) ≤ (smoothCutoffNat L : ℝ) := by exact_mod_cast hB
+  exact ⟨hR, by linarith, by linarith, by linarith, by linarith⟩
 
 /-- Combine the two finite cutoff terms after bounding the Euler-product exponent
 and rounding the smoothness cutoff. -/
@@ -93,5 +120,36 @@ private theorem hitCount_le_of_rankin_parameters
       have h := mul_le_mul_of_nonneg_right hindex' (show 0 ≤ 3 * E by positivity)
       dsimp [L, E] at h ⊢
       nlinarith only [h]
+
+private theorem eventually_hitCount_le_of_euler_cost
+    (hcost : ∀ (D : ℝ), 0 < D → ∀ᶠ L : ℝ in atTop,
+      4 * (smoothCutoffNat L : ℝ) ^ rankinDelta L * D *
+        (1 + Real.log (((Nat.log 2 (smoothCutoffNat L) + 1 : ℕ) : ℝ))) ≤
+          rootScale L / 8) :
+    ∀ᶠ N : ℕ in atTop,
+      (hitCount N 2 : ℝ) / (N + 1 : ℝ) ≤
+        6 * Real.log (primeAt N : ℝ) *
+          Real.exp (-(rootScale (Real.log (primeAt N : ℝ))) / 4) := by
+  obtain ⟨D, hD, hcut⟩ := hitCount_le_rankin_cutoff
+  filter_upwards [log_primeAt_tendsto.eventually (eventually_gt_atTop (1 : ℝ)),
+    log_primeAt_tendsto.eventually eventually_smoothCutoffNat_ge_two,
+    log_primeAt_tendsto.eventually (hcost D hD),
+    eventually_primeAt_over_index_le] with N hL hB hP hN
+  let L := Real.log (primeAt N : ℝ)
+  let B := smoothCutoffNat L
+  let s := 1 - rankinDelta L
+  obtain ⟨hR, hRL, hslo, hshi, hround⟩ := rounded_parameters L hL hB
+  have hbalance : (1 - s) * L = rootScale L / 2 := by
+    have h := rankinDelta_mul_self hL
+    change rankinDelta L * L = rootScale L / 2 at h
+    dsimp [s]
+    linarith only [h]
+  have hP' : 4 * (B : ℝ) ^ (1 - s) * D *
+      (1 + Real.log (((Nat.log 2 B + 1 : ℕ) : ℝ))) ≤ rootScale L / 8 := by
+    change 4 * (B : ℝ) ^ rankinDelta L * D *
+      (1 + Real.log (((Nat.log 2 B + 1 : ℕ) : ℝ))) ≤ rootScale L / 8 at hP
+    simpa only [s, sub_sub_cancel] using hP
+  exact hitCount_le_of_rankin_parameters D hcut N B s (rootScale L)
+    hB hslo hshi hR hRL hround hbalance hP' (by simpa only [Nat.cast_add, Nat.cast_one] using hN)
 
 end Implications.SmoothGapStretchedRate
