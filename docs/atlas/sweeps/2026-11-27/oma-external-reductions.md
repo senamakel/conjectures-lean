@@ -26,6 +26,8 @@ Poincaré `R1.H1.R1` also [passed the pinned checker and was pushed](https://git
 
 The [stacked sphere-connectivity proof](https://github.com/senamakel/open-math-agents/tree/oma/poincare-sphere-simple) closes `R1.H4.R1.H1` against the proposed smooth reduction interface and passed the pinned checker with the three standard axioms. It adapts the published source at its Apache-2.0 revision, preserving the license and NOTICE. The registry requires the intermediate H4 reduction to merge before it can accept the single-file proof.
 
+Green 100(i) `R1.H1.R1` [passed the pinned checker and was pushed](https://github.com/senamakel/open-math-agents/tree/oma/green100-group-algebra-r1). It separates OpenAI's finite-field group-algebra counterexample to direct finiteness from the transfer of a one-sided inverse to an injective nonsurjective cellular map.
+
 ## Earlier attempts and follow-up candidates
 
 | Target | Recovered public evidence | Remaining work |
