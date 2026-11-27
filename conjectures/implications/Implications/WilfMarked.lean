@@ -14,6 +14,17 @@ namespace WilfMarked
 def sigma : Fin 8 → Fin 8 := ![0, 5, 1, 2, 6, 3, 7, 4]
 def tau : Fin 8 → Fin 8 := ![0, 5, 1, 3, 6, 2, 7, 4]
 
+def pair16238475 : Fin 8 → Fin 8 := ![0, 5, 1, 2, 7, 3, 6, 4]
+def pair16248375 : Fin 8 → Fin 8 := ![0, 5, 1, 3, 7, 2, 6, 4]
+def pair17236485 : Fin 8 → Fin 8 := ![0, 6, 1, 2, 5, 3, 7, 4]
+def pair17246385 : Fin 8 → Fin 8 := ![0, 6, 1, 3, 5, 2, 7, 4]
+def pair17238465 : Fin 8 → Fin 8 := ![0, 6, 1, 2, 7, 3, 5, 4]
+def pair17248365 : Fin 8 → Fin 8 := ![0, 6, 1, 3, 7, 2, 5, 4]
+def pair18237465 : Fin 8 → Fin 8 := ![0, 7, 1, 2, 6, 3, 5, 4]
+def pair18247365 : Fin 8 → Fin 8 := ![0, 7, 1, 3, 6, 2, 5, 4]
+def pair18236475 : Fin 8 → Fin 8 := ![0, 7, 1, 2, 5, 3, 6, 4]
+def pair18246375 : Fin 8 → Fin 8 := ![0, 7, 1, 3, 5, 2, 6, 4]
+
 def rankList (p : Fin 8 → Fin 8) : List Nat := List.ofFn fun i => (p i).val
 
 theorem rankList_get (p : Fin 8 → Fin 8) (i : Fin 8) :
@@ -72,6 +83,63 @@ theorem tau_overlap_compatible_only_at_5_or_7 (shift : Nat)
     rw [hf] at hok
     contradiction
   · exact Or.inr rfl
+
+theorem overlap_compatible_only_at_5_or_7_of_decide (p : Fin 8 → Fin 8)
+    (hcheck : ∀ shift, 1 ≤ shift → shift < 8 →
+      (overlapCompatible p shift = true ↔ shift = 5 ∨ shift = 7))
+    (shift : Nat) (hpos : 1 ≤ shift) (hsmall : shift < 8)
+    (hok : overlapCompatible p shift = true) : shift = 5 ∨ shift = 7 :=
+  (hcheck shift hpos hsmall).mp hok
+
+theorem overlap_check_pair16238475 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair16238475 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
+
+theorem overlap_check_pair16248375 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair16248375 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
+
+theorem overlap_check_pair17236485 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair17236485 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
+
+theorem overlap_check_pair17246385 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair17246385 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
+
+theorem overlap_check_pair17238465 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair17238465 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
+
+theorem overlap_check_pair17248365 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair17248365 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
+
+theorem overlap_check_pair18237465 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair18237465 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
+
+theorem overlap_check_pair18247365 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair18247365 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
+
+theorem overlap_check_pair18236475 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair18236475 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
+
+theorem overlap_check_pair18246375 : ∀ shift, 1 ≤ shift → shift < 8 →
+    (overlapCompatible pair18246375 shift = true ↔ shift = 5 ∨ shift = 7) := by
+  intro shift hpos hsmall
+  interval_cases shift <;> decide
 
 /-- The adjacent transposition of the fourth and sixth positions. -/
 def windowSwap (i : Fin 8) : Fin 8 :=
@@ -166,12 +234,33 @@ theorem same_pattern_start_distance {n : Nat} (π : Equiv.Perm (Fin n))
   · have h := tau_overlap_compatible_only_at_5_or_7 d (by omega) hts (by simpa [d] using hov)
     simpa [d] using h
 
+/-- Generic form of the overlap-distance argument, parameterized by the finite
+overlap check for a pattern. -/
+theorem same_pattern_start_distance_of_overlap {n : Nat} (π : Equiv.Perm (Fin n))
+    (p : Fin 8 → Fin 8)
+    (hoverlap : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
+    (s t : Nat) (hs : ContainsAt π s p) (ht : ContainsAt π t p)
+    (hst : s < t) (hts : t - s < 8) : t - s = 5 ∨ t - s = 7 := by
+  have hov := same_pattern_overlap_compatible π p s t hs ht hst hts
+  exact hoverlap (t - s) (by omega) hts (by simpa using hov)
+
 theorem same_pattern_starts_separated {n : Nat} (π : Equiv.Perm (Fin n))
     (p : Fin 8 → Fin 8) (hp : p = sigma ∨ p = tau)
     (s t : Nat) (hs : ContainsAt π s p) (ht : ContainsAt π t p)
     (hst : s < t) : 5 ≤ t - s := by
   by_cases hsmall : t - s < 8
   · rcases same_pattern_start_distance π p hp s t hs ht hst hsmall with h | h <;> omega
+  · omega
+
+/-- Every two occurrences are separated by at least five positions when the
+pattern has no compatible overlap shorter than five. -/
+theorem same_pattern_starts_separated_of_overlap {n : Nat} (π : Equiv.Perm (Fin n))
+    (p : Fin 8 → Fin 8)
+    (hoverlap : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
+    (s t : Nat) (hs : ContainsAt π s p) (ht : ContainsAt π t p)
+    (hst : s < t) : 5 ≤ t - s := by
+  by_cases hsmall : t - s < 8
+  · rcases same_pattern_start_distance_of_overlap π p hoverlap s t hs ht hst hsmall with h | h <;> omega
   · omega
 
 /-- The two positions exchanged by the local marked-window operation. -/
@@ -191,12 +280,36 @@ theorem swap_supports_disjoint {n : Nat} (π : Equiv.Perm (Fin n))
   simp [swapSupport] at hx hy
   rcases hx with hxs | hxs <;> rcases hy with hyt | hyt <;> omega
 
+theorem swap_supports_disjoint_of_overlap {n : Nat} (π : Equiv.Perm (Fin n))
+    (p : Fin 8 → Fin 8)
+    (hoverlap : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
+    (s t : Nat) (hs : ContainsAt π s p) (ht : ContainsAt π t p) (hne : s ≠ t) :
+    Disjoint (swapSupport s) (swapSupport t) := by
+  have hgap : 5 ≤ t - s ∨ 5 ≤ s - t := by
+    by_cases hst : s < t
+    · exact Or.inl (same_pattern_starts_separated_of_overlap π p hoverlap s t hs ht hst)
+    · have hts : t < s := by omega
+      exact Or.inr (same_pattern_starts_separated_of_overlap π p hoverlap t s ht hs hts)
+  rw [Finset.disjoint_left]
+  intro x hx hy
+  simp [swapSupport] at hx hy
+  rcases hx with hxs | hxs <;> rcases hy with hyt | hyt <;> omega
+
 theorem marked_starts_separated {n : Nat} (π : Equiv.Perm (Fin n))
     (p : Fin 8 → Fin 8) (hp : p = sigma ∨ p = tau) (marks : Finset Nat)
     (hmarks : ∀ s ∈ marks, ContainsAt π s p) :
     ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t := by
   intro s hs t ht hst
   have hgap := same_pattern_starts_separated π p hp s t (hmarks s hs) (hmarks t ht) hst
+  omega
+
+theorem marked_starts_separated_of_overlap {n : Nat} (π : Equiv.Perm (Fin n))
+    (p : Fin 8 → Fin 8)
+    (hoverlap : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
+    (marks : Finset Nat) (hmarks : ∀ s ∈ marks, ContainsAt π s p) :
+    ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t := by
+  intro s hs t ht hst
+  have hgap := same_pattern_starts_separated_of_overlap π p hoverlap s t (hmarks s hs) (hmarks t ht) hst
   omega
 
 theorem marked_starts_bounded {n : Nat} (π : Equiv.Perm (Fin n))
