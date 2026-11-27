@@ -102,6 +102,29 @@ CPU seconds, any failed invariant, or a 2 GiB limit event. Record incomplete
 slices as such. The aggregate census is complete only if every exact-edge mask
 file is complete and the four counts sum to 4,576,964.
 
+### Q6 profile upper-vertex pruning
+
+Before the next run, use the published exact Q6 profile as an additional
+sound pruning bound. The table gives `L(6,k)=26` only for `k=1,2`, `L(6,k)≤25`
+for `k=3`, and `L(6,k)≤24` for `k=4,...,8`; Huang's bound
+`L(6,k)+k≤32` excludes larger component counts at the relevant edge targets.
+Therefore an eligible Q6 forest with 26 edges has at most 2 components and at
+most 28 vertices; one with 25 edges has at most 3 components and at most 28
+vertices; targets 23 and 24 have at most 32 vertices. Prune as soon as the
+selected count exceeds the corresponding ceiling. This is a logically exact
+consequence of the paper's Q6 table and Huang bound, and attacks the large
+isolated-vertex tail directly.
+
+Retry the incomplete `E=26` slice once with this pruning, capped at 170 seconds
+and 6 billion nodes. This is not an exhausted range; the prior run stopped
+incompletely. Then run the remaining exact targets `E=25,24,23` in that order,
+each capped at 170 seconds and 6 billion nodes. Total additional compute is at
+most 690 CPU seconds; including prior measurements (about 186 CPU seconds),
+this remains below the 15-minute aggregate budget. Do not rerun any target that
+completes. If any target hits both its cap and its vertex bound without
+completing, preserve it as partial and stop that target; the remaining targets
+still proceed under the aggregate limit.
+
 ## Interpretation
 
 Finishing the count reproduces only the Q7 enumeration stage; it does not prove

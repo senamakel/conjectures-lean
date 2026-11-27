@@ -29,7 +29,7 @@ struct Search {
   bool within_limits() {
     if (nodes >= 6'000'000'000ULL ||
         ((nodes & 0xffff) == 0 &&
-         std::chrono::steady_clock::now() - start >= std::chrono::seconds(180))) {
+        std::chrono::steady_clock::now() - start >= std::chrono::seconds(170))) {
       stopped = true;
       return false;
     }
@@ -41,8 +41,9 @@ struct Search {
     if (!within_limits()) return;
     ++nodes;
     int remaining_count = std::popcount(remaining);
+    int max_vertices = target_edges >= 25 ? 28 : 32;
     if (edges > target_edges || edges + 2 * remaining_count < target_edges ||
-        vertices + remaining_count < 27)
+        vertices > max_vertices || vertices + remaining_count < 27)
       return;
     if (remaining == 0) {
       if (edges != target_edges || vertices < 27) return;
