@@ -200,16 +200,11 @@ theorem reciprocalPrimeSum_le_dyadic_harmonic :
         ring
       _ = D * ∑ j ∈ Finset.Icc 1 (Nat.log 2 N + 1), (1 : ℝ) / j := by rw [hsum_shift]
       _ ≤ D * (1 + Real.log ((Nat.log 2 N + 1 : ℕ) : ℝ)) := by
-        have hh : (∑ j ∈ Finset.Icc 1 (Nat.log 2 N + 1), (1 : ℝ) / j) ≤
-            1 + Real.log ((Nat.log 2 N + 1 : ℕ) : ℝ) := by
-        have h := harmonic_le_one_add_log (Nat.log 2 N + 1)
-        simpa [harmonic_eq_sum_Icc, Rat.cast_sum, Rat.cast_inv, Rat.cast_natCast] using h
-        exact mul_le_mul_of_nonneg_left hh (by dsimp [D]; positivity)
-      _ ≤ D * (1 + Real.log ((Nat.log 2 N + 1 : ℕ) : ℝ)) := by
         have h := harmonic_le_one_add_log (Nat.log 2 N + 1)
         have hh : (∑ j ∈ Finset.Icc 1 (Nat.log 2 N + 1), (1 : ℝ) / j) ≤
             1 + Real.log ((Nat.log 2 N + 1 : ℕ) : ℝ) := by
-          simpa [harmonic_eq_sum_Icc, Rat.cast_sum, Rat.cast_inv, Rat.cast_natCast] using h
+          convert h using 1 <;> simp only [harmonic_eq_sum_Icc, Rat.cast_sum,
+            Rat.cast_inv, Rat.cast_natCast, one_div]
         exact mul_le_mul_of_nonneg_left hh (by dsimp [D]; positivity)
 
 end Implications.SmoothPrimeReciprocal
