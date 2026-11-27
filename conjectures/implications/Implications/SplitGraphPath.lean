@@ -398,7 +398,8 @@ theorem hamiltonian_of_split_partition_row_bounds
       exact hamiltonian_of_split_partition_two_endpoints G C i j a b hC
         hpart hiC hjC hij ha hb hab hia hbj
     · have hCone : C.card = 1 := by omega
-      obtain ⟨c, hc, hCeq⟩ := Finset.card_eq_one.mp hCone
+      obtain ⟨c, hCeq⟩ := Finset.card_eq_one.mp hCone
+      have hc : c ∈ C := by simpa [hCeq]
       obtain ⟨i, j, hij, hIeq⟩ := Finset.card_eq_two.mp htwo
       have hci : G.Adj c i := by
         obtain ⟨d, hd, hdi⟩ := hcover i (by simp [hIeq])
@@ -408,10 +409,16 @@ theorem hamiltonian_of_split_partition_row_bounds
         obtain ⟨d, hd, hdj⟩ := hcover j (by simp [hIeq])
         have : d = c := by simpa [hCeq] using hd
         simpa [this] using hdj
+      have hiC : i ∉ C := by
+        intro hmem
+        exact (Finset.disjoint_left.mp hdisj) hmem hi
+      have hjC : j ∉ C := by
+        intro hmem
+        exact (Finset.disjoint_left.mp hdisj) hmem hj
       have hnodup : ([i, c, j] : List V).Nodup := by
-        simp [hdisj.not_mem_of_mem_left hi, hdisj.not_mem_of_mem_left hj, hij]
+        simp [hiC, hjC, hCeq, hij]
       have hchain : ([i, c, j] : List V).IsChain G.Adj := by
-        simp [List.isChain_cons, hci, hcj]
+        simp [List.isChain_cons, hci.symm, hcj]
       apply hamiltonian_of_list G [i, c, j] (by simp) hnodup hchain
       intro v
       have hv : v ∈ C ∪ I := by simpa [hpartition] using (Finset.mem_univ v)
@@ -427,14 +434,22 @@ theorem hamiltonian_of_split_partition_row_bounds
       let l := c :: m.toList
       have hmnodup : m.toList.Nodup := m.nodup_toList
       have hcnot : c ∉ m := by simp [m]
+      have hiC : i ∉ C := by
+        intro hmem
+        exact (Finset.disjoint_left.mp hdisj) hmem hi
       have hlnodup : l.Nodup := by simp [l, hcnot, hmnodup]
       have hlfin : l.toFinset = C := by
         ext x
-        simp [l, m, Finset.mem_erase]
+        simp [l, m, Finset.insert_erase hc]
       have hlchain : l.IsChain G.Adj := clique_order_chain G C hC l hlnodup hlfin
       have hchain : (i :: l).IsChain G.Adj := by
-        simp [List.isChain_cons, l, hci, hlchain]
-      apply hamiltonian_of_list G (i :: l) (by simp) (by simp [hdisj.not_mem_of_mem_left hi, hlnodup]) hchain
+        simp [List.isChain_cons, l, hci.symm, hlchain]
+      have hiNotL : i ∉ l := by
+        intro hil
+        apply hiC
+        simpa [hlfin] using (List.mem_toFinset.mpr hil)
+      have hnodup : (i :: l).Nodup := by simp [hiNotL, hlnodup]
+      apply hamiltonian_of_list G (i :: l) (by simp) hnodup hchain
       intro v
       have hv : v ∈ C ∪ I := by simpa [hpartition] using (Finset.mem_univ v)
       rcases Finset.mem_union.mp hv with hvC | hvI
