@@ -45,7 +45,7 @@ struct Search {
   std::uint64_t max_nodes;
   std::uint64_t nodes = 0, total_nodes = 0, labeled = 0, cyclic_leaves = 0;
   std::uint64_t forced_exclusions = 0, early_cycle_prunes = 0;
-  bool stopped = false, force_saturated_neighbors, early_cycle_check, use_capacity_bound;
+  bool stopped = false, fatal = false, force_saturated_neighbors, early_cycle_check, use_capacity_bound;
   std::ofstream masks;
   std::filesystem::path output_path, checkpoint_path;
   std::vector<Prefix> frontier;
@@ -74,7 +74,7 @@ struct Search {
 
   void emit(std::uint64_t selected) {
     masks.write(reinterpret_cast<const char *>(&selected), sizeof(selected));
-    if (!masks) { std::cerr << "failed writing mask output\n"; stopped = true; }
+    if (!masks) { std::cerr << "failed writing mask output\n"; stopped = fatal = true; }
     else ++labeled;
   }
 
@@ -116,7 +116,7 @@ struct Search {
       }
       int degree_sum = 0;
       for (int v = 0; v < (1 << dimension); ++v) if ((selected >> v) & 1U) degree_sum += degree[v];
-      if (degree_sum != 2 * edges) { std::cerr << "degree invariant failure\n"; stopped = true; return; }
+      if (degree_sum != 2 * edges) { std::cerr << "degree invariant failure\n"; stopped = fatal = true; return; }
       if (edges != vertices - components) { ++cyclic_leaves; return; }
       emit(selected); return;
     }
@@ -125,7 +125,7 @@ struct Search {
     if (replay && replay_depth < replay->size()) {
       Decision d = (*replay)[replay_depth];
       if (d.vertex != next || !(remaining & (std::uint64_t{1} << next))) {
-        std::cerr << "checkpoint prefix does not match traversal configuration\n"; stopped = true; return;
+        std::cerr << "checkpoint prefix does not match traversal configuration\n"; stopped = fatal = true; return;
       }
       // Replay the saved choice without consuming this invocation's node cap.
       const std::uint64_t rest = remaining & ~(std::uint64_t{1} << next);
@@ -134,7 +134,7 @@ struct Search {
       for (std::uint64_t t = adj; t; t &= t - 1) if (degree[std::countr_zero(t)] >= 2) can = false;
       if (d.include) {
         if (!can || (early_cycle_check && nd == 2 && dsu.find(std::countr_zero(adj)) ==
-            dsu.find(std::countr_zero(adj & (adj - 1))))) { std::cerr << "invalid include prefix\n"; stopped = true; return; }
+            dsu.find(std::countr_zero(adj & (adj - 1))))) { std::cerr << "invalid include prefix\n"; stopped = fatal = true; return; }
         auto mark = dsu.snapshot();
         if (early_cycle_check) { dsu.make_set(next); for (std::uint64_t t = adj; t; t &= t - 1) dsu.unite(next, std::countr_zero(t)); }
         for (std::uint64_t t = adj; t; t &= t - 1) ++degree[std::countr_zero(t)];
@@ -180,14 +180,21 @@ struct Search {
   void save_checkpoint() {
     if (checkpoint_path.empty()) return;
     masks.flush(); auto offset = masks.tellp();
+    if (!masks || offset < 0) { std::cerr << "failed flushing mask output for checkpoint\n"; fatal = true; return; }
     auto temp = checkpoint_path; temp += ".tmp";
     std::ofstream out(temp, std::ios::trunc);
+    if (!out) { std::cerr << "failed opening checkpoint temporary\n"; fatal = true; return; }
     out << "SNAKECP1 " << dimension << ' ' << target_edges << ' ' << minimum_vertices << ' '
         << force_saturated_neighbors << ' ' << early_cycle_check << ' ' << use_capacity_bound << ' '
         << static_cast<std::uint64_t>(offset) << ' ' << total_nodes << ' ' << labeled << ' ' << cyclic_leaves << '\n';
     out << frontier.size() << '\n';
     for (const auto &p : frontier) { out << p.size(); for (auto d : p) out << ' ' << d.vertex << ' ' << d.include; out << '\n'; }
-    out.close(); std::filesystem::rename(temp, checkpoint_path);
+    out.flush();
+    if (!out) { std::cerr << "failed writing checkpoint temporary\n"; fatal = true; return; }
+    out.close();
+    if (!out) { std::cerr << "failed closing checkpoint temporary\n"; fatal = true; return; }
+    std::error_code ec; std::filesystem::rename(temp, checkpoint_path, ec);
+    if (ec) { std::cerr << "failed replacing checkpoint: " << ec.message() << '\n'; fatal = true; }
   }
   bool load_checkpoint(std::uint64_t &offset) {
     std::ifstream in(checkpoint_path); std::string magic; int dim, target, minv, force, cycle, capacity;
@@ -196,7 +203,9 @@ struct Search {
         force != force_saturated_neighbors || cycle != early_cycle_check || capacity != use_capacity_bound) return false;
     std::size_t n; if (!(in >> n)) return false; frontier.clear();
     for (std::size_t i=0;i<n;++i) { std::size_t len; if (!(in>>len)) return false; Prefix p; for (std::size_t j=0;j<len;++j) { int v,b; if (!(in>>v>>b)) return false; p.push_back({v,b!=0}); } frontier.push_back(std::move(p)); }
-    return true;
+    if (offset % sizeof(std::uint64_t) != 0 || labeled != offset / sizeof(std::uint64_t)) return false;
+    std::error_code ec; auto size = std::filesystem::file_size(output_path, ec);
+    return !ec && size >= offset;
   }
 };
 
@@ -211,12 +220,14 @@ int main(int argc, char **argv) {
       std::string v=argv[++i]; if(a=="--dimension") dimension=std::stoi(v); else if(a=="--min-vertices") minv=std::stoi(v); else if(a=="--node-cap") cap=std::stoull(v); else checkpoint=v;
     } else return 2;
   }
-  if(dimension<2||dimension>6||target<0||minv<3||cap==0|| (resume&&checkpoint.empty())) return 2;
+  if(dimension<2||dimension>6||target<0||minv<3||cap==0|| (resume&&checkpoint.empty())||
+     (!checkpoint.empty() && std::filesystem::path(checkpoint)==std::filesystem::path(argv[2]))) return 2;
   Search s(target,argv[2],force,cycle,capacity,dimension,minv,cap,checkpoint);
   std::uint64_t offset=0;
   if(resume) {
     if(!s.load_checkpoint(offset)) { std::cerr<<"invalid or incompatible checkpoint\n"; return 2; }
-    std::filesystem::resize_file(argv[2],offset);
+    std::error_code ec; std::filesystem::resize_file(argv[2],offset,ec);
+    if(ec) { std::cerr<<"failed truncating output to checkpoint offset: "<<ec.message()<<'\n'; return 2; }
     s.masks.open(argv[2],std::ios::binary|std::ios::app);
   } else {
     s.masks.open(argv[2],std::ios::binary|std::ios::trunc);
@@ -231,7 +242,11 @@ int main(int argc, char **argv) {
     s.visit(s.initial_remaining(),0b111,3,2,2,force?(s.neighbors[0]):0,path,&tasks[i],0);
     if(s.stopped) { for(std::size_t j=i+1;j<tasks.size();++j) s.frontier.push_back(tasks[j]); break; }
   }
-  s.save_checkpoint(); s.masks.flush(); s.masks.close();
+  if (!s.fatal) s.save_checkpoint();
+  s.masks.flush();
+  if (!s.masks) { std::cerr<<"failed flushing mask output\n"; s.fatal=true; }
+  s.masks.close();
+  if (s.fatal) return 2;
   auto sec=std::chrono::duration<double>(std::chrono::steady_clock::now()-s.start).count();
   std::cout<<(s.frontier.empty()?"COMPLETE":"STOPPED")<<" target_edges="<<target<<" nodes="<<s.nodes
     <<" total_nodes="<<s.total_nodes<<" labeled="<<s.labeled<<" cyclic_leaves="<<s.cyclic_leaves
