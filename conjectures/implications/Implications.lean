@@ -51,3 +51,4 @@ import Implications.C4PolarityCounterAssignment
 import Implications.C4PolarityLratBridge
 import Implications.C4PolarityCertifiedFormula
 import Implications.C4PolarityFullAssignment
+import Implications.C4PolaritySymmetryCertificate

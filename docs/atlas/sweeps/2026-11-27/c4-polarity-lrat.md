@@ -44,3 +44,25 @@ to check the same trace directly on the reconstructed Lean formula. The replay
 validates the nonzero literal convention and calls the standard LRAT checker
 on the reconstruction itself. CaDiCaL 2.1.2 regenerated the trace byte for byte.
 Lean accepted all 114,126 actions. [CaDiCaL 2.1.2 release](https://github.com/arminbiere/cadical/releases/tag/rel-2.1.2)
+
+## Concrete Lean proof replay
+
+From the checkout root, regenerate `symmetry.lrat` as above and run:
+
+```sh
+scripts/check_c4_polarity_42_embedded.sh .lake/polarity-sat/symmetry.lrat
+```
+
+This elaborates `Implications.C4PolarityEmbedded.no_candidate` for the
+concrete order-seven graph. Its single mathematical hypothesis bounds the
+edges of every one-vertex deletion of a candidate retained graph by 132.
+The exact ordered list of 336 permutations is checked to consist of graph
+automorphisms, and the full trace is replayed on the formula constructed
+from that list. The replay artifact is generated locally; the Lean proof
+checks its contents even if a different artifact is supplied.
+
+The replay uses one `native_decide` axiom for the 114,126 LRAT actions
+(11,243,269 bytes) and signed literal validation. The automorphism check
+uses a separate finite `native_decide` certificate. The general The two target
+modules and replay took 44.47 seconds on the shared Lean 4.36.0 cache.
+42-vertex extremal question remains open.
