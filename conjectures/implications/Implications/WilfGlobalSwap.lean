@@ -48,9 +48,10 @@ private theorem left_to_right (marks : Finset Nat)
     (hsep : ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t)
     (i : Fin n) (hi : IsLeft marks i) :
     IsRight marks (swapIndex marks hbounded hsep i) := by
+  have hleft := hi
   obtain ⟨s, hs, hsi⟩ := hi
   refine ⟨s, hs, ?_⟩
-  simp only [swapIndex, dif_pos hi]
+  simp [swapIndex, hleft, hsi]
   omega
 
 private theorem right_to_left (marks : Finset Nat)
@@ -58,13 +59,13 @@ private theorem right_to_left (marks : Finset Nat)
     (hsep : ∀ s ∈ marks, ∀ t ∈ marks, s < t → s + 5 ≤ t)
     (i : Fin n) (hi : IsRight marks i) :
     IsLeft marks (swapIndex marks hbounded hsep i) := by
+  have hright := hi
   obtain ⟨s, hs, hsi⟩ := hi
   have hnot : ¬ IsLeft marks i := by
     intro hleft
-    exact no_left_right marks hsep i ⟨hleft, hi⟩
+    exact no_left_right marks hsep i ⟨hleft, hright⟩
   refine ⟨s, hs, ?_⟩
-  apply Fin.ext_iff.mp
-  simp only [swapIndex, dif_neg hnot, dif_pos hi]
+  simp [swapIndex, hnot, hright, hsi]
   omega
 
 theorem swapIndex_involutive (marks : Finset Nat)

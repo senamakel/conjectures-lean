@@ -73,7 +73,8 @@ theorem addVertex_c4Free_iff {V : Type*} (G : SimpleGraph V) (s : Set V) :
           | none => simp [addVertex] at htwo
           | some w =>
             simp only [addVertex] at *
-            exact (hS (x := z) (y := w) (z := y) hzw hxz htwo.1)
+            exact (hS (x := z) (y := w) (z := y)
+              (fun he => hzw (congrArg some he)) hxz htwo.1)
               ⟨G.symm.symm y z hyz, G.symm.symm y w htwo.2⟩
     | some x =>
       cases y with
@@ -85,7 +86,8 @@ theorem addVertex_c4Free_iff {V : Type*} (G : SimpleGraph V) (s : Set V) :
           | none => simp [addVertex] at htwo
           | some w =>
             simp only [addVertex] at *
-            exact (hS (x := z) (y := w) (z := x) hzw hyz htwo.2)
+            exact (hS (x := z) (y := w) (z := x)
+              (fun he => hzw (congrArg some he)) hyz htwo.2)
               ⟨G.symm.symm x z hxz, G.symm.symm x w htwo.1⟩
       | some y =>
         cases z with
@@ -94,15 +96,19 @@ theorem addVertex_c4Free_iff {V : Type*} (G : SimpleGraph V) (s : Set V) :
           | none => exact hzw rfl
           | some w =>
             simp only [addVertex] at *
-            exact (hS (x := x) (y := y) (z := w) hxy hxz hyz) htwo
+            exact (hS (x := x) (y := y) (z := w)
+              (fun he => hxy (congrArg some he)) hxz hyz) htwo
         | some z =>
           cases w with
           | none =>
             simp only [addVertex] at *
-            exact (hS (x := x) (y := y) (z := z) hxy hxz hyz) htwo
+            exact (hS (x := x) (y := y) (z := z)
+              (fun he => hxy (congrArg some he)) hxz hyz) htwo
           | some w =>
             simp only [addVertex] at *
-            exact (hG (x := x) (y := y) (z := z) (w := w) hxy hzw hxz hyz) htwo
+            exact (hG (x := x) (y := y) (z := z) (w := w)
+              (fun he => hxy (congrArg some he))
+              (fun he => hzw (congrArg some he)) hxz hyz) htwo
 
 #print axioms addVertex_c4Free_iff
 
