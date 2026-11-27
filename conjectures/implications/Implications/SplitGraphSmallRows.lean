@@ -217,6 +217,24 @@ theorem pairwise_intersecting_two_sets
         · subst q; exact (hzD hqD).elim
       exact hnotTriple x ⟨hwA, hwB, hwD⟩
 
+/-- Without a common center, there are at most three distinct two-element sets. -/
+theorem card_le_three_of_no_common_center
+    {α : Type*} [DecidableEq α] (F : Finset (Finset α))
+    (hne : F.Nonempty)
+    (hcard : ∀ A ∈ F, A.card = 2)
+    (hint : ∀ A ∈ F, ∀ B ∈ F, A ≠ B → ∃ x, x ∈ A ∧ x ∈ B)
+    (hno : ¬ ∃ x, ∀ A ∈ F, x ∈ A) : F.card ≤ 3 := by
+  obtain hcenter | htriangle := pairwise_intersecting_two_sets F hne hcard hint
+  · exact (hno hcenter).elim
+  · obtain ⟨a, b, c, hab, hac, hbc, hsub⟩ := htriangle
+    let S : Finset α := {a, b, c}
+    have hsubset : F ⊆ S.powersetCard 2 := by
+      intro A hA
+      exact Finset.mem_powersetCard.mpr ⟨by simpa [S] using hsub A hA, hcard A hA⟩
+    have hle := Finset.card_le_card hsubset
+    rw [Finset.card_powersetCard, show S.card = 3 by simp [S, hab, hac, hbc]] at hle
+    norm_num at hle ⊢
+
 /-! The exact family statement applied to clique rows. -/
 theorem clique_rows_two_set_structure
     {V : Type*} [Fintype V] [DecidableEq V]
