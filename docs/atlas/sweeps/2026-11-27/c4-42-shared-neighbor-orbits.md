@@ -38,3 +38,33 @@ Each case fixes all 15 edges among the six witnesses before emitting clauses.
 The shared-neighbor orbit reduction permutes all four roots, while the separate
 matching reduction distinguishes root 0. Applying both independently can lose
 cases, so the encoder accepts only one of the two switches at a time.
+
+## First solver screen
+
+Test cases 15 and 16 first. They are the only orbit representatives with four
+present shared edges, the maximum permitted by the local constraints. Present
+edges trigger two-step uniqueness and exact-degree propagation, so these cases
+may resolve faster than a split that fixes the root matching alone.
+
+Generate exactly these two formulas with the encoder and run CaDiCaL 2.1.2
+in parallel, with `--lrat --checkproof=2 -t 45`. Use an external 55-second
+wall limit, a 50-second CPU limit, and 2 GiB limits on address space and output
+file size per solver. Stop at SAT, UNSAT, a limit, or an error. The combined
+CPU budget is 100 seconds. Independently verify a model or replay a complete
+proof before counting a case as resolved.
+
+Both formulas had 8,804 variables and 243,530 clauses. Both solvers reached
+the configured wall limit and returned UNKNOWN with process exit code 0.
+
+| Case | Wall seconds | CPU seconds | Conflicts | Propagations | Peak KiB | Partial LRAT bytes |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 15 | 45.09 | 37.95 | 667,872 | 84,954,679 | 48,464 | 85,993,871 |
+| 16 | 45.02 | 38.59 | 679,622 | 81,013,610 | 51,556 | 101,326,334 |
+
+The DIMACS SHA-256 digests were:
+
+- Case 15: `5a289361235a24442448909b27a2403ecc2b07de21ed560ebdd8ac4a55bc9d7a`
+- Case 16: `9fec54b1978a8175b4ceaf2eb161cbd63da898081f82cf2ff0addba1cc9ae7fc`
+
+The partial traces provide no certificate and no model was emitted. Cases
+1–14 were outside the screen, and cases 15–16 remain unresolved at this cap.
