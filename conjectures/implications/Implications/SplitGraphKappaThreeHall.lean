@@ -40,11 +40,13 @@ theorem outside_anchor_le_one_of_rowDiff
   · let R := row S inc c
     let A := row S inc a
     have hdisj : Disjoint (A \ R) (R \ A) := by
-      simp [Finset.disjoint_left, Finset.mem_sdiff]
+      rw [Finset.disjoint_left]
+      intro x hx₁ hx₂
+      exact (Finset.mem_sdiff.mp hx₁).2 (Finset.mem_sdiff.mp hx₂).1
     have hdiffcard : (rowDiff S inc c a).card =
         (A \ R).card + (R \ A).card := by
-      change ((A \ R) ∪ (R \ A)).card = _
-      rw [Finset.card_union_of_disjoint hdisj]
+      rw [rowDiff]
+      simpa [A, R] using Finset.card_union_of_disjoint hdisj
     have hAc : A.card = (A \ R).card + (A ∩ R).card := by
       have := Finset.card_sdiff_add_card_inter A R
       omega
