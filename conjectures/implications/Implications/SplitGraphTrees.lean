@@ -6,7 +6,8 @@ Bridge lemmas for the split-graph case of Written on the Wall II #199.
 The Formal Conjectures helpers for largest induced trees are not a dependency of this package.
 We use the equivalent Mathlib-level premise `inducedTreeBound`: every induced tree has at most
 `k + 2` vertices. The star witness is proved from Mathlib's `starGraph`; the double-star witness
-is currently an explicit premise. This avoids depending on external declarations for
+is proved from connectedness and the fact that leaf vertices cannot occur in cycles. This avoids
+depending on external declarations for
 `largestInducedTreeSize`.
 -/
 
@@ -22,6 +23,172 @@ noncomputable def row (G : SimpleGraph V) (I : Finset V) (c : V) : Finset V := b
 /-- The symmetric difference of the rows of two clique vertices. -/
 noncomputable def rowDiff (G : SimpleGraph V) (I : Finset V) (c d : V) : Finset V :=
   (row G I c \ row G I d) ∪ (row G I d \ row G I c)
+
+/-- A vertex in the row difference belongs to the independent side and is adjacent
+to exactly one of the two clique vertices. -/
+theorem mem_rowDiff_iff (G : SimpleGraph V) (I : Finset V) (c d x : V) :
+    x ∈ rowDiff G I c d ↔ x ∈ I ∧
+      (G.Adj c x ∧ ¬ G.Adj d x ∨ G.Adj d x ∧ ¬ G.Adj c x) := by
+  classical
+  simp only [rowDiff, Finset.mem_union, Finset.mem_sdiff, row,
+    Finset.mem_filter]
+  tauto
+
+/-- The induced double star formed by a clique edge and the vertices seeing exactly one
+of its endpoints is a tree. -/
+theorem doubleStar_isTree (G : SimpleGraph V) (C I : Finset V) (c d : V)
+    (hC : G.IsClique (C : Set V)) (hI : G.IsIndepSet (I : Set V))
+    (hCI : Disjoint C I) (hc : c ∈ C) (hd : d ∈ C) (hcd : c ≠ d) :
+    (G.induce
+      ((insert c (insert d (rowDiff G I c d) : Finset V) : Finset V) : Set V)).IsTree := by
+  classical
+  let R := rowDiff G I c d
+  let S := insert c (insert d R)
+  let H := G.induce (S : Set V)
+  let c' : {x // x ∈ (S : Finset V)} := ⟨c, by simp [S]⟩
+  let d' : {x // x ∈ (S : Finset V)} := ⟨d, by simp [S, hcd]⟩
+  have hcdG : G.Adj c d := hC hc hd hcd
+  have hcR : c ∉ R := by
+    intro h
+    exact (Finset.disjoint_left.mp hCI hc) ((mem_rowDiff_iff G I c d c).mp h |>.1)
+  have hdR : d ∉ R := by
+    intro h
+    exact (Finset.disjoint_left.mp hCI hd) ((mem_rowDiff_iff G I c d d).mp h |>.1)
+  have hc'ne : c' ≠ d' := by
+    intro h
+    exact hcd (congrArg Subtype.val h)
+  have hc'd' : H.Adj c' d' := by
+    simp [H, c', d', hcdG]
+  have hleaf (x : {x // x ∈ (S : Finset V)}) (hxC : x ≠ c') (hxD : x ≠ d') :
+      (∀ y, H.Adj x y ↔ y = c') ∨ (∀ y, H.Adj x y ↔ y = d') := by
+    have hxR : x.val ∈ R := by
+      have hxS := x.property
+      change x.val ∈ insert c (insert d R) at hxS
+      simp only [Finset.mem_insert] at hxS
+      rcases hxS with h | h
+      · exact (hxC (Subtype.ext h)).elim
+      · rcases h with h | h
+        · exact (hxD (Subtype.ext h)).elim
+        · exact h
+    have hxI := (mem_rowDiff_iff G I c d x.val).mp hxR |>.1
+    rcases (mem_rowDiff_iff G I c d x.val).mp hxR |>.2 with hcx | hdx
+    · left
+      intro y
+      constructor
+      · intro hxy
+        have hxyG : G.Adj x.val y.val := by simpa [H] using hxy
+        have hyS := y.property
+        change y.val ∈ insert c (insert d R) at hyS
+        simp only [Finset.mem_insert] at hyS
+        rcases hyS with hyc | hy
+        · exact Subtype.ext hyc
+        · rcases hy with hyd | hyr
+          · have hxyG' : G.Adj x.val d := by simpa [hyd] using hxyG
+            exact (hcx.2 hxyG'.symm).elim
+          · have hyI := (mem_rowDiff_iff G I c d y.val).mp hyr |>.1
+            have hne : x.val ≠ y.val := fun h => G.irrefl (h ▸ hxyG)
+            exact (hI hxI hyI hne hxyG).elim
+      · rintro rfl
+        simpa [H, c'] using hcx.1.symm
+    · right
+      intro y
+      constructor
+      · intro hxy
+        have hxyG : G.Adj x.val y.val := by simpa [H] using hxy
+        have hyS := y.property
+        change y.val ∈ insert c (insert d R) at hyS
+        simp only [Finset.mem_insert] at hyS
+        rcases hyS with hyc | hy
+        · have hxyG' : G.Adj x.val c := by simpa [hyc] using hxyG
+          exact (hdx.2 hxyG'.symm).elim
+        · rcases hy with hyd | hyr
+          · exact Subtype.ext hyd
+          · have hyI := (mem_rowDiff_iff G I c d y.val).mp hyr |>.1
+            have hne : x.val ≠ y.val := fun h => G.irrefl (h ▸ hxyG)
+            exact (hI hxI hyI hne hxyG).elim
+      · rintro rfl
+        simpa [H, d'] using hdx.1.symm
+  have hconn : H.Connected := by
+    rw [SimpleGraph.connected_iff_exists_forall_reachable]
+    refine ⟨c', fun x => ?_⟩
+    by_cases hxc : x = c'
+    · simpa [hxc]
+    by_cases hxd : x = d'
+    · exact hxd ▸ hc'd'.reachable
+    · rcases hleaf x hxc hxd with hleft | hright
+      · exact ((hleft c').2 rfl).reachable.symm
+      · exact hc'd'.reachable.trans (((hright d').2 rfl).reachable.symm)
+  have hacyc : H.IsAcyclic := by
+    rw [SimpleGraph.isAcyclic_iff_forall_not_isCycle]
+    intro x p hp
+    have hx : x = c' ∨ x = d' := by
+      by_cases hxc : x = c'
+      · exact Or.inl hxc
+      by_cases hxd : x = d'
+      · exact Or.inr hxd
+      rcases hleaf x hxc hxd with hleft | hright
+      · have h1 := (hleft p.snd).mp (p.adj_snd hp.not_nil)
+        have h2 := (hleft p.penultimate).mp (p.adj_penultimate hp.not_nil).symm
+        exact (hp.snd_ne_penultimate (h1.trans h2.symm)).elim
+      · have h1 := (hright p.snd).mp (p.adj_snd hp.not_nil)
+        have h2 := (hright p.penultimate).mp (p.adj_penultimate hp.not_nil).symm
+        exact (hp.snd_ne_penultimate (h1.trans h2.symm)).elim
+    have hnoLeaf (z : {x // x ∈ (S : Finset V)}) (hz : z ∈ p.support)
+        (hzx : z ≠ x) : z = c' ∨ z = d' := by
+      by_cases hzc : z = c'
+      · exact Or.inl hzc
+      by_cases hzd : z = d'
+      · exact Or.inr hzd
+      rcases hleaf z hzc hzd with hleft | hright
+      · have hsub : (H.neighborSet z).Subsingleton := by
+          intro a ha b hb
+          change H.Adj z a at ha
+          change H.Adj z b at hb
+          exact ((hleft a).mp ha).trans ((hleft b).mp hb).symm
+        exact (hp.isTrail.notMem_support_of_subsingleton_neighborSet hzx hzx hsub) hz |>.elim
+      · have hsub : (H.neighborSet z).Subsingleton := by
+          intro a ha b hb
+          change H.Adj z a at ha
+          change H.Adj z b at hb
+          exact ((hright a).mp ha).trans ((hright b).mp hb).symm
+        exact (hp.isTrail.notMem_support_of_subsingleton_neighborSet hzx hzx hsub) hz |>.elim
+    have hsndMem : p.snd ∈ p.support :=
+      List.mem_of_mem_tail (p.snd_mem_tail_support hp.not_nil)
+    have hpenMem : p.penultimate ∈ p.support :=
+      List.mem_of_mem_dropLast (p.penultimate_mem_dropLast_support hp.not_nil)
+    have hsndX : p.snd ≠ x := by
+      intro h
+      have hadj := p.adj_snd hp.not_nil
+      rw [h] at hadj
+      exact H.irrefl hadj
+    have hpenX : p.penultimate ≠ x := by
+      intro h
+      have hadj := p.adj_penultimate hp.not_nil
+      rw [h] at hadj
+      exact H.irrefl hadj
+    have hsnd := hnoLeaf p.snd hsndMem hsndX
+    have hpen := hnoLeaf p.penultimate hpenMem hpenX
+    rcases hx with rfl | rfl
+    · have hsnd' : p.snd = d' := by
+        rcases hsnd with hsnd | hsnd
+        · exact (hsndX hsnd).elim
+        · exact hsnd
+      have hpen' : p.penultimate = d' := by
+        rcases hpen with hpen | hpen
+        · exact (hpenX hpen).elim
+        · exact hpen
+      exact hp.snd_ne_penultimate (hsnd'.trans hpen'.symm)
+    · have hsnd' : p.snd = c' := by
+        rcases hsnd with hsnd | hsnd
+        · exact hsnd
+        · exact (hsndX hsnd).elim
+      have hpen' : p.penultimate = c' := by
+        rcases hpen with hpen | hpen
+        · exact hpen
+        · exact (hpenX hpen).elim
+      exact hp.snd_ne_penultimate (hsnd'.trans hpen'.symm)
+  simpa [H, S, R] using (show H.IsTree from ⟨hconn, hacyc⟩)
+
 
 /-- A Mathlib-level formulation of the bound on the largest induced tree. -/
 def inducedTreeBound (G : SimpleGraph V) (k : ℕ) : Prop :=
@@ -92,11 +259,9 @@ theorem row_card_le (G : SimpleGraph V) (C I : Finset V) (k : ℕ)
 
 /-- The induced double-star bound controls the symmetric difference of every pair of rows. -/
 theorem row_symmDiff_card_le (G : SimpleGraph V) (C I : Finset V) (k : ℕ)
+    (hC : G.IsClique (C : Set V)) (hI : G.IsIndepSet (I : Set V))
     (hdisj : Disjoint C I)
-    (hTreeBound : inducedTreeBound G k)
-    (hDoubleStar : ∀ c ∈ C, ∀ d ∈ C, c ≠ d →
-      (G.induce
-        ((insert c (insert d (rowDiff G I c d) : Finset V) : Finset V) : Set V)).IsTree) :
+    (hTreeBound : inducedTreeBound G k) :
     ∀ c ∈ C, ∀ d ∈ C, c ≠ d → (rowDiff G I c d).card ≤ k := by
   classical
   intro c hc d hd hcd
@@ -121,7 +286,8 @@ theorem row_symmDiff_card_le (G : SimpleGraph V) (C I : Finset V) (k : ℕ)
   have hcdRow : c ∉ insert d (rowDiff G I c d) := by
     simp [hcd, hcRow]
   have hTree := hTreeBound
-    (insert c (insert d (rowDiff G I c d))) (hDoubleStar c hc d hd hcd)
+    (insert c (insert d (rowDiff G I c d)))
+    (doubleStar_isTree G C I c d hC hI hdisj hc hd hcd)
   rw [Finset.card_insert_of_notMem hcdRow, Finset.card_insert_of_notMem hdRow] at hTree
   omega
 
@@ -129,18 +295,18 @@ theorem row_symmDiff_card_le (G : SimpleGraph V) (C I : Finset V) (k : ℕ)
 theorem rows_bounded_of_inducedTreeBound
     (G : SimpleGraph V) (C I : Finset V) (k : ℕ)
     (hTreeBound : inducedTreeBound G k)
+    (hC : G.IsClique (C : Set V))
     (hI : G.IsIndepSet (I : Set V))
-    (hdisj : Disjoint C I)
-    (hDoubleStar : ∀ c ∈ C, ∀ d ∈ C, c ≠ d →
-      (G.induce
-        ((insert c (insert d (rowDiff G I c d) : Finset V) : Finset V) : Set V)).IsTree) :
+    (hdisj : Disjoint C I) :
     (∀ c ∈ C, (row G I c).card ≤ k + 1) ∧
       (∀ c ∈ C, ∀ d ∈ C, c ≠ d → (rowDiff G I c d).card ≤ k) := by
   exact ⟨row_card_le G C I k hI hTreeBound,
-    row_symmDiff_card_le G C I k hdisj hTreeBound hDoubleStar⟩
+    row_symmDiff_card_le G C I k hC hI hdisj hTreeBound⟩
 
 end SplitGraphTrees
 
 #print axioms SplitGraphTrees.star_isTree
+#print axioms SplitGraphTrees.mem_rowDiff_iff
+#print axioms SplitGraphTrees.doubleStar_isTree
 #print axioms SplitGraphTrees.row_card_le
 #print axioms SplitGraphTrees.row_symmDiff_card_le
