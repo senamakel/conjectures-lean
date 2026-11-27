@@ -168,6 +168,48 @@ end C4RootWitnessCountIdentity
 
 #print axioms C4RootWitnessCountIdentity.four_root_witness_weighted_count
 
+namespace C4RootWitnessCountIdentity
+
+private theorem cross_neighbor_sum_comm
+    {V : Type*} [Fintype V] [DecidableEq V]
+    (G : SimpleGraph V) [DecidableRel G.Adj] (A B : Finset V) :
+    (∑ x ∈ A, (G.neighborFinset x ∩ B).card) =
+      ∑ x ∈ B, (G.neighborFinset x ∩ A).card := by
+  classical
+  have hfilter (x : V) (T : Finset V) :
+      (G.neighborFinset x ∩ T).card = ∑ y ∈ T, if G.Adj x y then 1 else 0 := by
+    have hset : G.neighborFinset x ∩ T = T.filter (fun y => G.Adj x y) := by
+      ext y
+      simp [SimpleGraph.mem_neighborFinset, and_comm]
+    rw [hset, Finset.card_filter]
+  simp_rw [hfilter]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun y _ => Finset.sum_congr rfl fun x _ => ?_
+  simp [G.adj_comm]
+
+private theorem within_neighbor_sum_eq
+    {V : Type*} [Fintype V] [DecidableEq V]
+    (G : SimpleGraph V) [DecidableRel G.Adj] (A : Finset V) :
+    (∑ x ∈ A, (G.neighborFinset x ∩ A).card) =
+      2 * Implications.C4PolarityDeletion.inducedEdgeCount G A := by
+  classical
+  change (∑ x ∈ A, (G.neighborFinset x ∩ A).card) =
+    2 * (G.induce (A : Set V)).edgeFinset.card
+  rw [← (G.induce (A : Set V)).sum_degrees_eq_twice_card_edges]
+  rw [← Finset.sum_coe_sort A (fun x => (G.neighborFinset x ∩ A).card)]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  rw [SimpleGraph.degree]
+  refine Finset.card_bij
+    (fun y hy => (⟨y, (Finset.mem_inter.mp hy).2⟩ : {z : V // z ∈ A}))
+    (fun y hy => by
+      simp only [SimpleGraph.mem_neighborFinset, SimpleGraph.induce_adj]
+      exact (SimpleGraph.mem_neighborFinset G x y).mp
+        (Finset.mem_inter.mp hy).1)
+    (fun _ _ _ _ h => congrArg Subtype.val h)
+    (fun y hy => ⟨y.1, Finset.mem_inter.mpr
+      ⟨(SimpleGraph.mem_neighborFinset G x y.1).mpr
+        ((SimpleGraph.mem_neighborFinset _ x y).mp hy), y.2⟩, rfl⟩)
+
 /-- The local incidence identities imply the global outer-edge count. This
 form is independent of how the structural classes were constructed, so the
 graph-specific lemmas can feed it directly. -/
@@ -210,3 +252,5 @@ theorem outer_edge_count_from_local_counts
   omega
 
 #print axioms outer_edge_count_from_local_counts
+
+end C4RootWitnessCountIdentity
