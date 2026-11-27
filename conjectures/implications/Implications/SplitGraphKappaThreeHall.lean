@@ -18,6 +18,45 @@ variable {V : Type*} [Fintype V] [DecidableEq V]
 def row (S : Finset V) (inc : V → V → Prop) (c : V)
     [DecidableRel inc] : Finset V := S.filter (fun x => inc c x)
 
+/-- Symmetric difference between two rows. -/
+def rowDiff (S : Finset V) (inc : V → V → Prop) (c d : V)
+    [DecidableRel inc] : Finset V :=
+  row S inc c \\ row S inc d ∪ row S inc d \\ row S inc c
+
+/-- A full anchor row and pairwise symmetric difference at most three force
+every row to have at most one element outside the anchor. -/
+theorem outside_anchor_le_one_of_rowDiff
+    (C S : Finset V) (inc : V → V → Prop) [DecidableRel inc] (a : V)
+    (ha : a ∈ C)
+    (hanchor : (row S inc a).card = 4)
+    (hrow : ∀ c ∈ C, (row S inc c).card ≤ 4)
+    (hdiff : ∀ c ∈ C, c ≠ a → (rowDiff S inc c a).card ≤ 3) :
+    ∀ c ∈ C, ((row S inc c) \\ row S inc a).card ≤ 1 := by
+  classical
+  intro c hc
+  by_cases hca : c = a
+  · subst c
+    simp
+  · let R := row S inc c
+    let A := row S inc a
+    have hdisj : Disjoint (A \\ R) (R \\ A) := by
+      simp [Finset.disjoint_left]
+    have hdiffcard : (rowDiff S inc c a).card =
+        (A \\ R).card + (R \\ A).card := by
+      simp [rowDiff, A, R, Finset.card_union_of_disjoint hdisj]
+    have hAc : A.card = (A \\ R).card + (A ∩ R).card := by
+      have := Finset.card_sdiff_add_card_inter A R
+      omega
+    have hRc : R.card = (A ∩ R).card + (R \\ A).card := by
+      have := Finset.card_sdiff_add_card_inter R A
+      omega
+    have hAcard : A.card = 4 := hanchor
+    have hRcard : R.card ≤ 4 := hrow c hc
+    have hd := hdiff c hc hca
+    rw [hdiffcard] at hd
+    dsimp [A, R] at *
+    omega
+
 /-- Count incidences by rows or by left vertices. -/
 theorem sum_row_card_eq_sum_degree (C S : Finset V) (inc : V → V → Prop)
     [DecidableRel inc] :
@@ -143,6 +182,8 @@ theorem small_set_capacity_cut (s incidences capacity : ℕ)
 
 end SplitGraphKappaThreeHall
 
+#print axioms SplitGraphKappaThreeHall.sum_row_card_eq_sum_degree
+#print axioms SplitGraphKappaThreeHall.hall_deficit_one_of_single_anchor
 #print axioms SplitGraphKappaThreeHall.capacity_two_cut_from_incidence
 #print axioms SplitGraphKappaThreeHall.large_set_rows_force_small
 #print axioms SplitGraphKappaThreeHall.small_set_capacity_cut
