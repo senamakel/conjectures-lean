@@ -21,14 +21,14 @@ private theorem other_labels_ne
 /-- Translate the selected-row cardinalities for the one-overlap case into the
 exact incidence statements used by the path construction. -/
 private theorem selected_incidence_properties
-    (I : Finset V) (left right : V → V) (c i j : V)
+    (C I : Finset V) (left right : V → V) (c i j : V)
     (hi : i ∈ I) (hj : j ∈ I) (hij : i ≠ j)
     (hci : left i = c ∨ right i = c) (hcj : left j = c ∨ right j = c)
     (hcenterCard : (I.filter (fun k => left k = c ∨ right k = c)).card = 2)
-    (hrows : ∀ x ∈ Finset.univ, x ≠ c →
+    (hrows : ∀ x ∈ C, x ≠ c →
       (I.filter (fun k => left k = x ∨ right k = x)).card ≤ 1) :
     (∀ k ∈ I, (left k = c ∨ right k = c) ↔ k = i ∨ k = j) ∧
-    (∀ x ∈ Finset.univ, x ≠ c → ∀ k ∈ I, ∀ l ∈ I,
+    (∀ x ∈ C, x ≠ c → ∀ k ∈ I, ∀ l ∈ I,
       (left k = x ∨ right k = x) → (left l = x ∨ right l = x) → k = l) := by
   classical
   let row := I.filter (fun k => left k = c ∨ right k = c)
@@ -72,7 +72,7 @@ private theorem selected_incidence_properties
       rcases hkC with rfl | rfl
       · exact hci
       · exact hcj
-  have hunique : ∀ x ∈ Finset.univ, x ≠ c → ∀ k ∈ I, ∀ l ∈ I,
+  have hunique : ∀ x ∈ C, x ≠ c → ∀ k ∈ I, ∀ l ∈ I,
       (left k = x ∨ right k = x) → (left l = x ∨ right l = x) → k = l := by
     intro x hx hxne k hk l hl hki hli
     by_contra hkl
@@ -493,9 +493,9 @@ theorem hamiltonian_of_one_shared_selected_row
       (I.filter (fun k => left k = x ∨ right k = x)).card ≤ 1)
     (huniv : (Finset.univ : Finset V).Nonempty) :
     ∃ u v : V, ∃ p : G.Walk u v, p.IsHamiltonian := by
-  have hprops := selected_incidence_properties I left right c i j hi hj hij
+  have hprops := selected_incidence_properties C I left right c i j hi hj hij
     (Or.inr hrighti) (Or.inl hleftj) hcenterCard
-    (fun x _ hx => hrows x (Finset.mem_univ x) hx)
+    hrows
   exact hamiltonian_of_one_shared_selected_clique_vertex G C I hC hdisj hpartition
     left right hleftC hrightC hleftAdj hrightAdj hneq c a b i j hi hj hij
     hlefti hrighti hleftj hrightj hprops.1 hprops.2 huniv
