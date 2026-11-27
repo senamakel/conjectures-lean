@@ -135,7 +135,7 @@ theorem smallGapMultiHitBound {N Y j : ℕ} (S : Finset ℕ)
 allowed by the `maxPrimeFac` predicate, is bounded by Mathlib's square-root
 estimate for smooth numbers. The extra `1` accounts for zero, which is not a
 member of `Nat.smoothNumbers B`. -/
-theorem smoothGapUniverseCardBound (N B : ℕ) (hB : 0 < B) :
+theorem smoothGapUniverseCardBound (N B : ℕ) :
     ((Finset.range (primeAt N + 1)).filter (fun m => m.maxPrimeFac < B)).card ≤
       1 + 2 ^ B.primesBelow.card * (primeAt N).sqrt := by
   let U := (Finset.range (primeAt N + 1)).filter (fun m => m.maxPrimeFac < B)
@@ -144,23 +144,17 @@ theorem smoothGapUniverseCardBound (N B : ℕ) (hB : 0 < B) :
     have hmem := Finset.mem_filter.mp hm
     by_cases hm0 : m = 0
     · simp [hm0]
-    · right
+    · apply Finset.mem_insert_of_mem
       apply Nat.mem_smoothNumbersUpTo.mpr
-      refine ⟨Finset.mem_range.mp hmem.1 |>.le, ?_⟩
+      refine ⟨Nat.le_of_lt_succ (Finset.mem_range.mp hmem.1), ?_⟩
       apply Nat.mem_smoothNumbers'.2
       intro p hp hpd
-      by_cases hm1 : m = 1
-      · subst m
-        exact (hp.not_dvd_one hpd).elim
-      · have htwo : 1 < m := by omega
-        exact lt_of_le_of_lt (Nat.le_maxPrimeFac hm0 hp hpd) hmem.2
+      exact lt_of_le_of_lt (Nat.le_maxPrimeFac hm0 hp hpd) hmem.2
   calc
     U.card ≤ (insert 0 (Nat.smoothNumbersUpTo (primeAt N) B)).card :=
       Finset.card_le_card hsubset
     _ ≤ 1 + (Nat.smoothNumbersUpTo (primeAt N) B).card := by
-      by_cases hz : 0 ∈ Nat.smoothNumbersUpTo (primeAt N) B
-      · simp [Finset.card_insert_of_mem hz]
-      · simp [Finset.card_insert_of_not_mem hz]
+      simpa [Nat.add_comm] using Finset.card_insert_le 0 (Nat.smoothNumbersUpTo (primeAt N) B)
     _ ≤ 1 + 2 ^ B.primesBelow.card * (primeAt N).sqrt := by
       exact Nat.add_le_add_left (Nat.smoothNumbersUpTo_card_le _ _) 1
 
@@ -242,7 +236,7 @@ theorem cutoffHitCount (N B j : ℕ) (hB : 0 < B) :
     _ ≤ (j : ℝ) * primeAt N + (B : ℝ) * (U.card : ℝ) := add_le_add hLscaled hSscaled
 
 /-- The finite cutoff estimate with the smooth-number term evaluated using
-Mathlib's bound `2^π(B) * √p_N` (and one extra element for zero). -/
+Mathlib's bound using the number of primes strictly below `B` (and one extra element for zero). -/
 theorem cutoffHitCount_smoothNumbers (N B j : ℕ) (hB : 0 < B) :
     (B : ℝ) * j * (((Finset.range N).filter (fun r =>
       j ≤ ((Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
@@ -250,7 +244,7 @@ theorem cutoffHitCount_smoothNumbers (N B j : ℕ) (hB : 0 < B) :
       (j : ℝ) * primeAt N + (B : ℝ) *
         ((1 + 2 ^ B.primesBelow.card * (primeAt N).sqrt : ℕ) : ℝ) := by
   have hcut := cutoffHitCount N B j hB
-  have hsmooth := smoothGapUniverseCardBound N B hB
+  have hsmooth := smoothGapUniverseCardBound N B
   have hsmoothCast :
       ((((Finset.range (primeAt N + 1)).filter
         (fun m => m.maxPrimeFac < B)).card : ℕ) : ℝ) ≤
