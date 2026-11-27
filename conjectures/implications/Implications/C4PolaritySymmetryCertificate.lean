@@ -373,8 +373,15 @@ def rowCheck (p : List Nat) : Bool :=
       decide (graph.Adj (rowFunction p i) (rowFunction p j) ↔ graph.Adj i j)))
 
 theorem rowCheck_sound (p : List Nat) (hc : rowCheck p = true) : rowValid p := by
-  simp only [rowCheck, Bool.and_eq_true] at hc
-  rcases hc with ⟨hlen, hbounds, hinjective, hsurjective, hadj⟩
+  have hAdj := Bool.and_eq_true_iff.mp hc
+  have hSurj := Bool.and_eq_true_iff.mp hAdj.1
+  have hInj := Bool.and_eq_true_iff.mp hSurj.1
+  have hLength := Bool.and_eq_true_iff.mp hInj.1
+  have hlen := hLength.1
+  have hbounds := hLength.2
+  have hinjective := hInj.2
+  have hsurjective := hSurj.2
+  have hadj := hAdj.2
   have hlen' : p.length = 57 := of_decide_eq_true hlen
   have hb : ∀ i : Fin 57, p[i.val]! < 57 := by
     intro i
@@ -420,7 +427,9 @@ theorem rowFunction_list (p : List Nat) (h : rowValid p) :
   simp [rowFunction, List.getElem!_eq_getElem?_getD,
     List.getElem?_eq_getElem hnp]
   have hb := h.2.1 ⟨n, hn⟩
-  rw [Nat.mod_eq_of_lt hb]
+  have hl : p[n] < 57 := by
+    simpa [List.getElem!_eq_getElem?_getD, List.getElem?_eq_getElem hnp] using hb
+  exact (Nat.mod_eq_of_lt hl).symm
 
 /-- Concrete Lean interface for `no_candidate_of_checked_trace.hperms`. -/
 theorem hperms (p : List Nat) (hp : p ∈ symmetryRows) :
