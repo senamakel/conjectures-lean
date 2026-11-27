@@ -52,9 +52,12 @@ private theorem reverseIndex_eq {n : ℕ} (s : ℕ) (hs : s + 7 < n)
     (i : Fin 8) :
     Fin.revPerm ⟨s + (Fin.rev i).val, by have hi := (Fin.rev i).isLt; omega⟩ =
       ⟨n - 8 - s + i.val, by have hi := i.isLt; omega⟩ := by
+  have hi : (Fin.rev i).val = 7 - i.val := by simp [Fin.rev]
+  have hn : n - (s + (Fin.rev i).val + 1) = n - 8 - s + i.val := by
+    rw [hi]
+    omega
   apply Fin.ext
-  simp [Fin.revPerm_apply, Fin.rev]
-  omega
+  simpa [Fin.revPerm_apply, Fin.rev] using hn
 
 /-- A reversed permutation contains the reversed pattern at the reflected
 start exactly when the original permutation contains the original pattern. -/
@@ -87,13 +90,15 @@ private theorem containsAt_reverse_iff {n : ℕ} (π : Equiv.Perm (Fin n))
     have hj := reverseIndex_eq s.val hs j
     have hir := reverseIndex_eq s.val hs (Fin.rev i)
     have hjr := reverseIndex_eq s.val hs (Fin.rev j)
+    have hrr_i : Fin.rev (Fin.rev i) = i := Fin.rev_rev i
+    have hrr_j : Fin.rev (Fin.rev j) = j := Fin.rev_rev j
     have hcmp : (π (Fin.revPerm ⟨s.val + i.val, by
         have hk := i.isLt
         omega⟩) <
       π (Fin.revPerm ⟨s.val + j.val, by
         have hk := j.isLt
         omega⟩)) ↔ p (Fin.rev i) < p (Fin.rev j) := by
-      simpa [hir, hjr, Fin.rev, Fin.revPerm_apply] using h'
+      simpa [hir, hjr, hrr_i, hrr_j, Fin.rev, Fin.revPerm_apply] using h'
     simpa [reversePattern, Fin.revPerm_apply] using hcmp
 
 /-- Reversal maps the exact occurrence-start set to its reflected image. -/
@@ -116,19 +121,22 @@ theorem occurrenceSet_reverse {n : ℕ} (p : Fin 8 → Fin 8)
     rcases Finset.mem_map.mp hs with ⟨t, ht, hts⟩
     have hc := (Finset.mem_filter.mp ht).2
     have hvt := hc.1
-    have hts' := congrArg (reverseStartEquiv n) hts
-    have hts'' : t = reverseStartEquiv n s := by
-      simpa [reverseStartFun_involutive] using hts'
+    have hts0 : reverseStartFun t = s := by simpa [reverseStartEquiv] using hts
+    have hts' : t = reverseStartFun s := by
+      calc
+        t = reverseStartFun (reverseStartFun t) := (reverseStartFun_involutive t).symm
+        _ = reverseStartFun s := congrArg reverseStartFun hts0
     have hvs : s.val + 7 < n := by
       by_contra hbad
-      have hfix : reverseStartEquiv n s = s := by
-        simp [reverseStartEquiv, reverseStartFun, hbad]
-      rw [hfix] at hts''
-      have := congrArg Fin.val hts''
+      have hfix : reverseStartFun s = s := by simp [reverseStartFun, hbad]
+      rw [hfix] at hts'
+      have hvs : t.val = s.val := congrArg Fin.val hts'
       omega
+    have htsval : t.val = n - 8 - s.val := by
+      simpa [reverseStartFun, hvs] using congrArg Fin.val hts'
     have hsource : ContainsAt (Fin.revPerm.trans π) s.val (reversePattern p) := by
       apply (containsAt_reverse_iff π p s hvs).mpr
-      simpa [hts'', reverseStartEquiv, reverseStartFun, hvt] using hc
+      simpa [htsval] using hc
     exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, hsource⟩
 
 private theorem exactCount_eq_of_equiv_occurrenceSets {α β X Y : Type*}
@@ -148,8 +156,12 @@ private theorem exactCount_eq_of_equiv_occurrenceSets {α β X Y : Type*}
     Fintype.card_congr {
       toFun := fun x => ⟨eX x.1, by rw [h x.1, x.2]⟩
       invFun := fun y => ⟨eX.symm y.1, by
-        have hy := y.2
-        rw [← h (eX.symm y.1)] at hy
+        have hy : (occX (eX.symm y.1)).map eα.toEmbedding =
+            marks.map eα.toEmbedding := by
+          calc
+            (occX (eX.symm y.1)).map eα.toEmbedding = occY (eX (eX.symm y.1)) :=
+              (h (eX.symm y.1)).symm
+            _ = marks.map eα.toEmbedding := by simpa using y.2
         exact Finset.map_injective eα.toEmbedding hy⟩
       left_inv := by intro x; cases x; simp
       right_inv := by intro y; cases y; simp
@@ -169,10 +181,9 @@ theorem exactOccurrenceCount_eq_reverse (n : ℕ) (p : Fin 8 → Fin 8)
     WilfCounts.exactCount (occurrenceSet p) marks =
       WilfCounts.exactCount (occurrenceSet (reversePattern p))
         (marks.map (reverseStartEquiv n).toEmbedding) := by
-  apply exactCount_eq_of_equiv_occurrenceSets
+  exact exactCount_eq_of_equiv_occurrenceSets
     (occurrenceSet p) (occurrenceSet (reversePattern p))
     (reversePermEquiv n) (reverseStartEquiv n)
-  · exact occurrenceSet_reverse p
-  · exact marks
+    (occurrenceSet_reverse p) marks
 
 end Implications.WilfReversal
