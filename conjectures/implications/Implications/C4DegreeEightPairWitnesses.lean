@@ -223,6 +223,63 @@ theorem degree_eight_shared_private_degree_six_counts
   change B.card = 3 ∧ (A.filter fun x => (P x).card = 1).card = 4
   exact ⟨hB, by omega⟩
 
+/-- In the four-degree-eight case, the 16 vertices outside all four
+degree-eight neighborhoods consist of the four degree-eight vertices and
+12 vertices of degree seven. -/
+theorem degree_eight_outside_partition
+    (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    (hDel : ∀ v, C4Extremal42.inducedDeletionCount G v ≤ 132)
+    (he : G.edgeFinset.card = 138) (hC4 : C4VertexExtension.C4Free G)
+    (h8 : (Finset.univ.filter fun v => G.degree v = 8).card = 4) :
+    let D := Finset.univ.filter fun v => G.degree v = 8
+    let U := D.biUnion (fun v => G.neighborFinset v)
+    let E := (Finset.univ \ U).filter fun v => G.degree v = 7
+    Finset.univ \ U = D ∪ E ∧ Disjoint D E ∧ E.card = 12 := by
+  classical
+  dsimp only
+  let D := Finset.univ.filter fun v => G.degree v = 8
+  let U := D.biUnion (fun v => G.neighborFinset v)
+  let E := (Finset.univ \ U).filter fun v => G.degree v = 7
+  change Finset.univ \ U = D ∪ E ∧ Disjoint D E ∧ E.card = 12
+  have hwindow := C4DegreeBounds.degree_window_of_extremal_42 G hDel he hC4
+  have hDoutside (x : Fin 42) (hx : x ∈ D) : x ∉ U := by
+    intro hU
+    obtain ⟨v, hv, hxv⟩ := Finset.mem_biUnion.mp hU
+    have hcap := C4DegreeBounds.neighbor_degree_le_seven_of_degree_eight
+      G v (by simp) (fun z => (hwindow z).1) hC4 (Finset.mem_filter.mp hv).2 hxv
+    have hx8 := (Finset.mem_filter.mp hx).2
+    omega
+  have hpart : Finset.univ \ U = D ∪ E := by
+    ext x
+    constructor
+    · intro hout
+      have hxu := (Finset.mem_sdiff.mp hout).2
+      by_cases hx8 : G.degree x = 8
+      · exact Finset.mem_union_left _ (by simp [D, hx8])
+      · have hx6 : G.degree x ≠ 6 :=
+          fun hx => hxu (degree_six_vertex_in_degree_eight_union G hDel he hC4 h8 hx)
+        have hx := hwindow x
+        have hx7 : G.degree x = 7 := by omega
+        exact Finset.mem_union_right _ (Finset.mem_filter.mpr ⟨hout, hx7⟩)
+    · intro hx
+      rcases Finset.mem_union.mp hx with hd | hE
+      · exact Finset.mem_sdiff.mpr ⟨Finset.mem_univ _, hDoutside x hd⟩
+      · exact (Finset.mem_filter.mp hE).1
+  have hdis : Disjoint D E := by
+    apply Finset.disjoint_left.mpr
+    intro x hxD hxE
+    have hx8 := (Finset.mem_filter.mp hxD).2
+    have hx7 := (Finset.mem_filter.mp hxE).2
+    omega
+  have hUcard : U.card = 26 := degree_eight_neighborhood_union_card_eq_26 G hDel he hC4 h8
+  have hOutCard : (Finset.univ \ U).card = 16 := by
+    rw [Finset.card_sdiff_of_subset (Finset.subset_univ U), hUcard]
+    decide
+  rw [hpart, Finset.card_union_of_disjoint hdis] at hOutCard
+  have hDcard : D.card = 4 := h8
+  exact ⟨hpart, hdis, by omega⟩
+
+#print axioms degree_eight_outside_partition
 #print axioms degree_eight_shared_private_degree_six_counts
 #print axioms degree_eight_pair_has_unique_degree_six_neighbor
 #print axioms degree_eight_vertices_cover_four_degree_seven_neighbors
