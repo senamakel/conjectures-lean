@@ -153,7 +153,7 @@ private theorem containsAt_swapped_of_certificate (left : LeftOffset) {n : ℕ} 
   have hcompare (i : Fin 8) (hi : i ≠ 0) :
       π (f (m 0)) < π (f (m i)) ↔ p 0 < p (windowSwapAt left i) := by
     rw [hnonfirst i hi]
-    have hother : windowSwap i ≠ 0 := by
+    have hother : windowSwapAt left i ≠ 0 := by
       intro he
       exact hi ((windowSwapAt_involutive left).injective (he.trans hswap₀.symm))
     exact first_comparison left marks hb hd π p hcert hπ hs (windowSwapAt left i) hother

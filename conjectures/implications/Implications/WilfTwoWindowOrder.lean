@@ -51,12 +51,12 @@ theorem replacement_order_23167584 {α : Type*} [Preorder α] (f : Fin 13 → α
   · exact iff_of_true (haf.trans (hsecond 1 7 (by decide))) (by decide)
 
 /-- Lift any local order argument to two marked occurrences in a permutation. -/
-theorem lift_replacement_order {n : ℕ} (p : Fin 8 → Fin 8) (j : Fin 8)
+theorem lift_replacement_orderAt {n : ℕ} (offset : Fin 13) (p : Fin 8 → Fin 8) (j : Fin 8)
     (hlocal : ∀ f : Fin 13 → Fin n, WindowOrder p f 0 → WindowOrder p f 5 →
-      (f 3 < f (position 5 j) ↔ p 0 < p j))
+      (f offset < f (position 5 j) ↔ p 0 < p j))
     (π : Equiv.Perm (Fin n)) (t : ℕ) (ht : t + 12 < n)
     (hfirst : WilfMarked.ContainsAt π t p) (hsecond : WilfMarked.ContainsAt π (t + 5) p) :
-    π ⟨t + 3, by omega⟩ < π ⟨t + 5 + j.val, by have := j.isLt; omega⟩ ↔
+    π ⟨t + offset.val, by have := offset.isLt; omega⟩ < π ⟨t + 5 + j.val, by have := j.isLt; omega⟩ ↔
       p 0 < p j := by
   let f : Fin 13 → Fin n := fun k => π ⟨t + k.val, by have := k.isLt; omega⟩
   obtain ⟨_, hb₀⟩ := hfirst
@@ -68,6 +68,16 @@ theorem lift_replacement_order {n : ℕ} (p : Fin 8 → Fin 8) (j : Fin 8)
     intro i k hik
     simpa [f, position, Nat.add_assoc] using (hb₅ i k).mpr hik
   simpa [f, position, Nat.add_assoc] using hlocal f h₀ h₅
+
+/-- Lift any local order argument to two marked occurrences in a permutation. -/
+theorem lift_replacement_order {n : ℕ} (p : Fin 8 → Fin 8) (j : Fin 8)
+    (hlocal : ∀ f : Fin 13 → Fin n, WindowOrder p f 0 → WindowOrder p f 5 →
+      (f 3 < f (position 5 j) ↔ p 0 < p j))
+    (π : Equiv.Perm (Fin n)) (t : ℕ) (ht : t + 12 < n)
+    (hfirst : WilfMarked.ContainsAt π t p) (hsecond : WilfMarked.ContainsAt π (t + 5) p) :
+    π ⟨t + 3, by omega⟩ < π ⟨t + 5 + j.val, by have := j.isLt; omega⟩ ↔
+      p 0 < p j :=
+  lift_replacement_orderAt 3 p j hlocal π t ht hfirst hsecond
 
 /-- Lift the local certificate to two marked occurrences in a permutation. -/
 theorem replacement_order_of_occurrences {n : ℕ} (π : Equiv.Perm (Fin n))
