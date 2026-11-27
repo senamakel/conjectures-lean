@@ -91,3 +91,53 @@ unary counters. It works with either symmetry split or the unrestricted
 formula. The option is off by default, preserving earlier input hashes.
 The gate encoding was exhaustively checked on 1,024 small input assignments
 covering all four constant terms and both fixed Boolean values.
+
+## Screen with shared and outside degree balance
+
+The explicit degree-balance constraints can propagate the consequences of
+fixed shared edges before a two-step witness is chosen. This screen tests
+whether that makes any of the 16 cases resolve at a short cap. It uses the
+shared-neighbor split and the balance option for every case, including the
+two densest cases previously tested without balance.
+
+Emit each formula with `--shared-neighbor-case N --shared-outside-balance`.
+Run CaDiCaL 2.1.2 with `--lrat --checkproof=2 -t 60` and a 70-second
+external wall timeout, a 65-second CPU limit and 2 GiB limits on address
+space and output file size per case. Run at most eight solvers in parallel.
+Stop each at SAT, UNSAT, a resource limit, or an error. The total solver
+CPU budget is 1,040 seconds. Verify any SAT model or complete UNSAT trace
+independently before marking a case resolved.
+
+| Case | Solver status | CPU seconds | DIMACS SHA-256 |
+| ---: | --- | ---: | --- |
+| 1 | UNSAT | 54.04 | `04e203c18d69cd5dfec8c5f23ad4b6a5ffe4cc5bd3a8d451520174f096911357` |
+| 2 | UNKNOWN | 59.67 | `f1de4c6aa3eead03df374ccaf53bb16a2a3581f3796772cfa725b2c3f7127881` |
+| 3 | UNKNOWN | 59.69 | `3087d03486f67c0d3cc5a535635e9e9e274b0c95db319eeb9ae70c6accc2ea9b` |
+| 4 | UNKNOWN | 59.68 | `2b1330097e868eede8066c5bd8234539cab55c77bf43db97a4a7cfb9028a04ca` |
+| 5 | UNKNOWN | 59.75 | `6f3677b9ae7faf8d50d05566faf03e8afbced1f6c22c9bf3366d224a97134551` |
+| 6 | UNKNOWN | 59.53 | `8eb081f8a2e26ee0cb7fc4e5f23567ad6cfc48f5f087e3a30fe201bdf5728b7b` |
+| 7 | UNKNOWN | 59.73 | `c2d368030bf3a67595368150fb64a66a85626edeeeee5c31a01b148d2f1fa261` |
+| 8 | UNKNOWN | 59.67 | `d58c3b36b8c263ed306d59c7a4cf2607842ee8f545548706f51b948ab6f8438b` |
+| 9 | UNKNOWN | 58.65 | `1a748303ba87b228f68a4145141660038cad296db47e900b49ba1fb0e048f0ca` |
+| 10 | UNKNOWN | 59.51 | `f0f64634a252f52e4c8b04cffc88c2589115daa5a05e7fc3775640cec4b6142a` |
+| 11 | UNKNOWN | 58.09 | `98289b2d9852dab36c8c11a96949002aec00bbaa06c6d9002eb9ac1cb3cc3f2f` |
+| 12 | UNKNOWN | 59.27 | `3541e258e4e6ff72a0eb901a64b270bec775f8709704b877c6e02d49921afca6` |
+| 13 | UNKNOWN | 59.21 | `ef59bb8f0e9fed2213fdd973c1900f1626211bf6aca59c53ee9ca4aafdd42e53` |
+| 14 | UNKNOWN | 58.68 | `966255555e965ca8d2832950025f305e96839551111e0460e1df80886b3c17e5` |
+| 15 | UNKNOWN | 58.02 | `2658683f689cb983c370a360654b2e0fbdc2f8cc66dc40a43e72fdecb7a9be8f` |
+| 16 | UNKNOWN | 58.95 | `80a3974fa95930a0ca5aac09237d576d5288c4b5f1d7d7392e2224ca67cc23f8` |
+
+Case 1, the empty shared-neighbor pattern, finished in 54.30 wall seconds.
+It has 11,122 variables and 248,174 clauses. CaDiCaL exited 20 and emitted
+a complete binary LRAT trace with SHA-256
+`4abdfc93d8de33cbd13d096d2c9168bf30dacef5d45106230ae7739e0f6ecbf7`.
+Running `lake env lean --run ../../scripts/check_dimacs_lrat.lean FORMULA TRACE`
+from a built `conjectures/implications` checkout verified all 1,984,168 actions
+in 31.81 wall seconds. This checks the concrete DIMACS formula. A Lean proof
+that every empty-pattern graph gives a satisfying assignment to this exact
+formula is still needed for an end-to-end graph theorem. Cases 2–16 returned
+UNKNOWN and their partial traces certify no result.
+
+The mathematical weighted count is independently formalized as
+`C4RootWitnessCountIdentity.four_root_witness_weighted_count`. Lean reports
+the standard axioms `propext`, `Classical.choice`, and `Quot.sound`.
