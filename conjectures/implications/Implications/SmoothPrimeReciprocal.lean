@@ -272,14 +272,13 @@ theorem weighted_geometric_product_le_exp {s : Finset ℕ} {Y : ℝ} {σ : ℝ}
 
 /-- The prime Euler product at exponent `σ` is controlled by the reciprocal-prime
 mass, with the expected Rankin weight `Y^(1-σ)`. -/
-theorem primeEulerProduct_rankin_bound (Y : ℕ) (σ : ℝ) (hY2 : 2 ≤ Y)
-    (hσlo : 1 / 2 ≤ σ) (hσhi : σ ≤ 1) :
-    ∃ D : ℝ, 0 < D ∧
+theorem primeEulerProduct_rankin_bound :
+    ∃ D : ℝ, 0 < D ∧ ∀ (Y : ℕ) (σ : ℝ), 2 ≤ Y → 1 / 2 ≤ σ → σ ≤ 1 →
       (∏ p ∈ Y.primesBelow, (1 - ((p : ℝ) ^ σ)⁻¹)⁻¹) ≤
         Real.exp (4 * (Y : ℝ) ^ (1 - σ) * D *
           (1 + Real.log (((Nat.log 2 Y + 1 : ℕ) : ℝ)))) := by
   obtain ⟨D, hD, hrecip⟩ := reciprocalPrimeSum_le_dyadic_harmonic
-  refine ⟨D, hD, ?_⟩
+  refine ⟨D, hD, fun Y σ hY2 hσlo hσhi => ?_⟩
   let u : ℕ → ℝ := fun p => ((p : ℝ) ^ σ)⁻¹
   have hYpos : 0 < (Y : ℝ) := by exact_mod_cast (by omega : 0 < Y)
   have hlocal0 : ∀ p ∈ Y.primesBelow, 0 ≤ u p := by
