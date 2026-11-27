@@ -171,6 +171,55 @@ theorem thresholdGateDimacs_extend (assignment : Nat → Bool)
     literalValue_extendVariable_of_ne _ _ _ _ hbelow]
   exact hrec
 
+/-- One threshold gate with its allocated positive output identifier. -/
+structure ThresholdGate where
+  output : Nat
+  above : Int
+  input : Int
+  below : Int
+  deriving Repr
+
+/-- The Boolean value assigned to a gate output by its recurrence. -/
+def thresholdGateValue (assignment : Nat → Bool) (gate : ThresholdGate) : Bool :=
+  literalValue assignment gate.above ||
+    (literalValue assignment gate.input && literalValue assignment gate.below)
+
+/-- Extend an assignment at one gate output using its recurrence. -/
+def extendThresholdGate (assignment : Nat → Bool) (gate : ThresholdGate) : Nat → Bool :=
+  extendVariable assignment gate.output (thresholdGateValue assignment gate)
+
+/-- Extend an assignment through gates in allocation order. -/
+def extendThresholdGates (assignment : Nat → Bool) : List ThresholdGate → Nat → Bool
+  | [] => assignment
+  | gate :: gates => extendThresholdGates (extendThresholdGate assignment gate) gates
+
+/-- Gates are ordered when each output is fresh from its inputs and every
+later output is allocated after the current one. -/
+def ThresholdGate.Ordered : List ThresholdGate → Prop
+  | [] => True
+  | gate :: gates =>
+      0 < gate.output ∧
+      gate.above.natAbs < gate.output ∧
+      gate.input.natAbs < gate.output ∧
+      gate.below.natAbs < gate.output ∧
+      (∀ later ∈ gates, gate.output < later.output) ∧
+      Ordered gates
+
+theorem extendThresholdGates_preserves (assignment : Nat → Bool)
+    (gates : List ThresholdGate) (lit : Int)
+    (hfresh : ∀ gate ∈ gates, lit.natAbs ≠ gate.output) :
+    literalValue (extendThresholdGates assignment gates) lit =
+      literalValue assignment lit := by
+  induction gates generalizing assignment with
+  | nil => rfl
+  | cons gate gates ih =>
+      simp only [extendThresholdGates]
+      rw [ih]
+      · exact literalValue_extendVariable_of_ne assignment gate.output
+          (thresholdGateValue assignment gate) lit (hfresh gate (by simp))
+      · intro later hlater
+        exact hfresh later (by simp [hlater])
+
 /-- Build the clauses for one row, zipping `previous[k]`,
 `previous[k - 1]`, and the newly allocated output. -/
 def thresholdRowClauses (x : Int) (previous outputs : List Int) : List (List Int) :=
