@@ -25,6 +25,7 @@ import Implications.WilfEquivalence
 import Implications.C4Extremal42
 import Implications.C4DegreeBounds
 import Implications.C4DegreeEightCap
+import Implications.C4DegreeEightEquality
 import Implications.C4SeedCertificates
 import Implications.SmoothGapCounting
 import Implications.SmoothGapInfinitude
@@ -53,3 +54,4 @@ import Implications.C4PolarityCertifiedFormula
 import Implications.C4PolarityFullAssignment
 import Implications.C4PolaritySymmetryCertificate
 import Implications.C4PolaritySurvivorBound
+import Implications.C4Extremal42SearchConstraints

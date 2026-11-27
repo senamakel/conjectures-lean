@@ -27,7 +27,7 @@ def Ex41C4Bound : Prop :=
     Fintype.card α = 41 →
       C4VertexExtension.C4Free G → G.edgeSet.ncard ≤ 132
 
-private theorem c4Free_induce {α : Type*} (G : SimpleGraph α)
+theorem c4Free_induce {α : Type*} (G : SimpleGraph α)
     (hG : C4VertexExtension.C4Free G) (s : Set α) :
     C4VertexExtension.C4Free (G.induce s) := by
   intro x y z w hxy hzw hxz hyz htwo
