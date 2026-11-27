@@ -656,7 +656,7 @@ private theorem eventually_twoHitGapCount_tail_tendsto_zero :
     simp [one_div]
   have htail : Tendsto (fun n : ℕ =>
       Real.exp (3 * Real.log (primeAt n : ℝ) / 4) /
-        (2 * (n + 1 : ℝ))) atTop (nhds 0) := by
+        (n + 1 : ℝ)) atTop (nhds 0) := by
     have hlog : ∀ᶠ n : ℕ in atTop, 0 < Real.log (primeAt n : ℝ) := by
       filter_upwards [hp.eventually (eventually_gt_atTop (1 : ℝ))] with n hn
       exact Real.log_pos hn
@@ -666,9 +666,9 @@ private theorem eventually_twoHitGapCount_tail_tendsto_zero :
       exact Real.rpow_pos_of_pos hn _
     have hrewrite : ∀ᶠ n : ℕ in atTop,
         Real.exp (3 * Real.log (primeAt n : ℝ) / 4) /
-            (2 * (n + 1 : ℝ)) =
+            (n + 1 : ℝ) =
           ((primeAt n : ℝ) / (n + 1 : ℝ)) /
-            (2 * (primeAt n : ℝ) ^ (1 / 4 : ℝ)) := by
+            ((primeAt n : ℝ) ^ (1 / 4 : ℝ)) := by
       filter_upwards [hlog, hp.eventually (eventually_gt_atTop (0 : ℝ))] with n hln hpn
       have hidentity : Real.exp (3 * Real.log (primeAt n : ℝ) / 4) *
           (primeAt n : ℝ) ^ (1 / 4 : ℝ) = (primeAt n : ℝ) := by
@@ -680,8 +680,7 @@ private theorem eventually_twoHitGapCount_tail_tendsto_zero :
             Real.log (primeAt n : ℝ) := by ring
         rw [this, Real.exp_log hpn]
       rw [div_eq_div_iff (by positivity) (by positivity)]
-      field_simp
-      rw [hidentity]
+      nlinarith [hidentity]
     have hfactor : Tendsto (fun n : ℕ =>
         ((primeAt n : ℝ) / (n + 1 : ℝ)) /
           (2 * (primeAt n : ℝ) ^ (1 / 4 : ℝ))) atTop (nhds 0) := by
@@ -694,22 +693,24 @@ private theorem eventually_twoHitGapCount_tail_tendsto_zero :
           0 ≤ ((primeAt n : ℝ) / (n + 1 : ℝ)) /
             (2 * (primeAt n : ℝ) ^ (1 / 4 : ℝ)) ∧
           ((primeAt n : ℝ) / (n + 1 : ℝ)) /
-            (2 * (primeAt n : ℝ) ^ (1 / 4 : ℝ)) ≤
-              Real.log (primeAt n : ℝ) /
-                (primeAt n : ℝ) ^ (1 / 4 : ℝ) := by
+            ((primeAt n : ℝ) ^ (1 / 4 : ℝ)) ≤
+              2 * (Real.log (primeAt n : ℝ) /
+                (primeAt n : ℝ) ^ (1 / 4 : ℝ)) := by
         filter_upwards [hevent, hp.eventually (eventually_gt_atTop (0 : ℝ))]
           with n hn hp0
-        have hden : 0 < 2 * (primeAt n : ℝ) ^ (1 / 4 : ℝ) :=
-          mul_pos (by norm_num) (Real.rpow_pos_of_pos hp0 _)
+        have hden : 0 < (primeAt n : ℝ) ^ (1 / 4 : ℝ) :=
+          Real.rpow_pos_of_pos hp0 _
         constructor
         · positivity
-        · rw [div_le_div_iff₀ hden]
-          have hpow : 0 < (primeAt n : ℝ) ^ (1 / 4 : ℝ) :=
-            Real.rpow_pos_of_pos hp0 _
-          nlinarith
+        · calc
+            _ ≤ (2 * Real.log (primeAt n : ℝ)) /
+                (primeAt n : ℝ) ^ (1 / 4 : ℝ) :=
+              div_le_div_of_nonneg_right hn (le_of_lt hden)
+            _ = 2 * (Real.log (primeAt n : ℝ) /
+                (primeAt n : ℝ) ^ (1 / 4 : ℝ)) := by ring
       exact squeeze_zero' (by
         filter_upwards [hp.eventually (eventually_gt_atTop (0 : ℝ))] with n hn
-        positivity) (hbound.mono fun n hn => hn.2) hratio
+        positivity) (hbound.mono fun n hn => hn.2) (hratio.const_mul 2)
     exact hfactor.congr' (hrewrite.mono fun _ h => h.symm)
   have hsum := (hbase.add htail).const_mul (1 / 2 : ℝ)
   convert hsum using 1 <;> field_simp <;> ring
