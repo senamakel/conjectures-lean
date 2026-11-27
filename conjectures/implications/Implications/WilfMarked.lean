@@ -26,7 +26,6 @@ theorem sigma_overlap_compatible_only_at_5_or_7 (shift : Nat)
     (hpos : 1 ≤ shift) (hsmall : shift < 8)
     (hok : overlapCompatible sigmaList shift = true) : shift = 5 ∨ shift = 7 := by
   interval_cases shift
-  · omega
   · have hf : overlapCompatible sigmaList 1 = false := by decide
     rw [hf] at hok
     contradiction
