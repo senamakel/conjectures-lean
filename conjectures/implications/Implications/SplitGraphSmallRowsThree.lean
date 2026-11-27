@@ -67,17 +67,17 @@ theorem hamiltonian_of_prefix_and_remaining_chain
       rw [hlast] at hx
       exact hprefLastC x hx
     · have hlast : base.getLast? = rest.getLast? := by
-        simp [base, hrest]
+        change (pref ++ rest).getLast? = rest.getLast?
+        rw [List.getLast?_append_of_ne_nil _ hrest]
       rw [hlast] at hx
       exact hrestLastC x hx
   apply hamiltonian_of_list G (base ++ tail) (by simpa [base] using hne)
   · rw [List.nodup_append']
-    rw [List.disjoint_append]
-    refine ⟨?_, ?_⟩
-    · intro x hx hy
-      exact hbaseTailDisjoint x (List.mem_append_left _ hx) hy
-    · intro x hx hy
-      exact hbaseTailDisjoint x (List.mem_append_right _ hx) hy
+    rw [List.disjoint_left]
+    intro x hx hy
+    rcases List.mem_append.mp hx with hx | hx
+    · exact hbaseTailDisjoint x (List.mem_append_left _ hx) hy
+    · exact hbaseTailDisjoint x (List.mem_append_right _ hx) hy
   · rw [List.isChain_append]
     refine ⟨hbaseChain, ?_, ?_⟩
     · rw [List.isChain_iff_forall_rel_of_append_cons_cons]
@@ -143,7 +143,7 @@ theorem triangle_prefix_is_nodup_chain
     simp [List.isChain_cons, hax, hxb, hby, hyc, hcz]
   refine ⟨hnodup, hchain, ?_⟩
   intro v hv
-  have hvz : v = z := by simpa using hv
+  have hvz : z = v := by simpa using hv
   exact hvz ▸ hz
 
 /-- A triangle of selected pair rows supplies the prefix; any disjoint chain
