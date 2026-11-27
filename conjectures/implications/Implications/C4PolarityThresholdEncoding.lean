@@ -309,6 +309,21 @@ def thresholdRowClauses (x : Int) (previous outputs : List Int) : List (List Int
   ((previous.drop 1).zip (previous.take outputs.length)).zip outputs |>.flatMap
     (fun (ab, out) => thresholdGateDimacs ab.1 x ab.2 out)
 
+/-- Gate records represented by the exact tuples zipped in one emitted row. -/
+def thresholdRowGates (x : Int) (previous outputs : List Int) : List ThresholdGate :=
+  ((previous.drop 1).zip (previous.take outputs.length)).zip outputs |>.map
+    (fun (ab, out) => ⟨out.natAbs, ab.1, x, ab.2⟩)
+
+/-- The row clauses are exactly the concatenation of the corresponding gate
+clauses, when each output literal is the positive form of its variable. -/
+theorem thresholdRowClauses_eq_gateClauses (x : Int) (previous outputs : List Int)
+    (hout : ∀ out ∈ outputs, Int.ofNat out.natAbs = out) :
+    thresholdRowClauses x previous outputs =
+      (thresholdRowGates x previous outputs).flatMap
+        (fun gate => thresholdGateDimacs gate.above gate.input gate.below
+          (Int.ofNat gate.output)) := by
+  simp [thresholdRowClauses, thresholdRowGates, thresholdGateDimacs, hout]
+
 theorem thresholdRowClauses_length (x : Int) (previous outputs : List Int)
     (hprev : previous.length = outputs.length + 1) :
     (thresholdRowClauses x previous outputs).length = 4 * outputs.length := by
