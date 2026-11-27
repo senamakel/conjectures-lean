@@ -1,11 +1,13 @@
 import Mathlib
 
+/--!
 Bridge lemmas for the split-graph case of Written on the Wall II #199.
 
 The Formal Conjectures helpers for largest induced trees are not a dependency of this package.
 We use the equivalent Mathlib-level premise `inducedTreeBound`: every induced tree has at most
-`k + 2` vertices. The star and double-star trees are given explicitly as hypotheses here, so the
-resulting row bounds are independent of any external definition of `largestInducedTreeSize`.
+`k + 2` vertices. The star witness is proved from Mathlib's `starGraph`; the double-star witness
+is currently an explicit premise. This avoids depending on external declarations for
+`largestInducedTreeSize`.
 -/
 
 namespace SplitGraphTrees

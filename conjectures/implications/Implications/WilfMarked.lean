@@ -181,5 +181,10 @@ namespace WilfMarked
 #print axioms windowSwap_involutive
 #print axioms windowSwap_sigma
 #print axioms windowSwap_tau
+#print axioms sigma_overlap_compatible_only_at_5_or_7
+#print axioms tau_overlap_compatible_only_at_5_or_7
+#print axioms same_pattern_overlap_compatible
+#print axioms same_pattern_start_distance
+#print axioms same_pattern_starts_separated
 
 end WilfMarked
