@@ -1,13 +1,13 @@
 import Cramer.Main
 open Lean Meta
 
-def ours (env : Environment) (n : Name) : Option Name := do
+def oursMod (env : Environment) (n : Name) : Option Name := do
   let idx ← env.getModuleIdxFor? n
   let m := env.header.moduleNames[idx.toNat]!
   let r := m.getRoot
   if r == `Cramer || r == `Erdos985 || r == `Vendor then some m else none
 
-partial def closure (env : Environment) (roots : List Name) : NameSet := Id.run do
+partial def usedClosure (env : Environment) (roots : List Name) : NameSet := Id.run do
   let mut seen : NameSet := {}
   let mut stack := roots
   while !stack.isEmpty do
@@ -26,15 +26,15 @@ partial def closure (env : Environment) (roots : List Name) : NameSet := Id.run 
         | .inductInfo ii => cs := cs ++ ii.ctors
         | _ => pure ()
         for c in cs do
-          if !seen.contains c && (ours env c).isSome then stack := c :: stack
+          if !seen.contains c && (oursMod env c).isSome then stack := c :: stack
   return seen
 
 run_meta do
   let env ← getEnv
-  let used := closure env [`Cramer.cramer_of_RH]
+  let used := usedClosure env [`Cramer.cramer_of_RH]
   let mut out : Array String := #[]
   for (n, _) in env.constants.map₁.toList do
-    if let some m := ours env n then
+    if let some m := oursMod env n then
       if let some r ← findDeclarationRanges? n then
         let u := if used.contains n then 1 else 0
         out := out.push s!"{m}\t{n}\t{u}\t{r.range.pos.line}\t{r.range.pos.column}\t{r.range.endPos.line}\t{r.range.endPos.column}"
