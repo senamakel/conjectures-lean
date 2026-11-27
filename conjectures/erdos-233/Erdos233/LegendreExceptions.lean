@@ -157,10 +157,10 @@ theorem legendreBadGapIndices_subset_three_blocks (a : ℕ) (ha : 2 ≤ a)
   have hdiv : 2 ∣ a ^ 2 := by
     rw [pow_two]
     exact dvd_mul_of_dvd_left haEven a
-  have hfirst : 2 * (a ^ 2 / 2) = a ^ 2 := Nat.mul_div_cancel' hdiv
+  have hdivEq : 2 * (a ^ 2 / 2) = a ^ 2 := Nat.mul_div_cancel' hdiv
   have hfirstLower : a ^ 2 / 2 ≤ (squareGapIndex n).nth Nat.Prime := by
     have := hnextLower.trans hpnext_le
-    rw [← hfirst] at this
+    rw [← hdivEq] at this
     omega
   have hnlt : n ^ 2 < (2 * a) ^ 2 := Nat.pow_lt_pow_left hnhi (by decide)
   have hupperScale : (2 * a) ^ 2 = 4 * a ^ 2 := by ring
@@ -175,17 +175,22 @@ theorem legendreBadGapIndices_subset_three_blocks (a : ℕ) (ha : 2 ≤ a)
   · have hfirst' : (squareGapIndex n).nth Nat.Prime < 2 * (a ^ 2 / 2) := by
       calc
         (squareGapIndex n).nth Nat.Prime < a ^ 2 := hfirst
-        _ = 2 * (a ^ 2 / 2) := hfirst.symm
+        _ = 2 * (a ^ 2 / 2) := by omega
     have hmem := mem_block_of_nth_prime_bounds hfirstLower hfirst'
-    exact Finset.mem_union.mpr (Or.inl (Finset.mem_filter.mpr ⟨hmem, hlong⟩))
+    have hlongmem : squareGapIndex n ∈ longGapBlock (a ^ 2 / 2) (2 * a) := by
+      simp [longGapBlock, hmem, hlong]
+    exact Finset.mem_union.mpr (Or.inl hlongmem)
   · have hsecondLower : a ^ 2 ≤ (squareGapIndex n).nth Nat.Prime := le_of_not_gt hfirst
     by_cases hsecond : (squareGapIndex n).nth Nat.Prime < 2 * a ^ 2
     · have hmem := mem_block_of_nth_prime_bounds hsecondLower hsecond
-      exact Finset.mem_union.mpr (Or.inl (Finset.mem_union.mpr
-        (Or.inl (Finset.mem_filter.mpr ⟨hmem, hlong⟩))))
+      have hlongmem : squareGapIndex n ∈ longGapBlock (a ^ 2) (2 * a) := by
+        simp [longGapBlock, hmem, hlong]
+      exact Finset.mem_union.mpr (Or.inr (Finset.mem_union.mpr (Or.inl hlongmem)))
     · have hthirdLower : 2 * a ^ 2 ≤ (squareGapIndex n).nth Nat.Prime := le_of_not_gt hsecond
       have hmem := mem_block_of_nth_prime_bounds hthirdLower hlastUpper
-      exact Finset.mem_union.mpr (Or.inr (Finset.mem_filter.mpr ⟨hmem, hlong⟩))
+      have hlongmem : squareGapIndex n ∈ longGapBlock (2 * a ^ 2) (2 * a) := by
+        simp [longGapBlock, hmem, hlong]
+      exact Finset.mem_union.mpr (Or.inr (Finset.mem_union.mpr (Or.inr hlongmem)))
 
 /-- The total square-interval length in one block is bounded by the total length of
 the prime gaps which contain those intervals. -/
