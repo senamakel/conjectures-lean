@@ -151,4 +151,43 @@ theorem exactOccurrenceCount_eq_36215784_35216784 (n : ℕ) (marks : Finset (Fin
     (by intro d hd hs; interval_cases d <;> decide)
     (by intro d hd hs; interval_cases d <;> decide)
 
+private def pattern23147685 : Fin 8 → Fin 8 := ![1, 2, 0, 3, 6, 5, 7, 4]
+private def pattern23156784 : Fin 8 → Fin 8 := ![1, 2, 0, 4, 5, 6, 7, 3]
+private def pattern23157684 : Fin 8 → Fin 8 := ![1, 2, 0, 4, 6, 5, 7, 3]
+private def pattern23167584 : Fin 8 → Fin 8 := ![1, 2, 0, 5, 6, 4, 7, 3]
+private def pattern24156783 : Fin 8 → Fin 8 := ![1, 3, 0, 4, 5, 6, 7, 2]
+
+/-- The three patterns in archived block 42 have a common exact-count representative. -/
+theorem exactOccurrenceCount_eq_block42_common (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern26134785) marks =
+      WilfCounts.exactCount (occurrenceSet pattern23147685) marks := by
+  exact (WilfThreeCycleGlobal.exactOccurrenceCount_eq_26134785_23146785 n marks).trans
+    (WilfChainCertificate.exactOccurrenceCount_eq_23147685_23146785 n marks).symm
+
+/-- All four listed patterns in archived block 43 have a common exact-count representative. -/
+theorem exactOccurrenceCount_eq_block43_common (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern26135784) marks =
+      WilfCounts.exactCount (occurrenceSet pattern23167584) marks := by
+  exact (WilfThreeCycleGlobal.exactOccurrenceCount_eq_26135784_23156784 n marks).trans
+    ((WilfChainCertificate.exactOccurrenceCount_eq_23156784_23157684 n marks).trans
+      (WilfCertifiedSwap.exactOccurrenceCount_eq_23157684_23167584 n marks))
+
+/-- The two members of archived block 47 not already connected by its source edge agree. -/
+theorem exactOccurrenceCount_eq_block47_members (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (occurrenceSet pattern24156783) marks =
+      WilfCounts.exactCount (occurrenceSet pattern25146783) marks := by
+  exact (WilfThreeCycleGlobal.exactOccurrenceCount_eq_26145783_24156783 n marks).symm.trans
+    (exactOccurrenceCount_eq_26145783_25146783 n marks)
+
+#print axioms exactOccurrenceCount_eq_26134785_24136785
+#print axioms exactOccurrenceCount_eq_26135784_25136784
+#print axioms exactOccurrenceCount_eq_26145783_25146783
+#print axioms exactOccurrenceCount_eq_36124785_34126785
+#print axioms exactOccurrenceCount_eq_36214785_34216785
+#print axioms exactOccurrenceCount_eq_35126784_36125784
+#print axioms exactOccurrenceCount_eq_36215784_35216784
+#print axioms exactOccurrenceCount_eq_block42_common
+#print axioms exactOccurrenceCount_eq_block43_common
+#print axioms exactOccurrenceCount_eq_block47_members
+
 end Implications.WilfArchiveClosure
