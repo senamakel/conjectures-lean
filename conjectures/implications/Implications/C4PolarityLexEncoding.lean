@@ -313,6 +313,278 @@ theorem lexStep_extension (a : Nat → Bool) (pref x y same : Nat)
     · simpa [hbp, hbx, hby] using hsame
 
 
+theorem lexClauses_extend_of_constraint (a : Nat → Bool) (base : Nat)
+    (initialPref : Bool) (prefVar : Nat) (left right : List Nat)
+    (hlen : left.length = right.length)
+    (hpref0 : 0 < prefVar) (hprefBase : prefVar < base)
+    (hprefix : a prefVar = initialPref)
+    (hleftPos : ∀ x ∈ left, 0 < x) (hrightPos : ∀ y ∈ right, 0 < y)
+    (hleftBound : ∀ x ∈ left, x < base) (hrightBound : ∀ y ∈ right, y < base)
+    (hconstraint : lexConstraint initialPref (left.map a) (right.map a) = true) :
+    cnfValue (lexAssignment a base initialPref left right)
+      (lexClauses prefVar base left right) = true := by
+  induction left generalizing right base initialPref prefVar a with
+  | nil =>
+      cases right with
+      | nil => simp [lexClauses, cnfValue]
+      | cons y ys => simp at hlen
+  | cons x xs ih =>
+      cases right with
+      | nil => simp at hlen
+      | cons y ys =>
+          simp only [List.length_cons, Nat.succ.injEq] at hlen
+          have hxpos : 0 < x := hleftPos x (by simp)
+          have hypos : 0 < y := hrightPos y (by simp)
+          have hxbound : x < base := hleftBound x (by simp)
+          have hybound : y < base := hrightBound y (by simp)
+          have htailL : ∀ z ∈ xs, z < base := by
+            intro z hz
+            exact hleftBound z (by simp [hz])
+          have htailR : ∀ z ∈ ys, z < base := by
+            intro z hz
+            exact hrightBound z (by simp [hz])
+          have htailLp : ∀ z ∈ xs, 0 < z := by
+            intro z hz
+            exact hleftPos z (by simp [hz])
+          have htailRp : ∀ z ∈ ys, 0 < z := by
+            intro z hz
+            exact hrightPos z (by simp [hz])
+          by_cases hxy : x = y
+          · subst y
+            have hconstraint' :
+                lexConstraint initialPref (xs.map a) (ys.map a) = true := by
+              have h := (Bool.and_eq_true_iff.mp hconstraint).2
+              simpa using h
+            have hassign : lexAssignment a base initialPref (x :: xs) (x :: ys) =
+                lexAssignment a base initialPref xs ys := by
+              funext n
+              simp [lexAssignment, lexPrefixScan]
+            rw [hassign]
+            simp only [lexClauses, beq_self_eq_true, ite_true]
+            exact ih a base initialPref prefVar ys hlen hpref0 hprefBase hprefix
+              htailLp htailRp htailL htailR hconstraint'
+          · have hconstraint' :
+                ((!initialPref || a x || !a y) &&
+                  lexConstraint (initialPref && (a x == a y)) (xs.map a) (ys.map a)) = true := by
+              change ((!initialPref || a x || !a y) &&
+                lexConstraint (initialPref && (a x == a y)) (xs.map a) (ys.map a)) = true at hconstraint
+              exact hconstraint
+            rcases Bool.and_eq_true_iff.mp hconstraint' with ⟨hguard, htailConstraint⟩
+            let nextPref := initialPref && (a x == a y)
+            let g := lexAssignment a base initialPref (x :: xs) (y :: ys)
+            have hgpref : g prefVar = initialPref := by
+              dsimp [g]
+              rw [lexAssignment_preserves_below_base a base initialPref (x :: xs) (y :: ys)
+                hprefBase]
+              exact hprefix
+            have hgx : g x = a x := by
+              dsimp [g]
+              exact lexAssignment_preserves_below_base a base initialPref (x :: xs) (y :: ys) hxbound
+            have hgy : g y = a y := by
+              dsimp [g]
+              exact lexAssignment_preserves_below_base a base initialPref (x :: xs) (y :: ys) hybound
+            have hscanPos : 0 < (lexPrefixScan a initialPref (x :: xs) (y :: ys)).length := by
+              simp [lexPrefixScan, hxy]
+            have hgb : g base = nextPref := by
+              dsimp [g]
+              simpa [nextPref, lexPrefixScan, hxy] using
+                (lexAssignment_fresh_id a base initialPref (x :: xs) (y :: ys)
+                  (k := 0) (by simpa using hscanPos))
+            have hstep : cnfValue g (lexStepClauses prefVar x y base) = true := by
+              apply lexStep_auxiliary_assignment_satisfies g prefVar x y base hpref0 hxpos hypos
+              · omega
+              · simpa [hgpref, hgx, hgy] using hguard
+              · simp [hgpref, hgx, hgy, hgb, nextPref]
+            have hassign :
+                lexAssignment a base initialPref (x :: xs) (y :: ys) =
+                  lexAssignment (extendVariable a base nextPref) (base + 1)
+                    nextPref xs ys := by
+              simpa [nextPref] using
+                lexAssignment_cons_neq a base initialPref x y xs ys hxy hxbound hybound htailL htailR
+            have htailSat :
+                cnfValue (lexAssignment (extendVariable a base nextPref) (base + 1)
+                  nextPref xs ys) (lexClauses base (base + 1) xs ys) = true := by
+              have hext (z : Nat) (hz : z < base) :
+                  extendVariable a base nextPref z = a z := by
+                simp [extendVariable, Nat.ne_of_lt hz]
+              have hmapL : xs.map (extendVariable a base nextPref) = xs.map a :=
+                List.map_congr_left (fun z hz => hext z (htailL z hz))
+              have hmapR : ys.map (extendVariable a base nextPref) = ys.map a :=
+                List.map_congr_left (fun z hz => hext z (htailR z hz))
+              exact ih (extendVariable a base nextPref) (base + 1) nextPref base ys hlen
+                (by omega) (by omega) (by simp [extendVariable]) htailLp htailRp
+                (fun z hz => by have := htailL z hz; omega)
+                (fun z hz => by have := htailR z hz; omega)
+                (by simpa [hmapL, hmapR, nextPref] using htailConstraint)
+            have htailSat' : cnfValue g (lexClauses base (base + 1) xs ys) = true := by
+              dsimp [g]
+              rw [hassign]
+              exact htailSat
+            simp only [lexClauses, ite_eq_right (show ¬ (x == y) = true by simpa using hxy)]
+            simpa only [cnfValue, List.all_append, Bool.and_eq_true] using And.intro hstep htailSat'
+
+/-- On equal-length lists, the encoder's comparator agrees with Lean's
+lexicographic order on Boolean lists. -/
+theorem lexAtLeast_eq_true_of_le (left right : List Bool)
+    (hlen : left.length = right.length) (hle : right ≤ left) :
+    lexAtLeast left right = true := by
+  induction left generalizing right with
+  | nil =>
+    cases right with
+    | nil => rfl
+    | cons y ys => simp at hlen
+  | cons x xs ih =>
+    cases right with
+    | nil => simp at hlen
+    | cons y ys =>
+      simp only [List.length_cons, Nat.succ.injEq] at hlen
+      rw [le_iff_lt_or_eq] at hle
+      rcases hle with hlt | heq
+      · change List.Lex (· < ·) (y :: ys) (x :: xs) at hlt
+        rcases List.cons_lex_cons_iff.mp hlt with hxy | ⟨heq, ht⟩
+        · cases x <;> cases y <;> simp_all [lexAtLeast] <;> exact (by decide : ¬ true < false) hxy
+        · subst y
+          have ht' : ys < xs := ht
+          simp [lexAtLeast, ih ys hlen ht'.le]
+      · cases List.cons.inj heq with
+        | intro hxy htail =>
+          subst y
+          subst ys
+          simp [lexAtLeast, ih xs rfl le_rfl]
+
+private theorem lexNext_ge (base : Nat) (left right : List Nat) :
+    base ≤ lexNext base left right := by rw [lexNext_eq]; omega
+
+private theorem lexClauses_ids_lt_next (pref base : Nat) (left right : List Nat)
+    (hp : pref < base) (hl : ∀ v ∈ left, v < base) (hr : ∀ v ∈ right, v < base) :
+    ∀ clause ∈ lexClauses pref base left right, ∀ l ∈ clause,
+      l.natAbs < lexNext base left right := by
+  induction left generalizing right pref base with
+  | nil => cases right <;> simp [lexClauses]
+  | cons x xs ih =>
+    cases right with
+    | nil => simp [lexClauses]
+    | cons y ys =>
+      have hx := hl x (by simp)
+      have hy := hr y (by simp)
+      have hxs v (hv : v ∈ xs) := hl v (by simp [hv])
+      have hys v (hv : v ∈ ys) := hr v (by simp [hv])
+      by_cases hxy : x = y
+      · simpa [lexClauses, lexNext, hxy] using ih pref base ys hp hxs hys
+      · simp only [lexClauses, lexNext, show (x == y) = false by simp [hxy], Bool.false_eq_true,
+          ↓reduceIte]
+        intro clause hc l hLit
+        rcases List.mem_append.mp hc with hStep | hTail
+        · have hb : base < lexNext (base + 1) xs ys :=
+            lt_of_lt_of_le (by omega) (lexNext_ge (base + 1) xs ys)
+          simp [lexStepClauses] at hStep
+          rcases hStep with rfl | rfl | rfl | rfl | rfl | rfl <;>
+            simp [pos, neg] at hLit <;> rcases hLit with rfl | rfl | rfl | rfl | rfl <;>
+            (try simp only [pos, neg, Int.natAbs_negOfNat]) <;> omega
+        · exact ih base (base + 1) ys (by omega)
+            (fun v hv => Nat.lt_succ_of_lt (hxs v hv))
+            (fun v hv => Nat.lt_succ_of_lt (hys v hv)) clause hTail l hLit
+
+/-- Assign every fresh variable in every comparison, in the same order as
+the encoder. The original deletion variables are retained at each step. -/
+def orbitLexAssignment (truth next : Nat) (deleted : List Nat) :
+    (Nat → Bool) → List (List Nat) → Nat → Bool
+  | a, [] => a
+  | a, permutation :: rest =>
+    let image := permutationVariables deleted permutation
+    orbitLexAssignment truth (lexNext next deleted image) deleted
+      (lexAssignment a next (a truth) deleted image) rest
+
+theorem orbitLexAssignment_preserves (truth next : Nat) (deleted : List Nat)
+    (a : Nat → Bool) (permutations : List (List Nat)) (n : Nat) (hn : n < next) :
+    orbitLexAssignment truth next deleted a permutations n = a n := by
+  induction permutations generalizing next a with
+  | nil => rfl
+  | cons p ps ih =>
+    simp only [orbitLexAssignment]
+    rw [ih _ _ (lt_of_lt_of_le hn (lexNext_ge _ _ _))]
+    exact lexAssignment_preserves_below_base _ _ _ _ _ hn
+
+private theorem cnfValue_congr_of_bound (a b : Nat → Bool) (cs : List (List Int))
+    (bound : Nat) (hab : ∀ n < bound, a n = b n)
+    (hc : ∀ c ∈ cs, ∀ l ∈ c, l.natAbs < bound) :
+    cnfValue a cs = cnfValue b cs := by
+  unfold cnfValue
+  apply Bool.eq_iff_iff.mpr
+  simp only [List.all_eq_true]
+  have heq (c : List Int) (hmem : c ∈ cs) : clauseValue a c = clauseValue b c := by
+    unfold clauseValue
+    apply Bool.eq_iff_iff.mpr
+    simp only [List.any_eq_true]
+    have hl (l : Int) (hm : l ∈ c) : literalValue a l = literalValue b l := by
+      have hb := hc c hmem l hm
+      cases l with
+      | ofNat n => exact hab n hb
+      | negSucc n =>
+        change (!(a (n + 1))) = (!(b (n + 1)))
+        rw [hab (n + 1) hb]
+    exact ⟨fun ⟨l,hm,hv⟩ => ⟨l,hm,hl l hm ▸ hv⟩,
+      fun ⟨l,hm,hv⟩ => ⟨l,hm,(hl l hm).symm ▸ hv⟩⟩
+  exact ⟨fun h c hm => heq c hm ▸ h c hm, fun h c hm => (heq c hm).symm ▸ h c hm⟩
+
+/-- A common valuation satisfies every signed lex clause in the generated
+orbit, provided each input bit-vector comparison holds. -/
+theorem orbitLexClauses_satisfied (truth next : Nat) (deleted : List Nat)
+    (a : Nat → Bool) (permutations : List (List Nat))
+    (ht0 : 0 < truth) (ht : truth < next) (hta : a truth = true)
+    (hd : ∀ n ∈ deleted, 0 < n ∧ n < next)
+    (hp : ∀ p ∈ permutations, p.length = deleted.length ∧
+      (∀ i ∈ p, i < deleted.length) ∧
+      lexAtLeast (deleted.map a) ((permutationVariables deleted p).map a) = true) :
+    cnfValue (orbitLexAssignment truth next deleted a permutations)
+      (orbitLexClauses truth next deleted permutations) = true := by
+  induction permutations generalizing next a with
+  | nil => rfl
+  | cons p ps ih =>
+    let image := permutationVariables deleted p
+    let stop := lexNext next deleted image
+    let b := lexAssignment a next true deleted image
+    let out := orbitLexAssignment truth stop deleted b ps
+    have hstop := lexNext_ge next deleted image
+    have hpres {n : Nat} (hn : n < next) : b n = a n :=
+      lexAssignment_preserves_below_base a next true deleted image hn
+    have hvec (q : List Nat) (hq : ∀ i ∈ q, i < deleted.length) :
+        ∀ n ∈ permutationVariables deleted q, 0 < n ∧ n < next := by
+      intro n hn
+      obtain ⟨i,hi,rfl⟩ := List.mem_map.mp hn
+      have hlt := hq i hi
+      rw [List.getElem!_eq_getElem?_getD, List.getElem?_eq_getElem hlt]
+      exact hd _ (List.getElem_mem _)
+    obtain ⟨hlen, hip, hlex⟩ := hp p (by simp)
+    have hi := hvec p hip
+    have hlen' : deleted.length = image.length := by simp [image, permutationVariables, hlen]
+    have hcmp : lexConstraint true (deleted.map a) (image.map a) = true := by
+      rw [lex_constraint_iff _ _ (by simpa using hlen')]
+      exact hlex
+    have hcurrent : cnfValue b (lexClauses truth next deleted image) = true :=
+      lexClauses_extend_of_constraint a next true truth deleted image hlen'
+        ht0 ht hta (fun n hn => (hd n hn).1) (fun n hn => (hi n hn).1)
+        (fun n hn => (hd n hn).2) (fun n hn => (hi n hn).2) hcmp
+    have hsat : cnfValue out (lexClauses truth next deleted image) = true := by
+      rw [cnfValue_congr_of_bound out b _ stop
+        (orbitLexAssignment_preserves truth stop deleted b ps)
+        (lexClauses_ids_lt_next truth next deleted image ht
+          (fun n hn => (hd n hn).2) (fun n hn => (hi n hn).2))]
+      exact hcurrent
+    have htail : cnfValue out (orbitLexClauses truth stop deleted ps) = true := by
+      apply ih stop b (lt_of_lt_of_le ht hstop) ((hpres ht).trans hta)
+      · exact fun n hn => ⟨(hd n hn).1, lt_of_lt_of_le (hd n hn).2 hstop⟩
+      · intro q hq
+        obtain ⟨hql,hqi,hqlex⟩ := hp q (by simp [hq])
+        have hmap (l : List Nat) (hl : ∀ n ∈ l, n < next) :
+            l.map b = l.map a := List.map_congr_left (fun n hn => hpres (hl n hn))
+        refine ⟨hql,hqi,?_⟩
+        rw [hmap deleted (fun n hn => (hd n hn).2),
+          hmap _ (fun n hn => (hvec q hqi n hn).2)]
+        exact hqlex
+    simpa only [orbitLexAssignment, orbitLexClauses, hta, cnfValue, List.all_append,
+      Bool.and_eq_true] using And.intro hsat htail
+
 end Implications.C4PolarityLexEncoding
 
 #print axioms Implications.C4PolarityLexEncoding.lexFreshIds_length
@@ -320,3 +592,8 @@ end Implications.C4PolarityLexEncoding
 #print axioms Implications.C4PolarityLexEncoding.orbitLexNext_eq
 #print axioms Implications.C4PolarityLexEncoding.lexStep_auxiliary_assignment_satisfies
 #print axioms Implications.C4PolarityLexEncoding.lexStep_extension
+
+#print axioms Implications.C4PolarityLexEncoding.lexClauses_extend_of_constraint
+
+#print axioms Implications.C4PolarityLexEncoding.orbitLexClauses_satisfied
+#print axioms Implications.C4PolarityLexEncoding.lexAtLeast_eq_true_of_le

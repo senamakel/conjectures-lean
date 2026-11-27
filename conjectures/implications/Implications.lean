@@ -41,3 +41,4 @@ import Implications.WilfWindowGeometry
 import Implications.WilfArchiveClosure
 
 import Implications.C4PolarityCnfGates
+import Implications.C4PolarityLexEncoding
