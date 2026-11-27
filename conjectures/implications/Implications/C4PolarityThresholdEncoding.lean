@@ -313,7 +313,7 @@ theorem thresholdGateList_cnf_satisfies (assignment : Nat → Bool)
     cnfValue (extendThresholdGates assignment gates) (thresholdGateListClauses gates) = true := by
   simp only [cnfValue, List.all_eq_true, thresholdGateListClauses, List.mem_flatMap]
   intro clause hclause
-  rcases hclause with ⟨gate, hgate, clause, hgateClause, rfl⟩
+  rcases hclause with ⟨gate, hgate, hgateClause⟩
   have hsat := thresholdGateList_satisfies assignment gates hordered gate hgate
   simp only [cnfValue, List.all_eq_true] at hsat
   exact hsat clause hgateClause
