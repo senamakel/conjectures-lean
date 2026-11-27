@@ -180,7 +180,7 @@ theorem hamiltonian_of_all_four_triple_rows
         A.erase i = row G I (r i) := (hrows i hi).2.symm
         _ = row G I (r j) := by rw [heq]
         _ = A.erase j := (hrows j hj).2
-    have hmem : i ∈ A.erase j := Finset.mem_erase.mpr ⟨hne.symm, hi⟩
+    have hmem : i ∈ A.erase j := Finset.mem_erase.mpr ⟨Ne.symm hne, hi⟩
     have hmem' : i ∈ A.erase i := hsets ▸ hmem
     exact (Finset.mem_erase.mp hmem').1 rfl
   have hcross (i : V) (hi : i ∈ I) (q : V) (hq : q ∈ C) : i ≠ q := by
@@ -189,21 +189,27 @@ theorem hamiltonian_of_all_four_triple_rows
     exact (Finset.disjoint_left.mp hCI) hq hi
 
   let pref : List V := [a, r d, b, r a, c, r b, d, r c]
+  have hrdra : r d ≠ r a := fun heq => had (hrowInj d a (by simp [A]) (by simp [A]) heq)
+  have hrdrb : r d ≠ r b := fun heq => hbd (hrowInj d b (by simp [A]) (by simp [A]) heq)
+  have hrdrc : r d ≠ r c := fun heq => hcd (hrowInj d c (by simp [A]) (by simp [A]) heq)
+  have hrarb : r a ≠ r b := fun heq => hab (hrowInj a b (by simp [A]) (by simp [A]) heq)
+  have hrarc : r a ≠ r c := fun heq => hac (hrowInj a c (by simp [A]) (by simp [A]) heq)
+  have hrbrc : r b ≠ r c := fun heq => hbc (hrowInj b c (by simp [A]) (by simp [A]) heq)
   have hprefNodup : pref.Nodup := by
-    simp [pref, hab, hac, had, hbc, hbd, hcd, hrowInj, hcross, A,
-      ha, hb, hc, hd, hrows]
+    simp [pref, hab, hac, had, hbc, hbd, hcd, hrdra, hrdrb, hrdrc,
+      hrarb, hrarc, hrbrc, hcross, A, ha, hb, hc, hd, hrows]
   have hAdjRow (i j : V) (hi : i ∈ A) (hj : j ∈ A) (hne : i ≠ j) :
       G.Adj (r i) j := by
     have hjErase : j ∈ A.erase i := Finset.mem_erase.mpr ⟨hne, hj⟩
     have hjRow : j ∈ row G I (r i) := by rw [(hrows i hi).2]; exact hjErase
     exact (Finset.mem_filter.mp hjRow).2
-  have hrdA : G.Adj a (r d) := (hAdjRow d (by simp [A]) (by simp [A]) had.symm).symm
+  have hrdA : G.Adj a (r d) := (hAdjRow d (by simp [A]) (by simp [A]) (Ne.symm had)).symm
   have hrdB : G.Adj (r d) b := hAdjRow d (by simp [A]) (by simp [A]) hbd
-  have hraB : G.Adj b (r a) := (hAdjRow a (by simp [A]) (by simp [A]) hab.symm).symm
+  have hraB : G.Adj b (r a) := (hAdjRow a (by simp [A]) (by simp [A]) (Ne.symm hab)).symm
   have hraC : G.Adj (r a) c := hAdjRow a (by simp [A]) (by simp [A]) hac
-  have hrbC : G.Adj c (r b) := (hAdjRow b (by simp [A]) (by simp [A]) hbc.symm).symm
+  have hrbC : G.Adj c (r b) := (hAdjRow b (by simp [A]) (by simp [A]) (Ne.symm hbc)).symm
   have hrbD : G.Adj (r b) d := hAdjRow b (by simp [A]) (by simp [A]) hbd
-  have hrcD : G.Adj d (r c) := (hAdjRow c (by simp [A]) (by simp [A]) hcd.symm).symm
+  have hrcD : G.Adj d (r c) := (hAdjRow c (by simp [A]) (by simp [A]) (Ne.symm hcd)).symm
   have hprefChain : pref.IsChain G.Adj := by
     simp [pref, hrdA, hrdB, hraB, hraC, hrbC, hrbD, hrcD]
   have hprefLastC : ∀ x, x ∈ pref.getLast? → x ∈ C := by
