@@ -5,6 +5,9 @@ import Implications.C4PolarityCnfGates
 import Implications.C4PolarityDeletion
 import Implications.C4DegreeBounds
 
+set_option maxRecDepth 10000
+set_option maxHeartbeats 0
+
 /-! Exact Boolean inputs emitted by `scripts/encode_c4_polarity_42_cnf.py`. -/
 
 namespace Implications.C4PolarityEncoderInputs
@@ -51,8 +54,6 @@ private theorem countP_map_indicator {α : Type*} (l : List α) (P : α → Prop
   rw [List.countP_eq_length_filter]
 
 /-- The pair indicators count exactly the edges induced by the deletion set. -/
-set_option maxRecDepth 10000
-set_option maxHeartbeats 0
 theorem orthogonal_pair_score_count (D : Finset (Fin 57)) :
     (orthogonalPairs.map (fun p => decide (p.1 ∈ D ∧ p.2 ∈ D))).countP id =
       inducedEdgeCount graph D := by
@@ -81,31 +82,40 @@ theorem orthogonal_pair_score_count (D : Finset (Fin 57)) :
     simp only [Sym2.eq_iff] at heq
     rcases heq with heq | heq
     · exact Prod.ext (Subtype.ext_iff.mp heq.1) (Subtype.ext_iff.mp heq.2)
-    · have hlt1 := (Finset.mem_filter.mp (Finset.mem_filter.mp hp).1).2.1
-      have hlt2 := (Finset.mem_filter.mp (Finset.mem_filter.mp hq).1).2.1
-      have hrev : p.2 < p.1 := by simpa using hlt2
+    · have hp12 := (Finset.mem_filter.mp (Finset.mem_filter.mp hp).1).2.1
+      have hq12 := (Finset.mem_filter.mp (Finset.mem_filter.mp hq).1).2.1
+      have heq1 : p.1 = q.2 := Subtype.ext_iff.mp heq.1
+      have heq2 : p.2 = q.1 := Subtype.ext_iff.mp heq.2
+      have hrev : p.2 < p.1 := by simpa [heq1, heq2] using hq12
       omega
   · intro e he
     obtain ⟨ab, habeq⟩ := Sym2.mk_surjective e
     rcases ab with ⟨a, b⟩
-    have hab : H.Adj ⟨a, (by simpa [habeq] using (Finset.mem_filter.mp he).2.1)⟩
-        ⟨b, (by simpa [habeq] using (Finset.mem_filter.mp he).2.2)⟩ := by
-      have heEdge : Sym2.mk a b ∈ H.edgeSet := SimpleGraph.mem_edgeFinset.mp he
-      simpa [H, SimpleGraph.induce_adj] using SimpleGraph.mem_edgeSet.mp heEdge
-    have hne : a ≠ b := by
+    have hab : H.Adj a b := by
+      rw [← habeq] at he
+      have heEdge := SimpleGraph.mem_edgeFinset.mp he
+      exact SimpleGraph.mem_edgeSet.mp heEdge
+    have hne : a.val ≠ b.val := by
       intro h
-      subst b
-      exact H.loopless.irrefl ⟨a, (by simpa [habeq] using (Finset.mem_filter.mp he).2.1)⟩ hab
+      apply H.loopless.irrefl a
+      simpa [h] using hab
     rcases lt_or_gt_of_ne hne with hlt | hgt
     · refine ⟨(a.val, b.val), ?_, ?_⟩
-      · simp [T, orthogonalPairFinset, Finset.mem_filter, hlt, H] at *
-        exact ⟨⟨hlt, (SimpleGraph.induce_adj.mp hab)⟩, ⟨a.property, b.property⟩⟩
-      · simp [H, SimpleGraph.induce_adj]
-    · refine ⟨(b.val, a.val), ?_, ?_⟩
-      · have hba : graph.Adj b.val a.val := graph.symm b.val a.val (SimpleGraph.induce_adj.mp hab)
-        simp [T, orthogonalPairFinset, Finset.mem_filter, hgt, H] at *
-        exact ⟨⟨hgt, hba.2⟩, ⟨b.property, a.property⟩⟩
-      · simp [H, Sym2.eq_iff, SimpleGraph.induce_adj, graph.symm]
+      · apply Finset.mem_filter.mpr
+        refine ⟨?_, ⟨a.property, b.property⟩⟩
+        apply Finset.mem_filter.mpr
+        exact ⟨Finset.mem_univ _, hlt, (SimpleGraph.induce_adj.mp hab)⟩
+      · change Sym2.mk a b = e
+        exact habeq
+    · have hba : graph.Adj b.val a.val := graph.symm b.val a.val (SimpleGraph.induce_adj.mp hab)
+      refine ⟨(b.val, a.val), ?_, ?_⟩
+      · apply Finset.mem_filter.mpr
+        refine ⟨?_, ⟨b.property, a.property⟩⟩
+        apply Finset.mem_filter.mpr
+        exact ⟨Finset.mem_univ _, hgt, hba⟩
+      · change Sym2.mk b a = e
+        rw [Sym2.eq_iff]
+        exact Or.inr ⟨rfl, rfl⟩
 
 /-- The absolute-point indicators count the deleted absolute points. -/
 theorem absolute_score_count (D : Finset (Fin 57)) :
@@ -133,6 +143,7 @@ theorem scoreInputs_count_true (D : Finset (Fin 57)) :
   change (absoluteIndices.map (fun i => decide (i ∈ D))).countP id +
     (orthogonalPairs.map (fun p => decide (p.1 ∈ D ∧ p.2 ∈ D))).countP id = _
   rw [absolute_score_count, orthogonal_pair_score_count]
+  omega
 
 end Implications.C4PolarityEncoderInputs
 
