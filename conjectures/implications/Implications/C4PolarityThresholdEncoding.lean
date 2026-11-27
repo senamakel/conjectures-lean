@@ -113,14 +113,6 @@ theorem thresholdVar_mem_fresh {nextVar limit inputCount row k : Nat}
         nextVar + row * limit + k := by omega
     simpa [thresholdVar, hassoc] using congrArg Int.ofNat hNat
 
-theorem thresholdVar_fresh_from_input {nextVar limit row k : Nat}
-    (hk : 0 < k) (input : Int) (hinput : input.natAbs ≤ nextVar) :
-    input.natAbs ≠ (thresholdVar nextVar limit row k).natAbs := by
-  have hnat : nextVar < nextVar + row * limit + k := by omega
-  have hvar : nextVar < (thresholdVar nextVar limit row k).natAbs := by
-    simpa [thresholdVar, Int.natAbs_natCast] using hnat
-  omega
-
 /-- The four-clause DIMACS gate agrees with the Boolean recurrence when all
 four input and output literals are nonzero. -/
 theorem thresholdGateDimacs_iff (assignment : Nat → Bool)
