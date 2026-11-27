@@ -232,8 +232,9 @@ theorem thresholdGateList_satisfies (assignment : Nat → Bool)
   | cons gate gates ih =>
       rcases hordered with ⟨hpos, habove, hinput, hbelow, hlater, htail⟩
       intro current hmem
-      rcases List.mem_cons.mp hmem with rfl | hmem
-      · have haboveNe : gate.above ≠ 0 := by
+      cases hmem with
+      | head =>
+        have haboveNe : gate.above ≠ 0 := by
           intro hz
           simp [hz] at habove
           omega
@@ -282,7 +283,8 @@ theorem thresholdGateList_satisfies (assignment : Nat → Bool)
             omega)).2
         rw [hOutputPres, hAbovePres, hInputPres, hBelowPres]
         rfl
-      · apply ih (extendThresholdGate assignment gate) htail current hmem
+      | tail _ hmem =>
+        exact ih (extendThresholdGate assignment gate) htail current hmem
 
 /-- Build the clauses for one row, zipping `previous[k]`,
 `previous[k - 1]`, and the newly allocated output. -/
