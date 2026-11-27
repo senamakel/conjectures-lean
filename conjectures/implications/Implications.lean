@@ -33,6 +33,7 @@ import Implications.SplitGraphSmallRowsPath
 import Implications.SplitGraphSmallRowsThree
 import Implications.SplitGraphSmallRowsCompletion
 import Implications.SplitGraphSmallRows
+import Implications.SplitGraphSmallRowsOneShared
 import Implications.C4VertexExtension
 import Implications.WilfPatternSwap
 import Implications.WilfTwoWindowOrder
