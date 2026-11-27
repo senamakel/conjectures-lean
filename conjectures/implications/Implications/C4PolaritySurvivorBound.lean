@@ -32,8 +32,10 @@ private theorem c4Free_induce {α : Type*} (G : SimpleGraph α)
     C4VertexExtension.C4Free (G.induce s) := by
   intro x y z w hxy hzw hxz hyz htwo
   apply hG (x := x.val) (y := y.val) (z := z.val) (w := w.val)
-  · exact congrArg Subtype.val hxy
-  · exact congrArg Subtype.val hzw
+  · intro hval
+    exact hxy (Subtype.ext hval)
+  · intro hval
+    exact hzw (Subtype.ext hval)
   · exact (SimpleGraph.induce_adj.mp hxz).2
   · exact (SimpleGraph.induce_adj.mp hyz).2
   · intro h
