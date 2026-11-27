@@ -256,3 +256,11 @@ divides either component, its shifted-square equation makes 2 a
 square modulo that prime. Quadratic reciprocity in Mathlib then
 forces residue 1 or 7 modulo 8. The pinned Lean proof is in
 [CrystalQuotientFour.lean](CrystalQuotientFour.lean).
+
+The quotient-four branch also restricts the Vieta-partner difference.
+For the second normalized pair `(g*y,x*z)`, its shifted-square
+parameter `t` gives the partner `s = 2(t−1)²). Therefore
+`d = x³*s−y³*r` satisfies
+`y ∣ (d−3*x³)²−8*x⁶`. For the branch `x = 1` this is
+`(d−3)² ≡ 8 (mod y)). The exact proof checks at the OMA pin
+in [CrystalQuotientFour.lean](CrystalQuotientFour.lean).

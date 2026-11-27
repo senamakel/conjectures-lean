@@ -98,4 +98,31 @@ theorem prime_mod_eight_of_quotient_four {a b p : ℕ}
 
 #print axioms prime_mod_eight_of_quotient_four
 
+theorem scaled_difference_congruence {g x y z : ℕ} {r s : ℤ}
+    (hgy : Odd (g*y)) (hxz : Odd (x*z)) (ho : g*y ≤ x*z)
+    (hq : (g*y+x*z)^2 = 4*((g*y+1)*(x*z+1)))
+    (hs : ((x : ℤ)*z+1)*s = ((g : ℤ)*y-1)^2) :
+    (y : ℤ) ∣ (((x : ℤ)^3*s-(y : ℤ)^3*r)-3*(x : ℤ)^3)^2-8*(x : ℤ)^6 := by
+  obtain ⟨t, hfirst, hsecond⟩ := consecutive_squares hgy hxz ho hq
+  have hfirst' : (g : ℤ)*y+1 = 2*(t : ℤ)^2 := by exact_mod_cast hfirst
+  have hsecond' : (x : ℤ)*z+1 = 2*((t : ℤ)+1)^2 := by exact_mod_cast hsecond
+  have hs' : s = 2*((t : ℤ)-1)^2 := by
+    have hsub : (g : ℤ)*y-1 = 2*(t : ℤ)^2-2 := by linarith only [hfirst']
+    apply mul_left_cancel₀ (show (x : ℤ)*z+1 ≠ 0 by positivity)
+    rw [hs, hsub, hsecond']
+    ring
+  have ht : (y : ℤ) ∣ 2*(t : ℤ)^2-1 := ⟨g, by linear_combination -hfirst'⟩
+  let U := (x : ℤ)^3*s-(y : ℤ)^3*r-3*(x : ℤ)^3
+  let V := 4*(x : ℤ)^3*t
+  have hUV : (y : ℤ) ∣ U+V := ⟨(g : ℤ)*x^3-(y : ℤ)^2*r, by
+    dsimp [U,V]
+    linear_combination (x : ℤ)^3*hs'-(x : ℤ)^3*hfirst'⟩
+  change (y : ℤ) ∣ U^2-8*(x : ℤ)^6
+  rw [show U^2-8*(x : ℤ)^6 =
+      (U-V)*(U+V)+(8*(x : ℤ)^6)*(2*(t : ℤ)^2-1) by dsimp [V]; ring]
+  exact dvd_add (dvd_mul_of_dvd_right hUV (U-V))
+    (dvd_mul_of_dvd_right ht (8*(x : ℤ)^6))
+
+#print axioms scaled_difference_congruence
+
 end CrystalQuotientFour
