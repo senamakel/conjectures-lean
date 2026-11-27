@@ -170,7 +170,10 @@ theorem legendreBadGapIndices_subset_three_blocks (a : ℕ) (ha : 2 ≤ a)
     calc
       (squareGapIndex n).nth Nat.Prime < 4 * a ^ 2 := lt_trans hgap.2.1 hnlt
       _ = 2 * (2 * a ^ 2) := hscale
-  have hlong : 2 * a ≤ primeGap (squareGapIndex n) := by omega
+  have hlong : 2 * a ≤ primeGap (squareGapIndex n) := by
+    have h := hgap.2.2
+    dsimp [squareGapIndex] at h ⊢
+    omega
   by_cases hfirst : (squareGapIndex n).nth Nat.Prime < a ^ 2
   · have hfirst' : (squareGapIndex n).nth Nat.Prime < 2 * (a ^ 2 / 2) := by
       calc
