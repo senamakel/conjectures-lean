@@ -1,4 +1,5 @@
 import Implications.SplitGraphTrees
+import Implications.SplitGraphComponents
 
 /-!
 Small combinatorial consequences of the row bounds used for split graphs.
@@ -349,6 +350,355 @@ private theorem hamiltonian_of_list
     exact hcover v
   exact ⟨_, _, p, hpath.isHamiltonian_of_mem hvertices⟩
 
+/-- A list of distinct clique vertices is an adjacency chain. -/
+private theorem clique_subset_list_chain (G : SimpleGraph V) (C : Finset V)
+    (hC : G.IsClique (C : Set V)) (l : List V) (hnodup : l.Nodup)
+    (hsub : ∀ x ∈ l, x ∈ C) : l.IsChain G.Adj := by
+  rw [List.isChain_iff_forall_rel_of_append_cons_cons]
+  intro x y l₁ l₂ heq
+  have hx : x ∈ l := by rw [heq]; simp
+  have hy : y ∈ l := by rw [heq]; simp
+  have hxy : x ≠ y := by
+    intro h
+    subst y
+    have hcount := (List.nodup_iff_count_le_one.mp hnodup) x
+    rw [heq] at hcount
+    simp [List.count_append, List.count_cons] at hcount
+    omega
+  exact hC (hsub x hx) (hsub y hy) hxy
+
+/-- The two-outsider triple-row path. The list `rest` contains the unused clique
+vertices, which are appended after the second outsider's clique neighbour. -/
+theorem hamiltonian_of_split_partition_two_outsiders
+    (G : SimpleGraph V) (C I : Finset V)
+    (a b c z w t x y r s : V) (rest : List V)
+    (hC : G.IsClique (C : Set V))
+    (hpartition : (Finset.univ : Finset V) = C ∪ I)
+    (hI : I = {a, b, c, z, w})
+    (hct : G.Adj c t) (hta : G.Adj t a) (hax : G.Adj a x)
+    (hxz : G.Adj x z) (hzy : G.Adj z y) (hyb : G.Adj y b)
+    (hbr : G.Adj b r) (hrw : G.Adj r w) (hws : G.Adj w s)
+    (hsC : s ∈ C)
+    (hbaseNodup : ([c, t, a, x, z, y, b, r, w, s] : List V).Nodup)
+    (hrestNodup : rest.Nodup)
+    (hrestC : ∀ v ∈ rest, v ∈ C)
+    (hbaseRest : ∀ v ∈ ([c, t, a, x, z, y, b, r, w, s] : List V), v ∉ rest)
+    (hcoverC : ∀ v ∈ C, v = t ∨ v = x ∨ v = y ∨ v = r ∨ v = s ∨ v ∈ rest) :
+    ∃ (u v : V) (p : G.Walk u v), p.IsHamiltonian := by
+  classical
+  let base : List V := [c, t, a, x, z, y, b, r, w, s]
+  let l := base ++ rest
+  have hnodup : l.Nodup := by
+    rw [List.nodup_append']
+    exact ⟨hbaseNodup, hrestNodup, hbaseRest⟩
+  have hbaseChain : base.IsChain G.Adj := by
+    simp [base, List.isChain_cons, hct, hta, hax, hxz, hzy, hyb, hbr, hrw, hws]
+  have hrestChain : rest.IsChain G.Adj := clique_subset_list_chain G C hC rest hrestNodup hrestC
+  have hchain : l.IsChain G.Adj := by
+    rw [List.isChain_append]
+    refine ⟨hbaseChain, hrestChain, ?_⟩
+    intro u hu v hv
+    simp [base] at hu
+    subst u
+    have hvMem : v ∈ rest := List.mem_of_mem_head? hv
+    exact hC hsC (hrestC v hvMem) (by
+      intro h
+      subst v
+      exact hbaseRest s (by simp [base]) hvMem)
+  have hcover : ∀ v : V, v ∈ l := by
+    intro v
+    have hv : v ∈ C ∨ v ∈ I := by
+      have : v ∈ C ∪ I := by simpa [hpartition] using (Finset.mem_univ v)
+      exact Finset.mem_union.mp this
+    rcases hv with hvC | hvI
+    · rcases hcoverC v hvC with rfl | rfl | rfl | rfl | rfl | hvrest
+      · simp [l, base]
+      · simp [l, base]
+      · simp [l, base]
+      · simp [l, base]
+      · simp [l, base]
+      · exact List.mem_append_right _ hvrest
+    · have hv' : v = a ∨ v = b ∨ v = c ∨ v = z ∨ v = w := by
+        simpa [hI, Finset.mem_insert, Finset.mem_singleton, or_comm, or_left_comm, or_assoc] using hvI
+      rcases hv' with rfl | rfl | rfl | rfl | rfl <;> simp [l, base]
+  exact hamiltonian_of_list G l (by simp [l, base]) hnodup hchain hcover
+
+/-- The exact-two-outsider triple-row case follows from row size and
+symmetric-difference bounds plus two clique neighbours per outsider. -/
+theorem hamiltonian_of_split_partition_two_outsiders_of_rows
+    (G : SimpleGraph V) (C I : Finset V) (t z w : V)
+    (hC : G.IsClique (C : Set V)) (hdisj : Disjoint C I)
+    (hpartition : (Finset.univ : Finset V) = C ∪ I)
+    (ht : t ∈ C) (hA : (row G I t).card = 3)
+    (hI : I = row G I t ∪ {z, w}) (hzw : z ≠ w)
+    (hzA : z ∉ row G I t) (hwA : w ∉ row G I t)
+    (hrow : ∀ q ∈ C, (row G I q).card ≤ 3)
+    (hdiff : ∀ q ∈ C, ∀ d ∈ C, q ≠ d → (rowDiff G I q d).card ≤ 2)
+    (hdeg : ∀ i ∈ I, ∃ q ∈ C, ∃ d ∈ C, q ≠ d ∧ G.Adj q i ∧ G.Adj d i) :
+    ∃ (u v : V) (p : G.Walk u v), p.IsHamiltonian := by
+  classical
+  let A := row G I t
+  have hzI : z ∈ I := by rw [hI]; simp
+  have hwI : w ∈ I := by rw [hI]; simp
+  obtain ⟨x, hxC, y, hyC, hxy, hxzG, hyzG⟩ := hdeg z hzI
+  obtain ⟨r, hrC, s, hsC, hrs, hrwG, hswG⟩ := hdeg w hwI
+  have hRsize : ∀ B ∈ C.image (row G I), B.card ≤ 3 := by
+    intro B hB
+    obtain ⟨q, hq, rfl⟩ := Finset.mem_image.mp hB
+    exact hrow q hq
+  have hRdiff : ∀ B ∈ C.image (row G I), ∀ D ∈ C.image (row G I),
+      (B \ D ∪ D \ B).card ≤ 2 := by
+    intro B hB D hD
+    obtain ⟨q, hq, rfl⟩ := Finset.mem_image.mp hB
+    obtain ⟨d, hd, rfl⟩ := Finset.mem_image.mp hD
+    by_cases hqd : q = d
+    · subst d
+      simp [rowDiff]
+    · simpa [rowDiff] using hdiff q hq d hd hqd
+  have hAR : A ∈ C.image (row G I) := Finset.mem_image.mpr ⟨t, ht, rfl⟩
+  have hxR : row G I x ∈ C.image (row G I) := Finset.mem_image.mpr ⟨x, hxC, rfl⟩
+  have hrR : row G I r ∈ C.image (row G I) := Finset.mem_image.mpr ⟨r, hrC, rfl⟩
+  have hzRow : z ∈ row G I x \ A := Finset.mem_sdiff.mpr ⟨Finset.mem_filter.mpr ⟨hzI, hxzG⟩, hzA⟩
+  have hwRow : w ∈ row G I r \ A := Finset.mem_sdiff.mpr ⟨Finset.mem_filter.mpr ⟨hwI, hrwG⟩, hwA⟩
+  obtain ⟨P, hPA, hPcard, hcommon⟩ :=
+    SplitGraphComponents.tripleRow_common_outside_pair A (C.image (row G I))
+      hA hAR hRsize hRdiff hxR hrR hzRow hwRow hzw
+  obtain ⟨a, b, hab, hPeq⟩ := Finset.card_eq_two.mp hPcard
+  have haA : a ∈ A := by rw [hPeq] at hPA; exact hPA (by simp)
+  have hbA : b ∈ A := by rw [hPeq] at hPA; exact hPA (by simp)
+  have hdiffCard : (A \ P).card = 1 := by
+    have hcard := Finset.card_sdiff_add_card_inter A P
+    rw [Finset.inter_eq_right.mpr hPA, hA, hPcard] at hcard
+    omega
+  obtain ⟨c, hcDiffEq⟩ := Finset.card_eq_one.mp hdiffCard
+  have hcDiff : c ∈ A \ P := by rw [hcDiffEq]; simp
+  have hcA : c ∈ A := (Finset.mem_sdiff.mp hcDiff).1
+  have hcP : c ∉ P := (Finset.mem_sdiff.mp hcDiff).2
+  have hac : a ≠ c := by intro h; subst c; exact hcP (by rw [hPeq]; simp)
+  have hbc : b ≠ c := by intro h; subst c; exact hcP (by rw [hPeq]; simp)
+  have hcardABC : ({a, b, c} : Finset V).card = 3 := by simp [hab, hac, hbc]
+  have hAeq : A = {a, b, c} := by
+    apply Finset.eq_of_subset_of_card_le
+    · intro q hq
+      by_cases hqP : q ∈ P
+      · rw [hPeq] at hqP
+        have hqAB : q = a ∨ q = b := by simpa using hqP
+        rcases hqAB with hqa | hqb
+        · simp [hqa]
+        · simp [hqb]
+      · have hqDiff : q ∈ A \ P := Finset.mem_sdiff.mpr ⟨hq, hqP⟩
+        rw [hcDiffEq] at hqDiff
+        simp only [Finset.mem_singleton] at hqDiff
+        simp [hqDiff]
+    · rw [hA]
+      exact hcardABC.le
+  have hIeq : I = {a, b, c, z, w} := by
+    ext q
+    rw [hI]
+    simp [A, hAeq, Finset.mem_insert, Finset.mem_singleton, or_comm, or_left_comm, or_assoc]
+  have hcomm (q : V) (hq : q ∈ C) (hout : (row G I q \ A).Nonempty) :
+      A ∩ row G I q = P :=
+    hcommon (row G I q) (Finset.mem_image.mpr ⟨q, hq, rfl⟩) hout
+  have hzYRow : z ∈ row G I y \ A := Finset.mem_sdiff.mpr ⟨Finset.mem_filter.mpr ⟨hzI, hyzG⟩, hzA⟩
+  have hwSRow : w ∈ row G I s \ A := Finset.mem_sdiff.mpr ⟨Finset.mem_filter.mpr ⟨hwI, hswG⟩, hwA⟩
+  have hpairRow (q : V) (hq : q ∈ C) (hout : (row G I q \ A).Nonempty) :
+      a ∈ row G I q ∧ b ∈ row G I q := by
+    have hEq := hcomm q hq hout
+    constructor
+    · have : a ∈ A ∩ row G I q := by rw [hEq, hPeq]; simp
+      exact (Finset.mem_inter.mp this).2
+    · have : b ∈ A ∩ row G I q := by rw [hEq, hPeq]; simp
+      exact (Finset.mem_inter.mp this).2
+  have haxRow := (hpairRow x hxC ⟨z, hzRow⟩).1
+  have hbyRow := (hpairRow y hyC ⟨z, hzYRow⟩).2
+  have hbrRow := (hpairRow r hrC ⟨w, hwRow⟩).2
+  have haPair : a ∈ I ∧ G.Adj t a := by simpa [A, row] using haA
+  have hbPair : b ∈ I ∧ G.Adj t b := by simpa [A, row] using hbA
+  have hcPair : c ∈ I ∧ G.Adj t c := by simpa [A, row] using hcA
+  have haI : a ∈ I := haPair.1
+  have hbI : b ∈ I := hbPair.1
+  have hcI : c ∈ I := hcPair.1
+  have hta : G.Adj t a := by
+    have h : a ∈ row G I t := by simpa [A] using haA
+    have hm : a ∈ I ∧ G.Adj t a := by simpa [row] using h
+    exact hm.2
+  have hct : G.Adj c t := by
+    have h : c ∈ row G I t := by simpa [A] using hcA
+    have hm : c ∈ I ∧ G.Adj t c := by simpa [row] using h
+    exact hm.2.symm
+  have hax : G.Adj a x := (Finset.mem_filter.mp haxRow).2.symm
+  have hxz : G.Adj x z := hxzG
+  have hzy : G.Adj z y := hyzG.symm
+  have hyb : G.Adj y b := (Finset.mem_filter.mp hbyRow).2
+  have hbr : G.Adj b r := (Finset.mem_filter.mp hbrRow).2.symm
+  have hrw : G.Adj r w := hrwG
+  have hws : G.Adj w s := hswG.symm
+  have hci (q : V) (hq : q ∈ C) (i : V) (hi : i ∈ I) : q ≠ i := by
+    intro h
+    subst i
+    exact (Finset.disjoint_left.mp hdisj) hq hi
+  have hciRev (q : V) (hq : q ∈ C) (i : V) (hi : i ∈ I) : i ≠ q := (hci q hq i hi).symm
+  have htx : t ≠ x := by intro h; subst x; exact hzA (by simp [row, hzI, hxzG])
+  have hty : t ≠ y := by intro h; subst y; exact hzA (by simp [row, hzI, hyzG])
+  have htr : t ≠ r := by intro h; subst r; exact hwA (by simp [row, hwI, hrwG])
+  have hts : t ≠ s := by intro h; subst s; exact hwA (by simp [row, hwI, hswG])
+  have hnoShared (q : V) (hq : q ∈ C) (hqz : z ∈ row G I q) (hqw : w ∈ row G I q) : False := by
+    have hp := hpairRow q hq ⟨z, Finset.mem_sdiff.mpr ⟨hqz, hzA⟩⟩
+    have hsub : ({a, b, z, w} : Finset V) ⊆ row G I q := by
+      intro u hu
+      simp only [Finset.mem_insert, Finset.mem_singleton] at hu
+      rcases hu with rfl | rfl | rfl | rfl
+      · exact hp.1
+      · exact hp.2
+      · exact hqz
+      · exact hqw
+    have haz : a ≠ z := by intro h; exact hzA (h ▸ haA)
+    have haw : a ≠ w := by intro h; exact hwA (h ▸ haA)
+    have hbz : b ≠ z := by intro h; exact hzA (h ▸ hbA)
+    have hbw : b ≠ w := by intro h; exact hwA (h ▸ hbA)
+    have hfour : ({a, b, z, w} : Finset V).card = 4 := by simp [hab, hzw, haz, haw, hbz, hbw]
+    have hbound := hrow q hq
+    have hle := Finset.card_le_card hsub
+    omega
+  have hxr : x ≠ r := by intro h; subst r; exact hnoShared x hxC (Finset.mem_filter.mpr ⟨hzI, hxzG⟩) (Finset.mem_filter.mpr ⟨hwI, hrwG⟩)
+  have hxs : x ≠ s := by intro h; subst s; exact hnoShared x hxC (Finset.mem_filter.mpr ⟨hzI, hxzG⟩) (Finset.mem_filter.mpr ⟨hwI, hswG⟩)
+  have hyr : y ≠ r := by intro h; subst r; exact hnoShared y hyC (Finset.mem_filter.mpr ⟨hzI, hyzG⟩) (Finset.mem_filter.mpr ⟨hwI, hrwG⟩)
+  have hys : y ≠ s := by intro h; subst s; exact hnoShared y hyC (Finset.mem_filter.mpr ⟨hzI, hyzG⟩) (Finset.mem_filter.mpr ⟨hwI, hswG⟩)
+  have hcenterNodup : ([t, x, y, r, s] : List V).Nodup := by
+    simp [htx, hty, htr, hts, hxy, hxr, hxs, hyr, hys, hrs]
+  have haz : a ≠ z := by intro h; exact hzA (h ▸ haA)
+  have haw : a ≠ w := by intro h; exact hwA (h ▸ haA)
+  have hbz : b ≠ z := by intro h; exact hzA (h ▸ hbA)
+  have hbw : b ≠ w := by intro h; exact hwA (h ▸ hbA)
+  have hcz : c ≠ z := by intro h; exact hzA (h ▸ hcA)
+  have hcw : c ≠ w := by intro h; exact hwA (h ▸ hcA)
+  have hrowNodup : ([a, b, c, z, w] : List V).Nodup := by
+    simp [hab, hac, hbc, hzw, haz, haw, hbz, hbw, hcz, hcw]
+  let D := C \ {t, x, y, r, s}
+  let rest := D.toList
+  have hrestNodup : rest.Nodup := D.nodup_toList
+  have hrestC : ∀ q ∈ rest, q ∈ C := by
+    intro q hq
+    have hm : q ∈ rest.toFinset := List.mem_toFinset.mpr hq
+    have hqD : q ∈ D := by simpa [rest] using hm
+    exact (Finset.mem_sdiff.mp hqD).1
+  have hbaseNodup : ([c, t, a, x, z, y, b, r, w, s] : List V).Nodup := by
+    let p := [c, t, a]
+    let q := [x, z, y]
+    let rblock := [b, r, w, s]
+    have hp : p.Nodup := by simp [p, hac.symm, hciRev t ht c hcI, hci t ht a haI]
+    have hq : q.Nodup := by simp [q, hxy, hci x hxC z hzI, hci y hyC z hzI, hciRev y hyC z hzI]
+    have hr : rblock.Nodup := by
+      simp [rblock, hciRev r hrC b hbI, hciRev s hsC b hbI,
+        hci r hrC w hwI, hci s hsC w hwI, hciRev s hsC w hwI, hbw, hrs]
+    have hpq : ∀ v ∈ p, v ∉ q := by
+      intro v hv hvq
+      simp only [p, q, List.mem_cons, List.not_mem_nil, or_false] at hv hvq
+      rcases hv with hvc | hvt | hva
+      · rcases hvq with hvx | hvz | hvy
+        · exact hciRev x hxC c hcI (hvc.symm.trans hvx)
+        · exact hcz (hvc.symm.trans hvz)
+        · exact hciRev y hyC c hcI (hvc.symm.trans hvy)
+      · rcases hvq with hvx | hvz | hvy
+        · exact htx (hvt.symm.trans hvx)
+        · exact hci t ht z hzI (hvt.symm.trans hvz)
+        · exact hty (hvt.symm.trans hvy)
+      · rcases hvq with hvx | hvz | hvy
+        · exact hciRev x hxC a haI (hva.symm.trans hvx)
+        · exact haz (hva.symm.trans hvz)
+        · exact hciRev y hyC a haI (hva.symm.trans hvy)
+    have hpr : ∀ v ∈ p, v ∉ rblock := by
+      intro v hv hvr
+      simp only [p, rblock, List.mem_cons, List.not_mem_nil, or_false] at hv hvr
+      rcases hv with hvc | hvt | hva
+      · rcases hvr with hvb | hvr | hvw | hvs
+        · exact hbc.symm (hvc.symm.trans hvb)
+        · exact hciRev r hrC c hcI (hvc.symm.trans hvr)
+        · exact hcw (hvc.symm.trans hvw)
+        · exact hciRev s hsC c hcI (hvc.symm.trans hvs)
+      · rcases hvr with hvb | hvr | hvw | hvs
+        · exact hci t ht b hbI (hvt.symm.trans hvb)
+        · exact htr (hvt.symm.trans hvr)
+        · exact hci t ht w hwI (hvt.symm.trans hvw)
+        · exact hts (hvt.symm.trans hvs)
+      · rcases hvr with hvb | hvr | hvw | hvs
+        · exact hab (hva.symm.trans hvb)
+        · exact hciRev r hrC a haI (hva.symm.trans hvr)
+        · exact haw (hva.symm.trans hvw)
+        · exact hciRev s hsC a haI (hva.symm.trans hvs)
+    have hqr : ∀ v ∈ q, v ∉ rblock := by
+      intro v hv hvr
+      simp only [q, rblock, List.mem_cons, List.not_mem_nil, or_false] at hv hvr
+      rcases hv with hvx | hvz | hvy
+      · rcases hvr with hvb | hvr | hvw | hvs
+        · exact hci x hxC b hbI (hvx.symm.trans hvb)
+        · exact hxr (hvx.symm.trans hvr)
+        · exact hci x hxC w hwI (hvx.symm.trans hvw)
+        · exact hxs (hvx.symm.trans hvs)
+      · rcases hvr with hvb | hvr | hvw | hvs
+        · exact hbz (hvb.symm.trans hvz)
+        · exact hciRev r hrC z hzI (hvz.symm.trans hvr)
+        · exact hzw (hvz.symm.trans hvw)
+        · exact hciRev s hsC z hzI (hvz.symm.trans hvs)
+      · rcases hvr with hvb | hvr | hvw | hvs
+        · exact hci y hyC b hbI (hvy.symm.trans hvb)
+        · exact hyr (hvy.symm.trans hvr)
+        · exact hci y hyC w hwI (hvy.symm.trans hvw)
+        · exact hys (hvy.symm.trans hvs)
+    have hqrNodup : (q ++ rblock).Nodup := by
+      rw [List.nodup_append']
+      exact ⟨hq, hr, hqr⟩
+    have hpqrNodup : (p ++ (q ++ rblock)).Nodup := by
+      rw [List.nodup_append']
+      refine ⟨hp, hqrNodup, ?_⟩
+      intro v hv hvrest
+      rcases List.mem_append.mp hvrest with hvq | hvr
+      · exact hpq v hv hvq
+      · exact hpr v hv hvr
+    simpa [p, q, rblock, List.append_assoc] using hpqrNodup
+  have hbaseRest : ∀ q ∈ ([c, t, a, x, z, y, b, r, w, s] : List V), q ∉ rest := by
+    intro q hq hrest
+    have hqD : q ∈ D := by
+      have hm : q ∈ rest.toFinset := List.mem_toFinset.mpr hrest
+      simpa [rest] using hm
+    simp only [List.mem_cons, List.not_mem_nil, or_false] at hq
+    rcases hq with hqc | hqt | hqa | hqx | hqz | hqy | hqb | hqr | hqw | hqs
+    · have hqC : c ∈ C := by simpa [hqc] using (Finset.mem_sdiff.mp hqD).1
+      exact hci c hqC c hcI rfl
+    · exact (Finset.mem_sdiff.mp hqD).2 (by simp [hqt])
+    · have hqC : a ∈ C := by simpa [hqa] using (Finset.mem_sdiff.mp hqD).1
+      exact hci a hqC a haI rfl
+    · exact (Finset.mem_sdiff.mp hqD).2 (by simp [hqx])
+    · have hqC : z ∈ C := by simpa [hqz] using (Finset.mem_sdiff.mp hqD).1
+      exact hci z hqC z hzI rfl
+    · exact (Finset.mem_sdiff.mp hqD).2 (by simp [hqy])
+    · have hqC : b ∈ C := by simpa [hqb] using (Finset.mem_sdiff.mp hqD).1
+      exact hci b hqC b hbI rfl
+    · exact (Finset.mem_sdiff.mp hqD).2 (by simp [hqr])
+    · have hqC : w ∈ C := by simpa [hqw] using (Finset.mem_sdiff.mp hqD).1
+      exact hci w hqC w hwI rfl
+    · exact (Finset.mem_sdiff.mp hqD).2 (by simp [hqs])
+  have hcoverC : ∀ q ∈ C, q = t ∨ q = x ∨ q = y ∨ q = r ∨ q = s ∨ q ∈ rest := by
+    intro q hq
+    by_cases hqt : q = t
+    · exact Or.inl hqt
+    · by_cases hqx : q = x
+      · exact Or.inr (Or.inl hqx)
+      · by_cases hqy : q = y
+        · exact Or.inr (Or.inr (Or.inl hqy))
+        · by_cases hqr : q = r
+          · exact Or.inr (Or.inr (Or.inr (Or.inl hqr)))
+          · by_cases hqs : q = s
+            · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hqs))))
+            · right; right; right; right; right
+              have hm : q ∈ rest.toFinset := by
+                have hqD : q ∈ D := Finset.mem_sdiff.mpr ⟨hq, by simp [hqt, hqx, hqy, hqr, hqs]⟩
+                simpa [rest] using hqD
+              exact List.mem_toFinset.mp hm
+  exact hamiltonian_of_split_partition_two_outsiders G C I a b c z w t x y r s rest
+    hC hpartition hIeq hct hta hax hxz hzy hyb hbr hrw hws hsC
+    hbaseNodup hrestNodup hrestC hbaseRest hcoverC
+
 private theorem clique_order_chain (G : SimpleGraph V) (C : Finset V)
     (hC : G.IsClique (C : Set V)) (l : List V)
     (hnodup : l.Nodup) (hfin : l.toFinset = C) : l.IsChain G.Adj := by
@@ -542,5 +892,7 @@ end SplitGraphPath
 #print axioms SplitGraphPath.hamiltonian_of_clique_order_with_two_endpoints
 #print axioms SplitGraphPath.hamiltonian_of_split_partition_two_endpoints
 #print axioms SplitGraphPath.exists_distinct_row_attachments
+#print axioms SplitGraphPath.hamiltonian_of_split_partition_two_outsiders
+#print axioms SplitGraphPath.hamiltonian_of_split_partition_two_outsiders_of_rows
 #print axioms SplitGraphPath.hamiltonian_of_split_partition_row_bounds
 #print axioms SplitGraphPath.hamiltonian_of_split_partition_of_inducedTreeBound
