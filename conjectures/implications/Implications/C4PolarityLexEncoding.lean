@@ -54,6 +54,51 @@ def lexFreshIds (next : Nat) : List Nat → List Nat → List Nat
       else next :: lexFreshIds (next + 1) xs ys
   | _, _ => []
 
+/-- Scan the comparison from an initially equal prefix, recording one bit for
+each non-skipped position. Each recorded bit is the updated equality prefix. -/
+def lexPrefixScan (a : Nat → Bool) (pref : Bool) : List Nat → List Nat → List Bool
+  | x :: xs, y :: ys =>
+      if x == y then lexPrefixScan a pref xs ys
+      else
+        let nextPref := pref && (a x == a y)
+        nextPref :: lexPrefixScan a nextPref xs ys
+  | _, _ => []
+
+theorem lexPrefixScan_length (a : Nat → Bool) (pref : Bool)
+    (left right : List Nat) :
+    (lexPrefixScan a pref left right).length = (lexFreshIds 0 left right).length := by
+  induction left generalizing right pref with
+  | nil => cases right <;> rfl
+  | cons x xs ih =>
+      cases right with
+      | nil => rfl
+      | cons y ys =>
+          by_cases hxy : x = y
+          · simp [lexPrefixScan, lexFreshIds, hxy, ih]
+          · simp [lexPrefixScan, lexFreshIds, hxy, ih]
+
+/-- The lex auxiliary assignment uses the scan values at the consecutive DIMACS
+IDs beginning at `base`; IDs outside that block retain their original value. -/
+def lexAssignment (a : Nat → Bool) (base : Nat) (left right : List Nat) : Nat → Bool :=
+  fun n => if n < base then a n else
+    if n < base + (lexPrefixScan a true left right).length then
+      (lexPrefixScan a true left right).getD (n - base) false
+    else a n
+
+theorem lexAssignment_preserves_below_base (a : Nat → Bool) (base : Nat)
+    (left right : List Nat) {n : Nat} (hn : n < base) :
+    lexAssignment a base left right n = a n := by
+  simp [lexAssignment, hn]
+
+theorem lexAssignment_fresh_id (a : Nat → Bool) (base : Nat)
+    (left right : List Nat) {k : Nat}
+    (hk : k < (lexPrefixScan a true left right).length) :
+    lexAssignment a base left right (base + k) =
+      (lexPrefixScan a true left right).getD k false := by
+  have hbelow : ¬ base + k < base := by omega
+  have habove : base + k < base + (lexPrefixScan a true left right).length := by omega
+  simp [lexAssignment, hbelow, habove]
+
 /-- Each unequal variable pair allocates exactly one fresh prefix variable;
 identical variables are skipped. -/
 theorem lexFreshIds_length (next : Nat) (left right : List Nat) :
