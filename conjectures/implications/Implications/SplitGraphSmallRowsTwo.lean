@@ -268,7 +268,8 @@ theorem outer_endpoints_of_overlapping_rows
     (hrowBound : ∀ q ∈ C, (row G I q).card ≤ 2)
     (hnotDouble : ∀ q ∈ C, q ≠ c → q ≠ d → (selectedRow I left right q).card ≠ 2) :
     ∃ e f, e ∈ C ∧ f ∈ C ∧ e ≠ c ∧ e ≠ d ∧ f ≠ c ∧ f ≠ d ∧ e ≠ f ∧
-      G.Adj e v ∧ G.Adj v c ∧ G.Adj c u ∧ G.Adj u d ∧ G.Adj d w ∧ G.Adj w f := by
+      G.Adj e v ∧ G.Adj v c ∧ G.Adj c u ∧ G.Adj u d ∧ G.Adj d w ∧ G.Adj w f ∧
+      (left v = e ∨ right v = e) ∧ (left w = f ∨ right w = f) := by
   classical
   have hvSel : v ∈ selectedRow I left right c := by rw [hrowC]; simp [hvw]
   have hwSel : w ∈ selectedRow I left right d := by rw [hrowD]; simp [hvw.symm]
@@ -340,7 +341,7 @@ theorem outer_endpoints_of_overlapping_rows
     exact hnotDouble e heC heNeC heNeD hcard
   have hwf : G.Adj w f := hwfAdj.symm
   exact ⟨e,f,heC,hfC,heNeC,heNeD,hfNeC,hfNeD,heNeF,
-    hevAdj,hcv,hcu,hud,hdw,hwf⟩
+    hevAdj,hcv,hcu,hud,hdw,hwf,hevEnd,hwfEnd⟩
 
 /-- A split graph with exactly two selected double rows has a Hamiltonian
 path. -/
@@ -465,12 +466,101 @@ theorem hamiltonian_of_split_partition_two_double_rows
           )
       hprefixClique
   · rcases hoverlap with ⟨hrowC,hrowD,huv,huw,hvw⟩
-    -- The overlap branch uses the seven-vertex exceptional prefix.
-    exact False.elim (by
-      have : False := by
-        have h := hcount
-        omega
-      exact this)
+    obtain ⟨e,f,heC,hfC,hec,hed,hfc,hfd,hef,hev,hvc,hcu,hud,hdw,hwf,
+      hevEnd,hwfEnd⟩ := outer_endpoints_of_overlapping_rows G C I left right c d u v w
+      hcC hdC hcd hrowC hrowD huv huw hvw hleftC hrightC hleftAdj hrightAdj hneq hrow hnotDouble
+    let S : Finset V := {u,v,w}
+    let pref : List V := [e,v,c,u,d,w,f]
+    have huSelC : u ∈ selectedRow I left right c := by rw [hrowC]; simp [huv]
+    have hvSelC : v ∈ selectedRow I left right c := by rw [hrowC]; simp [hvw]
+    have huSelD : u ∈ selectedRow I left right d := by rw [hrowD]; simp [huw]
+    have hwSelD : w ∈ selectedRow I left right d := by rw [hrowD]; simp [hvw.symm]
+    have huI : u ∈ I := (Finset.mem_filter.mp huSelC).1
+    have hvI : v ∈ I := (Finset.mem_filter.mp hvSelC).1
+    have hwI : w ∈ I := (Finset.mem_filter.mp hwSelD).1
+    have hcentersNodup : ([e,c,d,f] : List V).Nodup := by
+      simp [List.nodup_cons, hec, hed, hef, hcd, Ne.symm hfc,
+        Ne.symm hfd, Ne.symm hfc, Ne.symm hfd]
+    have hcross (x : V) (hx : x ∈ C) (y : V) (hy : y ∈ I) : x ≠ y := by
+      intro heq
+      subst y
+      exact (Finset.disjoint_left.mp hdisj) hx hy
+    have hprefNodup : pref.Nodup := by
+      have hev' := hcross e heC v hvI
+      have hew' := hcross e heC w hwI
+      have heu' := hcross e heC u huI
+      have hcv' := hcross c hcC v hvI
+      have hcw' := hcross c hcC w hwI
+      have hcu' := hcross c hcC u huI
+      have hdv' := hcross d hdC v hvI
+      have hdu' := hcross d hdC u huI
+      have hdw' := hcross d hdC w hwI
+      have hfv' := hcross f hfC v hvI
+      have hfu' := hcross f hfC u huI
+      have hfw' := hcross f hfC w hwI
+      simp [pref, List.nodup_cons, hcentersNodup, huv, huw, hvw,
+        hev', hew', heu', hcv', hcw', hcu', hdv', hdu', hdw', hfv', hfu', hfw',
+        Ne.symm hcv', Ne.symm hcw', Ne.symm hcu', Ne.symm hdv', Ne.symm hdu',
+        Ne.symm hdw', Ne.symm hfv', Ne.symm hfu', Ne.symm hfw']
+    have hprefChain : pref.IsChain G.Adj := by
+      simp [pref, List.isChain_cons, hev, hvc, hcu, hud, hdw, hwf]
+    have hspecial : ∀ i ∈ I, i ∈ pref ↔ i ∈ S := by
+      intro i hi
+      constructor
+      · intro hmem
+        simp only [pref, List.mem_cons, List.not_mem_nil, or_false] at hmem
+        rcases hmem with h | h | h | h | h | h | h
+        · exact False.elim ((Finset.disjoint_left.mp hdisj) heC (h ▸ hi))
+        · exact Or.inl h.symm
+        · exact False.elim ((Finset.disjoint_left.mp hdisj) hcC (h ▸ hi))
+        · exact Or.inr (Or.inl h.symm)
+        · exact False.elim ((Finset.disjoint_left.mp hdisj) hdC (h ▸ hi))
+        · exact Or.inr (Or.inr h.symm)
+        · exact False.elim ((Finset.disjoint_left.mp hdisj) hfC (h ▸ hi))
+      · intro hmem
+        simp only [S, Finset.mem_insert, Finset.mem_singleton] at hmem
+        rcases hmem with h | h | h
+        · subst i; simp [pref]
+        · subst i; simp [pref]
+        · subst i; simp [pref]
+    have hprefixClique : ∀ q ∈ C, q ∈ pref → ∃ i ∈ I, i ∈ S ∧
+        (left i = q ∨ right i = q) := by
+      intro q hq hmem
+      simp only [pref, List.mem_cons, List.not_mem_nil, or_false] at hmem
+      rcases hmem with h | h | h | h | h | h | h
+      · subst q
+        exact ⟨v,hvI,by simp [S],hevEnd⟩
+      · exact False.elim ((Finset.disjoint_left.mp hdisj) hq (h ▸ hvI))
+      · subst q
+        exact ⟨v,hvI,by simp [S],(Finset.mem_filter.mp hvSelC).2⟩
+      · exact False.elim ((Finset.disjoint_left.mp hdisj) hq (h ▸ huI))
+      · subst q
+        exact ⟨w,hwI,by simp [S],(Finset.mem_filter.mp hwSelD).2⟩
+      · exact False.elim ((Finset.disjoint_left.mp hdisj) hq (h ▸ hwI))
+      · subst q
+        exact ⟨w,hwI,by simp [S],hwfEnd⟩
+    have hprefLastC : ∀ x, x ∈ pref.getLast? → x ∈ C := by
+      intro x hx
+      have hxf : f = x := by simpa [pref] using hx
+      simpa [hxf] using hfC
+    exact SplitGraphSmallRowsCompletion.hamiltonian_of_selected_prefix_of_double_rows
+      G C I S pref hC hdisj hpartition (by simp [pref]) hprefNodup hprefChain
+      hprefLastC hspecial left right hleftC hrightC hleftAdj hrightAdj hneq
+      (by intro q hq; simpa [selectedRow] using hcap q hq)
+      (by
+        intro q hq hqTwo
+        change selectedRow I left right q ⊆ S
+        have hqD : q ∈ doubleRows := Finset.mem_filter.mpr ⟨hq,hqTwo⟩
+        rw [hdoubleRows] at hqD
+        simp only [Finset.mem_insert, Finset.mem_singleton] at hqD
+        rcases hqD with hqc | hqd
+        · rw [hqc, hrowC]
+          intro i hi
+          simp [S] at hi ⊢
+        · rw [hqd, hrowD]
+          intro i hi
+          simp [S] at hi ⊢)
+      hprefixClique
 end SplitGraphSmallRowsTwo
 
 #print axioms SplitGraphSmallRowsTwo.two_original_rows_intersect
