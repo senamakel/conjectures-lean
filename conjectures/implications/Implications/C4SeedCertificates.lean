@@ -404,7 +404,7 @@ theorem no_compatible_six_in_seed_deletion (G : SimpleGraph (Fin 42))
     intro x hx₁ hx₂
     have hx₁' : G.Adj a.1 x.1 := by simpa [SimpleGraph.induce_adj] using hx₁
     have hx₂' : G.Adj b.1 x.1 := by simpa [SimpleGraph.induce_adj] using hx₂
-    exact hcompat a.1 haS b.1 hbS hab' x.1 (by simpa using x.2) hx₁' hx₂'
+    exact hcompat a.1 haS b.1 hbS hab' x.1 x.property hx₁' hx₂'
   have hn := no_disjoint_six_of_seed_iso
     (G.induce ({v}ᶜ : Set (Fin 42))) hseed
   apply hn
