@@ -125,4 +125,34 @@ theorem scaled_difference_congruence {g x y z : ℕ} {r s : ℤ}
 
 #print axioms scaled_difference_congruence
 
+theorem fixed_difference_bound {y : ℕ} {d : ℤ}
+    (h : (y : ℤ) ∣ (d-3)^2-8) : y ≤ ((d-3)^2-8).natAbs := by
+  have hn : (d-3)^2-8 ≠ 0 := by
+    intro he
+    have he' : (d-3)^2 = 8 := sub_eq_zero.mp he
+    have hs : (d-3).natAbs^2 = 8 := by
+      calc
+        (d-3).natAbs^2 = ((d-3)^2).natAbs := (Int.natAbs_pow _ _).symm
+        _ = (8 : ℤ).natAbs := congrArg Int.natAbs he'
+        _ = 8 := by decide +kernel
+    have hroot : (d-3).natAbs = 2 := by
+      rw [← Nat.sqrt_eq' (d-3).natAbs, hs]
+      exact (Nat.eq_sqrt'.2 ⟨by decide, by decide⟩).symm
+    rw [hroot] at hs
+    norm_num at hs
+  have hpos : 0 < ((d-3)^2-8).natAbs := Int.natAbs_pos.mpr hn
+  obtain ⟨k,hk⟩ := h
+  have hk' : ((d-3)^2-8).natAbs = y*k.natAbs := by
+    simpa only [Int.natAbs_mul, Int.natAbs_natCast] using congrArg Int.natAbs hk
+  exact Nat.le_of_dvd hpos ⟨k.natAbs,hk'⟩
+
+theorem difference_at_least_ten {y d : ℕ} (hy : 33 ≤ y) (hd : 0 < d)
+    (he : d % 2 = 0) (hc : (y : ℤ) ∣ ((d : ℤ)-3)^2-8) : 10 ≤ d := by
+  by_contra! hl
+  have hb := fixed_difference_bound hc
+  interval_cases d <;> (try norm_num at he) <;> norm_num at hb <;> omega
+
+#print axioms fixed_difference_bound
+#print axioms difference_at_least_ten
+
 end CrystalQuotientFour
