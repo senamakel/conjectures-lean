@@ -38,6 +38,25 @@ Every pair is either disjoint as windows or has a gap listed in `shifts`. -/
 def SeparatedBy (marks shifts : Finset ℕ) : Prop :=
   ∀ s ∈ marks, ∀ t ∈ marks, s < t → 8 ≤ t - s ∨ t - s ∈ shifts
 
+/-- When every allowed overlap shift is at least four, a marked window has at most
+one later marked window that overlaps it. -/
+theorem unique_overlapping_successor (marks shifts : Finset ℕ)
+    (hsep : SeparatedBy marks shifts)
+    (hgap : ∀ d ∈ shifts, 4 ≤ d)
+    {s t u : ℕ} (hs : s ∈ marks) (ht : t ∈ marks) (hu : u ∈ marks)
+    (hst : s < t) (hsu : s < u) (htt : t - s < 8) (htu : u - s < 8) :
+    t = u := by
+  rcases lt_trichotomy t u with h | h | h
+  · rcases hsep t ht u hu h with hfar | hd
+    · omega
+    · have := hgap (u - t) hd
+      omega
+  · exact h
+  · rcases hsep u hu t ht h with hfar | hd
+    · omega
+    · have := hgap (t - u) hd
+      omega
+
 /-- If local moved offsets never meet their translates at an allowed gap, the lifted
 permutations at all marked windows have pairwise-disjoint supports. -/
 theorem lifted_windows_pairwise_disjoint {n : ℕ} (marks shifts : Finset ℕ)
@@ -70,6 +89,7 @@ theorem lifted_windows_pairwise_disjoint {n : ℕ} (marks shifts : Finset ℕ)
   · exact (hordered ht hs h).symm
 
 #print axioms liftWindow_support_image
+#print axioms unique_overlapping_successor
 #print axioms lifted_windows_pairwise_disjoint
 
 end Implications.WilfWindowGeometry
