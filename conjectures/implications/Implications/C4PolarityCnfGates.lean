@@ -38,17 +38,17 @@ theorem edge_and_iff (edge x y : Bool) :
 
 /-- The five clauses defining one equality-prefix output in the symmetry
 breaking comparator. -/
-def prefixEqualityClauses (prefix x y same : Bool) : Bool :=
-  clauseSat [!same, prefix] &&
+def prefixEqualityClauses (pref x y same : Bool) : Bool :=
+  clauseSat [!same, pref] &&
     clauseSat [!same, !x, y] &&
     clauseSat [!same, x, !y] &&
-    clauseSat [!prefix, x, y, same] &&
-    clauseSat [!prefix, !x, !y, same]
+    clauseSat [!pref, x, y, same] &&
+    clauseSat [!pref, !x, !y, same]
 
-theorem prefix_equality_iff (prefix x y same : Bool) :
-    prefixEqualityClauses prefix x y same = true ↔
-      same = (prefix && (x == y)) := by
-  cases prefix <;> cases x <;> cases y <;> cases same <;> decide
+theorem prefix_equality_iff (pref x y same : Bool) :
+    prefixEqualityClauses pref x y same = true ↔
+      same = (pref && (x == y)) := by
+  cases pref <;> cases x <;> cases y <;> cases same <;> decide
 
 /-- Whether at least `k` entries of a Boolean list are true. -/
 def atLeast (k : Nat) (xs : List Bool) : Bool :=
@@ -60,7 +60,7 @@ theorem atLeast_append_singleton (k : Nat) (hk : 0 < k)
     (xs : List Bool) (x : Bool) :
     atLeast k (xs ++ [x]) =
       (atLeast k xs || (x && atLeast (k - 1) xs)) := by
-  cases x <;> simp [atLeast, List.count_append, hk]
+  cases x <;> simp [atLeast, List.count_append] <;> omega
 
 theorem atLeast_zero_nil : atLeast 0 [] = true := by
   simp [atLeast]
@@ -78,26 +78,21 @@ def lexAtLeast : List Bool → List Bool → Bool
 /-- Satisfaction of all comparison clauses, carrying the equality prefix. -/
 def lexConstraint : Bool → List Bool → List Bool → Bool
   | _, [], [] => true
-  | prefix, x :: xs, y :: ys =>
-      ((!prefix) || x || !y) &&
-        lexConstraint (prefix && (x == y)) xs ys
+  | pref, x :: xs, y :: ys =>
+      ((!pref) || x || !y) &&
+        lexConstraint (pref && (x == y)) xs ys
   | _, _, _ => false
 
 theorem lex_constraint_iff (xs ys : List Bool) :
     lexConstraint true xs ys = lexAtLeast xs ys := by
   induction xs generalizing ys with
-  | nil => cases ys <;> rfl
+  | nil => cases ys <;> simp [lexConstraint, lexAtLeast]
   | cons x xs ih =>
       cases ys with
-      | nil => rfl
+      | nil => simp [lexConstraint, lexAtLeast]
       | cons y ys =>
-          simp only [lexConstraint, lexAtLeast]
-          by_cases hxy : x = y
-          · subst y
-            simp [ih]
-          · have hbeq : (x == y) = false := by
-              cases x <;> cases y <;> simp_all
-            simp [hbeq, ih]
+          cases x <;> cases y <;>
+            simp [lexConstraint, lexAtLeast, ih]
 
 end Implications.C4PolarityCnfGates
 
