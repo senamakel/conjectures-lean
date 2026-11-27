@@ -98,6 +98,41 @@ theorem lexNext_eq (next : Nat) (left right : List Nat) :
           · simp [lexNext, lexFreshIds, hxy, ih]
           · simp [lexNext, lexFreshIds, hxy, ih, Nat.add_assoc, Nat.add_comm]
 
+/-- The permuted deletion-vector variables, using the permutation's indices as
+the Python list comprehension does. Valid permutations have in-range indices. -/
+def permutationVariables (deleted permutation : List Nat) : List Nat :=
+  permutation.map fun i => deleted[i]!
+
+/-- Concatenate the exact lex clauses for every permutation, threading the
+fresh-variable counter across comparisons as the encoder does. -/
+def orbitLexClauses (truth next : Nat) (deleted : List Nat) :
+    List (List Nat) → List (List Int)
+  | [] => []
+  | permutation :: rest =>
+      let image := permutationVariables deleted permutation
+      lexClauses truth next deleted image ++
+        orbitLexClauses truth (lexNext next deleted image) deleted rest
+
+/-- Final unused variable after all lex comparisons in an orbit list. -/
+def orbitLexNext (next : Nat) (deleted : List Nat) : List (List Nat) → Nat
+  | [] => next
+  | permutation :: rest =>
+      let image := permutationVariables deleted permutation
+      orbitLexNext (lexNext next deleted image) deleted rest
+
+theorem orbitLexNext_eq (next : Nat) (deleted : List Nat) (permutations : List (List Nat)) :
+    orbitLexNext next deleted permutations =
+      next + permutations.foldl
+        (fun count permutation => count +
+          (lexFreshIds next deleted (permutationVariables deleted permutation)).length) 0 := by
+  induction permutations generalizing next with
+  | nil => simp [orbitLexNext]
+  | cons permutation rest ih =>
+      simp only [orbitLexNext, List.foldl_cons]
+      rw [ih]
+      rw [lexNext_eq]
+      omega
+
 /-- Identical DIMACS variables have the same assigned bit, which justifies
 skipping that position without an auxiliary equality gate. -/
 theorem identical_variables_same_value (a : Nat → Bool) {x y : Nat}
