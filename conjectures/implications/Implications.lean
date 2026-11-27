@@ -30,3 +30,4 @@ import Implications.C4VertexExtension
 import Implications.WilfPatternSwap
 import Implications.WilfTwoWindowOrder
 import Implications.WilfCertifiedSwap
+import Implications.WilfChainCertificate
