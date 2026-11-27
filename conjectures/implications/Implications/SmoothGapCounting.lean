@@ -56,6 +56,37 @@ private theorem primeAt_count_asymptotic :
     field_simp
   exact hfinal
 
+private theorem eventually_primeBelow_count_le_two_mul
+    (B : ℕ → ℕ) (hB : Tendsto (fun n => (B n : ℝ)) atTop atTop) :
+    ∀ᶠ n : ℕ in atTop,
+      ((B n).primesBelow.card : ℝ) ≤ 2 * (B n : ℝ) / Real.log (B n : ℝ) := by
+  have heq := Nat.isEquivalent_primeCounting.comp_tendsto hB
+  have hden : ∀ᶠ n : ℕ in atTop,
+      (B n : ℝ) / Real.log (B n : ℝ) ≠ 0 := by
+    filter_upwards [hB.eventually (eventually_gt_atTop 1)] with n hn
+    exact div_ne_zero (by linarith) (Real.log_pos hn).ne'
+  have hratio := (Asymptotics.isEquivalent_iff_tendsto_one hden).mp heq
+  have hlt : ∀ᶠ n : ℕ in atTop,
+      ((Nat.primeCounting (B n) : ℝ) / ((B n : ℝ) / Real.log (B n : ℝ))) < 2 := by
+    filter_upwards [hratio.eventually (Iio_mem_nhds (by norm_num : (1 : ℝ) < 2))]
+      with n hn
+    simpa using hn
+  filter_upwards [hB.eventually (eventually_gt_atTop 1), hlt] with n hn hpi
+  have hlog : 0 < Real.log (B n : ℝ) := Real.log_pos hn
+  have hdenpos : 0 < (B n : ℝ) / Real.log (B n : ℝ) := div_pos (by linarith) hlog
+  have hpi' :
+      (Nat.primeCounting (B n) : ℝ) < 2 * ((B n : ℝ) / Real.log (B n : ℝ)) :=
+    (div_lt_iff₀ hdenpos).mp hpi
+  have hcard : (B n).primesBelow.card ≤ Nat.primeCounting (B n) := by
+    calc
+      (B n).primesBelow.card = Nat.primeCounting' (B n) :=
+        Nat.primesBelow_card_eq_primeCounting' _
+      _ = Nat.primeCounting (B n - 1) := (Nat.primeCounting_sub_one _).symm
+      _ ≤ Nat.primeCounting (B n) := Nat.monotone_primeCounting (Nat.sub_le _ _)
+  have hcard' : ((B n).primesBelow.card : ℝ) ≤ Nat.primeCounting (B n) := by
+    exact_mod_cast hcard
+  exact hcard'.trans hpi'.le
+
 private theorem primeAt_strictMono : StrictMono primeAt := by
   intro a b hab
   exact Nat.nth_strictMono Nat.infinite_setOfPred_prime hab
