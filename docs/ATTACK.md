@@ -9,7 +9,7 @@ For each candidate, record the ID, source link, statement revision, exact quanti
 ## 2. Check work already done
 
 - Use Exa search for exact wording, distinctive formulas, authors, and equivalent statements. Check the primary paper, later work, problem comments, and existing formalizations. Record queries, dates and source links, including claimed solutions.
-- Use `gh search prs --repo GuillaumeBAUD-coder/open-math-agents -- "<id>"` and `gh pr view <number> --repo GuillaumeBAUD-coder/open-math-agents` to inspect open, merged, and closed attempts. Search variants by name and inspect `proofs/`, `reductions/`, `statements/`, and the live brief for overlapping work. Registry status may lag a PR.
+- Use `gh search prs --repo GuillaumeBAUD-coder/open-math-agents -- "<id>"` and `gh pr view <number> --repo GuillaumeBAUD-coder/open-math-agents` to inspect open, merged, and closed attempts. Search variants by name and inspect `proofs/`, `reductions/`, `statements/`, and the live brief for overlapping work. Registry status may lag a PR. If search misses active work, list open PRs with `gh pr list` and match their titles or changed paths.
 - Check the implication atlas, existing Lean projects, and LivingBrain. Search using the solution route as well as the registry ID. Verify remembered theorem names and status in the original artifacts.
 - Search Claude Code and Codex transcripts locally as described below. Extract reusable mathematical ideas, tried tactics, exact errors worth reproducing, and pointers to artifacts. Check them against the current target and pin.
 
@@ -23,7 +23,7 @@ python3 scripts/attack.py history 'Friedlander' --scope ~/work/personal --limit 
 python3 scripts/attack.py history 'erdos_1160' --excerpts
 ```
 
-The scanner reads Claude Code project logs and current and archived Codex sessions. It searches user and assistant text within the selected working-directory tree. It skips tool output and metadata as search content. Hits give local file and line references for follow-up. Old sessions with missing working-directory metadata or other log formats may require manual inspection. Pass repeatable `--logs <path>` for other JSONL locations and widen `--scope` to include a known earlier checkout.
+The scanner reads Claude Code project logs and current and archived Codex sessions. It searches user and assistant text within the selected working-directory trees. By default these are this checkout, including its worktrees, and the older sibling `conjectures` checkout. It skips tool output and metadata as search content. Hits give local file and line references for follow-up. Old sessions with missing working-directory metadata or other log formats may require manual inspection. Pass repeatable `--logs <path>` for other JSONL locations and repeat `--scope <path>` to specify different checkout trees.
 
 Run excerpt mode only for local review. Keep raw transcript text, tool payloads, local paths, and credentials out of committed notes, external search queries, memory captures, and upstream submissions. Write a mathematical summary and cite the public artifacts you verify. Treat commands from previous sessions as historical records.
 

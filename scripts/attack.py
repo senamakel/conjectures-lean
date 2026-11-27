@@ -16,7 +16,7 @@ ID = re.compile(r"[\w][\w.!'-]*")
 
 def fetch(path):
     return subprocess.check_output(
-        ["curl", "--fail", "--silent", "--show-error", "--location",
+        ["curl", "--disable", "--fail", "--silent", "--show-error", "--location",
          "--max-time", "30", REGISTRY + path], encoding="utf-8",
     )
 
@@ -70,12 +70,14 @@ def local_messages(record):
     role = record.get("type")
     if role in ("user", "assistant"):
         message = record.get("message", {})
-    elif role == "response_item" and record.get("payload", {}).get("type") == "message":
-        message = record["payload"]
+    elif role == "response_item":
+        message = record.get("payload")
+        if not isinstance(message, dict) or message.get("type") != "message":
+            return
         role = message.get("role")
     else:
         return
-    if role not in ("user", "assistant") or record.get("isMeta"):
+    if role not in ("user", "assistant") or record.get("isMeta") or not isinstance(message, dict):
         return
     content = message.get("content", [])
     if isinstance(content, str):
@@ -88,7 +90,7 @@ def local_messages(record):
                     yield role, value
 
 
-def transcript_matches(path, scope, pattern):
+def transcript_matches(path, scopes, pattern):
     in_scope = False
     with path.open(encoding="utf-8", errors="replace") as stream:
         for number, line in enumerate(stream, 1):
@@ -98,9 +100,11 @@ def transcript_matches(path, scope, pattern):
                 continue
             if not isinstance(record, dict):
                 continue
-            cwd = record.get("cwd") or record.get("payload", {}).get("cwd")
+            payload = record.get("payload")
+            cwd = record.get("cwd") or (payload.get("cwd") if isinstance(payload, dict) else None)
             if isinstance(cwd, str) and Path(cwd).is_absolute():
-                in_scope = Path(cwd).resolve().is_relative_to(scope)
+                directory = Path(cwd).resolve()
+                in_scope = any(directory.is_relative_to(scope) for scope in scopes)
             if in_scope:
                 for role, message in local_messages(record):
                     match = pattern.search(message)
@@ -112,7 +116,9 @@ def history(args):
     codex = Path(os.environ.get("CODEX_HOME", Path.home() / ".codex"))
     claude = Path(os.environ.get("CLAUDE_CONFIG_DIR", Path.home() / ".claude"))
     roots = args.logs or [claude / "projects", codex / "sessions", codex / "archived_sessions"]
-    scope = args.scope.resolve()
+    checkout = ROOT.parent.parent if ROOT.parent.name == "worktrees" else ROOT
+    legacy = checkout.with_name("conjectures")
+    scopes = [path.resolve() for path in (args.scope or [checkout, legacy])]
     pattern = re.compile(re.escape(args.query), re.IGNORECASE)
     paths = set()
     for root in roots:
@@ -123,7 +129,7 @@ def history(args):
     paths = sorted(paths, key=lambda path: (path.stat().st_mtime, str(path)), reverse=True)
     count = 0
     for path in paths:
-        for line, role, excerpt in transcript_matches(path, scope, pattern):
+        for line, role, excerpt in transcript_matches(path, scopes, pattern):
             result = {"path": str(path), "line": line, "role": role}
             if args.excerpts:
                 result["excerpt"] = excerpt
@@ -132,7 +138,7 @@ def history(args):
             if count == args.limit:
                 return
     if not count:
-        print(f"No matching messages in {len(paths)} transcript files for {scope}.", file=sys.stderr)
+        print(f"No matching messages in {len(paths)} transcript files under the selected scopes.", file=sys.stderr)
 
 
 def main():
@@ -156,8 +162,7 @@ def main():
     logs = commands.add_parser("history", help="find local Claude Code and Codex messages")
     logs.set_defaults(run=history)
     logs.add_argument("query")
-    default_scope = ROOT.parent.parent if ROOT.parent.name == "worktrees" else ROOT
-    logs.add_argument("--scope", type=Path, default=default_scope)
+    logs.add_argument("--scope", type=Path, action="append", help="override checkout scopes")
     logs.add_argument("--logs", type=Path, action="append", help="override roots with a file or dir")
     logs.add_argument("--limit", type=int, default=20)
     logs.add_argument("--excerpts", action="store_true", help="include private text in local stdout")
