@@ -50,6 +50,10 @@ Do these searches for each shortlisted ID. Share results within a family and car
 
 OMA entries in LemmaGraph use OMA's pin. Premise ranking uses Mathlib's index and omits OMA declarations. A retrieved lemma is ready to use once its import works at the target pin and its hypotheses match.
 
+### Example triage for Erdős 151
+
+Exa led to the original problem description and the Erdős problem page. LemmaGraph found the pinned `SimpleGraph.cliqueTransversalNumber` definition and a merged proof of the triangle-free variant. That proof needs `G.CliqueFree 3`, while the reduction's first leaf permits triangles and assumes `G.CliqueFree 4`. For the narrower goal of bounding clique size, premise search returned `Finset.exists_subset_card_eq` and `SimpleGraph.IsNClique.card_eq`. Those help express the size bound. The missing argument is still how to hit the maximal edges and triangles with at most `n - H n` vertices under the leaf's hypotheses. Park the leaf until a candidate argument bridges that gap. [Problem statement](https://www.erdosproblems.com/151) · [Triangle-free proof](https://github.com/GuillaumeBAUD-coder/open-math-agents/blob/021d99de402a9bf935006b8a82bce998b7c62767/proofs/Erdos151.erdos_151.variants.cliqueFree_three.lean) · [Reduction](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/3477)
+
 ## Assign and verify
 
 Each batch can inspect many entries. Start at most three proof spikes per batch, with one owner per exact ID. Keep a shared ledger keyed by ID and statement revision and mark it before a spike begins. Reuse prior-art searches across siblings, and avoid parallel parent and child proofs that depend on the same missing argument. Scale by running independent families through the same process and by keeping proof capacity within the actual account-wide desk limit.
