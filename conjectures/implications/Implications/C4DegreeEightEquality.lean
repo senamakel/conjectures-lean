@@ -379,5 +379,6 @@ theorem every_other_vertex_has_unique_common_neighbor
 
 end C4DegreeEightEquality
 
+#print axioms C4DegreeEightEquality.each_degree_eight_vertex_has_one_degree_seven_neighbor
 #print axioms C4DegreeEightEquality.degree_seven_count_eq_sixteen
 #print axioms C4DegreeEightEquality.every_other_vertex_has_unique_common_neighbor
