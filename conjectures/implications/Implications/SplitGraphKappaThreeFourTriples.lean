@@ -231,11 +231,11 @@ theorem hamiltonian_of_all_four_triple_rows
   have hAd : d ∈ A := by simp [A]
   have hrdA : G.Adj a (r d) := (hAdjRow d a hAd hAa (by intro heq; exact had heq.symm)).symm
   have hrdB : G.Adj (r d) b := hAdjRow d b hAd hAb (by intro h; exact hbd h.symm)
-  have hraB : G.Adj b (r a) := (hAdjRow a b hAa hAb (by intro heq; exact hab heq.symm)).symm
+  have hraB : G.Adj b (r a) := (hAdjRow a b hAa hAb (by intro heq; exact hab heq)).symm
   have hraC : G.Adj (r a) c := hAdjRow a c hAa hAc hac
-  have hrbC : G.Adj c (r b) := (hAdjRow b c hAb hAc (by intro heq; exact hbc heq.symm)).symm
+  have hrbC : G.Adj c (r b) := (hAdjRow b c hAb hAc (by intro heq; exact hbc heq)).symm
   have hrbD : G.Adj (r b) d := hAdjRow b d hAb hAd hbd
-  have hrcD : G.Adj d (r c) := (hAdjRow c d hAc hAd (by intro heq; exact hcd heq.symm)).symm
+  have hrcD : G.Adj d (r c) := (hAdjRow c d hAc hAd (by intro heq; exact hcd heq)).symm
   have hprefChain : pref.IsChain G.Adj := by
     simp [pref, hrdA, hrdB, hraB, hraC, hrbC, hrbD, hrcD]
   have hprefLastC : ∀ x, x ∈ pref.getLast? → x ∈ C := by
