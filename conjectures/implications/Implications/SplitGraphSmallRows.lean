@@ -9,7 +9,7 @@ namespace SplitGraphSmallRows
 private theorem twoRows_intersect_of_symmDiff_card_le_two
     {α : Type*} [DecidableEq α] (s t : Finset α)
     (hs : s.card = 2) (ht : t.card = 2)
-    (hd : (s \\ t ∪ t \\ s).card ≤ 2) :
+    (hd : (s \ t ∪ t \ s).card ≤ 2) :
     ∃ x, x ∈ s ∧ x ∈ t := by
   classical
   by_contra hn
@@ -18,11 +18,11 @@ private theorem twoRows_intersect_of_symmDiff_card_le_two
     apply Finset.eq_empty_iff_forall_not_mem.mpr
     intro x hx
     exact hn ⟨x, (Finset.mem_inter.mp hx).1, (Finset.mem_inter.mp hx).2⟩
-  have hEq : s ∪ t = s \\ t ∪ t \\ s := by
+  have hEq : s ∪ t = s \ t ∪ t \ s := by
     rw [← Finset.symmDiff_eq_union hdis, Finset.symmDiff_def]
   have hunion : (s ∪ t).card = 4 := by
     rw [Finset.card_union_of_disjoint hdis, hs, ht]
-  have : (s \\ t ∪ t \\ s).card = 4 := by rw [← hEq]; exact hunion
+  have : (s \ t ∪ t \ s).card = 4 := by rw [← hEq]; exact hunion
   omega
 
 /-- A pairwise-intersecting family of two-element rows either has a common
@@ -213,4 +213,51 @@ theorem pairwise_intersecting_two_sets
         · subst q; exact (hzD hqD).elim
       exact hnotTriple x ⟨hwA, hwB, hwD⟩
 
+/-! The exact family statement applied to clique rows. -/
+theorem clique_rows_two_set_structure
+    {V : Type*} [Fintype V] [DecidableEq V]
+    (G : SimpleGraph V) (C I : Finset V)
+    (hrow : ∀ c ∈ C, (row G I c).card ≤ 2)
+    (hdiff : ∀ c ∈ C, ∀ d ∈ C, c ≠ d → (rowDiff G I c d).card ≤ 2)
+    (hRows : ∃ c ∈ C, (row G I c).card = 2) :
+    (∃ x, ∀ c ∈ C, (row G I c).card = 2 → x ∈ row G I c) ∨
+      ∃ a b c, a ≠ b ∧ a ≠ c ∧ b ≠ c ∧
+        ∀ d ∈ C, (row G I d).card = 2 → row G I d ⊆ {a, b, c} := by
+  classical
+  let R := (C.image (row G I)).filter (fun s => s.card = 2)
+  have hRne : R.Nonempty := by
+    obtain ⟨d, hdC, hdrow⟩ := hRows
+    exact ⟨row G I d, Finset.mem_filter.mpr ⟨Finset.mem_image.mpr ⟨d, hdC, rfl⟩, hdrow⟩⟩
+  have hRcard : ∀ A ∈ R, A.card = 2 := by
+    intro A hA
+    exact (Finset.mem_filter.mp hA).2
+  have hRint : ∀ A ∈ R, ∀ B ∈ R, A ≠ B → ∃ x, x ∈ A ∧ x ∈ B := by
+    intro A hA B hB hne
+    obtain ⟨d, hdC, hAeq⟩ := Finset.mem_image.mp (Finset.mem_filter.mp hA).1
+    obtain ⟨e, heC, hBeq⟩ := Finset.mem_image.mp (Finset.mem_filter.mp hB).1
+    subst A B
+    by_cases hde : d = e
+    · subst e
+      exact (hne rfl).elim
+    · have hbound := hdiff d hdC e heC hde
+      exact twoRows_intersect_of_symmDiff_card_le_two
+        (row G I d) (row G I e)
+        ((Finset.mem_filter.mp hA).2)
+        ((Finset.mem_filter.mp hB).2)
+        (by simpa [rowDiff] using hbound)
+  obtain hcenter | htriangle := pairwise_intersecting_two_sets R hRne hRcard hRint
+  · left
+    obtain ⟨x, hx⟩ := hcenter
+    refine ⟨x, ?_⟩
+    intro d hdC hdrow
+    exact hx (row G I d) (Finset.mem_filter.mpr ⟨Finset.mem_image.mpr ⟨d, hdC, rfl⟩, hdrow⟩)
+  · right
+    obtain ⟨a, b, c, hab, hac, hbc, hsubset⟩ := htriangle
+    refine ⟨a, b, c, hab, hac, hbc, ?_⟩
+    intro d hdC hdrow
+    exact hsubset (row G I d) (Finset.mem_filter.mpr ⟨Finset.mem_image.mpr ⟨d, hdC, rfl⟩, hdrow⟩)
+
 end SplitGraphSmallRows
+
+#print axioms SplitGraphSmallRows.pairwise_intersecting_two_sets
+#print axioms SplitGraphSmallRows.clique_rows_two_set_structure
