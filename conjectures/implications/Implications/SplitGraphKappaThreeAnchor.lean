@@ -395,7 +395,6 @@ theorem hamiltonian_of_common_pair [Fintype V]
     (hcommon : ∀ c ∈ C, G.Adj c a ∧ G.Adj c b)
     (hdegree : ∀ k ∈ I \ {a, b}, 2 ≤ (C.filter fun c => G.Adj c k).card) :
     ∃ u v : V, ∃ p : G.Walk u v, p.IsHamiltonian := by
-  classical
   let K : Finset V := {a, b}
   let O := I \ K
   have hdis : (O : Set V).PairwiseDisjoint (fun k => C.filter fun c => G.Adj c k) := by
