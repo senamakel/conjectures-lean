@@ -1,4 +1,4 @@
-import Mathlib.GroupTheory.Perm.ViaEmbedding
+import Implications.WilfDisjointPermutations
 import Implications.WilfThreeCycleOrder
 import Implications.WilfPatternSwap
 
@@ -8,23 +8,17 @@ namespace Implications.WilfThreeCycleGlobal
 
 open WilfMarked WilfTwoWindowOrder WilfThreeCycleOrder
 
-private def windowEmbedding {n : ℕ} (s : ℕ) (hs : s + 7 < n) : Fin 8 ↪ Fin n where
-  toFun i := ⟨s + i.val, by have := i.isLt; omega⟩
-  inj' := by
-    intro i j h
-    apply Fin.ext
-    have hv := congrArg Fin.val h
-    change s + i.val = s + j.val at hv
-    omega
+private abbrev windowEmbedding {n : ℕ} (s : ℕ) (hs : s + 7 < n) : Fin 8 ↪ Fin n :=
+  WilfDisjointPermutations.windowEmbedding s (by omega)
 
 private noncomputable def component {n : ℕ} (m : Equiv.Perm (Fin 8)) (s : ℕ) :
     Equiv.Perm (Fin n) :=
-  if hs : s + 7 < n then m.viaEmbedding (windowEmbedding s hs) else Equiv.refl _
+  if hs : s + 7 < n then WilfDisjointPermutations.liftWindow s (by omega) m else Equiv.refl _
 
 private theorem component_apply {n : ℕ} (m : Equiv.Perm (Fin 8)) {s : ℕ}
     (hs : s + 7 < n) (i : Fin 8) :
     component m s (windowEmbedding s hs i) = windowEmbedding s hs (m i) := by
-  rw [component, dif_pos hs, Equiv.Perm.viaEmbedding_apply]
+  rw [component, dif_pos hs, WilfDisjointPermutations.liftWindow_apply]
 
 private theorem mem_component_support {n : ℕ} (m : Equiv.Perm (Fin 8)) {s : ℕ}
     (hs : s + 7 < n) (x : Fin n) :
@@ -37,8 +31,8 @@ private theorem mem_component_support {n : ℕ} (m : Equiv.Perm (Fin 8)) {s : �
     · obtain ⟨i, rfl⟩ := hx
       rw [component_apply m hs] at h
       exact ⟨i, fun e => h (congrArg (windowEmbedding s hs) e), rfl⟩
-    · rw [component, dif_pos hs, Equiv.Perm.viaEmbedding_apply_of_notMem _ _ _ hx] at h
-      exact (h rfl).elim
+    · rw [component, dif_pos hs] at h
+      exact (h (Equiv.Perm.viaEmbedding_apply_of_notMem _ _ _ hx)).elim
   · rintro ⟨i, h, rfl⟩
     rw [component_apply m hs]
     exact fun e => h ((windowEmbedding s hs).injective e)
@@ -104,6 +98,166 @@ private theorem components_disjoint {n : ℕ} (m : Equiv.Perm (Fin 8))
   obtain ⟨_, rfl, _⟩ := crossing_offsets marks hsep hs ht hst ((hm j).mp hj) hindex
   simpa using (hm 6).mp hi
 
+private theorem assembled_on_window {n : ℕ} (m : Equiv.Perm (Fin 8))
+    (hm : ∀ i : Fin 8, m i ≠ i ↔ i = 1 ∨ i = 3 ∨ i = 4)
+    (marks : Finset ℕ) (hb : ∀ s ∈ marks, s + 7 < n) (hsep : SeparatedStarts marks)
+    {s : ℕ} (hs : s ∈ marks) (i : Fin 8) :
+    WilfDisjointPermutations.assemble marks (component m) (components_disjoint m hm marks hb hsep)
+        (windowEmbedding s (hb s hs) i) =
+      if h : i = 6 ∧ s + 5 ∈ marks then
+        windowEmbedding (s + 5) (hb _ h.2) (m 1)
+      else windowEmbedding s (hb s hs) (m i) := by
+  by_cases hnext : i = 6 ∧ s + 5 ∈ marks
+  · rw [dif_pos hnext]
+    have he : windowEmbedding (s + 5) (hb _ hnext.2) (1 : Fin 8) =
+        windowEmbedding s (hb s hs) i := by
+      apply Fin.ext
+      change s + 5 + 1 = s + i.val
+      rw [hnext.1]
+    rw [← he]
+    rw [WilfDisjointPermutations.assemble_apply_of_mem_support _ _ _ hnext.2]
+    · exact component_apply m (hb _ hnext.2) 1
+    · exact (mem_component_support m (hb _ hnext.2) _).mpr ⟨1, (hm 1).mpr (Or.inl rfl), rfl⟩
+  · rw [dif_neg hnext]
+    by_cases hmove : m i ≠ i
+    · rw [WilfDisjointPermutations.assemble_apply_of_mem_support _ _ _ hs]
+      · exact component_apply m (hb _ hs) i
+      · exact (mem_component_support m (hb _ hs) _).mpr ⟨i, hmove, rfl⟩
+    · rw [not_ne_iff.mp hmove]
+      apply WilfDisjointPermutations.assemble_apply_of_forall_fixes
+      intro t ht
+      by_cases heq : t = s
+      · subst t
+        rw [component_apply m (hb _ hs), not_ne_iff.mp hmove]
+      · by_contra! hbad
+        have hmem := Equiv.Perm.mem_support.mpr hbad
+        obtain ⟨j, hj, he⟩ := (mem_component_support m (hb _ ht) _).mp hmem
+        have hindex := congrArg Fin.val he.symm
+        change s + i.val = t + j.val at hindex
+        obtain ⟨ht', hi, _⟩ := crossing_offsets marks hsep hs ht (Ne.symm heq) ((hm j).mp hj) hindex
+        exact hnext ⟨hi, ht' ▸ ht⟩
+
+private def Marked {n : ℕ} (marks : Finset ℕ) (p : Fin 8 → Fin 8)
+    (π : Equiv.Perm (Fin n)) : Prop :=
+  ∀ s ∈ marks, ContainsAt π s p
+
+private noncomputable def moveMarked {n : ℕ} (marks : Finset ℕ) (p q : Fin 8 → Fin 8)
+    (m : Equiv.Perm (Fin 8))
+    (hm : ∀ i : Fin 8, m i ≠ i ↔ i = 1 ∨ i = 3 ∨ i = 4)
+    (hover : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
+    (hq : p ∘ m = q)
+    (hlocal : ∀ f : Fin 13 → Fin n, WindowOrder p f 0 → WindowOrder p f 5 →
+      ∀ i j, f (overlapImage m i) < f (overlapImage m j) ↔ q i < q j)
+    (π : {f : Equiv.Perm (Fin n) // Marked marks p f}) :
+    {f : Equiv.Perm (Fin n) // Marked marks q f} := by
+  let hb := marked_starts_bounded π.val p marks π.property
+  let hsep := separated_of_occurrences π.val p hover marks π.property
+  let g := WilfDisjointPermutations.assemble marks (component m)
+    (components_disjoint m hm marks hb hsep)
+  refine ⟨g.trans π.val, ?_⟩
+  intro s hs
+  have hfirst := π.property s hs
+  refine ⟨hb s hs, ?_⟩
+  intro i j
+  change π.val (g (windowEmbedding s (hb s hs) i)) <
+    π.val (g (windowEmbedding s (hb s hs) j)) ↔ q i < q j
+  by_cases hnext : s + 5 ∈ marks
+  · let f : Fin 13 → Fin n :=
+      fun k => π.val ⟨s + k.val, by have := hb _ hnext; have := k.isLt; omega⟩
+    have h0 : WindowOrder p f 0 := by
+      obtain ⟨_, hpat⟩ := hfirst
+      intro a b h
+      simpa [f, position] using (hpat a b).mpr h
+    have h5 : WindowOrder p f 5 := by
+      obtain ⟨_, hpat⟩ := π.property (s + 5) hnext
+      intro a b h
+      simpa [f, position, Nat.add_assoc] using (hpat a b).mpr h
+    have himage (k : Fin 8) :
+        π.val (g (windowEmbedding s (hb s hs) k)) = f (overlapImage m k) := by
+      change π.val (WilfDisjointPermutations.assemble marks (component m)
+        (components_disjoint m hm marks hb hsep) (windowEmbedding s (hb s hs) k)) = _
+      rw [assembled_on_window m hm marks hb hsep hs]
+      by_cases hk : k = 6
+      · rw [dif_pos ⟨hk, hnext⟩]
+        congr 1
+        apply Fin.ext
+        simp [overlapImage, hk, f, WilfDisjointPermutations.windowEmbedding, position, Nat.add_assoc]
+      · rw [dif_neg (fun h => hk h.1)]
+        congr 1
+        apply Fin.ext
+        simp [overlapImage, hk, f, WilfDisjointPermutations.windowEmbedding, position]
+    rw [himage i, himage j]
+    exact hlocal f h0 h5 i j
+  · have hfix (k : Fin 8) : g (windowEmbedding s (hb s hs) k) =
+        windowEmbedding s (hb s hs) (m k) := by
+      change WilfDisjointPermutations.assemble marks (component m)
+        (components_disjoint m hm marks hb hsep) (windowEmbedding s (hb s hs) k) = _
+      rw [assembled_on_window m hm marks hb hsep hs, dif_neg (fun h => hnext h.2)]
+    rw [hfix i, hfix j, ← hq]
+    obtain ⟨_, hpat⟩ := hfirst
+    exact hpat (m i) (m j)
+
+private theorem moveMarked_injective {n : ℕ} (marks : Finset ℕ) (p q : Fin 8 → Fin 8)
+    (m : Equiv.Perm (Fin 8))
+    (hm : ∀ i : Fin 8, m i ≠ i ↔ i = 1 ∨ i = 3 ∨ i = 4)
+    (hover : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
+    (hq : p ∘ m = q)
+    (hlocal : ∀ f : Fin 13 → Fin n, WindowOrder p f 0 → WindowOrder p f 5 →
+      ∀ i j, f (overlapImage m i) < f (overlapImage m j) ↔ q i < q j) :
+    Function.Injective (moveMarked marks p q m hm hover hq hlocal) := by
+  intro a b hab
+  apply Subtype.ext
+  let hb := marked_starts_bounded a.val p marks a.property
+  let hs := separated_of_occurrences a.val p hover marks a.property
+  let g := WilfDisjointPermutations.assemble marks (component m)
+    (components_disjoint m hm marks hb hs)
+  have he : g.trans a.val = g.trans b.val := congrArg Subtype.val hab
+  apply Equiv.ext
+  intro x
+  have hx := congrArg (fun e : Equiv.Perm (Fin n) => e (g.symm x)) he
+  simpa only [Equiv.trans_apply, Equiv.apply_symm_apply] using hx
+
+private theorem marked_iff_subset {n : ℕ} (p : Fin 8 → Fin 8)
+    (chosen : Finset (Fin n)) (π : Equiv.Perm (Fin n)) :
+    chosen ⊆ WilfPatternSwap.occurrenceSet p π ↔ Marked (chosen.image Fin.val) p π := by
+  classical
+  constructor
+  · intro h s hs
+    obtain ⟨i, hi, rfl⟩ := Finset.mem_image.mp hs
+    exact (Finset.mem_filter.mp (h hi)).2
+  · intro h i hi
+    exact Finset.mem_filter.mpr ⟨Finset.mem_univ i, h i.val (Finset.mem_image_of_mem _ hi)⟩
+
+/-- The marked three-position cycle proves exact occurrence-count equality. -/
+theorem exactOccurrenceCount_eq_23145786_25134786 (n : ℕ) (marks : Finset (Fin n)) :
+    WilfCounts.exactCount (WilfPatternSwap.occurrenceSet pattern23145786) marks =
+      WilfCounts.exactCount (WilfPatternSwap.occurrenceSet pattern25134786) marks := by
+  classical
+  apply WilfEquivalence.exactCount_eq_of_markedEquiv
+  intro chosen
+  let chosenNat := chosen.image Fin.val
+  have hpq : pattern23145786 ∘ cycle = pattern25134786 := by funext i; fin_cases i <;> rfl
+  have hqp : pattern25134786 ∘ cycle.symm = pattern23145786 := by funext i; fin_cases i <;> rfl
+  have hcount : Fintype.card {π : Equiv.Perm (Fin n) // Marked chosenNat pattern23145786 π} =
+      Fintype.card {π : Equiv.Perm (Fin n) // Marked chosenNat pattern25134786 π} := by
+    apply le_antisymm
+    · apply Fintype.card_le_of_injective _
+        (moveMarked_injective chosenNat pattern23145786 pattern25134786 cycle
+          (by decide) _ hpq overlap_order_23145786_25134786)
+      apply overlap_compatible_only_at_5_or_7_of_decide
+      intro d hd hsmall
+      interval_cases d <;> decide
+    · apply Fintype.card_le_of_injective _
+        (moveMarked_injective chosenNat pattern25134786 pattern23145786 cycle.symm
+          (by decide) _ hqp overlap_order_25134786_23145786)
+      apply overlap_compatible_only_at_5_or_7_of_decide
+      intro d hd hsmall
+      interval_cases d <;> decide
+  exact (Equiv.subtypeEquivRight (marked_iff_subset pattern23145786 chosen)).trans
+    ((Fintype.equivOfCardEq hcount).trans
+      (Equiv.subtypeEquivRight (marked_iff_subset pattern25134786 chosen)).symm)
+
 #print axioms crossing_offsets
+#print axioms exactOccurrenceCount_eq_23145786_25134786
 
 end Implications.WilfThreeCycleGlobal
