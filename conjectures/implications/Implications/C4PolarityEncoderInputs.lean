@@ -106,7 +106,7 @@ theorem orthogonal_pair_score_count (D : Finset (Fin 57)) :
         exact ⟨Finset.mem_univ _, hlt, (SimpleGraph.induce_adj.mp hab).2⟩
       · change Sym2.mk a b = e
         exact habeq
-    · have hba : graph.Adj b.val a.val := graph.symm.symm b.val a.val (SimpleGraph.induce_adj.mp hab)
+    · have hba : graph.Adj b.val a.val := graph.symm.symm a.val b.val (SimpleGraph.induce_adj.mp hab)
       refine ⟨(b.val, a.val), ?_, ?_⟩
       · apply Finset.mem_filter.mpr
         refine ⟨?_, ⟨b.property, a.property⟩⟩
