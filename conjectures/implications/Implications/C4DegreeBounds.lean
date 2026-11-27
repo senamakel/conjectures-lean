@@ -72,7 +72,7 @@ theorem degree_window_bound (v : V) (m : ℕ) (hm : 2 ≤ m)
     intro u hu
     have huv : v ∈ G.neighborFinset u := by
       have huv' : G.Adj v u := by simpa using hu
-      simpa using G.symm.symm v u huv' 
+      simpa using G.symm.symm v u huv'
     have hcard : (outerNeighbors G u v).card = G.degree u - 1 := by
       change #((G.neighborFinset u).erase v) = G.degree u - 1
       rw [Finset.card_erase_of_mem huv, G.card_neighborFinset_eq_degree]
@@ -109,7 +109,7 @@ theorem neighbor_degree_excess_le_one_of_degree_eight (v : V)
       change u ∈ G.neighborFinset v at hu
       have huv : v ∈ G.neighborFinset u := by
         have huv' : G.Adj v u := by simpa using hu
-        simpa using G.symm.symm v u huv' 
+        simpa using G.symm.symm v u huv'
       change #((G.neighborFinset u).erase v) = G.degree u - 1
       rw [Finset.card_erase_of_mem huv, G.card_neighborFinset_eq_degree]
     calc
