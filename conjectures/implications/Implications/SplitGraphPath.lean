@@ -513,8 +513,8 @@ private theorem clique_neighbor_of_connected
   have hsndI : p.snd ∉ I := by
     intro hsnd
     by_cases hsame : p.snd = i
-    · subst p.snd
-      exact G.irrefl hadj
+    · have hloop : G.Adj i i := by simpa [hsame] using hadj
+      exact G.irrefl hloop
     · exact (hI hi hsnd (fun h => hsame h.symm) hadj).elim
   have hsndUniv : p.snd ∈ (Finset.univ : Finset V) := Finset.mem_univ _
   rw [hpartition] at hsndUniv
