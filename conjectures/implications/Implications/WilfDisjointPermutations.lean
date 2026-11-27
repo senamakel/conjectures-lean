@@ -100,7 +100,7 @@ theorem liftWindow_apply_of_exterior {n : ℕ} (t : ℕ) (ht : t + 8 ≤ n)
   apply Equiv.Perm.viaEmbedding_apply_of_notMem
   intro hxRange
   rcases hxRange with ⟨i, hi⟩
-  have hval : x.val = t + i.val := congrArg Fin.val hi
+  have hval : x.val = t + i.val := (congrArg Fin.val hi).symm
   have hilt := i.isLt
   rcases hx with hbefore | hafter <;> omega
 
