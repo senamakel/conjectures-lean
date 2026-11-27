@@ -158,7 +158,6 @@ theorem reciprocalPrimeSum_le_dyadic_harmonic :
           exact div_nonneg (by positivity) (by exact_mod_cast hp'.pos.le)
         have hkpos : 0 < (k + 1 : ℝ) := by positivity
         apply (le_div_iff₀ hkpos).2
-        apply (le_div_iff₀ hkpos).2
         calc
           block k * (k + 1 : ℝ) = (k + 1 : ℝ) * block k := by ring
           _ ≤ extra := hsingle
@@ -171,30 +170,28 @@ theorem reciprocalPrimeSum_le_dyadic_harmonic :
         simp [T]
       have hinj : Set.InjOn (fun k : ℕ => k + 1) T := by
         intro a ha b hb hab
-        omega
+        exact Nat.add_left_cancel hab
       rw [← himage, Finset.sum_image hinj]
       simp
     calc
       (∑ p ∈ S, (1 : ℝ) / p) =
           ∑ k ∈ T, ∑ p ∈ S.filter (fun p => Nat.log 2 p = k), (1 : ℝ) / p := hdecomp.symm
       _ ≤ ∑ k ∈ T, block k := Finset.sum_le_sum hfiber
-      _ ≤ ∑ k ∈ T, D₀ / (k + 1 : ℝ) := hblocks
-      _ = D₀ * ∑ k ∈ T, (1 : ℝ) / (k + 1 : ℝ) := by
+      _ ≤ ∑ k ∈ T, D / (k + 1 : ℝ) := hblocks
+      _ = D * ∑ k ∈ T, (1 : ℝ) / (k + 1 : ℝ) := by
         rw [Finset.mul_sum]
         apply Finset.sum_congr rfl
         intro k hk
         ring
-      _ = D₀ * ∑ j ∈ Finset.Icc 1 (Nat.log 2 N + 1), (1 : ℝ) / j := by rw [hsum_shift]
-      _ ≤ D₀ * (1 + Real.log ((Nat.log 2 N + 1 : ℕ) : ℝ)) := by
-        apply mul_le_mul_of_nonneg_left (harmonic_le_one_add_log _)
-        have hDblock := hK K (le_refl K)
-        have hblocknonneg : 0 ≤ block K := by
-          dsimp [block]
-          apply Finset.sum_nonneg
-          intro p hp
-          exact div_nonneg (by positivity) (by positivity)
-        positivity
-      _ ≤ (D₀ + extra + 1) * (1 + Real.log ((Nat.log 2 N + 1 : ℕ) : ℝ)) := by
+      _ = D * ∑ j ∈ Finset.Icc 1 (Nat.log 2 N + 1), (1 : ℝ) / j := by rw [hsum_shift]
+      _ ≤ D * (1 + Real.log ((Nat.log 2 N + 1 : ℕ) : ℝ)) := by
+        have hh : (∑ j ∈ Finset.Icc 1 (Nat.log 2 N + 1), (1 : ℝ) / j) ≤
+            1 + Real.log ((Nat.log 2 N + 1 : ℕ) : ℝ) := by
+          have h := harmonic_le_one_add_log (Nat.log 2 N + 1)
+          simpa [harmonic_eq_sum_Icc, Rat.cast_sum, Rat.cast_inv, Rat.cast_natCast] using h
+        exact mul_le_mul_of_nonneg_left hh (by dsimp [D]; positivity)
+      _ ≤ D * (1 + Real.log ((Nat.log 2 N + 1 : ℕ) : ℝ)) := le_rfl
+    _ ≤ D * (1 + Real.log ((Nat.log 2 N + 1 : ℕ) : ℝ)) := by
         have hfactor : 0 ≤ 1 + Real.log ((Nat.log 2 N + 1 : ℕ) : ℝ) := by
           have : (1 : ℝ) ≤ ((Nat.log 2 N + 1 : ℕ) : ℝ) := by positivity
           have hl := Real.log_nonneg this
@@ -208,6 +205,8 @@ theorem reciprocalPrimeSum_le_dyadic_harmonic :
           apply Finset.sum_nonneg
           intro p hp
           exact div_nonneg (by positivity) (by positivity)
-        gcongr
+        apply mul_le_mul_of_nonneg_right _ hfactor
+        dsimp [D]
+        linarith
 
 end Implications.SmoothPrimeReciprocal
