@@ -168,4 +168,20 @@ theorem lindelof_small (hRH : RiemannHypothesis) {ε : ℝ} (hε : 0 < ε) (hε'
 theorem lindelof_of_RH (hRH : RiemannHypothesis) : LindelofHypothesis := fun _ hε =>
   isBigO_rpow_of_logBounds (logBounds_riemannZeta hRH) hε
 
+/-- The big-O formulation gives the little-o formulation by applying it at half the exponent. -/
+theorem lindelof_littleO_of_bigO (h : LindelofHypothesis) :
+    ∀ ε : ℝ, 0 < ε →
+      (fun t : ℝ => riemannZeta (1 / 2 + (t : ℂ) * I)) =o[atTop]
+        (fun t : ℝ => t ^ ε) := by
+  intro ε hε
+  apply (h (ε / 2) (half_pos hε)).of_norm_left.trans_isLittleO
+  apply (isLittleO_iff_tendsto' ?_).mpr
+  · apply (tendsto_rpow_neg_atTop (half_pos hε)).congr'
+    filter_upwards [eventually_gt_atTop (0 : ℝ)] with t ht
+    rw [← Real.rpow_sub ht]
+    congr 1
+    ring
+  · filter_upwards [eventually_gt_atTop (0 : ℝ)] with t ht hz
+    exact ((Real.rpow_pos_of_pos ht ε).ne' hz).elim
+
 end Lindelof
