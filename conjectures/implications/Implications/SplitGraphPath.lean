@@ -204,9 +204,10 @@ theorem hamiltonian_of_clique_order_with_two_endpoints
     rw [List.nodup_cons]
     refine ⟨?_, hlj⟩
     intro h
-    apply hi
-    have hlmem : i ∈ l := (List.mem_append.mp h).resolve_right (by simp)
-    exact (by simpa [hl_finset] using (List.mem_toFinset.mpr hlmem))
+    rcases List.mem_append.mp h with hlmem | hjmem
+    · exact hi (by simpa [hl_finset] using (List.mem_toFinset.mpr hlmem))
+    · simp at hjmem
+      exact hij hjmem
   have hpath : p.IsPath := by
     apply (SimpleGraph.Walk.isPath_def p).2
     simpa [p, SimpleGraph.Walk.support_ofSupport hne hchain] using hnodup
