@@ -3,7 +3,8 @@ import Mathlib.Data.Nat.Bitwise
 /-!
 # Finite certificates for the three published 41-vertex `C₄` extremal seeds
 
-The three sparse6 records in McKay's `c4_n41e132.maybe.s6` are represented here
+The [McKay sparse6 data file](https://users.cecs.anu.edu.au/~bdm/data/extremal/c4_n41e132.maybe.s6)
+is represented here
 by their 41 neighbourhood bitmasks.  Their SHA-256 digests, in order, are
 `4033a0cc2e1e8f6d7cb05009d2ed0b0cfcec9ce969d76c6ed2faec68b3405927`,
 `7b21f509d31f8002aba9c00d5a21a1db422177bd6a832cee6b4e80dad460db60`, and
@@ -43,37 +44,41 @@ decreasing_by
     omega
 
 /--
-There is a compatible clique of the requested size among the ordered candidates.
-The recurrence skips a candidate or takes it and filters all later candidates
-to those with no common neighbour with it.
+There is a pairwise-compatible list of the requested size that is an ordered
+sublist of the candidates.  This is the mathematical specification of the
+search result.
 -/
-def ExistsCompatibleClique (g : Array Nat) : List Nat → Nat → Prop
-  | _, 0 => True
-  | [], _ + 1 => False
-  | v :: vs, k + 1 =>
-      ExistsCompatibleClique g vs (k + 1) ∨
-        ExistsCompatibleClique g (vs.filter (compatible g v)) k
-termination_by candidates remaining => candidates.length + remaining
-decreasing_by
-  · simp_wf
-  · simp_wf
-    have hfilter : (vs.filter (compatible g v)).length ≤ vs.length :=
-      List.length_filter_le _ _
-    omega
+def ExistsCompatibleClique (g : Array Nat) (candidates : List Nat) (size : Nat) : Prop :=
+  ∃ chosen : List Nat, chosen.length = size ∧ chosen <+ candidates ∧
+    chosen.Pairwise (fun u v => compatible g u v = true)
 
-/-- The Boolean search agrees with its proposition-valued specification. -/
-theorem search_correct (g : Array Nat) (candidates : List Nat) (size : Nat) :
-    compatibleCliqueSearchBool g candidates size = true ↔
-      ExistsCompatibleClique g candidates size := by
+/-- A true checker result produces an actual compatible sublist witness. -/
+theorem search_sound (g : Array Nat) (candidates : List Nat) (size : Nat)
+    (h : compatibleCliqueSearchBool g candidates size = true) :
+    ExistsCompatibleClique g candidates size := by
   cases size with
-  | zero => simp [compatibleCliqueSearchBool, ExistsCompatibleClique]
+  | zero =>
+      exact ⟨[], by simp, List.Sublist.slnil, List.Pairwise.nil⟩
   | succ size =>
     cases candidates with
-    | nil => simp [compatibleCliqueSearchBool, ExistsCompatibleClique]
+    | nil => simp [compatibleCliqueSearchBool] at h
     | cons v vs =>
-      simp only [compatibleCliqueSearchBool, Bool.or_eq_true, ExistsCompatibleClique]
-      rw [search_correct g vs (size + 1)]
-      rw [search_correct g (vs.filter (compatible g v)) size]
+      have hsplit :
+          compatibleCliqueSearchBool g vs (size + 1) = true ∨
+            compatibleCliqueSearchBool g (vs.filter (compatible g v)) size = true := by
+        apply Bool.or_eq_true.mp
+        simpa [compatibleCliqueSearchBool] using h
+      rcases hsplit with hskip | htake
+      · obtain ⟨chosen, hlen, hsub, hpairs⟩ := search_sound g vs (size + 1) hskip
+        exact ⟨chosen, hlen, hsub.cons v, hpairs⟩
+      · obtain ⟨chosen, hlen, hsub, hpairs⟩ :=
+          search_sound g (vs.filter (compatible g v)) size htake
+        refine ⟨v :: chosen, by simp [hlen], ?_, ?_⟩
+        · exact List.Sublist.cons_cons v (hsub.trans List.filter_sublist)
+        · apply List.Pairwise.cons
+          · intro w hw
+            exact (List.mem_filter.mp (hsub.subset hw)).2
+          · exact hpairs
 termination_by candidates.length + size
 decreasing_by
   · simp_wf
@@ -82,6 +87,56 @@ decreasing_by
     have hfilter : (vs.filter (compatible g v)).length ≤ vs.length :=
       List.length_filter_le _ _
     omega
+
+/-- A genuine compatible sublist is found by the depth-pruned checker. -/
+theorem search_complete (g : Array Nat) (candidates : List Nat) (size : Nat)
+    (h : ExistsCompatibleClique g candidates size) :
+    compatibleCliqueSearchBool g candidates size = true := by
+  obtain ⟨chosen, hlen, hsub, hpairs⟩ := h
+  cases size with
+  | zero => simp [compatibleCliqueSearchBool]
+  | succ size =>
+    cases candidates with
+    | nil =>
+        have hlenBound := hsub.length_le
+        simp at hlen hlenBound
+    | cons v vs =>
+        cases hsub with
+        | cons htail =>
+            have hskip : ExistsCompatibleClique g vs (size + 1) :=
+              ⟨chosen, hlen, htail, hpairs⟩
+            rw [compatibleCliqueSearchBool, Bool.or_eq_true]
+            exact Or.inl (search_complete g vs (size + 1) hskip)
+        | cons_cons _ htail =>
+            have hlenTail : chosen.tail.length = size := by simpa using hlen
+            have hpairsTail : chosen.tail.Pairwise (fun u w => compatible g u w = true) :=
+              hpairs.of_cons
+            have hcompatible : ∀ w ∈ chosen.tail, compatible g v w = true := by
+              intro w hw
+              exact hpairs.rel_of_pairwise_cons hw
+            have htailFiltered :
+                chosen.tail <+ vs.filter (compatible g v) := by
+              rw [← List.filter_eq_self.mpr hcompatible]
+              exact htail.filter (compatible g v)
+            have htake :
+                ExistsCompatibleClique g (vs.filter (compatible g v)) size :=
+              ⟨chosen.tail, hlenTail, htailFiltered, hpairsTail⟩
+            rw [compatibleCliqueSearchBool, Bool.or_eq_true]
+            exact Or.inr (search_complete g (vs.filter (compatible g v)) size htake)
+termination_by candidates.length + size
+decreasing_by
+  · simp_wf
+    omega
+  · simp_wf
+    have hfilter : (vs.filter (compatible g v)).length ≤ vs.length :=
+      List.length_filter_le _ _
+    omega
+
+/-- The Boolean search is sound and complete for the stated clique property. -/
+theorem search_correct (g : Array Nat) (candidates : List Nat) (size : Nat) :
+    compatibleCliqueSearchBool g candidates size = true ↔
+      ExistsCompatibleClique g candidates size :=
+  ⟨search_sound g candidates size, search_complete g candidates size⟩
 
 /-- The executable Boolean certificate for a graph's candidate set and clique size. -/
 def checker (g : Array Nat) (vertices size : Nat) : Bool :=
