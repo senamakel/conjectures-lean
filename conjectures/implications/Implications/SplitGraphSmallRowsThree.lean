@@ -535,7 +535,8 @@ theorem hamiltonian_of_split_partition_three_double_rows
       rcases hi with h | h
       · exact Or.inl h
       · exact Or.inr (Or.inr h)
-  have hOavoidSpecial : ∀ k ∈ O, left k ∉ {x,y,z} ∧ right k ∉ {x,y,z} := by
+  have hOavoidSpecial : ∀ k ∈ O, left k ∉ ({x,y,z} : Finset V) ∧
+      right k ∉ ({x,y,z} : Finset V) := by
     intro k hk
     have hkI := (Finset.mem_sdiff.mp hk).1
     constructor <;> intro h
