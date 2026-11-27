@@ -73,4 +73,23 @@ extension from a word outside them.
 
 ## Result
 
-Pending the bounded run.
+The complete inventory found 5,982 word/append-color cases, of which 36 have
+`m <= 29`. Their exact witness-incidence count was 4,203,290, below the
+predeclared 50,000,000 cap. Greedy packing found `q=2` in all 36 cases: the
+unique `m=28` case (McKenna main, canonical append color 4) has lower bound
+`m+q=30`; each of the other 35 cases has `m=29`, hence bound 31. The other
+5,946 cases have `m >= 30` and already meet the target lower bound. The script
+reports all 36 word IDs and colors; no low-`m` case has bound below 30.
+
+For the minimum case, the packed conflict pairs are `(28,511)` and `(37,502)`;
+their selected witness-position unions have sizes 14 and 15 and are disjoint
+(the script checks disjointness directly). Thus every one of the 997 pinned
+words, for every appended color, requires at least 30 old-position changes to
+extend to 539. This is a corpus-bounded result, not a proof that no other
+538-word has a 539 extension. It is stronger for the pinned corpus than the
+prior distance-28-only exclusion and uses no SAT solver.
+
+Reproduction command: `python3 docs/atlas/sweeps/2026-11-27/schur-six-539-corpus-lowerbound.py`.
+The script checks input hashes, corpus cardinalities, every input's sum-freeness,
+the triple count, the incidence cap, and the stated packing rule. Python
+`py_compile` and a second complete run passed.
