@@ -275,3 +275,40 @@ was 515.10 MB. Its partial binary LRAT trace is 425,834,000 bytes, SHA-256
 `fc54ba38582c13f86baff5680c752500f07563806258538ab3a601d7ecbc4372`.
 There is no model or complete proof. Only case 1 was run; cases 2..4 remain
 untouched, so this screen says nothing conclusive about the full graph claim.
+
+## Remaining root-matching cases
+
+The orbit audit gives four disjoint classes under the allowed relabeling.
+Case 1 already returned UNKNOWN. This run covers only cases 2, 3, and 4,
+once each. Testing the remaining fixed patterns probes whether the unresolved
+case-1 run was specific to its neighborhood matching. The root-fixed CNFs
+retain all other constraints and their prior ordering.
+
+Generate the three instances with `--matching-case 2`, `3`, and `4`.
+Run CaDiCaL 2.1.2 with binary LRAT and its 120-second wall limit, plus an
+external 130-second wall timeout and a 125-second CPU limit per process.
+Use one solver process per case, a 2 GiB virtual-memory limit and a 2 GiB
+file-size limit per process. Keep the formula, log, and any trace or model
+under `.lake/c4-k4-matching-slices/`. Stop each case at a complete SAT or
+UNSAT result, its limit, or an error. The total solver budget is 375 CPU
+seconds. Independently check any model or proof and report capped cases
+as unresolved.
+
+All three runs reached the wall cap with `UNKNOWN` and exit 0. Each CNF has
+8,643 variables and 229,626 clauses. None of the partial traces is a proof.
+
+| Case | Wall seconds | CPU seconds | Conflicts | Propagations | Peak KiB | Partial LRAT bytes |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 2 | 120.01 | 119.70 | 2,628,131 | 365,079,720 | 85,120 | 520,099,615 |
+| 3 | 120.01 | 119.63 | 2,890,075 | 350,219,766 | 81,548 | 489,198,667 |
+| 4 | 120.01 | 119.45 | 2,591,280 | 296,409,507 | 94,580 | 444,078,633 |
+
+The DIMACS SHA-256 digests were:
+
+- Case 2: `08206977c1239f1276f78bf9182ee268e6338296f67e4b3e1e9c2f6de4d2828d`
+- Case 3: `2cc858da1c6788b4f0474b2e0e1f86526a5de6b1ae771bd159e57633b13b63b5`
+- Case 4: `a937cc073a2f4328be9c8771b994b9d8ebe90916b29246e5de0ecb70058dd197`
+
+The total CPU usage was 358.78 seconds. Together with the earlier case-1
+benchmark, all four fixed-matching cases remain unresolved at their caps.
+No model was emitted and no complete LRAT replay was available.
