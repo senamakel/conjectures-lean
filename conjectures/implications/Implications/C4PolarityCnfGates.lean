@@ -56,11 +56,12 @@ def atLeast (k : Nat) (xs : List Bool) : Bool :=
 
 /-- Appending a Boolean input updates the threshold counter by the recurrence
 used by the encoder. -/
-theorem atLeast_append_singleton (k : Nat) (hk : 0 < k)
-    (xs : List Bool) (x : Bool) :
+theorem atLeast_append_singleton (k : Nat) (xs : List Bool) (x : Bool) :
     atLeast k (xs ++ [x]) =
       (atLeast k xs || (x && atLeast (k - 1) xs)) := by
-  cases x <;> simp [atLeast, List.count_append] <;> omega
+  cases x
+  · simp [atLeast, List.count_append]
+  · simp [atLeast, List.count_append] <;> omega
 
 theorem atLeast_zero_nil : atLeast 0 [] = true := by
   simp [atLeast]
