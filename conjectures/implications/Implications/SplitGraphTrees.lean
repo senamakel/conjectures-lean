@@ -77,20 +77,15 @@ theorem star_isTree (G : SimpleGraph V) (I : Finset V) (c : V)
 
 /-- The induced star bound gives the size bound on each row. -/
 theorem row_card_le (G : SimpleGraph V) (C I : Finset V) (k : ℕ)
-    (hdisj : Disjoint C I)
-    (hTreeBound : inducedTreeBound G k)
-    (hStar : ∀ c ∈ C,
-      (G.induce ((insert c (row G I c) : Finset V) : Set V)).IsTree) :
+    (hI : G.IsIndepSet (I : Set V))
+    (hTreeBound : inducedTreeBound G k) :
     ∀ c ∈ C, (row G I c).card ≤ k + 1 := by
   classical
   intro c hc
-  have hcI : c ∉ I := by
-    intro hci
-    exact (Finset.disjoint_left.mp hdisj hc hci)
   have hcn : c ∉ row G I c := by
     intro h
     exact G.irrefl (Finset.mem_filter.mp h).2
-  have hbound := hTreeBound (insert c (row G I c)) (hStar c hc)
+  have hbound := hTreeBound (insert c (row G I c)) (star_isTree G I c hI)
   rw [Finset.card_insert_of_notMem hcn] at hbound
   omega
 
@@ -132,8 +127,8 @@ theorem row_symmDiff_card_le (G : SimpleGraph V) (C I : Finset V) (k : ℕ)
 /-- Both row constraints used by the path construction, packaged together. -/
 theorem rows_bounded_of_inducedTreeBound
     (G : SimpleGraph V) (C I : Finset V) (k : ℕ)
-    (hdisj : Disjoint C I)
     (hTreeBound : inducedTreeBound G k)
+    (hI : G.IsIndepSet (I : Set V))
     (hStar : ∀ c ∈ C,
       (G.induce ((insert c (row G I c) : Finset V) : Set V)).IsTree)
     (hDoubleStar : ∀ c ∈ C, ∀ d ∈ C, c ≠ d →
@@ -141,7 +136,7 @@ theorem rows_bounded_of_inducedTreeBound
         ((insert c (insert d (rowDiff G I c d) : Finset V) : Finset V) : Set V)).IsTree) :
     (∀ c ∈ C, (row G I c).card ≤ k + 1) ∧
       (∀ c ∈ C, ∀ d ∈ C, c ≠ d → (rowDiff G I c d).card ≤ k) := by
-  exact ⟨row_card_le G C I k hdisj hTreeBound hStar,
+  exact ⟨row_card_le G C I k hI hTreeBound,
     row_symmDiff_card_le G C I k hdisj hTreeBound hDoubleStar⟩
 
 end SplitGraphTrees

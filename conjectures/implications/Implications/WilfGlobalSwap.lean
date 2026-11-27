@@ -52,7 +52,6 @@ private theorem left_to_right (marks : Finset Nat)
   obtain ⟨s, hs, hsi⟩ := hi
   refine ⟨s, hs, ?_⟩
   simp [swapIndex, hleft, hsi]
-  omega
 
 private theorem right_to_left (marks : Finset Nat)
     (hbounded : ∀ s ∈ marks, s + 7 < n)
@@ -66,7 +65,6 @@ private theorem right_to_left (marks : Finset Nat)
     exact no_left_right marks hsep i ⟨hleft, hright⟩
   refine ⟨s, hs, ?_⟩
   simp [swapIndex, hnot, hright, hsi]
-  omega
 
 theorem swapIndex_involutive (marks : Finset Nat)
     (hbounded : ∀ s ∈ marks, s + 7 < n)
