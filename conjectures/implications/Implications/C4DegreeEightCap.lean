@@ -130,7 +130,8 @@ private theorem degree_seven_neighbors_card_le_one (G : SimpleGraph (Fin 42))
     (G.neighborFinset u ∩ Finset.univ.filter fun v => G.degree v = 7).card ≤ 1 := by
   classical
   apply Finset.card_le_one.mpr
-  intro x hx y hy hxy
+  intro x hx y hy
+  by_contra hxy
   have hxN := (Finset.mem_inter.mp hx).1
   have hyN := (Finset.mem_inter.mp hy).1
   have hx7 := (Finset.mem_filter.mp (Finset.mem_inter.mp hx).2).2
@@ -141,9 +142,6 @@ private theorem degree_seven_neighbors_card_le_one (G : SimpleGraph (Fin 42))
     Finset.single_le_sum (fun w hw => Nat.zero_le _) hxN
   have hyle : G.degree y - 6 ≤ ∑ w ∈ G.neighborFinset u, (G.degree w - 6) :=
     Finset.single_le_sum (fun w hw => Nat.zero_le _) hyN
-  have hxnoty : x ∉ G.neighborFinset u.erase y := by
-    intro h
-    exact hxy ((Finset.mem_erase.mp h).1)
   have hxySum : (G.degree x - 6) + (G.degree y - 6) ≤
       ∑ w ∈ G.neighborFinset u, (G.degree w - 6) := by
     have hsubset : insert x {y} ⊆ G.neighborFinset u := by
@@ -174,55 +172,41 @@ theorem degree_eight_count_le_four_of_extremal_42
   have hdeg8 : ∀ v, G.degree v ≤ 8 := fun v =>
     (C4DegreeBounds.degree_window_of_extremal_42 G hDel he hC4 v).2
   have hk7 := degree_eight_count_le_seven_of_extremal_42 G hDel he hC4
+  have hk : D.card ≤ 7 := by simpa [D] using hk7
   by_contra hnot
   change ¬ D.card ≤ 4 at hnot
   have hkLow : 5 ≤ D.card := by omega
   have hkHigh : D.card ≤ 7 := by simpa [D] using hk7
   let U := D.biUnion N
-  have hUlower : 36 ≤ U.card := by
+  have hUnionBound : 17 * D.card ≤ 2 * U.card + D.card ^ 2 := by
     have hbound := twice_union_card_add_square_bound D N
       (fun u hu => (Finset.mem_filter.mp hu).2) (by
         intro u hu v hv huv
         have hcommon : (G.neighborFinset u ∩ G.neighborFinset v).card ≤ 1 := by
           apply Finset.card_le_one.mpr
-          intro x hx y hy hxy
+          intro x hx y hy
+          by_contra hxy
           have hux := by simpa using (Finset.mem_inter.mp hx).1
           have hvx := by simpa using (Finset.mem_inter.mp hx).2
           have huy := by simpa using (Finset.mem_inter.mp hy).1
           have hvy := by simpa using (Finset.mem_inter.mp hy).2
           exact hC4 huv hxy hux hvx ⟨huy, hvy⟩
         exact hcommon)
-    have hk := hk7
-    rw [D] at hk
-    have hkcases : D.card = 5 ∨ D.card = 6 ∨ D.card = 7 := by omega
-    rcases hkcases with hkcases | hkcases | hkcases
-    · rw [hkcases] at hbound
-      norm_num at hbound ⊢
-      omega
-    · rw [hkcases] at hbound
-      norm_num at hbound ⊢
-      omega
-    · rw [hkcases] at hbound
-      norm_num at hbound ⊢
-      omega
-  have hDavoid : D ∩ U = ∅ := by
-    apply Finset.eq_empty_iff_forall_not_mem.mpr
-    intro x hx
-    rcases Finset.mem_inter.mp hx with ⟨hxD, hxU⟩
+    simpa [U] using hbound
+  have hDavoid : Disjoint D U := by
+    rw [Finset.disjoint_left]
+    intro x hxD hxU
     rcases Finset.mem_biUnion.mp hxU with ⟨u, huD, hxu⟩
-    have hxuAdj : G.Adj u x := (G.mem_neighborFinset u x).mp hxu
     have hu8 := (Finset.mem_filter.mp huD).2
-    have hx8 := (Finset.mem_filter.mp hxD).2
     have hbound := C4DegreeBounds.neighbor_degree_le_seven_of_degree_eight
-      G u (by simp) hmin hC4 hu8 (G.mem_neighborFinset u x).mpr hxuAdj
+      G u (by simp) hmin hC4 hu8 hxu
     omega
   have hWbound : (E ∩ U).card ≤ D.card := by
     have hsub : E ∩ U ⊆ D.biUnion (fun u => G.neighborFinset u ∩ E) := by
       intro x hx
       rcases Finset.mem_inter.mp hx with ⟨hxE, hxU⟩
       rcases Finset.mem_biUnion.mp hxU with ⟨u, huD, hxu⟩
-      exact Finset.mem_biUnion.mpr ⟨u, huD,
-        Finset.mem_inter.mpr ⟨(Finset.mem_neighborFinset.mp hxu), hxE⟩⟩
+      exact Finset.mem_biUnion.mpr ⟨u, huD, Finset.mem_inter.mpr ⟨hxu, hxE⟩⟩
     calc
       (E ∩ U).card ≤ (D.biUnion fun u => G.neighborFinset u ∩ E).card := Finset.card_le_card hsub
       _ ≤ ∑ u ∈ D, (G.neighborFinset u ∩ E).card := Finset.card_biUnion_le
@@ -238,7 +222,7 @@ theorem degree_eight_count_le_four_of_extremal_42
     rcases Finset.mem_union.mp hx with hxD | hxE
     · exact Finset.mem_sdiff.mpr ⟨Finset.mem_univ _, by
         intro hxU
-        exact Finset.not_mem_empty x (Finset.mem_eq_empty.mp hDavoid ⟨hxD, hxU⟩)⟩
+        exact (Finset.disjoint_left.mp hDavoid) hxD hxU⟩
     · exact Finset.mem_sdiff.mpr ⟨Finset.mem_univ _, (Finset.mem_sdiff.mp hxE).2⟩
   have hcap : D.card + (E \ U).card ≤ 42 - U.card := by
     calc
