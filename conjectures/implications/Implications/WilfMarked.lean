@@ -203,5 +203,6 @@ namespace WilfMarked
 #print axioms same_pattern_overlap_compatible
 #print axioms same_pattern_start_distance
 #print axioms same_pattern_starts_separated
+#print axioms swap_supports_disjoint
 
 end WilfMarked
