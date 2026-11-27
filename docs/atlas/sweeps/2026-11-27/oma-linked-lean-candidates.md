@@ -9,3 +9,5 @@ Compared the [current formal-conjectures source ea8e3e198ded](https://github.com
 | [Erdos897.erdos_897.variants.parts.ii](https://lefttosolve.com/p/Erdos897.erdos_897.variants.parts.ii) | open | 52 | No | [Proof 1](https://github.com/plby/lean-proofs/blob/main/src/v4.24.0/ErdosProblems/Erdos897.lean) |
 | [OeisA100475.conjecture](https://lefttosolve.com/p/OeisA100475.conjecture) | open | 52 | No | [Proof 1](https://palomar-registry.org/entry.html?id=PALOMAR-2026-11-11-000001) |
 | [MovingSofa.ambidextrousSofaConstant_eq_romiksSofa_area](https://lefttosolve.com/p/MovingSofa.ambidextrousSofaConstant_eq_romiksSofa_area) | open | 59 | Yes | [Proof 1](https://palomar-registry.org/entry.html?id=PALOMAR-2026-10-13-000003) |
+
+The two OEIS entries have open overlapping submissions. See [A60841 #3461](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/3461) and [A100475 #3508](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/3508). Use the existing reduction for the Moving Sofa entry when assessing its remaining hypotheses.
