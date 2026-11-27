@@ -13,6 +13,7 @@ This sweep covers public Lean developments and recovered local attempts with an 
 ## Checker and submission status
 
 - Poincaré R1 passed the pinned checker with the three standard axioms. Its four leaves are nonzero integral top homology of the three-sphere, vanishing integral top homology for connected noncompact three-manifolds, Moise smoothing, and the smooth three-dimensional Poincaré theorem in the compact second-countable case. The proof of the parent implication includes the homotopy-invariance and second-countability bridges. Submitted as [upstream PR #4454](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4454). The desk returned HTTP 500 and issued no lease.
+- Green 100(i) R1 passed the pinned checker with the three standard axioms. The two leaves are the injective nonsurjective finite-field linear cellular automaton and Gromov–Weiss surjunctivity specialized to those automata. Submitted as [upstream PR #4467](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4467). The desk returned HTTP 500 and issued no lease.
 - Hironaka R1 has a checked geometric assembly at an explicitly shared universe. The registry linter requires a bare chain of hypothesis names and the bare target, which Lean generalizes at independent universe levels. The exact registry submission fails on that mismatch. A checker interface for explicitly shared universe arguments, or a suitable universe-independent descent argument, would let this route proceed.
 
 ## Earlier attempts and follow-up candidates
