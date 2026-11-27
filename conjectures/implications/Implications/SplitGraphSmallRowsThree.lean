@@ -495,9 +495,9 @@ theorem hamiltonian_of_split_partition_three_double_rows
       intro q hq
       simp only [Finset.mem_insert, Finset.mem_singleton] at hq
       rcases hq with rfl | rfl | rfl
-      · exact Finset.mem_filter.mpr ⟨hxC, by rw [hrowX]; simp⟩
-      · exact Finset.mem_filter.mpr ⟨hyC, by rw [hrowY]; simp⟩
-      · exact Finset.mem_filter.mpr ⟨hzC, by rw [hrowZ]; simp⟩
+      · exact Finset.mem_filter.mpr ⟨hxC, by rw [hrowX]; simp [hab]⟩
+      · exact Finset.mem_filter.mpr ⟨hyC, by rw [hrowY]; simp [hbc]⟩
+      · exact Finset.mem_filter.mpr ⟨hzC, by rw [hrowZ]; simp [hac]⟩
     have htriCard : ({x,y,z} : Finset V).card = 3 := by simp [hxy, hxz, hyz]
     have hEq := Finset.eq_of_subset_of_card_le htriSub (by rw [hcount, htriCard])
     exact hEq.symm
@@ -519,13 +519,22 @@ theorem hamiltonian_of_split_partition_three_double_rows
     rcases hq with hq | hq | hq
     · subst q
       rw [hrowX] at hi
-      simpa [special] using hi
+      simp only [special, Finset.mem_insert, Finset.mem_singleton] at hi ⊢
+      rcases hi with h | h
+      · exact Or.inl h
+      · exact Or.inr (Or.inl h)
     · subst q
       rw [hrowY] at hi
-      simpa [special] using hi
+      simp only [special, Finset.mem_insert, Finset.mem_singleton] at hi ⊢
+      rcases hi with h | h
+      · exact Or.inr (Or.inl h)
+      · exact Or.inr (Or.inr h)
     · subst q
       rw [hrowZ] at hi
-      simpa [special] using hi
+      simp only [special, Finset.mem_insert, Finset.mem_singleton] at hi ⊢
+      rcases hi with h | h
+      · exact Or.inl h
+      · exact Or.inr (Or.inr h)
   have hOavoidSpecial : ∀ k ∈ O, left k ∉ {x,y,z} ∧ right k ∉ {x,y,z} := by
     intro k hk
     have hkI := (Finset.mem_sdiff.mp hk).1
