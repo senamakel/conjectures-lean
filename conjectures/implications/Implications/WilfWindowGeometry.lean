@@ -64,16 +64,6 @@ theorem unique_overlapping_successor (marks shifts : Finset ℕ)
     · omega
     · have hutGap := hgap (t - u) hd
       omega
-  · exact h
-  · rcases hsep u hu t ht h with hfar | hd
-    · omega
-    · have hutGap := hgap (t - u) hd
-      omega
-  · exact h
-  · rcases hsep u hu t ht h with hfar | hd
-    · omega
-    · have hutGap := hgap (t - u) hd
-      omega
 
 /-- The corresponding uniqueness statement for an earlier overlapping window. -/
 theorem unique_overlapping_predecessor (marks shifts : Finset ℕ)
@@ -94,6 +84,11 @@ theorem unique_overlapping_predecessor (marks shifts : Finset ℕ)
   · rcases hsep t ht u hu h with hfar | hd
     · omega
     · have htuGap := hgap (u - t) hd
+      omega
+  · exact h
+  · rcases hsep u hu t ht h with hfar | hd
+    · omega
+    · have hutGap := hgap (t - u) hd
       omega
 
 /-- If a summand based at another marked start moves a point of the central window,
@@ -162,7 +157,7 @@ private theorem markedComponents_disjoint {n : ℕ} (marks shifts : Finset ℕ)
         (markedComponent marks m hb s) (markedComponent marks m hb t)) := by
   have hpair := lifted_windows_pairwise_disjoint marks shifts m hb hsep htranslate
   intro s hs t ht hst
-  simpa [markedComponent, hs, ht] using hpair s hs t ht hst
+  simpa only [markedComponent, dif_pos hs, dif_pos ht] using hpair s hs t ht hst
 
 /-- Two distinct marked starts cannot both move the same point under their lifted
 local permutations, under the translated-support separation hypothesis. -/
@@ -191,7 +186,7 @@ theorem assemble_apply_of_lifted_support {n : ℕ} (marks shifts : Finset ℕ)
     WilfDisjointPermutations.assemble marks (markedComponent marks m hb)
       (markedComponents_disjoint marks shifts m hb hsep htranslate) x =
         liftWindow t (hb t ht) m x := by
-  simpa [markedComponent, ht] using
+  simpa only [markedComponent, dif_pos ht] using
     WilfDisjointPermutations.assemble_apply_of_mem_support marks
       (markedComponent marks m hb)
       (markedComponents_disjoint marks shifts m hb hsep htranslate) ht hx
@@ -206,9 +201,12 @@ theorem assemble_apply_of_no_lifted_support {n : ℕ} (marks shifts : Finset ℕ
       x ∉ (liftWindow t (hb t ht) m).support) :
     WilfDisjointPermutations.assemble marks (markedComponent marks m hb)
       (markedComponents_disjoint marks shifts m hb hsep htranslate) x = x := by
-  apply WilfDisjointPermutations.assemble_apply_of_forall_fixes
-  intro t ht
-  simpa [markedComponent, ht] using (Equiv.Perm.notMem_support.mp (hx t ht))
+  exact WilfDisjointPermutations.assemble_apply_of_forall_fixes marks
+    (markedComponent marks m hb)
+    (markedComponents_disjoint marks shifts m hb hsep htranslate) (by
+      intro t ht
+      simpa only [markedComponent, dif_pos ht] using
+        (Equiv.Perm.notMem_support.mp (hx t ht)))
 
 #print axioms liftWindow_support_image
 #print axioms unique_overlapping_successor
