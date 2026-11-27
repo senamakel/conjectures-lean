@@ -1,6 +1,6 @@
 # Open Math Agents sweep
 
-The 27 November 2026 sweep used the Open Math Agents catalogue for targets, LemmaGraph for Lean statements and premises, Exa for prior art, and GitHub CLI for open and merged PRs. The statements indexed under `oma/` were elaborated at the registry's pin, which differs from this workspace's. The arguments below are at the paper-proof stage.
+The 27 November 2026 sweep used the Open Math Agents catalogue for targets, LemmaGraph for Lean statements and premises, Exa for prior art, and GitHub CLI for open and merged PRs. The statements indexed under `oma/` were elaborated at the registry's pin, which differs from this workspace's. The notes mark which arguments have been checked in Lean.
 
 ## Split graphs of connectivity at most two
 
@@ -23,6 +23,8 @@ Let $t\ge1$ and suppose $p=4t^2+2t-1$ is prime. Among representations of $4/p$ a
 The displayed solution follows by clearing denominators. In any solution at least one denominator is divisible by $p$, because otherwise clearing denominators and reducing modulo $p$ gives a contradiction. Three multiples are impossible since their reciprocal sum is at most $3/p$. In the one-multiple case write it $pw$. Reducing the cleared identity after cancelling $p$ gives $4w\equiv1\pmod p$. For $t\ge2$, $w\ge(p+1)/4>t+1$. When $t=1$, $p=5$ and $w\equiv4\pmod 5$.
 
 In the two-multiple case write the denominators as $x,pu,pv$ with $u<v$ and $p\nmid x$. Then $x(4uv-u-v)=puv$, so the positive quantity $4uv-u-v$ is divisible by $p$. Since $u\le v-1$, it is at most $4v^2-6v+1$. The last expression increases for integer $v\ge2$, and equals $p$ at $v=t+1$. Thus $v\ge t+1$, with equality forcing $u=t$ and $x=t(t+1)$. The existence identity is a special case of the previously published Type II parameterization. The optimality question is a refinement and leaves the general Erdős–Straus conjecture open. [Erdős #242](https://www.erdosproblems.com/242) · [Type II parametrization](https://arxiv.org/html/2511.16817)
+
+Lean 4.36.0 verifies existence, the lower bound on the largest denominator, and the uniqueness of the minimizing increasing triple in `Implications.ErdosStrausOptimal.family_optimal`. The theorem `isRep_iff_unitFractions` identifies the denominator-cleared equation with the equality over the rationals when all denominators are positive. Both declarations print `[propext, Classical.choice, Quot.sound]`. [Lean source](../../../../conjectures/implications/Implications/ErdosStrausOptimal.lean)
 
 ## A length-eight consecutive-pattern equivalence
 
