@@ -28,6 +28,7 @@ import Implications.C4DegreeEightCap
 import Implications.C4SeedCertificates
 import Implications.SmoothGapCounting
 import Implications.SmoothGapAsymptotic
+import Implications.SmoothGapStretchedRate
 import Implications.SmoothGapInfinitude
 import Implications.SmoothPrimeReciprocal
 import Implications.SmoothGapRankin

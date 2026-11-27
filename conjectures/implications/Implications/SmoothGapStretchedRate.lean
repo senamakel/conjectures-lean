@@ -18,6 +18,17 @@ private theorem log_primeAt_tendsto :
     omega
   exact Real.tendsto_log_atTop.comp (tendsto_natCast_atTop_atTop.comp hnat)
 
+private theorem rootScale_le_self (L : ℝ) (hL : 1 < L) : rootScale L ≤ L := by
+  have hLpos : 0 < L := by linarith
+  have hlog : 0 ≤ Real.log L := (Real.log_pos hL).le
+  have hR : 0 ≤ rootScale L := Real.sqrt_nonneg _
+  have hp := Real.log_le_sub_one_of_pos hLpos
+  have hsq := rootScale_sq hLpos hlog
+  by_contra! hc
+  have ht := mul_pos (sub_pos.mpr hc) (add_pos_of_pos_of_nonneg hLpos hR)
+  have hu := mul_nonneg hLpos.le (show 0 ≤ L - Real.log L by linarith)
+  nlinarith only [hsq, ht, hu]
+
 private theorem rounded_parameters (L : ℝ) (hL : 1 < L)
     (hB : 2 ≤ smoothCutoffNat L) :
     0 ≤ rootScale L ∧ rootScale L / 4 ≤ L ∧
@@ -26,13 +37,7 @@ private theorem rounded_parameters (L : ℝ) (hL : 1 < L)
   have hLpos : 0 < L := by linarith
   have hlog : 0 ≤ Real.log L := (Real.log_pos hL).le
   have hR : 0 ≤ rootScale L := Real.sqrt_nonneg _
-  have hRle : rootScale L ≤ L := by
-    have hp := Real.log_le_sub_one_of_pos hLpos
-    have hsq := rootScale_sq hLpos hlog
-    by_contra! hc
-    have ht := mul_pos (sub_pos.mpr hc) (add_pos_of_pos_of_nonneg hLpos hR)
-    have hu := mul_nonneg hLpos.le (show 0 ≤ L - Real.log L by linarith)
-    nlinarith only [hsq, ht, hu]
+  have hRle := rootScale_le_self L hL
   have hδ := rankinDelta_mul_self hL
   have hδ0 : 0 ≤ rankinDelta L := div_nonneg hlog (by positivity)
   have hδ2 : rankinDelta L ≤ 1 / 2 := by
@@ -151,5 +156,97 @@ private theorem eventually_hitCount_le_of_euler_cost
     simpa only [s, sub_sub_cancel] using hP
   exact hitCount_le_of_rankin_parameters D hcut N B s (rootScale L)
     hB hslo hshi hR hRL hround hbalance hP' (by simpa only [Nat.cast_add, Nat.cast_one] using hN)
+
+private theorem eventually_remove_log_factor :
+    ∀ᶠ L : ℝ in atTop,
+      6 * L * Real.exp (-(rootScale L) / 4) ≤ Real.exp (-(rootScale L) / 8) := by
+  have hlog_event := Real.tendsto_log_atTop.eventually_ge_atTop (1 : ℝ)
+  filter_upwards [eventually_ge_atTop (1 : ℝ), hlog_event,
+    eventually_const_mul_eulerCost_le_eighth_rootScale 6 (by norm_num)]
+    with L hL hlog hcost
+  have hLpos : 0 < L := by linarith
+  have hpow : 1 ≤ L ^ (1 / 4 : ℝ) := Real.one_le_rpow hL (by norm_num)
+  have hlog6 : Real.log 6 ≤ 5 := by
+    have h := Real.log_le_sub_one_of_pos (show (0 : ℝ) < 6 by norm_num)
+    linarith
+  have hle : Real.log (6 * L) ≤ rootScale L / 8 := by
+    rw [Real.log_mul (by norm_num) hLpos.ne']
+    have hsmall : 6 * Real.log L ≤ 6 * L ^ (1 / 4 : ℝ) * Real.log L := by
+      have hm : 6 ≤ 6 * L ^ (1 / 4 : ℝ) := by
+        simpa using mul_le_mul_of_nonneg_left hpow (by norm_num : 0 ≤ (6 : ℝ))
+      exact mul_le_mul_of_nonneg_right hm (by linarith)
+    linarith
+  rw [← Real.exp_log (show 0 < 6 * L by positivity), ← Real.exp_add]
+  apply Real.exp_le_exp.mpr
+  linarith
+
+private theorem eventually_rankin_euler_cost (D : ℝ) (hD : 0 < D) :
+    ∀ᶠ L : ℝ in atTop,
+      4 * (smoothCutoffNat L : ℝ) ^ rankinDelta L * D *
+        (1 + Real.log (((Nat.log 2 (smoothCutoffNat L) + 1 : ℕ) : ℝ))) ≤
+          rootScale L / 8 := by
+  filter_upwards [eventually_gt_atTop (1 : ℝ), eventually_smoothCutoffNat_ge_two,
+    Real.tendsto_log_atTop.eventually_ge_atTop (1 : ℝ),
+    eventually_const_mul_eulerCost_le_eighth_rootScale (12 * D) (by positivity)]
+    with L hL hB hlog hcost
+  let B := smoothCutoffNat L
+  let Y := smoothCutoff L
+  have hBpos : (0 : ℝ) < B := by exact_mod_cast (by omega : 0 < B)
+  have hYpos : 0 < Y := Real.exp_pos _
+  have hBY : (B : ℝ) ≤ Y := smoothCutoffNat_cast_le L
+  have hRle := rootScale_le_self L hL
+  have hlog2 : (1 / 2 : ℝ) ≤ Real.log 2 := by
+    have h := Real.log_le_sub_one_of_pos (show (0 : ℝ) < 1 / 2 by norm_num)
+    rw [Real.log_div (by norm_num) (by norm_num), Real.log_one] at h
+    linarith
+  have hlog2pos : 0 < Real.log 2 := by linarith
+  have hdyadic : (Nat.log 2 B : ℝ) ≤ L := by
+    have hn := Real.natLog_le_logb B 2
+    change (Nat.log 2 B : ℝ) ≤ Real.logb (2 : ℝ) (B : ℝ) at hn
+    rw [Real.logb] at hn
+    have hlogBY := Real.log_le_log hBpos hBY
+    change Real.log (B : ℝ) ≤ Real.log (Real.exp (rootScale L / 2)) at hlogBY
+    rw [Real.log_exp] at hlogBY
+    apply hn.trans
+    apply (div_le_iff₀ hlog2pos).2
+    have hm := mul_le_mul_of_nonneg_left hlog2 (show 0 ≤ L by linarith)
+    linarith
+  have harg : (0 : ℝ) < ((Nat.log 2 B + 1 : ℕ) : ℝ) := by positivity
+  have hargle : ((Nat.log 2 B + 1 : ℕ) : ℝ) ≤ 2 * L := by push_cast; linarith
+  have hfac : 1 + Real.log (((Nat.log 2 B + 1 : ℕ) : ℝ)) ≤ 3 * Real.log L := by
+    have h := Real.log_le_log harg hargle
+    rw [Real.log_mul (by norm_num) (by linarith : L ≠ 0)] at h
+    have h2 : Real.log 2 ≤ 1 := by
+      have h := Real.log_le_sub_one_of_pos (show (0 : ℝ) < 2 by norm_num)
+      linarith
+    linarith
+  have hδ : 0 ≤ rankinDelta L := by
+    unfold rankinDelta
+    exact div_nonneg (by linarith) (mul_nonneg (by norm_num) (Real.sqrt_nonneg _))
+  have hpow : (B : ℝ) ^ rankinDelta L ≤ L ^ (1 / 4 : ℝ) := by
+    calc
+      _ ≤ Y ^ rankinDelta L := Real.rpow_le_rpow hBpos.le hBY hδ
+      _ = L ^ (1 / 4 : ℝ) := by
+        rw [Real.rpow_def_of_pos hYpos, mul_comm]
+        exact exp_rankinDelta_log_smoothCutoff hL
+  calc
+    4 * (B : ℝ) ^ rankinDelta L * D *
+        (1 + Real.log (((Nat.log 2 B + 1 : ℕ) : ℝ))) ≤
+        4 * L ^ (1 / 4 : ℝ) * D * (3 * Real.log L) := by
+      gcongr
+    _ = 12 * D * L ^ (1 / 4 : ℝ) * Real.log L := by ring
+    _ ≤ rootScale L / 8 := by simpa only [mul_assoc] using hcost
+
+/-- Eventually the proportion of the first `N` prime gaps containing at least
+two qualifying integers is bounded by an explicit stretched exponential. -/
+theorem eventually_twoHitGapCount_stretched :
+    ∀ᶠ N : ℕ in atTop,
+      (hitCount N 2 : ℝ) / (N + 1 : ℝ) ≤
+        Real.exp (-(rootScale (Real.log (primeAt N : ℝ))) / 8) := by
+  filter_upwards [eventually_hitCount_le_of_euler_cost eventually_rankin_euler_cost,
+    log_primeAt_tendsto.eventually eventually_remove_log_factor] with N hcount hfactor
+  exact hcount.trans hfactor
+
+#print axioms eventually_twoHitGapCount_stretched
 
 end Implications.SmoothGapStretchedRate
