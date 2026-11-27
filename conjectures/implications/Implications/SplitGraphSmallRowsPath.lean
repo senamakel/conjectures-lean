@@ -21,6 +21,22 @@ private theorem hamiltonian_of_list
     exact hcover v
   exact ⟨_, _, p, hpath.isHamiltonian_of_mem hvertices⟩
 
+private theorem clique_list_chain
+    (G : SimpleGraph V) (C : Finset V) (hC : G.IsClique (C : Set V))
+    (l : List V) (hnodup : l.Nodup) (hsub : ∀ x ∈ l, x ∈ C) : l.IsChain G.Adj := by
+  rw [List.isChain_iff_forall_rel_of_append_cons_cons]
+  intro x y l₁ l₂ heq
+  have hx : x ∈ l := by rw [heq]; simp
+  have hy : y ∈ l := by rw [heq]; simp
+  have hxy : x ≠ y := by
+    intro h
+    subst y
+    have hcount := (List.nodup_iff_count_le_one.mp hnodup) x
+    rw [heq] at hcount
+    simp [List.count_append, List.count_cons] at hcount
+    omega
+  exact hC (hsub x hx) (hsub y hy) hxy
+
 /-- A split graph with selected degree-two neighborhoods and no clique vertex
 selected twice has a Hamiltonian path, by concatenating the length-two blocks. -/
 theorem hamiltonian_of_split_partition_selected_rows_le_one
@@ -156,7 +172,35 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
       exact Finset.mem_toList.mp hi
 
   have hbase_chain : base.IsChain G.Adj := by
-    sorry
+    have chain_flat : ∀ l : List V, l.Nodup → (∀ i ∈ l, i ∈ I) →
+        (l.flatMap block).IsChain G.Adj := by
+      intro l
+      induction l with
+      | nil => simp
+      | cons i l ih =>
+        intro hnd hmem
+        have hiI := hmem i (by simp)
+        have hblock : (block i).IsChain G.Adj := by
+          simp [block, List.isChain_cons, hleftAdj i hiI, G.symm (hrightAdj i hiI)]
+        rw [List.flatMap_cons, List.isChain_append]
+        refine ⟨hblock, ih (List.nodup_cons.mp hnd).2 (by
+          intro j hj
+          exact hmem j (by simp [hj])), ?_⟩
+        rcases l with [] | j :: rest
+        · simp
+        · have hjI := hmem j (by simp)
+          have hij : i ≠ j := by
+            intro heq
+            subst j
+            exact (List.nodup_cons.mp hnd).1 (by simp)
+          intro x hx y hy
+          have hxEq : x = right i := by simpa [block] using hx
+          have hyEq : y = left j := by simpa [List.flatMap_cons, block] using hy
+          have hneEnds : right i ≠ left j :=
+            (hcross_endpoints i j hiI hjI hij).2.2.1
+          exact hC (hrightC i hiI) (hleftC j hjI) hneEnds
+    change (I.toList.flatMap block).IsChain G.Adj
+    exact chain_flat I.toList I.nodup_toList (fun i hi => Finset.mem_toList.mp hi)
 
   have hused_sub : used ⊆ C := by
     intro c hc
@@ -190,7 +234,28 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
     exact ⟨hbase_nodup, unused.nodup_toList, hbase_unused⟩
 
   have hbase_last_C : ∀ c, c ∈ base.getLast? → c ∈ C := by
-    sorry
+    have lastC : ∀ l : List V, (∀ i ∈ l, i ∈ I) →
+        ∀ c, c ∈ (l.flatMap block).getLast? → c ∈ C := by
+      intro l
+      induction l with
+      | nil => simp
+      | cons i l ih =>
+        intro hmem c hc
+        have hiI := hmem i (by simp)
+        by_cases htail : l.flatMap block = []
+        · have hc' : c ∈ (block i).getLast? := by
+            simpa [List.flatMap_cons, htail] using hc
+          simp [block] at hc'
+          rcases hc' with h | h
+          · exact h ▸ hleftC i hiI
+          · exact h ▸ hrightC i hiI
+        · have hc' : c ∈ (l.flatMap block).getLast? := by
+            rw [List.getLast?_append_of_ne_nil _ htail] at hc
+            simpa [List.flatMap_cons] using hc
+          exact ih (by
+            intro j hj
+            exact hmem j (by simp [hj])) c hc'
+    exact lastC I.toList (fun i hi => Finset.mem_toList.mp hi)
 
   have hpath_chain : pathList.IsChain G.Adj := by
     change (base ++ unused.toList).IsChain G.Adj
