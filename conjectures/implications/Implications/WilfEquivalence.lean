@@ -24,7 +24,8 @@ def HasMarkedOccurrences (occurs : α → X → Prop) (M : Finset α) (x : X) : 
   ∀ a ∈ M, occurs a x
 
 /-- The exact set of occurrence starts of `x` is `M`. -/
-def HasExactOccurrences (occurs : α → X → Prop) (M : Finset α) (x : X) : Prop :=
+def HasExactOccurrences (occurs : α → X → Prop) (M : Finset α) (x : X)
+    [DecidablePred (fun a => occurs a x)] : Prop :=
   occurrenceSet occurs x = M
 
 end WilfEquivalence
