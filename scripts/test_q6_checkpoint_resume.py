@@ -121,6 +121,15 @@ def main() -> int:
                          cwd=ROOT, text=True, capture_output=True, check=False)
     if bad.returncode != 2:
         raise AssertionError("resume accepted a duplicate/overlapping frontier")
+    overlong_cp = OUT / "overlong.chk"
+    overlong_out = OUT / "overlong.bin"
+    overlong_out.write_bytes(b"")
+    overlong_cp.write_text("SNAKECP1 4 3 3 0 0 0 0 0 0 0\n1\n2 3 1 15 0\n")
+    bad = subprocess.run([str(BIN), "3", str(overlong_out), "--dimension", "4", "--min-vertices", "3",
+                          "--checkpoint", str(overlong_cp), "--resume"], cwd=ROOT,
+                         text=True, capture_output=True, check=False)
+    if bad.returncode != 2:
+        raise AssertionError("resume silently completed an overlong prefix pruned before replay ended")
     rounds = 1
     while frontier(cp):
         if rounds >= 1000:
@@ -172,6 +181,39 @@ def main() -> int:
                          text=True, capture_output=True, check=False)
     if bad.returncode != 2:
         raise AssertionError("enumerator accepted identical output/checkpoint paths")
+    marker = OUT / "alias-marker.bin"
+    marker.write_bytes(b"preserve-me")
+    dotted = subprocess.run([str(BIN), "3", str(marker), "--dimension", "4", "--min-vertices", "3",
+                            "--checkpoint", str(OUT) + "/./alias-marker.bin"], cwd=ROOT,
+                           text=True, capture_output=True, check=False)
+    if dotted.returncode != 2 or marker.read_bytes() != b"preserve-me":
+        raise AssertionError("enumerator did not reject normalized output/checkpoint alias safely")
+    symlink = OUT / "alias-symlink.chk"
+    symlink.unlink(missing_ok=True)
+    symlink.symlink_to(marker)
+    linked = subprocess.run([str(BIN), "3", str(marker), "--dimension", "4", "--min-vertices", "3",
+                             "--checkpoint", str(symlink)], cwd=ROOT, text=True,
+                            capture_output=True, check=False)
+    if linked.returncode != 2 or marker.read_bytes() != b"preserve-me":
+        raise AssertionError("enumerator did not reject symlink output/checkpoint alias safely")
+    hardlink = OUT / "alias-hardlink.chk"
+    hardlink.unlink(missing_ok=True)
+    hardlink.hardlink_to(marker)
+    linked = subprocess.run([str(BIN), "3", str(marker), "--dimension", "4", "--min-vertices", "3",
+                             "--checkpoint", str(hardlink)], cwd=ROOT, text=True,
+                            capture_output=True, check=False)
+    if linked.returncode != 2 or marker.read_bytes() != b"preserve-me":
+        raise AssertionError("enumerator did not reject hardlink output/checkpoint alias safely")
+    temp_alias = OUT / "temp-alias.chk"
+    temp_alias.unlink(missing_ok=True)
+    temp_alias.with_name(temp_alias.name + ".tmp").unlink(missing_ok=True)
+    temp_alias.with_name(temp_alias.name + ".tmp").symlink_to(marker)
+    separate_output = OUT / "separate-output.bin"
+    temp_result = subprocess.run([str(BIN), "3", str(separate_output), "--dimension", "4",
+                                  "--min-vertices", "3", "--checkpoint", str(temp_alias), "--node-cap", "1"],
+                                 cwd=ROOT, text=True, capture_output=True, check=False)
+    if temp_result.returncode != 2 or marker.read_bytes() != b"preserve-me":
+        raise AssertionError("checkpoint temporary alias damaged mask output")
     before = hashlib.sha256(resumed.read_bytes()).hexdigest()
     run(resumed, cp, resume=True, capped=True)
     after = hashlib.sha256(resumed.read_bytes()).hexdigest()
