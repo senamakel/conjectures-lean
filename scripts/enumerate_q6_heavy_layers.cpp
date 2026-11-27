@@ -100,9 +100,21 @@ struct Search {
     int rem = std::popcount(remaining);
     int max_vertices = target_edges >= 25 ? 28 : 32;
     int max_additional = use_capacity_bound ? (capacity + 2 * rem) / 2 : 2 * rem;
-    if (edges > target_edges || edges + max_additional < target_edges ||
-        vertices > max_vertices || vertices + rem < minimum_vertices) return;
+    bool pruned = edges > target_edges || edges + max_additional < target_edges ||
+        vertices > max_vertices || vertices + rem < minimum_vertices;
+    if (pruned) {
+      if (replay && replay_depth < replay->size()) {
+        std::cerr << "checkpoint prefix continues beyond a pruned state\n";
+        stopped = fatal = true;
+      }
+      return;
+    }
     if (remaining == 0) {
+      if (replay && replay_depth < replay->size()) {
+        std::cerr << "checkpoint prefix continues beyond a terminal state\n";
+        stopped = fatal = true;
+        return;
+      }
       if (edges != target_edges || vertices < minimum_vertices) return;
       bool seen[64]{}; int components = 0;
       for (int v = 0; v < (1 << dimension); ++v) {
@@ -224,6 +236,23 @@ struct Search {
   }
 };
 
+bool aliases(const std::filesystem::path &left, const std::filesystem::path &right) {
+  std::error_code left_error;
+  std::error_code right_error;
+  const auto left_absolute = std::filesystem::absolute(left, left_error).lexically_normal();
+  const auto right_absolute = std::filesystem::absolute(right, right_error).lexically_normal();
+  if (!left_error && !right_error && left_absolute == right_absolute) return true;
+
+  std::error_code equivalent_error;
+  if (std::filesystem::equivalent(left, right, equivalent_error) && !equivalent_error) return true;
+
+  left_error.clear();
+  right_error.clear();
+  const auto left_canonical = std::filesystem::weakly_canonical(left, left_error);
+  const auto right_canonical = std::filesystem::weakly_canonical(right, right_error);
+  return !left_error && !right_error && left_canonical == right_canonical;
+}
+
 int main(int argc, char **argv) {
   if (argc < 3) { std::cerr << "usage: enumerate_q6_heavy_layers <target-edges> <mask-output> [--force-saturated] [--early-cycle] [--capacity-bound] [--dimension N] [--min-vertices N] [--node-cap N] [--checkpoint FILE] [--resume]\n"; return 2; }
   int target=std::stoi(argv[1]), dimension=6, minv=27; std::uint64_t cap=6'000'000'000ULL;
@@ -235,8 +264,17 @@ int main(int argc, char **argv) {
       std::string v=argv[++i]; if(a=="--dimension") dimension=std::stoi(v); else if(a=="--min-vertices") minv=std::stoi(v); else if(a=="--node-cap") cap=std::stoull(v); else checkpoint=v;
     } else return 2;
   }
-  if(dimension<2||dimension>6||target<0||minv<3||cap==0|| (resume&&checkpoint.empty())||
-     (!checkpoint.empty() && std::filesystem::path(checkpoint)==std::filesystem::path(argv[2]))) return 2;
+  if (dimension < 2 || dimension > 6 || target < 0 || minv < 3 || cap == 0 ||
+      (resume && checkpoint.empty())) return 2;
+  if (!checkpoint.empty()) {
+    const std::filesystem::path output_path(argv[2]);
+    const std::filesystem::path checkpoint_path(checkpoint);
+    const std::filesystem::path temporary_path(checkpoint + ".tmp");
+    if (aliases(output_path, checkpoint_path) || aliases(output_path, temporary_path)) {
+      std::cerr << "mask output aliases checkpoint or checkpoint temporary\n";
+      return 2;
+    }
+  }
   Search s(target,argv[2],force,cycle,capacity,dimension,minv,cap,checkpoint);
   std::uint64_t offset=0;
   if(resume) {
