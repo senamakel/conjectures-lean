@@ -326,13 +326,13 @@ theorem exists_distinct_row_attachments
     obtain ⟨x, hx⟩ := hrowd
     have hxI : x = i ∨ x = j := by
       have hx' := (Finset.mem_filter.mp hx).1
-      rw [hIeq] at hx'
-      simpa using hx'
-    rcases hxI with rfl | rfl
-    · exact ⟨i, j, d, a, by simp [hIeq], by simp [hIeq], hij, hd, ha, hda.symm,
-        (Finset.mem_filter.mp hx).2, hbj⟩
-    · exact ⟨j, i, d, a, by simp [hIeq], by simp [hIeq], hij.symm, hd, ha, hda.symm,
-        (Finset.mem_filter.mp hx).2, hai⟩
+      have hx'' : x ∈ ({i, j} : Finset V) := by simpa [hIeq] using hx'
+      simpa using hx''
+    rcases hxI with hxi | hxj
+    · refine ⟨i, j, d, a, by simp [hIeq], by simp [hIeq], hij, hd, ha, hda.symm, ?_, hbj⟩
+      simpa [hxi] using (Finset.mem_filter.mp hx).2
+    · refine ⟨j, i, d, a, by simp [hIeq], by simp [hIeq], hij.symm, hd, ha, hda.symm, ?_, hai⟩
+      simpa [hxj] using (Finset.mem_filter.mp hx).2
 
 end SplitGraphPath
 
