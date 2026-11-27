@@ -97,8 +97,12 @@ theorem primeGapSmoothCountBound {N j : ℕ} (S U : Finset ℕ)
   apply disjointCardBound S
     (fun r => (Finset.Ioo (primeAt r) (primeAt (r + 1))).filter
       (fun m => m.maxPrimeFac < primeGap r)) U j
-  · exact (primeGapInteriors_pairwiseDisjoint N).mono hS
-      (fun r => Finset.disjoint_filter_filter.mpr ?_)
+  · intro r hr s hs hrs
+    have hd := primeGapInteriors_pairwiseDisjoint N (hS hr) (hS hs) hrs
+    apply Finset.disjoint_left.mpr
+    intro m hmr hms
+    exact (Finset.disjoint_left.mp hd) m
+      (Finset.mem_filter.mp hmr).1 (Finset.mem_filter.mp hms).1
   · exact hlarge
   · exact hsub
 
