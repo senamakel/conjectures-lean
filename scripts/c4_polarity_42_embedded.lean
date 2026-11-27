@@ -47,7 +47,9 @@ theorem induced_edge_count_le_137
   apply no_candidate_of_ex41C4Bound hEx41
   refine ⟨Sᶜ, ?_, ?_⟩
   · simp [Finset.card_compl, hS]
-  · simpa [← Finset.compl_eq_univ_sdiff] using h
+  · have h138 : 138 ≤ C4PolarityDeletion.inducedEdgeCount C4PolarityOrderSeven.graph S := by
+      omega
+    simpa [← Finset.compl_eq_univ_sdiff] using h138
 
 end Implications.C4PolarityEmbedded
 
