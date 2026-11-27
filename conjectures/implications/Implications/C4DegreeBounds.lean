@@ -330,6 +330,7 @@ theorem degree_window_of_extremal_42 (G : SimpleGraph (Fin 42))
 
 #print axioms degree_window_bound
 #print axioms innerNeighbors_card_le_one
+#print axioms sum_innerNeighbors_card_ge_seven
 #print axioms neighbor_degree_excess_le_one_of_degree_eight
 #print axioms neighbor_degree_le_seven_of_degree_eight
 #print axioms degree_window_of_extremal_42
