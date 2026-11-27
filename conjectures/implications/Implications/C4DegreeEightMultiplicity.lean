@@ -347,13 +347,13 @@ theorem degree_six_vertex_has_at_most_two_degree_eight_neighbors
           ⟨hxN u huS', hxN w hwS'⟩
         have hle : (N u ∩ N w).card ≤ 1 := by omega
         have hEq := Finset.card_le_one.mp hle y hyCommon x hxCommon
-        exact hEq
+        simpa [hEq]
       · have hyCommon : y ∈ N v ∩ N w := Finset.mem_inter.mpr ⟨hyv, hyw⟩
         have hxCommon : x ∈ N v ∩ N w := Finset.mem_inter.mpr
           ⟨hxN v hvS', hxN w hwS'⟩
         have hle : (N v ∩ N w).card ≤ 1 := by omega
         have hEq := Finset.card_le_one.mp hle y hyCommon x hxCommon
-        exact hEq
+        simpa [hEq]
     · intro hy
       have hyx : y = x := Finset.mem_singleton.mp hy
       subst y
