@@ -250,5 +250,29 @@ theorem family_optimal (t : ℕ) (ht : 0 < t) (hp : (familyPrime t).Prime) :
   obtain ⟨_, _, heq⟩ := huniq hless.le
   omega
 
+/-- Clearing the denominators preserves the unit-fraction statement for
+positive denominators and a positive prime candidate. -/
+theorem isRep_iff_unitFractions {p x y z : ℕ} (hp : 0 < p) (hx : 0 < x)
+    (hy : 0 < y) (hz : 0 < z) :
+    IsRep p x y z ↔ (4 : ℚ) / p = 1 / x + 1 / y + 1 / z := by
+  unfold IsRep
+  have hp' : (p : ℚ) ≠ 0 := by positivity
+  have hx' : (x : ℚ) ≠ 0 := by positivity
+  have hy' : (y : ℚ) ≠ 0 := by positivity
+  have hz' : (z : ℚ) ≠ 0 := by positivity
+  field_simp
+  constructor
+  · intro h
+    have hq : (4 : ℚ) * x * y * z = p * ((x : ℚ) * y + x * z + y * z) := by
+      exact_mod_cast h
+    linear_combination hq
+  · intro h
+    have hq : (4 : ℚ) * x * y * z = p * ((x : ℚ) * y + x * z + y * z) := by
+      linear_combination h
+    exact_mod_cast hq
+
+#print axioms family_optimal
+#print axioms isRep_iff_unitFractions
+
 end Implications.ErdosStrausOptimal
 
