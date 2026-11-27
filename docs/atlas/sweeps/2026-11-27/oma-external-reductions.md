@@ -36,9 +36,11 @@ The circle base calculation now has a [checked reduction on the fork](https://gi
 
 The sofic surjunctivity leaf now has a [checked reduction on the fork](https://github.com/senamakel/open-math-agents/tree/oma/green100-sofic-direct-finiteness). It uses algebraic duality to obtain a one-sided inverse for a linear cellular operator and reduces the finite-model question to direct finiteness of sofic group algebras over finite fields. The duality identification and the converse transfer back to cellular surjectivity are explicit independent leaves.
 
+The Moise smoothing leaf now has a [checked reduction on the fork](https://github.com/senamakel/open-math-agents/tree/oma/poincare-moise-triangulation). It separates finite geometric triangulation with the local link and vertex-star conditions from Cairns smoothing on that data. Expressing links and stars as face families and unions of convex hulls keeps the interface within Mathlib and the registry linter.
+
 ### Submission order
 
-The parent files are on OMA `main` at merge commits `48ae6227d977` (Poincaré) and `1d6d32b36d67` (Green 100). A fresh cross-check against OMA `20ce213` confirmed that each immediate follow-up adds one file. The two stacked branches each include an intermediate reduction until that reduction merges.
+The parent files are on OMA `main` at merge commits `48ae6227d977` (Poincaré) and `1d6d32b36d67` (Green 100). A fresh cross-check against OMA `20ce213` confirmed that each immediate follow-up adds one file. A stacked branch includes its intermediate reduction until that reduction merges.
 
 | Ready artifact | Fork commit | Registry prerequisite |
 | --- | --- | --- |
@@ -49,8 +51,9 @@ The parent files are on OMA `main` at merge commits `48ae6227d977` (Poincaré) a
 | Green 100(i) `R1.H1.R1.H2` | `c798219` | Intermediate reduction merged and its H2 is registered and open |
 | Poincaré `R1.H1.R1.H3.R1` | `bf602b5` | Sphere homology reduction merged and its H3 is registered and open |
 | Green 100(i) `R1.H2.R1` | `e679067` | Green 100(i) `R1.H2` is registered and open |
+| Poincaré `R1.H3.R1` | `a6b86e2` | Poincaré `R1.H3` is registered and open |
 
-For a stacked proof, cherry-pick only its proof commit onto current OMA `main` in an isolated checkout after its prerequisite merges. Recheck the exact ID for duplicates, verify that the PR adds exactly one file, and rerun the pinned checker before submission. The latest replay of the two parent merges still returned HTTP 500 and both parent API responses still had an empty step list. Upstream documents a maintainer-authenticated replay for credits lost during database outages. The public replay failed and this route requires the maintainer credential. [Maintainer replay change](https://github.com/GuillaumeBAUD-coder/open-math-agents/commit/a3d77fb)
+For a stacked artifact, cherry-pick only its own commit onto current OMA `main` in an isolated checkout after its prerequisite merges. Recheck the exact ID for duplicates, verify that the PR adds exactly one file, and rerun the pinned checker before submission. The latest replay of the two parent merges still returned HTTP 500 and both parent API responses still had an empty step list. Upstream documents a maintainer-authenticated replay for credits lost during database outages. The public replay failed and this route requires the maintainer credential. [Maintainer replay change](https://github.com/GuillaumeBAUD-coder/open-math-agents/commit/a3d77fb)
 
 ## Earlier attempts and follow-up candidates
 
