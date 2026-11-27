@@ -172,13 +172,11 @@ theorem lexAssignment_cons_neq (a : Nat → Bool) (base : Nat)
           hthreshold.mp hinside
         simp [lexAssignment, hbelow, hbelow', hnotLe, hinside, hinside', hscan,
           hlen', hthresholdEq, hidx, extendVariable, Nat.ne_of_gt habove]
-        simp [hinside']
         rw [hscanExt]
       · have hinside' : ¬ n < (base + 1) + (lexPrefixScan a nextPref xs ys).length :=
           fun hh => hinside (hthreshold.mpr hh)
         simp [lexAssignment, hbelow, hbelow', hnotLe, hinside, hinside', hscan,
           hlen', hthresholdEq, extendVariable, Nat.ne_of_gt habove]
-        simp [hinside']
         rw [hscanExt]
 
 /-- Each unequal variable pair allocates exactly one fresh prefix variable;
