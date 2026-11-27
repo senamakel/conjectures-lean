@@ -6,6 +6,54 @@ open SplitGraphTrees
 
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
+/-- The local path block for two independent vertices that share one selected
+clique neighbor. -/
+theorem shared_clique_neighbor_block
+    (G : SimpleGraph V) (C I : Finset V) (hdisj : Disjoint C I)
+    (a c b i j : V) (ha : a ∈ C) (hc : c ∈ C) (hb : b ∈ C)
+    (hi : i ∈ I) (hj : j ∈ I) (hij : i ≠ j)
+    (hac : a ≠ c) (hcb : c ≠ b) (hab : a ≠ b)
+    (hai : G.Adj a i) (hci : G.Adj c i)
+    (hcj : G.Adj c j) (hbj : G.Adj b j) :
+    ∃ p : G.Walk a b, p.IsPath ∧ p.support = [a, i, c, j, b] := by
+  have hia : G.Adj i c := hci.symm
+  have hjc : G.Adj j c := hcj.symm
+  have hne_ai : a ≠ i := by
+    intro h
+    subst i
+    exact (Finset.disjoint_left.mp hdisj) ha hi
+  have hne_ic : i ≠ c := by
+    intro h
+    subst c
+    exact (Finset.disjoint_left.mp hdisj) hc hi
+  have hne_cj : c ≠ j := by
+    intro h
+    subst j
+    exact (Finset.disjoint_left.mp hdisj) hc hj
+  have hne_jb : j ≠ b := by
+    intro h
+    subst j
+    exact (Finset.disjoint_left.mp hdisj) hb hj
+  have hnodup : ([a, i, c, j, b] : List V).Nodup := by
+    simp only [List.nodup_cons, List.mem_cons, List.not_mem_nil]
+    exact ⟨⟨hne_ai, by
+      simp only [List.mem_cons, List.not_mem_nil]
+      exact ⟨hne_ic.symm, by
+        simp only [List.mem_cons, List.not_mem_nil]
+        exact ⟨hne_cj, by
+          simp only [List.mem_cons, List.not_mem_nil]
+          exact ⟨hne_jb.symm, by
+            simp only [List.mem_cons, List.not_mem_nil]
+            exact ⟨hab, by simp⟩⟩⟩⟩⟩⟩
+  have hchain : ([a, i, c, j, b] : List V).IsChain G.Adj := by
+    simp [List.isChain_cons, hai, hia, hcj, hbj]
+  let p := SimpleGraph.Walk.ofSupport ([a, i, c, j, b] : List V) (by simp) hchain
+  have hp : p.IsPath := by
+    apply (SimpleGraph.Walk.isPath_def p).2
+    simpa [p, SimpleGraph.Walk.support_ofSupport (by simp) hchain] using hnodup
+  refine ⟨p, hp, ?_⟩
+  exact SimpleGraph.Walk.support_ofSupport (by simp) hchain
+
 /-- Append a clique list to any nodup chain whose final vertex is in the
 clique. This is the reusable assembly step for clique-ended path blocks. -/
 theorem hamiltonian_of_clique_ended_chain
