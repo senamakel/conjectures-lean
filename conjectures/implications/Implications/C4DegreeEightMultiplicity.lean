@@ -347,13 +347,13 @@ theorem degree_six_vertex_has_at_most_two_degree_eight_neighbors
           ⟨hxN u huS', hxN w hwS'⟩
         have hle : (N u ∩ N w).card ≤ 1 := by omega
         have hEq := Finset.card_le_one.mp hle y hyCommon x hxCommon
-        simpa using hEq.symm
+        exact hEq
       · have hyCommon : y ∈ N v ∩ N w := Finset.mem_inter.mpr ⟨hyv, hyw⟩
         have hxCommon : x ∈ N v ∩ N w := Finset.mem_inter.mpr
           ⟨hxN v hvS', hxN w hwS'⟩
         have hle : (N v ∩ N w).card ≤ 1 := by omega
         have hEq := Finset.card_le_one.mp hle y hyCommon x hxCommon
-        simpa using hEq.symm
+        exact hEq
     · intro hy
       have hyx : y = x := Finset.mem_singleton.mp hy
       subst y
@@ -368,7 +368,7 @@ theorem degree_six_vertex_has_at_most_two_degree_eight_neighbors
     rw [hinter, hUvUnion, hwCardN] at hcard
     have hU3val : (N u ∪ N v ∪ N w).card = 22 := by
       norm_num at hcard
-      exact hcard
+      simpa [Finset.union_assoc] using hcard
     simpa [U3, Finset.union_assoc] using hU3val
   have hz : ∃ z ∈ D, z ∉ S := by
     by_contra hnone
