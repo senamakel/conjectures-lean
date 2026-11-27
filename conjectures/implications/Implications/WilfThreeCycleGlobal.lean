@@ -124,9 +124,9 @@ private theorem assembled_on_window {n : ℕ} (m : Equiv.Perm (Fin 8))
       rw [hnext.1]
       rfl
     rw [← he]
-    rw [WilfDisjointPermutations.assemble_apply_of_mem_support _ _ _ hnext.2]
-    · exact component_apply m (hb _ hnext.2) 1
-      · exact (mem_component_support m (hb _ hnext.2) _).mpr ⟨1, hm1, rfl⟩
+    rw [WilfDisjointPermutations.assemble_apply_of_mem_support _ _ _ hnext.2
+      ((mem_component_support m (hb _ hnext.2) _).mpr ⟨1, hm1, rfl⟩)]
+    exact component_apply m (hb _ hnext.2) 1
   · rw [dite_eq_right hnext]
     by_cases hmove : m i ≠ i
     · rw [WilfDisjointPermutations.assemble_apply_of_mem_support _ _ _ hs]
@@ -248,8 +248,10 @@ at the critical crossing point. -/
 theorem exactOccurrenceCount_eq_of_markedSwap (n : ℕ) (marks : Finset (Fin n))
     (p q : Fin 8 → Fin 8) (m : Equiv.Perm (Fin 8))
     (hm : ∀ i : Fin 8, m i ≠ i → i = 1 ∨ i = 3 ∨ i = 4) (hm1 : m 1 ≠ 1)
-    (hoverP : ∀ d, 1 ≤ d → d < 8 → overlapCompatible p d = true → d = 5 ∨ d = 7)
-    (hoverQ : ∀ d, 1 ≤ d → d < 8 → overlapCompatible q d = true → d = 5 ∨ d = 7)
+    (hcheckP : ∀ d, 1 ≤ d → d < 8 →
+      (overlapCompatible p d = true ↔ d = 5 ∨ d = 7))
+    (hcheckQ : ∀ d, 1 ≤ d → d < 8 →
+      (overlapCompatible q d = true ↔ d = 5 ∨ d = 7))
     (hpq : p ∘ m = q) (hqp : q ∘ m.symm = p)
     (hlocal : ∀ f : Fin 13 → Fin n, WindowOrder p f 0 → WindowOrder p f 5 →
       ∀ i j, f (overlapImage m i) < f (overlapImage m j) ↔ q i < q j)
@@ -277,15 +279,11 @@ theorem exactOccurrenceCount_eq_of_markedSwap (n : ℕ) (marks : Finset (Fin n))
       Fintype.card {π : Equiv.Perm (Fin n) // Marked chosenNat q π} := by
     apply le_antisymm
     · apply Fintype.card_le_of_injective _
-        (moveMarked_injective chosenNat p q m hm hm1 hoverP hpq hlocal)
-      apply overlap_compatible_only_at_5_or_7_of_decide
-      intro d hd hsmall
-      exact hoverP d hd hsmall
+        (moveMarked_injective chosenNat p q m hm hm1
+          (fun d hd hsmall hok => (hcheckP d hd hsmall).mp hok) hpq hlocal)
     · apply Fintype.card_le_of_injective _
-        (moveMarked_injective chosenNat q p m.symm hmInv hm1Inv hoverQ hqp hlocalInv)
-      apply overlap_compatible_only_at_5_or_7_of_decide
-      intro d hd hsmall
-      exact hoverQ d hd hsmall
+        (moveMarked_injective chosenNat q p m.symm hmInv hm1Inv
+          (fun d hd hsmall hok => (hcheckQ d hd hsmall).mp hok) hqp hlocalInv)
   exact (Equiv.subtypeEquivRight (marked_iff_subset p chosen)).trans
     ((Fintype.equivOfCardEq hcount).trans
       (Equiv.subtypeEquivRight (marked_iff_subset q chosen)).symm)
