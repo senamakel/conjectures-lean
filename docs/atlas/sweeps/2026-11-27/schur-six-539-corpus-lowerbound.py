@@ -116,8 +116,7 @@ def option_witness(
         if any(p in forbidden_positions for p in others):
             continue
         if all(word[p - 1] == colour for p in others):
-            if all(colour == word[p - 1] for p in triple if p == position):
-                return triple, others
+            return triple, others
     return None
 
 
