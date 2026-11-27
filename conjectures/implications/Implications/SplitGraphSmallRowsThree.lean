@@ -727,3 +727,5 @@ end SplitGraphSmallRowsThree
 
 #print axioms SplitGraphSmallRowsThree.three_pair_rows_are_triangle
 #print axioms SplitGraphSmallRowsThree.hamiltonian_of_triangle_block_and_remaining_chain
+#print axioms SplitGraphSmallRowsThree.chosen_three_double_rows_form_triangle
+#print axioms SplitGraphSmallRowsThree.hamiltonian_of_split_partition_three_double_rows
