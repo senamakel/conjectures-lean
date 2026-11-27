@@ -100,7 +100,7 @@ theorem hall_deficit_one_of_single_anchor
   have houtsideLow :
       3 * (S \ A).card ≤ ∑ x ∈ S \ A, (C.filter (fun c => inc c x)).card := by
     calc
-      3 * (S \ A).card = ∑ x ∈ S \ A, 3 := by simp
+      3 * (S \ A).card = ∑ x ∈ S \ A, 3 := by simp; ring
       _ ≤ _ := by
         apply Finset.sum_le_sum
         intro x hx
