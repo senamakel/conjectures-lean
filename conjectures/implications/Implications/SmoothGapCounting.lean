@@ -40,8 +40,7 @@ private theorem primeAt_count_asymptotic :
   have hden : ∀ᶠ n : ℕ in atTop,
       (primeAt n : ℝ) / Real.log (primeAt n : ℝ) ≠ 0 := by
     filter_upwards [hprime.eventually (eventually_gt_atTop 1)] with n hn
-    exact (div_ne_zero (by linarith
-      (Real.log_pos hn).ne')
+    exact div_ne_zero (by linarith) (Real.log_pos hn).ne'
   have hratio := (Asymptotics.isEquivalent_iff_tendsto_one hden).mp heq
   have hfloor (n : ℕ) : ⌊(primeAt n : ℝ)⌋₊ = primeAt n := by simp
   have hratio' : Tendsto (fun n : ℕ =>
