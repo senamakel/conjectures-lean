@@ -15,7 +15,8 @@ the other 34 vertices, a contradiction.
 
 namespace C4DegreeEightCap
 
-private theorem twice_union_card_add_square_bound {V : Type*} [Fintype V]
+/-- The union bound for eight-element sets with pairwise intersection at most one. -/
+theorem twice_union_card_add_square_bound {V : Type*} [Fintype V]
     [DecidableEq V] (S : Finset V) (f : V → Finset V)
     (hcard : ∀ u ∈ S, (f u).card = 8)
     (hinter : ∀ u ∈ S, ∀ v ∈ S, u ≠ v → (f u ∩ f v).card ≤ 1) :
@@ -124,7 +125,8 @@ theorem degree_eight_count_le_seven_of_extremal_42
   intro v
   exact (C4DegreeBounds.degree_window_of_extremal_42 G hDel he hC4 v).1
 
-private theorem degree_seven_neighbors_card_le_one (G : SimpleGraph (Fin 42))
+/-- A degree-eight vertex has at most one degree-seven neighbor. -/
+theorem degree_seven_neighbors_card_le_one (G : SimpleGraph (Fin 42))
     [DecidableRel G.Adj] (hmin : ∀ v, 6 ≤ G.degree v)
     (hC4 : C4VertexExtension.C4Free G) {u : Fin 42} (hu : G.degree u = 8) :
     (G.neighborFinset u ∩ Finset.univ.filter fun v => G.degree v = 7).card ≤ 1 := by

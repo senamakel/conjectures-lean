@@ -1,6 +1,6 @@
 import Mathlib.Combinatorics.SimpleGraph.DegreeSum
 import Mathlib.Tactic
-import Implications.C4DegreeBounds
+import Implications.C4DegreeEightCap
 
 /-!
 # Equality consequences when four vertices have degree eight
@@ -14,75 +14,7 @@ neighborhoods of its eight neighbors exhaust the other 41 vertices.
 
 namespace C4DegreeEightEquality
 
-private theorem twice_union_card_add_square_bound {V : Type*} [Fintype V]
-    [DecidableEq V] (S : Finset V) (f : V → Finset V)
-    (hcard : ∀ u ∈ S, (f u).card = 8)
-    (hinter : ∀ u ∈ S, ∀ v ∈ S, u ≠ v → (f u ∩ f v).card ≤ 1) :
-    17 * S.card ≤ 2 * (S.biUnion f).card + S.card ^ 2 := by
-  classical
-  induction S using Finset.induction_on with
-  | empty => simp
-  | @insert a S ha ih =>
-    have hcarda := hcard a (Finset.mem_insert_self ..)
-    have hcardS : ∀ u ∈ S, (f u).card = 8 := by
-      intro u hu
-      exact hcard u (Finset.mem_insert_of_mem hu)
-    have hinterS : ∀ u ∈ S, ∀ v ∈ S, u ≠ v → (f u ∩ f v).card ≤ 1 := by
-      intro u hu v hv huv
-      exact hinter u (Finset.mem_insert_of_mem hu) v (Finset.mem_insert_of_mem hv) huv
-    have hintera : ∀ v ∈ S, (f a ∩ f v).card ≤ 1 := by
-      intro v hv
-      exact hinter a (Finset.mem_insert_self ..) v (Finset.mem_insert_of_mem hv)
-        (by intro h; subst v; exact ha hv)
-    let U := S.biUnion f
-    have hsub : f a ∩ U ⊆ S.biUnion (fun v => f a ∩ f v) := by
-      intro x hx
-      rcases Finset.mem_inter.mp hx with ⟨hxa, hxU⟩
-      rcases Finset.mem_biUnion.mp hxU with ⟨v, hv, hxv⟩
-      exact Finset.mem_biUnion.mpr ⟨v, hv, Finset.mem_inter.mpr ⟨hxa, hxv⟩⟩
-    have hinterCard : (f a ∩ U).card ≤ S.card := by
-      calc
-        (f a ∩ U).card ≤ (S.biUnion fun v => f a ∩ f v).card := Finset.card_le_card hsub
-        _ ≤ ∑ v ∈ S, (f a ∩ f v).card := Finset.card_biUnion_le
-        _ ≤ ∑ _v ∈ S, 1 := Finset.sum_le_sum fun v hv => hintera v hv
-        _ = S.card := by simp
-    have hUnion : (insert a S).biUnion f = f a ∪ U := by
-      simp [U, Finset.biUnion_insert]
-    have hUnionCard := Finset.card_union_add_card_inter (f a) U
-    have hcardInsert : (insert a S).card = S.card + 1 := by simp [ha]
-    rw [hcardInsert]
-    have hprev := ih hcardS hinterS
-    rw [hUnion]
-    nlinarith [hcarda, hinterCard, hUnionCard]
-
-private theorem degree_seven_neighbors_card_le_one (G : SimpleGraph (Fin 42))
-    [DecidableRel G.Adj] (hmin : ∀ v, 6 ≤ G.degree v)
-    (hC4 : C4VertexExtension.C4Free G) {u : Fin 42} (hu : G.degree u = 8) :
-    (G.neighborFinset u ∩ Finset.univ.filter fun v => G.degree v = 7).card ≤ 1 := by
-  classical
-  apply Finset.card_le_one.mpr
-  intro x hx y hy
-  by_contra hxy
-  have hxN := (Finset.mem_inter.mp hx).1
-  have hyN := (Finset.mem_inter.mp hy).1
-  have hx7 := (Finset.mem_filter.mp (Finset.mem_inter.mp hx).2).2
-  have hy7 := (Finset.mem_filter.mp (Finset.mem_inter.mp hy).2).2
-  have hsum := C4DegreeBounds.neighbor_degree_excess_le_one_of_degree_eight
-    G u (by simp) hmin hC4 hu
-  have hsubset : insert x {y} ⊆ G.neighborFinset u := by
-    intro z hz
-    rcases Finset.mem_insert.mp hz with rfl | hz
-    · exact hxN
-    · simp at hz
-      subst z
-      exact hyN
-  have hsumSubset := Finset.sum_le_sum_of_subset_of_nonneg
-    (f := fun w : Fin 42 => G.degree w - 6) hsubset
-    (fun w hw hwo => Nat.zero_le _)
-  have htwo : (G.degree x - 6) + (G.degree y - 6) ≤
-      ∑ w ∈ G.neighborFinset u, (G.degree w - 6) := by
-    simpa [hxy] using hsumSubset
-  omega
+open C4DegreeEightCap
 
 /-- In a 42-vertex, 138-edge graph with degrees between six and eight, exactly
 four degree-eight vertices force exactly sixteen degree-seven vertices. -/
