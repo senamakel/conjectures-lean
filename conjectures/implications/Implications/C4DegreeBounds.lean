@@ -105,13 +105,14 @@ theorem neighbor_degree_excess_le_one_of_degree_eight (v : V)
   have houterDegree : (∑ u ∈ S, (G.degree u - 1)) ≤ 41 := by
     have hcards : ∀ u ∈ S, (outerNeighbors G u v).card = G.degree u - 1 := by
       intro u hu
+      change u ∈ G.neighborFinset v at hu
       have huv : v ∈ G.neighborFinset u := by
         have huv' : G.Adj v u := by simpa using hu
         simpa using G.symm.symm v u huv' 
       change #((G.neighborFinset u).erase v) = G.degree u - 1
       rw [Finset.card_erase_of_mem huv, G.card_neighborFinset_eq_degree]
     calc
-      (∑ u ∈ S, G.degree u - 1) = ∑ u ∈ S, (outerNeighbors G u v).card := by
+      (∑ u ∈ S, (G.degree u - 1)) = ∑ u ∈ S, (outerNeighbors G u v).card := by
         apply Finset.sum_congr rfl
         intro u hu
         exact (hcards u hu).symm
@@ -126,8 +127,11 @@ theorem neighbor_degree_excess_le_one_of_degree_eight (v : V)
           omega
         _ = (∑ u ∈ S, (G.degree u - 1)) + S.card := by simp [Finset.sum_add_distrib]
     have hScard : S.card = 8 := by simpa [S, G.card_neighborFinset_eq_degree] using hv
-    rw [hidentity, hScard]
-    omega
+    calc
+      (∑ u ∈ S, G.degree u) = (∑ u ∈ S, (G.degree u - 1)) + 8 := by
+        rw [hidentity, hScard]
+      _ ≤ 41 + 8 := by omega
+      _ = 49 := by omega
   have hexcessIdentity :
       (∑ u ∈ S, G.degree u) = (∑ u ∈ S, (G.degree u - 6)) + S.card * 6 := by
     calc
@@ -137,8 +141,12 @@ theorem neighbor_degree_excess_le_one_of_degree_eight (v : V)
         omega
       _ = (∑ u ∈ S, (G.degree u - 6)) + S.card * 6 := by simp [Finset.sum_add_distrib, Nat.mul_comm]
   have hScard : S.card = 8 := by simpa [S, G.card_neighborFinset_eq_degree] using hv
-  rw [hexcessIdentity, hScard] at hdegreeSum
-  omega
+  calc
+    (∑ u ∈ S, (G.degree u - 6)) ≤ 1 := by
+      have hrew : (∑ u ∈ S, G.degree u) = (∑ u ∈ S, (G.degree u - 6)) + 8 * 6 := by
+        rw [hexcessIdentity, hScard]
+      rw [← hrew]
+      omega
 
 theorem neighbor_degree_le_seven_of_degree_eight (v : V)
     (hcard : Fintype.card V = 42)
