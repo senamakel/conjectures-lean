@@ -441,10 +441,10 @@ theorem chosen_three_double_rows_form_triangle
     intro q hq i hi
     have hi' := Finset.mem_filter.mp hi
     rcases hi'.2 with heq | heq
-    · change i ∈ I ∧ G.Adj q i
-      exact ⟨hi'.1, heq ▸ hleftAdj i hi'.1⟩
-    · change i ∈ I ∧ G.Adj q i
-      exact ⟨hi'.1, heq ▸ hrightAdj i hi'.1⟩
+    · rw [row]
+      exact Finset.mem_filter.mpr ⟨hi'.1, heq ▸ hleftAdj i hi'.1⟩
+    · rw [row]
+      exact Finset.mem_filter.mpr ⟨hi'.1, heq ▸ hrightAdj i hi'.1⟩
   have hselectedEq : ∀ q ∈ S, selected q = row G I q := by
     intro q hq
     apply Finset.eq_of_subset_of_card_le (hselectedSubRow q (hSsub hq))
