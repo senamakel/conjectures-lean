@@ -41,7 +41,8 @@ open scoped Gradient RealInnerProductSpace
 
 abbrev E3 := EuclideanSpace ℝ (Fin 3)
 
-/-- Differentiate a single Coulomb term away from its source. -/
+/-- Differentiate a single Coulomb term away from its source.
+The differentiation argument follows @harshshah1618's Open Math Agents PR #289. -/
 private theorem coulomb_hasGradient (q : ℝ) {a x : E3} (hne : x ≠ a) :
     HasGradientAt (fun y : E3 => q / dist y a)
       ((-q / ‖x - a‖ ^ 3) • (x - a)) x := by
@@ -57,12 +58,14 @@ private theorem coulomb_hasGradient (q : ℝ) {a x : E3} (hne : x ≠ a) :
     · simp only [Real.sqrt_sq (norm_nonneg _), ← Nat.cast_smul_eq_nsmul ℝ, smul_smul]
       congr 1
       field_simp [hn]
-      <;> norm_num
+      norm_num
   have hderiv := ((hasDerivAt_inv hn).comp_hasFDerivAt x hd).const_mul q
   apply hasGradientAt_iff_hasFDerivAt.mpr
-  convert! hderiv using 1 <;> ext v <;>
-    simp [toDual_apply_apply, div_eq_mul_inv, smul_smul] <;>
-    field_simp [hn] <;> simp
+  convert! hderiv using 1
+  ext v
+  simp [toDual_apply_apply, div_eq_mul_inv, smul_smul]
+  field_simp [hn]
+  simp
 
 /-- Every equilibrium of three noncollinear charges lies in their plane.
 The theorem uses the registry's exact equilibrium definition. -/
