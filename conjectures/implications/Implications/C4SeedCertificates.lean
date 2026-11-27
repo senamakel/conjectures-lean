@@ -372,7 +372,7 @@ theorem no_compatible_six_in_seed_deletion (G : SimpleGraph (Fin 42))
       apply hvS
       simpa [hx] using x.2⟩, fun a b hab => by
       apply Subtype.ext
-      exact congrArg Subtype.val hab⟩
+      exact congrArg (fun x : {x : Fin 42 // x ∈ ({v}ᶜ : Set (Fin 42))} => x.1) hab⟩
   let T : Finset {x : Fin 42 // x ∈ ({v}ᶜ : Set (Fin 42))} := S.attach.map e
   have hTcard : T.card = 6 := by simp [T, e, hcard]
   have hTnodup : T.toList.Nodup := Finset.nodup_toList T
@@ -383,15 +383,26 @@ theorem no_compatible_six_in_seed_deletion (G : SimpleGraph (Fin 42))
     intro a b hab
     have hab' : a.1 ≠ b.1 := by
       intro heq
-      subst b
       have hnd := hTnodup.sublist hab
-      simpa using hnd
+      have heq' : a = b := Subtype.ext heq
+      exact (by simpa [heq'] using hnd)
+    have haT : a ∈ T := List.Sublist.subset hab (by simp)
+    have hbT : b ∈ T := List.Sublist.subset hab (by simp)
+    obtain ⟨a', ha'S, haEq⟩ := Finset.mem_map.mp haT
+    obtain ⟨b', hb'S, hbEq⟩ := Finset.mem_map.mp hbT
+    have haS : a.1 ∈ S := by
+      have hv := a'.2
+      have heq' : a'.1 = a.1 := congrArg Subtype.val haEq
+      simpa [heq'] using hv
+    have hbS : b.1 ∈ S := by
+      have hv := b'.2
+      have heq' : b'.1 = b.1 := congrArg Subtype.val hbEq
+      simpa [heq'] using hv
     apply Set.disjoint_left.mpr
     intro x hx₁ hx₂
     have hx₁' : G.Adj a.1 x.1 := by simpa [SimpleGraph.induce_adj] using hx₁
     have hx₂' : G.Adj b.1 x.1 := by simpa [SimpleGraph.induce_adj] using hx₂
-    exact hcompat a.1 (by simpa using a.2) b.1 (by simpa using b.2)
-      hab' x.1 (by simpa using x.2) hx₁' hx₂'
+    exact hcompat a.1 haS b.1 hbS hab' x.1 (by simpa using x.2) hx₁' hx₂'
   have hn := no_disjoint_six_of_seed_iso
     (G.induce ({v}ᶜ : Set (Fin 42))) hseed
   apply hn
