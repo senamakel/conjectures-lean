@@ -57,3 +57,4 @@ import Implications.C4PolaritySurvivorBound
 import Implications.C4Extremal42SearchConstraints
 import Implications.C4Extremal42RootLabel
 import Implications.C4Extremal42RootedClauses
+import Implications.C4Extremal42CommonNeighborClauses
