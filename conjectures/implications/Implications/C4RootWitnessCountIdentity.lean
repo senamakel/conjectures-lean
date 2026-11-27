@@ -53,6 +53,8 @@ theorem four_root_witness_weighted_count
     exact ⟨u, Finset.mem_inter.mpr ⟨huy, huD⟩⟩
   have hmultLe (y : Fin 42) (hy : y ∈ U) : m y ≤ 2 := by
     have hyNot8 := hUroot y hy
+    have hymin := (hwindow y).1
+    have hymax := (hwindow y).2
     have hydeg : G.degree y = 6 ∨ G.degree y = 7 := by omega
     rcases hydeg with hy6 | hy7
     · exact degree_six_vertex_has_at_most_two_degree_eight_neighbors
@@ -79,7 +81,8 @@ theorem four_root_witness_weighted_count
       intro heq
       subst u
       exact hxD huD
-    exact hC4 hxu hyz hyx hyu hzu.symm hzx.symm
+    apply hC4 hxu hyz hyx hyu.symm
+    exact ⟨hzx, hzu.symm⟩
   have hbiUnion : W.biUnion T = D := by
     ext u
     constructor
@@ -102,36 +105,54 @@ theorem four_root_witness_weighted_count
       exact Finset.mem_biUnion.mpr ⟨y, Finset.mem_inter.mpr ⟨hyx, hyU⟩, huT⟩
   have hsum : (∑ y ∈ W, m y) = 4 := by
     calc
-      _ = (W.biUnion T).card := by
-        rw [Finset.card_biUnion hTdisjoint]
+      _ = ∑ y ∈ W, (T y).card := by
         apply Finset.sum_congr rfl
         intro y hy
-        exact hTcard y
+        exact (hTcard y).symm
+      _ = (W.biUnion T).card := (Finset.card_biUnion hTdisjoint).symm
       _ = D.card := by rw [hbiUnion]
       _ = 4 := hDcard
   have hsplit : (∑ y ∈ W, m y) =
       2 * (W ∩ S).card + (W ∩ P).card := by
-    have hterm : ∀ y ∈ W, m y = if y ∈ S then 2 else 1 := by
-      intro y hy
-      have hyU := (Finset.mem_inter.mp hy).2
-      have hm := hmultCases y hyU
-      by_cases hs : y ∈ S
-      · simp only [S, Finset.mem_filter] at hs
-        simp [hs.2]
-      · have hp : y ∈ P := by
-          apply Finset.mem_filter.mpr
-          refine ⟨hyU, ?_⟩
-          rcases hm with hm | hm
-          · exact hm
-          · exact (hs (Finset.mem_filter.mpr ⟨hyU, hm⟩)).elim
-        simp [hs, (Finset.mem_filter.mp hp).2]
+    have hWsplit : W = (W ∩ S) ∪ (W ∩ P) := by
+      ext y
+      constructor
+      · intro hy
+        have hyU := (Finset.mem_inter.mp hy).2
+        rcases hmultCases y hyU with hm | hm
+        · exact Finset.mem_union.mpr (Or.inr
+            (Finset.mem_inter.mpr ⟨hy, Finset.mem_filter.mpr ⟨hyU, hm⟩⟩))
+        · exact Finset.mem_union.mpr (Or.inl
+            (Finset.mem_inter.mpr ⟨hy, Finset.mem_filter.mpr ⟨hyU, hm⟩⟩))
+      · intro hy
+        rcases Finset.mem_union.mp hy with hyS | hyP
+        · exact (Finset.mem_inter.mp hyS).1
+        · exact (Finset.mem_inter.mp hyP).1
+    have hWdisjoint : Disjoint (W ∩ S) (W ∩ P) := by
+      apply Finset.disjoint_left.mpr
+      intro y hyS hyP
+      have htwo := (Finset.mem_filter.mp (Finset.mem_inter.mp hyS).2).2
+      have hone := (Finset.mem_filter.mp (Finset.mem_inter.mp hyP).2).2
+      omega
     calc
-      _ = ∑ y ∈ W, if y ∈ S then (2 : ℕ) else 1 := by
-        apply Finset.sum_congr rfl
-        intro y hy
-        exact hterm y hy
+      _ = (∑ y ∈ W ∩ S, m y) + ∑ y ∈ W ∩ P, m y := by
+        rw [hWsplit, Finset.sum_union hWdisjoint]
       _ = 2 * (W ∩ S).card + (W ∩ P).card := by
-        simp [Finset.sum_ite, Finset.sum_filter, Finset.filter_filter, S, P, W]
+        have hsumS : (∑ y ∈ W ∩ S, m y) = 2 * (W ∩ S).card := by
+          calc
+            _ = ∑ y ∈ W ∩ S, (2 : ℕ) := by
+              apply Finset.sum_congr rfl
+              intro y hy
+              exact (Finset.mem_filter.mp (Finset.mem_inter.mp hy).2).2
+            _ = 2 * (W ∩ S).card := by simp [Nat.mul_comm]
+        have hsumP : (∑ y ∈ W ∩ P, m y) = (W ∩ P).card := by
+          calc
+            _ = ∑ y ∈ W ∩ P, (1 : ℕ) := by
+              apply Finset.sum_congr rfl
+              intro y hy
+              exact (Finset.mem_filter.mp (Finset.mem_inter.mp hy).2).2
+            _ = (W ∩ P).card := by simp
+        rw [hsumS, hsumP]
   have hWSp : W ∩ S = G.neighborFinset x ∩ S := by
     ext y
     simp [W, S]
