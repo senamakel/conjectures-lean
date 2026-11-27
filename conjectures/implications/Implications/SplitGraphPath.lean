@@ -334,6 +334,121 @@ theorem exists_distinct_row_attachments
     · refine ⟨j, i, d, a, by simp [hIeq], by simp [hIeq], hij.symm, hd, ha, hda, ?_, hai⟩
       simpa [hxj] using (Finset.mem_filter.mp hx).2
 
+private theorem hamiltonian_of_list
+    (G : SimpleGraph V) (l : List V) (hne : l ≠ []) (hnodup : l.Nodup)
+    (hchain : l.IsChain G.Adj) (hcover : ∀ v : V, v ∈ l) :
+    ∃ (u v : V) (p : G.Walk u v), p.IsHamiltonian := by
+  classical
+  let p := SimpleGraph.Walk.ofSupport l hne hchain
+  have hpath : p.IsPath := by
+    apply (SimpleGraph.Walk.isPath_def p).2
+    simpa [p, SimpleGraph.Walk.support_ofSupport hne hchain] using hnodup
+  have hvertices : ∀ v : V, v ∈ p.support := by
+    intro v
+    rw [SimpleGraph.Walk.support_ofSupport hne hchain]
+    exact hcover v
+  exact ⟨_, _, p, hpath.isHamiltonian_of_mem hvertices⟩
+
+private theorem clique_order_chain (G : SimpleGraph V) (C : Finset V)
+    (hC : G.IsClique (C : Set V)) (l : List V)
+    (hnodup : l.Nodup) (hfin : l.toFinset = C) : l.IsChain G.Adj := by
+  rw [List.isChain_iff_forall_rel_of_append_cons_cons]
+  intro x y l₁ l₂ heq
+  have hx : x ∈ l := by rw [heq]; simp
+  have hy : y ∈ l := by rw [heq]; simp
+  have hxy : x ≠ y := by
+    intro h
+    subst y
+    have hcount := (List.nodup_iff_count_le_one.mp hnodup) x
+    rw [heq] at hcount
+    simp [List.count_append] at hcount
+    omega
+  apply hC
+  · exact (by simpa [hfin] using (List.mem_toFinset.mpr hx))
+  · exact (by simpa [hfin] using (List.mem_toFinset.mpr hy))
+  · exact hxy
+
+/-- A connectivity-one split partition is traceable: the row conditions first
+bound the independent side by two, and the remaining cases give an explicit
+Hamiltonian walk through the clique. -/
+theorem hamiltonian_of_split_partition_row_bounds
+    (G : SimpleGraph V) (C I : Finset V)
+    (hC : G.IsClique (C : Set V)) (hI : G.IsIndepSet (I : Set V))
+    (hdisj : Disjoint C I)
+    (hpartition : (Finset.univ : Finset V) = C ∪ I)
+    (hrow : ∀ c ∈ C, (row G I c).card ≤ 2)
+    (hdiff : ∀ c ∈ C, ∀ d ∈ C, c ≠ d → (rowDiff G I c d).card ≤ 1)
+    (hcover : ∀ i ∈ I, ∃ c ∈ C, G.Adj c i)
+    (hCne : C.Nonempty) :
+    ∃ (u v : V) (p : G.Walk u v), p.IsHamiltonian := by
+  classical
+  have hIcard := independent_card_le_two_of_row_bounds G C I hrow hdiff hcover
+  by_cases htwo : I.card = 2
+  · by_cases hCtwo : 2 ≤ C.card
+    · obtain ⟨i, j, a, b, hi, hj, hij, ha, hb, hab, hia, hbj⟩ :=
+        exists_distinct_row_attachments G C I hrow hdiff hcover htwo hCtwo
+      exact hamiltonian_of_split_partition_two_endpoints G C i j a b hC
+        (by simpa [Finset.pair_comm] using hpartition) (hdisj.not_mem_of_mem_left hi)
+        (hdisj.not_mem_of_mem_left hj) hij ha hb hab hia hbj
+    · have hCone : C.card = 1 := by omega
+      obtain ⟨c, hc, hCeq⟩ := Finset.card_eq_one.mp hCone
+      obtain ⟨i, j, hij, hIeq⟩ := Finset.card_eq_two.mp htwo
+      have hci : G.Adj c i := by
+        obtain ⟨d, hd, hdi⟩ := hcover i (by simp [hIeq])
+        have : d = c := by simpa [hCeq] using hd
+        simpa [this] using hdi
+      have hcj : G.Adj c j := by
+        obtain ⟨d, hd, hdj⟩ := hcover j (by simp [hIeq])
+        have : d = c := by simpa [hCeq] using hd
+        simpa [this] using hdj
+      have hnodup : ([i, c, j] : List V).Nodup := by
+        simp [hdisj.not_mem_of_mem_left hi, hdisj.not_mem_of_mem_left hj, hij]
+      have hchain : ([i, c, j] : List V).IsChain G.Adj := by
+        simp [List.isChain_cons, hci, hcj]
+      apply hamiltonian_of_list G [i, c, j] (by simp) hnodup hchain
+      intro v
+      have hv : v ∈ C ∪ I := by simpa [hpartition] using (Finset.mem_univ v)
+      rcases Finset.mem_union.mp hv with hvC | hvI
+      · have : v = c := by simpa [hCeq] using hvC
+        simp [this]
+      · have : v = i ∨ v = j := by simpa [hIeq] using hvI
+        rcases this with rfl | rfl <;> simp
+  · by_cases hone : I.card = 1
+    · obtain ⟨i, hi⟩ := Finset.card_eq_one.mp hone
+      obtain ⟨c, hc, hci⟩ := hcover i (by simp [hi])
+      let m := C.erase c
+      let l := c :: m.toList
+      have hmnodup : m.toList.Nodup := m.nodup_toList
+      have hcnot : c ∉ m := by simp [m]
+      have hlnodup : l.Nodup := by simp [l, hcnot, hmnodup]
+      have hlfin : l.toFinset = C := by
+        ext x
+        simp [l, m, Finset.mem_erase]
+      have hlchain : l.IsChain G.Adj := clique_order_chain G C hC l hlnodup hlfin
+      have hchain : (i :: l).IsChain G.Adj := by
+        simp [List.isChain_cons, l, hci, hlchain]
+      apply hamiltonian_of_list G (i :: l) (by simp) (by simp [hdisj.not_mem_of_mem_left hi, hlnodup]) hchain
+      intro v
+      have hv : v ∈ C ∪ I := by simpa [hpartition] using (Finset.mem_univ v)
+      rcases Finset.mem_union.mp hv with hvC | hvI
+      · have hvl : v ∈ l := by simpa [hlfin] using hvC
+        simp [hvl]
+      · have : v = i := by simpa [hi] using hvI
+        simp [this]
+  · have hempty : I = ∅ := Finset.card_eq_zero.mp (by omega)
+    let l := C.toList
+    have hnodup : l.Nodup := C.nodup_toList
+    have hfin : l.toFinset = C := C.toList_toFinset
+    have hchain : l.IsChain G.Adj := clique_order_chain G C hC l hnodup hfin
+    have hne : l ≠ [] := by
+      intro he
+      have : C = ∅ := by simpa [l] using congrArg List.toFinset he
+      exact hCne.ne_empty this
+    apply hamiltonian_of_list G l hne hnodup hchain
+    intro v
+    have hv : v ∈ C ∪ I := by simpa [hpartition] using (Finset.mem_univ v)
+    simpa [l, hempty, hfin] using (Finset.mem_union.mp hv).resolve_right (by simp [hempty])
+
 end SplitGraphPath
 
 #print axioms SplitGraphPath.independent_card_le_two_of_row_bounds
