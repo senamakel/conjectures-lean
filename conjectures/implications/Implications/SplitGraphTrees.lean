@@ -6,7 +6,8 @@ Bridge lemmas for the split-graph case of Written on the Wall II #199.
 The Formal Conjectures helpers for largest induced trees are not a dependency of this package.
 We use the equivalent Mathlib-level premise `inducedTreeBound`: every induced tree has at most
 `k + 2` vertices. The star witness is proved from Mathlib's `starGraph`; the double-star witness
-is currently an explicit premise. This avoids depending on external declarations for
+is proved from connectedness and the fact that leaf vertices cannot occur in cycles. This avoids
+depending on external declarations for
 `largestInducedTreeSize`.
 -/
 
@@ -258,11 +259,9 @@ theorem row_card_le (G : SimpleGraph V) (C I : Finset V) (k : ℕ)
 
 /-- The induced double-star bound controls the symmetric difference of every pair of rows. -/
 theorem row_symmDiff_card_le (G : SimpleGraph V) (C I : Finset V) (k : ℕ)
+    (hC : G.IsClique (C : Set V)) (hI : G.IsIndepSet (I : Set V))
     (hdisj : Disjoint C I)
-    (hTreeBound : inducedTreeBound G k)
-    (hDoubleStar : ∀ c ∈ C, ∀ d ∈ C, c ≠ d →
-      (G.induce
-        ((insert c (insert d (rowDiff G I c d) : Finset V) : Finset V) : Set V)).IsTree) :
+    (hTreeBound : inducedTreeBound G k) :
     ∀ c ∈ C, ∀ d ∈ C, c ≠ d → (rowDiff G I c d).card ≤ k := by
   classical
   intro c hc d hd hcd
@@ -287,7 +286,8 @@ theorem row_symmDiff_card_le (G : SimpleGraph V) (C I : Finset V) (k : ℕ)
   have hcdRow : c ∉ insert d (rowDiff G I c d) := by
     simp [hcd, hcRow]
   have hTree := hTreeBound
-    (insert c (insert d (rowDiff G I c d))) (hDoubleStar c hc d hd hcd)
+    (insert c (insert d (rowDiff G I c d)))
+    (doubleStar_isTree G C I c d hC hI hdisj hc hd hcd)
   rw [Finset.card_insert_of_notMem hcdRow, Finset.card_insert_of_notMem hdRow] at hTree
   omega
 
@@ -295,19 +295,18 @@ theorem row_symmDiff_card_le (G : SimpleGraph V) (C I : Finset V) (k : ℕ)
 theorem rows_bounded_of_inducedTreeBound
     (G : SimpleGraph V) (C I : Finset V) (k : ℕ)
     (hTreeBound : inducedTreeBound G k)
+    (hC : G.IsClique (C : Set V))
     (hI : G.IsIndepSet (I : Set V))
-    (hdisj : Disjoint C I)
-    (hDoubleStar : ∀ c ∈ C, ∀ d ∈ C, c ≠ d →
-      (G.induce
-        ((insert c (insert d (rowDiff G I c d) : Finset V) : Finset V) : Set V)).IsTree) :
+    (hdisj : Disjoint C I) :
     (∀ c ∈ C, (row G I c).card ≤ k + 1) ∧
       (∀ c ∈ C, ∀ d ∈ C, c ≠ d → (rowDiff G I c d).card ≤ k) := by
   exact ⟨row_card_le G C I k hI hTreeBound,
-    row_symmDiff_card_le G C I k hdisj hTreeBound hDoubleStar⟩
+    row_symmDiff_card_le G C I k hC hI hdisj hTreeBound⟩
 
 end SplitGraphTrees
 
 #print axioms SplitGraphTrees.star_isTree
 #print axioms SplitGraphTrees.mem_rowDiff_iff
+#print axioms SplitGraphTrees.doubleStar_isTree
 #print axioms SplitGraphTrees.row_card_le
 #print axioms SplitGraphTrees.row_symmDiff_card_le
