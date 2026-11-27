@@ -18,8 +18,8 @@ candidate, or takes it and restricts later candidates to vertices compatible
 with it. `search_correct` proves equivalence with the proposition that an
 actual pairwise-compatible list of the requested size is a sublist of the
 candidates. The three closed Boolean results below are checked by
-`native_decide`, and `checker_false` converts each Boolean result to that
-proposition. Each finite check completed in under one second in Lean.
+`decide +kernel`, and `checker_false` converts each Boolean result to that
+proposition. All three certificates depend only on the standard Lean axioms.
 
 This certifies only that the three supplied seeds have no compatible
 six-element set.  It makes no claim that the list of seeds is exhaustive.
