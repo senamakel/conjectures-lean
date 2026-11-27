@@ -46,18 +46,20 @@ theorem pairwise_intersecting_two_sets
         · intro hcv
           subst v
           exact huv h.symm
-        · simpa [h] using hBeq
+        · subst u
+          exact hBeq
       · refine ⟨u, ?_, ?_⟩
         · intro hcu
           subst u
           exact huv h
-        · simpa [Finset.insert_comm] using hBeq
+        · subst v
+          simpa [Finset.insert_comm] using hBeq
     obtain ⟨c, hbc, hBeq'⟩ := hchoose
     have hca : c ≠ a := by
       intro h
       apply haB
-      rw [hBeq'] at hxB
-      simp [h, hxB]
+      rw [hBeq']
+      simp [h]
     have hABne' : A ≠ D := by
       intro he
       subst D
@@ -96,23 +98,25 @@ theorem pairwise_intersecting_two_sets
         · exact haD
         · exact hcD
         · exact hq
-      have hcardThree : ({a, c, q} : Finset α).card = 3 := by simp [hca, hqa, hqc]
+      have hcardThree : ({a, c, q} : Finset α).card = 3 := by simp [hca.symm, hqa, hqc]
       have := Finset.card_le_card hthree
       rw [hcard D hD] at this
       omega
     have hDeq : D = {a, c} := by
       apply Finset.eq_of_subset_of_card_le hDsub
-      simp [hca, hcard D hD]
-    have htriple : ({a, b, c} : Finset α).card = 3 := by simp [hab, hca, hbc]
+      simp only [Finset.card_insert_of_notMem, Finset.card_singleton]
+      · rw [hcard D hD]
+      · exact hca.symm
+    have htriple : ({a, b, c} : Finset α).card = 3 := by simp [hab, hca.symm, hbc]
     have hnotTriple : ∀ q, ¬ (q ∈ A ∧ q ∈ B ∧ q ∈ D) := by
       intro q hq
       rw [hAeq, hBeq', hDeq] at hq
       simp only [Finset.mem_insert, Finset.mem_singleton] at hq
-      rcases hq with ⟨(rfl | rfl), (rfl | rfl), (rfl | rfl)⟩ <;> simp_all
-    refine Or.inr ⟨a, b, c, hab, hca, hbc, ?_⟩
+      simp [hab, hca.symm, hbc] at hq
+    refine Or.inr ⟨a, b, c, hab, hca.symm, hbc, ?_⟩
     intro T hT
     by_contra hsub
-    obtain ⟨z, hzT, hzOut⟩ := Finset.exists_of_not_subset hsub
+    obtain ⟨z, hzT, hzOut⟩ := Finset.not_subset.mp hsub
     have hzA : z ∉ A := by
       intro hz
       have : z = a ∨ z = b := by rw [hAeq] at hz; simpa using hz
