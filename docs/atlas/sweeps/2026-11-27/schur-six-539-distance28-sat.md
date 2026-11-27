@@ -37,12 +37,13 @@ commit `47c01b341b74ef5620c5e3f858c527cd266e212b`; the source word's SHA-256 is
 normalized 538-symbol word has SHA-256
 `9be24a8e408a0d531aaa77596c7123c44a68d2c6725627f284dd2bc96df12c41`.
 
-An input inventory over the 1,021 evolved records, both published McKenna
-words, and all six possible appended colors found a unique minimum: 28 old
-complementary pairs already have the append color at both endpoints. In the
-first-occurrence canonical coloring, the append color is 4; it is color `3` in
-McKenna's published word. Pair positions below are 1-indexed and each pair sums
-to 539:
+An input inventory canonicalized the 1,021 evolved records to 995 words up to
+color renaming, then added both distinct McKenna words (neither occurs in that
+corpus). Across these 997 normalized words and all six possible appended
+colors, there is a unique minimum: 28 old complementary pairs already have the
+append color at both endpoints. In the first-occurrence canonical coloring,
+the append color is 4; it is color `3` in McKenna's published word. Pair
+positions below are 1-indexed and each pair sums to 539:
 
 ```text
 (6,533)   (24,515)  (28,511)  (37,502)  (39,500)  (42,497)  (55,484)
