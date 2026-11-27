@@ -26,7 +26,6 @@ private theorem reverseStartFun_involutive {n : ℕ} :
   · have hr : n - 8 - s.val + 7 < n := by omega
     apply Fin.ext
     simp only [reverseStartFun, dif_pos hs, dif_pos hr]
-    change n - 8 - (n - 8 - s.val) = s.val
     omega
   · simp [reverseStartFun, hs]
 
@@ -86,13 +85,15 @@ private theorem containsAt_reverse_iff {n : ℕ} (π : Equiv.Perm (Fin n))
     have h' := h (Fin.rev i) (Fin.rev j)
     have hi := reverseIndex_eq s.val hs i
     have hj := reverseIndex_eq s.val hs j
+    have hir := reverseIndex_eq s.val hs (Fin.rev i)
+    have hjr := reverseIndex_eq s.val hs (Fin.rev j)
     have hcmp : (π (Fin.revPerm ⟨s.val + i.val, by
         have hk := i.isLt
         omega⟩) <
       π (Fin.revPerm ⟨s.val + j.val, by
         have hk := j.isLt
         omega⟩)) ↔ p (Fin.rev i) < p (Fin.rev j) := by
-      simpa [hi, hj, Fin.rev, Fin.revPerm_apply] using h'
+      simpa [hir, hjr, Fin.rev, Fin.revPerm_apply] using h'
     simpa [reversePattern, Fin.revPerm_apply] using hcmp
 
 /-- Reversal maps the exact occurrence-start set to its reflected image. -/
@@ -108,15 +109,16 @@ theorem occurrenceSet_reverse {n : ℕ} (p : Fin 8 → Fin 8)
     have hv := hc.1
     have hsource := (containsAt_reverse_iff π p s hv).mp hc
     refine Finset.mem_map.mpr ⟨reverseStartEquiv n s, ?_, ?_⟩
-    · exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, hsource⟩
+    · exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, by
+        simpa [reverseStartEquiv, reverseStartFun, hv] using hsource⟩
     · exact reverseStartFun_involutive s
   · intro hs
     rcases Finset.mem_map.mp hs with ⟨t, ht, hts⟩
     have hc := (Finset.mem_filter.mp ht).2
     have hvt := hc.1
     have hts' := congrArg (reverseStartEquiv n) hts
-    have hts'' : reverseStartEquiv n s = t := by
-      simpa [reverseStartFun_involutive] using hts'.symm
+    have hts'' : t = reverseStartEquiv n s := by
+      simpa [reverseStartFun_involutive] using hts'
     have hvs : s.val + 7 < n := by
       by_contra hbad
       have hfix : reverseStartEquiv n s = s := by
@@ -144,10 +146,11 @@ private theorem exactCount_eq_of_equiv_occurrenceSets {α β X Y : Type*}
       Fintype.card {x : X // occX x = marks} =
         Fintype.card {y : Y // occY y = marks.map eα.toEmbedding} :=
     Fintype.card_congr {
-      toFun := fun x => ⟨eX x.1, by rw [h, x.2]⟩
+      toFun := fun x => ⟨eX x.1, by rw [h x.1, x.2]⟩
       invFun := fun y => ⟨eX.symm y.1, by
-        apply Finset.map_injective eα.toEmbedding
-        simpa using (h (eX.symm y.1)).symm.trans y.2⟩
+        have hy := y.2
+        rw [← h (eX.symm y.1)] at hy
+        exact Finset.map_injective eα.toEmbedding hy⟩
       left_inv := by intro x; cases x; simp
       right_inv := by intro y; cases y; simp
     }
