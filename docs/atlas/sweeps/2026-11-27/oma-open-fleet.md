@@ -264,3 +264,16 @@ parameter `t` gives the partner `s = 2(t−1)²). Therefore
 `y ∣ (d−3*x³)²−8*x⁶`. For the branch `x = 1` this is
 `(d−3)² ≡ 8 (mod y)). The exact proof checks at the OMA pin
 in [CrystalQuotientFour.lean](CrystalQuotientFour.lean).
+
+In the `x = 1` quotient-four branch, Lean checks that the
+nonzero integer `(d−3)²−8` bounds `y` in absolute value.
+For `y ≥ 33`, the positive even difference must therefore
+be at least 10. This makes the branch finite for each fixed
+difference, even when the reduced component is allowed to vary.
+A bounded exact-integer screen enumerated even `d ≤ 2048` and
+`y ≥ 33` dividing that nonzero integer, retaining
+`d < 2(y−1)`. It covered 2,550 `(d,y)` states and 1,226
+divisors of the second component constant after parity and order
+filters. No candidate also met the first component divisor bound.
+The screen stopped at its preset cutoff within a 45-second wall
+limit. This screen has no Lean certificate.
