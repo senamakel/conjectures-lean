@@ -18,7 +18,7 @@ private theorem nodup_of_all_distinct (l : List V)
     simp only [List.nodup_cons]
     refine ⟨?_, ih ?_⟩
     · intro ha
-      exact h a (by simp) a ha rfl
+      exact h a (by simp) a (by simp) rfl
     · intro p hp q hq
       exact h p (by simp [hp]) q (by simp [hq])
 
@@ -112,7 +112,6 @@ theorem core_path_ending_at_each_independent
     (hI : I = {a, b, c, z})
     (hvertices : ∀ p ∈ ([a, b, c, z, t, x, y] : List V),
       ∀ q ∈ ([a, b, c, z, t, x, y] : List V), p ≠ q)
-    (hC : G.IsClique ({t, x, y} : Set V))
     (htrow : row G I t = {a, b, c})
     (hxrow : row G I x = {a, b, z})
     (hyrow : row G I y = {a, c, z})
@@ -123,21 +122,15 @@ theorem core_path_ending_at_each_independent
   classical
   have hit : i = a ∨ i = b ∨ i = c ∨ i = z := by
     simpa [Finset.mem_insert, Finset.mem_singleton, or_comm, or_left_comm, or_assoc] using hi
-  have hbt : G.Adj b t := (Finset.mem_filter.mp (by rw [htrow]; simp)).2
-  have hat : G.Adj a t := (Finset.mem_filter.mp (by rw [htrow]; simp)).2
-  have hct : G.Adj c t := (Finset.mem_filter.mp (by rw [htrow]; simp)).2
-  have hxa : G.Adj x a := (Finset.mem_filter.mp (by rw [hxrow]; simp)).2
-  have hxb : G.Adj x b := (Finset.mem_filter.mp (by rw [hxrow]; simp)).2
-  have hxz : G.Adj x z := (Finset.mem_filter.mp (by rw [hxrow]; simp)).2
-  have hya : G.Adj y a := (Finset.mem_filter.mp (by rw [hyrow]; simp)).2
-  have hyc : G.Adj y c := (Finset.mem_filter.mp (by rw [hyrow]; simp)).2
-  have hyz : G.Adj y z := (Finset.mem_filter.mp (by rw [hyrow]; simp)).2
-  have htx : G.Adj t x := hC (by simp) (by simp) (by
-    intro h; exact hvertices t (by simp) x (by simp) h)
-  have hty : G.Adj t y := hC (by simp) (by simp) (by
-    intro h; exact hvertices t (by simp) y (by simp) h)
-  have hxy : G.Adj x y := hC (by simp) (by simp) (by
-    intro h; exact hvertices x (by simp) y (by simp) h)
+  have hbt : G.Adj t b := (Finset.mem_filter.mp (show b ∈ row G I t by rw [htrow]; simp [hI])).2
+  have hat : G.Adj t a := (Finset.mem_filter.mp (show a ∈ row G I t by rw [htrow]; simp [hI])).2
+  have hct : G.Adj t c := (Finset.mem_filter.mp (show c ∈ row G I t by rw [htrow]; simp [hI])).2
+  have hxa : G.Adj x a := (Finset.mem_filter.mp (show a ∈ row G I x by rw [hxrow]; simp [hI])).2
+  have hxb : G.Adj x b := (Finset.mem_filter.mp (show b ∈ row G I x by rw [hxrow]; simp [hI])).2
+  have hxz : G.Adj x z := (Finset.mem_filter.mp (show z ∈ row G I x by rw [hxrow]; simp [hI])).2
+  have hya : G.Adj y a := (Finset.mem_filter.mp (show a ∈ row G I y by rw [hyrow]; simp [hI])).2
+  have hyc : G.Adj y c := (Finset.mem_filter.mp (show c ∈ row G I y by rw [hyrow]; simp [hI])).2
+  have hyz : G.Adj y z := (Finset.mem_filter.mp (show z ∈ row G I y by rw [hyrow]; simp [hI])).2
   have hdistinct (l : List V) (hl : ∀ q ∈ l, q ∈ ([a,b,c,z,t,x,y] : List V)) :
       ∀ p ∈ l, ∀ q ∈ l, p ≠ q := by
     intro p hp q hq
@@ -156,8 +149,7 @@ theorem core_path_ending_at_each_independent
   · refine ⟨[b, x, z, y, c, t, a], ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · apply nodup_of_all_distinct
       exact hdistinct _ (by simp)
-    · simp [List.isChain_cons, hxb, hxz, hyz.symm, hyc, hct.symm, hat.symm,
-        hvertices t (by simp) x (by simp)]
+    · simp [List.isChain_cons, hxb.symm, hxz, hyz.symm, hyc, hct.symm, hat]
     · simp
     · exact hcoverA _ (by intro q hq; simp at hq ⊢ <;> tauto)
     · simp
@@ -166,7 +158,7 @@ theorem core_path_ending_at_each_independent
   · refine ⟨[a, t, c, y, z, x, b], ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · apply nodup_of_all_distinct
       exact hdistinct _ (by simp)
-    · simp [List.isChain_cons, hat, hct, hyc.symm, hyz, hxz.symm, hxb]
+    · simp [List.isChain_cons, hat.symm, hct, hyc.symm, hyz, hxz.symm, hxb]
     · simp
     · exact hcoverA _ (by intro q hq; simp at hq ⊢ <;> tauto)
     · simp
@@ -175,7 +167,7 @@ theorem core_path_ending_at_each_independent
   · refine ⟨[b, t, a, x, z, y, c], ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · apply nodup_of_all_distinct
       exact hdistinct _ (by simp)
-    · simp [List.isChain_cons, hbt, hat, hxa.symm, hxz, hyz.symm, hyc]
+    · simp [List.isChain_cons, hbt.symm, hat, hxa.symm, hxz, hyz.symm, hyc]
     · simp
     · exact hcoverA _ (by intro q hq; simp at hq ⊢ <;> tauto)
     · simp
@@ -184,7 +176,7 @@ theorem core_path_ending_at_each_independent
   · refine ⟨[b, x, a, t, c, y, z], ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · apply nodup_of_all_distinct
       exact hdistinct _ (by simp)
-    · simp [List.isChain_cons, hxb, hxa.symm, hat, hct, hyc.symm, hyz]
+    · simp [List.isChain_cons, hxb.symm, hxa, hat.symm, hct, hyc.symm, hyz]
     · simp
     · exact hcoverA _ (by intro q hq; simp at hq ⊢ <;> tauto)
     · simp
