@@ -15,6 +15,7 @@ namespace SplitGraphKappaThreeHall
 /-- Three incidences per left vertex and a capacity-two upper bound imply the
 deficit-one cut inequality. -/
 theorem capacity_two_cut_from_incidence (s incidences capacity : ℕ)
+    (hsmall : s ≤ 5)
     (hdegree : 3 * s ≤ incidences)
     (hcapacity : incidences ≤ 2 * capacity) :
     2 * s - 2 ≤ capacity := by
@@ -35,7 +36,7 @@ theorem small_set_capacity_cut (s incidences capacity : ℕ)
     (hdegree : 3 * s ≤ incidences)
     (hcapacity : incidences ≤ 2 * capacity) :
     2 * s - 2 ≤ capacity := by
-  omega
+  exact capacity_two_cut_from_incidence s incidences capacity hsmall hdegree hcapacity
 
 end SplitGraphKappaThreeHall
 
