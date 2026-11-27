@@ -31,5 +31,6 @@ import Implications.WilfPatternSwap
 import Implications.WilfTwoWindowOrder
 import Implications.WilfCertifiedSwap
 import Implications.WilfChainCertificate
+import Implications.WilfArchiveOrientation
 import Implications.WilfThreeCycleOrder
 import Implications.WilfThreeCycleGlobal
