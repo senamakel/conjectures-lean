@@ -24,7 +24,7 @@ private theorem twice_union_card_add_square_bound {V : Type*} [Fintype V]
     [DecidableEq V] (S : Finset V) (f : V → Finset V)
     (hcard : ∀ u ∈ S, (f u).card = 8)
     (hinter : ∀ u ∈ S, ∀ v ∈ S, u ≠ v → (f u ∩ f v).card ≤ 1) :
-    16 * S.card ≤ 2 * (S.biUnion f).card + S.card * (S.card - 1) := by
+    17 * S.card ≤ 2 * (S.biUnion f).card + S.card ^ 2 := by
   classical
   induction S using Finset.induction_on with
   | empty => simp
@@ -55,10 +55,10 @@ private theorem twice_union_card_add_square_bound {V : Type*} [Fintype V]
     have hUnion : (insert a S).biUnion f = f a ∪ U := by
       simp [U, Finset.biUnion_insert, ha]
     have hUnionCard := Finset.card_union_add_card_inter (f a) U
-    rw [hUnion] at hUnionCard
     have hcardInsert : (insert a S).card = S.card + 1 := by simp [ha]
     rw [hcardInsert]
     have hprev := ih hcardS hinterS
+    rw [hUnion]
     nlinarith [hcarda, hinterCard, hUnionCard]
 
 /-- A C4-free graph cannot have eight degree-eight vertices when all degrees
@@ -70,6 +70,7 @@ theorem degree_eight_count_le_seven (G : SimpleGraph (Fin 42)) [DecidableRel G.A
   classical
   let D := Finset.univ.filter fun v => G.degree v = 8
   by_contra hnot
+  change ¬ D.card ≤ 7 at hnot
   have hD : 8 ≤ D.card := by omega
   obtain ⟨S, hSD, hS⟩ := Finset.exists_subset_card_eq hD
   have hSdeg : ∀ u ∈ S, G.degree u = 8 := by
@@ -86,12 +87,13 @@ theorem degree_eight_count_le_seven (G : SimpleGraph (Fin 42)) [DecidableRel G.A
     have huy : G.Adj u y := by simpa using (Finset.mem_inter.mp hy).1
     have hvy : G.Adj v y := by simpa using (Finset.mem_inter.mp hy).2
     exact hC4 huv hxy hux hvx ⟨huy, hvy⟩
-  have hUnionLower := twice_union_card_add_square_bound S G.neighborFinset hSdeg hpair
-  have hUnionSize : 36 ≤ (S.biUnion G.neighborFinset).card := by
+  let N := fun u : Fin 42 => G.neighborFinset u
+  have hUnionLower := twice_union_card_add_square_bound S N hSdeg hpair
+  have hUnionSize : 36 ≤ (S.biUnion N).card := by
     rw [hS] at hUnionLower
-    norm_num at hUnionLower ⊢
+    norm_num at hUnionLower
     omega
-  have hnotD : S.biUnion G.neighborFinset ⊆ Finset.univ \ D := by
+  have hnotD : S.biUnion N ⊆ Finset.univ \ D := by
     intro x hx
     rcases Finset.mem_biUnion.mp hx with ⟨u, hu, hux⟩
     have huD := hSD hu
@@ -104,7 +106,7 @@ theorem degree_eight_count_le_seven (G : SimpleGraph (Fin 42)) [DecidableRel G.A
         G x (by simp) hmin hC4 hxDeg (G.mem_neighborFinset x u).mpr (G.symm.symm u x huxAdj)
       omega
     exact Finset.mem_sdiff.mpr ⟨Finset.mem_univ _, hxnot⟩
-  have hUnionUpper : (S.biUnion G.neighborFinset).card ≤ 42 - D.card := by
+  have hUnionUpper : (S.biUnion N).card ≤ 42 - D.card := by
     calc
       _ ≤ (Finset.univ \ D).card := Finset.card_le_card hnotD
       _ = 42 - D.card := by simp [D]
@@ -152,3 +154,4 @@ theorem count_le_seven_of_codegree_moments
 end C4DegreeEightCap
 
 #print axioms C4DegreeEightCap.count_le_seven_of_codegree_moments
+#print axioms C4DegreeEightCap.degree_eight_count_le_seven
