@@ -63,5 +63,6 @@ checks its contents even if a different artifact is supplied.
 
 The replay uses one `native_decide` axiom for the 114,126 LRAT actions
 (11,243,269 bytes) and signed literal validation. The automorphism check
-uses a separate finite `native_decide` certificate. The general
+uses a separate finite `native_decide` certificate. The general The two target
+modules and replay took 44.47 seconds on the shared Lean 4.36.0 cache.
 42-vertex extremal question remains open.
