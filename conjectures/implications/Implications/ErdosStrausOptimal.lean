@@ -4,13 +4,14 @@ import Mathlib
 # The sharp denominator in the Erdős–Straus quadratic family
 
 For `p = 4 t^2 + 2 t - 1`, the displayed Type II solution has denominators
-`t (t + 1)`, `p t`, and `p (t + 1)`.  This file records the exact algebraic
-certificate and the sharpness/rigidity argument for Type II solutions.
+`t (t + 1)`, `p t`, and `p (t + 1)`.  This file proves existence and uniqueness of the increasing triple with
+minimum largest denominator. The family construction is a special case of the
+Type II parametrization in Pomerance–Weingartner, arXiv:2511.16817, Corollary 2.4.
 -/
 
 namespace Implications.ErdosStrausOptimal
 
-/-- The denominator-cleared Erdős–Straus equation for numerator `p`. -/
+/-- The denominator-cleared Erdős–Straus equation for denominator `p`. -/
 def IsRep (p x y z : ℕ) : Prop :=
   4 * x * y * z = p * (x * y + x * z + y * z)
 
@@ -28,7 +29,7 @@ theorem family_rep (t : ℕ) (ht : 0 < t) :
   linear_combination (familyPrime t)^2 * t * (t+1) * hp.symm
 
 /-- In a Type II representation the non-multiple denominator is x, and the two
-multiples are p*u and p*v, with u < v. -/
+multiples are `p * u` and `p * v`, with `u < v`. -/
 theorem typeII_sharp (t p x u v : ℕ)
     (ht : 0 < t) (hp : p = familyPrime t)
     (hpp : p.Prime) (hpx : ¬ p ∣ x)
