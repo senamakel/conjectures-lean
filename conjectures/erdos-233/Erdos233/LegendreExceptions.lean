@@ -20,7 +20,7 @@ def legendreFailure (n : ℕ) : Prop :=
 
 lemma squareInterval_card (n : ℕ) : (squareInterval n).card = 2 * n + 1 := by
   unfold squareInterval
-  rw [Finset.card_Ico]
+  rw [Finset.card_Ico_eq_card_Icc_sub_one, Finset.card_Icc]
   have h : (n + 1) ^ 2 = n ^ 2 + (2 * n + 1) := by ring
   omega
 
@@ -69,8 +69,9 @@ lemma legendreFailure_gap {n : ℕ} (hn : 2 ≤ n) (hbad : legendreFailure n) :
   have hpow : (n + 1) ^ 2 = n ^ 2 + (2 * n + 1) := by ring
   refine ⟨k, hupper, hpk, ?_⟩
   unfold primeGap
-  rw [hpow] at hupper
-  omega
+  calc
+    2 * n + 1 = (n + 1) ^ 2 - n ^ 2 := by rw [hpow, Nat.add_sub_cancel_left]
+    _ ≤ (k + 1).nth Nat.Prime - k.nth Nat.Prime := Nat.sub_le_sub hupper hpk.le
 
 lemma squareInterval_subset_gap {n k : ℕ}
     (hleft : k.nth Nat.Prime ≤ n ^ 2)
