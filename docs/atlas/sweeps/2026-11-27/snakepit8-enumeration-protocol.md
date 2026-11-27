@@ -87,6 +87,21 @@ minutes, any invariant fails, or a slice hits its cap. The expected sum is
 4,576,964 masks; a mismatch requires debugging, not a result claim. Orbit
 reduction and Q8 compatibility are explicitly out of this phase.
 
+### Revised continuation after the first slice cap
+
+The first exact-edge slice `E=26` stopped at its 6-billion-node cap after
+118.50 CPU seconds, with 5,860 forest masks and 59,632 cyclic leaves. Its mask
+file is only a partial slice and must never be treated as complete. To continue
+under the requested aggregate budget, measure the remaining targets `E=25,24,23`
+in that order, each with a 170-second internal cap, a 190-second external
+timeout, and the same 6-billion-node / 2 GiB limits. These three runs consume
+at most 510 CPU seconds. Combined with prior measurements (185.94 CPU seconds),
+this leaves at least 204 seconds under the 15-minute total for one targeted
+prefix-splitting or optimization attempt. Stop all compute at 840 aggregate
+CPU seconds, any failed invariant, or a 2 GiB limit event. Record incomplete
+slices as such. The aggregate census is complete only if every exact-edge mask
+file is complete and the four counts sum to 4,576,964.
+
 ## Interpretation
 
 Finishing the count reproduces only the Q7 enumeration stage; it does not prove
