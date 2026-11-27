@@ -39,7 +39,7 @@ private theorem clique_list_chain
     subst y
     have hc := (List.nodup_iff_count_le_one.mp hnodup) x
     rw [heq] at hc
-    simp [List.count_append, List.count_cons] at hc
+    simp [List.count_append] at hc
     omega
   exact hC (hsub x hx) (hsub y hy) hxy
 
@@ -75,7 +75,7 @@ private theorem path_of_distinct_attachments
   let prefList : List V := [k,t,i]
   let path : List V := prefList ++ middle ++ [j]
   have hxM : x ∉ M := by simp [M, hxy]
-  have hyM : y ∉ M := by simp [M, hxy]
+  have hyM : y ∉ M := by simp [M]
   have hmiddleNodup : middle.Nodup := by
     rw [List.nodup_cons, List.nodup_append']
     refine ⟨?_, M.nodup_toList, by simp [hyM]⟩
@@ -91,7 +91,7 @@ private theorem path_of_distinct_attachments
       simp [middle, D, hxt, hxC]
     by_cases hvy : v = y
     · subst v
-      simp [middle, M, D, hyt, hyC, hxy]
+      simp [middle, M, D, hyt, hyC]
     simp [middle, M, D, hvx, hvy]
   have hmiddleSub : ∀ v ∈ middle, v ∈ C := by
     intro v hv
@@ -129,7 +129,7 @@ private theorem path_of_distinct_attachments
   have hpathNodup : path.Nodup := by
     dsimp [path]
     rw [List.nodup_append']
-    refine ⟨hprefListMiddle, by simp [hjC], ?_⟩
+    refine ⟨hprefListMiddle, by simp, ?_⟩
     intro v hv hvsuffix
     rcases List.mem_append.mp hv with hvprefList | hvmiddle
     · have hvj : v = j := by simpa using hvsuffix
