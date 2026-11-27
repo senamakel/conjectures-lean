@@ -66,9 +66,11 @@ theorem thresholdFreshVariables_length (nextVar limit inputCount : Nat) :
 theorem thresholdFreshVariables_nodup (nextVar limit inputCount : Nat) :
     (thresholdFreshVariables nextVar limit inputCount).Nodup := by
   apply List.Nodup.map
+    (f := fun j : Nat => Int.ofNat (nextVar + j + 1))
   · intro i j hij
+    have hNat : nextVar + i + 1 = nextVar + j + 1 := by exact_mod_cast hij
     omega
-  · exact List.nodup_range _
+  · exact List.nodup_range
 
 theorem thresholdFreshVariables_gt_base {nextVar limit inputCount : Nat}
     {v : Int} (hv : v ∈ thresholdFreshVariables nextVar limit inputCount) :
