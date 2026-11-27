@@ -575,12 +575,84 @@ theorem hamiltonian_of_split_partition_three_double_rows
       have hpairsCard : ({k,l} : Finset V).card = 2 := by simp [hkl]
       have := Finset.card_le_card hpairs
       omega
-  obtain ⟨blockNodup, blockChain, blockHeadC, blockLastC, blockMem⟩ :=
-    SplitGraphSmallRowsBlocks.ordinary_blocks_nodup_chain_ends
+  let rest := O.toList.flatMap (SplitGraphSmallRowsBlocks.ordinaryBlock left right)
+  have hblocks := SplitGraphSmallRowsBlocks.ordinary_blocks_nodup_chain_ends
       G C I O hC hdisj hOSub left right
       (fun k hk => hleftC k (hOSub hk)) (fun k hk => hrightC k (hOSub hk))
       (fun k hk => hleftAdj k (hOSub hk)) (fun k hk => hrightAdj k (hOSub hk))
       (fun k hk => hneq k (hOSub hk)) hunique
+  have hrestNodup : rest.Nodup := by
+    simpa [rest] using hblocks.1
+  have hrestChain : rest.IsChain G.Adj := by
+    simpa [rest] using hblocks.2.1
+  have hrestHeadC : ∀ v, v ∈ rest.head? → v ∈ C := by
+    simpa [rest] using hblocks.2.2.1
+  have hrestLastC : ∀ v, v ∈ rest.getLast? → v ∈ C := by
+    simpa [rest] using hblocks.2.2.2.1
+  have hrestMem : ∀ v, v ∈ rest ↔ ∃ k ∈ O,
+      v = left k ∨ v = k ∨ v = right k := by
+    simpa [rest] using hblocks.2.2.2.2
+  have hselectedAdj (q i : V) (hi : i ∈ I.filter (fun j => left j = q ∨ right j = q)) :
+      G.Adj q i := by
+    have hi' := Finset.mem_filter.mp hi
+    rcases hi'.2 with h | h
+    · exact h ▸ hleftAdj i hi'.1
+    · exact h ▸ hrightAdj i hi'.1
+  have haX : a ∈ I.filter (fun i => left i = x ∨ right i = x) := by
+    rw [hrowX]
+    simp
+  have hbX : b ∈ I.filter (fun i => left i = x ∨ right i = x) := by
+    rw [hrowX]
+    simp
+  have hbY : b ∈ I.filter (fun i => left i = y ∨ right i = y) := by
+    rw [hrowY]
+    simp
+  have hcY : c ∈ I.filter (fun i => left i = y ∨ right i = y) := by
+    rw [hrowY]
+    simp
+  have hcZ : c ∈ I.filter (fun i => left i = z ∨ right i = z) := by
+    rw [hrowZ]
+    simp
+  have hax : G.Adj a x := (hselectedAdj x a haX).symm
+  have hxb : G.Adj x b := hselectedAdj x b hbX
+  have hby : G.Adj b y := (hselectedAdj y b hbY).symm
+  have hyc : G.Adj y c := hselectedAdj y c hcY
+  have hcz : G.Adj c z := (hselectedAdj z c hcZ).symm
+  have haI : a ∈ I := (Finset.mem_filter.mp haX).1
+  have hbI : b ∈ I := (Finset.mem_filter.mp hbX).1
+  have hcI : c ∈ I := (Finset.mem_filter.mp hcY).1
+  have specialIndependentNotRest : ∀ i ∈ special, i ∈ I → i ∉ rest := by
+    intro i his hiI hrest
+    obtain ⟨k, hk, hcase⟩ := (hrestMem i).mp hrest
+    have hkI := hOSub hk
+    rcases hcase with h | h | h
+    · have hiC : i ∈ C := h.symm ▸ hleftC k hkI
+      exact (Finset.disjoint_left.mp hdisj) hiC hiI
+    · subst k
+      exact (Finset.mem_sdiff.mp hk).2 his
+    · have hiC : i ∈ C := h.symm ▸ hrightC k hkI
+      exact (Finset.disjoint_left.mp hdisj) hiC hiI
+  have specialCliqueNotRest : ∀ q ∈ ({x,y,z} : Finset V), q ∈ C → q ∉ rest := by
+    intro q hq hqC hrest
+    obtain ⟨k, hk, hcase⟩ := (hrestMem q).mp hrest
+    have hkI := hOSub hk
+    rcases hcase with h | h | h
+    · have hleftMem : left k ∈ ({x,y,z} : Finset V) := h.symm ▸ hq
+      exact (hOavoidSpecial k hk).1 hleftMem
+    · exact (Finset.disjoint_left.mp hdisj) hqC hkI
+    · have hrightMem : right k ∈ ({x,y,z} : Finset V) := h.symm ▸ hq
+      exact (hOavoidSpecial k hk).2 hrightMem
+  have hprefixRestDisjoint : ∀ v ∈ ([a,x,b,y,c,z] : List V), v ∉ rest := by
+    intro v hv hvr
+    simp only [List.mem_cons, List.not_mem_nil] at hv
+    simp only [or_false] at hv
+    rcases hv with hva | hvx | hvb | hvy | hvc | hvz
+    · subst v; exact specialIndependentNotRest a (by simp [special]) haI hvr
+    · subst v; exact specialCliqueNotRest x (by simp) hxC hvr
+    · subst v; exact specialIndependentNotRest b (by simp [special]) hbI hvr
+    · subst v; exact specialCliqueNotRest y (by simp) hyC hvr
+    · subst v; exact specialIndependentNotRest c (by simp [special]) hcI hvr
+    · subst v; exact specialCliqueNotRest z (by simp) hzC hvr
   sorry
 
 end SplitGraphSmallRowsThree
