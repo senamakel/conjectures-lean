@@ -13,6 +13,14 @@ private def swap14 : Equiv.Perm (Fin 8) := Equiv.swap 1 4
 
 private theorem exactOccurrenceCount_eq_swap14 (n : ℕ) (marks : Finset (Fin n))
     (p q : Fin 8 → Fin 8) (hpq : p ∘ swap14 = q) (hqp : q ∘ swap14 = p)
+    (hinjP : Function.Injective p)
+    (hmaxP : ∀ i : Fin 8, i ≠ 6 → p i < p 6)
+    (hsecondP : ∀ i : Fin 8, i ≠ 6 → i ≠ 5 → p i < p 5)
+    (hcrossP : p 0 < p (swap14 1))
+    (hinjQ : Function.Injective q)
+    (hmaxQ : ∀ i : Fin 8, i ≠ 6 → q i < q 6)
+    (hsecondQ : ∀ i : Fin 8, i ≠ 6 → i ≠ 5 → q i < q 5)
+    (hcrossQ : q 0 < q (swap14 1))
     (hcheckP : ∀ d, 1 ≤ d → d < 8 →
       (overlapCompatible p d = true ↔ d = 5 ∨ d = 7))
     (hcheckQ : ∀ d, 1 ≤ d → d < 8 →
@@ -28,12 +36,10 @@ private theorem exactOccurrenceCount_eq_swap14 (n : ℕ) (marks : Finset (Fin n)
   · exact hqp
   · intro f hf hn i j
     simpa only [← hpq, Function.comp_apply] using
-      overlap_cycle_order p swap14 (by decide) (by decide) (by decide) (by decide)
-        (by decide) f hf hn i j
+      overlap_cycle_order p swap14 hinjP (by decide) hmaxP hsecondP hcrossP f hf hn i j
   · intro f hf hn i j
     simpa only [← hqp, Function.comp_apply, Equiv.symm_symm] using
-      overlap_cycle_order q swap14 (by decide) (by decide) (by decide) (by decide)
-        (by decide) f hf hn i j
+      overlap_cycle_order q swap14 hinjQ (by decide) hmaxQ hsecondQ hcrossQ f hf hn i j
 
 def pattern26134785 : Fin 8 → Fin 8 := ![1, 5, 0, 2, 3, 6, 7, 4]
 def pattern24136785 : Fin 8 → Fin 8 := ![1, 3, 0, 2, 5, 6, 7, 4]
@@ -89,42 +95,56 @@ theorem exactOccurrenceCount_eq_26134785_24136785 (n : ℕ) (marks : Finset (Fin
     WilfCounts.exactCount (occurrenceSet pattern26134785) marks =
       WilfCounts.exactCount (occurrenceSet pattern24136785) marks := by
   exact exactOccurrenceCount_eq_swap14 n marks pattern26134785 pattern24136785
-    swap14_26134785 swap14_24136785 (checkOverlap _) (checkOverlap _)
+    swap14_26134785 swap14_24136785 (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide)
+    (checkOverlap _) (checkOverlap _)
 
 theorem exactOccurrenceCount_eq_26135784_25136784 (n : ℕ) (marks : Finset (Fin n)) :
     WilfCounts.exactCount (occurrenceSet pattern26135784) marks =
       WilfCounts.exactCount (occurrenceSet pattern25136784) marks := by
   exact exactOccurrenceCount_eq_swap14 n marks pattern26135784 pattern25136784
-    swap14_26135784 swap14_25136784 (checkOverlap _) (checkOverlap _)
+    swap14_26135784 swap14_25136784 (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide)
+    (checkOverlap _) (checkOverlap _)
 
 theorem exactOccurrenceCount_eq_26145783_25146783 (n : ℕ) (marks : Finset (Fin n)) :
     WilfCounts.exactCount (occurrenceSet pattern26145783) marks =
       WilfCounts.exactCount (occurrenceSet pattern25146783) marks := by
   exact exactOccurrenceCount_eq_swap14 n marks pattern26145783 pattern25146783
-    swap14_26145783 swap14_25146783 (checkOverlap _) (checkOverlap _)
+    swap14_26145783 swap14_25146783 (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide)
+    (checkOverlap _) (checkOverlap _)
 
 theorem exactOccurrenceCount_eq_36124785_34126785 (n : ℕ) (marks : Finset (Fin n)) :
     WilfCounts.exactCount (occurrenceSet pattern36124785) marks =
       WilfCounts.exactCount (occurrenceSet pattern34126785) marks := by
   exact exactOccurrenceCount_eq_swap14 n marks pattern36124785 pattern34126785
-    swap14_36124785 swap14_34126785 (checkOverlap _) (checkOverlap _)
+    swap14_36124785 swap14_34126785 (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide)
+    (checkOverlap _) (checkOverlap _)
 
 theorem exactOccurrenceCount_eq_36214785_34216785 (n : ℕ) (marks : Finset (Fin n)) :
     WilfCounts.exactCount (occurrenceSet pattern36214785) marks =
       WilfCounts.exactCount (occurrenceSet pattern34216785) marks := by
   exact exactOccurrenceCount_eq_swap14 n marks pattern36214785 pattern34216785
-    swap14_36214785 swap14_34216785 (checkOverlap _) (checkOverlap _)
+    swap14_36214785 swap14_34216785 (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide)
+    (checkOverlap _) (checkOverlap _)
 
 theorem exactOccurrenceCount_eq_35126784_36125784 (n : ℕ) (marks : Finset (Fin n)) :
     WilfCounts.exactCount (occurrenceSet pattern35126784) marks =
       WilfCounts.exactCount (occurrenceSet pattern36125784) marks := by
   exact exactOccurrenceCount_eq_swap14 n marks pattern35126784 pattern36125784
-    swap14_35126784 swap14_36125784 (checkOverlap _) (checkOverlap _)
+    swap14_35126784 swap14_36125784 (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide)
+    (checkOverlap _) (checkOverlap _)
 
 theorem exactOccurrenceCount_eq_36215784_35216784 (n : ℕ) (marks : Finset (Fin n)) :
     WilfCounts.exactCount (occurrenceSet pattern36215784) marks =
       WilfCounts.exactCount (occurrenceSet pattern35216784) marks := by
   exact exactOccurrenceCount_eq_swap14 n marks pattern36215784 pattern35216784
-    swap14_36215784 swap14_35216784 (checkOverlap _) (checkOverlap _)
+    swap14_36215784 swap14_35216784 (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide)
+    (checkOverlap _) (checkOverlap _)
 
 end Implications.WilfArchiveClosure
