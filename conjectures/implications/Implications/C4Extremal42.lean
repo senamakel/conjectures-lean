@@ -86,7 +86,38 @@ theorem simpleGraph_extremal_vertex_degree_six (G : SimpleGraph (Fin 42))
     exact SimpleGraph.degree_le_card_edgeFinset G v
   omega
 
+/-- A vertex of degree six gives six neighbors with no shared neighbor in its induced deletion,
+provided that any two vertices have at most one common neighbor in the original graph. -/
+theorem compatible_six_of_degree_six (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    (hC4 : ∀ u w, u ≠ w → (G.commonNeighbors u w).Subsingleton)
+    {v : Fin 42} (hv : G.degree v = 6) :
+    ∃ S : Finset (Fin 42), S.card = 6 ∧ v ∉ S ∧
+      ∀ u ∈ S, ∀ w ∈ S, u ≠ w → ∀ x, x ≠ v → G.Adj u x → ¬ G.Adj w x := by
+  refine ⟨G.neighborFinset v, ?_, ?_, ?_⟩
+  · rw [SimpleGraph.card_neighborFinset_eq_degree, hv]
+  · simp
+  · intro u hu w hw huw x hx hux hwx
+    have huv : G.Adj u v := ((G.mem_neighborFinset v u).mp hu).symm
+    have hwv : G.Adj w v := ((G.mem_neighborFinset v w).mp hw).symm
+    exact hx (hC4 u w huw ⟨hux, hwx⟩ ⟨huv, hwv⟩)
+
+/-- If extremal 41-vertex deletions forbid compatible six-sets, the 42-vertex bound drops to 137. -/
+theorem simpleGraph_edge_count_le_137_of_no_compatible_six
+    (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
+    (h41 : ∀ v, inducedDeletionCount G v ≤ 132)
+    (hC4 : ∀ u w, u ≠ w → (G.commonNeighbors u w).Subsingleton)
+    (hno : ∀ v, inducedDeletionCount G v = 132 →
+      ¬ ∃ S : Finset (Fin 42), S.card = 6 ∧ v ∉ S ∧
+        ∀ u ∈ S, ∀ w ∈ S, u ≠ w → ∀ x, x ≠ v → G.Adj u x → ¬ G.Adj w x) :
+    G.edgeFinset.card ≤ 137 := by
+  have hle := simpleGraph_edge_count_le_138 G h41
+  by_contra! h
+  have he : G.edgeFinset.card = 138 := by omega
+  obtain ⟨v, hv, hd⟩ := simpleGraph_extremal_vertex_degree_six G h41 he
+  exact hno v hd (compatible_six_of_degree_six G hC4 hv)
+
 #print axioms simpleGraph_edge_count_le_138
 #print axioms simpleGraph_extremal_vertex_degree_six
+#print axioms simpleGraph_edge_count_le_137_of_no_compatible_six
 
 end C4Extremal42
