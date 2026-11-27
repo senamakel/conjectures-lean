@@ -131,7 +131,7 @@ theorem lexFreshIds_nodup (next : Nat) (left right : List Nat) :
             simp only [lexFreshIds, hbeq, Bool.false_eq_true, ↓reduceIte]
             constructor
             · intro hmem
-              have hge := ih (next + 1) ys next hmem
+              have hge := lexFreshIds_ge (next + 1) xs ys next hmem
               omega
             · exact ih (next + 1) ys
 
@@ -150,7 +150,7 @@ theorem lexStep_auxiliary_assignment_satisfies (a : Nat → Bool)
     (hp : a pref = true) (hx : a x = true) (hy : a y = false)
     (hs : a same = (a pref && (a x == a y))) :
     cnfValue a (lexStepClauses pref x y same) = true := by
-  simp [cnfValue, clauseValue, lexStepClauses, literalValue, hp, hx, hy, hs]
+  simp [cnfValue, clauseValue, lexStepClauses, literalValue, pos, neg, hp, hx, hy, hs]
 
 end Implications.C4PolarityLexEncoding
 
