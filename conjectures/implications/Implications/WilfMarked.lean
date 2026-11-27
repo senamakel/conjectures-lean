@@ -14,24 +14,62 @@ namespace WilfMarked
 def sigma : Fin 8 → Fin 8 := ![0, 5, 1, 2, 6, 3, 7, 4]
 def tau : Fin 8 → Fin 8 := ![0, 5, 1, 3, 6, 2, 7, 4]
 
+def rankList (p : Fin 8 → Fin 8) : List Nat := List.ofFn fun i => (p i).val
+
+theorem rankList_get (p : Fin 8 → Fin 8) (i : Fin 8) :
+    (rankList p)[i.val]! = (p i).val := by
+  simp [rankList]
+
 /-- The shared suffix/prefix of two windows has to have the same relative order. -/
-def overlapCompatible (p : Fin 8 → Fin 8) (shift : Fin 8) : Bool :=
-  (List.range (8 - shift.val)).all fun i =>
-    (List.range (8 - shift.val)).all fun j =>
-      decide ((p ⟨shift.val + i, by have : i < 8 - shift.val := by omega; omega⟩ <
-                p ⟨shift.val + j, by have : j < 8 - shift.val := by omega; omega⟩) ↔
-              (p ⟨i, by have : i < 8 - shift.val := by omega; omega⟩ <
-                p ⟨j, by have : j < 8 - shift.val := by omega; omega⟩))
+def overlapCompatible (p : Fin 8 → Fin 8) (shift : Nat) : Bool :=
+  (List.range (8 - shift)).all fun i =>
+    (List.range (8 - shift)).all fun j =>
+      decide (((rankList p)[shift + i]! < (rankList p)[shift + j]!) ↔
+              ((rankList p)[i]! < (rankList p)[j]!))
 
-theorem sigma_overlap_compatible_only_at_5_or_7 (shift : Fin 8)
-    (hpos : 0 < shift.val)
-    (hok : overlapCompatible sigma shift = true) : shift.val = 5 ∨ shift.val = 7 := by
-  fin_cases shift <;> norm_num [overlapCompatible, sigma] at hok ⊢
+theorem sigma_overlap_compatible_only_at_5_or_7 (shift : Nat)
+    (hpos : 1 ≤ shift) (hsmall : shift < 8)
+    (hok : overlapCompatible sigma shift = true) : shift = 5 ∨ shift = 7 := by
+  interval_cases shift
+  · have hf : overlapCompatible sigma 1 = false := by decide
+    rw [hf] at hok
+    contradiction
+  · have hf : overlapCompatible sigma 2 = false := by decide
+    rw [hf] at hok
+    contradiction
+  · have hf : overlapCompatible sigma 3 = false := by decide
+    rw [hf] at hok
+    contradiction
+  · have hf : overlapCompatible sigma 4 = false := by decide
+    rw [hf] at hok
+    contradiction
+  · exact Or.inl rfl
+  · have hf : overlapCompatible sigma 6 = false := by decide
+    rw [hf] at hok
+    contradiction
+  · exact Or.inr rfl
 
-theorem tau_overlap_compatible_only_at_5_or_7 (shift : Fin 8)
-    (hpos : 0 < shift.val)
-    (hok : overlapCompatible tau shift = true) : shift.val = 5 ∨ shift.val = 7 := by
-  fin_cases shift <;> norm_num [overlapCompatible, tau] at hok ⊢
+theorem tau_overlap_compatible_only_at_5_or_7 (shift : Nat)
+    (hpos : 1 ≤ shift) (hsmall : shift < 8)
+    (hok : overlapCompatible tau shift = true) : shift = 5 ∨ shift = 7 := by
+  interval_cases shift
+  · have hf : overlapCompatible tau 1 = false := by decide
+    rw [hf] at hok
+    contradiction
+  · have hf : overlapCompatible tau 2 = false := by decide
+    rw [hf] at hok
+    contradiction
+  · have hf : overlapCompatible tau 3 = false := by decide
+    rw [hf] at hok
+    contradiction
+  · have hf : overlapCompatible tau 4 = false := by decide
+    rw [hf] at hok
+    contradiction
+  · exact Or.inl rfl
+  · have hf : overlapCompatible tau 6 = false := by decide
+    rw [hf] at hok
+    contradiction
+  · exact Or.inr rfl
 
 /-- The adjacent transposition of the fourth and sixth positions. -/
 def windowSwap (i : Fin 8) : Fin 8 :=
