@@ -91,6 +91,49 @@ theorem unique_overlapping_predecessor (marks shifts : Finset ℕ)
     · have hutGap := hgap (t - u) hd
       omega
 
+/-- If a summand based at another marked start moves a point of the central window,
+its start is an allowed overlap shift immediately before or after the central start. -/
+theorem moved_position_has_overlapping_neighbor (marks shifts : Finset ℕ)
+    (hsep : SeparatedBy marks shifts)
+    (m : Equiv.Perm (Fin 8))
+    {s t : ℕ} (hs : s ∈ marks) (ht : t ∈ marks) (hst : s ≠ t)
+    (i j : Fin 8) (_hj : j ∈ m.support)
+    (hcoord : s + i.val = t + j.val) :
+    (t < s ∧ s - t ∈ shifts ∧ s - t < 8) ∨
+      (s < t ∧ t - s ∈ shifts ∧ t - s < 8) := by
+  have hi8 := i.isLt
+  have hj8 := j.isLt
+  rcases lt_or_gt_of_ne hst with hst' | hts
+  · rcases hsep s hs t ht hst' with hfar | hd
+    · omega
+    · exact Or.inr ⟨hst', hd, by omega⟩
+  · rcases hsep t ht s hs hts with hfar | hd
+    · omega
+    · exact Or.inl ⟨hts, hd, by omega⟩
+
+/-- A lifted summand that moves a point of a central length-eight window is based at
+the unique overlapping predecessor or successor permitted by the shift set. -/
+theorem lifted_mover_overlaps {n : ℕ} (marks shifts : Finset ℕ)
+    (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n)
+    (hsep : SeparatedBy marks shifts)
+    {s t : ℕ} (hs : s ∈ marks) (ht : t ∈ marks) (hst : s ≠ t)
+    (i : Fin 8) (hx : windowEmbedding s (hb s hs) i ∈
+      (liftWindow t (hb t ht) m).support) :
+    (t < s ∧ s - t ∈ shifts ∧ s - t < 8) ∨
+      (s < t ∧ t - s ∈ shifts ∧ t - s < 8) := by
+  rw [liftWindow_support_image] at hx
+  obtain ⟨j, hj, heq⟩ := Finset.mem_image.mp hx
+  have hcoord := congrArg Fin.val heq
+  change t + j.val = s + i.val at hcoord
+  exact moved_position_has_overlapping_neighbor marks shifts hsep m hs ht hst i j hj (by omega)
+
+private abbrev MarkedStart (marks : Finset ℕ) := {t : ℕ // t ∈ marks}
+
+private noncomputable def markedComponent {n : ℕ} (marks : Finset ℕ)
+    (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n) (t : MarkedStart marks) :
+    Equiv.Perm (Fin n) :=
+  liftWindow t.val (hb t.val t.property) m
+
 /-- If local moved offsets never meet their translates at an allowed gap, the lifted
 permutations at all marked windows have pairwise-disjoint supports. -/
 theorem lifted_windows_pairwise_disjoint {n : ℕ} (marks shifts : Finset ℕ)
@@ -122,9 +165,79 @@ theorem lifted_windows_pairwise_disjoint {n : ℕ} (marks shifts : Finset ℕ)
   · exact hordered hs ht h
   · exact (hordered ht hs h).symm
 
+private theorem markedComponents_disjoint {n : ℕ} (marks shifts : Finset ℕ)
+    (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n)
+    (hsep : SeparatedBy marks shifts)
+    (htranslate : ∀ d ∈ shifts, ∀ i j : Fin 8,
+      i ∈ m.support → j ∈ m.support → i.val ≠ d + j.val) :
+    ((Finset.univ : Finset (MarkedStart marks)) : Set (MarkedStart marks)).Pairwise
+      (fun s t => Equiv.Perm.Disjoint
+        (markedComponent marks m hb s) (markedComponent marks m hb t)) := by
+  have hpair := lifted_windows_pairwise_disjoint marks shifts m hb hsep htranslate
+  intro s _ t _ hst
+  apply hpair s.val s.property t.val t.property
+  intro h
+  apply hst
+  exact Subtype.ext h
+
+/-- Two distinct marked starts cannot both move the same point under their lifted
+local permutations, under the translated-support separation hypothesis. -/
+theorem lifted_support_mover_unique {n : ℕ} (marks shifts : Finset ℕ)
+    (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n)
+    (hsep : SeparatedBy marks shifts)
+    (htranslate : ∀ d ∈ shifts, ∀ i j : Fin 8,
+      i ∈ m.support → j ∈ m.support → i.val ≠ d + j.val)
+    {s t : ℕ} (hs : s ∈ marks) (ht : t ∈ marks) (hst : s ≠ t)
+    {x : Fin n} (hx₁ : x ∈ (liftWindow s (hb s hs) m).support)
+    (hx₂ : x ∈ (liftWindow t (hb t ht) m).support) : False := by
+  have hdisj := lifted_windows_pairwise_disjoint marks shifts m hb hsep htranslate
+    s hs t ht hst
+  rw [Equiv.Perm.disjoint_iff_disjoint_support] at hdisj
+  exact (Finset.disjoint_left.mp hdisj) hx₁ hx₂
+
+/-- At a point moved by one marked-window summand, the global assembled permutation
+acts exactly as that summand. -/
+theorem assemble_apply_of_lifted_support {n : ℕ} (marks shifts : Finset ℕ)
+    (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n)
+    (hsep : SeparatedBy marks shifts)
+    (htranslate : ∀ d ∈ shifts, ∀ i j : Fin 8,
+      i ∈ m.support → j ∈ m.support → i.val ≠ d + j.val)
+    {t : ℕ} (ht : t ∈ marks) {x : Fin n}
+    (hx : x ∈ (liftWindow t (hb t ht) m).support) :
+    WilfDisjointPermutations.assemble (Finset.univ : Finset (MarkedStart marks))
+      (markedComponent marks m hb)
+      (markedComponents_disjoint marks shifts m hb hsep htranslate) x =
+        liftWindow t (hb t ht) m x := by
+  exact WilfDisjointPermutations.assemble_apply_of_mem_support
+    (Finset.univ : Finset (MarkedStart marks)) (markedComponent marks m hb)
+    (markedComponents_disjoint marks shifts m hb hsep htranslate)
+    (i := ⟨t, ht⟩) (Finset.mem_univ _) hx
+
+/-- If no marked-window summand moves a point, the assembled permutation fixes it. -/
+theorem assemble_apply_of_no_lifted_support {n : ℕ} (marks shifts : Finset ℕ)
+    (m : Equiv.Perm (Fin 8)) (hb : ∀ s ∈ marks, s + 8 ≤ n)
+    (hsep : SeparatedBy marks shifts)
+    (htranslate : ∀ d ∈ shifts, ∀ i j : Fin 8,
+      i ∈ m.support → j ∈ m.support → i.val ≠ d + j.val)
+    {x : Fin n} (hx : ∀ t (ht : t ∈ marks),
+      x ∉ (liftWindow t (hb t ht) m).support) :
+    WilfDisjointPermutations.assemble (Finset.univ : Finset (MarkedStart marks))
+      (markedComponent marks m hb)
+      (markedComponents_disjoint marks shifts m hb hsep htranslate) x = x := by
+  exact WilfDisjointPermutations.assemble_apply_of_forall_fixes
+    (Finset.univ : Finset (MarkedStart marks)) (markedComponent marks m hb)
+    (markedComponents_disjoint marks shifts m hb hsep htranslate) (by
+      intro t _
+      exact Equiv.Perm.notMem_support.mp (hx t.val t.property))
+
 #print axioms liftWindow_support_image
 #print axioms unique_overlapping_successor
 #print axioms unique_overlapping_predecessor
+#print axioms moved_position_has_overlapping_neighbor
+#print axioms lifted_mover_overlaps
 #print axioms lifted_windows_pairwise_disjoint
+#print axioms lifted_support_mover_unique
+#print axioms assemble_apply_of_lifted_support
+#print axioms assemble_apply_of_no_lifted_support
 
 end Implications.WilfWindowGeometry
