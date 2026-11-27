@@ -152,5 +152,6 @@ theorem rows_bounded_of_inducedTreeBound
 end SplitGraphTrees
 
 #print axioms SplitGraphTrees.star_isTree
+#print axioms SplitGraphTrees.mem_rowDiff_iff
 #print axioms SplitGraphTrees.row_card_le
 #print axioms SplitGraphTrees.row_symmDiff_card_le
