@@ -35,18 +35,15 @@ theorem shared_clique_neighbor_block
     subst j
     exact (Finset.disjoint_left.mp hdisj) hb hj
   have hnodup : ([a, i, c, j, b] : List V).Nodup := by
-    simp only [List.nodup_cons, List.mem_cons, List.not_mem_nil]
-    exact ⟨⟨hne_ai, by
-      simp only [List.mem_cons, List.not_mem_nil]
-      exact ⟨hne_ic.symm, by
-        simp only [List.mem_cons, List.not_mem_nil]
-        exact ⟨hne_cj, by
-          simp only [List.mem_cons, List.not_mem_nil]
-          exact ⟨hne_jb.symm, by
-            simp only [List.mem_cons, List.not_mem_nil]
-            exact ⟨hab, by simp⟩⟩⟩⟩⟩⟩
+    simp [List.nodup_cons, hne_ai, hne_ic, hne_cj, hne_jb, hij,
+      hac, hcb, hab, (Finset.disjoint_left.mp hdisj) ha hi,
+      (Finset.disjoint_left.mp hdisj) ha hj,
+      (Finset.disjoint_left.mp hdisj) hc hi,
+      (Finset.disjoint_left.mp hdisj) hc hj,
+      (Finset.disjoint_left.mp hdisj) hb hi,
+      (Finset.disjoint_left.mp hdisj) hb hj]
   have hchain : ([a, i, c, j, b] : List V).IsChain G.Adj := by
-    simp [List.isChain_cons, hai, hia, hcj, hbj]
+    simp [List.isChain_cons, hai, hia, hcj, hbj.symm]
   let p := SimpleGraph.Walk.ofSupport ([a, i, c, j, b] : List V) (by simp) hchain
   have hp : p.IsPath := by
     apply (SimpleGraph.Walk.isPath_def p).2
