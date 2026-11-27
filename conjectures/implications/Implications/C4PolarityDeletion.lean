@@ -29,6 +29,8 @@ private theorem degree_sum_partition {V : Type*} [Fintype V] [DecidableEq V]
   have hwithin (A : Finset V) :
       (∑ v ∈ A, (G.neighborFinset v ∩ A).card) =
         2 * inducedEdgeCount G A := by
+    change (∑ v ∈ A, (G.neighborFinset v ∩ A).card) =
+      2 * (G.induce (A : Set V)).edgeFinset.card
     rw [← (G.induce (A : Set V)).sum_degrees_eq_twice_card_edges]
     rw [← Finset.sum_coe_sort A (fun v => (G.neighborFinset v.1 ∩ A).card)]
     refine Finset.sum_congr rfl fun v _ => ?_
@@ -82,9 +84,12 @@ theorem retained_edge_count_eq_104_add_deleted_score
     inducedEdgeCount G (Finset.univ \ D) =
       104 + inducedEdgeCount G D + (D ∩ A).card := by
   classical
-  rcases hprofile with ⟨hV, hA, hE, hdeg⟩
+  rcases hprofile with ⟨_hV, _hA, hE, hdeg⟩
   let R := Finset.univ \ D
-  have hdisj : Disjoint R D := by simp [R]
+  have hdisj : Disjoint R D := by
+    apply Finset.disjoint_left.mpr
+    intro v hvR hvD
+    exact (Finset.mem_sdiff.mp hvR).2 hvD
   have hunion : R ∪ D = Finset.univ := by
     ext v
     simp [R]
@@ -112,15 +117,21 @@ theorem retained_edge_count_eq_104_add_deleted_score
       congr 1
       ext v
       simp [Finset.mem_inter]
-    rw [Finset.sum_congr rfl (fun v hv => hdeg_form v), hsum, hcount] at *
-    simp only [Finset.sum_const, nsmul_eq_mul] at hsum
-    rw [hD] at hsum
-    norm_num at hsum ⊢
-    exact hsum
+    calc
+      (∑ v ∈ D, G.degree v) + (D ∩ A).card =
+          (∑ v ∈ D, (8 - (if v ∈ A then 1 else 0))) + (D ∩ A).card := by
+        congr 1
+        exact Finset.sum_congr rfl fun v _ => hdeg_form v
+      _ = (∑ _v ∈ D, (8 : ℕ)) -
+          (∑ v ∈ D, if v ∈ A then 1 else 0) + (D ∩ A).card := by rw [hsum]
+      _ = 8 * D.card - (D ∩ A).card + (D ∩ A).card := by
+        simp only [Finset.sum_const, nsmul_eq_mul]
+        rw [hcount]
+        ring
+      _ = 120 := by rw [hD]; omega
   have hcountRelation :
       inducedEdgeCount G R + (∑ v ∈ D, G.degree v) =
         G.edgeFinset.card + inducedEdgeCount G D := by
-    rw [hpart] at htotal
     omega
   have hresult :
       inducedEdgeCount G R = 104 + inducedEdgeCount G D + (D ∩ A).card := by
@@ -132,7 +143,7 @@ theorem retained_edge_count_eq_104_add_deleted_score
 and the graph has 138 edges, every vertex has degree at least six. -/
 theorem min_degree_six_of_delete_bound
     {V : Type*} [Fintype V] [DecidableEq V]
-    (G : SimpleGraph V) [DecidableRel G.Adj] (hV : Fintype.card V = 42)
+    (G : SimpleGraph V) [DecidableRel G.Adj] (_hV : Fintype.card V = 42)
     (hE : G.edgeFinset.card = 138)
     (hDel : ∀ v, (G.induce ({v}ᶜ : Set V)).edgeFinset.card ≤ 132) :
     ∀ v, 6 ≤ G.degree v := by
