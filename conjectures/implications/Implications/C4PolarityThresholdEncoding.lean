@@ -25,6 +25,22 @@ def clauseValue (assignment : Nat → Bool) (clause : List Int) : Bool :=
 def cnfValue (assignment : Nat → Bool) (clauses : List (List Int)) : Bool :=
   clauses.all (clauseValue assignment)
 
+/-- Extend an assignment by setting one fresh DIMACS variable. -/
+def extendVariable (assignment : Nat → Bool) (variable : Nat) (value : Bool) : Nat → Bool :=
+  fun v => if v = variable then value else assignment v
+
+theorem literalValue_extendVariable_of_ne (assignment : Nat → Bool)
+    (variable : Nat) (value : Bool) (lit : Int)
+    (h : lit.natAbs ≠ variable) :
+    literalValue (extendVariable assignment variable value) lit =
+      literalValue assignment lit := by
+  cases lit <;> simp_all [literalValue, extendVariable]
+
+theorem literalValue_extendVariable_self (assignment : Nat → Bool)
+    (variable : Nat) (value : Bool) :
+    literalValue (extendVariable assignment variable value) (Int.ofNat variable) = value := by
+  simp [literalValue, extendVariable]
+
 /-- The four exact DIMACS clauses emitted for one threshold gate. -/
 def thresholdGateDimacs (above x below out : Int) : List (List Int) :=
   [[-above, out], [-x, -below, out], [-out, above, x], [-out, above, below]]
@@ -92,6 +108,28 @@ theorem thresholdGateDimacs_iff (assignment : Nat → Bool)
   simpa [Implications.C4PolarityCnfGates.thresholdGateClauses,
     Implications.C4PolarityCnfGates.clauseSat, cnfValue, thresholdGateDimacs,
     clauseValue, and_assoc, hneg above ha, hneg x hx, hneg below hb, hneg out ho] using hgate
+
+/-- Any threshold gate can be satisfied by extending the assignment at its
+fresh output variable with the Boolean recurrence value. -/
+theorem thresholdGateDimacs_extend (assignment : Nat → Bool)
+    (variable : Nat) (above x below : Int)
+    (value : Bool) (hvar : 0 < variable)
+    (hrec : value =
+      (literalValue assignment above ||
+        (literalValue assignment x && literalValue assignment below)))
+    (ha : above ≠ 0) (hx : x ≠ 0) (hb : below ≠ 0)
+    (habove : above.natAbs ≠ variable)
+    (hxFresh : x.natAbs ≠ variable)
+    (hbelow : below.natAbs ≠ variable) :
+    cnfValue (extendVariable assignment variable value)
+      (thresholdGateDimacs above x below (Int.ofNat variable)) = true := by
+  apply (thresholdGateDimacs_iff (extendVariable assignment variable value)
+    above x below (Int.ofNat variable) ha hx hb (by omega)).2
+  rw [literalValue_extendVariable_self]
+  simp only [literalValue_extendVariable_of_ne _ _ _ _ habove,
+    literalValue_extendVariable_of_ne _ _ _ _ hxFresh,
+    literalValue_extendVariable_of_ne _ _ _ _ hbelow]
+  exact hrec
 
 /-- Build the clauses for one row, zipping `previous[k]`,
 `previous[k - 1]`, and the newly allocated output. -/
