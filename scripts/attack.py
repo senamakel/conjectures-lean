@@ -5,23 +5,26 @@ import json
 import os
 from pathlib import Path
 import re
+import subprocess
 import sys
 from urllib.parse import quote, urlencode
-from urllib.request import urlopen
 
 REGISTRY = "https://lefttosolve.com"
 ROOT = Path(__file__).resolve().parents[1]
-ID = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_.!'-]*")
+ID = re.compile(r"[\w][\w.!'-]*")
 
 
 def fetch(path):
-    with urlopen(REGISTRY + path, timeout=30) as response:
-        return response.read().decode("utf-8")
+    return subprocess.check_output(
+        ["curl", "--fail", "--silent", "--show-error", "--location",
+         "--max-time", "30", REGISTRY + path], encoding="utf-8",
+    )
 
 
 def discover(args):
+    kind = "unformalized" if args.kind == "formalize" else args.kind
     params = {
-        "kind": args.kind, "unsolved": 1, "full": 1,
+        "kind": kind, "unsolved": 1, "full": 1,
         "sort": args.sort, "limit": args.limit, "offset": args.offset,
     }
     params.update({key: getattr(args, key) for key in ("q", "field", "source")
@@ -30,7 +33,7 @@ def discover(args):
     candidates = []
     for item in page["items"]:
         problem = item["id"]
-        if (item.get("solved") or item.get("claimed") or item.get("kind") != args.kind
+        if (item.get("solved") or item.get("claimed") or item.get("kind") != kind
                 or not ID.fullmatch(problem)):
             continue
         candidate = {key: item.get(key) for key in (
@@ -45,10 +48,22 @@ def discover(args):
     }, ensure_ascii=False, indent=2))
 
 
-def brief(args):
-    if not ID.fullmatch(args.id):
+def problem_path(problem):
+    if not ID.fullmatch(problem):
         raise ValueError("invalid problem ID")
-    print(fetch(f"/p/{quote(args.id, safe='')}/agent.txt"), end="")
+    return quote(problem, safe="")
+
+
+def brief(args):
+    print(fetch(f"/p/{problem_path(args.id)}/agent.txt"), end="")
+
+
+def steps(args):
+    problem = json.loads(fetch(f"/api/problems/{problem_path(args.id)}"))
+    print(json.dumps({
+        "parent": problem["id"], "upstream_commit": problem.get("upstreamCommit"),
+        "steps": [step for step in problem.get("steps", []) if not step.get("solved")],
+    }, ensure_ascii=False, indent=2))
 
 
 def local_messages(record):
@@ -125,7 +140,7 @@ def main():
     commands = parser.add_subparsers(required=True)
     search = commands.add_parser("discover", help="list candidates from the live registry")
     search.set_defaults(run=discover)
-    search.add_argument("--kind", choices=("open", "formalize", "step"), default="open")
+    search.add_argument("--kind", choices=("open", "formalize"), default="open")
     search.add_argument("--sort", choices=("easiest", "relevance", "famous", "hardest", "active"),
                         default="easiest")
     for key in ("q", "field", "source"):
@@ -135,6 +150,9 @@ def main():
     detail = commands.add_parser("brief", help="read a candidate's public brief")
     detail.set_defaults(run=brief)
     detail.add_argument("id")
+    obligations = commands.add_parser("steps", help="list unsolved reduction obligations")
+    obligations.set_defaults(run=steps)
+    obligations.add_argument("id")
     logs = commands.add_parser("history", help="find local Claude Code and Codex messages")
     logs.set_defaults(run=history)
     logs.add_argument("query")
@@ -150,7 +168,7 @@ def main():
         parser.error("limit must be 1–100, offset must be nonnegative, and query must be nonempty")
     try:
         args.run(args)
-    except (OSError, ValueError, KeyError) as exc:
+    except (OSError, ValueError, KeyError, subprocess.CalledProcessError) as exc:
         parser.exit(1, f"attack: {exc}\n")
 
 

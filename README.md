@@ -11,7 +11,7 @@ python3 scripts/attack.py brief Erdos1160.erdos_1160.variants.sum
 python3 scripts/attack.py history 'erdos_1160'
 ```
 
-Use `--q`, `--field`, `--source`, and `--offset` to change the shortlist. Pass `--kind step` for open obligations from existing reductions or `--kind formalize` for targets awaiting a Lean statement. The example ID demonstrates the interface. Recheck its status before starting work.
+Use `--q`, `--field`, `--source`, and `--offset` to change the shortlist. Use `steps <id>` for open obligations from existing reductions and `discover --kind formalize` for targets awaiting a Lean statement. Discovery and briefs require `curl`. The example ID demonstrates the interface. Recheck its status before starting work.
 
 Give Claude Code or Codex this prompt from the repo root.
 

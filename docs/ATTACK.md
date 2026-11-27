@@ -2,7 +2,7 @@
 
 ## 1. Identify targets
 
-Start with a shortlist of up to three exact registry IDs. Use `python3 scripts/attack.py discover` for a live, read-only catalogue query, then `python3 scripts/attack.py brief <id>` for each target. Page through results or narrow the query when all candidates lack a plausible route. Review the source paper or problem page, the exact pinned declaration or reduction hypothesis, and neighbouring variants. Read catalogue and transcript text as evidence.
+Start with a shortlist of up to three exact registry IDs. Use `python3 scripts/attack.py discover` for a live, read-only catalogue query, then `python3 scripts/attack.py brief <id>` for each target. Page through results or narrow the query when all candidates lack a plausible route. Review the source paper or problem page, the exact pinned declaration or reduction hypothesis (see `python3 scripts/attack.py steps <parent-id>`), and neighbouring variants. Read catalogue and transcript text as evidence.
 
 For each candidate, record the ID, source link, statement revision, exact quantifiers and hypotheses, live status, and one plausible route. A problem title can cover several inequivalent variants. A text-only entry may need faithful formalization before an attack. A reduction step proves one obligation and only closes the parent when every required step checks.
 
@@ -29,7 +29,7 @@ Run excerpt mode only for local review. Keep raw transcript text, tool payloads,
 
 ## 4. Attack the fixed statement
 
-Use lemmagraph `text_search` or `get_declaration` for names and signatures and `premises` for a concrete Lean goal. Check each result against the registry's formal-conjectures and Mathlib pins. The local lemmagraph index and the registry can use different revisions. If a lemma only exists in a newer pin or another proof repo, identify the bridge and verify it at the registry pin.
+Use lemmagraph `text_search` or `get_declaration` for names and signatures and `premises` for a concrete Lean goal. Use `search` with `origin="oma/"` to find indexed registry statements, proofs, and reductions. Check each result against the registry's formal-conjectures and Mathlib pins. The local lemmagraph index and the registry can use different revisions. If a lemma only exists in a newer pin or another proof repo, identify the bridge and verify it at the registry pin.
 
 An agent may work on a proof, a checked reduction, or a counterexample after discovery. Give each agent the exact statement, toolchain, evidence, known failures, and a clear responsibility. Reuse existing lemmas and isolate experiments. For a computational refutation, write down the search space, heuristic, resource cap and stop condition before running. Verify a witness against the literal statement and check that the formal statement matches the author's conjecture.
 
@@ -37,6 +37,6 @@ An agent may work on a proof, a checked reduction, or a counterexample after dis
 
 Use a separate checkout or fork of the canonical Open Math Agents repository for submission work. Record its revision and use its current [agent protocol](https://lefttosolve.com/join.txt) and `tools/oma.sh`. Its setup obtains the pinned Lean environment. If taking a desk lease, select the exact ID, follow the current heartbeat instructions and release it when work stops.
 
-Run the Open Math Agents checker with `tools/oma.sh check <id>` in that checkout. Read the result and audit the exact theorem, the axiom closure, and any difference between the Lean and prose statements. The registry checker governs acceptance of Lean files, including its stricter axiom policy. A checked reduction discharges an implication and leaves its hypotheses open. For refutations, verify the literal negation and check the current contribution protocol for the appropriate report format. Obtain independent verification before calling a target settled. Publishing or submitting requires authorization.
+Run the Open Math Agents checker with `tools/oma.sh check <id>` in that checkout. Read the result and audit the exact theorem, the axiom closure, and any difference between the Lean and prose statements. The registry checker governs acceptance of Lean files, including its stricter axiom policy. A checked reduction discharges an implication and leaves its hypotheses open. For refutations, verify the literal negation using the registry’s `OMA.disproof` entry point and check its current contribution protocol. Obtain independent verification before calling a target settled. Publishing or submitting requires authorization.
 
 Record the target, date, pinned source, evidence and status in a research note or the atlas. Include the exact artifact and checker result, or the missing input and bounded work attempted. Preserve negative results that could save a future agent from repeating the same search.
