@@ -30,3 +30,14 @@ Earlier aiXiv paper 2611.02431 (public 2026-11-22) establishes exclusions throug
 - LivingBrain was unavailable: no LivingBrain tools were loaded in this session, so no memory search was performed.
 
 No Lean proof was started and no OMA lease or submission was made.
+
+## Artifact-level verification
+
+Downloaded the public v1.1.0 Zenodo archive into this ignored scratch directory and inspected `lean/oeis-a245211/OeisA245211/OmegaSix.lean` directly. It closes exactly the proposed squarefree `Omega=6` case:
+
+- `omegaSix_must_be_squarefree_ge_37`: any fixed point with `omegaBig n = 6` is squarefree `p*q*r*s*t*u` with `37 ≤ p < q < r < s < t < u`.
+- `six_prime_growth_bound`: for `p ≥ 181`, the product `(2p+1)…(2u+1) < 65*p*q*r*s*t*u`, contradicting the fixed-point identity.
+- `six_prime_moment_ne`: for the remaining `30` possible smallest primes `37 ≤ p < 181`, Cunningham forced closure rules out the equality.
+- `not_isFixedPoint_of_omegaBig_eq_six` and `fixedPoint_eq_21_of_omegaBig_le_six` close the full six-multiplicity case and all cases `Omega ≤ 6` respectively.
+
+The exact local idea is already covered. No proof experiment is warranted. `python3 scripts/attack.py history 'OeisA245211' --limit 30` completed and returned no matching local transcripts.
