@@ -143,13 +143,19 @@ theorem absoluteIndices_length : absoluteIndices.length = 8 := by
   classical
   have h := List.toFinset_card_of_nodup
     ((List.nodup_finRange 57).filter fun i : Fin 57 => decide (orthogonal i i))
-  simpa [absoluteIndices, absolute_card] using h.symm
+  have hlen : absoluteIndices.length = absolute.card := by
+    simpa [absoluteIndices, absolute] using h.symm
+  rw [absolute_card] at hlen
+  exact hlen
 
 /-- The second score segment contains one entry for each of the 224 graph edges. -/
 theorem orthogonalPairs_length : orthogonalPairs.length = 224 := by
   classical
   have h := orthogonal_pair_score_count (Finset.univ : Finset (Fin 57))
-  simpa [List.countP_map, inducedEdgeCount, C4PolarityOrderSeven.edge_card] using h
+  have hlen : orthogonalPairs.length = graph.edgeFinset.card := by
+    simpa [List.countP_eq_length_filter, inducedEdgeCount] using h
+  rw [C4PolarityOrderSeven.edge_card] at hlen
+  exact hlen
 
 /-- The score list has the same 232 inputs as the Python script: eight absolute
 indicators followed by 224 lexicographically ordered edge indicators. -/
