@@ -235,7 +235,7 @@ theorem finite_geometric_product_le_exp_four_sum {ι : Type*} [DecidableEq ι]
     exact Real.exp_le_exp.mpr hlog'
   calc
     (∏ i ∈ s, (1 - u i)⁻¹) ≤ ∏ i ∈ s, Real.exp (4 * u i) := by
-      apply Finset.prod_le_prod
+      apply Finset.prod_le_prod₀
       · intro i hi
         exact inv_nonneg.mpr (by linarith [hu3 i hi])
       · intro i hi
