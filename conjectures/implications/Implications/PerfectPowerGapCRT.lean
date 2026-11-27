@@ -17,20 +17,20 @@ The power and prime-gap arguments using this finite input are separate.
 
 namespace Implications.PerfectPowerGapCRT
 
-private def basePrimes : List ℕ :=
+def basePrimes : List ℕ :=
   [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
 
-private def exponentPrimes : List ℕ :=
+def exponentPrimes : List ℕ :=
   [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73,
    79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163,
    167, 173, 179, 181]
 
-private def W : ℕ := 614889782588491410
+def W : ℕ := 614889782588491410
 
-private def E : ℕ :=
+def E : ℕ :=
   5397346292805549782720214077673687806275517530364350655459511599582614290
 
-private def crtExponent : List ℕ :=
+def crtExponent : List ℕ :=
   [946866288615739509321066849959644752832899644419237537322679246829569143,
    2343225385769350445363922254029248522876362434355196192526458056824627189,
    4382393917830765912594306907315318967620807984906167589972529030107083359,
@@ -49,7 +49,7 @@ private def crtExponent : List ℕ :=
 
 /- The square offsets use exponent 2; 3 and 24 use exponent 3; all other offsets
 are matched in order to the 40 primes from 5 through 181. -/
-private def exponentClasses : List (ℕ × ℕ) :=
+def exponentClasses : List (ℕ × ℕ) :=
   [(1, 2), (2, 5), (3, 3), (4, 2), (5, 7), (6, 11), (7, 13), (8, 17), (9, 2),
    (10, 19), (11, 23), (12, 29), (13, 31), (14, 37), (15, 41), (16, 2), (17, 43),
    (18, 47), (19, 53), (20, 59), (21, 61), (22, 67), (23, 71), (24, 3), (25, 2),
@@ -116,5 +116,20 @@ theorem crtCoordinatesBounded : coordinatesBounded = true := by
 using `W < 10^18`. This comparison is kernel-reduced. -/
 theorem exponentDecimalBound : 18 * E + 2 < 10 ^ 74 := by
   norm_num [E]
+
+/-- The finite construction bound from Gyarmati's Lemma 6 is verified without
+expanding `W^E`. -/
+theorem publishedNumericalBound : 49 * W ^ E < 10 ^ (10 ^ 74) := by
+  have hW : W ≤ 10 ^ 18 := by norm_num [W]
+  have hWE : W ^ E ≤ 10 ^ (18 * E) := by
+    calc
+      W ^ E ≤ (10 ^ 18) ^ E := Nat.pow_le_pow_left hW
+      _ = 10 ^ (18 * E) := by rw [← Nat.pow_mul]
+  calc
+    49 * W ^ E ≤ 49 * 10 ^ (18 * E) := Nat.mul_le_mul_left 49 hWE
+    _ < 100 * 10 ^ (18 * E) := by
+      exact Nat.mul_lt_mul_of_pos_right (by omega) (by positivity)
+    _ = 10 ^ (18 * E + 2) := by rw [Nat.pow_add]; norm_num
+    _ < 10 ^ (10 ^ 74) := Nat.pow_lt_pow_right (by norm_num) exponentDecimalBound
 
 end Implications.PerfectPowerGapCRT

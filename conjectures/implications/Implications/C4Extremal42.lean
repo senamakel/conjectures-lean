@@ -45,7 +45,7 @@ theorem sum_inducedDeletionCount (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
     _ = 40 * G.edgeFinset.card := by
       rw [SimpleGraph.sum_degrees_eq_twice_card_edges G]
       simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin]
-      norm_num [Finset.sum_const, Finset.card_univ, Fintype.card_fin] <;> omega
+      norm_num [Finset.sum_const, Finset.card_univ, Fintype.card_fin]; omega
 
 /-- The actual induced 41-vertex bound implies the 42-vertex edge bound. -/
 theorem simpleGraph_edge_count_le_138 (G : SimpleGraph (Fin 42)) [DecidableRel G.Adj]
