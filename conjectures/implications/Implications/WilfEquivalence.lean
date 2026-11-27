@@ -15,8 +15,8 @@ variable {α : Type*} [Fintype α] [DecidableEq α]
 variable {X Y : Type*} [Fintype X] [Fintype Y]
 
 /-- The set of starts at which `x` has the designated occurrence. -/
-def occurrenceSet (occurs : α → X → Prop) [DecidablePred (fun a => occurs a x)]
-    (x : X) : Finset α :=
+def occurrenceSet (occurs : α → X → Prop) (x : X)
+    [DecidablePred (fun a => occurs a x)] : Finset α :=
   Finset.univ.filter (fun a => occurs a x)
 
 /-- A marked set `M` is present among the occurrences of `x`. -/
