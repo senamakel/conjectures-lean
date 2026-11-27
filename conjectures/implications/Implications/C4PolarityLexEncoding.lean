@@ -115,6 +115,10 @@ theorem lexStep_auxiliary_assignment_satisfies (a : Nat → Bool)
     cnfValue a (lexStepClauses pref x y same) = true := by
   simp only [cnfValue, List.all_cons, List.all_nil, clauseValue, List.any_cons,
     List.any_nil, lexStepClauses]
+  simp only [literalValue_neg a pref hp0, literalValue_neg a x hx0,
+    literalValue_neg a y hy0, literalValue_neg a same hs0,
+    literalValue_pos a pref hp0, literalValue_pos a x hx0,
+    literalValue_pos a y hy0, literalValue_pos a same hs0]
   simp [pos, hp, hx, hy, hs]
 
 end Implications.C4PolarityLexEncoding
