@@ -42,3 +42,5 @@ import Implications.WilfArchiveClosure
 
 import Implications.C4PolarityCnfGates
 import Implications.C4PolarityLexEncoding
+import Implications.C4PolarityDimacs
+import Implications.C4PolarityLratBridge
