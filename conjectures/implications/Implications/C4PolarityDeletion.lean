@@ -126,8 +126,12 @@ theorem retained_edge_count_eq_104_add_deleted_score
           (∑ v ∈ D, if v ∈ A then 1 else 0) + (D ∩ A).card := by rw [hsum]
       _ = 8 * D.card - (D ∩ A).card + (D ∩ A).card := by
         rw [hsum8, hcount]
-        omega
-      _ = 120 := by rw [hD]; omega
+      _ = 120 := by
+        have hle : (D ∩ A).card ≤ 8 * D.card := by
+          have hsub : D ∩ A ⊆ D := Finset.inter_subset_left
+          exact (Finset.card_le_card hsub).trans (by omega)
+        rw [Nat.sub_add_cancel hle, hD]
+        norm_num
   have hcountRelation :
       inducedEdgeCount G R + (∑ v ∈ D, G.degree v) =
         G.edgeFinset.card + inducedEdgeCount G D := by
