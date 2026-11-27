@@ -23,13 +23,15 @@ class MCP:
     def __init__(self, url):
         self.url = url
         self.session = None
+        self.request_id = 0
 
     def request(self, method, params, notification=False):
         message = {"jsonrpc": "2.0", "method": method, "params": params}
         headers = {"Accept": "application/json, text/event-stream",
-                   "Content-Type": "application/json"}
+                   "Content-Type": "application/json", "User-Agent": "oma-attack-scan/1"}
         if not notification:
-            message["id"] = 1
+            self.request_id += 1
+            message["id"] = self.request_id
         if self.session:
             headers["Mcp-Session-Id"] = self.session
         request = Request(self.url, json.dumps(message).encode(), headers)
@@ -38,8 +40,13 @@ class MCP:
             if notification:
                 return None
             if response.headers.get_content_type() == "text/event-stream":
-                reply = next(event for line in response if line.startswith(b"data:")
-                             for event in [json.loads(line[5:])] if event.get("id") == 1)
+                for line in response:
+                    if line.startswith(b"data:"):
+                        reply = json.loads(line[5:])
+                        if reply.get("id") == message["id"]:
+                            break
+                else:
+                    raise ValueError(f"MCP stream ended before the {method} response")
             else:
                 reply = json.load(response)
         if "error" in reply:
@@ -107,8 +114,12 @@ def inspect_target(target, endpoint):
                   if hit.get("name") != target["id"]]
     proof_neighbours = [hit for hit in neighbours if hit.get("origin") == "oma/proofs"]
     best = sorted(premises + proof_neighbours, key=evidence_score, reverse=True)
+    checks = [
+        f"#check {hit['name']}" for hit in best[:5]
+        if hit in premises and QUALIFIED.fullmatch(hit["name"])
+    ]
     return {**target, "goal": goal, "symbols": symbols, "premises": premises,
-            "neighbours": neighbours, "proposed_bridges": best[:5],
+            "neighbours": neighbours, "proposed_bridges": best[:5], "lean_checks": checks,
             "priority": evidence_score(best[0]) if best else (0, 0)}
 
 

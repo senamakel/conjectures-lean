@@ -4,6 +4,8 @@ The 27 November 2026 contributor review found 280 merged PRs from genbox and 219
 
 For this workspace, use known proofs to find reusable techniques and premises. Give proving time to genuinely open statements, new deductions, stronger bounds, or checked steps that remove a substantive obstacle in an open result. Use the [workspace novelty rules](../AGENTS.md#priority-results-not-yet-in-the-public-literature) for the full prior-art check.
 
+Use the [nearest-proof scanner](LEAN_NEAREST.md) for an automated premise shortlist, overlap checks, shared-lemma suggestions, and agent handoff packets.
+
 ## Run a discovery batch
 
 Pick one mathematical family and a reusable technique. Start with 30 catalogue entries per family and up to three candidates for detailed triage. Use a second search term to find variants that lack the same lemma. Put scratch files in a run directory outside the tracked docs.
