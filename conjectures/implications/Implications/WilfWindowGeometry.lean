@@ -26,6 +26,7 @@ theorem liftWindow_support_image {n : ℕ} (s : ℕ) (hs : s + 8 ≤ n)
     rw [liftWindow_apply]
     exact congrArg (windowEmbedding s hs) hfix
   · rintro ⟨i, hi, rfl⟩
+    rw [Equiv.Perm.mem_support] at hi
     intro hfix
     apply hi
     apply (windowEmbedding s hs).injective
