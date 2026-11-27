@@ -12,6 +12,7 @@ argument: `δ L = R / 2`, while the Euler product's exponential weight is
 namespace Implications.SmoothGapAsymptotic
 
 open Filter
+open scoped Topology
 
 /-- The stretched-exponential scale `sqrt (L log L)`. -/
 noncomputable def rootScale (L : ℝ) : ℝ := Real.sqrt (L * Real.log L)
@@ -48,7 +49,7 @@ theorem exp_rankinDelta_log_smoothCutoff {L : ℝ} (hL : 1 < L) :
     exact mul_pos (by linarith) hlog
   rw [smoothCutoff, Real.log_exp, rankinDelta]
   have hmul : Real.log L / (2 * rootScale L) * (rootScale L / 2) =
-      Real.log L / 4 := by field_simp
+      Real.log L / 4 := by field_simp [hR.ne'] <;> ring
   rw [hmul, Real.rpow_def_of_pos (by linarith : 0 < L)]
   congr 1
   ring
@@ -64,29 +65,23 @@ theorem eulerCost_div_rootScale_tendsto_zero :
       L ^ (1 / 4 : ℝ)) atTop (𝓝 0) := by
     simpa [div_eq_mul_inv] using hsmall
   have hL : ∀ᶠ L : ℝ in atTop, 1 < L := eventually_gt_atTop 1
-  have hlog : ∀ᶠ L : ℝ in atTop, 1 ≤ Real.log L := by
-    filter_upwards [hL] with L hL
-    exact Real.one_le_log_of_pos (by linarith) hL
+  have hlog : ∀ᶠ L : ℝ in atTop, 1 ≤ Real.log L :=
+    Real.tendsto_log_atTop.eventually_ge_atTop 1
   filter_upwards [hL, hlog] with L hL hlog
+  have hLpos : 0 < L := by linarith
+  have hlogpos : 0 < Real.log L := by linarith
   have hroot : 0 < rootScale L := by
     apply Real.sqrt_pos.2
-    exact mul_pos (by linarith) (by linarith)
-  have hrootSq := rootScale_sq (by linarith) (by linarith)
+    exact mul_pos hLpos hlogpos
+  have hsqrt : rootScale L = Real.sqrt L * Real.sqrt (Real.log L) := by
+    rw [rootScale, Real.sqrt_mul hLpos.le]
   have hscale : L ^ (1 / 4 : ℝ) * Real.log L / rootScale L =
       (Real.log L ^ (1 / 2 : ℝ)) / (L ^ (1 / 4 : ℝ)) := by
-    rw [Real.sqrt_eq_rpow] at hrootSq ⊢
-    rw [Real.rpow_mul (by linarith : 0 < L)] at hrootSq
-    rw [Real.rpow_mul (by linarith : 0 < Real.log L)] at hrootSq
-    have hRpow : rootScale L = L ^ (1 / 2 : ℝ) * Real.log L ^ (1 / 2 : ℝ) := by
-      rw [rootScale, Real.sqrt_eq_rpow, Real.rpow_mul (by positivity)]
-      rw [Real.rpow_mul (by positivity)]
-      congr 1 <;> ring
-    rw [hRpow]
-    rw [← Real.rpow_sub (by linarith : 0 < L)]
+    rw [hsqrt, Real.sqrt_eq_rpow, Real.sqrt_eq_rpow]
+    rw [← Real.rpow_sub hLpos, ← Real.rpow_sub hlogpos]
     rw [show (1 / 4 : ℝ) - 1 / 2 = -(1 / 4 : ℝ) by ring]
-    rw [Real.rpow_neg (by linarith : 0 < L)]
-    field_simp
-    rw [Real.rpow_neg (by linarith : 0 < Real.log L)]
+    rw [show (1 : ℝ) - 1 / 2 = 1 / 2 by ring]
+    rw [Real.rpow_neg hLpos, Real.rpow_neg hlogpos]
     field_simp
     ring
   rw [hscale]
@@ -99,12 +94,12 @@ theorem eventually_eulerCost_le_eighth_rootScale :
     ∀ᶠ L : ℝ in atTop,
       L ^ (1 / 4 : ℝ) * Real.log L ≤ rootScale L / 8 := by
   filter_upwards [eulerCost_div_rootScale_tendsto_zero.eventually
-    (Iio_mem_nhds (by norm_num : (0 : ℝ) < 1 / 8))] with L hL
+      (Iio_mem_nhds (by norm_num : (0 : ℝ) < 1 / 8)),
+    eventually_gt_atTop (1 : ℝ)] with L hcost hL
   have hroot : 0 < rootScale L := by
     apply Real.sqrt_pos.2
-    filter_upwards [eventually_gt_atTop 1] with L h
-    exact mul_pos (by linarith) (Real.log_pos h)
-  exact (div_lt_iff₀ hroot).mp hL.le
+    exact mul_pos (by linarith) (Real.log_pos hL)
+  exact (div_lt_iff₀ hroot).mp hcost.le
 
 end Implications.SmoothGapAsymptotic
 
