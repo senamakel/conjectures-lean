@@ -179,3 +179,12 @@ normalized coprime factor is 1 or at least 3. Both odd-parameter
 branches remain open. The desk rejected the exact lease request with
 `not_found_or_solved`, as disclosed in the submission.
 [Odd-parameter reduction #4990](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4990)
+
+[CrystalSharedBounds.lean](CrystalSharedBounds.lean) derives a finite
+search range for fixed `g,x` in the sorted shared-divisor branch.
+The first square divisibility gives `y*z+1 ∣ (g*x−1)²` by reducing
+the numerator modulo `y*z+1`. Together with `g*y ≤ x*z`, this
+implies `y*z ≤ g*x*(g*x−2)` and `y² ≤ x²*(g*x−2)`.
+For `x = 1` this forces `y²+2 ≤ g`, hence `g ≥ 11` when
+`y ≥ 3`. Both bounds check at the OMA pin with only the standard
+axioms. The unbounded parameter ranges in #4990 remain open.
