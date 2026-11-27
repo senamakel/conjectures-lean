@@ -303,7 +303,7 @@ theorem capacity_two_cut_of_row_constraints
     have hMass := (hlo (S \ A) Finset.sdiff_subset).trans hOut
     have hSout : S.card - 4 ≤ (S \ A).card := by
       have hcount := Finset.card_sdiff_add_card_inter S A
-      have hinter := Finset.card_le_card (Finset.inter_subset_right (s := S) (t := A))
+      have hinter : (S ∩ A).card ≤ A.card := Finset.card_le_card Finset.inter_subset_right
       have hA : A.card = 4 := hanchor
       omega
     have h := Nat.mul_le_mul_left 3 hSout
@@ -336,12 +336,17 @@ theorem split_graph_capacity_two_cut
   have hdegree := SplitGraphBoundedDeletions.attachment_count_of_bounded_deletion_connected
     G C I 3 hI hpartition hcard hconn
   have ⟨hrows, hdiff⟩ := SplitGraphBoundedDeletions.restricted_row_bounds G C I S 3 hS hTree hC hI hCI
+  have hEq (c : V) : row S G.Adj c = SplitGraphTrees.row G S c := by
+    ext x
+    simp [row, SplitGraphTrees.row]
   apply capacity_two_cut_of_row_constraints C S G.Adj
   · intro x hx
     exact hdegree x (hS hx)
   · intro c hc
+    rw [hEq]
     exact hrows c hc
   · intro c hc d hd hcd
+    rw [rowDiff, hEq, hEq]
     exact hdiff c hc d hd hcd
 
 end SplitGraphKappaThreeHall
