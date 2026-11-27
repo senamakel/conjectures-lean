@@ -222,14 +222,19 @@ theorem hamiltonian_of_all_four_triple_rows
       G.Adj (r i) j := by
     have hjErase : j ∈ A.erase i := Finset.mem_erase.mpr ⟨(by intro h; exact hne h.symm), hj⟩
     have hjRow : j ∈ row G I (r i) := by rw [(hrows i hi).2]; exact hjErase
-    exact (Finset.mem_filter.mp hjRow).2
-  have hrdA : G.Adj a (r d) := (hAdjRow d (by simp [A]) (by simp [A]) (by intro heq; exact had heq.symm)).symm
-  have hrdB : G.Adj (r d) b := hAdjRow d (by simp [A]) (by simp [A]) (by intro h; exact hbd h.symm)
-  have hraB : G.Adj b (r a) := (hAdjRow a (by simp [A]) (by simp [A]) (by intro heq; exact hab heq.symm)).symm
-  have hraC : G.Adj (r a) c := hAdjRow a (by simp [A]) (by simp [A]) hac
-  have hrbC : G.Adj c (r b) := (hAdjRow b (by simp [A]) (by simp [A]) (by intro heq; exact hbc heq.symm)).symm
-  have hrbD : G.Adj (r b) d := hAdjRow b (by simp [A]) (by simp [A]) hbd
-  have hrcD : G.Adj d (r c) := (hAdjRow c (by simp [A]) (by simp [A]) (by intro heq; exact hcd heq.symm)).symm
+    change j ∈ I ∧ G.Adj (r i) j at hjRow
+    exact hjRow.2
+  have hAa : a ∈ A := by simp [A]
+  have hAb : b ∈ A := by simp [A]
+  have hAc : c ∈ A := by simp [A]
+  have hAd : d ∈ A := by simp [A]
+  have hrdA : G.Adj a (r d) := (hAdjRow d hAd hAa (by intro heq; exact had heq.symm)).symm
+  have hrdB : G.Adj (r d) b := hAdjRow d hAd hAb (by intro h; exact hbd h.symm)
+  have hraB : G.Adj b (r a) := (hAdjRow a hAa hAb (by intro heq; exact hab heq.symm)).symm
+  have hraC : G.Adj (r a) c := hAdjRow a hAa hAc hac
+  have hrbC : G.Adj c (r b) := (hAdjRow b hAb hAc (by intro heq; exact hbc heq.symm)).symm
+  have hrbD : G.Adj (r b) d := hAdjRow b hAb hAd hbd
+  have hrcD : G.Adj d (r c) := (hAdjRow c hAc hAd (by intro heq; exact hcd heq.symm)).symm
   have hprefChain : pref.IsChain G.Adj := by
     simp [pref, hrdA, hrdB, hraB, hraC, hrbC, hrbD, hrcD]
   have hprefLastC : ∀ x, x ∈ pref.getLast? → x ∈ C := by
