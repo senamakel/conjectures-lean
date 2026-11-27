@@ -36,12 +36,20 @@ index, so this works for any finite ambient permutation. -/
 def ContainsAt {n : Nat} (π : Equiv.Perm (Fin n)) (s : Nat)
     (p : Fin 8 → Fin 8) : Prop :=
   s + 7 < n ∧ ∀ i j : Fin 8,
-    (π ⟨s + i.val, by omega⟩ < π ⟨s + j.val, by omega⟩) ↔ p i < p j
+    (π ⟨s + i.val, by
+      have hi : i.val ≤ 7 := Nat.le_of_lt_succ i.isLt
+      omega⟩ < π ⟨s + j.val, by
+      have hj : j.val ≤ 7 := Nat.le_of_lt_succ j.isLt
+      omega⟩) ↔ p i < p j
 
 /-- The elementary marked-window swap map. The structural proof that all swaps
 are compatible for a valid marked set is developed below. -/
 end WilfMarked
 
-#print axioms WilfMarked.windowSwap_involutive
-#print axioms WilfMarked.windowSwap_sigma
-#print axioms WilfMarked.windowSwap_tau
+namespace WilfMarked
+
+#print axioms windowSwap_involutive
+#print axioms windowSwap_sigma
+#print axioms windowSwap_tau
+
+end WilfMarked
