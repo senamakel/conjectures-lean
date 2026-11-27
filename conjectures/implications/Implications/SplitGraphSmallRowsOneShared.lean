@@ -210,6 +210,15 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
     exact hchain others.toList others.nodup_toList
       (fun k hk => Finset.mem_toList.mp hk)
 
+  have hrestHeadC : ∀ x, x ∈ rest.head? → x ∈ C := by
+    intro x hx
+    cases hlist : others.toList with
+    | nil => simp [rest, hlist] at hx
+    | cons k ks =>
+      have hkO : k ∈ others := Finset.mem_toList.mp (by simp [hlist])
+      have hxEq : left k = x := by simpa [rest, hlist, block] using hx
+      exact hxEq ▸ hleftC k (Finset.mem_sdiff.mp hkO).1
+
   have hrestLastC : ∀ x, x ∈ rest.getLast? → x ∈ C := by
     have hlast : ∀ l : List V, (∀ k ∈ l, k ∈ others) →
         ∀ x, x ∈ (l.flatMap block).getLast? → x ∈ C := by
@@ -288,18 +297,21 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
 
   have husedC : used ⊆ C := by
     intro x hx
-    simp only [used, Finset.mem_union, Finset.mem_insert, Finset.mem_singleton] at hx
-    rcases hx with h | h | h | hxRows
-    · exact h ▸ hCabc.1
-    · exact h ▸ hCabc.2.2
-    · exact h ▸ hCabc.2.1
+    change x ∈ ({a, b, c} ∪ others.biUnion (fun k => {left k, right k})) at hx
+    rw [Finset.mem_union] at hx
+    rcases hx with hxSpec | hxRows
+    · simp only [Finset.mem_insert, Finset.mem_singleton] at hxSpec
+      rcases hxSpec with h | h | h
+      · exact h ▸ hCabc.1
+      · exact h ▸ hCabc.2.2
+      · exact h ▸ hCabc.2.1
     · obtain ⟨k, hk, hxPair⟩ := Finset.mem_biUnion.mp hxRows
       simp only [Finset.mem_insert, Finset.mem_singleton] at hxPair
       rcases hxPair with h | h
       · exact h ▸ hleftC k (Finset.mem_sdiff.mp hk).1
       · exact h ▸ hrightC k (Finset.mem_sdiff.mp hk).1
 
-  have htailNodup : tail.Nodup := by simp [tail]
+  have htailNodup : tail.Nodup := by exact (C \ used).nodup_toList
   have htailC : ∀ x ∈ tail, x ∈ C := by
     intro x hx
     exact (Finset.mem_sdiff.mp (Finset.mem_toList.mp hx)).1
@@ -327,12 +339,12 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
       rcases hxBlock with hL | hK | hR
       · have hxUsed : x ∈ used := by
           apply Finset.mem_union.mpr
-          exact Or.inr (Finset.mem_biUnion.mpr ⟨k, hkI, by simp [hL]⟩)
+          exact Or.inr (Finset.mem_biUnion.mpr ⟨k, hkO, by simp [hL]⟩)
         exact (Finset.mem_sdiff.mp (Finset.mem_toList.mp hxTail)).2 hxUsed
       · exact (Finset.disjoint_left.mp hdisj) hxC (hK.symm ▸ hkI)
       · have hxUsed : x ∈ used := by
           apply Finset.mem_union.mpr
-          exact Or.inr (Finset.mem_biUnion.mpr ⟨k, hkI, by simp [hR]⟩)
+          exact Or.inr (Finset.mem_biUnion.mpr ⟨k, hkO, by simp [hR]⟩)
         exact (Finset.mem_sdiff.mp (Finset.mem_toList.mp hxTail)).2 hxUsed
 
   have hcover : ∀ x : V, x ∈ [a, i, c, j, b] ++ rest ∨ x ∈ tail := by
@@ -382,8 +394,8 @@ theorem hamiltonian_of_one_shared_selected_clique_vertex
     htailNodup htailC hdisjointTail hcover (by
       obtain ⟨x⟩ := huniv
       intro hnil
-      have hxCover := hcover x
-      rw [hnil] at hxCover
-      simp at hxCover)
+      have hxa : a ∈ ([a, i, c, j, b] ++ rest ++ tail) := by simp
+      rw [hnil] at hxa
+      simp at hxa)
 
 end SplitGraphSmallRowsOneShared
