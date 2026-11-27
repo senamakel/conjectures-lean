@@ -41,7 +41,7 @@ theorem assemble_apply_of_mem_support {ι α : Type*} [DecidableEq ι] [Fintype 
     exact Finset.mul_noncommProd_erase s hi k
       (hdisj.imp fun _ _ => Equiv.Perm.Disjoint.commute)
   have hEval := congrArg (fun f : Equiv.Perm α => f x) hprod
-  simpa [Equiv.Perm.mul_apply, hrest] using hEval.symm
+  simpa [assemble, Equiv.Perm.mul_apply, hrest] using hEval.symm
 
 /-- Away from every component support, the assembled permutation fixes the point. -/
 theorem assemble_apply_of_forall_fixes {ι α : Type*} [DecidableEq ι] [Fintype α] [DecidableEq α]
@@ -75,5 +75,33 @@ theorem assemble_support {ι α : Type*} [DecidableEq ι] [Fintype α] [Decidabl
     (hdisj : (s : Set ι).Pairwise fun i j => Equiv.Perm.Disjoint (k i) (k j)) :
     (assemble s k hdisj).support = s.biUnion fun i => (k i).support := by
   exact Equiv.Perm.support_noncommProd hdisj
+
+/-- The embedding of the offsets of an eight-element window into `Fin n`. -/
+def windowEmbedding {n : ℕ} (t : ℕ) (ht : t + 8 ≤ n) : Fin 8 ↪ Fin n where
+  toFun i := ⟨t + i.val, by have := i.isLt; omega⟩
+  inj' i j h := Fin.ext (Nat.add_left_cancel (congrArg Fin.val h))
+
+/-- Extend a permutation of an eight-element window by the identity outside it. -/
+noncomputable def liftWindow {n : ℕ} (t : ℕ) (ht : t + 8 ≤ n)
+    (σ : Equiv.Perm (Fin 8)) : Equiv.Perm (Fin n) :=
+  σ.viaEmbedding (windowEmbedding t ht)
+
+/-- The lifted window permutation acts as its original permutation on the window. -/
+theorem liftWindow_apply {n : ℕ} (t : ℕ) (ht : t + 8 ≤ n)
+    (σ : Equiv.Perm (Fin 8)) (i : Fin 8) :
+    liftWindow t ht σ (windowEmbedding t ht i) = windowEmbedding t ht (σ i) := by
+  exact Equiv.Perm.viaEmbedding_apply σ (windowEmbedding t ht) i
+
+/-- A lifted window permutation fixes every point strictly outside the window. -/
+theorem liftWindow_apply_of_exterior {n : ℕ} (t : ℕ) (ht : t + 8 ≤ n)
+    (σ : Equiv.Perm (Fin 8)) (x : Fin n)
+    (hx : x.val < t ∨ t + 8 ≤ x.val) :
+    liftWindow t ht σ x = x := by
+  apply Equiv.Perm.viaEmbedding_apply_of_notMem
+  intro hxRange
+  rcases hxRange with ⟨i, hi⟩
+  have hval : x.val = t + i.val := congrArg Fin.val hi
+  have hilt := i.isLt
+  rcases hx with hbefore | hafter <;> omega
 
 end Implications.WilfDisjointPermutations
