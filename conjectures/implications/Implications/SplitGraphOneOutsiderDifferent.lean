@@ -140,12 +140,16 @@ theorem core_path_ending_at_each_independent
     intro q hq
     have hq' : q = a ∨ q = b ∨ q = c ∨ q = z := by
       simpa [hI, Finset.mem_insert, Finset.mem_singleton, or_comm, or_left_comm, or_assoc] using hq
-    rcases hq' with rfl | rfl | rfl | rfl
-    · exact hl a (by simp)
-    · exact hl b (by simp)
-    · exact hl c (by simp)
-    · exact hl z (by simp)
-  rcases hit with rfl | rfl | rfl | rfl
+    rcases hq' with hqa | hqb | hqc | hqz
+    · subst q
+      exact hl a (by simp)
+    · subst q
+      exact hl b (by simp)
+    · subst q
+      exact hl c (by simp)
+    · subst q
+      exact hl z (by simp)
+  rcases hit with hia | hib | hic | hiz
   · refine ⟨[b, x, z, y, c, t, a], ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · apply nodup_of_all_distinct
       exact hdistinct _ (by simp)
@@ -155,7 +159,8 @@ theorem core_path_ending_at_each_independent
     · simp
     · simp
     · simp
-  · refine ⟨[a, t, c, y, z, x, b], ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · subst i
+    refine ⟨[a, t, c, y, z, x, b], ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · apply nodup_of_all_distinct
       exact hdistinct _ (by simp)
     · simp [List.isChain_cons, hat.symm, hct, hyc.symm, hyz, hxz.symm, hxb]
@@ -164,7 +169,8 @@ theorem core_path_ending_at_each_independent
     · simp
     · simp
     · simp
-  · refine ⟨[b, t, a, x, z, y, c], ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · subst i
+    refine ⟨[b, t, a, x, z, y, c], ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · apply nodup_of_all_distinct
       exact hdistinct _ (by simp)
     · simp [List.isChain_cons, hbt.symm, hat, hxa.symm, hxz, hyz.symm, hyc]
@@ -173,7 +179,8 @@ theorem core_path_ending_at_each_independent
     · simp
     · simp
     · simp
-  · refine ⟨[b, x, a, t, c, y, z], ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · subst i
+    refine ⟨[b, x, a, t, c, y, z], ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · apply nodup_of_all_distinct
       exact hdistinct _ (by simp)
     · simp [List.isChain_cons, hxb.symm, hxa, hat.symm, hct, hyc.symm, hyz]
