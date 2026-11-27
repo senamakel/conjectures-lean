@@ -19,8 +19,8 @@ def rankList (p : Fin 8 → Fin 8) : List Nat := List.ofFn fun i => (p i).val
 theorem rankList_get (p : Fin 8 → Fin 8) (i : Fin 8) :
     (rankList p)[i.val]! = (p i).val := by
   unfold rankList
-  rw [getElem!_pos]
-  rw [List.getElem_ofFn]
+  rw [getElem!_pos _ _ (by simp)]
+  rw [List.getElem_ofFn (by simp)]
 
 /-- The shared suffix/prefix of two windows has to have the same relative order. -/
 def overlapCompatible (p : Fin 8 → Fin 8) (shift : Nat) : Bool :=
