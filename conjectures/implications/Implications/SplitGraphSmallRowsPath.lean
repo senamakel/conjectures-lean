@@ -79,8 +79,8 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
       · exact hjSel
     have htwo : ({i, j} : Finset V).card = 2 := by simp [hij]
     have hle := Finset.card_le_card hpair
-    have hle' : ({i, j} : Finset V).card ≤ (selected x).card := hle
-    rw [hrows x hxC, htwo] at hle'
+    change ({i, j} : Finset V).card ≤ (I.filter (fun k => left k = x ∨ right k = x)).card at hle
+    rw [hrows x hxC, htwo] at hle
     omega
 
   have hcross_endpoints (i j : V) (hi : i ∈ I) (hj : j ∈ I) (hij : i ≠ j) :
@@ -96,41 +96,61 @@ theorem hamiltonian_of_split_partition_selected_rows_le_one
       exact hij (hendpoint_eq i j (right i) hi hj (Or.inr rfl) (Or.inr h))
 
   have hblock_nodup (i : V) (hi : i ∈ I) : (block i).Nodup := by
-    simp [block, hleft_ne i hi, hright_ne i hi, hneq i hi]
+    simp [block, hleft_ne i hi, hneq i hi, (hright_ne i hi).symm]
 
   have hblocks_disjoint (i j : V) (hi : i ∈ I) (hj : j ∈ I) (hij : i ≠ j) :
       List.Disjoint (block i) (block j) := by
     rw [List.disjoint_left]
     intro x hx hy
-    simp [block] at hx hy
-    rcases hx with hxi | hxi | hxi <;> rcases hy with hyj | hyj | hyj
-    · exact (hcross_endpoints i j hi hj hij).1 (hxi.symm.trans hyj)
-      · have hiC : x ∈ C := hxi.symm ▸ hleftC i hi
-        have hxI : x ∈ I := hyj.symm ▸ hj
-      exact (Finset.disjoint_left.mp hdisj) hiC hxI
-    · exact (hcross_endpoints i j hi hj hij).2.1 (hxi.symm.trans hyj)
-    · have hiI : x ∈ I := hxi.symm ▸ hi
-      have hxC : x ∈ C := hyj.symm ▸ hleftC j hj
-      exact (Finset.disjoint_left.mp hdisj) hxC hiI
-    · exact hij (hxi.symm.trans hyj)
-    · have hiC : x ∈ C := hyj.symm ▸ hrightC j hj
-      exact (Finset.disjoint_left.mp hdisj) hiC (hxi.symm ▸ hi)
-    · exact (hcross_endpoints i j hi hj hij).2.2.1 (hxi.symm.trans hyj)
-    · have hiI : x ∈ I := hyj.symm ▸ hj
-      have hxC : x ∈ C := hxi.symm ▸ hrightC i hi
-      exact (Finset.disjoint_left.mp hdisj) hxC hiI
-    · exact (hcross_endpoints i j hi hj hij).2.2.2 (hxi.symm.trans hyj)
+    simp only [block, List.mem_cons, List.not_mem_nil] at hx hy
+    rcases hx with hxL | hxI | hxR <;> rcases hy with hyL | hyI | hyR
+    · exact (hcross_endpoints i j hi hj hij).1 (hxL.symm.trans hyL)
+    · have hxC : x ∈ C := hxL.symm ▸ hleftC i hi
+      have hxInI : x ∈ I := hyI.symm ▸ hj
+      exact (Finset.disjoint_left.mp hdisj) hxC hxInI
+    · exact (hcross_endpoints i j hi hj hij).2.1 (hxL.symm.trans hyR)
+    · have hxInI : x ∈ I := hxI.symm ▸ hi
+      have hxC : x ∈ C := hyL.symm ▸ hleftC j hj
+      exact (Finset.disjoint_left.mp hdisj) hxC hxInI
+    · exact hij (hxI.symm.trans hyI)
+    · have hxInI : x ∈ I := hxI.symm ▸ hi
+      have hxC : x ∈ C := hyR.symm ▸ hrightC j hj
+      exact (Finset.disjoint_left.mp hdisj) hxC hxInI
+    · exact (hcross_endpoints i j hi hj hij).2.2.1 (hxR.symm.trans hyL)
+    · have hxC : x ∈ C := hxR.symm ▸ hrightC i hi
+      have hxInI : x ∈ I := hyI.symm ▸ hj
+      exact (Finset.disjoint_left.mp hdisj) hxC hxInI
+    · exact (hcross_endpoints i j hi hj hij).2.2.2 (hxR.symm.trans hyR)
+
+  have pairwise_blocks : ∀ l : List V, l.Nodup →
+      (∀ i ∈ l, i ∈ I) → l.Pairwise (List.Disjoint on block) := by
+    intro l
+    induction l with
+    | nil => simp
+    | cons i l ih =>
+      intro hnd hmem
+      apply List.Pairwise.cons
+      · intro j hj
+        have hiI := hmem i (by simp)
+        have hjI := hmem j (by simp [hj])
+        have hij : i ≠ j := by
+          intro heq
+          subst j
+          exact (List.nodup_cons.mp hnd).1 hj
+        exact hblocks_disjoint i j hiI hjI hij
+      · apply ih
+        · exact (List.nodup_cons.mp hnd).2
+        · intro j hj
+          exact hmem j (by simp [hj])
 
   have hbase_nodup : base.Nodup := by
     change (I.toList.flatMap block).Nodup
     rw [List.nodup_flatMap]
-    refine ⟨?_, ?_⟩
+    refine ⟨?_, pairwise_blocks I.toList I.nodup_toList ?_⟩
     · intro i hi
-      exact hblock_nodup i (List.mem_toFinset.mp (by simpa using hi))
-    · apply List.Pairwise.of_forall_sublist
-      intro i j hij hsub
-      rcases List.mem_toFinset.mp (by simpa using (List.mem_of_subset hsub)) with hmem
-      sorry
+      exact hblock_nodup i (Finset.mem_toList.mp hi)
+    · intro i hi
+      exact Finset.mem_toList.mp hi
 
   have hbase_chain : base.IsChain G.Adj := by
     sorry
