@@ -117,3 +117,26 @@ candidate.
 This screen only tests the listed stored certificates and the specified
 Hamming neighborhood; it says nothing about other six-colorings of `[1,538]`
 or a construction from scratch.
+
+## Lower bound on changes from the stored words
+
+For each stored word, minimize the number of conflicting complementary pairs
+over the six choices of append color. The minimum over all 997 words is 28.
+The per-word minima are:
+
+| Conflicting pairs at the best append color | Stored words |
+| ---: | ---: |
+| 28 | 1 |
+| 29 | 35 |
+| 30 | 200 |
+| 31 | 304 |
+| 32 | 223 |
+| 33 | 150 |
+| 34 | 81 |
+| 35 | 3 |
+
+Every extension of one of these words to length 539 must therefore change
+at least 28 old positions, even before considering monochromatic triples
+entirely below 539. The `--inventory` command reproduces this distribution.
+An independent calculation used the size of the intersection of each color
+class with its reflection about 539/2, divided by two.
