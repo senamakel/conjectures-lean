@@ -14,7 +14,7 @@ namespace WilfMarked
 def sigma : Fin 8 → Fin 8 := ![0, 5, 1, 2, 6, 3, 7, 4]
 def tau : Fin 8 → Fin 8 := ![0, 5, 1, 3, 6, 2, 7, 4]
 
-def sigmaList : List Nat := List.ofFn sigma
+def sigmaList : List Nat := [0, 5, 1, 2, 6, 3, 7, 4]
 
 /-- The shared suffix/prefix of two windows has to have the same relative order. -/
 def overlapCompatible (p : List Nat) (shift : Nat) : Bool :=
@@ -49,7 +49,7 @@ theorem sigma_overlap_compatible_7 : overlapCompatible sigmaList 7 = true := by 
 
 theorem sigmaList_get (i : Nat) (hi : i < 8) :
     sigmaList[i]! = (sigma ⟨i, hi⟩).val := by
-  simp [sigmaList]
+  interval_cases i <;> rfl
 
 /-- The adjacent transposition of the fourth and sixth positions. -/
 def windowSwap (i : Fin 8) : Fin 8 :=
